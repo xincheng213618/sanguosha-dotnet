@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,8 +10,8 @@ internal sealed partial class CharacterTaoQianOlRuntime
     internal const string WenrenDrawReason = "skill-program.tao-qian.wenren.draw";
     internal bool HasTaoQianCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZongluanPreparationSlashAndDiscard) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZhaohuoFirstVictimGift) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveWenrenSequentialDraw);
 
-    internal static CardConversionSource TaoQianSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_tao_qian_ol_TaoQian.TaoQianSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.ITaoQianHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginTaoQian(f, op);
+    internal static CardConversionSource TaoQianSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_tao_qian_ol_TaoQian.TaoQianSource(f);
+    SkillProgramStepOutcome ITaoQianHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginTaoQian(f, op);
     internal SkillProgramStepOutcome BeginTaoQian(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -123,7 +120,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
     [ProgramAnswer("tao-qian")]
     internal void AnswerTaoQian(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TaoQian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != TaoQianChooser(f) || !TaoQianChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TaoQian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != TaoQianChooser(f) || !TaoQianChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Tao Qian requires the actual chooser's exact published private input.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,22 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICharacterSunShangxiangMouMobileMouSunShangxiangOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterSunShangxiangMouMobileMouSunShangxiangOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MouSunShangxiangRuntime Get();
+    MouSunShangxiangRuntime Get();
 }
 
-internal interface ICharacterSunShangxiangMouMobileCoreWushuangModeProjectionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterSunShangxiangMouMobileCoreWushuangModeProjectionOperations : IProgramRuntimeOperations
 {
     bool IsWushuangMode { get; }
 }
 
-internal interface ICharacterSunShangxiangMouMobileCorePlayerViewProjectionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterSunShangxiangMouMobileCorePlayerViewProjectionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
+    GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
 }

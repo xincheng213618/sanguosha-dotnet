@@ -1,9 +1,9 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreGameEngineAdvancedPoliciesState : global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedPoliciesNextUnlimitedCardOwnersAccess
+internal sealed class CoreGameEngineAdvancedPoliciesState : Contracts.ICoreGameEngineAdvancedPoliciesNextUnlimitedCardOwnersAccess
 {
-    private global::System.Collections.Generic.HashSet<int> _nextUnlimitedCardOwners = [];
-    internal ref readonly global::System.Collections.Generic.HashSet<int> ReferenceToNextUnlimitedCardOwners => ref _nextUnlimitedCardOwners;
+    private HashSet<int> _nextUnlimitedCardOwners = [];
+    internal ref readonly HashSet<int> ReferenceToNextUnlimitedCardOwners => ref _nextUnlimitedCardOwners;
 
-    ref readonly global::System.Collections.Generic.HashSet<int> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedPoliciesNextUnlimitedCardOwnersAccess._nextUnlimitedCardOwners => ref _nextUnlimitedCardOwners;
+    ref readonly HashSet<int> Contracts.ICoreGameEngineAdvancedPoliciesNextUnlimitedCardOwnersAccess._nextUnlimitedCardOwners => ref _nextUnlimitedCardOwners;
 }

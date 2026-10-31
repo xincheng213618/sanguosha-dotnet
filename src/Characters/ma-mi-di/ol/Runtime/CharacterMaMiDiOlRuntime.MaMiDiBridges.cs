@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaMiDiOlRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 10)]
     internal void CollectIssuedBingjieCandidates(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result)
     {
-        if (window != SkillProgramTriggerWindow.CardUseTargetsFinalized || action.Type != CardActionType.Use || !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind)) || _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBingjieIssuedTargetDiscards) != true || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == action.ActionId)is not { } use)
+        if (window != SkillProgramTriggerWindow.CardUseTargetsFinalized || action.Type != CardActionType.Use || !(CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind)) || _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBingjieIssuedTargetDiscards) != true || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == action.ActionId)is not { } use)
             return;
         if (use.MaMiDiBingjie is null)
         {
@@ -48,17 +44,17 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 120)]
     internal bool IsIssuedBingjieCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
     {
-        if (candidate.SkillId != "ol:bingjie" || candidate.BindingId != "issued-turn-target-discards" || c is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } card } || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { MaMiDiBingjie: { } r, Action: { } action } use || r.UseId != use.Id || r.ActionId != action.ActionId || r.ActorSeat != candidate.OwnerSeat || r.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || r.Kind != action.EffectiveKind || action.ActorSeat != candidate.OwnerSeat || window.Action.ActorSeat != candidate.OwnerSeat || !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(r.Kind)) || card.CardActionId != r.ActionId || card.ParentCardUseFrameId != use.Id || window.Action.ActionId != r.ActionId || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive)
+        if (candidate.SkillId != "ol:bingjie" || candidate.BindingId != "issued-turn-target-discards" || c is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } card } || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { MaMiDiBingjie: { } r, Action: { } action } use || r.UseId != use.Id || r.ActionId != action.ActionId || r.ActorSeat != candidate.OwnerSeat || r.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || r.Kind != action.EffectiveKind || action.ActorSeat != candidate.OwnerSeat || window.Action.ActorSeat != candidate.OwnerSeat || !(CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind) || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(r.Kind)) || card.CardActionId != r.ActionId || card.ParentCardUseFrameId != use.Id || window.Action.ActionId != r.ActionId || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive)
             return false;
         var current = window.Candidates[window.CandidateIndex];
-        if (!MaMiDiCandidateMatches(candidate, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(current)) || _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) != c || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program is not { } p || p.GameplayHash != candidate.GameplayHash || p.Triggers.Single(t => t.Id == candidate.BindingId).Effects is not [{ Op: SkillProgramEffectOp.ResolveBingjieIssuedTargetDiscards }])
+        if (!MaMiDiCandidateMatches(candidate, CoreGameEngineCardActionsRuntime.ToSharedCandidate(current)) || _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) != c || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program is not { } p || p.GameplayHash != candidate.GameplayHash || p.Triggers.Single(t => t.Id == candidate.BindingId).Effects is not [{ Op: SkillProgramEffectOp.ResolveBingjieIssuedTargetDiscards }])
             return false;
         return r.Grants.Any(g => g.Source.SkillId == candidate.SkillId && g.Source.SkillInstanceId == candidate.SkillInstanceId && g.Source.OwnerSeat == candidate.OwnerSeat && g.GameplayHash == candidate.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<BingjieGrantedEvent>().Contains(g) && !_coreProgramEventHistoryOperations.ProgramEventHistory<BingjieUseBoundEvent>().Any(e => e.UseId == use.Id && e.GrantFrameId == g.FrameId));
     }
 
     internal ProgramSkillWindowContext CreateMaMiDiIssuedContext(ProgramCardTriggerWindowFrame w, ProgramCardTriggerCandidate candidate, ProgramSkillWindowContext c)
     {
-        if (candidate.SkillId != "ol:bingjie" || candidate.TriggerId != "issued-turn-target-discards" || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)?.MaMiDiBingjie is not { } r || r.ActorSeat != candidate.OwnerSeat || r.ActionId != w.Action.ActionId || w.Action.ActorSeat != r.ActorSeat)
+        if (candidate.SkillId != "ol:bingjie" || candidate.TriggerId != "issued-turn-target-discards" || CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)?.MaMiDiBingjie is not { } r || r.ActorSeat != candidate.OwnerSeat || r.ActionId != w.Action.ActionId || w.Action.ActorSeat != r.ActorSeat)
             return c;
         var current = _coreCardActionsOperations.CreateCardActionProgramContext(w.Action, SkillProgramTriggerWindow.CardUseTargetsFinalized, w.Id, candidate.OwnerSeat, candidate.OpponentSeat, c.Facts ?? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], w.Action));
         return current with
@@ -70,7 +66,7 @@ internal sealed partial class CharacterMaMiDiOlRuntime
         };
     }
 
-    internal static bool? MaMiDiActionColor(CardActionContext a) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ma_mi_di_ol_MaMiDiBridges.MaMiDiActionColor(a);
+    internal static bool? MaMiDiActionColor(CardActionContext a) => RuntimeSkills.RuntimeRules_ma_mi_di_ol_MaMiDiBridges.MaMiDiActionColor(a);
     internal MaMiDiResponseLinkedEvent? BuildMaMiDiResponseLink(ProgramCardTriggerWindowFrame w)
     {
         if (w.ResponseCompletion is not { } completion || !_coreResponseCompletionOperations.ValidResponseCompletionParent(w) || w.Action is not { Type: CardActionType.Response } a)
@@ -119,12 +115,12 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     {
         window = null !;
         link = null !;
-        if (candidate.SkillId != "ol:zhengding" || c is not { Window: SkillProgramTriggerWindow.CardResponseCompleted, CardUse: { } card } || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { ResponseCompletion: { CostsDrained: true } } w || !_coreResponseCompletionOperations.ValidResponseCompletionWindow(w) || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !MaMiDiCandidateMatches(candidate, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex])) || _coreProgramEventHistoryOperations.ProgramEventHistory<MaMiDiResponseLinkedEvent>().Where(e => e.WindowId == w.Id).ToArray()is not [var frozen] || frozen.ResponseActionId != card.CardActionId || frozen.ResponseActor != candidate.OwnerSeat || frozen.Provider != candidate.OwnerSeat || frozen.NativeActor != w.Action.ActorSeat || frozen.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || frozen.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || frozen.ResponseActor == frozen.TurnOwner || frozen.ResponseActor == frozen.IncomingActor || frozen.ResponseIsRed is not { } responseColor || frozen.IncomingIsRed is not { } incomingColor || responseColor != incomingColor || frozen.ResponseKind != w.Action.EffectiveKind || card.ParentCardUseFrameId != w.ParentFrameId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(frozen.IncomingActor))
+        if (candidate.SkillId != "ol:zhengding" || c is not { Window: SkillProgramTriggerWindow.CardResponseCompleted, CardUse: { } card } || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { ResponseCompletion: { CostsDrained: true } } w || !_coreResponseCompletionOperations.ValidResponseCompletionWindow(w) || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !MaMiDiCandidateMatches(candidate, CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex])) || _coreProgramEventHistoryOperations.ProgramEventHistory<MaMiDiResponseLinkedEvent>().Where(e => e.WindowId == w.Id).ToArray()is not [var frozen] || frozen.ResponseActionId != card.CardActionId || frozen.ResponseActor != candidate.OwnerSeat || frozen.Provider != candidate.OwnerSeat || frozen.NativeActor != w.Action.ActorSeat || frozen.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || frozen.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || frozen.ResponseActor == frozen.TurnOwner || frozen.ResponseActor == frozen.IncomingActor || frozen.ResponseIsRed is not { } responseColor || frozen.IncomingIsRed is not { } incomingColor || responseColor != incomingColor || frozen.ResponseKind != w.Action.EffectiveKind || card.ParentCardUseFrameId != w.ParentFrameId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(frozen.IncomingActor))
             return false;
         window = w;
         link = frozen;
         return true;
     }
 
-    internal static bool MaMiDiCandidateMatches(ProgramTriggerCandidate a, ProgramTriggerCandidate b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ma_mi_di_ol_MaMiDiBridges.MaMiDiCandidateMatches(a, b);
+    internal static bool MaMiDiCandidateMatches(ProgramTriggerCandidate a, ProgramTriggerCandidate b) => RuntimeSkills.RuntimeRules_ma_mi_di_ol_MaMiDiBridges.MaMiDiCandidateMatches(a, b);
 }

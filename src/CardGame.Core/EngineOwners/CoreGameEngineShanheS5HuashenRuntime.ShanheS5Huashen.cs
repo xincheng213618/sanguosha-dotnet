@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5HuashenRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheS5HuashenHost.ChooseOrExchangeShanheS5Avatar(SkillProgramEffect effect, ProgramSkillFrame frame) => ChooseOrExchangeShanheS5Avatar(effect, frame);
+    SkillProgramStepOutcome IShanheS5HuashenHost.ChooseOrExchangeShanheS5Avatar(SkillProgramEffect effect, ProgramSkillFrame frame) => ChooseOrExchangeShanheS5Avatar(effect, frame);
     internal SkillProgramStepOutcome ChooseOrExchangeShanheS5Avatar(SkillProgramEffect effect, ProgramSkillFrame frame)
     {
         var source = _corePrivateGeneralLibrariesOperations.ResolvePrivateGeneralLibrarySource(frame, effect);

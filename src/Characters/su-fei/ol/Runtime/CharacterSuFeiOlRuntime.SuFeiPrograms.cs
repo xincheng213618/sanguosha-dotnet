@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSuFeiOlRuntime
 {
     internal const string SuFeiDrawReason = "skill-program.lianpian.draw", SuFeiGiftReason = "skill-program.lianpian.gift";
-    internal static CardConversionSource SuFeiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_su_fei_ol_SuFeiPrograms.SuFeiSource(f);
+    internal static CardConversionSource SuFeiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_su_fei_ol_SuFeiPrograms.SuFeiSource(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 450)]
     internal bool CanOfferSuFei(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {
@@ -77,7 +73,7 @@ internal sealed partial class CharacterSuFeiOlRuntime
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         RequireSuFei(f);
         var r = f.SuFei!;
-        if (r.Stage != SuFeiStage.ChoosingGift || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], SuFeiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (r.Stage != SuFeiStage.ChoosingGift || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], SuFeiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Lianpian cannot replace its drawn entity or gift authority.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters.GetValueOrDefault("branch") == "keep")
@@ -161,5 +157,5 @@ internal sealed partial class CharacterSuFeiOlRuntime
             throw new InvalidOperationException("Lianpian cannot repeat or substitute its actual paid gift.");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISuFeiProgramHost.BeginSuFei(ProgramSkillFrame f, SkillProgramEffect e) => BeginSuFei(f, e);
+    SkillProgramStepOutcome ISuFeiProgramHost.BeginSuFei(ProgramSkillFrame f, SkillProgramEffect e) => BeginSuFei(f, e);
 }

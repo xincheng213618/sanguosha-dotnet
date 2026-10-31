@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFeiYiOlRuntime
 {
     internal bool FeiYiTrickPaymentMaterialsMatch(CardUseFrame use, CardMovementBatchContext batch)
     {
-        if (!HasFeiYiHezhong || use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || use.CardKind == CardKind.Nullification || action.EffectiveKind != use.CardKind || action.ActorSeat != use.SourceSeat || batch.ParentFrameId != use.Id || batch.ParentBatchId is not null || batch.AwaitingProgramFrameId is not null || batch.NativeDrawInvocation is not null || batch.NativeBuZhiDiscardInvocation is not null || batch.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || batch.Movements.Count == 0 || batch.Movements.Count != action.PhysicalCards.Count || batch.Movements.Select(m => m.CardId).Distinct().Count() != batch.Movements.Count || batch.FeiYiSingletons?.SingleOrDefault(t => t.OwnerSeat == action.ProviderSeat)is not { } singleton || singleton.Before == 1 || singleton.After != 1 || !batch.Movements.Any(m => m.From == CardLocation.Hand(singleton.OwnerSeat)))
+        if (!HasFeiYiHezhong || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || use.CardKind == CardKind.Nullification || action.EffectiveKind != use.CardKind || action.ActorSeat != use.SourceSeat || batch.ParentFrameId != use.Id || batch.ParentBatchId is not null || batch.AwaitingProgramFrameId is not null || batch.NativeDrawInvocation is not null || batch.NativeBuZhiDiscardInvocation is not null || batch.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || batch.Movements.Count == 0 || batch.Movements.Count != action.PhysicalCards.Count || batch.Movements.Select(m => m.CardId).Distinct().Count() != batch.Movements.Count || batch.FeiYiSingletons?.SingleOrDefault(t => t.OwnerSeat == action.ProviderSeat)is not { } singleton || singleton.Before == 1 || singleton.After != 1 || !batch.Movements.Any(m => m.From == CardLocation.Hand(singleton.OwnerSeat)))
             return false;
         foreach (var move in batch.Movements)
         {
@@ -40,7 +36,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MatchBatch, 40)]
-    internal bool IsFeiYiTrickPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => FeiYiTrickPaymentMaterialsMatch(use, batch) && global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch) && (use.PaymentMovementReceipt!.Batch.FeiYiSingletons ?? []).SequenceEqual(batch.FeiYiSingletons ?? []);
+    internal bool IsFeiYiTrickPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => FeiYiTrickPaymentMaterialsMatch(use, batch) && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch) && (use.PaymentMovementReceipt!.Batch.FeiYiSingletons ?? []).SequenceEqual(batch.FeiYiSingletons ?? []);
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.TrailingTail, 30)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.HpObserverTail, 30)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SharedProcessingTail, 30)]

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuJinMobileRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CharacterYuJinMobileRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
         if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1].Id != context.ParentFrameId)
             return false;
-        return ending ? _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame end && end.OwnerSeat == frame.OwnerSeat && end.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && end.ItemIndex >= 0 && end.ItemIndex < end.Items.Count && end.Items[end.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate) : _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame start && start.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && start.Continuation == ProgramLifecycleContinuation.NormalTurnStart && start.OwnerSeat == frame.OwnerSeat && start.CandidateIndex >= 0 && start.CandidateIndex < start.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, start.Candidates[start.CandidateIndex]);
+        return ending ? _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame end && end.OwnerSeat == frame.OwnerSeat && end.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && end.ItemIndex >= 0 && end.ItemIndex < end.Items.Count && end.Items[end.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate) : _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame start && start.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && start.Continuation == ProgramLifecycleContinuation.NormalTurnStart && start.OwnerSeat == frame.OwnerSeat && start.CandidateIndex >= 0 && start.CandidateIndex < start.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, start.Candidates[start.CandidateIndex]);
     }
 
     internal IReadOnlyList<PromptChoice> MobileYuJinStorePayments(ProgramSkillFrame frame, int target) => _programPaidCardOperations.Get().BuildOwnedCardPaymentChoices(frame.Id, target, target, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Transfer, canSelect: (_, card) => !card.IsGeneralWeapon);
@@ -22,7 +18,7 @@ internal sealed partial class CharacterYuJinMobileRuntime
     {
         if (!ExactMobileYuJinParent(frame, true) || frame.SelectedTargetSeats is not [var target] || target == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || frame.ChoiceBindings.Any(b => b.Name == "jieyue-answer") || _coreProgramLifecycleOperations.GetProgramCardSet(frame, "jieyue-cost").CardIds is not [var paid] || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == paid && m.From == CardLocation.Hand(frame.OwnerSeat) && m.Reason.Value == "skill-program.mobile:jieyue.SelectAndMoveOwnedCard" && m.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber))
             throw new InvalidOperationException("Jieyue's other-participant choice requires its original actual paid hand discard and ending parent.");
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+        var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
         var choice = new MobileYuJinChoiceDraft(target, MobileYuJinChoiceStage.Branch, source, frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, frame.WindowContext!.ParentFrameId);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { MobileYuJinChoice = choice });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileYuJinChoiceOpenedEvent(frame.Id, target, source, frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, choice.ParentId));
@@ -58,7 +54,7 @@ internal sealed partial class CharacterYuJinMobileRuntime
 
     internal bool ValidMobileYuJinChoice(ProgramSkillFrame frame)
     {
-        if (frame.MobileYuJinChoice is not { } draft || frame.SkillId != MobileYuJinJieyue.Skill || frame.TriggerId != MobileYuJinJieyue.Ending || frame.InstructionIndex != 3 || frame.MobileYuJinTransfer is not null || draft.Source != new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || draft.GameplayHash != frame.GameplayHash || draft.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || draft.ParentId != frame.WindowContext?.ParentFrameId || frame.SelectedTargetSeats is not [var target] || target != draft.TargetSeat || target == frame.OwnerSeat || !Enum.IsDefined(draft.Stage) || !ExactMobileYuJinParent(frame, true))
+        if (frame.MobileYuJinChoice is not { } draft || frame.SkillId != MobileYuJinJieyue.Skill || frame.TriggerId != MobileYuJinJieyue.Ending || frame.InstructionIndex != 3 || frame.MobileYuJinTransfer is not null || draft.Source != new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || draft.GameplayHash != frame.GameplayHash || draft.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || draft.ParentId != frame.WindowContext?.ParentFrameId || frame.SelectedTargetSeats is not [var target] || target != draft.TargetSeat || target == frame.OwnerSeat || !Enum.IsDefined(draft.Stage) || !ExactMobileYuJinParent(frame, true))
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory();
         if (history.OfType<MobileYuJinChoiceOpenedEvent>().Count(e => e == new MobileYuJinChoiceOpenedEvent(frame.Id, target, draft.Source, draft.GameplayHash, draft.ActualTurn, draft.ParentId)) != 1)
@@ -87,7 +83,7 @@ internal sealed partial class CharacterYuJinMobileRuntime
     [ProgramAnswer("mobile-yu-jin-jieyue")]
     internal void AnswerMobileYuJinChoice(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileYuJinChoice: { } draft } frame || !ValidMobileYuJinChoice(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.TargetSeat || !MobileYuJinChoices(frame).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileYuJinChoice: { } draft } frame || !ValidMobileYuJinChoice(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.TargetSeat || !MobileYuJinChoices(frame).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Jieyue's answer must match the exact original participant and still-legal transfer.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
@@ -117,7 +113,7 @@ internal sealed partial class CharacterYuJinMobileRuntime
     internal PromptChoice AiMobileYuJinChoice(PendingDecision decision, ProgramSkillFrame frame)
     {
         var draft = frame.MobileYuJinChoice!;
-        int Keep(PromptChoice c) => c.Cards is [var id] ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(card => card.Id == id), _coreMatchParticipantsPlayersAccess._players[draft.TargetSeat]) : 0;
+        int Keep(PromptChoice c) => c.Cards is [var id] ? CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(card => card.Id == id), _coreMatchParticipantsPlayersAccess._players[draft.TargetSeat]) : 0;
         if (draft.Stage == MobileYuJinChoiceStage.Store)
             return decision.Choices.OrderBy(Keep).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
         var canStore = decision.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("option-id") == "store");

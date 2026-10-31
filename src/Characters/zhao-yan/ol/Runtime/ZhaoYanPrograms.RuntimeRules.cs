@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_zhao_yan_ol_ZhaoYanPrograms
 {
     internal static bool IsTongxieMember(ProgramTongxieArmedEvent arm, int seat) =>

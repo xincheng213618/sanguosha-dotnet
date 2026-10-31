@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineOriginalTargetAdditionsOriginalTargetAdditionGrantsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineOriginalTargetAdditionsOriginalTargetAdditionGrantsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.OriginalTargetAdditionGrant> _originalTargetAdditionGrants { get; }
+    ref readonly List<OriginalTargetAdditionGrant> _originalTargetAdditionGrants { get; }
 }

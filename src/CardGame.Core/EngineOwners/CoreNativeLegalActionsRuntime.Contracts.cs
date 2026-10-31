@@ -1,27 +1,23 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreNativeLegalActionsCoreEquipmentContentOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeLegalActionsCoreEquipmentContentOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.EquipmentContentRegistry EquipmentRules { get; }
+    EquipmentContentRegistry EquipmentRules { get; }
 }
 
-internal interface ICoreNativeLegalActionsCorePlayerViewProjectionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeLegalActionsCorePlayerViewProjectionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
+    GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
 }
 
-internal interface ICoreNativeLegalActionsCoreProgramActionModulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeLegalActionsCoreProgramActionModulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramActionRouter ProgramActions { get; }
+    ProgramActionRouter ProgramActions { get; }
 }
 
-internal interface ICoreNativeLegalActionsCoreNativeRuleQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeLegalActionsCoreNativeRuleQueriesOperations : IProgramRuntimeOperations
 {
     int GetCombatDistance(int sourceSeat, int targetSeat);
 }

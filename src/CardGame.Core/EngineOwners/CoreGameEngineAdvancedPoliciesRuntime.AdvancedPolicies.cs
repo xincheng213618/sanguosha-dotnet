@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAdvancedPoliciesRuntime
@@ -40,7 +36,7 @@ internal sealed partial class CoreGameEngineAdvancedPoliciesRuntime
 
     internal bool HasNextUnlimitedCard(CharacterState owner) => _coreGameEngineAdvancedPoliciesNextUnlimitedCardOwnersAccess._nextUnlimitedCardOwners.Contains(owner.Seat) && _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.NextCardUnlimitedAfterNonLockedSkill).Any();
     internal bool HasFriendQihuiAllowance(CharacterState owner) => _coreGameEngineFriendTrioFriendQihuiUnlimitedAccess._friendQihuiUnlimited.Contains(owner.Seat);
-    internal int RedBladeDamageBonus(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal int RedBladeDamageBonus(NativeOwners.CardAttackHandle attack)
     {
         if (attack.IsChainPropagation || attack.CardUserSeat != attack.SourceSeat || attack.EffectiveCardKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash))
             return 0;
@@ -51,7 +47,7 @@ internal sealed partial class CoreGameEngineAdvancedPoliciesRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 200)]
-    internal int RedBladeActualDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.CardAttackHandle card ? RedBladeDamageBonus(card) : 0;
+    internal int RedBladeActualDamageBonus(GameEngine.IDamageAttempt attack) => attack is NativeOwners.CardAttackHandle card ? RedBladeDamageBonus(card) : 0;
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 160)]
     internal bool DistanceCardUseExemption160HasNextUnlimitedCard(ProgramCardDistanceQuery q) => HasNextUnlimitedCard(q.Actor);
 }

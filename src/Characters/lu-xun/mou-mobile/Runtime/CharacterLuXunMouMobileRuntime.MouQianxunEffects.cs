@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuXunMouMobileRuntime
 {
     internal bool HasPerTargetTrickEffectBinding(ProgramCardTriggerCandidate c) => _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program!.Triggers.Single(t => t.Id == c.TriggerId).Effects.Any(e => ProgramOperationCatalog.Default.Resolve(e.Op) is IProgramPerTargetTrickEffectOperation);
     internal bool CanMouLuXunRecordNativeTarget(int target, CardActionContext action) => action.ActorSeat != target && !MouLuXunRecordedNames(target).Contains(action.EffectiveKind) && _coreMatchParticipantsPlayersAccess._players[target].SkillGrants.Grants.Any(g => g.SkillId == MouLuXunComposition.Qianxun && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[target], g.SkillId, g.SkillInstanceId));
-    internal bool TryBeginMouLuXunGroupEffect(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal bool TryBeginMouLuXunGroupEffect(NativeOwners.GroupCardHandle group)
     {
         if (!HasMouLuXun || group.TargetIndex >= group.TargetSeats.Count || _coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)?.Action is not { } action)
             return false;

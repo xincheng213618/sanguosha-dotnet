@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramPhaseHandDiscardsRuntime
@@ -98,7 +94,7 @@ internal sealed partial class CoreGameEngineProgramPhaseHandDiscardsRuntime
 
         var owner = _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat];
         var pile = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).ToDictionary(card => card.Id);
-        var selected = giveChoices.OrderBy(choice => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(pile[choice.Cards[0]], owner)).ThenBy(choice => choice.Id.Value, StringComparer.Ordinal).First();
+        var selected = giveChoices.OrderBy(choice => CoreNativeAiDecisionsRuntime.GetKeepValue(pile[choice.Cards[0]], owner)).ThenBy(choice => choice.Id.Value, StringComparer.Ordinal).First();
         _coreNativeAiDecisionsOperations.AddThought(new AiThoughtRecord(++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence, _coreActualTurnProgressTurnNumberAccess._turnNumber, decision.PlayerSeat, selected.Description, [], $"【{(skill.Name)}】交还一张牌，换取其余 {(giveChoices.Length - 1)} 张牌。"));
         return selected;
     }

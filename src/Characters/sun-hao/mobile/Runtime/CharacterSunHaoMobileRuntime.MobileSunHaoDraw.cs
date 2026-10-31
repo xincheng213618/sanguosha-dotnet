@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunHaoMobileRuntime
@@ -26,7 +21,7 @@ internal sealed partial class CharacterSunHaoMobileRuntime
             throw new InvalidOperationException("Mobile Canshi requires one clean original draw instruction.");
         var guiming = HasQualifiedMobileGuiming(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]);
         var count = _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive && (_coreTreatedWoundedOperations.IsRuleWounded(p) || guiming && p.Seat != frame.OwnerSeat && p.HasHpValue && !p.IdentityConcealed && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(p) == "wu"));
-        var receipt = new MobileSunHaoDrawReceipt(global::CardGame.Core.EngineOwners.CharacterSunHaoOlRuntime.SunHaoSource(frame), frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, context.ParentFrameId, count);
+        var receipt = new MobileSunHaoDrawReceipt(CharacterSunHaoOlRuntime.SunHaoSource(frame), frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, context.ParentFrameId, count);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { MobileSunHaoDraw = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileSunHaoDrawIssuedEvent(frame.Id, receipt.Source, receipt.Hash, receipt.ActualTurn, receipt.TurnOwner, receipt.WindowId, receipt.X));
         return _coreProgramNativeDrawOperations.BeginOperationProgramDraw(frame, frame.OwnerSeat, count, new(MobileSunHaoDrawReason));
@@ -90,6 +85,6 @@ internal sealed partial class CharacterSunHaoMobileRuntime
             return false;
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == frame.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
-        return child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsMobileSunHaoDrawMovement(frame, m));
+        return child is CardsMovedTriggerWindowFrame moved && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsMobileSunHaoDrawMovement(frame, m));
     }
 }

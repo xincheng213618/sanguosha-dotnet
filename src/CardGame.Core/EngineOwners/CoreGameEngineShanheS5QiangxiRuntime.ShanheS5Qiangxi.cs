@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5QiangxiRuntime
@@ -48,5 +44,5 @@ internal sealed partial class CoreGameEngineShanheS5QiangxiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 59100)]
     internal bool ContinuePaidShanheS5Qiangxi(ProgramSkillFrame f) => HasShanheS5QiangxiPayment(f);
 
-    SkillProgramStepOutcome global::CardGame.Core.IShanheS5QiangxiHost.ResolveShanheS5Qiangxi(ProgramSkillFrame frame, string stage) => ResolveShanheS5Qiangxi(frame, stage);
+    SkillProgramStepOutcome IShanheS5QiangxiHost.ResolveShanheS5Qiangxi(ProgramSkillFrame frame, string stage) => ResolveShanheS5Qiangxi(frame, stage);
 }

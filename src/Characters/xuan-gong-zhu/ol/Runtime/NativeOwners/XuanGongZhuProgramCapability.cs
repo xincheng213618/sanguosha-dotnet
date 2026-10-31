@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class XuanGongZhuProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineQimeiProgramsEntries> getCoreGameEngineQimeiProgramsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineZhuijiProgramsEntries> getCoreGameEngineZhuijiProgramsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineIdentityConcealmentEntries> getCoreGameEngineIdentityConcealmentRuntime) : IXuanGongZhuProgramHost
+internal sealed class XuanGongZhuProgramCapability(Func<RuntimeEntries.CoreGameEngineQimeiProgramsEntries> getCoreGameEngineQimeiProgramsRuntime, Func<RuntimeEntries.CoreGameEngineZhuijiProgramsEntries> getCoreGameEngineZhuijiProgramsRuntime, Func<RuntimeEntries.CoreGameEngineIdentityConcealmentEntries> getCoreGameEngineIdentityConcealmentRuntime) : IXuanGongZhuProgramHost
 {
     public SkillProgramStepOutcome ArmQimeiPair(ProgramSkillFrame f) => getCoreGameEngineQimeiProgramsRuntime().ArmQimeiPair(f);
     public SkillProgramStepOutcome SettleQimeiPairEquality(ProgramSkillFrame f) => getCoreGameEngineQimeiProgramsRuntime().SettleQimeiPairEquality(f);

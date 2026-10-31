@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuBanOlRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IHuBanHost.Resolve(ProgramSkillFrame f) => BeginHuiyun(f);
+    SkillProgramStepOutcome IHuBanHost.Resolve(ProgramSkillFrame f) => BeginHuiyun(f);
     internal SkillProgramStepOutcome BeginHuiyun(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -24,7 +21,7 @@ internal sealed partial class CharacterHuBanOlRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal static HuiyunOpportunity HuiyunCurrent(HuiyunReceipt r) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hu_ban_ol_Huiyun.HuiyunCurrent(r);
+    internal static HuiyunOpportunity HuiyunCurrent(HuiyunReceipt r) => RuntimeSkills.RuntimeRules_hu_ban_ol_Huiyun.HuiyunCurrent(r);
     internal IReadOnlyList<PromptChoice> HuiyunChoices(ProgramSkillFrame f)
     {
         var r = f.Huiyun!;
@@ -79,7 +76,7 @@ internal sealed partial class CharacterHuBanOlRuntime
     [ProgramAnswer("huiyun")]
     internal void AnswerHuiyun(PromptChoice supplied)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Huiyun: { } r } f || r.Stage is not (HuiyunStage.OptionChoice or HuiyunStage.HandUseChoice) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == HuiyunStage.OptionChoice ? f.OwnerSeat : HuiyunCurrent(r).TargetSeat) || !HuiyunChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [supplied])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Huiyun: { } r } f || r.Stage is not (HuiyunStage.OptionChoice or HuiyunStage.HandUseChoice) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == HuiyunStage.OptionChoice ? f.OwnerSeat : HuiyunCurrent(r).TargetSeat) || !HuiyunChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [supplied])))
             throw new InvalidOperationException("Huiyun requires its current published original option or actual target's private natural-card choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

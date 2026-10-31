@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDamagePreventionDrawEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDamagePreventionDrawRuntime> _resolve;
-    private CoreGameEngineDamagePreventionDrawEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDamagePreventionDrawRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineDamagePreventionDrawRuntime> _resolve;
+    private CoreGameEngineDamagePreventionDrawEntries(Func<EngineOwners.CoreGameEngineDamagePreventionDrawRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineDamagePreventionDrawEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDamagePreventionDrawRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineDamagePreventionDrawEntries Create(Func<EngineOwners.CoreGameEngineDamagePreventionDrawRuntime> resolve) => new(resolve);
 }

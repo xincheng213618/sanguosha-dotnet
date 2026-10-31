@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouEnAnniversaryRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 45000)]
-    internal bool ReturnXiahouEnShiwuAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnXiahouEnShiwuAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryXiahouEn: { Operation: SkillProgramEffectOp.ResolveAnniversaryXiahouEnShiwu, Stage: AnniversaryXiahouEnStage.NativeUse, Origin: { } origin } } f || completion.ResolutionId != origin.UseId)
             return false;

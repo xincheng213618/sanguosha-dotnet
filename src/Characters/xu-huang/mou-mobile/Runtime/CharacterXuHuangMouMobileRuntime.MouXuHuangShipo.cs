@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -14,7 +11,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     internal bool CanOfferMouXuHuangShipo(ProgramTriggerLegalityContext c) => c.Owner.IsAlive && MouXuHuangComposition.IsShipo(c.Program) && c.Context.Window == SkillProgramTriggerWindow.TurnEnding && c.Context.SourceSeat == c.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Ending } phase && phase.ActorSeat == c.OwnerSeat && (MouXuHuangShipoEligible(c.OwnerSeat, false).Length > 0 || MouXuHuangShipoEligible(c.OwnerSeat, true).Length > 0);
     internal bool MouXuHuangShipoRoot(ProgramSkillFrame f)
     {
-        if (f.SkillId != MouXuHuangComposition.Shipo || f.TriggerId != "ending-gift-or-damage" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } c || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !MouXuHuangComposition.IsShipo(p) || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != f.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
+        if (f.SkillId != MouXuHuangComposition.Shipo || f.TriggerId != "ending-gift-or-damage" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } c || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !MouXuHuangComposition.IsShipo(p) || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != f.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == parent.Id;
@@ -85,7 +82,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouXuHuangShipo!;
         var chooser = r.Stage == MouXuHuangShipoStage.RecipientChoice ? r.Targets[r.Cursor] : f.OwnerSeat;
-        if (!ValidMouXuHuangShipo(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXuHuangShipoChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidMouXuHuangShipo(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXuHuangShipoChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Shipo requires the actual participant's exact private published branch, material and cursor.");
         var branch = selected.Parameters["branch"];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -245,7 +242,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
         {
             var self = view.Players[p.PlayerSeat];
             var damageValue = self.Armor > 0 ? -1.5 : self.Hp <= 1 ? -30 : self.Hp == 2 ? -16 : -6;
-            var gift = p.Choices.Where(c => c.Parameters["branch"] == "give").Select(c => (Choice: c, Value: _coreAiBrainsAiBrainsAccess._aiBrains[p.PlayerSeat].ScoreProgramTarget(view, f.OwnerSeat, new(1, 0, 0, 0, 0, 0, false, false)) - global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) * 0.35d)).OrderByDescending(x => x.Value).FirstOrDefault();
+            var gift = p.Choices.Where(c => c.Parameters["branch"] == "give").Select(c => (Choice: c, Value: _coreAiBrainsAiBrainsAccess._aiBrains[p.PlayerSeat].ScoreProgramTarget(view, f.OwnerSeat, new(1, 0, 0, 0, 0, 0, false, false)) - CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) * 0.35d)).OrderByDescending(x => x.Value).FirstOrDefault();
             return gift.Choice is not null && gift.Value >= damageValue ? gift.Choice : p.Choices.Single(c => c.Parameters["branch"] == "damage");
         }
 

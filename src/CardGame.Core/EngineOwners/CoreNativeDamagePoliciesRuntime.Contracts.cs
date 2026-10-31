@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreNativeDamagePoliciesCoreProgramDamageHooksOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeDamagePoliciesCoreProgramDamageHooksOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramDamageHooks DamageHooks { get; }
+    ProgramDamageHooks DamageHooks { get; }
 }
 
-internal interface ICoreNativeDamagePoliciesCoreNativeRuleQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeDamagePoliciesCoreNativeRuleQueriesOperations : IProgramRuntimeOperations
 {
     int GetCombatDistance(int sourceSeat, int targetSeat);
     int GetAttackRange(int sourceSeat);

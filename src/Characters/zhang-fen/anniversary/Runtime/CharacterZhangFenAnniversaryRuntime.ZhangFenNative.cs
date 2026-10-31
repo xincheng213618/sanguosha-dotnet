@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangFenAnniversaryRuntime
@@ -48,7 +44,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 43500)]
-    internal bool CompleteDagongCheAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool CompleteDagongCheAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { DagongCheSlash: { } o } use || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == o.FrameId)is not { } f || !ExactDagongCheUse(use, f))
@@ -67,7 +63,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 43500)]
-    internal bool ReturnDagongCheAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnDagongCheAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangFen: { Stage: ZhangFenStage.NativeReturned } r } f || completion.ResolutionId != r.UseId)
             return false;

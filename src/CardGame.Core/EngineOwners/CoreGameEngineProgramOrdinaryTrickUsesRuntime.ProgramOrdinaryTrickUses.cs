@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramOrdinaryTrickUsesRuntime
@@ -59,9 +55,9 @@ internal sealed partial class CoreGameEngineProgramOrdinaryTrickUsesRuntime
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(resolutionId, representative, owner.Seat, option.TargetSeats, option.ActionKind, option.TargetCardId, option.RequiredCardKind, option.EffectiveCardKind);
     }
 
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> BuildProgramOrdinaryTrickUseOptions(CharacterState source, CardKind? outputKind = null, Suit? physicalSuit = null, bool excludeOwner = false, bool enforceUsePermission = false, Suit? beneficiaryShieldSuit = null, bool? actualEffectiveColor = null, bool hasActualColor = false, IReadOnlyList<int>? physicalCardIds = null, bool includeNextActualUseAdjustment = false, CardConversionSource? conversionSource = null)
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> BuildProgramOrdinaryTrickUseOptions(CharacterState source, CardKind? outputKind = null, Suit? physicalSuit = null, bool excludeOwner = false, bool enforceUsePermission = false, Suit? beneficiaryShieldSuit = null, bool? actualEffectiveColor = null, bool hasActualColor = false, IReadOnlyList<int>? physicalCardIds = null, bool includeNextActualUseAdjustment = false, CardConversionSource? conversionSource = null)
     {
-        var options = new List<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption>();
+        var options = new List<GameEngine.ProgramOrdinaryTrickUseOption>();
         bool Wants(CardKind kind) => _modeRulesOperations._modeRules.Cards.AllowsOrdinaryTrickOption(kind, outputKind);
         var effectiveColor = hasActualColor ? actualEffectiveColor : _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(source, _corePhysicalOwnedCardQueriesOperations.GetHand(source));
         // A multi-card virtual card only carries a suit while every physical card
@@ -96,25 +92,25 @@ internal sealed partial class CoreGameEngineProgramOrdinaryTrickUsesRuntime
                 return;
             var targetPart = targets.Length == 0 ? "none" : string.Join('-', targets);
             var cardPart = targetCardId?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none";
-            options.Add(new global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption(new ChoiceId($"ordinary-trick.{(cardKind)}.targets-{(targetPart)}.card-{(cardPart)}"), cardKind, actionKind, Array.AsReadOnly(targets), targetCardId, requiredCardKind, description));
+            options.Add(new GameEngine.ProgramOrdinaryTrickUseOption(new ChoiceId($"ordinary-trick.{(cardKind)}.targets-{(targetPart)}.card-{(cardPart)}"), cardKind, actionKind, Array.AsReadOnly(targets), targetCardId, requiredCardKind, description));
         }
 
         if (Wants(CardKind.DrawTwo) && !excludeOwner && !_coreDyingWindowSkillPoliciesOperations.IsBlackTrickTargetProhibited(source, CardKind.DrawTwo, effectiveColor))
             Add(CardKind.DrawTwo, LegalActionKind.DrawTwo, "当【无中生有】使用：摸两张牌");
-        foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineGuanduCardsDefinitions.GuanduOrdinaryTrickKinds.Where(Wants))
+        foreach (var kind in CoreGameEngineGuanduCardsDefinitions.GuanduOrdinaryTrickKinds.Where(Wants))
             foreach (var targets in _coreGuanduCardsOperations.GuanduTargetChoices(source, kind, virtualSuit, effectiveColor, excludeOwner))
-                Add(kind, global::CardGame.Core.EngineOwners.CoreGameEngineGuanduCardsRuntime.GuanduCardAction(kind), $"当【{(CardCatalog.Get(kind).DisplayName)}】使用", targets);
-        foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDragonBoatCardsDefinitions.DragonBoatOrdinaryTrickKinds.Where(Wants))
+                Add(kind, CoreGameEngineGuanduCardsRuntime.GuanduCardAction(kind), $"当【{(CardCatalog.Get(kind).DisplayName)}】使用", targets);
+        foreach (var kind in CoreGameEngineDragonBoatCardsDefinitions.DragonBoatOrdinaryTrickKinds.Where(Wants))
         {
             var seats = Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(source.Seat, offset)]).Where(player => player.IsAlive && (!excludeOwner || player.Seat != source.Seat) && (kind == CardKind.StriveUpstream || (kind == CardKind.SameBoat) == _coreDragonBoatCardsOperations.DragonBoatCardAllies(source.Seat, player.Seat)) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(source.Seat, player.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(player, kind, virtualSuit, effectiveColor) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(source.Seat, player.Seat, kind) && (kind != CardKind.StriveUpstream || !_coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ExcludeGlobalTarget, kind))).Select(player => player.Seat).ToArray();
             if (kind == CardKind.StriveUpstream)
             {
                 if (seats.Length > 0)
-                    Add(kind, global::CardGame.Core.EngineOwners.CoreGameEngineDragonBoatCardsRuntime.DragonBoatCardAction(kind), "当【力争上游】使用", seats);
+                    Add(kind, CoreGameEngineDragonBoatCardsRuntime.DragonBoatCardAction(kind), "当【力争上游】使用", seats);
             }
             else
                 foreach (var seat in seats)
-                    Add(kind, global::CardGame.Core.EngineOwners.CoreGameEngineDragonBoatCardsRuntime.DragonBoatCardAction(kind), $"当【{(CardCatalog.Get(kind).DisplayName)}】对 {(_coreMatchParticipantsPlayersAccess._players[seat].Name)} 使用", [seat]);
+                    Add(kind, CoreGameEngineDragonBoatCardsRuntime.DragonBoatCardAction(kind), $"当【{(CardCatalog.Get(kind).DisplayName)}】对 {(_coreMatchParticipantsPlayersAccess._players[seat].Name)} 使用", [seat]);
         }
 
         if (Wants(CardKind.QizhengXiangsheng))
@@ -135,7 +131,7 @@ internal sealed partial class CoreGameEngineProgramOrdinaryTrickUsesRuntime
         {
             var self = kind is CardKind.BeamSwap or CardKind.WenheChaos;
             foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && (self ? player.Seat == source.Seat && !excludeOwner : player.Seat != source.Seat) && (kind != CardKind.StarShift || source.HasHpValue && player.HasHpValue && source.Hp >= 1 && player.Hp >= 1) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(source.Seat, player.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(player, kind, virtualSuit, effectiveColor) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(source.Seat, player.Seat, kind)))
-                Add(kind, global::CardGame.Core.EngineOwners.CoreGameEngineWenheCardsRuntime.WenheCardAction(kind), $"当【{(CardCatalog.Get(kind).DisplayName)}】对 {(target.Name)} 使用", [target.Seat]);
+                Add(kind, CoreGameEngineWenheCardsRuntime.WenheCardAction(kind), $"当【{(CardCatalog.Get(kind).DisplayName)}】对 {(target.Name)} 使用", [target.Seat]);
         }
 
         if (Wants(CardKind.ReturnSoul))
@@ -215,12 +211,12 @@ internal sealed partial class CoreGameEngineProgramOrdinaryTrickUsesRuntime
         return includeNextActualUseAdjustment ? _coreNextActualUseTargetAdjustmentsOperations.NextActualUseOrdinaryTrickOptions(source, legalOptions, virtualSuit, effectiveColor, shieldSuit, excludeOwner) : legalOptions;
     }
 
-    internal void AddProgramOrdinaryTrickTargetCardOptions(ICollection<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> options, CharacterState source, CharacterState target, CardKind cardKind, LegalActionKind actionKind, string cardName)
+    internal void AddProgramOrdinaryTrickTargetCardOptions(ICollection<GameEngine.ProgramOrdinaryTrickUseOption> options, CharacterState source, CharacterState target, CardKind cardKind, LegalActionKind actionKind, string cardName)
     {
         void AddTarget(int? targetCardId, string suffix)
         {
             var cardPart = targetCardId?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none";
-            options.Add(new global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption(new ChoiceId($"ordinary-trick.{(cardKind)}.targets-{(target.Seat)}.card-{(cardPart)}"), cardKind, actionKind, Array.AsReadOnly(new[] { target.Seat }), targetCardId, RequiredCardKind: null, $"当【{(cardName)}】对 {(target.Name)} 使用{(suffix)}"));
+            options.Add(new GameEngine.ProgramOrdinaryTrickUseOption(new ChoiceId($"ordinary-trick.{(cardKind)}.targets-{(target.Seat)}.card-{(cardPart)}"), cardKind, actionKind, Array.AsReadOnly(new[] { target.Seat }), targetCardId, RequiredCardKind: null, $"当【{(cardName)}】对 {(target.Name)} 使用{(suffix)}"));
         }
 
         if (_corePhysicalOwnedCardQueriesOperations.GetHand(target).Count > 0)
@@ -231,5 +227,5 @@ internal sealed partial class CoreGameEngineProgramOrdinaryTrickUsesRuntime
             AddTarget(judgment.Id, $"，选择其判定区【{(judgment.DisplayName)}】");
     }
 
-    internal static PromptChoice CreateProgramOrdinaryTrickPromptChoice(ProgramSkillFrame frame, string viewAsId, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption option) => new(option.Id, option.Description, [], option.TargetSeats, new Dictionary<string, string> { ["program-action"] = "use-all-hand-as-ordinary-trick", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["view-as-id"] = viewAsId, ["card-kind"] = option.EffectiveCardKind.ToString(), ["action-kind"] = option.ActionKind.ToString(), ["target-card-id"] = option.TargetCardId?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty });
+    internal static PromptChoice CreateProgramOrdinaryTrickPromptChoice(ProgramSkillFrame frame, string viewAsId, GameEngine.ProgramOrdinaryTrickUseOption option) => new(option.Id, option.Description, [], option.TargetSeats, new Dictionary<string, string> { ["program-action"] = "use-all-hand-as-ordinary-trick", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["view-as-id"] = viewAsId, ["card-kind"] = option.EffectiveCardKind.ToString(), ["action-kind"] = option.ActionKind.ToString(), ["target-card-id"] = option.TargetCardId?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty });
 }

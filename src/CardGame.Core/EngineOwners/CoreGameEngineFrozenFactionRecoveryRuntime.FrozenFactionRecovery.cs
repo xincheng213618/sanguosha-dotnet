@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFrozenFactionRecoveryRuntime
 {
-    void global::CardGame.Core.IFrozenFactionRecoveryProgramHost.FreezeLivingFactionRecovery(ProgramSkillFrame f) => FreezeProgramLivingFactionRecovery(f);
-    void global::CardGame.Core.IFrozenFactionRecoveryProgramHost.DrawToFrozenFactionCount(ProgramSkillFrame f) => DrawProgramToFrozenFactionCount(f);
+    void IFrozenFactionRecoveryProgramHost.FreezeLivingFactionRecovery(ProgramSkillFrame f) => FreezeProgramLivingFactionRecovery(f);
+    void IFrozenFactionRecoveryProgramHost.DrawToFrozenFactionCount(ProgramSkillFrame f) => DrawProgramToFrozenFactionCount(f);
     internal void FreezeProgramLivingFactionRecovery(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -19,7 +15,7 @@ internal sealed partial class CoreGameEngineFrozenFactionRecoveryRuntime
         _coreProgramExpressionsOperations.CaptureProgramExpressionNumber(f.Id, FrozenFactionRecoveryComposition.FactionNumber, x);
         _coreProgramExpressionsOperations.CaptureProgramExpressionNumber(f.Id, FrozenFactionRecoveryComposition.DamageNumber, points);
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { FrozenFactionRecovery = new(f.InstructionIndex, dying.Id) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FrozenFactionRecoveryCapturedEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), dying.Id, x, points));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FrozenFactionRecoveryCapturedEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), dying.Id, x, points));
         _coreProgramLifecycleOperations.RecoverProgramTargetTo(f.Id, f.OwnerSeat, f.OwnerSeat, SkillProgramNumberExpression.IntegerConstant, x, true);
     }
 

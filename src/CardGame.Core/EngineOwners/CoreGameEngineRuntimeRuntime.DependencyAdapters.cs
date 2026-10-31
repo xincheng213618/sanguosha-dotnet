@@ -1,42 +1,38 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.NativeFrameAutomaticRuntime))]
-internal sealed class CoreRuntimeNativeFrameAutomaticAdapter(global::System.Func<global::CardGame.Core.NativeFrameAutomaticRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreRuntimeNativeFrameAutomaticOperations
+[Core.ProgramCapability(typeof(NativeFrameAutomaticRuntime))]
+internal sealed class CoreRuntimeNativeFrameAutomaticAdapter(Func<NativeFrameAutomaticRuntime> targetFactory) : ICoreRuntimeNativeFrameAutomaticOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.NativeFrameAutomaticRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.NativeFrameAutomaticRuntime Get() => this._targetFactory();
+    private readonly Func<NativeFrameAutomaticRuntime> _targetFactory = targetFactory;
+    public NativeFrameAutomaticRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MatchStepDispatcher))]
-internal sealed class CoreRuntimeMatchStepDispatcherAdapter(global::System.Func<global::CardGame.Core.MatchStepDispatcher> targetFactory) : global::CardGame.Core.EngineOwners.ICoreRuntimeMatchStepDispatcherOperations
+[Core.ProgramCapability(typeof(MatchStepDispatcher))]
+internal sealed class CoreRuntimeMatchStepDispatcherAdapter(Func<MatchStepDispatcher> targetFactory) : ICoreRuntimeMatchStepDispatcherOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MatchStepDispatcher> _targetFactory = targetFactory;
-    public global::CardGame.Core.MatchStepDispatcher Get() => this._targetFactory();
+    private readonly Func<MatchStepDispatcher> _targetFactory = targetFactory;
+    public MatchStepDispatcher Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.NativeFrameRoutingRuntime))]
-internal sealed class CoreRuntimeNativeFrameRoutingAdapter(global::System.Func<global::CardGame.Core.NativeFrameRoutingRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreRuntimeNativeFrameRoutingOperations
+[Core.ProgramCapability(typeof(NativeFrameRoutingRuntime))]
+internal sealed class CoreRuntimeNativeFrameRoutingAdapter(Func<NativeFrameRoutingRuntime> targetFactory) : ICoreRuntimeNativeFrameRoutingOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.NativeFrameRoutingRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.NativeFrameRoutingRuntime Get() => this._targetFactory();
+    private readonly Func<NativeFrameRoutingRuntime> _targetFactory = targetFactory;
+    public NativeFrameRoutingRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ProgramCompletionRuntime))]
-internal sealed class CoreRuntimeProgramCompletionAdapter(global::System.Func<global::CardGame.Core.ProgramCompletionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreRuntimeProgramCompletionOperations
+[Core.ProgramCapability(typeof(ProgramCompletionRuntime))]
+internal sealed class CoreRuntimeProgramCompletionAdapter(Func<ProgramCompletionRuntime> targetFactory) : ICoreRuntimeProgramCompletionOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.ProgramCompletionRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramCompletionRuntime Get() => this._targetFactory();
+    private readonly Func<ProgramCompletionRuntime> _targetFactory = targetFactory;
+    public ProgramCompletionRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksRuntime))]
-internal sealed class CoreRuntimeCoreProgramRuntimeHooksAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreRuntimeCoreProgramRuntimeHooksOperations
+[Core.ProgramCapability(typeof(CoreProgramRuntimeHooksRuntime))]
+internal sealed class CoreRuntimeCoreProgramRuntimeHooksAdapter(Func<CoreProgramRuntimeHooksRuntime> targetFactory) : ICoreRuntimeCoreProgramRuntimeHooksOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramRuntimeHooks RuntimeHooks { get => this._targetFactory().RuntimeHooks; }
+    private readonly Func<CoreProgramRuntimeHooksRuntime> _targetFactory = targetFactory;
+    public ProgramRuntimeHooks RuntimeHooks { get => this._targetFactory().RuntimeHooks; }
 }

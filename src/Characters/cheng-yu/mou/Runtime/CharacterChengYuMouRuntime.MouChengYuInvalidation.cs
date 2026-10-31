@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengYuMouRuntime
 {
     internal MouCyUse? MouCyUse(ProgramSkillWindowContext c)
     {
-        if (c.Window != SkillProgramTriggerWindow.CardUseCommitted || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } w || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != c.Window)
+        if (c.Window != SkillProgramTriggerWindow.CardUseCommitted || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } w || CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != c.Window)
             return null;
         var a = w.Action;
         if (a.Type == CardActionType.Response)
@@ -22,7 +18,7 @@ internal sealed partial class CharacterChengYuMouRuntime
     {
         var record = _coreProgramEventHistoryOperations.ProgramEventHistory<MouCyNameRecordedEvent>().SingleOrDefault(r => r.FrameId == proof.RecordFrameId);
         var started = _coreProgramEventHistoryOperations.ProgramEventHistory<MouCyStartedEvent>().SingleOrDefault(s => s.FrameId == proof.FrameId);
-        return record is not null && started is not null && proof.Source.SkillId == MouChengYuAnniversaryRuntime.Shizha && proof.Source.BindingId == "consume-name" && record.Source.OwnerSeat == proof.Source.OwnerSeat && record.Source.SkillInstanceId == proof.Source.SkillInstanceId && record.GameplayHash == proof.GameplayHash && record.Name == global::CardGame.Core.EngineOwners.CoreGameEngineNamedAmbushRuntime.AmbushCardName(proof.Use.Action.EffectiveKind) && proof.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(proof.Source.SkillId).Program?.GameplayHash && started.Source == proof.Source && started.GameplayHash == proof.GameplayHash && started.Operation == SkillProgramEffectOp.ConsumeMouChengYuAnniversaryShizha && started.ParentId == proof.Use.WindowId && record.Round == started.Round && proof.Use.ParentId == parent && MouCySameAction(proof.Use.Action, action) && proof.Use.Response == (action.Type == CardActionType.Response) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouCyNameConsumedEvent>().Count(e => e.FrameId == proof.FrameId && e.RecordFrameId == record.FrameId && e.ActionId == action.ActionId) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouCyUseInvalidatedEvent>().Count(e => e.FrameId == proof.FrameId && e.RecordFrameId == proof.RecordFrameId && e.Source == proof.Source && e.GameplayHash == proof.GameplayHash && e.Use.WindowId == proof.Use.WindowId && e.Use.ParentId == proof.Use.ParentId && e.Use.Response == proof.Use.Response && MouCySameAction(e.Use.Action, proof.Use.Action)) == 1;
+        return record is not null && started is not null && proof.Source.SkillId == MouChengYuAnniversaryRuntime.Shizha && proof.Source.BindingId == "consume-name" && record.Source.OwnerSeat == proof.Source.OwnerSeat && record.Source.SkillInstanceId == proof.Source.SkillInstanceId && record.GameplayHash == proof.GameplayHash && record.Name == CoreGameEngineNamedAmbushRuntime.AmbushCardName(proof.Use.Action.EffectiveKind) && proof.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(proof.Source.SkillId).Program?.GameplayHash && started.Source == proof.Source && started.GameplayHash == proof.GameplayHash && started.Operation == SkillProgramEffectOp.ConsumeMouChengYuAnniversaryShizha && started.ParentId == proof.Use.WindowId && record.Round == started.Round && proof.Use.ParentId == parent && MouCySameAction(proof.Use.Action, action) && proof.Use.Response == (action.Type == CardActionType.Response) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouCyNameConsumedEvent>().Count(e => e.FrameId == proof.FrameId && e.RecordFrameId == record.FrameId && e.ActionId == action.ActionId) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouCyUseInvalidatedEvent>().Count(e => e.FrameId == proof.FrameId && e.RecordFrameId == proof.RecordFrameId && e.Source == proof.Source && e.GameplayHash == proof.GameplayHash && e.Use.WindowId == proof.Use.WindowId && e.Use.ParentId == proof.Use.ParentId && e.Use.Response == proof.Use.Response && MouCySameAction(e.Use.Action, proof.Use.Action)) == 1;
     }
 
     internal void ApplyMouCyInvalidation(ProgramSkillFrame f, MouCyUseInvalidatedEvent proof)
@@ -49,7 +45,7 @@ internal sealed partial class CharacterChengYuMouRuntime
         return true;
     }
 
-    internal bool ContinueMouCyIneffectiveDodge(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal bool ContinueMouCyIneffectiveDodge(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         if (continuation != ProgramCardContinuation.Dodge || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MouCyResponseInvalidations is not { } proofs)
             return false;
@@ -68,7 +64,7 @@ internal sealed partial class CharacterChengYuMouRuntime
         return true;
     }
 
-    internal bool HasMouCyMatchingName(int actor, CardKind kind) => HasMouChengYuAnniversary && _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Any(owner => _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCommitted).Any(b => b.SkillId == MouChengYuAnniversaryRuntime.Shizha && b.Trigger.Id == "consume-name" && MouChengYuAnniversary.Names(owner.Seat, b.SkillInstanceId).Any(n => n.Name == global::CardGame.Core.EngineOwners.CoreGameEngineNamedAmbushRuntime.AmbushCardName(kind))));
+    internal bool HasMouCyMatchingName(int actor, CardKind kind) => HasMouChengYuAnniversary && _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Any(owner => _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCommitted).Any(b => b.SkillId == MouChengYuAnniversaryRuntime.Shizha && b.Trigger.Id == "consume-name" && MouChengYuAnniversary.Names(owner.Seat, b.SkillInstanceId).Any(n => n.Name == CoreGameEngineNamedAmbushRuntime.AmbushCardName(kind))));
     internal bool MouCyCounterspellInvalidated(NullificationWindowFrame pending, CardActionContext action)
     {
         if (pending.MouCyResponseInvalidation is not { } p)

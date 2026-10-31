@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineSourceCursesSourceCursesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineSourceCursesSourceCursesAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.SourceCurseDeposit> _sourceCurses { get; }
+    ref readonly List<SourceCurseDeposit> _sourceCurses { get; }
 }

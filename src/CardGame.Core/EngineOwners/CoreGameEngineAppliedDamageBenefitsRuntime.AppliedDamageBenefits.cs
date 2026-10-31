@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAppliedDamageBenefitsRuntime
@@ -31,7 +27,7 @@ internal sealed partial class CoreGameEngineAppliedDamageBenefitsRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == active.Id);
-        if (active.AppliedDamageBenefit is not null || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame damage || active.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || context.ParentFrameId != damage.Id || context.DamageFrameId != damage.ParentFrameId || context.TargetSeat != damage.TargetSeat || damage.TriggerWindow != context.Window || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()))
+        if (active.AppliedDamageBenefit is not null || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame damage || active.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || context.ParentFrameId != damage.Id || context.DamageFrameId != damage.ParentFrameId || context.TargetSeat != damage.TargetSeat || damage.TriggerWindow != context.Window || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("An applied-damage Draw requires its exact actual producer and frozen current candidate.");
         var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
         if (!attack.DamageWasApplied || attack.DamageAmount <= 0 || context.Amount != attack.DamageAmount)
@@ -49,7 +45,7 @@ internal sealed partial class CoreGameEngineAppliedDamageBenefitsRuntime
     }
 
     internal SkillProgram AppliedDamageProgramDefinition(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId).Program!;
-    SkillProgramStepOutcome global::CardGame.Core.IAppliedDamageBenefitProgramHost.ReceiveOwnerDamage(ProgramSkillFrame frame, int amount) => ReceiveProgramOwnerDamage(frame, amount);
-    void global::CardGame.Core.IAppliedDamageBenefitProgramHost.ConsumeDistinctTurnTarget(ProgramSkillFrame frame, string usageId) => ConsumeDistinctProgramTurnTarget(frame, usageId);
-    SkillProgramStepOutcome global::CardGame.Core.IAppliedDamageBenefitProgramHost.DrawOwnerAtAppliedDamage(ProgramSkillFrame frame, int amount) => BeginAppliedDamageBenefitDraw(frame, amount);
+    SkillProgramStepOutcome IAppliedDamageBenefitProgramHost.ReceiveOwnerDamage(ProgramSkillFrame frame, int amount) => ReceiveProgramOwnerDamage(frame, amount);
+    void IAppliedDamageBenefitProgramHost.ConsumeDistinctTurnTarget(ProgramSkillFrame frame, string usageId) => ConsumeDistinctProgramTurnTarget(frame, usageId);
+    SkillProgramStepOutcome IAppliedDamageBenefitProgramHost.DrawOwnerAtAppliedDamage(ProgramSkillFrame frame, int amount) => BeginAppliedDamageBenefitDraw(frame, amount);
 }

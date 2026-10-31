@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreShenwuNpcProgramsRuntime
 {
     [ProgramTargetRule(ProgramTargetRulePoint.DirectedProhibition, 30)]
     internal bool ShenwuMingwanDirectedTargetProhibited(ProgramDirectedTargetQuery query) => ShenwuMingwanForbidsTarget(query.ActorSeat, query.TargetSeat);
-    SkillProgramStepOutcome global::CardGame.Core.IShenwuNpcProgramHost.ExecuteShenwuNpc(ProgramSkillFrame frame, SkillProgramEffect effect) => ExecuteShenwuNpc(frame, effect);
+    SkillProgramStepOutcome IShenwuNpcProgramHost.ExecuteShenwuNpc(ProgramSkillFrame frame, SkillProgramEffect effect) => ExecuteShenwuNpc(frame, effect);
     internal SkillProgramStepOutcome ExecuteShenwuNpc(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -25,7 +21,7 @@ internal sealed partial class CoreShenwuNpcProgramsRuntime
                 break;
             case SkillProgramEffectOp.ResolveShenwuYinzei:
             {
-                global::CardGame.Core.GameEngine.IDamageAttempt attack = ShenwuAppliedDamage(frame);
+                GameEngine.IDamageAttempt attack = ShenwuAppliedDamage(frame);
                 if (_corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count != 0 || attack.IsSourceLess || attack.SourceSeat == owner.Seat || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive)
                     break;
                 var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
@@ -40,7 +36,7 @@ internal sealed partial class CoreShenwuNpcProgramsRuntime
 
             case SkillProgramEffectOp.BindShenwuOtherDamageSource:
             {
-                global::CardGame.Core.GameEngine.IDamageAttempt attack = ShenwuAppliedDamage(frame);
+                GameEngine.IDamageAttempt attack = ShenwuAppliedDamage(frame);
                 var eligible = !attack.IsSourceLess && attack.SourceSeat != owner.Seat && _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive;
                 BindShenwuParticipant(frame, effect, eligible ? attack.SourceSeat : null, eligible ? "eligible" : "other");
                 break;
@@ -61,7 +57,7 @@ internal sealed partial class CoreShenwuNpcProgramsRuntime
 
             case SkillProgramEffectOp.RecordShenwuMingwanVictim:
             {
-                global::CardGame.Core.GameEngine.IDamageAttempt attack = ShenwuAppliedDamage(frame);
+                GameEngine.IDamageAttempt attack = ShenwuAppliedDamage(frame);
                 if (!ShenwuOwnActualTurn(owner.Seat) || attack.IsSourceLess || attack.SourceSeat != owner.Seat || attack.TargetSeat == owner.Seat || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || use.SourceSeat != owner.Seat || use.CardKind != attack.EffectiveCardKind)
                     break;
                 if (!ShenwuMingwanVictims(owner.Seat).Contains(attack.TargetSeat))
@@ -112,7 +108,7 @@ internal sealed partial class CoreShenwuNpcProgramsRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    internal global::CardGame.Core.GameEngine.IDamageAttempt ShenwuAppliedDamage(ProgramSkillFrame frame)
+    internal GameEngine.IDamageAttempt ShenwuAppliedDamage(ProgramSkillFrame frame)
     {
         if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId)is not { } window)
             throw new InvalidOperationException("Shenwu requires its actual applied-damage parent.");
@@ -128,7 +124,7 @@ internal sealed partial class CoreShenwuNpcProgramsRuntime
     internal bool ShenwuFutaiForbidsPeach(int actorSeat, CardKind kind, CardActionType type) => kind == CardKind.Peach && type == CardActionType.Use && _coreMatchParticipantsPlayersAccess._players.Any(p => p.Seat != actorSeat && !ShenwuOwnActualTurn(p.Seat) && ShenwuEnabled(p, "shenwu:futai"));
     internal bool ShenwuCannotTurnOver(CharacterState target) => ShenwuEnabled(target, "shenwu:xiongshou") || _coreProgramShanheSourceWarElephantOperations.ShanheWarElephantCannotTurnOver(target);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 230)]
-    internal int ShenwuNpcDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int ShenwuNpcDamageBonus(GameEngine.IDamageAttempt attack)
     {
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
         var bonus = 0;

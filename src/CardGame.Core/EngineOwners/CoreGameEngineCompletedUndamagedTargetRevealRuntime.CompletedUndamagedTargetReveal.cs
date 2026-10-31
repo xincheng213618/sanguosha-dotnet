@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 using CardGame.Core.Campaigns;
 
@@ -10,19 +7,19 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntime
 {
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedAfterCategory, 160)]
-    internal bool CompletedUndamagedFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => TracksCompletedUndamagedUseDamage && IsCompletedUndamagedDamageUse(query.Kind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind);
+    internal bool CompletedUndamagedFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => TracksCompletedUndamagedUseDamage && IsCompletedUndamagedDamageUse(query.Kind) && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind);
     internal const string CompletedUndamagedRevealBind = "completed-undamaged-target-reveal";
     internal long CompletedUndamagedMovementSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
     internal bool TracksCompletedUndamagedUseDamage => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMiuyanCompletedUse) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RevealUndamagedUseTargetHandAndDiscardSameColor) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.JoinUniqueLargestHpTrickTargetAndDrawAfterDamage) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InvalidateRemainingActualDamageCardEffects) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ClaimCompletedUndamagedIncomingCardEntities) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RequestFulueZeroDamageCounterSlash);
 
-    internal static bool IsCompletedUndamagedDamageUse(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CompletedUndamagedTargetReveal.IsCompletedUndamagedDamageUse(kind);
-    internal static string CompletedUndamagedDiscardReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CompletedUndamagedTargetReveal.CompletedUndamagedDiscardReason(f);
+    internal static bool IsCompletedUndamagedDamageUse(CardKind kind) => RuntimeSkills.RuntimeRules_Core_CompletedUndamagedTargetReveal.IsCompletedUndamagedDamageUse(kind);
+    internal static string CompletedUndamagedDiscardReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_CompletedUndamagedTargetReveal.CompletedUndamagedDiscardReason(f);
     internal bool HasExactCompletedUndamagedPublicPileCost(CardUseFrame use, CardActionContext action)
     {
         // Xiansi pays two public Authority entities to issue a zero-material
         // Slash. Those activation costs are recorded on Action, but they are
         // deliberately absent from the native Slash's physical materials.
-        if (!_coreForeignPublicPileSlashesOperations.IsForeignPublicPileSlashUse(use.Id) || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.PhysicalCards is not [var first, var second] || first.CardId <= 0 || second.CardId <= 0 || first.CardId == second.CardId || first.From != second.From || first.From is not { Zone: CardZoneKind.Authority, OwnerSeat: { } owner } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || owner == action.ProviderSeat || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || action.ParentActionId is not null)
+        if (!_coreForeignPublicPileSlashesOperations.IsForeignPublicPileSlashUse(use.Id) || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.PhysicalCards is not [var first, var second] || first.CardId <= 0 || second.CardId <= 0 || first.CardId == second.CardId || first.From != second.From || first.From is not { Zone: CardZoneKind.Authority, OwnerSeat: { } owner } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || owner == action.ProviderSeat || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || action.ParentActionId is not null)
             return false;
         var sources = action.ConversionChain.Where(s => s.OwnerSeat == owner && !string.IsNullOrWhiteSpace(s.SkillInstanceId) && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(s.SkillId)?.Program?.CardPolicies.Any(p => p.Id == s.BindingId && p.Kind == SkillProgramCardPolicyKind.ForeignPublicPileSlash) == true).ToArray();
         return sources.Length == 1 && action.PhysicalCards.All(c => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == c.CardId && m.CardKind == c.CardKind && m.From == c.From && m.To == CardLocation.DiscardPile && m.Reason.Value == "program.public-pile.slash-payment"));
@@ -43,24 +40,24 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
         return true;
     }
 
-    internal bool HasExactCompletedUndamagedTunanVirtualAttack(CardUseFrame use, CardActionContext action, global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool HasExactCompletedUndamagedTunanVirtualAttack(CardUseFrame use, CardActionContext action, NativeOwners.CardAttackHandle attack)
     {
         // Tunan retains its one publicly revealed input on CardUse/Action, but
         // its converted native Slash intentionally has no physical materials.
         // Only that exact suspended producer can explain the difference.
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.PhysicalCards.Count != 0 || attack.ProgramSkillCardUseFrameId is not { } parentId || use.PhysicalCardIds is not [var cardId] || use.CardId != cardId || action.PhysicalCards is not [var cost] || cost.CardId != cardId || cost.From != CardLocation.Processing)
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.PhysicalCards.Count != 0 || attack.ProgramSkillCardUseFrameId is not { } parentId || use.PhysicalCardIds is not [var cardId] || use.CardId != cardId || action.PhysicalCards is not [var cost] || cost.CardId != cardId || cost.From != CardLocation.Processing)
             return false;
         var useIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
         if (useIndex < 1 || _resolutionStackOperations._resolutionStack[useIndex - 1] is not ProgramSkillFrame parent || parent.Id != parentId || parent.SelectedTargetSeats is not [var user] || user == parent.OwnerSeat || action.ProviderSeat != user || parent.WindowContext?.Window != SkillProgramTriggerWindow.PlayPhaseStarting || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash)
             return false;
         var plan = ProgramInstructionResolver.Default.Resolve(parent, program);
-        if (parent.InstructionIndex < 1 || parent.InstructionIndex > plan.Instructions.Count || plan.GetPausedInstruction(parent.InstructionIndex).Effect is not { Op: SkillProgramEffectOp.TunanUseRevealedCard, SourceBind: { } bind } || parent.CardSetBindings.SingleOrDefault(b => b.Name == bind)is not { Visibility: SkillProgramCardSetVisibility.Public, CardIds: [var boundCard] } || boundCard != cardId || !action.ConversionChain.Contains(new(parent.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), user, parent.SkillInstanceId)))
+        if (parent.InstructionIndex < 1 || parent.InstructionIndex > plan.Instructions.Count || plan.GetPausedInstruction(parent.InstructionIndex).Effect is not { Op: SkillProgramEffectOp.TunanUseRevealedCard, SourceBind: { } bind } || parent.CardSetBindings.SingleOrDefault(b => b.Name == bind)is not { Visibility: SkillProgramCardSetVisibility.Public, CardIds: [var boundCard] } || boundCard != cardId || !action.ConversionChain.Contains(new(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), user, parent.SkillInstanceId)))
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        return history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == parent.Id && e.SkillId == parent.SkillId && e.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent) && e.SkillInstanceId == parent.SkillInstanceId && e.OwnerSeat == parent.OwnerSeat && e.Window == SkillProgramTriggerWindow.PlayPhaseStarting) == 1 && history.OfType<ProgramCardsRevealedEvent>().Where(e => e.FrameId == parent.Id && e.SkillId == parent.SkillId && e.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent) && e.OwnerSeat == parent.OwnerSeat && e.Bind == bind).ToArray()is [{ Cards: [var revealed] }] && revealed.Id == cardId && revealed.Kind == cost.CardKind && history.OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == cardId && e.CardKind == CardKind.Slash && e.SourceSeat == user) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cardId && m.CardKind == cost.CardKind && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason.Value == $"skill-program.{(parent.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent))}.reveal");
+        return history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == parent.Id && e.SkillId == parent.SkillId && e.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent) && e.SkillInstanceId == parent.SkillInstanceId && e.OwnerSeat == parent.OwnerSeat && e.Window == SkillProgramTriggerWindow.PlayPhaseStarting) == 1 && history.OfType<ProgramCardsRevealedEvent>().Where(e => e.FrameId == parent.Id && e.SkillId == parent.SkillId && e.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent) && e.OwnerSeat == parent.OwnerSeat && e.Bind == bind).ToArray()is [{ Cards: [var revealed] }] && revealed.Id == cardId && revealed.Kind == cost.CardKind && history.OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == cardId && e.CardKind == CardKind.Slash && e.SourceSeat == user) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cardId && m.CardKind == cost.CardKind && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason.Value == $"skill-program.{(parent.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent))}.reveal");
     }
 
-    internal bool CompletedUndamagedNativeUseActorMatches(CardUseFrame use, global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool CompletedUndamagedNativeUseActorMatches(CardUseFrame use, NativeOwners.CardAttackHandle attack)
     {
         if (use.SourceSeat == attack.CardUserSeat)
             return true;
@@ -70,9 +67,9 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
         return use.CardKind == CardKind.BarbarianAssault && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { } group && group.ResolutionId == use.Id && group.SourceSeat == use.SourceSeat && group.Effect == GroupCardEffect.ResponseAttack && group.RequiredCardKind == CardKind.Slash && group.Card.Kind == use.CardKind && group.DamageSourceSeat == attack.SourceSeat && attack.CardUserSeat == group.DamageSourceSeat && group.TargetSeats.SequenceEqual(use.TargetSeats) && group.CurrentAttack is { } current && current.ResolutionId == attack.ResolutionId && current.SourceSeat == attack.SourceSeat && current.TargetSeat == attack.TargetSeat && current.EffectiveCardKind == use.CardKind && group.PhysicalCards.Select(c => c.Id).SequenceEqual(attack.PhysicalCards.Select(c => c.Id)) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<HuoshouAttributedEvent>().Where(e => e.ResolutionId == use.Id).ToArray()is [var attributed] && attributed.CardUserSeat == use.SourceSeat && attributed.DamageSourceSeat == attack.SourceSeat;
     }
 
-    internal void RecordCompletedUndamagedTargetDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageFrameId, int amount)
+    internal void RecordCompletedUndamagedTargetDamage(GameEngine.IDamageAttempt attack, long damageFrameId, int amount)
     {
-        if (!TracksCompletedUndamagedUseDamage || amount <= 0 || attack is not global::CardGame.Core.NativeOwners.CardAttackHandle card || card.IsDelayedJudgmentDamage || card.IsProgramJudgmentDamage || card.IsProgramSkillDamage || !card.DamageWasApplied || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.Id != damageFrameId || damage.ParentFrameId != card.ResolutionId || damage.SourceSeat != card.SourceSeat || damage.TargetSeat != card.TargetSeat || damage.Amount != amount || damage.Nature != _coreNativeCardClassificationsOperations.GetDamageNature(card) || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ResolutionId)is not { } use || !CompletedUndamagedNativeUseActorMatches(use, card) || use.CardKind != card.EffectiveCardKind || !IsCompletedUndamagedDamageUse(use.CardKind))
+        if (!TracksCompletedUndamagedUseDamage || amount <= 0 || attack is not NativeOwners.CardAttackHandle card || card.IsDelayedJudgmentDamage || card.IsProgramJudgmentDamage || card.IsProgramSkillDamage || !card.DamageWasApplied || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.Id != damageFrameId || damage.ParentFrameId != card.ResolutionId || damage.SourceSeat != card.SourceSeat || damage.TargetSeat != card.TargetSeat || damage.Amount != amount || damage.Nature != _coreNativeCardClassificationsOperations.GetDamageNature(card) || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ResolutionId)is not { } use || !CompletedUndamagedNativeUseActorMatches(use, card) || use.CardKind != card.EffectiveCardKind || !IsCompletedUndamagedDamageUse(use.CardKind))
             return;
         if (!_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageRequestedEvent>().Any(e => e.ResolutionId == damageFrameId && e.SourceSeat == damage.SourceSeat && e.TargetSeat == damage.TargetSeat && e.Amount == amount && e.SourceCard == use.CardKind && e.Nature == damage.Nature && e.SourceLess == card.IsSourceLess))
             throw new InvalidOperationException("Whole-use damage lost its native declared attack or real requested damage.");
@@ -124,7 +121,7 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
         var r = new ProgramCompletedUndamagedTargetRevealReceipt
         {
             InstructionIndex = f.InstructionIndex,
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             WindowFrameId = context.ParentFrameId,
             CardUseFrameId = use.Id,
@@ -235,8 +232,8 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
         IssueCompletedUndamagedTargetReveal(f);
     }
 
-    internal static bool CompletedUndamagedChoiceEquals(PromptChoice a, PromptChoice b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CompletedUndamagedTargetReveal.CompletedUndamagedChoiceEquals(a, b);
-    internal static CardColor? CompletedUndamagedColor(Suit suit) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CompletedUndamagedTargetReveal.CompletedUndamagedColor(suit);
+    internal static bool CompletedUndamagedChoiceEquals(PromptChoice a, PromptChoice b) => RuntimeSkills.RuntimeRules_Core_CompletedUndamagedTargetReveal.CompletedUndamagedChoiceEquals(a, b);
+    internal static CardColor? CompletedUndamagedColor(Suit suit) => RuntimeSkills.RuntimeRules_Core_CompletedUndamagedTargetReveal.CompletedUndamagedColor(suit);
     internal void IssueCompletedUndamagedTargetReveal(ProgramSkillFrame f)
     {
         var r = f.CompletedUndamagedTargetReveal!;
@@ -259,7 +256,7 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CompletedUndamagedTargetReveal = r with { SelectionIssued = true, RevealedMaterials = revealed, SameColor = same, PaidMaterials = paid, SequenceBefore = before, SequenceAfter = before, Stage = paid.Length > 0 ? CompletedUndamagedTargetRevealStage.MovementChildren : CompletedUndamagedTargetRevealStage.Complete }, PendingMovementContinuation = null });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CompletedUndamagedTargetRevealSelectionIssuedEvent(f.Id, target, selected.Length, revealed.Length, same));
         if (cards.Length > 0)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, CompletedUndamagedRevealBind, Array.AsReadOnly(cards.Select(c => _coreSnapshotValueProjectionOperations.ToSnapshot(c)with { Suit = revealed.Single(m => m.CardId == c.Id).EffectiveSuit }).ToArray())));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, CompletedUndamagedRevealBind, Array.AsReadOnly(cards.Select(c => _coreSnapshotValueProjectionOperations.ToSnapshot(c)with { Suit = revealed.Single(m => m.CardId == c.Id).EffectiveSuit }).ToArray())));
         if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "completed-target-hand-reveal"))
             return;
         ContinueCompletedTargetPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
@@ -305,7 +302,7 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 540)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 560)]
     internal bool CanContinueCompletedUndamagedTargetReveal(ProgramSkillFrame f) => f.CompletedUndamagedTargetReveal is { SelectionIssued: true } && _coreCompletedUndamagedTargetRevealObserversOperations.ValidCompletedUndamagedTargetRevealReceipt(f);
-    SkillProgramStepOutcome global::CardGame.Core.ICompletedUndamagedTargetRevealProgramHost.CompletedUndamagedTargetReveal(ProgramSkillFrame f) => BeginCompletedUndamagedTargetReveal(f);
+    SkillProgramStepOutcome ICompletedUndamagedTargetRevealProgramHost.CompletedUndamagedTargetReveal(ProgramSkillFrame f) => BeginCompletedUndamagedTargetReveal(f);
     [PublicHandRevealReturn("completed-target-hand-reveal")]
     internal void ContinueCompletedTargetPublicReveal(ProgramSkillFrame f)
     {

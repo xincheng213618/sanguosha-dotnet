@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineTurnHandLimitKindExemptionsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineTurnHandLimitKindExemptionsRuntime))]
 internal sealed partial class CoreGameEngineTurnHandLimitKindExemptionsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnHandLimitKindExemptionsRuntime> _resolve;
-    private CoreGameEngineTurnHandLimitKindExemptionsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnHandLimitKindExemptionsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineTurnHandLimitKindExemptionsRuntime> _resolve;
+    private CoreGameEngineTurnHandLimitKindExemptionsEntries(Func<EngineOwners.CoreGameEngineTurnHandLimitKindExemptionsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineTurnHandLimitKindExemptionsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnHandLimitKindExemptionsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineTurnHandLimitKindExemptionsEntries Create(Func<EngineOwners.CoreGameEngineTurnHandLimitKindExemptionsRuntime> resolve) => new(resolve);
 }

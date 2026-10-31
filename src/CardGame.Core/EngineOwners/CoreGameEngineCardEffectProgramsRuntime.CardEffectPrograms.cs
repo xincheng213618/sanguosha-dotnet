@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCardEffectProgramsRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreGameEngineCardEffectProgramsRuntime
 
     internal bool TryBeginOrdinaryCardEffectPrograms(NullificationWindowFrame pending)
     {
-        if (!HasCardEffectBeforeApplyPrograms || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(pending.EffectCardKind))
+        if (!HasCardEffectBeforeApplyPrograms || CoreNativeCardClassificationsRuntime.IsDelayedCard(pending.EffectCardKind))
             return false;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(f => f.Id == pending.ParentFrameId);
         var action = use.Action ?? throw new InvalidOperationException("An actual trick effect needs its frozen action.");
@@ -19,7 +15,7 @@ internal sealed partial class CoreGameEngineCardEffectProgramsRuntime
             return BeginCardEffectPrograms(_coreNativeSlashTargetDuelOperations.NativeSlashTargetDuelEffectAction(use, nativeSlice), [nativeSlice.TargetSeat], pending, null);
         var designated = action.EffectiveKind == CardKind.BorrowedSword ? action.TargetSeats.Where((_, i) => i % 2 == 0).Distinct().ToArray() : action.EffectiveDesignatedTargetSeats.Distinct().ToArray();
         if (designated.Length != 1)
-            return pending.TargetSeats.Count == 1 && global::CardGame.Core.EngineOwners.CoreGameEngineSequentialTrickTargetsRuntime.UsesSequentialTrickTargets(pending.ActionKind) && BeginCardEffectPrograms(action, pending.TargetSeats, pending, null, perTargetOnly: true);
+            return pending.TargetSeats.Count == 1 && CoreGameEngineSequentialTrickTargetsRuntime.UsesSequentialTrickTargets(pending.ActionKind) && BeginCardEffectPrograms(action, pending.TargetSeats, pending, null, perTargetOnly: true);
         // Group cards enter their exact target boundary after their native
         // group cursor is created, not at the common whole-use nullification.
         if (pending.ActionKind is LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage or LegalActionKind.PeachGarden or LegalActionKind.FiveGrains)
@@ -55,7 +51,7 @@ internal sealed partial class CoreGameEngineCardEffectProgramsRuntime
     internal bool CanRunCardEffectCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
         var frame = _resolutionStackOperations._resolutionStack.OfType<CardEffectBeforeApplyFrame>().LastOrDefault();
-        return frame is not null && frame.Id == context.ParentFrameId && frame.CandidateIndex < frame.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(frame.Candidates[frame.CandidateIndex]) == candidate && frame.Candidates[frame.CandidateIndex].FrozenContext == context && frame.FinalDesignatedTargetSeats.Count == 1 && frame.FinalDesignatedTargetSeats[0] == candidate.OwnerSeat && (frame.DelayedReturn is not null || frame.Action.ActorSeat != candidate.OwnerSeat);
+        return frame is not null && frame.Id == context.ParentFrameId && frame.CandidateIndex < frame.Candidates.Count && CoreGameEngineCardActionsRuntime.ToSharedCandidate(frame.Candidates[frame.CandidateIndex]) == candidate && frame.Candidates[frame.CandidateIndex].FrozenContext == context && frame.FinalDesignatedTargetSeats.Count == 1 && frame.FinalDesignatedTargetSeats[0] == candidate.OwnerSeat && (frame.DelayedReturn is not null || frame.Action.ActorSeat != candidate.OwnerSeat);
     }
 
     [NativeFrameRoute(typeof(CardEffectBeforeApplyFrame), 180)]
@@ -88,7 +84,7 @@ internal sealed partial class CoreGameEngineCardEffectProgramsRuntime
 
             var candidate = frame.Candidates[frame.CandidateIndex];
             var context = candidate.FrozenContext!;
-            var shared = global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate);
+            var shared = CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate);
             if (!_coreProgramLifecycleOperations.CanRunProgramTrigger(shared, context))
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame with { CandidateIndex = frame.CandidateIndex + 1 });
@@ -138,7 +134,7 @@ internal sealed partial class CoreGameEngineCardEffectProgramsRuntime
 
     internal void BeginActualDelayedJudgment(CharacterState current, Card card, CardKind kind)
     {
-        var info = global::CardGame.Core.EngineOwners.CoreActualTurnsRuntime.GetDelayedJudgmentInfo(kind);
+        var info = CoreActualTurnsRuntime.GetDelayedJudgmentInfo(kind);
         var judgment = _coreNativeJudgmentOperations.BeginJudgment(attack: null, targetSeat: current.Seat, reason: info.Reason, parentFrameId: 0, sourceCard: kind, continuation: info.Continuation, delayedCard: card, sourceSeat: current.Seat);
         if (judgment is null)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();

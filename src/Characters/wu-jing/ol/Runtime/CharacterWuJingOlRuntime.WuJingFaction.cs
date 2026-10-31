@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuJingOlRuntime
 {
     internal const string WuJingFactionBind = "heji-native-faction";
-    internal bool WuJingFactionTarget(ProgramSkillFrame f) => f.WuJing is { TargetSeat: var target } && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && target != f.OwnerSeat && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(f.OwnerSeat, SkillProgramCardTargetRestriction.SelfOnly) && global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(f.OwnerSeat, kind, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(f.OwnerSeat, target, kind) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(_coreMatchParticipantsPlayersAccess._players[target]));
+    internal bool WuJingFactionTarget(ProgramSkillFrame f) => f.WuJing is { TargetSeat: var target } && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && target != f.OwnerSeat && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(f.OwnerSeat, SkillProgramCardTargetRestriction.SelfOnly) && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(f.OwnerSeat, kind, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(f.OwnerSeat, target, kind) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(_coreMatchParticipantsPlayersAccess._players[target]));
     internal void BeginWuJingFaction(ProgramSkillFrame f)
     {
         var r = f.WuJing!;
@@ -23,7 +19,7 @@ internal sealed partial class CharacterWuJingOlRuntime
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateWuJingFactionParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
+    internal bool ValidateWuJingFactionParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
     {
         if (f.WuJing is not { FactionPolicy: { } policy } r)
             return false;
@@ -33,7 +29,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     }
 
     internal bool HasWuJingFactionDistance(int actor, int target) => _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsAssistedProgramUse: true, ProgramSkillFrameId: { } id } pending && pending.OwnerSeat == actor && pending.TargetSeat == target && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == id)is { WuJing: not null } owner && ValidateWuJingFactionParent(pending, owner) && WuJingFactionTarget(owner);
-    internal bool PrepareWuJingFactionNative(ProgramSkillFrame f, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind)
+    internal bool PrepareWuJingFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind)
     {
         if (!ValidateWuJingFactionParent(pending, f))
             return false;
@@ -43,7 +39,7 @@ internal sealed partial class CharacterWuJingOlRuntime
         return true;
     }
 
-    internal bool FinishWuJingFactionDeclined(long id, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending)
+    internal bool FinishWuJingFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuJing: { FactionPolicy: not null } } f || f.Id != id)
             return false;

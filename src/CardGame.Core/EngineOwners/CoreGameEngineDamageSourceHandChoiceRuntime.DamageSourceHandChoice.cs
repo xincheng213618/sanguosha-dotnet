@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -25,7 +22,7 @@ internal sealed partial class CoreGameEngineDamageSourceHandChoiceRuntime
             throw new InvalidOperationException("The hand choice requires its actual sourced damage occurrence.");
         var r = new DamageSourceHandChoiceReceipt
         {
-            Source = global::CardGame.Core.EngineOwners.CoreGameEngineNamedAmbushRuntime.AmbushSource(f),
+            Source = CoreGameEngineNamedAmbushRuntime.AmbushSource(f),
             GameplayHash = f.GameplayHash,
             InstructionIndex = f.InstructionIndex,
             WindowFrameId = window.Id,
@@ -86,7 +83,7 @@ internal sealed partial class CoreGameEngineDamageSourceHandChoiceRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Damage hand choice lost owner.");
         RequireDamageSourceHandChoice(f);
         var r = f.DamageSourceHandChoice!;
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DamageSourceHandChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DamageSourceHandChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Damage hand choice no longer matches its published branch or hand cost.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -181,7 +178,7 @@ internal sealed partial class CoreGameEngineDamageSourceHandChoiceRuntime
 
     internal void RequireDamageSourceHandChoice(ProgramSkillFrame f)
     {
-        if (f.DamageSourceHandChoice is not { } r || r.Source != global::CardGame.Core.EngineOwners.CoreGameEngineNamedAmbushRuntime.AmbushSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || context.ParentFrameId != r.WindowFrameId || context.DamageFrameId != r.DamageFrameId || context.TargetSeat != f.OwnerSeat || context.SourceSeat != r.DamageSourceSeat || context.Amount != r.DamageAmount || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveDamageSourceHandChoice || r.SourceHandCount < 0 || r.OwnerHandCount < 0 || r.SelectedCards.Distinct().Count() != r.SelectedCards.Count || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageSourceHandChoiceOfferedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Receipt.Source == r.Source && e.Receipt.WindowFrameId == r.WindowFrameId && e.Receipt.DamageFrameId == r.DamageFrameId && e.Receipt.SourceHandCount == r.SourceHandCount) != 1)
+        if (f.DamageSourceHandChoice is not { } r || r.Source != CoreGameEngineNamedAmbushRuntime.AmbushSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || context.ParentFrameId != r.WindowFrameId || context.DamageFrameId != r.DamageFrameId || context.TargetSeat != f.OwnerSeat || context.SourceSeat != r.DamageSourceSeat || context.Amount != r.DamageAmount || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveDamageSourceHandChoice || r.SourceHandCount < 0 || r.OwnerHandCount < 0 || r.SelectedCards.Distinct().Count() != r.SelectedCards.Count || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageSourceHandChoiceOfferedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Receipt.Source == r.Source && e.Receipt.WindowFrameId == r.WindowFrameId && e.Receipt.DamageFrameId == r.DamageFrameId && e.Receipt.SourceHandCount == r.SourceHandCount) != 1)
             throw new InvalidOperationException("Damage hand choice lost its exact sourced damage, instruction or frozen count.");
         if (r.Stage is not (DamageSourceHandChoiceStage.MovementChildren or DamageSourceHandChoiceStage.DamageIssued))
             return;
@@ -207,8 +204,8 @@ internal sealed partial class CoreGameEngineDamageSourceHandChoiceRuntime
     {
         if (f.DamageSourceHandChoice!.Stage == DamageSourceHandChoiceStage.Branch)
             return d.Choices.FirstOrDefault(c => c.Parameters["branch"] == "draw") ?? d.Choices.FirstOrDefault(c => c.Parameters["branch"] == "retaliate") ?? d.Choices[0];
-        return d.Choices.FirstOrDefault(c => c.Parameters["branch"] == "pay") ?? d.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? d.Choices[0];
+        return d.Choices.FirstOrDefault(c => c.Parameters["branch"] == "pay") ?? d.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? d.Choices[0];
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDamageSourceHandChoiceHost.ResolveDamageSourceHandChoice(ProgramSkillFrame f) => BeginDamageSourceHandChoice(f);
+    SkillProgramStepOutcome IDamageSourceHandChoiceHost.ResolveDamageSourceHandChoice(ProgramSkillFrame f) => BeginDamageSourceHandChoice(f);
 }

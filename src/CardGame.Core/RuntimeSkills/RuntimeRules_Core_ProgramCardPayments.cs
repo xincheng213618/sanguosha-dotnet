@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_ProgramCardPayments
 {
     internal static bool IsProgramAttackRangeCoverageDecreased(ProgramSkillFrame frame, string bind)
@@ -13,14 +13,14 @@ internal static class RuntimeRules_Core_ProgramCardPayments
         CardKind kind,
         IReadOnlyList<SkillProgramCardCategory> categories)
     {
-        return categories.Any(category => CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesSkillProgramCardCategory(kind, category));
+        return categories.Any(category => RuntimeRules_Core_ProgramCardPayments.MatchesSkillProgramCardCategory(kind, category));
     }
 
     // "Trick" keeps matching every trick; "InstantTrick" excludes delayed tricks (Indulgence, SupplyShortage, Lightning).
     internal static bool MatchesSkillProgramCardCategory(CardKind kind, SkillProgramCardCategory category) =>
         category != SkillProgramCardCategory.InstantTrick
-            ? CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.GetProgramCardCategory(kind) == category
-            : CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.GetProgramCardCategory(kind) == SkillProgramCardCategory.Trick &&
+            ? RuntimeRules_Core_ProgramCardPayments.GetProgramCardCategory(kind) == category
+            : RuntimeRules_Core_ProgramCardPayments.GetProgramCardCategory(kind) == SkillProgramCardCategory.Trick &&
               CardUseCategoryCatalog.Get(kind) is not CardUseCategories.DelayedTrick;
 
 
@@ -29,7 +29,7 @@ internal static class RuntimeRules_Core_ProgramCardPayments
         CardKind kind,
         IReadOnlyList<SkillProgramCardCategory> categories,
         IReadOnlyList<CardKind> kinds) =>
-        (categories.Count == 0 || CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardCategory(kind, categories)) &&
+        (categories.Count == 0 || RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardCategory(kind, categories)) &&
         (kinds.Count == 0 || kinds.Contains(kind));
 
     internal static SkillProgramCardCategory GetProgramCardCategory(CardKind kind)

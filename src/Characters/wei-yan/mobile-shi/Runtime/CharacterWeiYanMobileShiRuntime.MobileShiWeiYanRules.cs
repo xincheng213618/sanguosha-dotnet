@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWeiYanMobileShiRuntime
@@ -65,9 +61,9 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 47100)]
-    internal int MobileShiYinzhanDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int MobileShiYinzhanDamageBonus(GameEngine.IDamageAttempt attack)
     {
-        if (attack.IsSourceLess || attack.CardUserSeat != attack.SourceSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Duel) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreNativeSkillContextQueriesOperations.HasProgramSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], ShiWyYinzhan) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { CardKind: CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash })
+        if (attack.IsSourceLess || attack.CardUserSeat != attack.SourceSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Duel) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreNativeSkillContextQueriesOperations.HasProgramSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], ShiWyYinzhan) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { CardKind: CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash })
             return 0;
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];

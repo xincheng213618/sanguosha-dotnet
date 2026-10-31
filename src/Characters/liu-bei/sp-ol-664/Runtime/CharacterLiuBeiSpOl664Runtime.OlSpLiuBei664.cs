@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBeiSpOl664Runtime
 {
     internal const string OlSpZhujiu = "ol:zhujiu-3577", OlSpJinglei = "ol:jinglei-3578", OlSpBrewDisabled = "zhujiu-disabled";
-    SkillProgramStepOutcome global::CardGame.Core.IOlSpLiuBei664Host.Execute(ProgramSkillFrame frame, SkillProgramEffect effect) => effect.Op switch
+    SkillProgramStepOutcome IOlSpLiuBei664Host.Execute(ProgramSkillFrame frame, SkillProgramEffect effect) => effect.Op switch
     {
         SkillProgramEffectOp.UseOlSpLiuBeiZhujiu => BeginOlSpZhujiu(frame),
         SkillProgramEffectOp.GrantOlSpLiuBeiXudai => GrantOlSpXudai(frame),
@@ -118,7 +114,7 @@ internal sealed partial class CharacterLiuBeiSpOl664Runtime
         if (frame.OlSpLiuBei664 is not { } draft || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || decision.Kind != DecisionKind.ProgramTrigger || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PromptId != decision.PromptId || decision.PlayerSeat != (draft.Stage == "discard" ? draft.TargetSeat : frame.OwnerSeat))
             throw new InvalidOperationException("SP Liu Bei AI lost its actual issued chooser and original program frame.");
         var current = OlSpLiuBeiChoices(frame);
-        var legal = decision.Choices.Where(choice => draft.Choices.Any(issued => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([issued], [choice])) && current.Any(candidate => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([candidate], [choice]))).ToArray();
+        var legal = decision.Choices.Where(choice => draft.Choices.Any(issued => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([issued], [choice])) && current.Any(candidate => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([candidate], [choice]))).ToArray();
         if (legal.Length == 0)
             throw new InvalidOperationException("SP Liu Bei AI has no currently legal issued choice.");
         if (draft.Stage == "recipient")
@@ -152,7 +148,7 @@ internal sealed partial class CharacterLiuBeiSpOl664Runtime
     [ProgramAnswer("ol-sp-liubei-664")]
     internal void AnswerOlSpLiuBei(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OlSpLiuBei664: { } draft } frame || draft.Choices.SingleOrDefault(choice => choice.Id == selected.Id)is not { } choice || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]) || !OlSpLiuBeiChoices(frame).Any(current => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [current])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OlSpLiuBei664: { } draft } frame || draft.Choices.SingleOrDefault(choice => choice.Id == selected.Id)is not { } choice || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]) || !OlSpLiuBeiChoices(frame).Any(current => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [current])))
             throw new InvalidOperationException("SP Liu Bei lost its issued selection and current owned entities.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (draft.Stage == "recipient")
@@ -235,7 +231,7 @@ internal sealed partial class CharacterLiuBeiSpOl664Runtime
         _coreProgramLifecycleOperations.CompleteDyingProgramBinding(frame, completed);
         if (_coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.Id == context.ParentFrameId && dying.VictimSeat == frame.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Hp <= 0)
         {
-            var key = global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.SelfDyingBindingKey(frame.SkillId, frame.TriggerId!, frame.SkillInstanceId);
+            var key = CoreGameEngineProgramLifecycleRuntime.SelfDyingBindingKey(frame.SkillId, frame.TriggerId!, frame.SkillInstanceId);
             _coreNativeDyingFramesOperations.UpdateDyingFrame(dying.Id, current => current with { AttemptedSelfDyingBindings = current.AttemptedSelfDyingBindings.Where(binding => binding != key).ToArray() });
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreNativeDyingFramesOperations.SetDyingFrameStep(dying.Id, ResolutionFrameStep.AwaitingResponse);

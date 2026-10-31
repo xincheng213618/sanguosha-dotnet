@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal readonly struct ProgramTriggerActionFactQueries(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineCurrentTurnUseKindsEntries> getCoreGameEngineCurrentTurnUseKindsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEnginePlayCardHistoryEntries> getCoreGameEnginePlayCardHistoryRuntime) : IProgramTriggerActionFactQueries
+internal readonly struct ProgramTriggerActionFactQueries(Func<RuntimeEntries.CoreGameEngineCurrentTurnUseKindsEntries> getCoreGameEngineCurrentTurnUseKindsRuntime, Func<RuntimeEntries.CoreGameEnginePlayCardHistoryEntries> getCoreGameEnginePlayCardHistoryRuntime) : IProgramTriggerActionFactQueries
 {
     public bool TracksActualTurnUseOrdinal => getCoreGameEngineCurrentTurnUseKindsRuntime().TracksActualTurnUseOrdinal;
 

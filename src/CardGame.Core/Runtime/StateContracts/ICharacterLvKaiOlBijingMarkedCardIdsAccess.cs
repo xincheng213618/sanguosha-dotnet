@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterLvKaiOlBijingMarkedCardIdsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterLvKaiOlBijingMarkedCardIdsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.Dictionary<int, int> _bijingMarkedCardIds { get; }
+    ref readonly Dictionary<int, int> _bijingMarkedCardIds { get; }
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCardDeclarationsRuntime
@@ -91,11 +87,11 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
     [ProgramCardAction(ProgramCardActionPhase.BeforeProgram, 30)]
     internal void AddDeclarationSlashActions(List<LegalAction> actions, CharacterState actor, IReadOnlyList<Card> playable)
     {
-        actions.RemoveAll(action => action.ConversionSource is { } source && _corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is not null && (action.Kind == LegalActionKind.Recast || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.PlayedCardKind ?? CardKind.Dodge)));
+        actions.RemoveAll(action => action.ConversionSource is { } source && _corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is not null && (action.Kind == LegalActionKind.Recast || CoreNativeCardClassificationsRuntime.IsSlashCard(action.PlayedCardKind ?? CardKind.Dodge)));
         if (!_coreNationalSkillsOperations.GetSkillBindingShard(actor).ViewAsPrograms.Any(program => program.ViewAs.Any(rule => rule.DeclarationValidation is not null)))
             return;
         foreach (var card in playable.Where(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card)))
-            foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+            foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
                 foreach (var source in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, false).Where(source => _corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is not null))
                 {
                     var targets = _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, card, source, effectiveKind: kind);
@@ -128,7 +124,7 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
         var selected = explicitSource ?? (use && _coreGameEngineCardConversionsHasSelectedResponseConversionChoiceHasSelectedUseConversionChoiceSelectedResponseConversionSelectedUseConversionAccess._hasSelectedUseConversionChoice ? _coreGameEngineCardConversionsHasSelectedResponseConversionChoiceHasSelectedUseConversionChoiceSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion : _coreGameEngineCardConversionsHasSelectedResponseConversionChoiceHasSelectedUseConversionChoiceSelectedResponseConversionSelectedUseConversionAccess._hasSelectedResponseConversionChoice ? _coreGameEngineCardConversionsHasSelectedResponseConversionChoiceHasSelectedUseConversionChoiceSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion : use ? _coreGameEngineCardConversionsHasSelectedResponseConversionChoiceHasSelectedUseConversionChoiceSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion : _coreGameEngineCardConversionsHasSelectedResponseConversionChoiceHasSelectedUseConversionChoiceSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion);
         if (selected is not null)
             return _corePlayCardHistoryOperations.ViewAsRule(selected)?.DeclarationValidation is not null ? selected : null;
-        if (hasPublishedSource || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(card.Kind, kind))
+        if (hasPublishedSource || CoreNativeCardClassificationsRuntime.MatchesRequiredCard(card.Kind, kind))
             return null;
         return _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, !use, _coreDyingCursorRuntimeOperations.ActiveDying is not null).FirstOrDefault(source => _corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is not null);
     }

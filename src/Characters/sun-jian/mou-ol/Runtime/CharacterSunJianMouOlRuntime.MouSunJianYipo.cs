@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunJianMouOlRuntime
 {
     internal const string MouSunJianOlYipoDrawReason = "skill-program.mou-ol:yipo.draw", MouSunJianOlYipoDiscardReason = "skill-program.mou-ol:yipo.discard";
-    internal static CardConversionSource MouSunJianOlSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMouSunJianOlHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouSunJianYipo ? BeginMouSunJianOlYipo(f) : BeginMouSunJianOlHulie(f, op);
+    internal static CardConversionSource MouSunJianOlSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMouSunJianOlHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouSunJianYipo ? BeginMouSunJianOlYipo(f) : BeginMouSunJianOlHulie(f, op);
     internal bool HasMouSunJianOlHpSubject(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[seat], SkillProgramTriggerWindow.AfterHealthChanged).Any(c => c.SkillId == MouSunJianOlComposition.Yipo && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ResolveMouSunJianYipo }]);
     internal void CaptureMouSunJianOlHp(HpChangeContext change)
     {
@@ -30,7 +27,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     internal SkillProgramStepOutcome BeginMouSunJianOlYipo(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.MouSunJianOlYipo is not null || f.InstructionIndex != 1 || f.ActivationId != f.TriggerId || f.WindowContext is not { } w || !QualifiedMouSunJianOlYipo(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w))
+        if (f.MouSunJianOlYipo is not null || f.InstructionIndex != 1 || f.ActivationId != f.TriggerId || f.WindowContext is not { } w || !QualifiedMouSunJianOlYipo(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w))
             throw new InvalidOperationException("Yipo requires its genuine first reached positive HP occurrence.");
         var r = new MouSunJianOlYipoReceipt(MouSunJianOlSource(f), f.GameplayHash, w.ParentFrameId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouSunJianOlYipo = r });
@@ -98,7 +95,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     [ProgramAnswer("mou-sun-jian-yipo")]
     internal void AnswerMouSunJianOlYipo(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouSunJianOlYipo: { } r } f || !ValidMouSunJianOlYipo(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouSunJianOlYipoStage.Discard ? r.TargetSeat : f.OwnerSeat) || !MouSunJianOlYipoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouSunJianOlYipo: { } r } f || !ValidMouSunJianOlYipo(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouSunJianOlYipoStage.Discard ? r.TargetSeat : f.OwnerSeat) || !MouSunJianOlYipoChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Yipo changed its actual chooser, original HP event or published payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -232,7 +229,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
         if (f.MouSunJianOlYipo!.Stage == MouSunJianOlYipoStage.Target)
             return p.Choices.First(c => c.Targets.Contains(f.OwnerSeat));
         if (f.MouSunJianOlYipo.Stage == MouSunJianOlYipoStage.Option)
-            return p.Choices.Single(c => c.Parameters["branch"] == (global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.MouSunJianOlYipo.TargetSeat!.Value]) ? "draw-many" : "discard-many"));
-        return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "confirm") ?? p.Choices.Where(c => c.Parameters["branch"] == "card").OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).First();
+            return p.Choices.Single(c => c.Parameters["branch"] == (CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.MouSunJianOlYipo.TargetSeat!.Value]) ? "draw-many" : "discard-many"));
+        return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "confirm") ?? p.Choices.Where(c => c.Parameters["branch"] == "card").OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).First();
     }
 }

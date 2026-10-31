@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineHellSoulCardsRuntime
 {
     internal const string HellSoulResolutionSkill = "hell:return-soul-resolution";
-    internal static string HellSoulGrant(long id) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_HellSoulCards.HellSoulGrant(id);
+    internal static string HellSoulGrant(long id) => RuntimeSkills.RuntimeRules_Core_HellSoulCards.HellSoulGrant(id);
     internal string HellSoulGrantSource(long id) => $"turn:{(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber)}:{(_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)}:card-use:hell-return-soul:{(id)}";
     internal HellWanghunGrantLostEvent[] HellSoulOutstandingLosses(int seat)
     {
@@ -30,7 +25,7 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
         }
     }
 
-    internal IReadOnlyList<int> HellReturnSoulUseTargets(CharacterState actor, Card card) => _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(actor, HellReturnSoulTargets(actor.Seat).Where(seat => !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, seat, CardKind.ReturnSoul) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.ReturnSoul, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(actor.Seat, seat, CardKind.ReturnSoul) && !_coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[seat], SkillProgramCardPolicyKind.ExcludeGlobalTarget, CardKind.ReturnSoul) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))).ToArray());
+    internal IReadOnlyList<int> HellReturnSoulUseTargets(CharacterState actor, Card card) => _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(actor, HellReturnSoulTargets(actor.Seat).Where(seat => !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, seat, CardKind.ReturnSoul) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.ReturnSoul, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(actor.Seat, seat, CardKind.ReturnSoul) && !_coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[seat], SkillProgramCardPolicyKind.ExcludeGlobalTarget, CardKind.ReturnSoul) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))).ToArray());
     internal void ResolveHellReturnSoul(CharacterState actor, Card card)
     {
         if (!_coreNativeLegalActionsOperations.BuildLegalActions(actor, selectedPhysicalCardId: card.Id).Any(a => a.Kind == LegalActionKind.ReturnSoul && a.CardId == card.Id))
@@ -44,8 +39,8 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
     internal void ResolveHellReturnSoulEffect(NullificationWindowFrame pending)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ParentFrameId) ?? throw new InvalidOperationException("Return soul lost its actual native card owner.");
-        var seat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Return soul lost its exact native target.");
-        if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.ReturnSoul || use.HellSoul is not null || use.Action is not { } action || use.TargetIndex < 0 || use.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != seat)
+        var seat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Return soul lost its exact native target.");
+        if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.ReturnSoul || use.HellSoul is not null || use.Action is not { } action || use.TargetIndex < 0 || use.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != seat)
             throw new InvalidOperationException("Return soul changed its issued native effect or target cursor.");
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.ResolvingEffect);
         if (!_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || HellSoulOutstandingLosses(seat).Length == 0)
@@ -73,7 +68,7 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
     internal bool AllowsHellSoulVoluntaryActivation(ProgramActivationLegalityContext context) => context.SkillId != HellSoulResolutionSkill;
     internal bool IsExactHellSoulProgram(ProgramSkillFrame frame)
     {
-        if (frame.HellSoulReturn is not { } returned || frame.SkillId != HellSoulResolutionSkill || frame.ActivationId != "card-effect" || frame.TriggerId is not null || frame.SelectedCardIds.Count != 0 || !frame.SelectedTargetSeats.SequenceEqual([returned.TargetSeat]) || frame.SkillInstanceId != HellSoulGrant(returned.CardUseFrameId) || frame.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!.GameplayHash || _coreCardUseLifecycleOperations.LifecycleCardUse(returned.CardUseFrameId)is not { Step: ResolutionFrameStep.ResolvingEffect, HellSoul: { } current, Action: { } action } use || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.ReturnSoul || current.ProgramFrameId != frame.Id || current.ActionId != action.ActionId || returned.ActionId != action.ActionId || current.TargetIndex != use.TargetIndex || returned.TargetIndex != use.TargetIndex || current.TargetSeat != returned.TargetSeat || use.TargetIndex < 0 || use.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != returned.TargetSeat || use.SourceSeat != frame.OwnerSeat)
+        if (frame.HellSoulReturn is not { } returned || frame.SkillId != HellSoulResolutionSkill || frame.ActivationId != "card-effect" || frame.TriggerId is not null || frame.SelectedCardIds.Count != 0 || !frame.SelectedTargetSeats.SequenceEqual([returned.TargetSeat]) || frame.SkillInstanceId != HellSoulGrant(returned.CardUseFrameId) || frame.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!.GameplayHash || _coreCardUseLifecycleOperations.LifecycleCardUse(returned.CardUseFrameId)is not { Step: ResolutionFrameStep.ResolvingEffect, HellSoul: { } current, Action: { } action } use || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.ReturnSoul || current.ProgramFrameId != frame.Id || current.ActionId != action.ActionId || returned.ActionId != action.ActionId || current.TargetIndex != use.TargetIndex || returned.TargetIndex != use.TargetIndex || current.TargetSeat != returned.TargetSeat || use.TargetIndex < 0 || use.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != returned.TargetSeat || use.SourceSeat != frame.OwnerSeat)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == use.Id && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].SkillGrants.Grants.Any(g => g.GrantId == frame.SkillInstanceId && g.SkillId == frame.SkillId && g.SkillInstanceId == frame.SkillInstanceId && g.SourceId == HellSoulGrantSource(use.Id) && g.TurnExpiry == new SkillGrantTurnExpiry(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat));

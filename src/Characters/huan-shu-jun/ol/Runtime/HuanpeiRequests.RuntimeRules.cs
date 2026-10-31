@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_huan_shu_jun_ol_HuanpeiRequests
 {
     internal const string HuanpeiOpen = "huanpei-open";

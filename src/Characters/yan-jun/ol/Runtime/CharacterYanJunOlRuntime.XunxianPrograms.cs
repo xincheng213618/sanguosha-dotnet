@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanJunOlRuntime
@@ -57,7 +53,7 @@ internal sealed partial class CharacterYanJunOlRuntime
         var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(item => item.Id == movement.CardId);
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(recipient), new($"skill-program.{(active.SkillId)}.xunxian-gift"), _characterHuangQuanMouOperations.NativeGiveCompletion(active.Id, active.OwnerSeat, recipient, [card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】，将 {(card.DisplayName)} 交给 {(_coreMatchParticipantsPlayersAccess._players[recipient].Name)}。", active.OwnerSeat, recipient);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramXunxianGiftEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, recipient, card.Id, movement.Sequence));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramXunxianGiftEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, recipient, card.Id, movement.Sequence));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }

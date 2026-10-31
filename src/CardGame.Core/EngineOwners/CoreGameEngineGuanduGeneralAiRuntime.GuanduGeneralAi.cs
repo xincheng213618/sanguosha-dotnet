@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -34,14 +31,14 @@ internal sealed partial class CoreGameEngineGuanduGeneralAiRuntime
         double Value(PromptChoice c)
         {
             var option = c.Parameters.GetValueOrDefault("option");
-            var keep = c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat]) : 0;
+            var keep = c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat]) : 0;
             var target = c.Targets.FirstOrDefault(-1);
             var allied = target >= 0 && _coreGuanduActivitiesOperations.GuanduAllies(f.OwnerSeat, target);
             if (option == "skip")
                 return -10;
             return r.Stage switch
             {
-                "shicai-cost" => _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault()is { } top ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(top, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) - keep : -20,
+                "shicai-cost" => _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault()is { } top ? CoreNativeAiDecisionsRuntime.GetKeepValue(top, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) - keep : -20,
                 "jieliang-cost" => _coreGuanduActivitiesOperations.GuanduAllies(f.OwnerSeat, r.TargetSeat) ? -30 : 30 - keep,
                 "jieliang-claim" => keep,
                 "zezhu-take" => option == "take-hand" ? 7 : keep + 3,

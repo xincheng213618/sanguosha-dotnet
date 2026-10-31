@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceXiyingEndingRuntime
@@ -78,7 +74,7 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingEndingRuntime
         var paid = ExactSourceXiyingEnding(candidate, c) ?? throw new InvalidOperationException("Source1180 reward lost its exact paid Play and actual Ending obligation.");
         if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingRewardEvent>().Any(e => e.PaidFrameId == paid.FrameId))
             throw new InvalidOperationException("Source1180 cannot pay the same earned reward twice.");
-        var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || global::CardGame.Core.EngineOwners.CoreGameEngineShanheSchoolTrickRuntime.IsShanheSchoolDamageTrick(card.Kind)).ToArray();
+        var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || CoreGameEngineShanheSchoolTrickRuntime.IsShanheSchoolDamageTrick(card.Kind)).ToArray();
         var selected = pool.Length == 0 ? null : pool[_randomOperations._random.Next(pool.Length)];
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         if (selected is null)

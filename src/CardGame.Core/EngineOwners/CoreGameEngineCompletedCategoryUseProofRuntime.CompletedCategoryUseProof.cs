@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCompletedCategoryUseProofRuntime
@@ -233,7 +229,7 @@ internal sealed partial class CoreGameEngineCompletedCategoryUseProofRuntime
                     before = [actor];
                 if (!actual.SequenceEqual(designated) || !_characterXunYuMobileGodOperations.IsDinghanCancellationFact(use, dinghan, before))
                     return false;
-                designated = global::CardGame.Core.EngineOwners.CharacterXunYuMobileGodRuntime.DinghanRetainedTargets(kind, before, dinghan.Owner).ToList();
+                designated = CharacterXunYuMobileGodRuntime.DinghanRetainedTargets(kind, before, dinghan.Owner).ToList();
                 actual = designated.ToList();
             }
             else if (fact is BeiMiHuTargetsPaidEvent kuiTargets && kuiTargets.Receipt.CardUseId == use.Id)
@@ -242,7 +238,7 @@ internal sealed partial class CoreGameEngineCompletedCategoryUseProofRuntime
                 IReadOnlyList<int> originalTargets = designated;
                 if (kind == CardKind.DrawTwo && designated.Count == 0 && actual.Count == 0 && receipt.BeforeTargets is [var self] && self == actor)
                     originalTargets = [actor];
-                if (!actual.SequenceEqual(designated) || !originalTargets.SequenceEqual(receipt.BeforeTargets) || receipt.ActionId != completed.ActionId || use.BeiMiHuTargetMutation is not { } mutation || !global::CardGame.Core.EngineOwners.CharacterBeiMiHuOlRuntime.BeiMiHuMutationEqual(mutation, receipt) || !_characterBeiMiHuOlOperations.ValidBeiMiHuTargetMutation(use))
+                if (!actual.SequenceEqual(designated) || !originalTargets.SequenceEqual(receipt.BeforeTargets) || receipt.ActionId != completed.ActionId || use.BeiMiHuTargetMutation is not { } mutation || !CharacterBeiMiHuOlRuntime.BeiMiHuMutationEqual(mutation, receipt) || !_characterBeiMiHuOlOperations.ValidBeiMiHuTargetMutation(use))
                     return false;
                 designated = receipt.AfterTargets.ToList();
                 actual = receipt.AfterTargets.ToList();

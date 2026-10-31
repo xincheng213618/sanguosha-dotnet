@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineLiushiEffectsRuntime
@@ -14,13 +10,13 @@ internal sealed partial class CoreGameEngineLiushiEffectsRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target } context || context.ParentFrameId != window.Id || context.DamageFrameId != window.ParentFrameId || source != f.OwnerSeat || target != window.TargetSeat || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
+        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target } context || context.ParentFrameId != window.Id || context.DamageFrameId != window.ParentFrameId || source != f.OwnerSeat || target != window.TargetSeat || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("Liushi lost its exact applied-damage candidate.");
         var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
         if (attack.IsChainPropagation)
             return;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == attack.ResolutionId);
-        if (attack.IsSourceLess || !attack.DamageWasApplied || attack.DamageAmount != context.Amount || use?.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != source || attack.TargetSeat != target || attack.ConversionSource is not { } conversion || !action.ConversionChain.Contains(conversion) || conversion.SkillId != f.SkillId || conversion.SkillInstanceId != f.SkillInstanceId || conversion.OwnerSeat != source || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[source], f.SkillId, f.SkillInstanceId))
+        if (attack.IsSourceLess || !attack.DamageWasApplied || attack.DamageAmount != context.Amount || use?.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != source || attack.TargetSeat != target || attack.ConversionSource is not { } conversion || !action.ConversionChain.Contains(conversion) || conversion.SkillId != f.SkillId || conversion.SkillInstanceId != f.SkillInstanceId || conversion.OwnerSeat != source || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[source], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("Liushi requires its own exact native converted Slash damage.");
         if (!_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
             return;
@@ -49,7 +45,7 @@ internal sealed partial class CoreGameEngineLiushiEffectsRuntime
         if (!IsLiushiClearDraw(f) || p.FrameId != f.Id || p.SkillId != f.SkillId || p.SkillInstanceId != f.SkillInstanceId || p.GameplayHash != f.GameplayHash || p.OwnerSeat != f.OwnerSeat || f.WindowContext is not { } c || p.WindowId != c.ParentFrameId || p.TargetSeat != c.TargetSeat || p.RequestedCount < 1 || p.RequestedCount != c.Facts?.TurnOwnerDiscardPhaseHandDiscardCount || p.InstructionIndex != 1 || f.InstructionIndex is < 1 or > 2 || p.ActualCount < 0 || p.ActualCount > p.RequestedCount || p.SequenceBefore > p.SequenceAfter || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramLiushiDrawPaidEvent>().Count(e => e.Payment == p) != 1)
             throw new InvalidOperationException("Liushi clearing lost its issued owning draw receipt.");
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == p.WindowId);
-        if (parent is null || parent.Window != SkillProgramTriggerWindow.DiscardPhaseEnded || parent.OwnerSeat != p.TargetSeat || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
+        if (parent is null || parent.Window != SkillProgramTriggerWindow.DiscardPhaseEnded || parent.OwnerSeat != p.TargetSeat || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
             throw new InvalidOperationException("Liushi clearing lost its exact discard candidate parent.");
         var moves = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > p.SequenceBefore && m.Sequence <= p.SequenceAfter && m.Reason == new CardMoveReason($"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.Draw)}")).ToArray();
         if (moves.Length != p.ActualCount || moves.Select(m => m.CardId).Distinct().Count() != moves.Length || moves.Any(m => m.From != CardLocation.DrawPile || m.To != CardLocation.Hand(f.OwnerSeat)))
@@ -88,6 +84,6 @@ internal sealed partial class CoreGameEngineLiushiEffectsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramLiushiEffectClearedEvent(f.Id, p.WindowId, f.OwnerSeat, p.TargetSeat, sources.Sum(s => s.Value)));
     }
 
-    void global::CardGame.Core.ILiushiEffectHost.ApplyLiushiEffect(ProgramSkillFrame f) => ApplyProgramLiushiEffect(f);
-    void global::CardGame.Core.ILiushiEffectHost.ClearLiushiEffect(ProgramSkillFrame f) => ClearProgramLiushiEffect(f);
+    void ILiushiEffectHost.ApplyLiushiEffect(ProgramSkillFrame f) => ApplyProgramLiushiEffect(f);
+    void ILiushiEffectHost.ClearLiushiEffect(ProgramSkillFrame f) => ClearProgramLiushiEffect(f);
 }

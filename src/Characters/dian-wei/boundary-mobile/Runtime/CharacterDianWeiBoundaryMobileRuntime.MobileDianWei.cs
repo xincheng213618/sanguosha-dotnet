@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDianWeiBoundaryMobileRuntime
 {
-    void global::CardGame.Core.IMobileDianWeiProgramHost.ConsumeTarget(ProgramSkillFrame frame) => ConsumeMobileDianWeiTarget(frame);
+    void IMobileDianWeiProgramHost.ConsumeTarget(ProgramSkillFrame frame) => ConsumeMobileDianWeiTarget(frame);
     internal void ConsumeMobileDianWeiTarget(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

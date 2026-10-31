@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHeYanAnniversaryRuntime
@@ -21,14 +17,14 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
         if (child is PublicHandRevealWindowFrame reveal)
             return r.Stage == AnniversaryHeYanStage.Revealing && reveal.ParentFrameId == f.Id && reveal.ReturnKind == PublicHandRevealReturnKind.Registered && reveal.ReturnKey == HeYanRevealReturn && _characterXiaoQiaoMouOlOperations.IsPublicHandRevealProducerSuspended(f.Id, HeYanRevealReturn);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryHeYanStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.DrawTarget && draw.Context.RequestedCount == r.DrawAmount && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryHeYanStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.DrawTarget && draw.Context.RequestedCount == r.DrawAmount && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
         if (r.Stage is not (AnniversaryHeYanStage.MovementChildren or AnniversaryHeYanStage.DrawChildren))
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
         {
             var before = r.Stage == AnniversaryHeYanStage.MovementChildren ? r.Payment!.Before : r.Draws[^1].SequenceBefore;
             var after = r.Stage == AnniversaryHeYanStage.MovementChildren ? r.Payment!.After : r.Draws[^1].SequenceAfter;
-            return f.PendingMovementContinuation is { } p && HeYanMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > before && m.Sequence <= after && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+            return f.PendingMovementContinuation is { } p && HeYanMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > before && m.Sequence <= after && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         }
 
         if (child is RecoveryReplacementFrame recovery)

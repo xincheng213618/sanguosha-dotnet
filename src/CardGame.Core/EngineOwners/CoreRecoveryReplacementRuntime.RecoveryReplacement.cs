@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreRecoveryReplacementRuntime
@@ -96,7 +92,7 @@ internal sealed partial class CoreRecoveryReplacementRuntime
             return;
         }
 
-        global::CardGame.Core.NativeOwners.CardAttackHandle attack = _coreActiveNativeAttackQueriesOperations.ActiveCardAttack;
+        NativeOwners.CardAttackHandle attack = _coreActiveNativeAttackQueriesOperations.ActiveCardAttack;
         if (attack is null || attack.ResolutionId != useId)
             throw new InvalidOperationException("A paid recovery continuation lost its actual active attack.");
         switch (continuation.Kind)

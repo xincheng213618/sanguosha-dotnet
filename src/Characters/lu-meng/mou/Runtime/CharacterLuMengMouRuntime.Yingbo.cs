@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuMengMouRuntime
 {
     internal const string YingboSkillId = "mou:yingbo";
-    internal global::CardGame.Core.NativeOwners.YingboGiftHandle? ActiveYingboGift
+    internal NativeOwners.YingboGiftHandle? ActiveYingboGift
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.YingboGift?.Active == true)is { } id ? _kernelCharacterLuMengMouOperations.CreateYingboGiftHandle(id) : null;
         set
@@ -21,9 +17,9 @@ internal sealed partial class CharacterLuMengMouRuntime
 
     internal void RecordYingboCardUse(long resolutionId, int sourceSeat, CardKind cardKind)
     {
-        if (!_coreMouLuMengOperations.UsesFormalMouLuMeng || !global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(cardKind))
+        if (!_coreMouLuMengOperations.UsesFormalMouLuMeng || !CoreGameEngineMouLuMengRuntime.IsDamageCardKind(cardKind))
             return;
-        var usageId = global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.GetRoundDamageCardUsageId(cardKind);
+        var usageId = CoreGameEngineMouLuMengRuntime.GetRoundDamageCardUsageId(cardKind);
         var wasUsedEarlier = _coreMatchParticipantsPlayersAccess._players.Any(player => _skillRuntimeStateOperations._skillRuntimeState.GetUsage(player.Seat, "system:round-damage-card-history", usageId, SkillUsageScope.Round) > 0);
         var source = _coreMatchParticipantsPlayersAccess._players[sourceSeat];
         if (source.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(source, YingboSkillId))
@@ -44,7 +40,7 @@ internal sealed partial class CharacterLuMengMouRuntime
 
     internal bool IsYingboUnrespondable(long resolutionId) => _coreMouLuMengOperations.UsesFormalMouLuMeng && (_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.YingboUnrespondable == true);
     internal bool IsYingboRepeated(long resolutionId) => _coreMouLuMengOperations.UsesFormalMouLuMeng && (_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.YingboRepeated == true);
-    internal bool TryBeginYingboGift(long resolutionId, int sourceSeat, Card card, CardKind cardKind, IReadOnlyList<Card> physicalCards, YingboGiftContinuation continuation, global::CardGame.Core.NativeOwners.CardAttackHandle? attack = null, global::CardGame.Core.NativeOwners.GroupCardHandle? group = null)
+    internal bool TryBeginYingboGift(long resolutionId, int sourceSeat, Card card, CardKind cardKind, IReadOnlyList<Card> physicalCards, YingboGiftContinuation continuation, NativeOwners.CardAttackHandle? attack = null, NativeOwners.GroupCardHandle? group = null)
     {
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !IsYingboUnrespondable(resolutionId) || ActiveYingboGift is not null || physicalCards is not [var physicalCard] || physicalCard.Id != card.Id || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Processing)
             return false;

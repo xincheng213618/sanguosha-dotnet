@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterRuanHuiOlRuntime
 {
     internal const string MingchaGain = "skill-program.ruan-hui.mingcha.gain", MingchaCleanup = "skill-program.ruan-hui.mingcha.cleanup", MingchaRandom = "skill-program.ruan-hui.mingcha.random", JingzhongGain = "skill-program.ruan-hui.jingzhong.gain", MingchaBind = "mingcha-public-three";
-    SkillProgramStepOutcome global::CardGame.Core.IRuanHuiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginRuanHui(f, op);
+    SkillProgramStepOutcome IRuanHuiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginRuanHui(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27080)]
     internal bool QualifyRuanHui(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)
     {
@@ -26,12 +22,12 @@ internal sealed partial class CharacterRuanHuiOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var context = f.WindowContext;
-        if (f.RuanHui is not null || f.InstructionIndex != 1 || context is null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !QualifyRuanHui(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
+        if (f.RuanHui is not null || f.InstructionIndex != 1 || context is null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !QualifyRuanHui(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Ruan Hui requires her exact unissued native boundary.");
         var r = new RuanHuiReceipt(RuanHuiSource(f), f.GameplayHash, op, f.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, op == SkillProgramEffectOp.ResolveMingchaRevealDrawChoice ? RuanHuiStage.RevealChildren : RuanHuiStage.TargetChoice, [], []);
         if (op == SkillProgramEffectOp.ObtainJingzhongUsedEntities)
         {
-            var facts = RuanHuiClaimFacts(context.MovementBatch!, new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex));
+            var facts = RuanHuiClaimFacts(context.MovementBatch!, new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex));
             var first = facts.First(e => JingzhongUsedCount(e.LeaseId) < 3 && _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == e.CardId).Sequence == e.MovementSequence);
             var entities = facts.Where(e => e.LeaseId == first.LeaseId && e.ActionId == first.ActionId && _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == e.CardId).Sequence == e.MovementSequence).Select(e => new RuanHuiEntity(e.CardId, _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId).Kind, _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId).Rank, CardLocation.DiscardPile, e.MovementSequence)).ToArray();
             r = r with
@@ -119,7 +115,7 @@ internal sealed partial class CharacterRuanHuiOlRuntime
     [ProgramAnswer("ruan-hui")]
     internal void AnswerRuanHui(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanHui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !RuanHuiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanHui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !RuanHuiChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Ruan Hui requires her actual published native choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -129,7 +125,7 @@ internal sealed partial class CharacterRuanHuiOlRuntime
             var replace = branch == "replace";
             if (replace)
             {
-                if (_resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == r.ParentId)is not ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.DrawPhaseStarting } parent || parent.OwnerSeat != f.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
+                if (_resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == r.ParentId)is not ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.DrawPhaseStarting } parent || parent.OwnerSeat != f.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
                     throw new InvalidOperationException("Mingcha lost its exact normal-draw plan parent.");
                 _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { NormalDrawReplaced = true });
             }

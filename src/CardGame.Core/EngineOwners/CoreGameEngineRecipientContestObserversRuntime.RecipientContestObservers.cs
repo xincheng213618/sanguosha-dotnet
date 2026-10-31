@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRecipientContestObserversRuntime
@@ -36,14 +32,14 @@ internal sealed partial class CoreGameEngineRecipientContestObserversRuntime
             draw = peer.Stage == UniqueHpPeerStage.DrawChildren;
             before = draw ? invoice.DrawBefore : invoice.CostBefore;
             after = draw ? invoice.DrawAfter : invoice.CostAfter;
-            reason = draw ? global::CardGame.Core.EngineOwners.CoreGameEngineUniqueHpPeerProgramsRuntime.UniqueHpPeerDrawReason(f, actor) : global::CardGame.Core.EngineOwners.CoreGameEngineUniqueHpPeerProgramsRuntime.UniqueHpPeerCostReason(f);
+            reason = draw ? CoreGameEngineUniqueHpPeerProgramsRuntime.UniqueHpPeerDrawReason(f, actor) : CoreGameEngineUniqueHpPeerProgramsRuntime.UniqueHpPeerCostReason(f);
         }
         else if (f.RecipientContest is { Stage: RecipientContestStage.GiftChildren } gift && _coreRecipientContestReceiptsOperations.ValidRecipientContest(f))
         {
             before = gift.SequenceBefore;
             after = gift.SequenceAfter;
             actor = f.OwnerSeat;
-            reason = global::CardGame.Core.EngineOwners.CoreGameEngineRecipientContestsRuntime.RecipientContestGiftReason(f);
+            reason = CoreGameEngineRecipientContestsRuntime.RecipientContestGiftReason(f);
             draw = false;
         }
         else

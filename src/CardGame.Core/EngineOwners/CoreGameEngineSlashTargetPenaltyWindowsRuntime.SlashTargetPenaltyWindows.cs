@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSlashTargetPenaltyWindowsRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyWindowsRuntime
 
     internal bool MatchesSlashTargetPenaltyUse(SlashTargetPenaltyIdentity r)
     {
-        if (r.FrozenDistance != 1 || r.Source.OwnerSeat != r.ActorSeat || string.IsNullOrWhiteSpace(r.Source.SkillId) || string.IsNullOrWhiteSpace(r.Source.BindingId) || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.CardUseFrameId)is not { } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardKind != r.EffectiveKind)
+        if (r.FrozenDistance != 1 || r.Source.OwnerSeat != r.ActorSeat || string.IsNullOrWhiteSpace(r.Source.SkillId) || string.IsNullOrWhiteSpace(r.Source.BindingId) || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.CardUseFrameId)is not { } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardKind != r.EffectiveKind)
             return false;
         // Reuse the mature same-use actor-replacement and legacy producer proof.
         var target = r.TargetSeat;
@@ -25,9 +21,9 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyWindowsRuntime
         return _coreSlashTargetBenefitWindowsOperations.MatchesSlashTargetBenefitUse(new(use.Id, r.ActionId, r.ActorSeat, r.ProviderSeat, r.EffectiveKind, target, r.ActualTurnNumber, r.ActualTurnOwnerSeat, r.LegacyProducerProgramId));
     }
 
-    internal bool TryBeginSlashTargetPenalties(global::CardGame.Core.NativeOwners.CardAttackHandle attack, bool legacy = false, bool afterActualTargets = false)
+    internal bool TryBeginSlashTargetPenalties(NativeOwners.CardAttackHandle attack, bool legacy = false, bool afterActualTargets = false)
     {
-        if (!HasSlashTargetPenaltyPrograms || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.IsSourceLess || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat) || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive)
+        if (!HasSlashTargetPenaltyPrograms || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.IsSourceLess || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat) || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive)
             return false;
         var owner = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat];
         var facts = use.Action is { } action ? _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(owner, action) : _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(owner);
@@ -98,7 +94,7 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyWindowsRuntime
         var e = parent.Entries[parent.CandidateIndex];
         var r = e.Identity;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == parent.Id && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, e.Candidate) && context.OwnerSeat == f.OwnerSeat && context.SourceSeat == r.ActorSeat && context.TargetSeat == r.TargetSeat && context.OccurrenceIndex == e.Candidate.OccurrenceIndex && context.SlashTargetPenalty == r && f.InstructionIndex is 0 or 1;
+        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == parent.Id && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, e.Candidate) && context.OwnerSeat == f.OwnerSeat && context.SourceSeat == r.ActorSeat && context.TargetSeat == r.TargetSeat && context.OccurrenceIndex == e.Candidate.OccurrenceIndex && context.SlashTargetPenalty == r && f.InstructionIndex is 0 or 1;
     }
 
     internal bool CanRunSlashTargetPenalty(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => context.SlashTargetPenalty is { } r && context.Window == SkillProgramTriggerWindow.ActualSlashTargetPenalty && r.Source.SkillId == c.SkillId && r.Source.BindingId == c.BindingId && r.Source.OwnerSeat == c.OwnerSeat && r.Source.SkillInstanceId == c.SkillInstanceId && r.GameplayHash == c.GameplayHash && MatchesSlashTargetPenaltyUse(r) && _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive && _coreCardUseLifecycleOperations.LifecycleCardUse(r.CardUseFrameId)!.TargetSeats.Contains(r.TargetSeat) && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat], c.SkillId, c.SkillInstanceId);
@@ -152,7 +148,7 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyWindowsRuntime
 
     internal void CompleteSlashTargetPenaltyBinding(ProgramSkillFrame f)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not SlashTargetPenaltyWindowFrame w || w.Id != f.WindowContext?.ParentFrameId || w.CandidateIndex >= w.Entries.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Entries[w.CandidateIndex].Candidate))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not SlashTargetPenaltyWindowFrame w || w.Id != f.WindowContext?.ParentFrameId || w.CandidateIndex >= w.Entries.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Entries[w.CandidateIndex].Candidate))
             throw new InvalidOperationException("The target penalty binding lost its exact parent candidate.");
         _coreRuntimeOperations.ReplaceRuntimeTop(w with { CandidateIndex = w.CandidateIndex + 1, Step = ResolutionFrameStep.ResolvingEffect });
         _coreRuntimeOperations.AdvanceRuntimeTop<SlashTargetPenaltyWindowFrame>();

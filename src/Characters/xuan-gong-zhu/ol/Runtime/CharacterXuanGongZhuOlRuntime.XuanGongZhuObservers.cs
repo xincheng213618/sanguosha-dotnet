@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXuanGongZhuOlRuntime
@@ -41,9 +37,9 @@ internal sealed partial class CharacterXuanGongZhuOlRuntime
     internal ProgramSkillFrame? XuanGongZhuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.XuanGongZhuFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 420)]
     internal bool TryAdvanceXuanGongZhuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XuanGongZhuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    SkillProgramStepOutcome global::CardGame.Core.IXuanGongZhuProgramHost.ArmQimeiPair(ProgramSkillFrame f) => _coreQimeiProgramsOperations.ArmQimeiPair(f);
-    SkillProgramStepOutcome global::CardGame.Core.IXuanGongZhuProgramHost.SettleQimeiPairEquality(ProgramSkillFrame f) => _coreQimeiProgramsOperations.SettleQimeiPairEquality(f);
-    SkillProgramStepOutcome global::CardGame.Core.IXuanGongZhuProgramHost.OfferZhuijiActualPlayChoice(ProgramSkillFrame f) => _coreZhuijiProgramsOperations.ArmZhuijiActualPlay(f);
-    SkillProgramStepOutcome global::CardGame.Core.IXuanGongZhuProgramHost.SettleZhuijiActualPlayDebt(ProgramSkillFrame f) => _coreZhuijiProgramsOperations.SettleZhuijiActualPlayDebt(f);
-    SkillProgramStepOutcome global::CardGame.Core.IXuanGongZhuProgramHost.AfterActualIdentityAppearanceRecover(ProgramSkillFrame f) => _coreIdentityConcealmentOperations.ArmGaolingRecovery(f);
+    SkillProgramStepOutcome IXuanGongZhuProgramHost.ArmQimeiPair(ProgramSkillFrame f) => _coreQimeiProgramsOperations.ArmQimeiPair(f);
+    SkillProgramStepOutcome IXuanGongZhuProgramHost.SettleQimeiPairEquality(ProgramSkillFrame f) => _coreQimeiProgramsOperations.SettleQimeiPairEquality(f);
+    SkillProgramStepOutcome IXuanGongZhuProgramHost.OfferZhuijiActualPlayChoice(ProgramSkillFrame f) => _coreZhuijiProgramsOperations.ArmZhuijiActualPlay(f);
+    SkillProgramStepOutcome IXuanGongZhuProgramHost.SettleZhuijiActualPlayDebt(ProgramSkillFrame f) => _coreZhuijiProgramsOperations.SettleZhuijiActualPlayDebt(f);
+    SkillProgramStepOutcome IXuanGongZhuProgramHost.AfterActualIdentityAppearanceRecover(ProgramSkillFrame f) => _coreIdentityConcealmentOperations.ArmGaolingRecovery(f);
 }

@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunYuanOlRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.ISunYuanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginSunYuan(f, op);
+    SkillProgramStepOutcome ISunYuanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginSunYuan(f, op);
     internal SkillProgramStepOutcome BeginSunYuan(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -66,7 +63,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
     [ProgramAnswer("sun-yuan")]
     internal void AnswerSunYuan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunYuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SunYuanStage.Request ? r.Holder : f.OwnerSeat) || !SunYuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunYuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SunYuanStage.Request ? r.Holder : f.OwnerSeat) || !SunYuanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Sun Yuan requires her exact private choice and participant.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

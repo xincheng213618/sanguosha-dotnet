@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYangFengOlRuntime
 {
     internal const string JiaweiDiscard = "skill-program.yang-feng.jiawei.discard", JiaweiOwnerGain = "skill-program.yang-feng.jiawei.owner-gain", JiaweiTargetGain = "skill-program.yang-feng.jiawei.target-gain", JiaweiCleanup = "skill-program.yang-feng.jiawei.cleanup", QujiaGain = "skill-program.yang-feng.qujia.gain", JiaweiRevealBind = "jiawei-public-top";
-    internal static CardConversionSource YangFengSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yang_feng_ol_YangFeng.YangFengSource(f);
+    internal static CardConversionSource YangFengSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_yang_feng_ol_YangFeng.YangFengSource(f);
     internal int YangFengCompletedTurns(int owner, int cutoff) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Take(cutoff).OfType<TurnEndedEvent>().Count(e => e.ActorSeat == owner);
-    SkillProgramStepOutcome global::CardGame.Core.IYangFengHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYangFeng(f, op);
+    SkillProgramStepOutcome IYangFengHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYangFeng(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27150)]
     internal bool QualifyYangFeng(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -100,7 +96,7 @@ internal sealed partial class CharacterYangFengOlRuntime
     [ProgramAnswer("yang-feng")]
     internal void AnswerYangFeng(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YangFeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !YangFengChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YangFeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !YangFengChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Yang Feng requires his exact published private selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -120,7 +116,7 @@ internal sealed partial class CharacterYangFengOlRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { YangFeng = f.YangFeng!with { Stage = YangFengStage.QujiaGainChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             _ = _corePhysicalDrawFacadesOperations.EnsureDrawPile();
-            var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind));
+            var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind));
             var material = card is null ? null : new YangFengMaterial(card.Id, card.Kind, CardLocation.DrawPile, 0);
             if (material is not null && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
                 MoveYangFengEntities(f, [material], CardLocation.Hand(f.OwnerSeat), QujiaGain, YangFengStage.QujiaGainChildren, before);
@@ -236,5 +232,5 @@ internal sealed partial class CharacterYangFengOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveJiaweiDiscardReveal, SkillProgramEffectOp.ResolveQujiaLimitedTurnEnd)]
-    internal PromptChoice ChooseYangFengAi(PendingDecision p, ProgramSkillFrame f) => f.YangFeng!.Stage == YangFengStage.QujiaChoice ? p.Choices.First(c => c.Parameters["branch"] == "extra") : p.Choices.OrderBy(c => c.Cards.Count == 0 ? 2 : global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.YangFeng.TargetSeat]) * (f.YangFeng.TargetSeat == f.OwnerSeat ? 1 : -1)).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    internal PromptChoice ChooseYangFengAi(PendingDecision p, ProgramSkillFrame f) => f.YangFeng!.Stage == YangFengStage.QujiaChoice ? p.Choices.First(c => c.Parameters["branch"] == "extra") : p.Choices.OrderBy(c => c.Cards.Count == 0 ? 2 : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.YangFeng.TargetSeat]) * (f.YangFeng.TargetSeat == f.OwnerSeat ? 1 : -1)).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 }

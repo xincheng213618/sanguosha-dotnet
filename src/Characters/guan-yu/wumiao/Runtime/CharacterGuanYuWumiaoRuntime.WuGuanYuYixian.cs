@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,8 +8,8 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     internal const string WuYixianObtainReason = "skill-program.wu-guan-yu.yixian.obtain";
     internal const string WuYixianDrawReason = "skill-program.wu-guan-yu.yixian.draw";
     internal const string WuYixianUsage = "all-equipment";
-    internal static CardConversionSource WuYixianSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guan_yu_wumiao_WuGuanYuYixian.WuYixianSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IWuYixianHost.Resolve(ProgramSkillFrame frame) => BeginWuYixian(frame);
+    internal static CardConversionSource WuYixianSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_guan_yu_wumiao_WuGuanYuYixian.WuYixianSource(f);
+    SkillProgramStepOutcome IWuYixianHost.Resolve(ProgramSkillFrame frame) => BeginWuYixian(frame);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 28530, SkillProgramEffectOp.ResolveYixianAllEquipmentObtainAndCompensate)]
     internal bool CanActivateWuYixian(ProgramActivationLegalityContext c) => c.Owner.IsAlive && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && c.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(c.OwnerSeat, c.Program.Id, WuYixianUsage, SkillUsageScope.Game) == 0;
     internal SkillProgramStepOutcome BeginWuYixian(ProgramSkillFrame supplied)
@@ -69,7 +66,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     [ProgramAnswer("wu-yixian")]
     internal void AnswerWuYixian(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Yixian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WuYixianChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Yixian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WuYixianChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Yixian requires its original private branch or recipient choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

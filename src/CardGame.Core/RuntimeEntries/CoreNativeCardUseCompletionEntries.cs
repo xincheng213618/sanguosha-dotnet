@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreNativeCardUseCompletionRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreNativeCardUseCompletionRuntime))]
 internal sealed partial class CoreNativeCardUseCompletionEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeCardUseCompletionRuntime> _resolve;
-    private CoreNativeCardUseCompletionEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeCardUseCompletionRuntime> resolve)
+    private readonly Func<EngineOwners.CoreNativeCardUseCompletionRuntime> _resolve;
+    private CoreNativeCardUseCompletionEntries(Func<EngineOwners.CoreNativeCardUseCompletionRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreNativeCardUseCompletionEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeCardUseCompletionRuntime> resolve) => new(resolve);
+    internal static CoreNativeCardUseCompletionEntries Create(Func<EngineOwners.CoreNativeCardUseCompletionRuntime> resolve) => new(resolve);
 }

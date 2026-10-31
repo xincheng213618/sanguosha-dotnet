@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,10 +8,10 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
     internal const string HaoMengAction = "anniversary-hao-meng";
     internal bool HasAnniversaryHaoMengCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryHaoMengXiongmangConsequence);
 
-    internal static CardConversionSource HaoMengSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource HaoMengSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardConversionSource HaoMengNativeSource(ProgramSkillFrame f, int count) => new(f.SkillId, "distinct-hand-" + count, f.OwnerSeat, f.SkillInstanceId);
     internal Suit HaoMengHandSuit(int owner, int id) => _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], _coreAdvancedLifecycleOperations.GetAdvancedCard(id), CardLocation.Hand(owner));
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryHaoMengHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHaoMeng(f, op);
+    SkillProgramStepOutcome IAnniversaryHaoMengHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHaoMeng(f, op);
     internal bool HaoMengMaterials(int owner, IReadOnlyList<int> ids, CardConversionSource source)
     {
         if (source.SkillId != AnniversaryHaoMengComposition.Skill || source.OwnerSeat != owner || ids.Count is < 1 or > 4 || ids.Distinct().Count() != ids.Count || _corePlayCardHistoryOperations.ViewAsRule(source)is not { OutputKind: CardKind.Slash } rule || rule.Id != "distinct-hand-" + ids.Count || rule.InputCount != ids.Count)
@@ -23,7 +20,7 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
     }
 
     [ProgramCardLegality(ProgramCardLegalityStage.ViewAsBan, 49700)]
-    internal bool BanHaoMengConversion(ProgramViewAsLegalityQuery q) => q.Source.SkillId == AnniversaryHaoMengComposition.Skill && (q.ForResponse || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) || !HaoMengMaterials(q.Owner.Seat, q.CardIds, q.Source));
+    internal bool BanHaoMengConversion(ProgramViewAsLegalityQuery q) => q.Source.SkillId == AnniversaryHaoMengComposition.Skill && (q.ForResponse || !CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) || !HaoMengMaterials(q.Owner.Seat, q.CardIds, q.Source));
     [ProgramCardLegality(ProgramCardLegalityStage.LegalActionProjection, 49700)]
     internal LegalAction? ProjectHaoMengUse(ProgramLegalActionQuery q) => q.Action.ConversionSource is { SkillId: AnniversaryHaoMengComposition.Skill } s && _corePlayCardHistoryOperations.ViewAsRule(s)is { } rule && q.Action.TargetSeats.Count > rule.InputCount ? null : q.Action;
     internal int[] HaoMengNativeTargets(int actor, IReadOnlyList<int> ids, CardConversionSource source)
@@ -143,7 +140,7 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
     [ProgramAnswer(HaoMengAction)]
     internal void AnswerHaoMeng(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHaoMeng: { Stage: AnniversaryHaoMengStage.Cards or AnniversaryHaoMengStage.Targets } r } f || !ValidHaoMeng(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HaoMengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHaoMeng: { Stage: AnniversaryHaoMengStage.Cards or AnniversaryHaoMengStage.Targets } r } f || !ValidHaoMeng(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HaoMengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xiongmang rejects another Hand entity, suit, native target or payment stage.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

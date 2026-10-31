@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class AnniversaryHuCheErHost(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterHuCheErAnniversaryEntries> getCharacterHuCheErAnniversaryRuntime) : IAnniversaryHuCheErHost
+internal sealed class AnniversaryHuCheErHost(Func<RuntimeEntries.CharacterHuCheErAnniversaryEntries> getCharacterHuCheErAnniversaryRuntime) : IAnniversaryHuCheErHost
 {
     public SkillProgramStepOutcome Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {

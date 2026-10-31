@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,16 +7,16 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
 {
     internal long SequentialDiscardMovementSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.Count == 0 ? 0 : _coreCardMovementJournalCardMovementsAccess._cardMovements[^1].Sequence;
 
-    internal static bool IsSequentialDiscardOp(SkillProgramEffectOp op) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SequentialDiscardPrograms.IsSequentialDiscardOp(op);
+    internal static bool IsSequentialDiscardOp(SkillProgramEffectOp op) => RuntimeSkills.RuntimeRules_Core_SequentialDiscardPrograms.IsSequentialDiscardOp(op);
     internal SkillProgramEffect SequentialDiscardEffect(ProgramSkillFrame frame) => ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
     internal string SequentialDiscardReason(ProgramSkillFrame frame) => $"skill-program.{(frame.SkillId)}.{(SequentialDiscardEffect(frame).Op)}";
-    internal CardConversionSource SequentialDiscardSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource SequentialDiscardSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal IReadOnlyList<int> SequentialDiscardOrder(int owner, int start, bool ring) => Array.AsReadOnly((ring ? Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreTableOrderOperations.TableStepSeat(start, offset)).Where(seat => seat != owner) : Enumerable.Repeat(start, 1)).ToArray());
     internal bool SequentialDiscardCanContinue(ProgramSkillFrame frame) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId);
     internal IEnumerable<(Card Card, CardLocation Location)> SequentialDiscardCards(ProgramSkillFrame frame, int chooser, SkillProgramEffect effect) => effect.Zones.SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, chooser)).Where(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, card, new(zone, chooser), OwnedCardMoveIntent.Discard) && !(zone == CardZoneKind.Equipment && chooser == frame.OwnerSeat && _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(chooser, frame.SkillId, frame.SkillInstanceId, card))).Select(card => (card, new CardLocation(zone, chooser))));
     internal SkillProgramStepOutcome RunSequentialDiscard(ProgramSkillFrame supplied, SkillProgramEffect effect, int selectedTarget)
     {
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineAllHandChallengesRuntime.IsAllHandChallengeOp(effect.Op))
+        if (CoreGameEngineAllHandChallengesRuntime.IsAllHandChallengeOp(effect.Op))
             return _coreAllHandChallengesOperations.RunAllHandChallenge(supplied, effect);
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (!IsSequentialDiscardOp(effect.Op) || effect.Target != (effect.Op == SkillProgramEffectOp.EscalatingDiscardOrDamageFromSelected ? SkillProgramEffectTarget.Owner : SkillProgramEffectTarget.SelectedTarget) || frame.TriggerId is not null || frame.WindowContext is not null || frame.SelectedTargetSeats is not [var start] || start == frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(start))
@@ -101,7 +98,7 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
         {
             if (d.Kind == ProgramSequentialDiscardKind.CategoryOrSequential)
             {
-                if (available.Any(item => effect.CardCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(item.Card.Kind, category))))
+                if (available.Any(item => effect.CardCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(item.Card.Kind, category))))
                     Add("primary", $"弃置 {(effect.Amount)} 张指定类别牌。");
                 if (available.Length != 0)
                     Add("sequential", $"依次弃置 {(effect.MinimumValue)} 张任意牌。");
@@ -115,7 +112,7 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
         }
         else
         {
-            foreach (var item in available.Where(item => !d.SelectedCardIds.Contains(item.Card.Id) && (d.PrimaryBranch != true || effect.CardCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(item.Card.Kind, category)))))
+            foreach (var item in available.Where(item => !d.SelectedCardIds.Contains(item.Card.Id) && (d.PrimaryBranch != true || effect.CardCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(item.Card.Kind, category)))))
                 Add("card", $"{((d.Stage == ProgramSequentialDiscardStage.SelectingBatch ? "选择" : "弃置"))}【{(item.Card.DisplayName)}】。", [item.Card.Id], item.Location);
             if (d.Stage == ProgramSequentialDiscardStage.SelectingBatch && d.SelectedCardIds.Count > d.PreviousCount)
                 Add("finish", $"一次弃置所选 {(d.SelectedCardIds.Count)} 张牌。");
@@ -141,7 +138,7 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Missing sequential discard owner.");
         var d = f.SequentialDiscard ?? throw new InvalidOperationException("Missing sequential discard receipt.");
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineAllHandChallengesRuntime.IsAllHandChallengeKind(d.Kind))
+        if (CoreGameEngineAllHandChallengesRuntime.IsAllHandChallengeKind(d.Kind))
         {
             _coreAllHandChallengesOperations.ResolveAllHandChallengeChoice(f, choice);
             return;
@@ -192,7 +189,7 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
             if (choice.Cards is not [var id] || choice.Targets is not [var chooser] || chooser != d.ChooserSeat || d.SelectedCardIds.Contains(id) || !Enum.TryParse<CardZoneKind>(choice.Parameters.GetValueOrDefault("source-zone"), out var zone))
                 throw new InvalidOperationException("Invalid sequential discard entity.");
             var item = SequentialDiscardCards(f, chooser, effect).SingleOrDefault(item => item.Card.Id == id && item.Location.Zone == zone);
-            if (item.Card is null || d.PrimaryBranch == true && !effect.CardCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(item.Card.Kind, category)))
+            if (item.Card is null || d.PrimaryBranch == true && !effect.CardCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(item.Card.Kind, category)))
                 throw new InvalidOperationException("The selected entity no longer satisfies the frozen discard branch.");
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             if (d.Stage == ProgramSequentialDiscardStage.SelectingBatch)
@@ -248,7 +245,7 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
     {
         var d = frame.SequentialDiscard!;
         var effect = SequentialDiscardEffect(frame);
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineAllHandChallengesRuntime.IsAllHandChallengeKind(d.Kind))
+        if (CoreGameEngineAllHandChallengesRuntime.IsAllHandChallengeKind(d.Kind))
             return _coreAllHandChallengesOperations.SelectAiAllHandChallenge(decision, frame, effect);
         var branches = decision.Choices.Where(c => c.Cards.Count == 0).ToArray();
         if (d.Stage == ProgramSequentialDiscardStage.BranchChoice)
@@ -259,13 +256,13 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
             if (discard is null)
                 return branches.Single();
             // The actor sees only its own current entities and public HP/range. No other concealed hand is consulted.
-            var cost = SequentialDiscardCards(frame, d.ChooserSeat, effect).Select(item => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(item.Card, _coreMatchParticipantsPlayersAccess._players[d.ChooserSeat])).Order().Take(d.PreviousCount + 1).Sum();
+            var cost = SequentialDiscardCards(frame, d.ChooserSeat, effect).Select(item => CoreNativeAiDecisionsRuntime.GetKeepValue(item.Card, _coreMatchParticipantsPlayersAccess._players[d.ChooserSeat])).Order().Take(d.PreviousCount + 1).Sum();
             return cost <= effect.Amount * 20d ? discard : branches.Single(c => c.Parameters.GetValueOrDefault("branch") == "damage");
         }
 
         if (branches.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "finish")is { } finish)
             return finish;
-        return decision.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(card => card.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[d.ChooserSeat])).ThenBy(c => c.Cards[0]).First();
+        return decision.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(card => card.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[d.ChooserSeat])).ThenBy(c => c.Cards[0]).First();
     }
 
     // Opt in only after this operation's exact physical ledger has paid. A dead
@@ -282,5 +279,5 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISequentialDiscardProgramHost.RunSequentialDiscard(ProgramSkillFrame f, SkillProgramEffect e, int target) => RunSequentialDiscard(f, e, target);
+    SkillProgramStepOutcome ISequentialDiscardProgramHost.RunSequentialDiscard(ProgramSkillFrame f, SkillProgramEffect e, int target) => RunSequentialDiscard(f, e, target);
 }

@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiYangAnniversaryRuntime
 {
     internal bool HasAnniversaryCaiYang => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ArmAnniversaryCaiYangXunji);
 
-    internal static CardConversionSource CaiYangSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource CaiYangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static ProgramTriggerCandidate CaiYangCandidate(ProgramSkillFrame f) => new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 45600)]
     internal void StartCaiYangNextTurn(TurnStartedEvent t)
@@ -65,9 +61,9 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
 
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 45600)]
     internal bool AdmitCaiYangXunji(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => HasAnniversaryCaiYang && c.SkillId == AnniversaryCaiYangComposition.Xunji && (c.BindingId is AnniversaryCaiYangComposition.Ending or AnniversaryCaiYangComposition.Retaliate) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && (CaiYangEndingWitness(c, w)is { } g && _coreDamageColorDuelProgramsOperations.CanIssueSelectedActorDuel(g.Target, c.OwnerSeat) || CaiYangDuelDamage(c.OwnerSeat, w)is not null);
-    internal int CaiYangChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => a.IsChainPropagation ? a is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex : 0;
+    internal int CaiYangChainCursor(GameEngine.IDamageAttempt a) => a.IsChainPropagation ? a is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex : 0;
     internal bool CaiYangFirstDamage(int owner) => !_corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent).OfType<DamageAppliedEvent>().Any(e => e.SourceSeat == owner && !e.SourceLess && e.Amount > 0);
-    internal bool TryBeginAnniversaryCaiYangJiaofengSourceWindow(global::CardGame.Core.GameEngine.IDamageAttempt a)
+    internal bool TryBeginAnniversaryCaiYangJiaofengSourceWindow(GameEngine.IDamageAttempt a)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryCaiYangJiaofeng) || a.IsSourceLess || a.DamageAmountFinalized || a.DamageWasApplied || a.DamageAmount <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(a.SourceSeat) || !_coreMatchParticipantsPlayersAccess._players[a.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[a.TargetSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[a.SourceSeat], AnniversaryCaiYangComposition.Jiaofeng) || !CaiYangFirstDamage(a.SourceSeat))
             return false;
@@ -94,7 +90,7 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
 
     internal bool ValidCaiYangFirstOrigin(CaiYangJiaofengOrigin r) => r.Source.SkillId == AnniversaryCaiYangComposition.Jiaofeng && r.Source.BindingId == AnniversaryCaiYangComposition.First && r.LostHp > 0 && r.OriginalAmount > 0 && r.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash == r.Hash && _coreProgramEventHistoryOperations.ProgramEventHistory<CaiYangJiaofengWindowIssuedEvent>().Count(e => e.Origin == r) == 1;
     internal CaiYangJiaofengOrigin? CaiYangFirstWitness(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => w.Window == SkillProgramTriggerWindow.BeforeDamageApplied && _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().SingleOrDefault(x => x.Id == w.ParentFrameId)is { CaiYangJiaofeng: { } r } p && ValidCaiYangFirstOrigin(r) && c.OwnerSeat == r.Source.OwnerSeat && c.SkillId == r.Source.SkillId && c.BindingId == r.Source.BindingId && c.SkillInstanceId == r.Source.SkillInstanceId && c.GameplayHash == r.Hash && w.SourceSeat == c.OwnerSeat && w.TargetSeat == r.Target && w.Amount == r.OriginalAmount && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && p.Candidates[p.CandidateIndex].Candidate == c && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsSourceLess: false, DamageAmountFinalized: false } a && a.ResolutionId == r.AttackId && a.SourceSeat == c.OwnerSeat && a.TargetSeat == r.Target && CaiYangChainCursor(a) == r.ChainCursor ? r : null;
-    internal bool ResumeAnniversaryCaiYangJiaofengSourceWindow(BeforeDamageProgramWindowFrame p, global::CardGame.Core.GameEngine.IDamageAttempt a)
+    internal bool ResumeAnniversaryCaiYangJiaofengSourceWindow(BeforeDamageProgramWindowFrame p, GameEngine.IDamageAttempt a)
     {
         if (p.CaiYangJiaofeng is not { } r)
             return false;
@@ -107,7 +103,7 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 45600)]
-    internal int CaiYangJiaofengDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt a) => a.IsSourceLess ? 0 : _coreProgramEventHistoryOperations.ProgramEventHistory<CaiYangJiaofengWindowIssuedEvent>().Count(e => e.Origin.LostHp > 1 && e.Origin.AttackId == a.ResolutionId && e.Origin.Source.OwnerSeat == a.SourceSeat && e.Origin.Target == a.TargetSeat && e.Origin.ChainCursor == CaiYangChainCursor(a) && e.Origin.Chain == a.IsChainPropagation && ValidCaiYangFirstOrigin(e.Origin));
+    internal int CaiYangJiaofengDamageBonus(GameEngine.IDamageAttempt a) => a.IsSourceLess ? 0 : _coreProgramEventHistoryOperations.ProgramEventHistory<CaiYangJiaofengWindowIssuedEvent>().Count(e => e.Origin.LostHp > 1 && e.Origin.AttackId == a.ResolutionId && e.Origin.Source.OwnerSeat == a.SourceSeat && e.Origin.Target == a.TargetSeat && e.Origin.ChainCursor == CaiYangChainCursor(a) && e.Origin.Chain == a.IsChainPropagation && ValidCaiYangFirstOrigin(e.Origin));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 45600, SkillProgramEffectOp.ResolveAnniversaryCaiYangXunji, SkillProgramEffectOp.ResolveAnniversaryCaiYangJiaofeng)]
     internal bool CanOfferCaiYang(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => t.Id switch
     {

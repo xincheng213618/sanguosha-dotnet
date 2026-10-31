@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramNativeSlashQueriesRuntime
@@ -22,7 +18,7 @@ internal sealed partial class CoreProgramNativeSlashQueriesRuntime
         bool At(long id) => top?.Id == id || top is ResponseWindowFrame response && response.ParentFrameId == id;
         if (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { ActiveAttack: null } borrowed && borrowed.WeaponOwnerSeat == owner.Seat && At(borrowed.ResolutionId))
             return true;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && At(qinglong.Attack.ResolutionId))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && At(qinglong.Attack.ResolutionId))
             return true;
         if (top is not ProgramSkillFrame f || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)is not { } effect)
             return false;

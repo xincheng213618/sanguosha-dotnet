@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouDcLightningNative(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineOriginalUseLightningEntries> getCoreGameEngineOriginalUseLightningRuntime, global::System.Func<global::CardGame.Core.FrameStore> getFrameStore, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries> getCoreGameEngineRuntimeRuntime, global::CardGame.Core.EngineStates.CoreActualTurnProgressState actualTurnProgressState, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState) : IMouDcLightningNative
+internal sealed class MouDcLightningNative(Func<RuntimeEntries.CoreGameEngineOriginalUseLightningEntries> getCoreGameEngineOriginalUseLightningRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineRuntimeEntries> getCoreGameEngineRuntimeRuntime, EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreMatchParticipantsState matchParticipantsState) : IMouDcLightningNative
 {
     public ProgramSkillFrame BindSettlement(ProgramSkillFrame child, long judgment) => getCoreGameEngineOriginalUseLightningRuntime().BindNativeDelayedAttackChild(child, judgment);
     public void MarkReward(MouDcDelayedCause cause, long dying)

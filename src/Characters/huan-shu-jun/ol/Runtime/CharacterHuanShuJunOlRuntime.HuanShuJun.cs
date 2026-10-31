@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -14,8 +11,8 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     internal const string MiaoxinDrawReason = "skill-program.huan-shu-jun.miaoxin.draw";
     internal bool HasHuanShuJunCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveHuanpeiHandAdjustmentAndBasicUse) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveWenyiHealthOneAid) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMiaoxinDamageDrawAndRefresh);
 
-    internal static CardConversionSource HuanShuJunSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanShuJun.HuanShuJunSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IHuanShuJunHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHuanShuJun(f, op);
+    internal static CardConversionSource HuanShuJunSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanShuJun.HuanShuJunSource(f);
+    SkillProgramStepOutcome IHuanShuJunHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHuanShuJun(f, op);
     internal SkillProgramStepOutcome BeginHuanShuJun(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -146,7 +143,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     [ProgramAnswer("huan-shu-jun")]
     internal void AnswerHuanShuJun(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuanShuJun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HuanShuJunChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuanShuJun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HuanShuJunChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Huan Shu Jun requires her exact current private decision.");
         if (r.Stage == HuanShuJunStage.WenyiPeachRequest && !choice.Parameters.ContainsKey(HuanShuJunChoice))
         {

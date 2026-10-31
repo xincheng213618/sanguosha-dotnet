@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSkillInvocationNativeRuntime
@@ -58,12 +54,12 @@ internal sealed partial class CoreGameEngineSkillInvocationNativeRuntime
 
     internal void ValidateNativeFactionInvocationReturn(SkillInvocationFrame frame, long requestOwnerId)
     {
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not { } parent || parent.Id != frame.ParentFrameId || parent.Id != requestOwnerId && (parent is not ResponseWindowFrame response || response.ParentFrameId != requestOwnerId) || parent.SkillInvocations?.Issued.Contains(global::CardGame.Core.EngineOwners.CharacterHuaTuoAnniversaryGodRuntime.InvocationSourceKey(frame.ActorSeat, frame.SkillKey, frame.OccurrenceKey), StringComparer.Ordinal) != true || _coreProgramEventHistoryOperations.ProgramEventHistory<SkillInvocationStartedEvent>().Count(e => e == new SkillInvocationStartedEvent(frame.Id, frame.ParentFrameId, frame.ActorSeat, frame.SkillKey, frame.OccurrenceKey, frame.SkillInstanceId, frame.SkillName, frame.GameplayHash, frame.RoundNumber, frame.TurnNumber, frame.TurnOwnerSeat, frame.ReturnKind)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<SkillInvocationCompletedEvent>().Count(e => e.FrameId == frame.Id && e.ParentFrameId == frame.ParentFrameId && e.OccurrenceKey == frame.OccurrenceKey) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeFactionSkillInvocationCanceledEvent>().Any(e => e.InvocationId == frame.Id))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not { } parent || parent.Id != frame.ParentFrameId || parent.Id != requestOwnerId && (parent is not ResponseWindowFrame response || response.ParentFrameId != requestOwnerId) || parent.SkillInvocations?.Issued.Contains(CharacterHuaTuoAnniversaryGodRuntime.InvocationSourceKey(frame.ActorSeat, frame.SkillKey, frame.OccurrenceKey), StringComparer.Ordinal) != true || _coreProgramEventHistoryOperations.ProgramEventHistory<SkillInvocationStartedEvent>().Count(e => e == new SkillInvocationStartedEvent(frame.Id, frame.ParentFrameId, frame.ActorSeat, frame.SkillKey, frame.OccurrenceKey, frame.SkillInstanceId, frame.SkillName, frame.GameplayHash, frame.RoundNumber, frame.TurnNumber, frame.TurnOwnerSeat, frame.ReturnKind)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<SkillInvocationCompletedEvent>().Count(e => e.FrameId == frame.Id && e.ParentFrameId == frame.ParentFrameId && e.OccurrenceKey == frame.OccurrenceKey) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeFactionSkillInvocationCanceledEvent>().Any(e => e.InvocationId == frame.Id))
             throw new InvalidOperationException("A native faction activation lost its original accepted source and exact completed typed return.");
     }
 
     internal void RecordNativeFactionInvocationCancellation(SkillInvocationFrame frame, long requestOwnerId) => _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeFactionSkillInvocationCanceledEvent(frame.Id, frame.ParentFrameId, requestOwnerId, frame.ReturnKind, frame.ActorSeat, frame.SkillKey, frame.SkillInstanceId, frame.OccurrenceKey));
-    internal void CancelInvokedFactionDefense(global::CardGame.Core.NativeOwners.FactionDefenseHandle defense)
+    internal void CancelInvokedFactionDefense(NativeOwners.FactionDefenseHandle defense)
     {
         var attack = defense.Attack;
         _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense = null;
@@ -71,7 +67,7 @@ internal sealed partial class CoreGameEngineSkillInvocationNativeRuntime
         FinishCanceledNativeFactionResponse(attack);
     }
 
-    internal void CancelInvokedFactionSlash(global::CardGame.Core.NativeOwners.FactionCardRequestHandle request)
+    internal void CancelInvokedFactionSlash(NativeOwners.FactionCardRequestHandle request)
     {
         var purpose = request.Purpose;
         var attack = request.ResponseAttack;
@@ -106,9 +102,9 @@ internal sealed partial class CoreGameEngineSkillInvocationNativeRuntime
         }
     }
 
-    internal void FinishCanceledNativeFactionResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void FinishCanceledNativeFactionResponse(NativeOwners.CardAttackHandle attack)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ResponseWindowFrame response || response.ParentFrameId != attack.ResolutionId || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ResponseWindowFrame response || response.ParentFrameId != attack.ResolutionId || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack))
             throw new InvalidOperationException("Canceled native faction response lost its original response host.");
         _coreNativeResponseWindowsOperations.PopResponseWindow(attack.ResolutionId);
         _coreNativeResponseWindowsOperations.SetResponseParentStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);

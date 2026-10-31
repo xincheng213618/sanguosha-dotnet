@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineTurnEndDamageMarkerEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnEndDamageMarkerRuntime> _resolve;
-    private CoreGameEngineTurnEndDamageMarkerEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnEndDamageMarkerRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineTurnEndDamageMarkerRuntime> _resolve;
+    private CoreGameEngineTurnEndDamageMarkerEntries(Func<EngineOwners.CoreGameEngineTurnEndDamageMarkerRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineTurnEndDamageMarkerEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnEndDamageMarkerRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineTurnEndDamageMarkerEntries Create(Func<EngineOwners.CoreGameEngineTurnEndDamageMarkerRuntime> resolve) => new(resolve);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiYangAnniversaryRuntime
@@ -38,7 +34,7 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     {
         if (f.AnniversaryCaiYang is not { } r)
             return false;
-        if (r.Stage == AnniversaryCaiYangStage.Drawing && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
+        if (r.Stage == AnniversaryCaiYangStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
             return true;
         if (child is CardsMovedTriggerWindowFrame moved)
             return r.Stage == AnniversaryCaiYangStage.DrawChildren && r.Draw is { } d && moved.Batch.ParentFrameId == f.Id && (moved.ResumeProgramFrameId == f.Id || moved.Batch.AwaitingProgramFrameId == f.Id) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter);

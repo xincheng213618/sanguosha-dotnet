@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5ZhangxiuRuntime
 {
     internal const string ShanheS5XiongluanId = "shanhe:s5-xiongluan-14116";
     internal const string ShanheXiongluanJudgmentReason = "shanhe.s5.xiongluan.abolish-judgment";
-    SkillProgramStepOutcome global::CardGame.Core.IShanheS5ZhangxiuHost.PayShanheS5Xiongluan(ProgramSkillFrame f) => PayShanheS5Xiongluan(f);
-    void global::CardGame.Core.IShanheS5ZhangxiuHost.ResolveShanheLeizhenUse(ProgramSkillFrame f) => _coreShanheLeizhenOperations.ResolveShanheLeizhenUse(f);
+    SkillProgramStepOutcome IShanheS5ZhangxiuHost.PayShanheS5Xiongluan(ProgramSkillFrame f) => PayShanheS5Xiongluan(f);
+    void IShanheS5ZhangxiuHost.ResolveShanheLeizhenUse(ProgramSkillFrame f) => _coreShanheLeizhenOperations.ResolveShanheLeizhenUse(f);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 59401)]
     internal bool CanPayShanheS5Xiongluan(CharacterState owner, SkillProgramActivation activation) => !activation.Effects.Any(e => e.Op == SkillProgramEffectOp.PayShanheS5Xiongluan) || owner.IsAlive && Enum.GetValues<EquipmentSlot>().Any(slot => owner.EquipmentSlotCapacity(slot) > 0);
     internal SkillProgramStepOutcome PayShanheS5Xiongluan(ProgramSkillFrame input)
@@ -25,7 +21,7 @@ internal sealed partial class CoreGameEngineShanheS5ZhangxiuRuntime
         var beforeRandom = _randomOperations._random.State;
         var chosen = slots[_randomOperations._random.Next(slots.Length)];
         var afterRandom = _randomOperations._random.State;
-        var receipt = new ShanheS5XiongluanPayment(new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, target, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, chosen, slots.Length, beforeRandom, afterRandom, owner.JudgmentAreaAbolished, _coreCardMovementJournalMovementSequenceAccess._movementSequence, _coreCardMovementJournalMovementSequenceAccess._movementSequence, false);
+        var receipt = new ShanheS5XiongluanPayment(new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, target, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, chosen, slots.Length, beforeRandom, afterRandom, owner.JudgmentAreaAbolished, _coreCardMovementJournalMovementSequenceAccess._movementSequence, _coreCardMovementJournalMovementSequenceAccess._movementSequence, false);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheS5Xiongluan = receipt, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         if (!owner.JudgmentAreaAbolished)
             _coreProgramAbolishAreasOperationOperations.AbolishProgramOwnerAreas(f, [CardZoneKind.Judgment]);

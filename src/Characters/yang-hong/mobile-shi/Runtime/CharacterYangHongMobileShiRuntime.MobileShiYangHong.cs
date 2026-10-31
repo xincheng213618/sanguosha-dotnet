@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYangHongMobileShiRuntime
 {
     internal const string ShiYhJijian = ShiYangHongComposition.JijianSkill, ShiYhYuanmo = ShiYangHongComposition.YuanmoSkill;
-    SkillProgramStepOutcome global::CardGame.Core.IShiYangHongHost.ResolveJijian(ProgramSkillFrame frame) => BeginShiYhJijian(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiYangHongHost.ResolveYuanmo(ProgramSkillFrame frame) => BeginShiYhYuanmo(frame);
+    SkillProgramStepOutcome IShiYangHongHost.ResolveJijian(ProgramSkillFrame frame) => BeginShiYhJijian(frame);
+    SkillProgramStepOutcome IShiYangHongHost.ResolveYuanmo(ProgramSkillFrame frame) => BeginShiYhYuanmo(frame);
     internal SkillProgramStepOutcome BeginShiYhJijian(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -241,7 +238,7 @@ internal sealed partial class CharacterYangHongMobileShiRuntime
     [ProgramAnswer(ShiYangHongComposition.ProgramAction)]
     internal void AnswerShiYh(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YangHong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiYhChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YangHong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiYhChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Shi Yang Hong choice lost its current frame or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

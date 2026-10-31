@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZuoCiHappyGodRuntime
 {
     internal const string HappyZcAction = "happy-zuo-ci";
-    SkillProgramStepOutcome global::CardGame.Core.IHappyZuoCiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyZuoCi(f, op);
-    internal CardConversionSource HappyZcSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IHappyZuoCiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyZuoCi(f, op);
+    internal CardConversionSource HappyZcSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int HappyZcBonus(CharacterState owner) => owner.HappyZuoCi is { BonusTurn: var turn, BonusUses: var count } && turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber ? count : 0;
     internal int HappyZcTransformCount(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<HappyZuoCiTransformedEvent>().Count(e => e.OwnerSeat == owner && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyZuoCiStartedEvent>().Any(s => s.FrameId == e.FrameId && s.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber));
     internal IReadOnlyList<Card> HappyZcPhantomChoices(CharacterState owner) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(owner).Where(c => HappyZcEntity(c.Id)is { } p && p.Owner == owner.Seat && !p.Entity.ManuallyTransformed && HappyZcTemplates(owner, c.Id).Count > 0).ToArray());
@@ -56,7 +53,7 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.HappyZuoCi is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !HappyZcOriginalFrame(f))
-            throw new InvalidOperationException($"Happy Zuo Ci needs its exact original unstarted zero-input program: frame={(f.Id)}, skill={(f.SkillId)}, binding={(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}, instruction={(f.InstructionIndex)}, window={(f.WindowContext?.Window)}, parent={(_resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == f.WindowContext?.ParentFrameId)?.GetType().Name)}, selectedCards={(f.SelectedCardIds.Count)}, selectedTargets={(f.SelectedTargetSeats.Count)}.");
+            throw new InvalidOperationException($"Happy Zuo Ci needs its exact original unstarted zero-input program: frame={(f.Id)}, skill={(f.SkillId)}, binding={(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}, instruction={(f.InstructionIndex)}, window={(f.WindowContext?.Window)}, parent={(_resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == f.WindowContext?.ParentFrameId)?.GetType().Name)}, selectedCards={(f.SelectedCardIds.Count)}, selectedTargets={(f.SelectedTargetSeats.Count)}.");
         var stage = operation == SkillProgramEffectOp.TransformHappyZuoCiPhantom ? HappyZuoCiStage.PhantomChoice : HappyZuoCiStage.InitialChildren;
         var r = new HappyZuoCiReceipt(HappyZcSource(f), f.GameplayHash, operation, f.WindowContext?.ParentFrameId ?? 0, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, stage)
         {
@@ -187,7 +184,7 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
         ContinueHappyZc(f.Id);
     }
 
-    internal PromptChoice HappyZcChoice(ProgramSkillFrame f, string mode, Card? card = null) => new(new($"happy-zc.{(f.Id)}.{(f.HappyZuoCi!.Stage)}.{(mode)}.{(card?.Id ?? 0)}"), card is null ? "取消幻化" : $"{((mode == "phantom" ? "幻化" : "参照"))}【{(card.DisplayName)}】{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))}{(card.RankText)}", card is null ? [] : [card.Id], [], new Dictionary<string, string> { { "program-action", HappyZcAction }, { "frame-id", f.Id.ToString(CultureInfo.InvariantCulture) }, { "mode", mode } });
+    internal PromptChoice HappyZcChoice(ProgramSkillFrame f, string mode, Card? card = null) => new(new($"happy-zc.{(f.Id)}.{(f.HappyZuoCi!.Stage)}.{(mode)}.{(card?.Id ?? 0)}"), card is null ? "取消幻化" : $"{((mode == "phantom" ? "幻化" : "参照"))}【{(card.DisplayName)}】{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))}{(card.RankText)}", card is null ? [] : [card.Id], [], new Dictionary<string, string> { { "program-action", HappyZcAction }, { "frame-id", f.Id.ToString(CultureInfo.InvariantCulture) }, { "mode", mode } });
     internal IReadOnlyList<PromptChoice> HappyZcChoices(ProgramSkillFrame f)
     {
         var r = f.HappyZuoCi!;
@@ -206,7 +203,7 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
     [ProgramAnswer(HappyZcAction)]
     internal void AnswerHappyZc(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyZuoCi: { } r } f || !ValidHappyZc(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HappyZcChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyZuoCi: { } r } f || !ValidHappyZc(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HappyZcChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Phantom choice lost its exact original private hand and cursor.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

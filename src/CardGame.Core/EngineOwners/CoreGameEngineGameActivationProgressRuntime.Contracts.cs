@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-internal interface ICoreGameActivationProgressCoreProgramPhaseUsedProjectionsOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameActivationProgressCoreProgramPhaseUsedProjectionsOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramPhaseUsedProjections PhaseUsedProjections { get; }
+    ProgramPhaseUsedProjections PhaseUsedProjections { get; }
 }
 
-internal interface ICoreGameActivationProgressCoreProgramSelectionModulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameActivationProgressCoreProgramSelectionModulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramSelectionRegistry ProgramSelections { get; }
+    ProgramSelectionRegistry ProgramSelections { get; }
 }

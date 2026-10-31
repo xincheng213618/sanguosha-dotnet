@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOrderedPrintedSkillLossRuntime
 {
-    internal static bool IsOrderedPrintedSkillLossTrigger(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OrderedPrintedSkillLoss.IsOrderedPrintedSkillLossTrigger(trigger);
+    internal static bool IsOrderedPrintedSkillLossTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_OrderedPrintedSkillLoss.IsOrderedPrintedSkillLossTrigger(trigger);
     internal long OrderedPrintedLossMovementSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static string OrderedPrintedLossDrawReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OrderedPrintedSkillLoss.OrderedPrintedLossDrawReason(f);
+    internal static string OrderedPrintedLossDrawReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_OrderedPrintedSkillLoss.OrderedPrintedLossDrawReason(f);
     internal int? OrderedPrintedLossActualTurnOwner() => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && _coreTableSeatQueriesOperations.IsValidPlayerSeat(_coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) ? _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat : null;
-    internal bool CanOfferOrderedPrintedSkillLoss(int ownerSeat, SkillProgramTrigger trigger, global::CardGame.Core.GameEngine.IDamageAttempt attack) => !IsOrderedPrintedSkillLossTrigger(trigger) || _coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) && _coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive && OrderedPrintedLossActualTurnOwner()is not null && attack.DamageWasApplied && attack.DamageAmount > 0 && (ownerSeat == attack.TargetSeat || !attack.IsSourceLess && ownerSeat == attack.SourceSeat);
+    internal bool CanOfferOrderedPrintedSkillLoss(int ownerSeat, SkillProgramTrigger trigger, GameEngine.IDamageAttempt attack) => !IsOrderedPrintedSkillLossTrigger(trigger) || _coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) && _coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive && OrderedPrintedLossActualTurnOwner()is not null && attack.DamageWasApplied && attack.DamageAmount > 0 && (ownerSeat == attack.TargetSeat || !attack.IsSourceLess && ownerSeat == attack.SourceSeat);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 980)]
     internal bool CanOfferOrderedPrintedSkillLoss(int ownerSeat, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => !IsOrderedPrintedSkillLossTrigger(trigger) || _coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) && _coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive && OrderedPrintedLossActualTurnOwner()is not null && context is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0 } && context.OwnerSeat == ownerSeat && (context.SourceSeat == ownerSeat || context.TargetSeat == ownerSeat);
     internal (string SourceId, GeneralDefinition General) OrderedPrintedLossTemplate(ProgramSkillFrame f)
@@ -38,7 +34,7 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossRuntime
         var lease = new OrderedPrintedSkillLossLease
         {
             ProgramFrameId = f.Id,
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             ActualTurnNumber = _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber,
             ActualTurnOwnerSeat = turnOwner,
@@ -164,5 +160,5 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OrderedPrintedSkillLossExpiredEvent(lease.ProgramFrameId, lease.Source.OwnerSeat, turnNumber, turnOwnerSeat, decisions.Count(d => d.Lease == lease && d.Restore), decisions.Count(d => d.Lease == lease && !d.Restore)));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IOrderedPrintedSkillLossProgramHost.ExecuteOrderedPrintedSkillLoss(ProgramSkillFrame frame) => ExecuteOrderedPrintedSkillLoss(frame);
+    SkillProgramStepOutcome IOrderedPrintedSkillLossProgramHost.ExecuteOrderedPrintedSkillLoss(ProgramSkillFrame frame) => ExecuteOrderedPrintedSkillLoss(frame);
 }

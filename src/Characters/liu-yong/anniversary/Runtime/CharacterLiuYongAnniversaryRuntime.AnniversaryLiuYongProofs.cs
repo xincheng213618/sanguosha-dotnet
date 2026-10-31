@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYongAnniversaryRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
         if (child is NativeDrawAttemptFrame draw)
             return r.Stage == AnniversaryLiuYongStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == 1;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } pending && AnniversaryLiuYongMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+            return f.PendingMovementContinuation is { } pending && AnniversaryLiuYongMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is HappyQiaoHealthChoiceFrame health)
             return r.Stage == AnniversaryLiuYongStage.HealthChildren && _characterDaQiaoXiaoQiaoHappyGodOperations.HappyQiaoHealthChoiceRidesOn(health, f);
         if (child is RecoveryReplacementFrame recovery)

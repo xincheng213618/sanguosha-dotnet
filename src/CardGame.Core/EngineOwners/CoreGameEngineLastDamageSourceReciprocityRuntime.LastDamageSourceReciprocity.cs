@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
 {
-    internal static string LastDamageSourceReason(ProgramSkillFrame f, bool draw) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_LastDamageSourceReciprocity.LastDamageSourceReason(f, draw);
+    internal static string LastDamageSourceReason(ProgramSkillFrame f, bool draw) => RuntimeSkills.RuntimeRules_Core_LastDamageSourceReciprocity.LastDamageSourceReason(f, draw);
     internal long LastDamageSourceMovementSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static bool IsLastDamageSourceTrigger(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_LastDamageSourceReciprocity.IsLastDamageSourceTrigger(trigger);
-    internal static LastDamageSourceReciprocityDirection LastDamageSourceDirection(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_LastDamageSourceReciprocity.LastDamageSourceDirection(trigger);
+    internal static bool IsLastDamageSourceTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_LastDamageSourceReciprocity.IsLastDamageSourceTrigger(trigger);
+    internal static LastDamageSourceReciprocityDirection LastDamageSourceDirection(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_LastDamageSourceReciprocity.LastDamageSourceDirection(trigger);
     internal int? RecordedLastDamageSource(int owner, string skillId, string stateId) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LastDamageSourceRecordedEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillId == skillId && e.StateId == stateId)?.SourceSeat;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 610)]
     internal void ObserveLastDamageSourceReciprocity(IGameEvent payload)
@@ -53,7 +50,7 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
 
     internal LastDamageSourceReciprocityEligibleEvent? LastDamageSourceEligibility(int owner, string skillId, SkillProgramTrigger trigger, long damageId) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LastDamageSourceReciprocityEligibleEvent>().SingleOrDefault(e => e.OwnerSeat == owner && e.SkillId == skillId && e.StateId == trigger.Effects[0].StateId && e.BindingId == trigger.Id && e.DamageFrameId == damageId && e.Direction == LastDamageSourceDirection(trigger));
     internal bool LastDamageSourceAlreadyIssued(LastDamageSourceReciprocityEligibleEvent e) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LastDamageSourceReciprocityStartedEvent>().Any(s => s.Source.OwnerSeat == e.OwnerSeat && s.Source.SkillId == e.SkillId && s.StateId == e.StateId && s.Direction == e.Direction && s.DamageFrameId == e.DamageFrameId);
-    internal bool CanOfferLastDamageSourceReciprocity(int ownerSeat, string skillId, SkillProgramTrigger trigger, global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool CanOfferLastDamageSourceReciprocity(int ownerSeat, string skillId, SkillProgramTrigger trigger, GameEngine.IDamageAttempt attack)
     {
         if (!IsLastDamageSourceTrigger(trigger))
             return true;
@@ -84,7 +81,7 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
         var trigger = plan.Trigger;
-        if (trigger is null || !IsLastDamageSourceTrigger(trigger) || f.InstructionIndex != 1 || f.LastDamageSourceReciprocity is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || trigger.Effects[0].StateId != stateId || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, DamageFrameId: { } damageId } context || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.ParentFrameId != damageId || window.TriggerWindow != context.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
+        if (trigger is null || !IsLastDamageSourceTrigger(trigger) || f.InstructionIndex != 1 || f.LastDamageSourceReciprocity is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || trigger.Effects[0].StateId != stateId || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, DamageFrameId: { } damageId } context || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.ParentFrameId != damageId || window.TriggerWindow != context.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("Last-source reciprocity lost its exact applied-damage candidate or first instruction.");
         var e = LastDamageSourceEligibility(f.OwnerSeat, f.SkillId, trigger, damageId);
         if (e is null || e.SkillInstanceId != f.SkillInstanceId || !CanOfferLastDamageSourceReciprocity(f.OwnerSeat, f.SkillId, trigger, context))
@@ -96,7 +93,7 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
         var r = new ProgramLastDamageSourceReceipt
         {
             InstructionIndex = f.InstructionIndex,
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             StateId = stateId,
             Direction = e.Direction,
@@ -204,6 +201,6 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 660)]
     internal bool CanContinueLastDamageSourceReciprocity(ProgramSkillFrame f) => f.LastDamageSourceReciprocity is { MovementIssued: true } && _coreLastDamageSourceReciprocityObserversOperations.ValidLastDamageSourceReceipt(f);
     [ProgramAiChoice(SkillProgramEffectOp.LastDamageSourceReciprocity)]
-    internal PromptChoice SelectAiLastDamageSourceReciprocity(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.LastDamageSourceReciprocity!.ParticipantSeat])).ThenBy(c => c.Cards.Single()).First();
-    SkillProgramStepOutcome global::CardGame.Core.ILastDamageSourceReciprocityProgramHost.LastDamageSourceReciprocity(ProgramSkillFrame f, string stateId) => BeginLastDamageSourceReciprocity(f, stateId);
+    internal PromptChoice SelectAiLastDamageSourceReciprocity(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.LastDamageSourceReciprocity!.ParticipantSeat])).ThenBy(c => c.Cards.Single()).First();
+    SkillProgramStepOutcome ILastDamageSourceReciprocityProgramHost.LastDamageSourceReciprocity(ProgramSkillFrame f, string stateId) => BeginLastDamageSourceReciprocity(f, stateId);
 }

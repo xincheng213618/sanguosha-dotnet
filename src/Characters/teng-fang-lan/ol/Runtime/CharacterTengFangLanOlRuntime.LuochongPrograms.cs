@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTengFangLanOlRuntime
 {
-    internal static string LuochongOptionDisplayName(string optionId) => global::CardGame.Core.RuntimeSkills.RuntimeRules_teng_fang_lan_ol_Luochong_Programs.LuochongOptionDisplayName(optionId);
-    internal static bool IsLuochongOptionId(string optionId) => global::CardGame.Core.EngineOwners.CharacterTengFangLanOlDefinitions.LuochongOptionIds.Contains(optionId);
+    internal static string LuochongOptionDisplayName(string optionId) => RuntimeSkills.RuntimeRules_teng_fang_lan_ol_Luochong_Programs.LuochongOptionDisplayName(optionId);
+    internal static bool IsLuochongOptionId(string optionId) => CharacterTengFangLanOlDefinitions.LuochongOptionIds.Contains(optionId);
     internal (IReadOnlySet<string> Options, IReadOnlySet<int> Targets) LuochongRoundLedger(int ownerSeat) => (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramLuochongResolvedEvent>().Where(fact => fact.OwnerSeat == ownerSeat && fact.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber).Select(fact => fact.OptionId).ToHashSet(StringComparer.Ordinal), _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramLuochongResolvedEvent>().Where(fact => fact.OwnerSeat == ownerSeat && fact.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber).Select(fact => fact.TargetSeat).ToHashSet());
     internal IReadOnlyList<(Card Card, CardLocation Location)> LuochongDiscardPool(int targetSeat)
     {
@@ -37,7 +33,7 @@ internal sealed partial class CharacterTengFangLanOlRuntime
         var(options, targets) = LuochongRoundLedger(ownerSeat);
         ledger = (options, targets);
         var removed = AichenRemovedOptions(ownerSeat);
-        return global::CardGame.Core.EngineOwners.CharacterTengFangLanOlDefinitions.LuochongOptionIds.Where(optionId => !removed.Contains(optionId) && !options.Contains(optionId)).SelectMany(optionId => _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).Select(player => player.Seat).Where(targetSeat => !targets.Contains(targetSeat)).Where(targetSeat => IsLuochongOptionAvailableFor(ownerSeat, optionId, targetSeat, options, targets, removed)).Select(targetSeat => (optionId, targetSeat))).OrderBy(entry => Array.IndexOf(global::CardGame.Core.EngineOwners.CharacterTengFangLanOlDefinitions.LuochongOptionIds, entry.optionId)).ThenBy(entry => entry.targetSeat).ToArray();
+        return CharacterTengFangLanOlDefinitions.LuochongOptionIds.Where(optionId => !removed.Contains(optionId) && !options.Contains(optionId)).SelectMany(optionId => _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).Select(player => player.Seat).Where(targetSeat => !targets.Contains(targetSeat)).Where(targetSeat => IsLuochongOptionAvailableFor(ownerSeat, optionId, targetSeat, options, targets, removed)).Select(targetSeat => (optionId, targetSeat))).OrderBy(entry => Array.IndexOf(CharacterTengFangLanOlDefinitions.LuochongOptionIds, entry.optionId)).ThenBy(entry => entry.targetSeat).ToArray();
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 140, SkillProgramEffectOp.LuochongResolve)]
@@ -137,7 +133,7 @@ internal sealed partial class CharacterTengFangLanOlRuntime
         }
     }
 
-    internal ProgramLuochongResolvedEvent LuochongResolvedEvent(ProgramSkillFrame active, LuochongPendingState pending) => new(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualRoundProgressRoundNumberAccess._roundNumber, pending.OptionId, pending.TargetSeat, pending.OptionId == "recover" ? 1 : 0, pending.OptionId == "loseHp" ? 1 : 0, pending.DiscardedCardIds, pending.OptionId == "drawTwo" ? 2 : 0);
+    internal ProgramLuochongResolvedEvent LuochongResolvedEvent(ProgramSkillFrame active, LuochongPendingState pending) => new(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualRoundProgressRoundNumberAccess._roundNumber, pending.OptionId, pending.TargetSeat, pending.OptionId == "recover" ? 1 : 0, pending.OptionId == "loseHp" ? 1 : 0, pending.DiscardedCardIds, pending.OptionId == "drawTwo" ? 2 : 0);
     internal SkillProgramStepOutcome FinalizeLuochongResolution(ProgramSkillFrame frame, LuochongPendingState pending)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);

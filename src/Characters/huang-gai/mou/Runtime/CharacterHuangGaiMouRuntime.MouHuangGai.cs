@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangGaiMouRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterHuangGaiMouRuntime
 
     internal bool ValidMouHg(ProgramSkillFrame f) => MouHuangGaiRules.Valid(f);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 35400)]
-    internal int MouHgDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => MouHuangGaiRules.DamageBonus(attack.IsChainPropagation || attack is not global::CardGame.Core.NativeOwners.CardAttackHandle ? null : _characterHuangGaiMouOperations.CreateMouHuangGaiFacts().Use(attack.ResolutionId));
+    internal int MouHgDamageBonus(GameEngine.IDamageAttempt attack) => MouHuangGaiRules.DamageBonus(attack.IsChainPropagation || attack is not NativeOwners.CardAttackHandle ? null : _characterHuangGaiMouOperations.CreateMouHuangGaiFacts().Use(attack.ResolutionId));
     internal bool MouHgLiejiParent(ProgramSkillFrame f)
     {
         if (f.SkillId != MouHuangGaiRuntime.Lieji || f.TriggerId != "after-trick" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } info } w || w.OwnerSeat != f.OwnerSeat)

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
             target.HasAlcoholEffect = true;
     }
 
-    internal bool RestoreExtraGroupDamageSource(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal bool RestoreExtraGroupDamageSource(NativeOwners.GroupCardHandle group)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)is not { } use || _characterFeiYiOlOperations.NativeExtraEffectState(use)is not { WholeGroupRepeated: true, FrozenGroupDamageSourceSeat: { } source })
             return false;
@@ -23,7 +19,7 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
         return true;
     }
 
-    internal void CaptureExtraGroupDamageSource(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal void CaptureExtraGroupDamageSource(NativeOwners.GroupCardHandle group)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)is not { } use || _characterFeiYiOlOperations.NativeExtraEffectState(use)is not { WholeGroupRepeated: false })
             return;
@@ -32,14 +28,14 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
 
     internal bool IsExtraCardEffectRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.ShanheSchoolTrick?.Started == true || _characterJiangJiMouOperations.IsMouJjEffectRound(id) || _characterHuangQuanMouOperations.IsMouHqRound(id) || _coreSoleIncomingEffectRepeatOperations.IsSoleIncomingExtraRound(id) || _characterHuangYueyingOlMouOperations.IsMouBingcaiExtraRound(id) || _characterSunQuanOlMagicOperations.IsMoQuanyuExtraRound(id) || _characterDaQiaoLeOperations.IsZixiExtraEffectRound(id) || _characterFeiYiOlOperations.IsFeiYiExtraEffectRound(id) || _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.ExtraCardEffect?.WholeGroupRepeated == true;
     internal bool HasUnstartedExtraCardEffect(long id) => _coreShanheSchoolTrickOperations.HasUnstartedShanheSchoolTrick(id) || _characterJiangJiMouOperations.HasUnstartedMouJjEffect(id) || _characterHuangQuanMouOperations.HasUnstartedMouHqRound(id) || _coreSoleIncomingEffectRepeatOperations.HasUnstartedSoleIncomingEffect(id) || _characterHuangYueyingOlMouOperations.HasUnstartedMouBingcaiExtraEffect(id) || _characterSunQuanOlMagicOperations.HasUnstartedMoQuanyuExtraRound(id) || _characterDaQiaoLeOperations.HasUnstartedZixiExtraEffect(id) || _characterFeiYiOlOperations.HasUnstartedFeiYiExtraEffect(id) || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ExtraCardEffect: { WholeGroupRepeated: false } } use && use.Action is { } action && use.ExtraCardEffect.ActionId == action.ActionId && !_coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(use) && _coreMatchOutcomeWinnerAccess._winner == Winner.None;
-    internal void CaptureExtraCardEffectAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CaptureExtraCardEffectAttack(NativeOwners.CardAttackHandle attack)
     {
         _characterHuangQuanMouOperations.CaptureMouHqAttack(attack);
         _coreSoleIncomingEffectRepeatOperations.CaptureSoleIncomingAttack(attack);
         _characterHuangYueyingOlMouOperations.CaptureMouBingcaiExtraEffectAttack(attack);
         _characterDaQiaoLeOperations.CaptureZixiExtraEffectAttack(attack);
         _characterSunQuanOlMagicOperations.CaptureMoQuanyuExtraAttack(attack);
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ExtraCardEffect: { WholeGroupRepeated: false } r, CardAttack: { } original } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || r.OriginalAttacks.Any(s => s.TargetIndex == use.TargetIndex))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ExtraCardEffect: { WholeGroupRepeated: false } r, CardAttack: { } original } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || r.OriginalAttacks.Any(s => s.TargetIndex == use.TargetIndex))
             return;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { ExtraCardEffect = r with { OriginalAttacks = r.OriginalAttacks.Append(new(use.TargetIndex, original)).ToArray(), Fangtian = current.Continuations.FangtianHalberd ?? r.Fangtian } });
     }
@@ -89,7 +85,7 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
         {
             var first = r.OriginalAttacks.OrderBy(s => s.TargetIndex).FirstOrDefault(s => _coreMatchParticipantsPlayersAccess._players[s.Attack.TargetSeat].IsAlive && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(id, s.Attack.TargetSeat));
             if (first is null)
@@ -129,8 +125,8 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
         throw new InvalidOperationException("An issued extra effect lacks its original native effect continuation.");
     }
 
-    internal static CardAttackState ResetExtraCardEffectAttack(CardAttackState original) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ExtraCardEffectRounds.ResetExtraCardEffectAttack(original);
-    internal bool ContinueExtraCardEffectFangtian(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal static CardAttackState ResetExtraCardEffectAttack(CardAttackState original) => RuntimeSkills.RuntimeRules_Core_ExtraCardEffectRounds.ResetExtraCardEffectAttack(original);
+    internal bool ContinueExtraCardEffectFangtian(NativeOwners.CardAttackHandle attack)
     {
         if (_characterHuangQuanMouOperations.ContinueMouHqFangtian(attack))
             return true;
@@ -154,7 +150,7 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
         return true;
     }
 
-    internal bool TryBeginExtraAttackRound(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryBeginExtraAttackRound(NativeOwners.CardAttackHandle attack)
     {
         // All chain propagation and all native target cursors must have returned
         // before FinishAttack calls this bridge. The accepted use stays live.
@@ -162,7 +158,7 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AttackCompletionPrelude, 20)]
-    internal bool FinishExtraAttackRound(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishExtraAttackRound(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = TryBeginExtraAttackRound(attack);
         return paused;

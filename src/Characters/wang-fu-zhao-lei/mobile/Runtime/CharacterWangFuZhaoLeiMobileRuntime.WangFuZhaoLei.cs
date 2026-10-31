@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
 {
-    internal static CardConversionSource XunyiSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_fu_zhao_lei_mobile_WangFuZhaoLei.XunyiSource(frame);
+    internal static CardConversionSource XunyiSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_wang_fu_zhao_lei_mobile_WangFuZhaoLei.XunyiSource(frame);
     internal bool TracksXunyi => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.SettleXunyiDamagePoint) == true;
 
     internal IEnumerable<XunyiRelationGrant> XunyiRelations() => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XunyiRelationChangedEvent>().GroupBy(e => (e.Relation.Source.OwnerSeat, e.Relation.Source.SkillId, e.Relation.Source.SkillInstanceId)).Select(g => g.Last().Relation);
@@ -102,9 +98,9 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(frame.Id, holder, marker, total - before, total, frame.OwnerSeat, "skill-program.xunyi.marker"));
     }
 
-    internal static int XunyiBranches(XunyiDamageReceipt receipt) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_fu_zhao_lei_mobile_WangFuZhaoLei.XunyiBranches(receipt);
-    internal static int XunyiStepCount(XunyiDamageReceipt receipt) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_fu_zhao_lei_mobile_WangFuZhaoLei.XunyiStepCount(receipt);
-    internal static (int Seat, bool Draw) XunyiStep(XunyiDamagePending pending) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_fu_zhao_lei_mobile_WangFuZhaoLei.XunyiStep(pending);
+    internal static int XunyiBranches(XunyiDamageReceipt receipt) => RuntimeSkills.RuntimeRules_wang_fu_zhao_lei_mobile_WangFuZhaoLei.XunyiBranches(receipt);
+    internal static int XunyiStepCount(XunyiDamageReceipt receipt) => RuntimeSkills.RuntimeRules_wang_fu_zhao_lei_mobile_WangFuZhaoLei.XunyiStepCount(receipt);
+    internal static (int Seat, bool Draw) XunyiStep(XunyiDamagePending pending) => RuntimeSkills.RuntimeRules_wang_fu_zhao_lei_mobile_WangFuZhaoLei.XunyiStep(pending);
     internal IReadOnlyList<PromptChoice> XunyiChoices(ProgramSkillFrame frame)
     {
         var seat = XunyiStep(frame.Xunyi!).Seat;
@@ -151,7 +147,7 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
     {
         var frame = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         var seat = XunyiStep(frame.Xunyi!).Seat;
-        if (frame.Xunyi!.Stage != XunyiStage.DiscardChoice || XunyiStep(frame.Xunyi).Draw || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], XunyiChoices(frame).Where(c => c.Id == choice.Id).ToArray()))
+        if (frame.Xunyi!.Stage != XunyiStage.DiscardChoice || XunyiStep(frame.Xunyi).Draw || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], XunyiChoices(frame).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xunyi discard lost its actual recipient authority.");
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single());
         var from = _cardZonesOperations._cardZones.GetLocation(card.Id);
@@ -206,5 +202,5 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 26320)]
     internal bool ReturnXunyiMovement(ProgramSkillFrame frame) => frame.Xunyi is not null && ResumeXunyi(frame.Id);
-    SkillProgramStepOutcome global::CardGame.Core.IWangFuZhaoLeiProgramHost.ExecuteXunyi(ProgramSkillFrame frame, SkillProgramEffectOp operation) => ExecuteXunyi(frame, operation);
+    SkillProgramStepOutcome IWangFuZhaoLeiProgramHost.ExecuteXunyi(ProgramSkillFrame frame, SkillProgramEffectOp operation) => ExecuteXunyi(frame, operation);
 }

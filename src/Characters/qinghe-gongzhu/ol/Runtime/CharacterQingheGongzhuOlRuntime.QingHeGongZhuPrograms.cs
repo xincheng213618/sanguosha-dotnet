@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQingheGongzhuOlRuntime
@@ -23,6 +19,6 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
     }
 
     internal IReadOnlyList<Card> NonBasicOwnedCards(int ownerSeat) => _cardZonesOperations._cardZones.CardsAt(CardLocation.Hand(ownerSeat)).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.Equipment(ownerSeat))).Where(card => CardCatalog.Get(card.Kind).CategoryName != "基本牌").ToArray();
-    SkillProgramStepOutcome global::CardGame.Core.IQingHeGongZhuProgramHost.ChangjiEndingDamageChoice(ProgramSkillFrame frame, SkillProgramEffect effect) => ChangjiProgramEndingDamageChoice(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IQingHeGongZhuProgramHost.ZengouNullifyDodge(ProgramSkillFrame frame, SkillProgramEffect effect) => ZengouProgramNullifyDodge(frame, effect);
+    SkillProgramStepOutcome IQingHeGongZhuProgramHost.ChangjiEndingDamageChoice(ProgramSkillFrame frame, SkillProgramEffect effect) => ChangjiProgramEndingDamageChoice(frame, effect);
+    SkillProgramStepOutcome IQingHeGongZhuProgramHost.ZengouNullifyDodge(ProgramSkillFrame frame, SkillProgramEffect effect) => ZengouProgramNullifyDodge(frame, effect);
 }

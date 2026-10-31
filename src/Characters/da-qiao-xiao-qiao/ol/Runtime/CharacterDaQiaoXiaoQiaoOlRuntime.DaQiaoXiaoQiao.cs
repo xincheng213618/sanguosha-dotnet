@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
 {
     internal const string XingwuDepositReason = "skill-program.da-qiao-xiao-qiao.xingwu.deposit", XingwuPileReason = "skill-program.da-qiao-xiao-qiao.xingwu.pile-remove", XingwuHandReason = "skill-program.da-qiao-xiao-qiao.xingwu.hand-discard", XingwuEquipmentReason = "skill-program.da-qiao-xiao-qiao.xingwu.equipment-discard";
-    internal static CardConversionSource DaQiaoXiaoQiaoSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_da_qiao_xiao_qiao_ol_DaQiaoXiaoQiao.DaQiaoXiaoQiaoSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDaQiaoXiaoQiaoHost.Resolve(ProgramSkillFrame f, bool maintain) => BeginDaQiaoXiaoQiao(f, maintain);
-    internal bool DaQiaoXiaoQiaoParent(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.DiscardPhaseStarting } c && c.OwnerSeat == f.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == f.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Discard && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { Window: SkillProgramTriggerWindow.DiscardPhaseStarting, Continuation: ProgramLifecycleContinuation.CompleteDiscardPhase } p && p.OwnerSeat == f.OwnerSeat && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]);
+    internal static CardConversionSource DaQiaoXiaoQiaoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_da_qiao_xiao_qiao_ol_DaQiaoXiaoQiao.DaQiaoXiaoQiaoSource(f);
+    SkillProgramStepOutcome IDaQiaoXiaoQiaoHost.Resolve(ProgramSkillFrame f, bool maintain) => BeginDaQiaoXiaoQiao(f, maintain);
+    internal bool DaQiaoXiaoQiaoParent(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.DiscardPhaseStarting } c && c.OwnerSeat == f.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == f.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Discard && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { Window: SkillProgramTriggerWindow.DiscardPhaseStarting, Continuation: ProgramLifecycleContinuation.CompleteDiscardPhase } p && p.OwnerSeat == f.OwnerSeat && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]);
     internal bool DaQiaoXiaoQiaoLive(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
     internal SkillProgramStepOutcome BeginDaQiaoXiaoQiao(ProgramSkillFrame input, bool maintain)
     {
@@ -102,7 +99,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
     [ProgramAnswer("da-qiao-xiao-qiao")]
     internal void AnswerDaQiaoXiaoQiao(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DaQiaoXiaoQiao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DaQiaoXiaoQiaoChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DaQiaoXiaoQiao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DaQiaoXiaoQiaoChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xingwu lost its exact private chooser or payable entity.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -291,11 +288,11 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
     {
         var r = f.DaQiaoXiaoQiao!;
         if (r.Stage == DaQiaoXiaoQiaoStage.Deposit)
-            return p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? p.Choices[0];
+            return p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? p.Choices[0];
         if (r.Stage == DaQiaoXiaoQiaoStage.Burst)
             return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "pile") ?? p.Choices.First(c => c.Parameters["branch"] == "finish");
         if (r.Stage == DaQiaoXiaoQiaoStage.Target)
-            return p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).ThenByDescending(c => _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets[0]]).Count).ThenBy(c => c.Targets[0]).First();
-        return p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
+            return p.Choices.OrderBy(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).ThenByDescending(c => _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets[0]]).Count).ThenBy(c => c.Targets[0]).First();
+        return p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
     }
 }

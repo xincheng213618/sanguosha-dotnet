@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangNiBoundaryMobileRuntime
 {
     internal const string BoundaryWurongGift = "skill-program.boundary-zhang-ni.wurong.gift";
-    internal static CardConversionSource BoundaryWurongSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryZhangNiHost.Resolve(ProgramSkillFrame f, SkillProgramEffect e) => e.Op == SkillProgramEffectOp.ConsumeBoundaryZhangNiDrawSkip ? ConsumeBoundaryWurongSkip(f) : BeginBoundaryWurong(f, e);
+    internal static CardConversionSource BoundaryWurongSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IBoundaryZhangNiHost.Resolve(ProgramSkillFrame f, SkillProgramEffect e) => e.Op == SkillProgramEffectOp.ConsumeBoundaryZhangNiDrawSkip ? ConsumeBoundaryWurongSkip(f) : BeginBoundaryWurong(f, e);
     internal SkillProgramStepOutcome BeginBoundaryWurong(ProgramSkillFrame supplied, SkillProgramEffect e)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -224,7 +220,7 @@ internal sealed partial class CharacterZhangNiBoundaryMobileRuntime
         if (parent.ActualPhaseSubstitution is null)
         {
             _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { ActualPhaseSubstitution = new(parent.Id, f.Id, f.OwnerSeat, f.SkillId, f.SkillInstanceId, _coreActualTurnProgressTurnNumberAccess._turnNumber, SkillProgramTurnPhase.Draw) });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.OwnerSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, context.Window, SkillProgramTurnPhase.Draw));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.OwnerSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, context.Window, SkillProgramTurnPhase.Draw));
         }
 
         return _coreProgramTurnPhaseOperations.SkipProgramTurnPhases(f, [SkillProgramTurnPhase.Draw]);

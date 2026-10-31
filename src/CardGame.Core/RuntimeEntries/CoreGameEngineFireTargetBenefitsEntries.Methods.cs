@@ -2,9 +2,9 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineFireTargetBenefitsEntries
 {
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginFireTargetBenefit(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginFireTargetBenefit(supplied);
-    internal bool CanRunFireTargetBenefit(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunFireTargetBenefit(candidate, trigger, context);
+    internal SkillProgramStepOutcome BeginFireTargetBenefit(ProgramSkillFrame supplied) => _resolve().BeginFireTargetBenefit(supplied);
+    internal bool CanRunFireTargetBenefit(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().CanRunFireTargetBenefit(candidate, trigger, context);
     internal bool ResumeFireTargetBenefit(long id) => _resolve().ResumeFireTargetBenefit(id);
-    internal bool ReturnFireTargetBenefitMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnFireTargetBenefitMovement(f);
-    internal bool TryDrainFireTargetMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().TryDrainFireTargetMovement(f);
+    internal bool ReturnFireTargetBenefitMovement(ProgramSkillFrame f) => _resolve().ReturnFireTargetBenefitMovement(f);
+    internal bool TryDrainFireTargetMovement(ProgramSkillFrame f) => _resolve().TryDrainFireTargetMovement(f);
 }

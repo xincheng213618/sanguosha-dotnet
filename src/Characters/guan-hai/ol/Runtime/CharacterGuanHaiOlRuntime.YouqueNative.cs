@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanHaiOlRuntime
@@ -60,7 +56,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
 
     internal bool IsIssuedYouqueUse(CardUseFrame use)
     {
-        if (use.YouqueSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || o.UseId != use.Id || o.ActionId != current.ActionId || current.ProviderSeat != o.ActorSeat || current.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<YouqueSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { GuanHai: { Stage: GuanHaiStage.NativeSlash, Paid: true, NativeReturned: false } r } parent || r.NativeUseId != use.Id || r.ActionId != o.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.LoserSeat != o.ActorSeat || r.WinnerSeat != o.TargetSeat || r.Phase != o.Phase)
+        if (use.YouqueSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || o.UseId != use.Id || o.ActionId != current.ActionId || current.ProviderSeat != o.ActorSeat || current.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<YouqueSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { GuanHai: { Stage: GuanHaiStage.NativeSlash, Paid: true, NativeReturned: false } r } parent || r.NativeUseId != use.Id || r.ActionId != o.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.LoserSeat != o.ActorSeat || r.WinnerSeat != o.TargetSeat || r.Phase != o.Phase)
             return false;
         var original = current;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -78,7 +74,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     internal bool IsYouqueUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedYouqueUse(use);
     internal Card YouqueRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedYouqueUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Youque requires its issued native zero-entity representation.");
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 70)]
-    internal bool FinishYouqueAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishYouqueAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || !IsYouqueUse(attack.ResolutionId))
@@ -119,7 +115,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 27579)]
-    internal bool ReturnYouqueAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt c)
+    internal bool ReturnYouqueAttack(GameEngine.AttackCompletionReceipt c)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuanHai: { NativeReturned: true, Stage: GuanHaiStage.NativeSlash } r } f || c.ResolutionId != r.NativeUseId)
             return false;
@@ -147,7 +143,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         return use;
     }
 
-    internal void AppendGuanHaiYouqueDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> result)
+    internal void AppendGuanHaiYouqueDamageCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> result)
     {
         if (window != SkillProgramTriggerWindow.AfterDamageApplied || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { YouqueSlash: { } o } use || !IsIssuedYouqueUse(use) || !_coreMatchParticipantsPlayersAccess._players[o.Source.OwnerSeat].IsAlive)
             return;

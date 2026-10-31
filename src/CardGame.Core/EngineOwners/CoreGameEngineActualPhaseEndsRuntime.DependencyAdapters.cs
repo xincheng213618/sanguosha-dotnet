@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ActualPhaseEndRuntime))]
-internal sealed class CoreActualPhaseEndsActualPhaseEndAdapter(global::System.Func<global::CardGame.Core.ActualPhaseEndRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreActualPhaseEndsActualPhaseEndOperations
+[Core.ProgramCapability(typeof(ActualPhaseEndRuntime))]
+internal sealed class CoreActualPhaseEndsActualPhaseEndAdapter(Func<ActualPhaseEndRuntime> targetFactory) : ICoreActualPhaseEndsActualPhaseEndOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.ActualPhaseEndRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ActualPhaseEndRuntime Get() => this._targetFactory();
+    private readonly Func<ActualPhaseEndRuntime> _targetFactory = targetFactory;
+    public ActualPhaseEndRuntime Get() => this._targetFactory();
 }

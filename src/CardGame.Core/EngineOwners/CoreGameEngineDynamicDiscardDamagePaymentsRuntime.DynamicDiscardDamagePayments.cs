@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CoreGameEngineDynamicDiscardDamagePaymentsRuntime
 {
     internal const string DynamicDiscardDamageBlocked = "dynamic-discard-damage-blocked";
     internal const string DynamicDiscardDamageReason = "program.dynamic-target-hp.discard";
-    SkillProgramStepOutcome global::CardGame.Core.IDynamicDiscardDamageHost.DiscardTargetHpCardsAndDamage(ProgramSkillFrame f) => BeginDynamicDiscardDamage(f);
+    SkillProgramStepOutcome IDynamicDiscardDamageHost.DiscardTargetHpCardsAndDamage(ProgramSkillFrame f) => BeginDynamicDiscardDamage(f);
     internal bool DynamicDiscardDamageSourceValid(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreSkillProgramsOperations.EnabledActivationPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId);
     internal Card[] DynamicDiscardDamageCards(int owner, string skill, string instance) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(owner)).Where(c => !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, skill, instance, c)).ToArray();
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 50, SkillProgramEffectOp.DiscardTargetHpCardsAndDamage)]
@@ -54,7 +51,7 @@ internal sealed partial class CoreGameEngineDynamicDiscardDamagePaymentsRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Variable payment lost its parent.");
         var r = f.DynamicDiscardDamage ?? throw new InvalidOperationException("Variable payment lost its unpaid receipt.");
-        if (r.Stage != DynamicDiscardDamageStage.Choosing || !DynamicDiscardDamageSourceValid(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], DynamicDiscardDamageChoices(f).Where(x => x.Id == c.Id).ToArray()))
+        if (r.Stage != DynamicDiscardDamageStage.Choosing || !DynamicDiscardDamageSourceValid(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], DynamicDiscardDamageChoices(f).Where(x => x.Id == c.Id).ToArray()))
             throw new InvalidOperationException("Variable payment no longer matches its published source or choice.");
         if (c.Parameters["branch"] == "cancel")
         {
@@ -163,7 +160,7 @@ internal sealed partial class CoreGameEngineDynamicDiscardDamagePaymentsRuntime
                 return true;
             }
 
-            if ((f.SkillId == "wushuang:skill-3062" || global::CardGame.Core.EngineOwners.CharacterZhugeKeMobileRuntime.IsMobileZhugeKeDuwu(f.SkillId)) ? r.DyingFrameId is null : r.DyingSurvived != true)
+            if ((f.SkillId == "wushuang:skill-3062" || CharacterZhugeKeMobileRuntime.IsMobileZhugeKeDuwu(f.SkillId)) ? r.DyingFrameId is null : r.DyingSurvived != true)
             {
                 _coreSkillProgramsOperations.FinishProgramSkill(f, true);
                 return true;
@@ -216,7 +213,7 @@ internal sealed partial class CoreGameEngineDynamicDiscardDamagePaymentsRuntime
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { DynamicDiscardDamage = r with { DyingFrameId = dyingId } });
     }
 
-    internal void CaptureDynamicDiscardDamageSurvival(global::CardGame.Core.GameEngine.DyingCompletionReceipt completion, bool survived)
+    internal void CaptureDynamicDiscardDamageSurvival(GameEngine.DyingCompletionReceipt completion, bool survived)
     {
         var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(x => x.DynamicDiscardDamage?.DyingFrameId == completion.FrameId);
         if (f?.DynamicDiscardDamage is not { } r)

@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuKangWumiaoRuntime
 {
     internal bool ValidWuLuKangShenduan(ProgramSkillFrame f)
     {
-        if (f.WuLuKangShenduan is not { } r || f.InstructionIndex != 1 || f.TriggerId != "native-pindian" || r.Source != WuLuKangSource(f) || r.GameplayHash != f.GameplayHash || f.WindowContext is not { WuLuKangPindian: { } c } context || context.ParentFrameId != r.WindowId || c != new WuLuKangPindianContext(r.ContestId, r.WindowStage, r.ComparisonIndex, r.ParticipantSeat) || _resolutionStackOperations._resolutionStack.SingleOrDefault(w => w.Id == r.WindowId)is not WuLuKangPindianFrame w || w.ParentFrameId != r.ContestId || w.Stage != r.WindowStage || w.ComparisonIndex != r.ComparisonIndex || w.CandidateIndex >= w.Entries.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Entries[w.CandidateIndex].Candidate) || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == r.ContestId)is not { WuLuKangContest: { } contest } parent || !ValidWuLuKangContest(parent) || _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangShenduanStartedEvent>().Count(e => e == new WuLuKangShenduanStartedEvent(f.Id, r.WindowId, r.ContestId, r.Source, r.GameplayHash, r.WindowStage, r.ComparisonIndex, r.ParticipantSeat)) != 1)
+        if (f.WuLuKangShenduan is not { } r || f.InstructionIndex != 1 || f.TriggerId != "native-pindian" || r.Source != WuLuKangSource(f) || r.GameplayHash != f.GameplayHash || f.WindowContext is not { WuLuKangPindian: { } c } context || context.ParentFrameId != r.WindowId || c != new WuLuKangPindianContext(r.ContestId, r.WindowStage, r.ComparisonIndex, r.ParticipantSeat) || _resolutionStackOperations._resolutionStack.SingleOrDefault(w => w.Id == r.WindowId)is not WuLuKangPindianFrame w || w.ParentFrameId != r.ContestId || w.Stage != r.WindowStage || w.ComparisonIndex != r.ComparisonIndex || w.CandidateIndex >= w.Entries.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Entries[w.CandidateIndex].Candidate) || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == r.ContestId)is not { WuLuKangContest: { } contest } parent || !ValidWuLuKangContest(parent) || _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangShenduanStartedEvent>().Count(e => e == new WuLuKangShenduanStartedEvent(f.Id, r.WindowId, r.ContestId, r.Source, r.GameplayHash, r.WindowStage, r.ComparisonIndex, r.ParticipantSeat)) != 1)
             return false;
         var ownIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
         var windowIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == w.Id);

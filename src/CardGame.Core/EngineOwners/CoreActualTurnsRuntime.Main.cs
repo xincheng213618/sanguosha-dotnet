@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreActualTurnsRuntime
@@ -135,7 +131,7 @@ internal sealed partial class CoreActualTurnsRuntime
 
         _coreActualDiscardRecoveryPhasesOperations.StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind.Preparation, current.Seat);
         _coreDeferredBenefitsProgramsOperations.ApplyQueuedNextTurnRuleModifiers(current.Seat);
-        _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects = global::CardGame.Core.GameEngine.DelayedTurnEffects.None;
+        _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects = GameEngine.DelayedTurnEffects.None;
         _characterZhangLiaoAnniversaryGodOperations.ApplyAnniversaryCuixiDrawSkip(current.Seat);
         if (_characterQiaoZhouOlOperations.TryBeginQiaoZhouPreparation(current))
             return;
@@ -157,7 +153,7 @@ internal sealed partial class CoreActualTurnsRuntime
             return;
         if (_coreActualPhaseEndsOperations.TryBeginActualPhaseEnd(ActualDiscardRecoveryPhaseKind.Preparation, ActualPhaseEndContinuation.Preparation))
             return;
-        if (_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipJudgmentPhase))
+        if (_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipJudgmentPhase))
         {
             _coreShanheS5ShensuOperations.RecordShanheS5ActualPhaseSkip(current.Seat, SkillProgramTurnPhase.Judgment);
             _characterZhuHuanBoundaryMobileOperations.RecordBoundaryZhuHuanSkippedPhase(current.Seat, SkillProgramTurnPhase.Judgment);
@@ -175,7 +171,7 @@ internal sealed partial class CoreActualTurnsRuntime
     {
         if (_coreOriginalUseLightningOperations.TryBeginHeldOriginalUseLightning(current, excludedCardId))
             return;
-        var delayedCard = _corePhysicalOwnedCardQueriesOperations.GetJudgment(current).FirstOrDefault(card => !_characterDaQiaoLeOperations.IsZixiQinJudgmentCard(card.Id) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(GetJudgmentEffectiveCardKind(card)) && card.Id != excludedCardId);
+        var delayedCard = _corePhysicalOwnedCardQueriesOperations.GetJudgment(current).FirstOrDefault(card => !_characterDaQiaoLeOperations.IsZixiQinJudgmentCard(card.Id) && CoreNativeCardClassificationsRuntime.IsDelayedCard(GetJudgmentEffectiveCardKind(card)) && card.Id != excludedCardId);
         if (delayedCard is not null)
         {
             var effectiveKind = GetJudgmentEffectiveCardKind(delayedCard);
@@ -186,7 +182,7 @@ internal sealed partial class CoreActualTurnsRuntime
         CompleteTurnStart(current, _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects);
     }
 
-    internal void CompleteTurnStart(CharacterState current, global::CardGame.Core.GameEngine.DelayedTurnEffects delayedEffects, bool skippedActualJudgment = false)
+    internal void CompleteTurnStart(CharacterState current, GameEngine.DelayedTurnEffects delayedEffects, bool skippedActualJudgment = false)
     {
         // Judgment-ending children can likewise finish the game before Draw.
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None)
@@ -195,21 +191,21 @@ internal sealed partial class CoreActualTurnsRuntime
             return;
         if (_characterKanZeOlOperations.ConsumeKuanshiDrawSkip(current.Seat))
         {
-            delayedEffects |= global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase;
-            _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase;
+            delayedEffects |= GameEngine.DelayedTurnEffects.SkipDrawPhase;
+            _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= GameEngine.DelayedTurnEffects.SkipDrawPhase;
         }
 
-        if (delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase))
+        if (delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase))
             _coreActualDiscardRecoveryPhasesOperations.ClearActualDiscardRecoveryPhase();
         else
             _coreActualDiscardRecoveryPhasesOperations.StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind.Draw, current.Seat);
         if (_coreDrawPhaseAttemptsOperations.TryBeginNormalDrawAttemptPhase(current, delayedEffects))
             return;
-        if (delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase))
+        if (delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase))
         {
             _coreMatchLogOperations.AddLog("DelayedCardEffect", $"{(current.Name)} 跳过摸牌阶段。", current.Seat);
         }
-        else if (_coreProgramLifecycleOperations.TryBeginDrawPhaseProgramWindow(current, delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase)))
+        else if (_coreProgramLifecycleOperations.TryBeginDrawPhaseProgramWindow(current, delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase)))
         {
             return;
         }
@@ -223,41 +219,41 @@ internal sealed partial class CoreActualTurnsRuntime
         CompleteTurnStartAfterDraw(current, delayedEffects);
     }
 
-    internal int GetTurnDrawCount(CharacterState current) => global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateDrawCount(current));
+    internal int GetTurnDrawCount(CharacterState current) => CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateDrawCount(current));
     internal void CompleteDrawPhaseAfterProgramWindow(CharacterState current, bool skipPlayPhaseAfterDraw, bool normalDrawReplaced, int normalDrawAdjustment, int? frozenBaseDrawCount = null, bool confirmedActualDrawSubstitution = false)
     {
         if (confirmedActualDrawSubstitution)
         {
-            CompleteTurnStartAfterDraw(current, _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects | global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase | (skipPlayPhaseAfterDraw ? global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase : global::CardGame.Core.GameEngine.DelayedTurnEffects.None));
+            CompleteTurnStartAfterDraw(current, _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects | GameEngine.DelayedTurnEffects.SkipDrawPhase | (skipPlayPhaseAfterDraw ? GameEngine.DelayedTurnEffects.SkipPlayPhase : GameEngine.DelayedTurnEffects.None));
             return;
         }
 
-        if (_coreDrawPhaseAttemptsOperations.TryBeginNormalDrawAttemptPhase(current, skipPlayPhaseAfterDraw ? global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase : global::CardGame.Core.GameEngine.DelayedTurnEffects.None, afterStartingWindow: true, normalDrawReplaced, normalDrawAdjustment, frozenBaseDrawCount))
+        if (_coreDrawPhaseAttemptsOperations.TryBeginNormalDrawAttemptPhase(current, skipPlayPhaseAfterDraw ? GameEngine.DelayedTurnEffects.SkipPlayPhase : GameEngine.DelayedTurnEffects.None, afterStartingWindow: true, normalDrawReplaced, normalDrawAdjustment, frozenBaseDrawCount))
             return;
         _characterDuFuRenOlOperations.ConsumeDuFuRenPhase(ActualDiscardRecoveryPhaseKind.Draw, current.Seat);
         _characterChengGongYingOlOperations.ConsumeChengGongYingDraw(current.Seat);
         var baseDrawCount = frozenBaseDrawCount ?? _characterCaoXiOlOperations.FreezeAndCaptureCaoXiNativeDrawBase(current, normalDrawReplaced);
         if (!normalDrawReplaced)
             _corePhysicalDrawFacadesOperations.DrawCards(current, Math.Max(0, checked(baseDrawCount + normalDrawAdjustment)), log: true);
-        CompleteTurnStartAfterDraw(current, skipPlayPhaseAfterDraw ? global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase : global::CardGame.Core.GameEngine.DelayedTurnEffects.None);
+        CompleteTurnStartAfterDraw(current, skipPlayPhaseAfterDraw ? GameEngine.DelayedTurnEffects.SkipPlayPhase : GameEngine.DelayedTurnEffects.None);
     }
 
-    internal void CompleteTurnStartAfterDraw(CharacterState current, global::CardGame.Core.GameEngine.DelayedTurnEffects delayedEffects, bool afterNormalDrawProgramsCompleted = false, bool drawPhaseEndedProgramsCompleted = false, bool actualDrawCompletionCompleted = false)
+    internal void CompleteTurnStartAfterDraw(CharacterState current, GameEngine.DelayedTurnEffects delayedEffects, bool afterNormalDrawProgramsCompleted = false, bool drawPhaseEndedProgramsCompleted = false, bool actualDrawCompletionCompleted = false)
     {
-        _coreNianActivityProgramsOperations.RecordNianActualPhaseSkips(current.Seat, delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase), delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase));
-        if (delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase) && _programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, SkillProgramTurnPhase.Draw, (int)delayedEffects, afterNormalDrawProgramsCompleted, drawPhaseEndedProgramsCompleted, actualDrawCompletionCompleted)))
+        _coreNianActivityProgramsOperations.RecordNianActualPhaseSkips(current.Seat, delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase), delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase));
+        if (delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) && _programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, SkillProgramTurnPhase.Draw, (int)delayedEffects, afterNormalDrawProgramsCompleted, drawPhaseEndedProgramsCompleted, actualDrawCompletionCompleted)))
             return;
         if (!drawPhaseEndedProgramsCompleted && !actualDrawCompletionCompleted && _coreDrawPhaseObligationsOperations.TryBeginActualDrawCompletion(current, delayedEffects))
             return;
-        if (!drawPhaseEndedProgramsCompleted && !delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase) && _coreProgramLifecycleOperations.TryBeginDrawPhaseEndedProgramWindow(current, delayedEffects))
+        if (!drawPhaseEndedProgramsCompleted && !delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) && _coreProgramLifecycleOperations.TryBeginDrawPhaseEndedProgramWindow(current, delayedEffects))
             return;
-        if (!delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase) && _coreActualPhaseEndsOperations.TryBeginActualPhaseEnd(ActualDiscardRecoveryPhaseKind.Draw, ActualPhaseEndContinuation.Draw, (int)delayedEffects, afterNormalDrawProgramsCompleted, drawPhaseEndedProgramsCompleted, actualDrawCompletionCompleted))
+        if (!delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) && _coreActualPhaseEndsOperations.TryBeginActualPhaseEnd(ActualDiscardRecoveryPhaseKind.Draw, ActualPhaseEndContinuation.Draw, (int)delayedEffects, afterNormalDrawProgramsCompleted, drawPhaseEndedProgramsCompleted, actualDrawCompletionCompleted))
             return;
-        if (!afterNormalDrawProgramsCompleted && !delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase) && _coreProgramLifecycleOperations.TryBeginAfterNormalDrawProgramWindow(current))
+        if (!afterNormalDrawProgramsCompleted && !delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase) && _coreProgramLifecycleOperations.TryBeginAfterNormalDrawProgramWindow(current))
             return;
         if (_programPhaseScheduleOperations._programPhaseSchedule?.Phase == TurnPhase.Draw && _coreProgramLifecycleOperations.ResumeScheduledProgramPhase())
             return;
-        if (delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase))
+        if (delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase))
         {
             if (_programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, SkillProgramTurnPhase.Play, (int)delayedEffects, afterNormalDrawProgramsCompleted, drawPhaseEndedProgramsCompleted, actualDrawCompletionCompleted)))
                 return;
@@ -304,13 +300,13 @@ internal sealed partial class CoreActualTurnsRuntime
 
     internal CardKind GetJudgmentEffectiveCardKind(Card card) => _coreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess._judgmentEffectiveCardKinds.GetValueOrDefault(card.Id, card.Kind);
     internal bool HasJudgmentEffectiveCard(CharacterState player, CardKind kind) => _corePhysicalOwnedCardQueriesOperations.GetJudgment(player).Any(card => _characterDaQiaoLeOperations.ZixiQinJudgmentSlot(card.Id)is { } slot ? slot == kind : GetJudgmentEffectiveCardKind(card) == kind) || kind == CardKind.Lightning && _coreOriginalUseLightningOperations.HasHeldOriginalUseLightning(player);
-    internal static bool IsDelayedJudgmentContinuation(JudgmentContinuationKind continuation) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsDelayedJudgmentContinuation(continuation);
-    internal static (string Reason, JudgmentContinuationKind Continuation) GetDelayedJudgmentInfo(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.GetDelayedJudgmentInfo(kind);
-    internal static global::CardGame.Core.GameEngine.DelayedTurnEffects GetDelayedTurnEffects(CardKind kind) => kind switch
+    internal static bool IsDelayedJudgmentContinuation(JudgmentContinuationKind continuation) => RuntimeSkills.RuntimeRules_Core_CommonRules.IsDelayedJudgmentContinuation(continuation);
+    internal static (string Reason, JudgmentContinuationKind Continuation) GetDelayedJudgmentInfo(CardKind kind) => RuntimeSkills.RuntimeRules_Core_CommonRules.GetDelayedJudgmentInfo(kind);
+    internal static GameEngine.DelayedTurnEffects GetDelayedTurnEffects(CardKind kind) => kind switch
     {
-        CardKind.Indulgence => global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase,
-        CardKind.SupplyShortage => global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase,
-        CardKind.Lightning => global::CardGame.Core.GameEngine.DelayedTurnEffects.None,
+        CardKind.Indulgence => GameEngine.DelayedTurnEffects.SkipPlayPhase,
+        CardKind.SupplyShortage => GameEngine.DelayedTurnEffects.SkipDrawPhase,
+        CardKind.Lightning => GameEngine.DelayedTurnEffects.None,
         _ => throw new ArgumentOutOfRangeException("kind", kind, "The card is not a delayed turn card.")};
     internal void EndTurn()
     {

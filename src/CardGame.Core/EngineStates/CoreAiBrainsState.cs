@@ -1,9 +1,9 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreAiBrainsState : global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess
+internal sealed class CoreAiBrainsState : Contracts.ICoreAiBrainsAiBrainsAccess
 {
-    private global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.SimpleAiBrain> _aiBrains = [];
-    internal ref readonly global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.SimpleAiBrain> ReferenceToAiBrains => ref _aiBrains;
+    private Dictionary<int, SimpleAiBrain> _aiBrains = [];
+    internal ref readonly Dictionary<int, SimpleAiBrain> ReferenceToAiBrains => ref _aiBrains;
 
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.SimpleAiBrain> global::CardGame.Core.EngineStates.Contracts.ICoreAiBrainsAiBrainsAccess._aiBrains => ref _aiBrains;
+    ref readonly Dictionary<int, SimpleAiBrain> Contracts.ICoreAiBrainsAiBrainsAccess._aiBrains => ref _aiBrains;
 }

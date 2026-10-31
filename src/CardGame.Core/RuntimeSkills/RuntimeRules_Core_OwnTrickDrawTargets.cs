@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_OwnTrickDrawTargets
 {
     internal static int ActualTrickTargetCount(CardUseFrame use) => (use.CardKind == CardKind.BorrowedSword

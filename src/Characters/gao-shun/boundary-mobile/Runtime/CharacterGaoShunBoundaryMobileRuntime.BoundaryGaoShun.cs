@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGaoShunBoundaryMobileRuntime
 {
-    internal static CardConversionSource BoundaryGaoShunSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    void global::CardGame.Core.IBoundaryGaoShunHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteBoundaryGaoShun(f, op);
+    internal static CardConversionSource BoundaryGaoShunSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    void IBoundaryGaoShunHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteBoundaryGaoShun(f, op);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 57300)]
     internal void CaptureBoundaryGaoShunPindian(PindianResultDeterminedEvent fact)
     {
@@ -34,9 +30,9 @@ internal sealed partial class CharacterGaoShunBoundaryMobileRuntime
             throw new InvalidOperationException("Mobile Xianzhen must issue once from its exact completed native comparison and original Play.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber != receipt.Phase.TurnNumber || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != receipt.Phase.ActualTurnOwnerSeat)
             return;
-        var exempt = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(receipt.SourceCardKind);
+        var exempt = CoreNativeCardClassificationsRuntime.IsSlashCard(receipt.SourceCardKind);
         if (exempt)
-            _coreTurnHandLimitKindExemptionsOperations.GrantProgramTurnHandLimitCardKindExemption(f, global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds);
+            _coreTurnHandLimitKindExemptionsOperations.GrantProgramTurnHandLimitCardKindExemption(f, CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryGaoShunXianzhenIssuedEvent(f.Id, receipt.Source, receipt.GameplayHash, receipt.PindianFrameId, receipt.TargetSeat, binding.SourceWon, exempt, receipt.Phase, receipt.DebitPhase));
     }
 
@@ -65,13 +61,13 @@ internal sealed partial class CharacterGaoShunBoundaryMobileRuntime
     [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 57300)]
     internal bool BoundaryGaoShunSlashDistance(ProgramSlashDistanceQuery q) => BoundaryGaoShunWonTarget(q.Actor.Seat, q.Target.Seat);
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeIntrinsicUseBan, 57300)]
-    internal bool BoundaryGaoShunSlashBan(ProgramCardUseQuery q) => q.ActionType == CardActionType.Use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && ActiveBoundaryGaoShunXianzhen(q.ActorSeat)is { Won: false };
+    internal bool BoundaryGaoShunSlashBan(ProgramCardUseQuery q) => q.ActionType == CardActionType.Use && CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && ActiveBoundaryGaoShunXianzhen(q.ActorSeat)is { Won: false };
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 57301, SkillProgramEffectOp.ReduceBoundaryGaoShunAlcoholSlash)]
     internal bool CanRunBoundaryGaoShunJinjiu(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == BoundaryGaoShunComposition.Jinjiu && TryBoundaryGaoShunAlcoholBonus(context, c.OwnerSeat, out _);
     internal bool TryBoundaryGaoShunAlcoholBonus(ProgramSkillWindowContext context, int owner, out int bonus)
     {
         bonus = 0;
-        if (context.Window != SkillProgramTriggerWindow.BeforeDamageApplied || context.TargetSeat != owner || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || attack.TargetSeat != owner || attack.IsSourceLess || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ConsumedAlcoholBoost: true, ConsumedAlcoholBonus: > 0, Action: { Type: CardActionType.Use } action } use || use.SourceSeat != attack.CardUserSeat || action.ActorSeat != attack.CardUserSeat || action.EffectiveKind != kind || _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Prevented: false } window || window.TargetSeat != owner || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseAlcoholConsumptionCapturedEvent>().Where(e => e.CardUseFrameId == use.Id).ToArray()is not [var consumed] || consumed.ActionId != action.ActionId || consumed.ActorSeat != action.ActorSeat || consumed.AlcoholBonus != use.ConsumedAlcoholBonus)
+        if (context.Window != SkillProgramTriggerWindow.BeforeDamageApplied || context.TargetSeat != owner || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || attack.TargetSeat != owner || attack.IsSourceLess || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ConsumedAlcoholBoost: true, ConsumedAlcoholBonus: > 0, Action: { Type: CardActionType.Use } action } use || use.SourceSeat != attack.CardUserSeat || action.ActorSeat != attack.CardUserSeat || action.EffectiveKind != kind || _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Prevented: false } window || window.TargetSeat != owner || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseAlcoholConsumptionCapturedEvent>().Where(e => e.CardUseFrameId == use.Id).ToArray()is not [var consumed] || consumed.ActionId != action.ActionId || consumed.ActorSeat != action.ActorSeat || consumed.AlcoholBonus != use.ConsumedAlcoholBonus)
             return false;
         bonus = use.ConsumedAlcoholBonus.Value;
         return true;

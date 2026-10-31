@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -38,9 +35,9 @@ internal sealed partial class CoreGameEngineExtraEffectForeignSelectionRuntime
             AllowFinish = allowFinish
         };
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.AwaitingResponse);
-        _coreRuntimeOperations.PushRuntimeFrame(new TargetCardSelectionFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, use.Id, use.SourceSeat, target.Seat, use.CardId, global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), pending.ActionKind, Array.AsReadOnly(slots.Select(slot => slot.Slot).ToArray())) { ExtraForeignSelection = receipt });
+        _coreRuntimeOperations.PushRuntimeFrame(new TargetCardSelectionFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, use.Id, use.SourceSeat, target.Seat, use.CardId, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), pending.ActionKind, Array.AsReadOnly(slots.Select(slot => slot.Slot).ToArray())) { ExtraForeignSelection = receipt });
         var choices = slots.Select(slot => new PromptChoice(new($"extra-effect.foreign.{(use.Id)}.{(slot.Slot)}"), allowFinish && slot.Slot == slots.Count - 1 ? "结束额外弃置" : slot.PublicCardId is { } cardId ? $"选择 {(target.Name)} 的【{(_coreCardAttackStateOperations.GetAttackCard(cardId).DisplayName)}】" : _coreWushuangCombatTacticsOperations.WushuangHasVisibleTargetHand(use.SourceSeat, pending.EffectCardKind) ? $"选择【{(hand[slot.Slot].DisplayName)}】（{(hand[slot.Slot].RankText)}）" : $"选择 {(target.Name)} 的一张暗牌（牌位 {(slot.Slot + 1)}）", slot.PublicCardId is { } visible ? [visible] : [], [target.Seat], new Dictionary<string, string> { ["action"] = "target-card-slot", ["slot-index"] = slot.Slot.ToString(CultureInfo.InvariantCulture) })).ToArray();
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.SelectTargetCard, use.SourceSeat, "选择目标区域的一张牌。", [], [target.Seat], use.SourceSeat, global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use))
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.SelectTargetCard, use.SourceSeat, "选择目标区域的一张牌。", [], [target.Seat], use.SourceSeat, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use))
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             IsPrivate = true,
@@ -85,7 +82,7 @@ internal sealed partial class CoreGameEngineExtraEffectForeignSelectionRuntime
         var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, true);
         _coreRuntimeOperations.PopResolutionFrame(pending.Id, ResolutionFrameKind.TargetCardSelection);
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.ResolvingEffect);
-        _coreNativeTrickEffectsOperations.ApplyTargetCardEffect(use.Id, card, global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), use.SourceSeat, target.Seat, pending.ActionKind, chosen, from);
+        _coreNativeTrickEffectsOperations.ApplyTargetCardEffect(use.Id, card, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), use.SourceSeat, target.Seat, pending.ActionKind, chosen, from);
         return true;
     }
 

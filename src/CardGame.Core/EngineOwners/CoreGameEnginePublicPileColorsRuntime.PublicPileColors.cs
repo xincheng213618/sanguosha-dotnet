@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePublicPileColorsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IPublicPileColorHost.ExecutePublicPileColor(SkillProgramEffect e, ProgramSkillFrame f) => ExecutePublicPileColor(e, f);
+    SkillProgramStepOutcome IPublicPileColorHost.ExecutePublicPileColor(SkillProgramEffect e, ProgramSkillFrame f) => ExecutePublicPileColor(e, f);
     internal IEnumerable<PublicPersistentPileSource> SameGrantColorPiles(int seat, string sourceSkill, string consumerInstance)
     {
         var consumer = _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants.FirstOrDefault(g => g.SkillInstanceId == consumerInstance);
         return _corePublicPileSourcesOperations.ReferencedPublicPileSources(seat, sourceSkill, consumerInstance).Where(s => s.SkillInstanceId == consumerInstance || consumer is not null && _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants.Any(g => g.SkillId == s.SkillId && g.SkillInstanceId == s.SkillInstanceId && g.SourceId == consumer.SourceId)).Where(s => _corePublicPileSourcesOperations.PublicPileCards(s).Count == 1);
     }
 
-    internal static bool? SuitColor(Suit? suit) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PublicPileColors.SuitColor(suit);
+    internal static bool? SuitColor(Suit? suit) => RuntimeSkills.RuntimeRules_Core_PublicPileColors.SuitColor(suit);
     internal bool? PileColor(PublicPersistentPileSource s) => SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[s.OwnerSeat], _corePublicPileSourcesOperations.PublicPileCards(s).Single()));
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 120)]
     internal bool CanActivatePublicPileColor(CharacterState owner, string skill, ProgramInstructionFeatures features)
@@ -33,7 +29,7 @@ internal sealed partial class CoreGameEnginePublicPileColorsRuntime
         foreach (var pile in SameGrantColorPiles(owner, e.SkillIds.Single(), instance))
             foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner])).Where(c => SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], c))is { } color && color == PileColor(pile) && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, skill, instance, c)))
                 foreach (var target in _coreProgramLifecycleOperations.GetProgramTargetSeats(owner, SkillProgramTargetKind.OtherLivingInAttackRange))
-                    result.Add(new(new($"public-pile-color.frame-{(frameId)}.pile-{(global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(pile.SkillId, pile.SkillInstanceId))}.card-{(card.Id)}.target-{(target)}"), "弃置【" + global::CardGame.Core.EngineOwners.CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(card) + "】，对 " + _coreMatchParticipantsPlayersAccess._players[target].Name + " 造成1点伤害。", [card.Id], [target], new Dictionary<string, string> { ["program-action"] = "public-pile-color", ["frame-id"] = frameId.ToString(), ["pile-instance"] = pile.SkillInstanceId }));
+                    result.Add(new(new($"public-pile-color.frame-{(frameId)}.pile-{(CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(pile.SkillId, pile.SkillInstanceId))}.card-{(card.Id)}.target-{(target)}"), "弃置【" + CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(card) + "】，对 " + _coreMatchParticipantsPlayersAccess._players[target].Name + " 造成1点伤害。", [card.Id], [target], new Dictionary<string, string> { ["program-action"] = "public-pile-color", ["frame-id"] = frameId.ToString(), ["pile-instance"] = pile.SkillInstanceId }));
         return result;
     }
 
@@ -155,5 +151,5 @@ internal sealed partial class CoreGameEnginePublicPileColorsRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.PublicPileColorDamage, SkillProgramEffectOp.RewardDiscardedActionColor)]
-    internal PromptChoice SelectAiPublicPileColorChoice(PendingDecision p, ProgramSkillFrame f) => f.HpDifferencePileDamage is not null ? p.Choices.OrderByDescending(c => c.Targets.Count == 1 && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).ThenBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First() : p.Choices.OrderByDescending(c => c.Targets.Count == 1 && (c.Cards.Count == 0 ? global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) : !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]))).ThenBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(x => x.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).ThenBy(c => c.Targets[0]).First();
+    internal PromptChoice SelectAiPublicPileColorChoice(PendingDecision p, ProgramSkillFrame f) => f.HpDifferencePileDamage is not null ? p.Choices.OrderByDescending(c => c.Targets.Count == 1 && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).ThenBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First() : p.Choices.OrderByDescending(c => c.Targets.Count == 1 && (c.Cards.Count == 0 ? CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) : !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]))).ThenBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(x => x.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).ThenBy(c => c.Targets[0]).First();
 }

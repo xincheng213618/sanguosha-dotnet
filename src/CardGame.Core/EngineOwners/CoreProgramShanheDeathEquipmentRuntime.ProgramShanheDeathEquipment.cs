@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramShanheDeathEquipmentRuntime
 {
-    void global::CardGame.Core.IShanheDeathEquipmentProgramHost.AbolishPublicTeamEnemyEquipmentSlots(ProgramSkillFrame frame) => AbolishPublicTeamEnemyEquipmentSlots(frame);
+    void IShanheDeathEquipmentProgramHost.AbolishPublicTeamEnemyEquipmentSlots(ProgramSkillFrame frame) => AbolishPublicTeamEnemyEquipmentSlots(frame);
     internal void AbolishPublicTeamEnemyEquipmentSlots(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

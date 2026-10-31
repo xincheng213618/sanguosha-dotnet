@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePlacedEquipmentBenefitObserversRuntime
 {
     internal bool ValidPlacedEquipmentBenefit(ProgramSkillFrame f)
     {
-        if (!_corePlacedEquipmentBenefitsOperations.PlacedEquipmentParentMatches(f) || f.PlacedEquipmentBenefit is not { } r || !Enum.IsDefined(r.Stage) || r.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || r.EndingFrameId != f.WindowContext!.ParentFrameId || r.OccurrenceIndex != f.WindowContext.OccurrenceIndex || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlacedEquipmentBenefitStartedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.TurnNumber == r.TurnNumber && e.TurnOwnerSeat == r.TurnOwnerSeat && e.EndingFrameId == r.EndingFrameId && e.OccurrenceIndex == r.OccurrenceIndex) != 1)
+        if (!_corePlacedEquipmentBenefitsOperations.PlacedEquipmentParentMatches(f) || f.PlacedEquipmentBenefit is not { } r || !Enum.IsDefined(r.Stage) || r.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || r.EndingFrameId != f.WindowContext!.ParentFrameId || r.OccurrenceIndex != f.WindowContext.OccurrenceIndex || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlacedEquipmentBenefitStartedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.TurnNumber == r.TurnNumber && e.TurnOwnerSeat == r.TurnOwnerSeat && e.EndingFrameId == r.EndingFrameId && e.OccurrenceIndex == r.OccurrenceIndex) != 1)
             return false;
         if ((r.SelectedCardId is null) != (r.SelectedFrom is null) || r.SelectedCardId is { } selected && (selected <= 0 || r.SelectedFrom!.Value.OwnerSeat != f.OwnerSeat || r.SelectedFrom.Value.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)))
             return false;

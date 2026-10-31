@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -14,9 +11,9 @@ internal sealed partial class CharacterXiahouHuiAnniversaryRuntime
     internal bool HasXiahouHuiDujun => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.BindAnniversaryXiahouHuiDujun);
     internal bool HasXiahouHuiJikun => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryXiahouHuiJikun);
 
-    internal static CardConversionSource XiahouHuiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource XiahouHuiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static ProgramTriggerCandidate XiahouHuiCandidate(ProgramSkillFrame f) => new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext!.OccurrenceIndex);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryXiahouHuiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginXiahouHui(f, operation);
+    SkillProgramStepOutcome IAnniversaryXiahouHuiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginXiahouHui(f, operation);
     internal XiahouHuiBoundEvent? XiahouHuiPartner(int owner, string? instance = null, bool requireCurrent = true) => !HasXiahouHuiDujun ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<XiahouHuiBoundEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner && e.Source.SkillId == XiahouHuiComposition.Dujun && e.Source.BindingId == "choose-partner" && (instance is null || e.Source.SkillInstanceId == instance) && _contentRegistryOperations._contentRegistry.Skills.TryGetValue(e.Source.SkillId, out var skill) && skill.Program?.GameplayHash == e.Hash && (!requireCurrent || _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[owner], e.Source.SkillId, e.Source.SkillInstanceId)));
     internal bool AnniversaryXiahouHuiCannotRespond(int sourceSeat, int responderSeat) => HasXiahouHuiDujun && sourceSeat != responderSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(sourceSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(responderSeat) && XiahouHuiPartner(responderSeat)?.Partner == sourceSeat;
     internal bool AnniversaryXiahouHuiResponseForbidden(int actorSeat, CardKind requiredKind)
@@ -79,7 +76,7 @@ internal sealed partial class CharacterXiahouHuiAnniversaryRuntime
             throw new InvalidOperationException("Xiahou Hui requires her original typed trigger frame and exact content identity.");
         if (operation == SkillProgramEffectOp.BindAnniversaryXiahouHuiDujun)
         {
-            if (f.SkillId != XiahouHuiComposition.Dujun || f.TriggerId != "choose-partner" || f.InstructionIndex != 2 || f.SelectedTargetSeats is not [var partner] || partner == f.OwnerSeat || c.Window != SkillProgramTriggerWindow.GameStarting || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.Window != c.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]) || _coreProgramEventHistoryOperations.ProgramEventHistory<XiahouHuiBoundEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId))
+            if (f.SkillId != XiahouHuiComposition.Dujun || f.TriggerId != "choose-partner" || f.InstructionIndex != 2 || f.SelectedTargetSeats is not [var partner] || partner == f.OwnerSeat || c.Window != SkillProgramTriggerWindow.GameStarting || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.Window != c.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]) || _coreProgramEventHistoryOperations.ProgramEventHistory<XiahouHuiBoundEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId))
                 throw new InvalidOperationException("Dujun's partner requires the exact original GameStarting owner/candidate and living other selection.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiahouHuiBoundEvent(f.Id, XiahouHuiSource(f), f.GameplayHash, window.Id, partner));
             return SkillProgramStepOutcome.Continue;
@@ -158,7 +155,7 @@ internal sealed partial class CharacterXiahouHuiAnniversaryRuntime
     [ProgramAnswer(XiahouHuiAction)]
     internal void AnswerXiahouHui(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XiahouHui: { Stage: XiahouHuiStage.Recipient } r } f || !ValidXiahouHui(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], XiahouHuiChoices(f).Where(c => c.Id == answer.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XiahouHui: { Stage: XiahouHuiStage.Recipient } r } f || !ValidXiahouHui(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], XiahouHuiChoices(f).Where(c => c.Id == answer.Id).ToArray()))
             throw new InvalidOperationException("Xiahou Hui requires her exact original recipient menu and unpaid movement.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var recipient = answer.Targets[0];

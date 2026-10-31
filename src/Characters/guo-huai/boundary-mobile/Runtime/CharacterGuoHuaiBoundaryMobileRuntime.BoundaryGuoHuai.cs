@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoHuaiBoundaryMobileRuntime
@@ -44,7 +40,7 @@ internal sealed partial class CharacterGuoHuaiBoundaryMobileRuntime
         return BoundaryGuoHuaiEnding(candidate, context)is not null && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat] is { IsAlive: true, HasHpValue: true } owner && BoundaryGuoHuaiCount(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) >= owner.Hp;
     }
 
-    void global::CardGame.Core.IBoundaryGuoHuaiHost.Prepare(ProgramSkillFrame frame) => PrepareBoundaryGuoHuaiJingce(frame);
+    void IBoundaryGuoHuaiHost.Prepare(ProgramSkillFrame frame) => PrepareBoundaryGuoHuaiJingce(frame);
     internal void PrepareBoundaryGuoHuaiJingce(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

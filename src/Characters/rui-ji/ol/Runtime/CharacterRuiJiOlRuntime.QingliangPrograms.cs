@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterRuiJiOlRuntime
@@ -18,7 +14,7 @@ internal sealed partial class CharacterRuiJiOlRuntime
             return SkillProgramStepOutcome.Continue;
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).OrderBy(card => card.Id).ToArray();
         _coreProgramLifecycleOperations.SetProgramCardSet(active.Id, QingliangRevealBinding, hand.Select(card => card.Id).ToArray(), SkillProgramCardSetVisibility.Public);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQingliangRevealEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, action.ActorSeat, hand.Length));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQingliangRevealEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, action.ActorSeat, hand.Length));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 清靓：展示所有手牌（{(hand.Length)} 张）。", owner.Seat);
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id)with { RuiJiQingliang = new RuiJiQingliangState(parent.Id, action.ActorSeat, "option") });
         if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(active.Id, "qingliang-hand"))
@@ -65,7 +61,7 @@ internal sealed partial class CharacterRuiJiOlRuntime
             _corePhysicalDrawFacadesOperations.DrawCards(owner, 1, true, new($"skill-program.{(active.SkillId)}.qingliang-draw"));
             _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[state.ActorSeat], 1, true, new($"skill-program.{(active.SkillId)}.qingliang-draw"));
             _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 清靓：与 {(_coreMatchParticipantsPlayersAccess._players[state.ActorSeat].Name)} 各摸一张牌。", active.OwnerSeat, state.ActorSeat);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQingliangResolutionEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.ActorSeat, "draw", 0, false));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQingliangResolutionEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.ActorSeat, "draw", 0, false));
             _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id)with { RuiJiQingliang = null });
             if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
                 _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
@@ -133,7 +129,7 @@ internal sealed partial class CharacterRuiJiOlRuntime
         _coreProgramCardTargetEffectsOperations.MarkCardEffectIneffective(parent.Id, active.OwnerSeat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardEffectSkippedEvent(parent.Id, state.ActorSeat, active.OwnerSeat, parent.CardKind, CardEffectSkipReason.SkillNullified));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 清靓：弃置 {(discarded.Length)} 张手牌，取消【{(parent.CardKind)}】对此目标的结算。", active.OwnerSeat, state.ActorSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQingliangResolutionEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.ActorSeat, "discard", discarded.Length, true));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQingliangResolutionEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.ActorSeat, "discard", discarded.Length, true));
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id)with { RuiJiQingliang = null });
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);

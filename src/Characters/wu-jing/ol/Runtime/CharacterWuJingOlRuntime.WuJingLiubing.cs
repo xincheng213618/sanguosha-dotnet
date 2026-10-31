@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuJingOlRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     internal bool HasWuJingLiubing => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ClaimLiubingUndamagingSlash) == true;
 
     internal bool WuJingOwnsLiubing(int actor) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && (_coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[actor])?.GetInstanceTriggers(SkillProgramTriggerWindow.DiscardPileReceived) ?? []).Any(b => b.Trigger.Effects is [{ Op: SkillProgramEffectOp.ClaimLiubingUndamagingSlash }]);
-    internal static bool WuJingPhysicalSlash(Card card, CardKind kind, IReadOnlyList<int> ids, IReadOnlyList<CardConversionSource>? conversions) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wu_jing_ol_WuJingLiubing.WuJingPhysicalSlash(card, kind, ids, conversions);
+    internal static bool WuJingPhysicalSlash(Card card, CardKind kind, IReadOnlyList<int> ids, IReadOnlyList<CardConversionSource>? conversions) => RuntimeSkills.RuntimeRules_wu_jing_ol_WuJingLiubing.WuJingPhysicalSlash(card, kind, ids, conversions);
     internal bool WuJingFirstPhysicalSlash(int actor) => !_coreProgramEventHistoryOperations.ProgramEventHistory<WuJingActualPhysicalSlashEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && e.ActorSeat == actor);
     internal Suit? WuJingLiubingUsedSuit(int actorSeat, Card card, CardKind effectiveKind, IReadOnlyList<int> ids, IReadOnlyList<CardConversionSource>? conversions, Suit? ordinary) => HasWuJingLiubing && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && WuJingOwnsLiubing(actorSeat) && WuJingPhysicalSlash(card, effectiveKind, ids, conversions) && WuJingFirstPhysicalSlash(actorSeat) ? Suit.Diamond : ordinary;
     internal Card WuJingLiubingUseCard(CharacterState actor, Card card, CardKind kind, CardConversionSource? conversion = null, IReadOnlyList<int>? ids = null, long? existingUseId = null)
@@ -83,7 +79,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     {
         if (!HasWuJingLiubing || !batch.Movements.Any(m => m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.UseFinished))
             return;
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.Action is { Type: CardActionType.Use, PhysicalCards.Count: > 0 } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && !u.CausedDamage).ToArray())
+        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.Action is { Type: CardActionType.Use, PhysicalCards.Count: > 0 } && CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && !u.CausedDamage).ToArray())
         {
             var action = use.Action!;
             var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingUseMaterialEvent>().Where(e => e.UseId == use.Id && e.ActionId == action.ActionId).OrderBy(e => e.Index).ToArray();

@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MouZhouYuRuntime))]
-internal sealed class CharacterZhouYuMouMouZhouYuAdapter(global::System.Func<global::CardGame.Core.MouZhouYuRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterZhouYuMouMouZhouYuOperations
+[Core.ProgramCapability(typeof(MouZhouYuRuntime))]
+internal sealed class CharacterZhouYuMouMouZhouYuAdapter(Func<MouZhouYuRuntime> targetFactory) : ICharacterZhouYuMouMouZhouYuOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MouZhouYuRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MouZhouYuRuntime Get() => this._targetFactory();
+    private readonly Func<MouZhouYuRuntime> _targetFactory = targetFactory;
+    public MouZhouYuRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime))]
-internal sealed class CharacterZhouYuMouCoreProgramTargetRulesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterZhouYuMouCoreProgramTargetRulesOperations
+[Core.ProgramCapability(typeof(CoreProgramTargetRulesRuntime))]
+internal sealed class CharacterZhouYuMouCoreProgramTargetRulesAdapter(Func<CoreProgramTargetRulesRuntime> targetFactory) : ICharacterZhouYuMouCoreProgramTargetRulesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
+    private readonly Func<CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
+    public ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
 }

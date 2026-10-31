@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeQilinBowRuntime
 {
     internal IReadOnlyList<Card> GetQilinBowTargetMounts(CharacterState target) => _corePhysicalOwnedCardQueriesOperations.GetEquipment(target).Where(card => _coreFieldEquipmentOperations.FieldEquipmentSlot(card)is EquipmentSlot.OffensiveHorse or EquipmentSlot.DefensiveHorse).ToArray();
-    internal bool TryBeginQilinBowChoice(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryBeginQilinBowChoice(NativeOwners.CardAttackHandle attack)
     {
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
@@ -29,9 +25,9 @@ internal sealed partial class CoreNativeQilinBowRuntime
         return true;
     }
 
-    internal void PublishQilinBowChoice(global::CardGame.Core.NativeOwners.QilinBowHandle pending)
+    internal void PublishQilinBowChoice(NativeOwners.QilinBowHandle pending)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQilinBow, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQilinBow, pending) || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack))
         {
             throw new InvalidOperationException("The Qilin Bow choice has no current Slash continuation.");
         }
@@ -47,7 +43,7 @@ internal sealed partial class CoreNativeQilinBowRuntime
 
         var choices = mounts.Select(card => new PromptChoice(new ChoiceId($"qilin-bow.mount-{(card.Id)}.resolution-{(attack.ResolutionId)}"), $"发动【麒麟弓】，弃置 {(target.Name)} 的【{(card.DisplayName)}】。", [card.Id], [target.Seat], new Dictionary<string, string> { ["action"] = "qilin-bow-discard", ["target-zone"] = "equipment" })).ToList();
         choices.Add(new PromptChoice(new ChoiceId($"qilin-bow.skip.resolution-{(attack.ResolutionId)}"), "不发动【麒麟弓】，继续结算此伤害。", [], [], new Dictionary<string, string> { ["action"] = "qilin-bow-skip" }));
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.QilinBow, source.Seat, $"你的【{(CardCatalog.Get(global::CardGame.Core.EngineOwners.CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack)).DisplayName)}】将对 {(target.Name)} 造成伤害，是否发动【麒麟弓】弃置其一张坐骑？", mounts.Select(card => card.Id).ToArray(), [target.Seat], SourceSeat: source.Seat, IncomingCard: attack.EffectiveCardKind)
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.QilinBow, source.Seat, $"你的【{(CardCatalog.Get(CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack)).DisplayName)}】将对 {(target.Name)} 造成伤害，是否发动【麒麟弓】弃置其一张坐骑？", mounts.Select(card => card.Id).ToArray(), [target.Seat], SourceSeat: source.Seat, IncomingCard: attack.EffectiveCardKind)
         {
             PromptId = source.IsHuman ? _coreNativePromptBoundaryOperations.CreatePromptId() : default,
             IsPrivate = true,
@@ -61,7 +57,7 @@ internal sealed partial class CoreNativeQilinBowRuntime
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveQilinBow ?? throw new InvalidOperationException("There is no Qilin Bow choice to resolve.");
         var attack = pending.Attack;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.QilinBow } decision || decision.PlayerSeat != attack.SourceSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.QilinBow } decision || decision.PlayerSeat != attack.SourceSeat)
         {
             throw new InvalidOperationException("The Qilin Bow choice is not the current Slash continuation.");
         }

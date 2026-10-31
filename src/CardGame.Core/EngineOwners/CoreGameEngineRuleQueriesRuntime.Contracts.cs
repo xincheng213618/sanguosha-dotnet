@@ -1,37 +1,33 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreRuleQueriesMatchCardTargetQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreRuleQueriesMatchCardTargetQueriesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MatchCardTargetQueries Get();
+    MatchCardTargetQueries Get();
 }
 
-internal interface ICoreRuleQueriesMatchHandLimitQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreRuleQueriesMatchHandLimitQueriesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MatchHandLimitQueries Get();
+    MatchHandLimitQueries Get();
 }
 
-internal interface ICoreRuleQueriesProgramNumericContributionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreRuleQueriesProgramNumericContributionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramNumericContributionRuntime Get();
+    ProgramNumericContributionRuntime Get();
 }
 
-internal interface ICoreRuleQueriesMatchTurnNumericQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreRuleQueriesMatchTurnNumericQueriesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MatchTurnNumericQueries Get();
+    MatchTurnNumericQueries Get();
 }
 
-internal interface ICoreRuleQueriesCoreProgramTargetRulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreRuleQueriesCoreProgramTargetRulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTargetRules TargetRules { get; }
+    ProgramTargetRules TargetRules { get; }
 }
 
-internal interface ICoreRuleQueriesMatchDistanceQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreRuleQueriesMatchDistanceQueriesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MatchDistanceQueries Get();
+    MatchDistanceQueries Get();
 }

@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeLiangMouRuntime
 {
     internal bool MouZhijueYang(int seat) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(seat, "mou:zhijue", _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[seat], "mou:zhijue"), "yang");
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> MouYangOptions(CharacterState owner)
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> MouYangOptions(CharacterState owner)
     {
         var top = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault();
-        return top is null ? [] : _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(owner, CardKind.FireAttack, _coreNativeCardAppearanceOperations.EffectiveSuit(owner, top), enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(owner, top), actualEffectiveColor: global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, top)), hasActualColor: true, physicalCardIds: [top.Id], includeNextActualUseAdjustment: true);
+        return top is null ? [] : _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(owner, CardKind.FireAttack, _coreNativeCardAppearanceOperations.EffectiveSuit(owner, top), enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(owner, top), actualEffectiveColor: CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, top)), hasActualColor: true, physicalCardIds: [top.Id], includeNextActualUseAdjustment: true);
     }
 
     internal IReadOnlyList<LegalAction> MouYinActions(ProgramSkillFrame frame)
@@ -23,14 +20,14 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
         {
             if (_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
                 continue;
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
                 foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, target, kind, Suit.None, effectiveColor: null, physicalCardIds: [])))
                     result.Add(new(LegalActionKind.Slash, 0, target.Seat, $"视为对 {(target.Name)} 使用【{(CardCatalog.Get(kind).DisplayName)}】", kind, TargetSeats: [target.Seat]));
             else if (kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None))
                 result.Add(new(LegalActionKind.Peach, 0, null, "视为使用【桃】", kind));
             else if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && (!actor.UsedPlayPhaseAlcoholThisTurn || HasMouWujingAllowance(actor) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || _coreAdvancedPoliciesOperations.HasNextUnlimitedCard(actor) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None))
                 result.Add(new(LegalActionKind.Alcohol, 0, null, "视为使用【酒】", kind));
-            else if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
+            else if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
                 foreach (var option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: true))
                     result.Add(new(option.ActionKind, 0, option.TargetSeats.Count == 1 ? option.TargetSeats[0] : null, option.Description, kind, option.TargetCardId, option.TargetSeats));
         }
@@ -59,7 +56,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
 
             )
             {
-                var ids = _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) == red).Select(card => card.Id).Order().ToArray();
+                var ids = _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Where(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) == red).Select(card => card.Id).Order().ToArray();
                 if (ids.Length > 0 && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(actor.Seat, frame.SkillId, "color:" + red, SkillUsageScope.Turn) == 0)
                     choices.Add(new(new($"mou-color.{(frame.Id)}.{(red)}"), $"将所有{((red ? "红" : "黑"))}色手牌（{(ids.Length)}张）置入弃牌堆", ids, [], Params(red.ToString())));
             }
@@ -155,7 +152,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
 
         var draft = frame.MouZhijue ?? throw new InvalidOperationException("Zhijue lost its typed draft.");
         var canonical = MouZhijueChoices(frame).SingleOrDefault(item => item.Id == choice.Id);
-        if (canonical is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [choice]))
+        if (canonical is null || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [choice]))
             throw new InvalidOperationException("Zhijue changed its exact cards or legal targets.");
         var option = choice.Parameters["option"];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -163,12 +160,12 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
         {
             var red = bool.Parse(option);
             var actor = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-            var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) == red).OrderBy(c => c.Id).ToArray();
+            var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Where(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) == red).OrderBy(c => c.Id).ToArray();
             if (!_skillRuntimeStateOperations._skillRuntimeState.TryConsumeUsage(frame.OwnerSeat, frame.SkillId, "color:" + red, SkillUsageScope.Turn, 1))
                 throw new InvalidOperationException("Zhijue repeated its color this actual turn.");
             _coreProgramSkillChangesOperations.SetProgramBooleanState(frame, "yang", true);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhijuePolarityChangedEvent(frame.OwnerSeat, true));
-            _coreRuntimeOperations.ReplaceRuntimeTop(frame with { MouZhijue = draft with { Stage = "copy", PaidCardIds = Array.AsReadOnly(cards.Select(c => c.Id).ToArray()), CopiedKinds = Array.AsReadOnly(cards.Where(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(c.Kind) || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(c.Kind, [SkillProgramCardCategory.Basic])).Select(c => c.Kind).Distinct().Order().ToArray()) } });
+            _coreRuntimeOperations.ReplaceRuntimeTop(frame with { MouZhijue = draft with { Stage = "copy", PaidCardIds = Array.AsReadOnly(cards.Select(c => c.Id).ToArray()), CopiedKinds = Array.AsReadOnly(cards.Where(c => CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(c.Kind) || CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(c.Kind, [SkillProgramCardCategory.Basic])).Select(c => c.Kind).Distinct().Order().ToArray()) } });
             _corePhysicalMovementFacadesOperations.MoveCards(cards, CardLocation.Hand(frame.OwnerSeat), CardLocation.DiscardPile, new("mou.zhijue.place"));
             _coreDeckProgramsOperations.AwaitDeckProgramMovement(frame.Id);
             return;
@@ -183,7 +180,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
 
         var index = int.Parse(option, CultureInfo.InvariantCulture);
         LegalAction action;
-        global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption? trick;
+        GameEngine.ProgramOrdinaryTrickUseOption? trick;
         Card card;
         IReadOnlyList<int> physicalIds;
         if (draft.Yang)
@@ -200,13 +197,13 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
             action = MouYinActions(frame)[index];
             card = new(0, action.PlayedCardKind!.Value, Suit.None, 0);
             physicalIds = [];
-            trick = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(card.Kind) ? _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card.Kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: true).Single(item => item.ActionKind == action.Kind && item.TargetCardId == action.TargetCardId && item.TargetSeats.SequenceEqual(action.TargetSeats)) : null;
+            trick = CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(card.Kind) ? _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card.Kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: true).Single(item => item.ActionKind == action.Kind && item.TargetCardId == action.TargetCardId && item.TargetSeats.SequenceEqual(action.TargetSeats)) : null;
         }
 
         IssueMouZhijueUse(frame, action, trick, card, physicalIds);
     }
 
-    internal void IssueMouZhijueUse(ProgramSkillFrame frame, LegalAction action, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption? trick, Card card, IReadOnlyList<int> physicalIds)
+    internal void IssueMouZhijueUse(ProgramSkillFrame frame, LegalAction action, GameEngine.ProgramOrdinaryTrickUseOption? trick, Card card, IReadOnlyList<int> physicalIds)
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var kind = action.PlayedCardKind!.Value;
@@ -231,7 +228,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
             return;
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var target = _coreMatchParticipantsPlayersAccess._players[action.TargetSeats[0]];
             var damage = 1 + actor.AlcoholDamageBonus;

@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunQuanOlMagicRuntime
 {
-    internal bool HasMoQuanyuProspectiveQuota(CharacterState actor, CharacterState target, CardKind kind) => TryGetMoQuanyuDeclarationQuota(actor, target, kind, out var frozen) ? frozen : HasMoQuanyuSlash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && actor.IsAlive && target.IsAlive && actor.Seat != target.Seat && TryGetMoQuanyuSource(actor.Seat, out _, out _) && (MoQuanyuSlashMask(actor.Seat, target.Seat) & MoQuanyuBit(MoQuanyuEffect.Liuxing)) != 0;
+    internal bool HasMoQuanyuProspectiveQuota(CharacterState actor, CharacterState target, CardKind kind) => TryGetMoQuanyuDeclarationQuota(actor, target, kind, out var frozen) ? frozen : HasMoQuanyuSlash && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && actor.IsAlive && target.IsAlive && actor.Seat != target.Seat && TryGetMoQuanyuSource(actor.Seat, out _, out _) && (MoQuanyuSlashMask(actor.Seat, target.Seat) & MoQuanyuBit(MoQuanyuEffect.Liuxing)) != 0;
     internal LegalAction? RestrictMoQuanyuQuotaAction(CharacterState actor, LegalAction action, CardKind kind, Card? nativeOriginal)
     {
-        if (!HasMoQuanyuSlash || !TryGetMoQuanyuSource(actor.Seat, out _, out _) || action.Kind != LegalActionKind.Slash || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat)
+        if (!HasMoQuanyuSlash || !TryGetMoQuanyuSource(actor.Seat, out _, out _) || action.Kind != LegalActionKind.Slash || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat)
             return action;
         var targets = action.TargetSeats.Count > 0 ? action.TargetSeats : action.TargetSeat is { } t ? [t] : Array.Empty<int>();
         if (targets.Count == 0)
@@ -61,7 +57,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     {
         if (TryInheritMoQuanyuDeclarationQuota(use))
             return;
-        if (!HasMoQuanyuSlash || use.Action is not { Type: CardActionType.Use } a || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.TargetSeats is not [var target] || !HasMoQuanyuProspectiveQuota(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat], _coreMatchParticipantsPlayersAccess._players[target], use.CardKind) || !TryGetMoQuanyuSource(use.SourceSeat, out var source, out var hash))
+        if (!HasMoQuanyuSlash || use.Action is not { Type: CardActionType.Use } a || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.TargetSeats is not [var target] || !HasMoQuanyuProspectiveQuota(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat], _coreMatchParticipantsPlayersAccess._players[target], use.CardKind) || !TryGetMoQuanyuSource(use.SourceSeat, out var source, out var hash))
             return;
         var r = new MoQuanyuQuotaReceipt(use.Id, a.ActionId, use.SourceSeat, target, use.CardKind, source, hash, MoQuanyuSlashMask(use.SourceSeat, target), MoQiangangEntered(use.SourceSeat));
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { MoQuanyuQuota = r });

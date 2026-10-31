@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEnginePassiveRulePoliciesRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEnginePassiveRulePoliciesRuntime))]
 internal sealed partial class CoreGameEnginePassiveRulePoliciesEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePassiveRulePoliciesRuntime> _resolve;
-    private CoreGameEnginePassiveRulePoliciesEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePassiveRulePoliciesRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEnginePassiveRulePoliciesRuntime> _resolve;
+    private CoreGameEnginePassiveRulePoliciesEntries(Func<EngineOwners.CoreGameEnginePassiveRulePoliciesRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEnginePassiveRulePoliciesEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePassiveRulePoliciesRuntime> resolve) => new(resolve);
+    internal static CoreGameEnginePassiveRulePoliciesEntries Create(Func<EngineOwners.CoreGameEnginePassiveRulePoliciesRuntime> resolve) => new(resolve);
 }

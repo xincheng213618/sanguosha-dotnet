@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaHuiOlRuntime
 {
-    internal static bool IsSimaHuiOp(SkillProgramEffectOp op) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sima_hui_ol_SimaHuiPrograms.IsSimaHuiOp(op);
-    internal CardConversionSource SimaHuiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static bool IsSimaHuiOp(SkillProgramEffectOp op) => RuntimeSkills.RuntimeRules_sima_hui_ol_SimaHuiPrograms.IsSimaHuiOp(op);
+    internal CardConversionSource SimaHuiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SimaHuiReceipt NewSimaHuiReceipt(ProgramSkillFrame f, string stage) => new()
     {
         Source = SimaHuiSource(f),
@@ -28,7 +25,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
         if (op == SkillProgramEffectOp.AssignOrderedDragonPhoenixOnFirstActualTurn)
             return context.BeforeTurnPreludeProof is { } p && p.UpcomingOwnerSeat == owner && _characterBeiMiHuOlOperations.ValidBeiMiHuBeforeTurnPrelude(p) && SimaHuiOwnTurns(owner) == 0 && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SimaHuiSealMovedEvent>().Any(e => e.Issuer.OwnerSeat == owner) && _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive && p.Seat != owner) >= 2;
         if (op == SkillProgramEffectOp.TransferDeadDragonPhoenixSeal)
-            return context.Window == SkillProgramTriggerWindow.CharacterDied && context.TargetSeat is { } victim && _coreTableSeatQueriesOperations.IsValidPlayerSeat(victim) && !_coreMatchParticipantsPlayersAccess._players[victim].IsAlive && _resolutionStackOperations._resolutionStack.OfType<ProgramKillTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } window && window.VictimSeat == victim && global::CardGame.Core.EngineOwners.CharacterSimaHuiOlDefinitions.SimaHuiSeals.Any(m => SimaHuiHolder(new("ol:jianjie", "seals", owner, candidate.SkillInstanceId), m) == victim) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != victim);
+            return context.Window == SkillProgramTriggerWindow.CharacterDied && context.TargetSeat is { } victim && _coreTableSeatQueriesOperations.IsValidPlayerSeat(victim) && !_coreMatchParticipantsPlayersAccess._players[victim].IsAlive && _resolutionStackOperations._resolutionStack.OfType<ProgramKillTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } window && window.VictimSeat == victim && CharacterSimaHuiOlDefinitions.SimaHuiSeals.Any(m => SimaHuiHolder(new("ol:jianjie", "seals", owner, candidate.SkillInstanceId), m) == victim) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != victim);
         return true;
     }
 
@@ -37,9 +34,9 @@ internal sealed partial class CharacterSimaHuiOlRuntime
     {
         var features = ProgramInstructionResolver.Default.Features(activation);
         if (features.HasOperation(SkillProgramEffectOp.TransferOwnedDragonOrPhoenixSeal))
-            return SimaHuiOwnTurns(owner) > 1 && global::CardGame.Core.EngineOwners.CharacterSimaHuiOlDefinitions.SimaHuiSeals.Any(m => _coreMatchParticipantsPlayersAccess._players.Any(p => p.MarkerSourceCounts.GetValueOrDefault((m, owner)) > 0));
+            return SimaHuiOwnTurns(owner) > 1 && CharacterSimaHuiOlDefinitions.SimaHuiSeals.Any(m => _coreMatchParticipantsPlayersAccess._players.Any(p => p.MarkerSourceCounts.GetValueOrDefault((m, owner)) > 0));
         if (features.HasOperation(SkillProgramEffectOp.ConsumeDragonPhoenixForNativeYeyan))
-            return global::CardGame.Core.EngineOwners.CharacterSimaHuiOlDefinitions.SimaHuiSeals.All(m => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(m) > 0);
+            return CharacterSimaHuiOlDefinitions.SimaHuiSeals.All(m => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(m) > 0);
         return true;
     }
 
@@ -83,7 +80,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
         void Add(string value, string label, IReadOnlyList<int>? cards = null, IReadOnlyList<int>? targets = null) => result.Add(new(new($"sima-hui.{(f.Id)}.{(r.Stage)}.{(r.Cursor)}.{(value)}"), label, cards ?? [], targets ?? [], new Dictionary<string, string> { ["program-action"] = "sima-hui", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["value"] = value }));
         if (r.Stage == "transfer-kind")
         {
-            foreach (var marker in global::CardGame.Core.EngineOwners.CharacterSimaHuiOlDefinitions.SimaHuiSeals)
+            foreach (var marker in CharacterSimaHuiOlDefinitions.SimaHuiSeals)
                 if (SimaHuiHolder(SimaHuiIssuer(f), marker)is { } holder && (f.WindowContext?.Window != SkillProgramTriggerWindow.CharacterDied || holder == f.WindowContext.TargetSeat))
                     Add(marker.ToString(), "转移" + PlayerMarkerCatalog.GetDisplayName(marker));
             Add("finish", "结束转移");
@@ -126,7 +123,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Missing Sima Hui choice frame.");
         AssertSimaHui(f);
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], SimaHuiChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], SimaHuiChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Sima Hui choice lost its exact current entity/recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.SimaHui!;
@@ -217,5 +214,5 @@ internal sealed partial class CharacterSimaHuiOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISimaHuiProgramHost.BeginSimaHuiOperation(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginSimaHuiOperation(frame, op);
+    SkillProgramStepOutcome ISimaHuiProgramHost.BeginSimaHuiOperation(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginSimaHuiOperation(frame, op);
 }

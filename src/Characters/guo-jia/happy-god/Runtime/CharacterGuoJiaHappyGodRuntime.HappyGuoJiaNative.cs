@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoJiaHappyGodRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterGuoJiaHappyGodRuntime
     internal void IssueHappyGuoJiaUse(ProgramSkillFrame frame)
     {
         var receipt = frame.HappyGuoJia!;
-        if (!ValidHappyGj(frame) || receipt is not { Stage: HappyGuoJiaStage.CostChildren, Operation: SkillProgramEffectOp.ResolveHappyGuoJiaZuoxing, Plan: { } plan } || !HappyGjPlans(frame.OwnerSeat).Any(option => global::CardGame.Core.EngineOwners.CharacterGuoJiaMobileGodRuntime.SameShenGuoJiaPlan(option, plan)))
+        if (!ValidHappyGj(frame) || receipt is not { Stage: HappyGuoJiaStage.CostChildren, Operation: SkillProgramEffectOp.ResolveHappyGuoJiaZuoxing, Plan: { } plan } || !HappyGjPlans(frame.OwnerSeat).Any(option => CharacterGuoJiaMobileGodRuntime.SameShenGuoJiaPlan(option, plan)))
         {
             FinishHappyGj(frame);
             return;

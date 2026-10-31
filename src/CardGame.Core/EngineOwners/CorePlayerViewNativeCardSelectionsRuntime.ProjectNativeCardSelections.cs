@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -21,7 +18,7 @@ internal sealed partial class CorePlayerViewNativeCardSelectionsRuntime
         if (_characterLuSuMobileShiOperations.ProjectShiLsCardSelection(decision, f)is { } sharedHandChoice)
             return sharedHandChoice;
         if (f.BijingPunish is { } bijing && decision.PlayerSeat == bijing.TurnOwnerSeat && decision.Choices.All(c => c.Parameters.GetValueOrDefault("program-action") == "bijing-punish-discard"))
-            return global::CardGame.Core.EngineOwners.CorePlayerViewCardPaymentsRuntime.ProjectCollectedOwnedCards(decision, f, "bijing-punish-discard", bijing.Remaining - bijing.SelectedCardIds.Count, selected: bijing.SelectedCardIds);
+            return CorePlayerViewCardPaymentsRuntime.ProjectCollectedOwnedCards(decision, f, "bijing-punish-discard", bijing.Remaining - bijing.SelectedCardIds.Count, selected: bijing.SelectedCardIds);
         if (f.MouGuoJia is { Stage: MouGuoJiaStage.Select, Yin: true } xianmou && xianmou.Target == decision.PlayerSeat && decision.PlayerSeat == f.OwnerSeat)
             return NativeOwnedSelection(decision, f, $"{(xianmou.Stage)}:{(xianmou.Target)}", "branch", ["add"], ["done"], xianmou.Selected, 0, Math.Max(0, xianmou.X - xianmou.Selected.Count));
         if (f.SequentialDiscard is { Stage: ProgramSequentialDiscardStage.SelectingBatch } sequential)

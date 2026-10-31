@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuLieMouRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterHuLieMouRuntime
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHuLieDamageEvent(d.Id, lease.FrameId, lease.Source.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, applied.SourceSeat, applied.TargetSeat, applied.Amount));
     }
 
-    internal void AppendMouHuLieDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> candidates)
+    internal void AppendMouHuLieDamageCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> candidates)
     {
         if (!HasMouHuLie || window != SkillProgramTriggerWindow.AfterDamageApplied || attack.IsSourceLess)
             return;

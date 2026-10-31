@@ -11,7 +11,7 @@ internal sealed partial class DingShangWanRuntime(IProgramRuntimeFrames frames, 
     IProgramHealthChildOperations healthOperations, IProgramEventHistoryQueries history,
     IProgramSkillCompletion completion, IProgramChildWindows children) : IDingShangWanHost
 {
-    private const string DingShangWanDrawReason="skill-program.ding-shang-wan.draw",FudaoGiftReason="skill-program.ding-shang-wan.fudao.give",        FudaoDiscardReason=global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FudaoDiscardReason,FengyanGiftReason="skill-program.ding-shang-wan.fengyan.give",FengyanDiscardReason=global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FengyanDiscardReason;
+    private const string DingShangWanDrawReason="skill-program.ding-shang-wan.draw",FudaoGiftReason="skill-program.ding-shang-wan.fudao.give",        FudaoDiscardReason=RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FudaoDiscardReason,FengyanGiftReason="skill-program.ding-shang-wan.fengyan.give",FengyanDiscardReason=RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FengyanDiscardReason;
     public SkillProgramStepOutcome Execute(ProgramSkillFrame frame,SkillProgramEffectOp operation)=>BeginDingShangWan(frame,operation);
     private long PhysicalMovementSequence=>movements.Last()?.Sequence??0;
     private Card Card(int id)=>zones.CardsAt(zones.GetLocation(id)).Single(card=>card.Id==id);
@@ -127,7 +127,7 @@ prompts.Clear();var branch=choice.Parameters["branch"];
         events.AdvanceFact(new DingShangWanMovementIssuedEvent(id,r.Stage,r.Payer,r.Recipient,r.Before,after,count));
     }
     private static bool IsDingShangWanDrawStage(DingShangWanStage stage) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_ding_shang_wan_ol_DingShangWan.IsDingShangWanDrawStage(stage);
+        RuntimeSkills.RuntimeRules_ding_shang_wan_ol_DingShangWan.IsDingShangWanDrawStage(stage);
     private bool DrainDingShangWan(ProgramSkillFrame f)=>children.Begin(f.Id,PostEventContinuation.AwaitedProgramMovement);
     private void ContinueDingShangWan(long id)
     {

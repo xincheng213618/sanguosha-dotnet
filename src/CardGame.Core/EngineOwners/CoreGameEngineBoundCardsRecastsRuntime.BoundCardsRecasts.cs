@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineBoundCardsRecastsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IBoundCardsRecastHost.RecastBoundCards(ProgramSkillFrame frame, string sourceBind) => BeginBoundCardsRecast(frame, sourceBind);
+    SkillProgramStepOutcome IBoundCardsRecastHost.RecastBoundCards(ProgramSkillFrame frame, string sourceBind) => BeginBoundCardsRecast(frame, sourceBind);
     internal SkillProgramStepOutcome BeginBoundCardsRecast(ProgramSkillFrame supplied, string sourceBind)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -26,7 +22,7 @@ internal sealed partial class CoreGameEngineBoundCardsRecastsRuntime
             var card = _cardZonesOperations._cardZones.CardsAt(from).Single(c => c.Id == id);
             return new NativeRecastMaterial(id, card.Kind, from, card.IsGeneralWeapon);
         }).ToArray();
-        var receipt = new ProgramBoundCardsRecastReceipt(frame.InstructionIndex, sourceBind, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._phase, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
+        var receipt = new ProgramBoundCardsRecastReceipt(frame.InstructionIndex, sourceBind, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._phase, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
         {
             Materials = materials
         };
@@ -47,10 +43,10 @@ internal sealed partial class CoreGameEngineBoundCardsRecastsRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal bool IsBoundCardsRecastPayment(CardMovementRecord move, NativeRecastMaterial material) => move.CardId == material.CardId && move.CardKind == material.PrintedKind && move.From == material.From && move.Reason == CardMoveReasons.RecastDiscard && (move.To == CardLocation.DiscardPile || move.To == CardLocation.OutsideGame && (material.IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId), material.From, move.To) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(move)));
+    internal bool IsBoundCardsRecastPayment(CardMovementRecord move, NativeRecastMaterial material) => move.CardId == material.CardId && move.CardKind == material.PrintedKind && move.From == material.From && move.Reason == CardMoveReasons.RecastDiscard && (move.To == CardLocation.DiscardPile || move.To == CardLocation.OutsideGame && (material.IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId), material.From, move.To) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(move)));
     internal bool ValidBoundCardsRecast(ProgramSkillFrame frame)
     {
-        if (frame.BoundCardsRecast is not { } receipt || receipt.InstructionIndex != frame.InstructionIndex || receipt.Source != new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || receipt.GameplayHash != frame.GameplayHash || receipt.TurnNumber != _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber || receipt.TurnOwnerSeat != _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || receipt.Phase != _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._phase || receipt.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || !Enum.IsDefined(receipt.Stage) || receipt.Materials is not System.Collections.IList { IsReadOnly: true } || receipt.Materials.Count is < 1 or > 2 || receipt.Materials.Select(m => m.CardId).Distinct().Count() != receipt.Materials.Count || receipt.Materials.Any(m => m.From.OwnerSeat != frame.OwnerSeat || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || receipt.CostBatchId <= 0 || receipt.SequenceBefore < 0 || receipt.SequenceAfter <= receipt.SequenceBefore || receipt.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || receipt.DrawCount < 0 || receipt.DrawCount > receipt.Materials.Count)
+        if (frame.BoundCardsRecast is not { } receipt || receipt.InstructionIndex != frame.InstructionIndex || receipt.Source != new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || receipt.GameplayHash != frame.GameplayHash || receipt.TurnNumber != _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber || receipt.TurnOwnerSeat != _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || receipt.Phase != _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._phase || receipt.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || !Enum.IsDefined(receipt.Stage) || receipt.Materials is not System.Collections.IList { IsReadOnly: true } || receipt.Materials.Count is < 1 or > 2 || receipt.Materials.Select(m => m.CardId).Distinct().Count() != receipt.Materials.Count || receipt.Materials.Any(m => m.From.OwnerSeat != frame.OwnerSeat || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || receipt.CostBatchId <= 0 || receipt.SequenceBefore < 0 || receipt.SequenceAfter <= receipt.SequenceBefore || receipt.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || receipt.DrawCount < 0 || receipt.DrawCount > receipt.Materials.Count)
             return false;
         var source = _coreProgramLifecycleOperations.GetProgramCardSet(frame, receipt.SourceBind);
         if (!source.CardIds.SequenceEqual(receipt.Materials.Select(m => m.CardId)) || !source.SourceLocations.SequenceEqual(receipt.Materials.Select(m => m.From)))

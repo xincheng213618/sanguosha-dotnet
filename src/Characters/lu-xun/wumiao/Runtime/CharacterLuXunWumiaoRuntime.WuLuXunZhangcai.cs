@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuXunWumiaoRuntime
@@ -18,7 +14,7 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
         return _coreAlcoholIdentityPoliciesOperations.CaptureAlcoholResponseRank(provider, effectiveKind, costs) ?? _corePlayCardHistoryOperations.ApplyProgramUseAppearance(provider, card, source).Rank;
     }
 
-    internal static string WuLuXunZhangcaiBinding(SkillProgramTriggerWindow window) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_xun_wumiao_WuLuXunZhangcai.WuLuXunZhangcaiBinding(window);
+    internal static string WuLuXunZhangcaiBinding(SkillProgramTriggerWindow window) => RuntimeSkills.RuntimeRules_lu_xun_wumiao_WuLuXunZhangcai.WuLuXunZhangcaiBinding(window);
     internal void CaptureWuLuXunZhangcai(CardActionContext action, SkillProgramTriggerWindow window)
     {
         if (!HasWuLuXunZhangcaiCapability || action.ActionId <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat) || window is not (SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardResponseAccepted or SkillProgramTriggerWindow.CardSupplyCompleted) || window == SkillProgramTriggerWindow.CardUseCommitted && action.Type != CardActionType.Use || window == SkillProgramTriggerWindow.CardResponseAccepted && action.Type != CardActionType.Response)
@@ -72,11 +68,11 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal static WuLuXunZhangcaiStartedEvent WuLuXunZhangcaiStart(long id, WuLuXunZhangcaiReceipt r) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_xun_wumiao_WuLuXunZhangcai.WuLuXunZhangcaiStart(id, r);
+    internal static WuLuXunZhangcaiStartedEvent WuLuXunZhangcaiStart(long id, WuLuXunZhangcaiReceipt r) => RuntimeSkills.RuntimeRules_lu_xun_wumiao_WuLuXunZhangcai.WuLuXunZhangcaiStart(id, r);
     internal bool WuLuXunZhangcaiWindowMatches(ProgramCardTriggerWindowFrame w, WuLuXunZhangcaiQualification q)
     {
-        var action = q.Window == SkillProgramTriggerWindow.CardSupplyCompleted && w.CardSupplyCompletion is not null ? global::CardGame.Core.EngineOwners.CoreGameEngineCardSupplyCompletionRuntime.CardSupplyCompletionActorAction(w) : w.Action;
-        return global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) == q.Window && action.ActionId == q.ActionId && action.ActorSeat == q.ActorSeat && action.ProviderSeat == q.ProviderSeat && action.EffectiveKind == q.EffectiveKind && action.EffectiveRank == q.EffectiveRank && (q.Source.OwnerSeat == action.ActorSeat || q.Window == SkillProgramTriggerWindow.CardResponseAccepted && q.Source.OwnerSeat == action.ProviderSeat);
+        var action = q.Window == SkillProgramTriggerWindow.CardSupplyCompleted && w.CardSupplyCompletion is not null ? CoreGameEngineCardSupplyCompletionRuntime.CardSupplyCompletionActorAction(w) : w.Action;
+        return CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) == q.Window && action.ActionId == q.ActionId && action.ActorSeat == q.ActorSeat && action.ProviderSeat == q.ProviderSeat && action.EffectiveKind == q.EffectiveKind && action.EffectiveRank == q.EffectiveRank && (q.Source.OwnerSeat == action.ActorSeat || q.Window == SkillProgramTriggerWindow.CardResponseAccepted && q.Source.OwnerSeat == action.ProviderSeat);
     }
 
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveWuLuXunZhangcai)]

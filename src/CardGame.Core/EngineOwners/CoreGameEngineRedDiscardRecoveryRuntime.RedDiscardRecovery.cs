@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRedDiscardRecoveryRuntime
@@ -229,7 +225,7 @@ internal sealed partial class CoreGameEngineRedDiscardRecoveryRuntime
         return decision.Choices.First(choice => choice.Parameters.GetValueOrDefault("mode") == "draw");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IRedDiscardRecoveryHost.OfferRedDiscardRecoveryChoice(ProgramSkillFrame f) => BeginRedDiscardRecovery(f);
+    SkillProgramStepOutcome IRedDiscardRecoveryHost.OfferRedDiscardRecoveryChoice(ProgramSkillFrame f) => BeginRedDiscardRecovery(f);
     [ProgramPipelineHook(ProgramPipelinePhase.CaptureMovementBatchFacts, 400)]
     internal void CaptureMovementBatchFactsCaptureTurnRedDiscardCount(CardMovementBatchBuilder batch, IReadOnlyList<CardMovementRecord> movements) => CaptureTurnRedDiscardCount(batch.TurnNumber, movements);
 }

@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFinalTargetTurnCountsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IFinalTargetTurnCountHost.ExecuteFinalTargetTurnCount(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteFinalTargetTurnCount(effect, frame);
+    SkillProgramStepOutcome IFinalTargetTurnCountHost.ExecuteFinalTargetTurnCount(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteFinalTargetTurnCount(effect, frame);
     internal int GetNamedTurnSkillCount(int seat, string skill) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<NamedTurnSkillChoiceCommittedEvent>().Count(e => e.OwnerSeat == seat && e.SkillId == skill && e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
     internal bool NamedTurnActionAlreadyCommitted(int seat, string skill, long actionId) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<NamedTurnSkillChoiceCommittedEvent>().Any(e => e.OwnerSeat == seat && e.SkillId == skill && e.ActionId == actionId);
     internal CardUseFrame NonFinalTargetUse(ProgramSkillFrame frame)
@@ -72,7 +68,7 @@ internal sealed partial class CoreGameEngineFinalTargetTurnCountsRuntime
         var choices = draft.CardIds.Except(draft.SelectedIds).Select(id =>
         {
             var card = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Single(c => c.Id == id);
-            return new PromptChoice(new($"named-turn-hand.frame-{(frame.Id)}.card-{(id)}"), "弃置【" + global::CardGame.Core.EngineOwners.CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(card) + "】", [id], [], new Dictionary<string, string> { ["program-action"] = "named-turn-flow", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) });
+            return new PromptChoice(new($"named-turn-hand.frame-{(frame.Id)}.card-{(id)}"), "弃置【" + CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(card) + "】", [id], [], new Dictionary<string, string> { ["program-action"] = "named-turn-flow", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) });
         }).ToArray();
         PublishNamedTurnFlow(frame, choices, $"请选择 {(draft.Required - draft.SelectedIds.Count)} 张手牌弃置。", true);
     }

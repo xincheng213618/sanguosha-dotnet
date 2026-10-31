@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramTargetCommitRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IProgramTargetCommitHost.SelectRelativeZoneDemandTarget(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginRelativeZoneDemand(effect, frame);
-    SkillProgramStepOutcome global::CardGame.Core.IProgramTargetCommitHost.DrawOnFirstProgramTargetEncounter(SkillProgramEffect effect, ProgramSkillFrame frame) => DrawFirstProgramTargetReward(effect, frame);
+    SkillProgramStepOutcome IProgramTargetCommitHost.SelectRelativeZoneDemandTarget(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginRelativeZoneDemand(effect, frame);
+    SkillProgramStepOutcome IProgramTargetCommitHost.DrawOnFirstProgramTargetEncounter(SkillProgramEffect effect, ProgramSkillFrame frame) => DrawFirstProgramTargetReward(effect, frame);
     internal bool ProgramTargetSourceValid(ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Any(item => item.Id == frame.SkillId);
     internal SkillProgramStepOutcome BeginRelativeZoneDemand(SkillProgramEffect effect, ProgramSkillFrame frame)
     {
@@ -59,7 +55,7 @@ internal sealed partial class CoreGameEngineProgramTargetCommitRuntime
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Missing real relative-zone parent.");
         var draft = frame.RelativeZoneDemand ?? throw new InvalidOperationException("Missing relative-zone selection.");
-        if (draft.Commit is not null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], RelativeZoneChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
+        if (draft.Commit is not null || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], RelativeZoneChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The relative-zone declaration no longer matches its published parent.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!ProgramTargetSourceValid(frame))

@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBianFuRenOlRuntime
 {
     internal bool HasBianFuRenCapability => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.WanweiObtainMatchingLostCard) == true || _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.YuejianRevealAndClaimUsedCard) == true;
 
-    internal static bool IsBianFuRenOwnedZone(CardLocation from) => global::CardGame.Core.RuntimeSkills.RuntimeRules_bian_fu_ren_ol_BianFuRenMovements.IsBianFuRenOwnedZone(from);
+    internal static bool IsBianFuRenOwnedZone(CardLocation from) => RuntimeSkills.RuntimeRules_bian_fu_ren_ol_BianFuRenMovements.IsBianFuRenOwnedZone(from);
     internal void RecordBianFuRenOwnedTransferProducer(CardMovementRecord movement, int recipientSeat, long producerId)
     {
         _characterLuSuMouOperations.RecordMouLuSuOwnedTransferProducer(movement, recipientSeat, producerId);
@@ -285,8 +281,8 @@ internal sealed partial class CharacterBianFuRenOlRuntime
         };
     }
 
-    internal static bool BianFuRenNativeUseFinish(CardMovementRecord movement) => global::CardGame.Core.RuntimeSkills.RuntimeRules_bian_fu_ren_ol_BianFuRenMovements.BianFuRenNativeUseFinish(movement);
-    internal static bool BianFuRenNativeUsePayment(CardMovementRecord movement) => global::CardGame.Core.RuntimeSkills.RuntimeRules_bian_fu_ren_ol_BianFuRenMovements.BianFuRenNativeUsePayment(movement);
+    internal static bool BianFuRenNativeUseFinish(CardMovementRecord movement) => RuntimeSkills.RuntimeRules_bian_fu_ren_ol_BianFuRenMovements.BianFuRenNativeUseFinish(movement);
+    internal static bool BianFuRenNativeUsePayment(CardMovementRecord movement) => RuntimeSkills.RuntimeRules_bian_fu_ren_ol_BianFuRenMovements.BianFuRenNativeUsePayment(movement);
     internal IEnumerable<ProgramTriggerCandidate> CollectBianFuRenLossCandidates(CardMovementBatchContext batch)
     {
         if (batch.BianFuRenOwnedLosses is not { Count: > 0 } losses)

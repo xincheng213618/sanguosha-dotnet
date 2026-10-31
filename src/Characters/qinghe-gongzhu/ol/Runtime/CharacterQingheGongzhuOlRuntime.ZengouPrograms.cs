@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQingheGongzhuOlRuntime
@@ -93,7 +89,7 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeFrame(attack.Id, attack with { Enhancements = attack.Enhancements | CurrentCardEnhancement.Uncancelable, EnhancementOwnerSeat = active.OwnerSeat });
         _corePhysicalMovementFacadesOperations.MoveCard(dodge, CardLocation.DiscardPile, CardLocation.Hand(active.OwnerSeat), new($"skill-program.{(active.SkillId)}.zengou-gain"));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】：" + (cost == "discard" ? $"弃置一张非基本牌" : "失去1点体力") + $"，令 {(_coreMatchParticipantsPlayersAccess._players[dodgerSeat].Name)} 使用的【闪】无效，并获得之。", active.OwnerSeat, dodgerSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZengouNullifiedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, dodgerSeat, cost, paidCardId, dodge.Id));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZengouNullifiedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, dodgerSeat, cost, paidCardId, dodge.Id));
         if (owner.Hp == 0)
         {
             _coreSkillProgramsOperations.BeginProgramSkillDying(active.Id, owner);

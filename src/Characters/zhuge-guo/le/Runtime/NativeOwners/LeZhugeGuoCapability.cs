@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class LeZhugeGuoCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZhugeGuoLeEntries> getCharacterZhugeGuoLeRuntime) : ILeZhugeGuoHost
+internal sealed class LeZhugeGuoCapability(Func<RuntimeEntries.CharacterZhugeGuoLeEntries> getCharacterZhugeGuoLeRuntime) : ILeZhugeGuoHost
 {
     public SkillProgramStepOutcome Initialize(ProgramSkillFrame f) => getCharacterZhugeGuoLeRuntime().InitializeLeXidi(f);
     public SkillProgramStepOutcome Reorder(ProgramSkillFrame f) => getCharacterZhugeGuoLeRuntime().ReorderLeXidi(f);

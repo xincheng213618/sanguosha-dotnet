@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineConversionStatesRuntime
@@ -20,6 +16,6 @@ internal sealed partial class CoreGameEngineConversionStatesRuntime
         var program = definition.Program;
         var optIn = program is not null && (program.Activations.Any(binding => ProgramInstructionResolver.Default.Features(binding).UsesConversionPolarity) || program.Triggers.Any(binding => ProgramInstructionResolver.Default.Features(binding).UsesConversionPolarity));
         if (optIn || program is null && (definition.Tags & SkillTag.Conversion) != 0)
-            _skillRuntimeStateOperations._skillRuntimeState.RegisterConversionSkill(player.Seat, skillId, global::CardGame.Core.EngineOwners.CharacterYanYanBoundaryMobileRuntime.InitialBoundaryYanYanPolarity(player, skillId));
+            _skillRuntimeStateOperations._skillRuntimeState.RegisterConversionSkill(player.Seat, skillId, CharacterYanYanBoundaryMobileRuntime.InitialBoundaryYanYanPolarity(player, skillId));
     }
 }

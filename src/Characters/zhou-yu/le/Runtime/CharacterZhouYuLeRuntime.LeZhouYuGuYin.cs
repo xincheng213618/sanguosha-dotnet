@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouYuLeRuntime
@@ -10,8 +6,8 @@ internal sealed partial class CharacterZhouYuLeRuntime
     internal const string GuYinDrawReason = "skill-program.le-zhou-yu.guyin.draw";
     internal bool HasGuYinCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeGuYinInitialEntities);
 
-    internal static CardConversionSource GuYinSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_yu_le_LeZhouYuGuYin.GuYinSource(f);
-    internal static bool IsGuYinDiscardTrigger(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_yu_le_LeZhouYuGuYin.IsGuYinDiscardTrigger(t);
+    internal static CardConversionSource GuYinSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhou_yu_le_LeZhouYuGuYin.GuYinSource(f);
+    internal static bool IsGuYinDiscardTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_zhou_yu_le_LeZhouYuGuYin.IsGuYinDiscardTrigger(t);
     internal int ApplyGuYinInitialHandSize(CharacterState player, int ordinaryCount)
     {
         if (!HasGuYinCapability)
@@ -52,8 +48,8 @@ internal sealed partial class CharacterZhouYuLeRuntime
     }
 
     internal bool IsIssuedGuYinInitialCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => HasGuYinCapability && c.SkillId == "le:guyin" && c.BindingId == "mark-initial-entities" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash == c.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.InitializeGuYinInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == c.OwnerSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, GuYinInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == c && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<GuYinInitializedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat);
-    SkillProgramStepOutcome global::CardGame.Core.ILeZhouYuGuYinHost.Initialize(ProgramSkillFrame f) => InitializeGuYin(f);
-    SkillProgramStepOutcome global::CardGame.Core.ILeZhouYuGuYinHost.Draw(ProgramSkillFrame f) => BeginGuYinDraw(f);
+    SkillProgramStepOutcome ILeZhouYuGuYinHost.Initialize(ProgramSkillFrame f) => InitializeGuYin(f);
+    SkillProgramStepOutcome ILeZhouYuGuYinHost.Draw(ProgramSkillFrame f) => BeginGuYinDraw(f);
     internal SkillProgramStepOutcome InitializeGuYin(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

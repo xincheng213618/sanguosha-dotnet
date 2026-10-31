@@ -52,7 +52,7 @@ internal sealed partial class HealthContinuationRuntime
     internal bool ProgramRecoveryReceiptMatches(ProgramSkillFrame owner, HpChangedTriggerWindowFrame hp,
         IReadOnlyList<IGameEvent> history)
     {
-        if (!global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.ProgramHpReturnMatches(owner, hp) || hp.Change.Kind != HpChangeKind.Recovery ||
+        if (!RuntimeSkills.RuntimeRules_Core_CommonRules.ProgramHpReturnMatches(owner, hp) || hp.Change.Kind != HpChangeKind.Recovery ||
             (owner.RecoveryApplications ?? []).Where(r => r.HpChangeId == hp.Change.Id).ToArray() is not [var receipt] ||
             receipt.InstructionIndex != owner.InstructionIndex || receipt.GameplayHash != owner.GameplayHash ||
             TypedRecoveryPausedEffect(owner) is null || receipt.SourceSeat != hp.Change.SourceSeat ||

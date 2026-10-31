@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoSiOlRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
             return false;
         if (a.EffectiveKind == CardKind.Nullification)
             return _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } n && a.OpponentSeat == n.SourceSeat && a.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(n);
-        return a.EffectiveKind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.EffectiveCardKind is { } incoming && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == a.ActorSeat && a.OpponentSeat == attack.SourceSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId == a.ParentActionId;
+        return a.EffectiveKind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.EffectiveCardKind is { } incoming && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == a.ActorSeat && a.OpponentSeat == attack.SourceSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId == a.ParentActionId;
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 500)]
@@ -49,7 +45,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
     {
         if (!HasGuoSiCapability || _coreMatchParticipantsPlayersAccess._players[a.ActorSeat].GuoSiUses is not { } list || !list.Any(s => s.ActionId == a.ActionId))
             return;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { } actual } use || actual.ActionId != a.ActionId || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, a) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, a))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { } actual } use || actual.ActionId != a.ActionId || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, a) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, a))
             throw new InvalidOperationException("Sidao finalized targets require their actual accepted native action.");
         _coreMatchParticipantsPlayersAccess._players[a.ActorSeat].GuoSiUses = Array.AsReadOnly(list.Select(s => s.ActionId == a.ActionId ? s with { NativeUseId = id, Finalized = true, Targets = _characterSuFeiOlOperations.SuFeiPrimaryTargets(a) } : s).ToArray());
     }
@@ -60,9 +56,9 @@ internal sealed partial class CharacterGuoSiOlRuntime
             return;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id);
         var response = GuoSiResponseUse(a);
-        if (response && (_resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(f => f.Id == id)is not { CompletedResponseReturn: { } ret } window || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(window.Action, a) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window) || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, ret.Kind)))
+        if (response && (_resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(f => f.Id == id)is not { CompletedResponseReturn: { } ret } window || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(window.Action, a) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window) || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, ret.Kind)))
             throw new InvalidOperationException("Sidao response completion requires its exact native use-return parent.");
-        if (!response && (use is not { Step: ResolutionFrameStep.Completed, Action: { } actual } || actual.ActionId != a.ActionId || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, a) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, a) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == use.CardId && e.CardKind == use.CardKind) != 1))
+        if (!response && (use is not { Step: ResolutionFrameStep.Completed, Action: { } actual } || actual.ActionId != a.ActionId || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, a) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, a) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == use.CardId && e.CardKind == use.CardKind) != 1))
             throw new InvalidOperationException("Sidao completion lost its native action.");
         var next = Array.AsReadOnly(list.Select(s => s.ActionId == a.ActionId ? s with { Completed = true, Finalized = response || s.Finalized, Targets = response ? [] : _characterSuFeiOlOperations.SuFeiPrimaryTargets(a) } : s).ToArray());
         _coreMatchParticipantsPlayersAccess._players[a.ActorSeat].GuoSiUses = next;

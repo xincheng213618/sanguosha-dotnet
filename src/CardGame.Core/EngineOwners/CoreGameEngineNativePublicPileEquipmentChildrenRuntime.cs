@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineNativePublicPileEquipmentChildrenRuntime
 {
-    private readonly global::CardGame.Core.EngineOwners.IKernelPendingCardsMovedBatchesAccess _pendingCardsMovedBatchesOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly IKernelPendingCardsMovedBatchesAccess _pendingCardsMovedBatchesOperations;
+    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
     private readonly ICoreNativePublicPileEquipmentChildrenCoreEquipmentContentOperations _coreEquipmentContentOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNativePublicPileOriginalCardsEntries _coreNativePublicPileOriginalCardsOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
-    internal CoreGameEngineNativePublicPileEquipmentChildrenRuntime(global::CardGame.Core.EngineOwners.IKernelPendingCardsMovedBatchesAccess pendingCardsMovedBatchesOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, ICoreNativePublicPileEquipmentChildrenCoreEquipmentContentOperations coreEquipmentContentOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineNativePublicPileOriginalCardsEntries coreNativePublicPileOriginalCardsOperations, global::CardGame.Core.EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
+    private readonly RuntimeEntries.CoreGameEngineNativePublicPileOriginalCardsEntries _coreNativePublicPileOriginalCardsOperations;
+    private readonly EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess _coreCardMovementJournalCardMovementsAccess;
+    internal CoreGameEngineNativePublicPileEquipmentChildrenRuntime(IKernelPendingCardsMovedBatchesAccess pendingCardsMovedBatchesOperations, IKernelFrameStoreAccess resolutionStackOperations, ICoreNativePublicPileEquipmentChildrenCoreEquipmentContentOperations coreEquipmentContentOperations, RuntimeEntries.CoreGameEngineNativePublicPileOriginalCardsEntries coreNativePublicPileOriginalCardsOperations, EngineStates.Contracts.ICoreCardMovementJournalCardMovementsAccess coreCardMovementJournalCardMovementsAccess)
     {
         this._pendingCardsMovedBatchesOperations = pendingCardsMovedBatchesOperations;
         this._resolutionStackOperations = resolutionStackOperations;

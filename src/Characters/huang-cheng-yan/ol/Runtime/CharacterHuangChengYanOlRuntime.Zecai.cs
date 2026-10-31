@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangChengYanOlRuntime
@@ -22,7 +18,7 @@ internal sealed partial class CharacterHuangChengYanOlRuntime
         var others = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != active.OwnerSeat).OrderBy(player => player.Seat).ToArray();
         if (others.Length == 0)
             return SkillProgramStepOutcome.Continue;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZecaiRoundSettledEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, settledRound));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZecaiRoundSettledEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, settledRound));
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
         var leader = UniqueRoundTrickLeaderSeat(settledRound);
         var choices = others.Select(player => new PromptChoice(new ChoiceId($"zecai.frame-{(frame.Id)}.seat-{(player.Seat)}"), $"令 {(player.Name)} 获得“集智”直到本轮游戏结束。", [], [player.Seat], new Dictionary<string, string> { ["program-action"] = "zecai-target", ["target-seat"] = player.Seat.ToString(System.Globalization.CultureInfo.InvariantCulture), ["unique-trick-leader"] = (player.Seat == leader).ToString(System.Globalization.CultureInfo.InvariantCulture) })).ToList<PromptChoice>();
@@ -67,12 +63,12 @@ internal sealed partial class CharacterHuangChengYanOlRuntime
         if (!int.TryParse(selected.Parameters.GetValueOrDefault("target-seat"), System.Globalization.CultureInfo.InvariantCulture, out var targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || targetSeat == active.OwnerSeat)
             throw new InvalidOperationException("The Zecai beneficiary is no longer legal.");
         var round = _coreActualRoundProgressRoundNumberAccess._roundNumber;
-        _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[targetSeat], $"round:{(round)}:{(active.SkillId)}:{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active))}", ["classic:jizhi"]);
+        _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[targetSeat], $"round:{(round)}:{(active.SkillId)}:{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active))}", ["classic:jizhi"]);
         var extraTurn = UniqueRoundTrickLeaderSeat(round - 1) == targetSeat;
         if (extraTurn)
             _coreSkillProgramsOperations.PendProgramExtraTurn(active, targetSeat);
         _coreMatchLogOperations.AddLog("SkillTriggered", extraTurn ? $"{(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 获得“集智”直到本轮游戏结束，并执行一个额外的回合。" : $"{(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 获得“集智”直到本轮游戏结束。", active.OwnerSeat, targetSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZecaiSkillGrantedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, targetSeat, round, "classic:jizhi", extraTurn));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZecaiSkillGrantedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, targetSeat, round, "classic:jizhi", extraTurn));
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
 
@@ -87,7 +83,7 @@ internal sealed partial class CharacterHuangChengYanOlRuntime
             CardActionAcceptedEvent accepted when accepted.Action.Type == CardActionType.Response && accepted.Action.EffectiveKind == CardKind.Nullification && accepted.Action.ActorSeat == accepted.Action.ProviderSeat && accepted.Action.ResponderSeat == accepted.Action.ActorSeat && accepted.Action.RequesterSeat is null && _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().Any(window => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == window.ParentFrameId)?.Action?.ActionId == accepted.Action.ParentActionId) => accepted.Action,
             _ => null
         };
-        if (action is null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Trick || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramRoundTrickUsedEvent>().Any(fact => fact.ActionId == action.ActionId))
+        if (action is null || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Trick || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramRoundTrickUsedEvent>().Any(fact => fact.ActionId == action.ActionId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramRoundTrickUsedEvent(_coreActualRoundProgressRoundNumberAccess._roundNumber, action.ActorSeat, action.ActionId, action.EffectiveKind));
     }

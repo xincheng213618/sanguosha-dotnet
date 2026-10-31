@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,8 +8,8 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
     internal const string ShiGyQingdao = "mobile:shi-qingdao", ShiGyXiugeng = "mobile:shi-xiugeng", ShiGyChenshe = "mobile:shi-chenshe";
     internal static CardMoveReason ShiGyDiscardReason => new("skill.mobile-shi-guo-yuan.discard");
 
-    internal static CardConversionSource ShiGySource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IShiGuoYuanHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiGy(f, op);
+    internal static CardConversionSource ShiGySource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IShiGuoYuanHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiGy(f, op);
     internal ShiGyRecordCommittedEvent? ShiGyRecord(int owner, string instance) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiGyRecordCommittedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner && e.Source.SkillInstanceId == instance);
     internal ShiGyHandRecordedEvent? ShiGyRecordedHand(int owner, string instance, int target) => ShiGyRecord(owner, instance)is { } record ? _coreProgramEventHistoryOperations.ProgramEventHistory<ShiGyHandRecordedEvent>().SingleOrDefault(e => e.FrameId == record.FrameId && e.Target == target) : null;
     internal int ShiGyHandLimitBonus(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiGyHandLimitRaisedEvent>().Count(e => e.Target == target);
@@ -30,7 +27,7 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
     internal bool CanOfferShiGy(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {
         if (c.SkillId == ShiGyQingdao)
-            return w.CardUse is { } a && a.ActorSeat != c.OwnerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(a.EffectiveKind);
+            return w.CardUse is { } a && a.ActorSeat != c.OwnerSeat && CoreGameEngineMouLuMengRuntime.IsDamageCardKind(a.EffectiveKind);
         if (c.SkillId == ShiGyXiugeng)
             return t.Id == "record-hands" ? w.OwnerSeat == c.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == c.OwnerSeat : w.TargetSeat is { } target && ShiGyRecordedHand(c.OwnerSeat, c.SkillInstanceId, target)is not null;
         return c.SkillId != ShiGyChenshe || w.TargetSeat is { } victim && victim != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[victim].IsAlive && _coreMatchParticipantsPlayersAccess._players[victim].Hp <= 0;
@@ -47,7 +44,7 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
             After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
         };
-        if (f.SkillId == ShiGyQingdao && op == SkillProgramEffectOp.ResolveMobileShiGuoYuanQingdao && w is { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } a } && a.ActorSeat != f.OwnerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(a.EffectiveKind))
+        if (f.SkillId == ShiGyQingdao && op == SkillProgramEffectOp.ResolveMobileShiGuoYuanQingdao && w is { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } a } && a.ActorSeat != f.OwnerSeat && CoreGameEngineMouLuMengRuntime.IsDamageCardKind(a.EffectiveKind))
             r = r with
             {
                 OriginalUse = a.ParentCardUseFrameId,
@@ -152,7 +149,7 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
     [ProgramAnswer("shi-guo-yuan")]
     internal void AnswerShiGy(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiGuoYuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiGyChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiGuoYuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiGyChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shi Guo Yuan rejects an unpublished hand, field slot or native use choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -176,7 +173,7 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
         if (branch == "obtain")
         {
             var kind = r.Damaged ? CardKind.Dodge : CardKind.Slash;
-            var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(c => kind == CardKind.Slash ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) : c.Kind == kind) ?? _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).FirstOrDefault(c => kind == CardKind.Slash ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) : c.Kind == kind);
+            var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(c => kind == CardKind.Slash ? CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) : c.Kind == kind) ?? _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).FirstOrDefault(c => kind == CardKind.Slash ? CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) : c.Kind == kind);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiGuoYuan = r with { Stage = ShiGyStage.Movement, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             if (card is not null)
                 _corePhysicalMovementFacadesOperations.MoveCard(card, _cardZonesOperations._cardZones.GetLocation(card.Id), CardLocation.Hand(f.OwnerSeat), new("skill.mobile-shi-guo-yuan.qingdao.obtain"));
@@ -311,10 +308,10 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
     internal PromptChoice ChooseShiGy(PendingDecision p, ProgramSkillFrame f)
     {
         if (f.ShiGuoYuan!.Stage == ShiGyStage.Record)
-            return p.Choices.FirstOrDefault(c => c.Targets is [var seat] && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[seat])) ?? p.Choices.Last();
+            return p.Choices.FirstOrDefault(c => c.Targets is [var seat] && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[seat])) ?? p.Choices.Last();
         if (f.ShiGuoYuan.Stage == ShiGyStage.Benefit)
             return p.Choices.First(c => c.Parameters["branch"] == "obtain");
         // Opaque foreign Hand slots have no face-based score.
-        return p.Choices.OrderBy(c => c.Cards is [var id] ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).First();
+        return p.Choices.OrderBy(c => c.Cards is [var id] ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).First();
     }
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNativePublicPileOriginalCardsRuntime
@@ -91,7 +87,7 @@ internal sealed partial class CoreGameEngineNativePublicPileOriginalCardsRuntime
             return[];
         if (_resolutionStackOperations._resolutionStack.Any(f => f.NativePublicPilePayment is { SequenceAfter: 0 } pending && pending.Request.ProviderSeat == request.ProviderSeat && pending.Request != request))
             return[];
-        return _characterLiFengOlOperations.ShuliangOriginalGrainChoices(request).Concat(_characterGongsunZanMouMobileOperations.MouGszHuOriginalChoices(request)).Where(selection => selection.Request == request && selection.AccessSource.OwnerSeat == request.ProviderSeat && selection.Pile.OwnerSeat == request.ProviderSeat && Enum.IsDefined(selection.Card.Kind) && _cardZonesOperations._cardZones.GetLocation(selection.Card.Id) == selection.Pile.Location && _corePublicPileSourcesOperations.PublicPileCards(selection.Pile).Any(c => c == selection.Card) && (request.RequiredKind is null || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(selection.Card.Kind, request.RequiredKind.Value)) && (_characterLiFengOlOperations.IsShuliangOriginalGrainChoice(request, selection) || _characterGongsunZanMouMobileOperations.IsMouGszHuOriginalChoice(request, selection))).DistinctBy(selection => selection.Card.Id).ToArray();
+        return _characterLiFengOlOperations.ShuliangOriginalGrainChoices(request).Concat(_characterGongsunZanMouMobileOperations.MouGszHuOriginalChoices(request)).Where(selection => selection.Request == request && selection.AccessSource.OwnerSeat == request.ProviderSeat && selection.Pile.OwnerSeat == request.ProviderSeat && Enum.IsDefined(selection.Card.Kind) && _cardZonesOperations._cardZones.GetLocation(selection.Card.Id) == selection.Pile.Location && _corePublicPileSourcesOperations.PublicPileCards(selection.Pile).Any(c => c == selection.Card) && (request.RequiredKind is null || CoreNativeCardClassificationsRuntime.MatchesRequiredCard(selection.Card.Kind, request.RequiredKind.Value)) && (_characterLiFengOlOperations.IsShuliangOriginalGrainChoice(request, selection) || _characterGongsunZanMouMobileOperations.IsMouGszHuOriginalChoice(request, selection))).DistinctBy(selection => selection.Card.Id).ToArray();
     }
 
     internal NativePublicPileCardSelection RequireNativePublicPileOriginalCard(NativePublicPileCardRequest request, NativePublicPileCardSelection selection) => GetNativePublicPileOriginalCards(request).SingleOrDefault(s => s == selection) ?? throw new InvalidOperationException("An original public-pile card lost its exact live source, request or shared quota.");
@@ -109,7 +105,7 @@ internal sealed partial class CoreGameEngineNativePublicPileOriginalCardsRuntime
     }
 
     internal IReadOnlyList<Card> NativePublicPileOriginalUseCards(CharacterState provider) => GetNativePublicPileOriginalCards(NativePublicPileUseRequest(provider.Seat, provider.Seat, parent: _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id)).Select(s => s.Card).ToArray();
-    internal void PrepareNativePublicPileProvidedSlash(global::CardGame.Core.NativeOwners.FactionCardRequestHandle request, CharacterState provider, IReadOnlyList<Card> cards, CardConversionSource? conversion)
+    internal void PrepareNativePublicPileProvidedSlash(NativeOwners.FactionCardRequestHandle request, CharacterState provider, IReadOnlyList<Card> cards, CardConversionSource? conversion)
     {
         if (conversion is not null || cards is not [var card] || _cardZonesOperations._cardZones.GetLocation(card.Id).Zone != CardZoneKind.PublicPersistentPile)
             return;
@@ -145,9 +141,9 @@ internal sealed partial class CoreGameEngineNativePublicPileOriginalCardsRuntime
             return false;
         var prepared = _resolutionStackOperations._resolutionStack.LastOrDefault(f => f.NativePublicPilePayment is { SequenceAfter: 0 } p && p.Request.ProviderSeat == owner.Seat && p.Card.Id == card.Id)?.NativePublicPilePayment;
         if (prepared is not null)
-            return prepared.Card == card && _cardZonesOperations._cardZones.GetLocation(card.Id) == prepared.Pile.Location && (card.Kind == kind || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && kind == CardKind.Slash || card.Kind == CardKind.Slash && kind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[prepared.Request.ActorSeat]));
+            return prepared.Card == card && _cardZonesOperations._cardZones.GetLocation(card.Id) == prepared.Pile.Location && (card.Kind == kind || CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && kind == CardKind.Slash || card.Kind == CardKind.Slash && kind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[prepared.Request.ActorSeat]));
         var request = response ? NativePublicPileResponseRequest(owner, kind) : NativePublicPileUseRequest(owner.Seat, owner.Seat);
-        return (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(card.Kind, kind) || card.Kind == CardKind.Slash && kind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(owner)) && GetNativePublicPileOriginalCards(request).Any(s => s.Card == card);
+        return (CoreNativeCardClassificationsRuntime.MatchesRequiredCard(card.Kind, kind) || card.Kind == CardKind.Slash && kind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(owner)) && GetNativePublicPileOriginalCards(request).Any(s => s.Card == card);
     }
 
     internal void PrepareNativePublicPilePayment(ResolutionFrame parent, NativePublicPileCardSelection selection)

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJuShouMouRuntime
@@ -44,13 +40,13 @@ internal sealed partial class CharacterJuShouMouRuntime
                         plans.Add(new("zhangba", FreezeMouJsAction(a), kind) { Cards = ids, Targets = [target.Seat] });
                     }
 
-        foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Concat(new[] { CardKind.Peach, CardKind.Alcohol }))
+        foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Concat(new[] { CardKind.Peach, CardKind.Alcohol }))
             foreach (var selection in _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(actor, kind, false).Where(p => p.Cards.Count > 1 && p.Cards.All(c => bound.Contains(c.Id))))
             {
                 var ids = selection.Cards.Select(c => c.Id).ToArray();
                 var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, selection.Cards);
                 var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, selection.Cards);
-                IEnumerable<IReadOnlyList<int>> targets = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, suit, color, physicalCardIds: ids)).Select(t => (IReadOnlyList<int>)new[] { t.Seat }) : kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, suit) ? new IReadOnlyList<int>[]
+                IEnumerable<IReadOnlyList<int>> targets = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, suit, color, physicalCardIds: ids)).Select(t => (IReadOnlyList<int>)new[] { t.Seat }) : kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, suit) ? new IReadOnlyList<int>[]
                 {
                     new[]
                     {
@@ -66,7 +62,7 @@ internal sealed partial class CharacterJuShouMouRuntime
                 : Array.Empty<IReadOnlyList<int>>();
                 foreach (var t in targets)
                 {
-                    var a = new LegalAction(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? LegalActionKind.Slash : kind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol, ids[0], t.Count > 0 ? t[0] : null, "将本次所得牌当【" + CardCatalog.Get(kind).DisplayName + "】使用", PlayedCardKind: kind)
+                    var a = new LegalAction(CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? LegalActionKind.Slash : kind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol, ids[0], t.Count > 0 ? t[0] : null, "将本次所得牌当【" + CardCatalog.Get(kind).DisplayName + "】使用", PlayedCardKind: kind)
                     {
                         ConversionSource = selection.Source,
                         TargetSeats = t
@@ -96,7 +92,7 @@ internal sealed partial class CharacterJuShouMouRuntime
         var id = n.Plan.Cards.Single();
         var card = _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, _coreCardAttackStateOperations.GetAttackCard(id), a.ConversionSource);
         if (a.ConversionSource is { } source && _corePlayCardHistoryOperations.ViewAsRule(source)is { SingleCardTrickUse: true } rule)
-            return _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, rule.OutputKind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, _coreCardAttackStateOperations.GetAttackCard(id)), rule.ExcludeOwnerEffects, enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), actualEffectiveColor: global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)), hasActualColor: true, physicalCardIds: [id]).Where(o => o.ActionKind == a.Kind && o.TargetCardId == a.TargetCardId && (o.TargetSeats.SequenceEqual(a.TargetSeats) || a.ProgramActivationId == "red-additional-targets" && o.TargetSeats.SequenceEqual(a.TargetSeats.Take(o.TargetSeats.Count)))).OrderByDescending(o => o.TargetSeats.Count).Select(o => o.TargetSeats).First();
+            return _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, rule.OutputKind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, _coreCardAttackStateOperations.GetAttackCard(id)), rule.ExcludeOwnerEffects, enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), actualEffectiveColor: CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)), hasActualColor: true, physicalCardIds: [id]).Where(o => o.ActionKind == a.Kind && o.TargetCardId == a.TargetCardId && (o.TargetSeats.SequenceEqual(a.TargetSeats) || a.ProgramActivationId == "red-additional-targets" && o.TargetSeats.SequenceEqual(a.TargetSeats.Take(o.TargetSeats.Count)))).OrderByDescending(o => o.TargetSeats.Count).Select(o => o.TargetSeats).First();
         if (_coreGuanduCardsOperations.GuanduExpectedNativeTargets(actor, card, a)is { } guandu)
             return guandu;
         if (_coreDragonBoatCardsOperations.DragonBoatExpectedNativeTargets(actor, card, a)is { } dragon)
@@ -106,7 +102,7 @@ internal sealed partial class CharacterJuShouMouRuntime
         if (a.Kind is not (LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage or LegalActionKind.PeachGarden or LegalActionKind.FiveGrains))
             return _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(n.Plan.Kind, n.Actor, a.TargetSeats);
         var offensive = a.Kind is LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage;
-        var seats = Enumerable.Range(offensive ? 1 : 0, _coreMatchDefinitionPlayerCountAccess._playerCount - (offensive ? 1 : 0)).Select(i => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(n.Actor, i)]).Where(p => p.IsAlive && (!offensive || !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, n.Plan.Kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, n.Plan.Kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(n.Actor, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(n.Actor, p.Seat, n.Plan.Kind))).Select(p => p.Seat).ToArray();
+        var seats = Enumerable.Range(offensive ? 1 : 0, _coreMatchDefinitionPlayerCountAccess._playerCount - (offensive ? 1 : 0)).Select(i => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(n.Actor, i)]).Where(p => p.IsAlive && (!offensive || !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, n.Plan.Kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, n.Plan.Kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(n.Actor, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(n.Actor, p.Seat, n.Plan.Kind))).Select(p => p.Seat).ToArray();
         if (!offensive)
             seats = _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(actor, seats).ToArray();
         if (a.Kind == LegalActionKind.FiveGrains)
@@ -153,7 +149,7 @@ internal sealed partial class CharacterJuShouMouRuntime
         var conversion = plan.Action.ConversionSource ?? throw new InvalidOperationException("A multi-material Zuo Jun Use lost its native source.");
         if (_coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(actor, plan.Cards, plan.Kind, false, conversion)is null)
             throw new InvalidOperationException("Zuo Jun's native multi-material conversion expired.");
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(plan.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(plan.Kind))
         {
             _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[plan.Targets.Single()], cards[0], plan.Kind, actor.Seat, physicalCards: cards, conversionSource: conversion);
             return;

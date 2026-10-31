@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5QuyiRuntime
@@ -42,7 +38,7 @@ internal sealed partial class CoreGameEngineShanheS5QuyiRuntime
         }.Distinct();
         return participants.Where(seat => _coreActualRoundProgressRoundNumberAccess._roundNumber >= 1 && view.Players.Single(p => p.Seat == seat)is { IsAlive: true } owner && view.Players.Where(p => p.IsAlive && p.Seat != seat).All(p => HandCount(p) <= HandCount(owner))).Sum(seat =>
         {
-            var visible = global::CardGame.Core.EngineOwners.CoreGameEnginePublicDamagePredictionRuntime.VisiblePredictionSkillIds(view.Players.Single(p => p.Seat == seat));
+            var visible = CoreGameEnginePublicDamagePredictionRuntime.VisiblePredictionSkillIds(view.Players.Single(p => p.Seat == seat));
             return _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[seat]).ProgramInstances.Where(instance => visible.Contains(instance.SkillId)).SelectMany(instance => instance.Program.DamageModifiers).Where(modifier => modifier.Condition == SkillProgramDamageModifierCondition.OwnerMaximumHandCurrentRound).Sum(ShanheS5JiaoziModifierAmount);
         });
     }

@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreNativeRuleQueriesRuntime))]
 internal sealed partial class CoreNativeRuleQueriesEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> _resolve;
-    private CoreNativeRuleQueriesEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> resolve)
+    private readonly Func<EngineOwners.CoreNativeRuleQueriesRuntime> _resolve;
+    private CoreNativeRuleQueriesEntries(Func<EngineOwners.CoreNativeRuleQueriesRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreNativeRuleQueriesEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> resolve) => new(resolve);
+    internal static CoreNativeRuleQueriesEntries Create(Func<EngineOwners.CoreNativeRuleQueriesRuntime> resolve) => new(resolve);
 }

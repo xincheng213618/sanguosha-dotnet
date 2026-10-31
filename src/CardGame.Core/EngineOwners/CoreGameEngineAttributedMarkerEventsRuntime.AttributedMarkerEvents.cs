@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAttributedMarkerEventsRuntime
@@ -113,5 +109,5 @@ internal sealed partial class CoreGameEngineAttributedMarkerEventsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramMarkerEventAppliedEvent(context.ParentFrameId, subject, marker, effect.Op, active.OwnerSeat, active.SkillId, active.SkillInstanceId));
     }
 
-    void global::CardGame.Core.IAttributedEventProgramHost.ApplyAttributedEvent(ProgramSkillFrame f, SkillProgramEffect e, int target) => ApplyAttributedEvent(f, e, target);
+    void IAttributedEventProgramHost.ApplyAttributedEvent(ProgramSkillFrame f, SkillProgramEffect e, int target) => ApplyAttributedEvent(f, e, target);
 }

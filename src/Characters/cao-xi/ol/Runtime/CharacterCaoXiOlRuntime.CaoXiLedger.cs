@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoXiOlRuntime
@@ -84,9 +80,9 @@ internal sealed partial class CharacterCaoXiOlRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoXiGangshuUnitExpiredEvent(unit.FrameId, seat, reason, nativeId));
     }
 
-    internal void CaptureCaoXiGangshuSlashOffset(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CaptureCaoXiGangshuSlashOffset(NativeOwners.CardAttackHandle attack)
     {
-        if (!HasCaoXiGangshuCapability || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || attack.SuccessfulDodgeResponses != attack.RequiredDodgeResponses || _coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(attack) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat))
+        if (!HasCaoXiGangshuCapability || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || attack.SuccessfulDodgeResponses != attack.RequiredDodgeResponses || _coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(attack) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat))
             return;
         var cursor = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.TargetIndex ?? 0;
         if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CaoXiGangshuActualOffsetEvent>().Any(e => e.NativeId == attack.ResolutionId && e.OwnerSeat == attack.TargetSeat && e.Kind == "slash" && e.Cursor == cursor))
@@ -101,7 +97,7 @@ internal sealed partial class CharacterCaoXiOlRuntime
     {
         if (!HasCaoXiGangshuCapability)
             return;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not NullificationWindowFrame current || current.Id != pending.Id || current.ParentFrameId != pending.ParentFrameId || current.ChainDepth != pending.ChainDepth || current.EffectNullified != pending.EffectNullified || pending.ChainDepth < 1 || pending.NamedAmbushResponse is not null || action.Type != CardActionType.Response || action.EffectiveKind != CardKind.Nullification || action.ActorSeat != action.ProviderSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || action.OpponentSeat != pending.SourceSeat || action.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(pending) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == action.ActionId && global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, action)))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not NullificationWindowFrame current || current.Id != pending.Id || current.ParentFrameId != pending.ParentFrameId || current.ChainDepth != pending.ChainDepth || current.EffectNullified != pending.EffectNullified || pending.ChainDepth < 1 || pending.NamedAmbushResponse is not null || action.Type != CardActionType.Response || action.EffectiveKind != CardKind.Nullification || action.ActorSeat != action.ProviderSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || action.OpponentSeat != pending.SourceSeat || action.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(pending) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == action.ActionId && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, action)))
             throw new InvalidOperationException("Gangshu offset requires the exact accepted native counterspell node after its real invalidation decision.");
         if (invalidated || pending.ChainDepth == 1 && _coreCurrentCardEnhancementsOperations.HasCurrentCardEnhancement(pending.ParentFrameId, CurrentCardEnhancement.Uncancelable) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CaoXiGangshuActualOffsetEvent>().Any(e => e.NativeId == pending.Id && e.OwnerSeat == action.ActorSeat && e.Kind == "nullification" && e.Cursor == pending.ChainDepth))
             return;
@@ -124,5 +120,5 @@ internal sealed partial class CharacterCaoXiOlRuntime
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeContributions, 20)]
-    internal void AddCaoXiGangshuBonusAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{(player.Seat)}:cao-xi:gangshu:attack-range", CaoXiGangshuBonus(player, SkillRuleQuery.AttackRange));
+    internal void AddCaoXiGangshuBonusAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{(player.Seat)}:cao-xi:gangshu:attack-range", CaoXiGangshuBonus(player, SkillRuleQuery.AttackRange));
 }

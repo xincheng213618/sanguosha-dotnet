@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime))]
 internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime> _resolve;
-    private CoreGameEngineJoinedTrickDamageRewardsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime> _resolve;
+    private CoreGameEngineJoinedTrickDamageRewardsEntries(Func<EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineJoinedTrickDamageRewardsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineJoinedTrickDamageRewardsEntries Create(Func<EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime> resolve) => new(resolve);
 }

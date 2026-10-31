@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_pang_ji_ol_Douyu
 {
     internal static CardConversionSource DouyuSource(ProgramTriggerCandidate c) => new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId);

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOrderedSelectedActorDuelsRuntime
@@ -89,7 +85,7 @@ internal sealed partial class CoreGameEngineOrderedSelectedActorDuelsRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 2402)]
-    internal bool ReturnOrderedSelectedActorDuelAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnOrderedSelectedActorDuelAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OrderedSelectedActorDuel: { } state } frame || state.IssuedCardUseFrameId != completion.ResolutionId)
             return false;

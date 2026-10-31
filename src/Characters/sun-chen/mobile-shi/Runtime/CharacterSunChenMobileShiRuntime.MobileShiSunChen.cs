@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunChenMobileShiRuntime
@@ -12,15 +8,15 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
     internal static CardMoveReason ShiScGiveReason => new("skill.mobile-shi-sun-chen.nigu.give");
 
     internal const string ShiScDrawReason = "skill.mobile-shi-sun-chen.lulian.draw";
-    internal static CardConversionSource ShiScSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IShiSunChenHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiSc(f, op);
+    internal static CardConversionSource ShiScSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IShiSunChenHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiSc(f, op);
     [ProgramTargetWindow(ProgramTargetWindowStage.ImplicitSelfDrawTwo, 49100)]
     [ProgramTargetWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, 49100)]
     internal bool ShiScImplicitDrawTwo(ProgramTargetCardWindowQuery q) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiSunChenLulian);
-    internal static SkillProgramCardCategory ShiScCategory(CardKind kind) => EquipmentCatalog.IsEquipment(kind) ? SkillProgramCardCategory.Equipment : global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(kind, [SkillProgramCardCategory.Trick]) ? SkillProgramCardCategory.Trick : SkillProgramCardCategory.Basic;
-    internal global::CardGame.Core.GameEngine.ShiScCompletedUse? ShiScCompleted(ProgramSkillWindowContext w, int owner)
+    internal static SkillProgramCardCategory ShiScCategory(CardKind kind) => EquipmentCatalog.IsEquipment(kind) ? SkillProgramCardCategory.Equipment : CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(kind, [SkillProgramCardCategory.Trick]) ? SkillProgramCardCategory.Trick : SkillProgramCardCategory.Basic;
+    internal GameEngine.ShiScCompletedUse? ShiScCompleted(ProgramSkillWindowContext w, int owner)
     {
-        if (w.Window != SkillProgramTriggerWindow.CardUseCompleted || w.OwnerSeat != owner || w.CardUse is not { } info || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame p || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(p) != SkillProgramTriggerWindow.CardUseCompleted || p.Action.ActorSeat != owner || info.ActorSeat != owner || p.Action.ActionId != info.CardActionId || p.Action.EffectiveKind != info.EffectiveKind || info.ParentCardUseFrameId != p.ParentFrameId || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count)
+        if (w.Window != SkillProgramTriggerWindow.CardUseCompleted || w.OwnerSeat != owner || w.CardUse is not { } info || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame p || CoreGameEngineCardActionsRuntime.GetCardActionWindow(p) != SkillProgramTriggerWindow.CardUseCompleted || p.Action.ActorSeat != owner || info.ActorSeat != owner || p.Action.ActionId != info.CardActionId || p.Action.EffectiveKind != info.EffectiveKind || info.ParentCardUseFrameId != p.ParentFrameId || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count)
             return null;
         var a = p.Action;
         var nativeId = p.ParentFrameId;
@@ -37,7 +33,7 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
         return new(nativeId, a, targets.Distinct().Where(_coreTableSeatQueriesOperations.IsValidPlayerSeat).ToArray());
     }
 
-    internal bool ShiScSourceWindow(ProgramSkillFrame f) => f.SkillId == ShiScLulian && f.TriggerId == "completed-hand-category" && f.ActivationId == f.TriggerId && f.WindowContext is { } w && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is ProgramCardTriggerWindowFrame p && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(p.Candidates[p.CandidateIndex]));
+    internal bool ShiScSourceWindow(ProgramSkillFrame f) => f.SkillId == ShiScLulian && f.TriggerId == "completed-hand-category" && f.ActivationId == f.TriggerId && f.WindowContext is { } w && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is ProgramCardTriggerWindowFrame p && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(p.Candidates[p.CandidateIndex]));
     internal bool ShiScNoCategory(int owner, CardKind used) => !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Any(c => ShiScCategory(c.Kind) == ShiScCategory(used));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 49100)]
     internal bool CanOfferShiSc(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
@@ -158,7 +154,7 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
     [ProgramAnswer("shi-sun-chen")]
     internal void AnswerShiSc(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiSunChen: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ShiScChooser(f) || !ShiScChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiSunChen: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ShiScChooser(f) || !ShiScChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shi Sun Chen rejects an unpublished chooser, original material or nonminimal fire target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -378,9 +374,9 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
         if (r.Stage == ShiScStage.Cards)
             return p.Choices.Single(c => c.Parameters["branch"] == "pay");
         if (r.Stage == ShiScStage.Votes)
-            return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == (global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) ? "give" : "refuse")) ?? p.Choices.Last();
+            return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == (CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) ? "give" : "refuse")) ?? p.Choices.Last();
         if (r.Stage == ShiScStage.GiveCard)
-            return p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).First();
+            return p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).First();
         return p.Choices.OrderByDescending(c => _coreAiBrainsAiBrainsAccess._aiBrains[f.OwnerSeat].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(f.OwnerSeat), c.Targets.Single(), new(0, 0, 0, 1, 0, 0, false, false))).First();
     }
 }

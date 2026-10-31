@@ -2,6 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreProgramDamageInsertionRuntimeEntries
 {
-    internal bool IsOriginalDyingSuspendedByProgramInsertion(global::CardGame.Core.DyingFrame dying) => _resolve().IsOriginalDyingSuspendedByProgramInsertion(dying);
-    internal global::CardGame.Core.ProgramDamageInsertionRuntime DamageInsertions { get => _resolve().DamageInsertions; }
+    internal bool IsOriginalDyingSuspendedByProgramInsertion(DyingFrame dying) => _resolve().IsOriginalDyingSuspendedByProgramInsertion(dying);
+    internal ProgramDamageInsertionRuntime DamageInsertions { get => _resolve().DamageInsertions; }
 }

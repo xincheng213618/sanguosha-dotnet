@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOriginalHandAwakeningRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CoreGameEngineOriginalHandAwakeningRuntime
         var r = new ProgramOriginalHandAwakeningReceipt
         {
             InstructionIndex = 1,
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             SourceSkillId = effect.SourceBind!,
             StateId = effect.StateId!,
@@ -77,7 +73,7 @@ internal sealed partial class CoreGameEngineOriginalHandAwakeningRuntime
 
     internal bool ValidOriginalHandAwakeningReceipt(ProgramSkillFrame f)
     {
-        if (f.OriginalHandAwakening is not { } r || f.InstructionIndex != 1 || r.InstructionIndex != 1 || !_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.LifecycleFrameId != f.WindowContext!.ParentFrameId || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != f.OwnerSeat || !Enum.IsDefined(r.Stage) || r.MaximumBefore < 1 || r.MaximumAfter != Math.Max(1, r.MaximumBefore - 1) || r.HpAfter != Math.Min(r.HpBefore, r.MaximumAfter) || f.PendingMovementContinuation is not null || !_coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesAccess._originalHandEntityStates.TryGetValue(new(f.OwnerSeat, r.SourceSkillId, r.StateId), out var state) || state.InitializationFrameId != r.InitializationFrameId || state.Entities.Count != r.OriginalCount || state.Entities.Any(e => e.FirstLossSequence is null) && !_characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningReceipt(f) || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is not [{ Op: SkillProgramEffectOp.AwakenWhenOriginalHandEmpty } effect] || effect.SourceBind != r.SourceSkillId || effect.StateId != r.StateId || !effect.SkillIds.SequenceEqual(r.SkillIds) || r.SkillIds.Count == 0 || r.SkillIds.Distinct(StringComparer.Ordinal).Count() != r.SkillIds.Count)
+        if (f.OriginalHandAwakening is not { } r || f.InstructionIndex != 1 || r.InstructionIndex != 1 || !_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.LifecycleFrameId != f.WindowContext!.ParentFrameId || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != f.OwnerSeat || !Enum.IsDefined(r.Stage) || r.MaximumBefore < 1 || r.MaximumAfter != Math.Max(1, r.MaximumBefore - 1) || r.HpAfter != Math.Min(r.HpBefore, r.MaximumAfter) || f.PendingMovementContinuation is not null || !_coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesAccess._originalHandEntityStates.TryGetValue(new(f.OwnerSeat, r.SourceSkillId, r.StateId), out var state) || state.InitializationFrameId != r.InitializationFrameId || state.Entities.Count != r.OriginalCount || state.Entities.Any(e => e.FirstLossSequence is null) && !_characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningReceipt(f) || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is not [{ Op: SkillProgramEffectOp.AwakenWhenOriginalHandEmpty } effect] || effect.SourceBind != r.SourceSkillId || effect.StateId != r.StateId || !effect.SkillIds.SequenceEqual(r.SkillIds) || r.SkillIds.Count == 0 || r.SkillIds.Distinct(StringComparer.Ordinal).Count() != r.SkillIds.Count)
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         if (!_coreOriginalHandEntityObserversOperations.OriginalHandBindingStarted(f, SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) || history.OfType<OriginalHandAwakeningMaximumPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid != new OriginalHandAwakeningMaximumPaidEvent(f.Id, r.Source, r.GameplayHash, r.SourceSkillId, r.StateId, r.InitializationFrameId, r.OriginalCount, r.LifecycleFrameId, r.ActualTurnNumber, r.ActualTurnOwnerSeat, r.MaximumBefore, r.MaximumAfter, r.HpBefore, r.HpAfter) || !history.OfType<MaximumHpChangedEvent>().Any(e => e.PlayerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.Delta == r.MaximumAfter - r.MaximumBefore && e.MaximumHp == r.MaximumAfter))

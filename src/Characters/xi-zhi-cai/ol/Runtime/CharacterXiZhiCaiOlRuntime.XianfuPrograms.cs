@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiZhiCaiOlRuntime
@@ -91,7 +86,7 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
         };
     }
 
-    internal bool CanOfferXianfuDamage(int ownerSeat, SkillProgramTrigger trigger, global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool CanOfferXianfuDamage(int ownerSeat, SkillProgramTrigger trigger, GameEngine.IDamageAttempt attack)
     {
         if (!IsXianfuEchoTrigger(trigger))
             return true;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaTuoMobileGodRuntime
@@ -156,7 +152,7 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 39100)]
-    internal int MobileHtTigerDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int MobileHtTigerDamage(GameEngine.IDamageAttempt attack)
     {
         if (attack.IsChainPropagation || attack.IsSourceLess || !MobileHtSpirit(attack.CardUserSeat, MobileWulingAnimal.Tiger) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } || action.ActorSeat != attack.CardUserSeat || action.EffectiveDesignatedTargetSeats is not [var target] || target != attack.TargetSeat)
             return 0;

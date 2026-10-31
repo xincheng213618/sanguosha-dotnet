@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,9 +9,9 @@ internal sealed partial class CoreGameEngineNamedAmbushRuntime
     internal const string NamedAmbushRemoveReason = "skill-program.named-ambush.remove";
     internal bool HasNamedAmbushCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.NullifyMatchingHandUse);
 
-    internal static CardKind AmbushCardName(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NamedAmbush.AmbushCardName(kind);
-    internal static CardConversionSource AmbushSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NamedAmbush.AmbushSource(f);
-    internal static CardLocation AmbushLocation(CardConversionSource source) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NamedAmbush.AmbushLocation(source);
+    internal static CardKind AmbushCardName(CardKind kind) => RuntimeSkills.RuntimeRules_Core_NamedAmbush.AmbushCardName(kind);
+    internal static CardConversionSource AmbushSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_NamedAmbush.AmbushSource(f);
+    internal static CardLocation AmbushLocation(CardConversionSource source) => RuntimeSkills.RuntimeRules_Core_NamedAmbush.AmbushLocation(source);
     internal NamedAmbushDeposit[] LiveAmbushDeposits(int owner, string? skill = null, string? instance = null)
     {
         if (!HasNamedAmbushCapability || !_cardZonesOperations._cardZones.HasPrivatePersistentCards(owner))
@@ -28,7 +25,7 @@ internal sealed partial class CoreGameEngineNamedAmbushRuntime
     {
         identity = null !;
         action = null !;
-        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCommitted || window.Action.PhysicalCards.Count == 0)
+        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCommitted || window.Action.PhysicalCards.Count == 0)
             return false;
         action = window.Action;
         var response = action.Type == CardActionType.Response;
@@ -118,7 +115,7 @@ internal sealed partial class CoreGameEngineNamedAmbushRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Ambush lost owning frame.");
         RequireNamedAmbushReceipt(f);
         var r = f.NamedAmbush!;
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], NamedAmbushChoices(f).Where(c => c.Id == choice.Id).ToArray()) || r.Stage == NamedAmbushStage.MovementChildren)
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], NamedAmbushChoices(f).Where(c => c.Id == choice.Id).ToArray()) || r.Stage == NamedAmbushStage.MovementChildren)
             throw new InvalidOperationException("Ambush choice changed after publication.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["branch"] == "decline")
@@ -216,7 +213,7 @@ internal sealed partial class CoreGameEngineNamedAmbushRuntime
 
     internal void RequireNamedAmbushReceipt(ProgramSkillFrame f)
     {
-        if (f.NamedAmbush is not { } r || f.TriggerId is null || r.Source != AmbushSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.WindowContext?.ParentFrameId != r.WindowFrameId || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != (r.Removing ? SkillProgramEffectOp.NullifyMatchingHandUse : SkillProgramEffectOp.RecordNamedPrivateAmbush) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<NamedAmbushOfferedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Receipt.Source == r.Source && e.Receipt.InstructionIndex == r.InstructionIndex && e.Receipt.WindowFrameId == r.WindowFrameId && e.Receipt.Use == r.Use && (r.OriginalAction is null ? e.Receipt.OriginalAction is null : e.Receipt.OriginalAction is { } issued && global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(issued, r.OriginalAction))) != 1 || r.Removing && (r.Use is null || r.OriginalAction is not { } original || !TryGetAmbushUse(f.WindowContext!, out var use, out var actual) || use != r.Use || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(original, actual)))
+        if (f.NamedAmbush is not { } r || f.TriggerId is null || r.Source != AmbushSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.WindowContext?.ParentFrameId != r.WindowFrameId || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != (r.Removing ? SkillProgramEffectOp.NullifyMatchingHandUse : SkillProgramEffectOp.RecordNamedPrivateAmbush) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<NamedAmbushOfferedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Receipt.Source == r.Source && e.Receipt.InstructionIndex == r.InstructionIndex && e.Receipt.WindowFrameId == r.WindowFrameId && e.Receipt.Use == r.Use && (r.OriginalAction is null ? e.Receipt.OriginalAction is null : e.Receipt.OriginalAction is { } issued && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(issued, r.OriginalAction))) != 1 || r.Removing && (r.Use is null || r.OriginalAction is not { } original || !TryGetAmbushUse(f.WindowContext!, out var use, out var actual) || use != r.Use || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(original, actual)))
             throw new InvalidOperationException("Ambush lost exact instruction, source, window or current hand-use identity.");
         if (r.Stage != NamedAmbushStage.MovementChildren)
             return;
@@ -265,8 +262,8 @@ internal sealed partial class CoreGameEngineNamedAmbushRuntime
     {
         if (f.NamedAmbush!.Stage == NamedAmbushStage.SelectName)
             return decision.Choices.FirstOrDefault(c => c.Parameters["recorded-kind"] == CardKind.Slash.ToString()) ?? decision.Choices[0];
-        return decision.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? decision.Choices[0];
+        return decision.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? decision.Choices[0];
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.INamedAmbushHost.ExecuteNamedAmbush(SkillProgramEffect e, ProgramSkillFrame f) => BeginNamedAmbush(e, f);
+    SkillProgramStepOutcome INamedAmbushHost.ExecuteNamedAmbush(SkillProgramEffect e, ProgramSkillFrame f) => BeginNamedAmbush(e, f);
 }

@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuanShuJunOlRuntime
 {
-    internal const string HuanpeiOpen = global::CardGame.Core.RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanpeiRequests.HuanpeiOpen;
+    internal const string HuanpeiOpen = RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanpeiRequests.HuanpeiOpen;
     internal HuanpeiNativeRequest? CaptureHuanpeiRequest(PendingDecision p, ResolutionFrame? suppliedTop = null)
     {
         var top = suppliedTop ?? _resolutionStackOperations._resolutionStack.LastOrDefault();
@@ -52,7 +49,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         return request;
     }
 
-    internal global::CardGame.Core.GameEngine.DrawFundedBasicNeed HuanpeiNativeNeed(HuanpeiNativeRequest n) => new(n.Intent switch
+    internal GameEngine.DrawFundedBasicNeed HuanpeiNativeNeed(HuanpeiNativeRequest n) => new(n.Intent switch
     {
         HuanpeiIntent.OwnSlashDodge => DrawFundedDistinctBasicIntent.OwnSlashDodge,
         HuanpeiIntent.Dying => DrawFundedDistinctBasicIntent.Dying,
@@ -76,13 +73,13 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 
     internal bool HuanpeiNativeLegal(HuanpeiNativeRequest n, CardKind kind, int? target)
     {
-        if (!HuanpeiRequestParentCurrent(n) || !global::CardGame.Core.EngineOwners.CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Contains(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, kind, CardActionType.Use) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(n.ActorSeat, [], null) || !_coreMatchParticipantsPlayersAccess._players[n.ActorSeat].IsAlive)
+        if (!HuanpeiRequestParentCurrent(n) || !CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Contains(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, kind, CardActionType.Use) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(n.ActorSeat, [], null) || !_coreMatchParticipantsPlayersAccess._players[n.ActorSeat].IsAlive)
             return false;
         var actor = _coreMatchParticipantsPlayersAccess._players[n.ActorSeat];
         if (n.Intent == HuanpeiIntent.WenyiPeach)
             return kind == CardKind.Peach && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == n.ParentFrameId)is ProgramSkillFrame p && TryGetWenyiPeachRequest(p, out var a, out var t) && a == actor.Seat && t == target && WenyiTargetCanReceivePeach(p);
         if (n.Intent == HuanpeiIntent.FixedSlash)
-            return global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && target is { } seat && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == n.ParentFrameId)is ProgramSkillFrame { FixedTargetSlash: { } fs } && seat == fs.TargetSeat && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], new(0, kind, Suit.None, 0), effectiveKind: kind, physicalCardIds: [], ignoreDistance: fs.IgnoreDistance);
+            return CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && target is { } seat && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == n.ParentFrameId)is ProgramSkillFrame { FixedTargetSlash: { } fs } && seat == fs.TargetSeat && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], new(0, kind, Suit.None, 0), effectiveKind: kind, physicalCardIds: [], ignoreDistance: fs.IgnoreDistance);
         if (n.Intent == HuanpeiIntent.KeBiNengBasic)
         {
             var source = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.HuanShuJun?.Request == n)?.HuanShuJun?.Source ?? HuanpeiSources(actor).FirstOrDefault();
@@ -97,10 +94,10 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !requested && (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(actor.Seat, [], null))
             return[];
         var result = new List<LegalAction>();
-        foreach (var kind in global::CardGame.Core.EngineOwners.CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Where(k => k != CardKind.Dodge && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, k, CardActionType.Use)))
+        foreach (var kind in CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Where(k => k != CardKind.Dodge && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, k, CardActionType.Use)))
         {
             var card = new Card(0, kind, Suit.None, 0);
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             {
                 var targets = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, p, card, source, kind, noEffectiveRank: true, physicalCardIds: [])).ToArray();
                 result.AddRange(targets.Select(p => new LegalAction(LegalActionKind.Slash, 0, p.Seat, $"视为对{(p.Name)}使用【{(card.DisplayName)}】", kind) { ConversionSource = source }));
@@ -133,7 +130,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
                 {
                     [HuanpeiOpen] = n.Intent.ToString()
                 };
-                global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
+                CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
                 result.Add(new(new($"huanpei.open.{(p.PromptId.Value)}.{(source.SkillInstanceId)}.basic"), "环佩：调整手牌，然后使用一张基本牌", [], [], args));
                 continue;
             }
@@ -176,7 +173,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
                         ["output-kind"] = kind.ToString(),
                         ["native-target-seat"] = target.ToString(CultureInfo.InvariantCulture)
                     };
-                    global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
+                    CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
                     IReadOnlyList<int> responseTargets = (n.Intent is HuanpeiIntent.OwnSlashDodge or HuanpeiIntent.Dying) ? Array.Empty<int>() : new[]
                     {
                         target
@@ -199,7 +196,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         };
     }
 
-    internal static PendingDecision HuanpeiNativeDecision(PendingDecision p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanpeiRequests.HuanpeiNativeDecision(p);
+    internal static PendingDecision HuanpeiNativeDecision(PendingDecision p) => RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanpeiRequests.HuanpeiNativeDecision(p);
     internal bool IsHuanpeiAnswer(ChoiceId id) => _corePendingDecisionPolicyPipelineOperations._pendingDecision?.Choices.Any(c => c.Id == id && c.Parameters.ContainsKey(HuanpeiOpen)) == true;
     internal CommandResult SubmitHuanpeiAnswer(int actor, PromptId prompt, ChoiceId id)
     {
@@ -219,9 +216,9 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         if (!choice.Parameters.ContainsKey(HuanpeiOpen))
             return false;
         var p = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("Huanpei lost its original native prompt.");
-        if (!HuanpeiResponseChoices(HuanpeiNativeDecision(p)).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || CaptureHuanpeiRequest(p)is not { } n)
+        if (!HuanpeiResponseChoices(HuanpeiNativeDecision(p)).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || CaptureHuanpeiRequest(p)is not { } n)
             throw new InvalidOperationException("Huanpei changed its published native need.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
         var definition = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!;
         var r = new HuanShuJunReceipt(source, definition.GameplayHash, SkillProgramEffectOp.ResolveHuanpeiHandAdjustmentAndBasicUse, n.ParentFrameId ?? 0, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, HuanShuJunStage.AdjustHand)
         {
@@ -341,6 +338,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         };
         var need = CaptureHuanpeiRequest(prompt, parent);
         var ignore = _characterLvKuangLvXiangOlOperations.IsQigongRequest(parent) || _characterWuJingOlOperations.IsWuJingHejiRequest(parent);
-        return candidates.Any(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && global::CardGame.Core.EngineOwners.CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Where(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard).Any(kind => need is not null ? HuanpeiNativeLegal(need, kind, t) : _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: [], ignoreDistance: ignore)));
+        return candidates.Any(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Where(CoreNativeCardClassificationsRuntime.IsSlashCard).Any(kind => need is not null ? HuanpeiNativeLegal(need, kind, t) : _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: [], ignoreDistance: ignore)));
     }
 }

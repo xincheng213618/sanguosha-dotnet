@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanOlMagicRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         return cohort is null || _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanCardGrantedEvent>().Where(e => e.CohortId == cohort.CohortId).All(e => _cardZonesOperations._cardZones.GetLocation(e.CardId) != CardLocation.Hand(e.RecipientSeat));
     }
 
-    internal static bool IsMoDcSingleDamageKind(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_diao_chan_ol_magic_MoDiaoChanQingshi.IsMoDcSingleDamageKind(kind);
+    internal static bool IsMoDcSingleDamageKind(CardKind kind) => RuntimeSkills.RuntimeRules_diao_chan_ol_magic_MoDiaoChanQingshi.IsMoDcSingleDamageKind(kind);
     internal CardKind[] MoDcModeDamageKinds() => _characterCaoZhiLeOperations.LeCaoZhiModeNamePool().Where(IsMoDcSingleDamageKind).ToArray();
     internal void StartMoDcCohort(ProgramSkillFrame f)
     {
@@ -52,7 +48,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         return use;
     }
 
-    internal int[] MoDcRedirectTargets(CardUseFrame use) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !use.TargetSeats.Contains(p.Seat) && (!_coreCardUseModulesOperations.HasTurnCardTargetRestriction(use.SourceSeat, SkillProgramCardTargetRestriction.SelfOnly) || p.Seat == use.SourceSeat) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(use.SourceSeat, p.Seat, use.CardKind, use.Id) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(use.SourceSeat, p.Seat, use.Action!.EffectiveSuit) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, use.CardKind, use.Action.EffectiveSuit ?? Suit.None, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(use.Action)) && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(use.CardKind) ? !p.JudgmentAreaAbolished && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(p, use.CardKind) && !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget) : _coreDesignatedExtraTargetsOperations.CanBeDistanceFreeDesignatedTarget(use, p))).Select(p => p.Seat).ToArray();
+    internal int[] MoDcRedirectTargets(CardUseFrame use) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !use.TargetSeats.Contains(p.Seat) && (!_coreCardUseModulesOperations.HasTurnCardTargetRestriction(use.SourceSeat, SkillProgramCardTargetRestriction.SelfOnly) || p.Seat == use.SourceSeat) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(use.SourceSeat, p.Seat, use.CardKind, use.Id) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(use.SourceSeat, p.Seat, use.Action!.EffectiveSuit) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, use.CardKind, use.Action.EffectiveSuit ?? Suit.None, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(use.Action)) && (CoreNativeCardClassificationsRuntime.IsDelayedCard(use.CardKind) ? !p.JudgmentAreaAbolished && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(p, use.CardKind) && !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget) : _coreDesignatedExtraTargetsOperations.CanBeDistanceFreeDesignatedTarget(use, p))).Select(p => p.Seat).ToArray();
     internal void ReplaceMoDcUniqueTarget(ProgramSkillFrame f, int target)
     {
         var r = f.MoDiaoChan!;
@@ -80,7 +76,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(use with { TargetSeats = Array.AsReadOnly(targets), Action = action, CardAttack = attack, PreparedTargetAttacks = prepared, TargetsAdjusted = true }, action);
         // This is the native sole-target mutation fact, with a distinct exact Qingshi producer proof.
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SoleTargetReplacedEvent(use.Id, a.ActionId, r.Source, previous, target, Array.AsReadOnly(new[] { previous }), Array.AsReadOnly(targets)));
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
         {
             var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w => w.Id == r.WindowId);
             _coreRuntimeOperations.ReplaceRuntimeFrame(window.Id, window with { SoleTargetRedirectPending = new(use.Id, a.ActionId, r.Source, target, 0) });

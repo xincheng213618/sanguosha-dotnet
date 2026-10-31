@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanYuAnniversaryGodRuntime
 {
-    void global::CardGame.Core.IAnniversaryGuanYuNightmareHost.RecordNightmare(ProgramSkillFrame frame) => RecordAnniversaryGuanYuNightmare(frame);
+    void IAnniversaryGuanYuNightmareHost.RecordNightmare(ProgramSkillFrame frame) => RecordAnniversaryGuanYuNightmare(frame);
     internal void RecordAnniversaryGuanYuNightmare(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

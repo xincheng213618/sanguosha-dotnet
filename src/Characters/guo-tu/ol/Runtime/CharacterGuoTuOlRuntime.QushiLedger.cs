@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoTuOlRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     internal bool HasQushiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveQushiDrawAndPrivateSeal);
 
     internal const string QushiDrawReason = "skill-program.guo-tu.qushi.draw", QushiSealReason = "skill-program.guo-tu.qushi.seal", QushiRemoveReason = "skill-program.guo-tu.qushi.remove", QushiDeathReason = "skill-program.guo-tu.qushi.holder-death";
-    internal static CardConversionSource QushiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_tu_ol_QushiLedger.QushiSource(f);
+    internal static CardConversionSource QushiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_guo_tu_ol_QushiLedger.QushiSource(f);
     internal bool ValidQushiSeal(QushiSeal s) => s.Source.SkillId == "ol:qushi" && s.Source.BindingId == "draw-seal" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(s.HolderSeat) && s.HolderSeat != s.Source.OwnerSeat && s.Location == new CardLocation(CardZoneKind.PrivatePersistentPile, s.HolderSeat, $"qushi:{(s.SealId)}") && _contentRegistryOperations._contentRegistry.GetSkill(s.Source.SkillId).Program?.GameplayHash == s.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<QushiStartedEvent>().Count(e => e.FrameId == s.SealId && e.Source == s.Source && e.GameplayHash == s.GameplayHash && e.Op == SkillProgramEffectOp.ResolveQushiDrawAndPrivateSeal) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == s.MovementSequence && m.CardId == s.CardId && m.CardKind == s.PrintedKind && m.From == CardLocation.Hand(s.Source.OwnerSeat) && m.To == s.Location && m.Reason.Value == QushiSealReason) == 1;
     internal QushiSeal[] LiveQushiSeals() => !HasQushiCapability ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<QushiSealPlacedEvent>().Select(e => e.Seal).Where(s => ValidQushiSeal(s) && !_coreProgramEventHistoryOperations.ProgramEventHistory<QushiSealRemovedEvent>().Any(e => e.SealId == s.SealId) && _cardZonesOperations._cardZones.GetLocation(s.CardId) == s.Location).ToArray();
     internal IReadOnlyList<NamedAmbushPileSnapshot>? ProjectQushiSeals(int holderSeat, int viewerSeat, bool revealAll)
@@ -74,7 +70,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     }
 
     [ProgramIssuedTrigger(290)]
-    internal bool IsIssuedQushiEndingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && CurrentQushiEndingSeal(c, context)is { } s && (LiveQushiSeals().Any(d => d == s) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Qushi is { Seal: { } seal, Paid: true } && seal == s && f.WindowContext == context && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c)));
+    internal bool IsIssuedQushiEndingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && CurrentQushiEndingSeal(c, context)is { } s && (LiveQushiSeals().Any(d => d == s) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Qushi is { Seal: { } seal, Paid: true } && seal == s && f.WindowContext == context && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c)));
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 27460)]
     internal void ObserveQushiUses(IGameEvent e)
     {
@@ -90,7 +86,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
                 origin = n.Id;
             }
 
-            if (a.EffectiveKind == CardKind.Dodge && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(u => u.Action?.ActionId == a.ParentActionId)is { CardAttack: { } attack } u && attack.TargetSeat == a.ActorSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? u.CardKind) && a.OpponentSeat == attack.SourceSeat)
+            if (a.EffectiveKind == CardKind.Dodge && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(u => u.Action?.ActionId == a.ParentActionId)is { CardAttack: { } attack } u && attack.TargetSeat == a.ActorSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? u.CardKind) && a.OpponentSeat == attack.SourceSeat)
             {
                 trueUse = true;
                 origin = u.Id;
@@ -119,7 +115,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
             return;
         var targets = use.Action?.EffectiveDesignatedTargetSeats ?? use.TargetSeats;
         var count = targets.Distinct().Count();
-        if (count == 0 && !use.TargetsAdjusted && (global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Equipment || use.CardKind is CardKind.DrawTwo or CardKind.Peach or CardKind.Alcohol))
+        if (count == 0 && !use.TargetsAdjusted && (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Equipment || use.CardKind is CardKind.DrawTwo or CardKind.Peach or CardKind.Alcohol))
             count = 1;
         var old = _coreProgramEventHistoryOperations.ProgramEventHistory<QushiActualUseEvent>().LastOrDefault(e => !e.ResponseUse && e.OriginId == use.Id);
         var next = new QushiActualUseEvent(old?.ActualTurn ?? _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, old?.TurnOwner ?? _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat, use.Id, use.Action?.ActionId ?? 0, false, use.SourceSeat, use.CardKind, count);

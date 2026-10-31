@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeLiangHappyGodRuntime
 {
-    void global::CardGame.Core.IHappyZhugeLiangHost.GrantMist(ProgramSkillFrame frame) => GrantHappyDawu(frame);
+    void IHappyZhugeLiangHost.GrantMist(ProgramSkillFrame frame) => GrantHappyDawu(frame);
     internal void GrantHappyDawu(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -24,11 +20,11 @@ internal sealed partial class CharacterZhugeLiangHappyGodRuntime
             throw new InvalidOperationException("Happy Dawu requires the exact physical star movement after this binding actually started.");
         _coreProgramSkillChangesOperations.SetProgramBooleanState(frame, HappyZhugeLiangComposition.MistState, true);
         _coreProgramBooleanStateExpirationOperations.ScheduleProgramBooleanStateExpiration(frame, [HappyZhugeLiangComposition.MistState], SkillProgramDamageModifierExpiration.NextOwnerTurnStart);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyDawuGrantedEvent(frame.Id, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), frame.GameplayHash, _coreActualTurnProgressTurnNumberAccess._turnNumber, movement.Sequence));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyDawuGrantedEvent(frame.Id, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), frame.GameplayHash, _coreActualTurnProgressTurnNumberAccess._turnNumber, movement.Sequence));
     }
 
     [ProgramDamageHook(ProgramDamagePhase.FactModifiers, 41480)]
-    internal IEnumerable<(CardUseEffectSource Source, int Amount)> HappyDawuNormalDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal IEnumerable<(CardUseEffectSource Source, int Amount)> HappyDawuNormalDamage(GameEngine.IDamageAttempt attack)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GrantHappyZhugeLiangDawu) || _coreNativeCardClassificationsOperations.GetDamageNature(attack) != DamageNature.Normal)
             return[];

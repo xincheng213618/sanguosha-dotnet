@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSuFeiOlRuntime
@@ -38,7 +34,7 @@ internal sealed partial class CharacterSuFeiOlRuntime
     {
         if (!HasSuFeiCapability || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1 || action.Type != CardActionType.Use || action.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || !SuFeiOwnerQualified(action.ActorSeat) && _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].SuFeiLastUse is null)
             return;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(nativeUseId)is not { Action: { } actual } use || actual.ActionId != action.ActionId || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(nativeUseId)is not { Action: { } actual } use || actual.ActionId != action.ActionId || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action))
             throw new InvalidOperationException("Lianpian requires the exact accepted native use and finalized target action.");
         if (use.SuFeiFinalizedUse is not null)
             return;
@@ -69,7 +65,7 @@ internal sealed partial class CharacterSuFeiOlRuntime
             _coreMatchParticipantsPlayersAccess._players[dead.VictimSeat].SuFeiLastUse = null;
     }
 
-    internal bool SuFeiUseIssued(SuFeiActualUse u) => u.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && u.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && u.Action.Type == CardActionType.Use && u.Action.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && u.PrimaryTargets.SequenceEqual(SuFeiPrimaryTargets(u.Action)) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SuFeiActualUseRecordedEvent>().Count(e => e.Use.NativeUseId == u.NativeUseId && e.Use.ActualTurn == u.ActualTurn && e.Use.PhaseInstance == u.PhaseInstance && global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Use.Action, u.Action) && e.Use.PrimaryTargets.SequenceEqual(u.PrimaryTargets)) == 1;
+    internal bool SuFeiUseIssued(SuFeiActualUse u) => u.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && u.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && u.Action.Type == CardActionType.Use && u.Action.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && u.PrimaryTargets.SequenceEqual(SuFeiPrimaryTargets(u.Action)) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SuFeiActualUseRecordedEvent>().Count(e => e.Use.NativeUseId == u.NativeUseId && e.Use.ActualTurn == u.ActualTurn && e.Use.PhaseInstance == u.PhaseInstance && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Use.Action, u.Action) && e.Use.PrimaryTargets.SequenceEqual(u.PrimaryTargets)) == 1;
     internal bool ValidSuFeiQualification(SuFeiConsecutiveQualification q, int owner) => q.Current.Action.ActorSeat == owner && q.Previous.Action.ActorSeat == owner && q.Current.NativeUseId != q.Previous.NativeUseId && SuFeiUseIssued(q.Previous) && SuFeiUseIssued(q.Current) && q.CommonTargets.Count > 0 && q.CommonTargets.SequenceEqual(q.Previous.PrimaryTargets.Intersect(q.Current.PrimaryTargets).Where(_coreTableSeatQueriesOperations.IsValidPlayerSeat));
     internal bool SuFeiFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {

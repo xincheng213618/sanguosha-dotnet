@@ -1,8 +1,7 @@
 #nullable enable
-using System.Globalization;
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class AnniversaryLeiBoHost(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterLeiBoAnniversaryEntries> getCharacterLeiBoAnniversaryRuntime) : IAnniversaryLeiBoHost
+internal sealed class AnniversaryLeiBoHost(Func<RuntimeEntries.CharacterLeiBoAnniversaryEntries> getCharacterLeiBoAnniversaryRuntime) : IAnniversaryLeiBoHost
 {
     public SkillProgramStepOutcome Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {

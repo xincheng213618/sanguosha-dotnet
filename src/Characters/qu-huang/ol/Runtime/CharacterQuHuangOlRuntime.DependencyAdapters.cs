@@ -1,28 +1,24 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineEquipmentContentRuntime))]
-internal sealed class CharacterQuHuangOlCoreEquipmentContentAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineEquipmentContentRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterQuHuangOlCoreEquipmentContentOperations
+[Core.ProgramCapability(typeof(CoreGameEngineEquipmentContentRuntime))]
+internal sealed class CharacterQuHuangOlCoreEquipmentContentAdapter(Func<CoreGameEngineEquipmentContentRuntime> targetFactory) : ICharacterQuHuangOlCoreEquipmentContentOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineEquipmentContentRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.EquipmentContentRegistry EquipmentRules { get => this._targetFactory().EquipmentRules; }
+    private readonly Func<CoreGameEngineEquipmentContentRuntime> _targetFactory = targetFactory;
+    public EquipmentContentRegistry EquipmentRules { get => this._targetFactory().EquipmentRules; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.QuHuangPhaseEndLedger))]
-internal sealed class CharacterQuHuangOlQuHuangPhaseEndLedgerAdapter(global::System.Func<global::CardGame.Core.QuHuangPhaseEndLedger> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterQuHuangOlQuHuangPhaseEndLedgerOperations
+[Core.ProgramCapability(typeof(QuHuangPhaseEndLedger))]
+internal sealed class CharacterQuHuangOlQuHuangPhaseEndLedgerAdapter(Func<QuHuangPhaseEndLedger> targetFactory) : ICharacterQuHuangOlQuHuangPhaseEndLedgerOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.QuHuangPhaseEndLedger> _targetFactory = targetFactory;
-    public global::CardGame.Core.QuHuangPhaseEndLedger Get() => this._targetFactory();
+    private readonly Func<QuHuangPhaseEndLedger> _targetFactory = targetFactory;
+    public QuHuangPhaseEndLedger Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.QuHuangRuntime))]
-internal sealed class CharacterQuHuangOlQuHuangAdapter(global::System.Func<global::CardGame.Core.QuHuangRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterQuHuangOlQuHuangOperations
+[Core.ProgramCapability(typeof(QuHuangRuntime))]
+internal sealed class CharacterQuHuangOlQuHuangAdapter(Func<QuHuangRuntime> targetFactory) : ICharacterQuHuangOlQuHuangOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.QuHuangRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.QuHuangRuntime Get() => this._targetFactory();
+    private readonly Func<QuHuangRuntime> _targetFactory = targetFactory;
+    public QuHuangRuntime Get() => this._targetFactory();
 }

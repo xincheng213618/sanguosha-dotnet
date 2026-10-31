@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeDamageApplicationRuntime
 {
-    internal bool ApplyAttackDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool ApplyAttackDamage(GameEngine.IDamageAttempt attack)
     {
-        if (attack is global::CardGame.Core.NativeOwners.CardAttackHandle responseAttack && _characterSimaYiMobileGodOperations.TryBeginMobileSimaRenjieFailedAttack(responseAttack))
+        if (attack is NativeOwners.CardAttackHandle responseAttack && _characterSimaYiMobileGodOperations.TryBeginMobileSimaRenjieFailedAttack(responseAttack))
             return true;
         _characterCaoAngMouOperations.PrepareMouCaDamageSource(attack);
         if (_characterXinPiOlOperations.IsXinPiRemainingCardDamageIneffective(attack))
@@ -37,7 +33,7 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
             return replacementPending;
         if (!attack.IsChainPropagation && (_coreDirectedCardPolicyQueriesOperations.HasDirectedCardArmorBypass(attack.ResolutionId, target.Seat) || _coreCurrentCardEnhancementsOperations.HasCurrentCardEnhancement(attack.ResolutionId, CurrentCardEnhancement.IgnoreArmor)))
             attack.SetIgnoresArmor(true);
-        if (!attack.DamageAmountFinalized && attack is global::CardGame.Core.NativeOwners.CardAttackHandle && (_contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.DamageBecomesHpLoss) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.FirstRoundCardDamageBecomesMaximumHpLoss)))
+        if (!attack.DamageAmountFinalized && attack is NativeOwners.CardAttackHandle && (_contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.DamageBecomesHpLoss) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.FirstRoundCardDamageBecomesMaximumHpLoss)))
             _ = _coreCardDamageMaximumHpReplacementOperations.CalculateCardDamageLayer(attack);
         if (_characterMangYaChangAnniversaryOperations.TryBeginAnniversaryJiedaoSourceWindow(attack))
             return true;
@@ -63,12 +59,12 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
 
         if (_coreColdDamageOperations.TryBeginColdDamageReplacement(attack, amount, nature))
             return true;
-        if (attack is global::CardGame.Core.NativeOwners.CardAttackHandle iceSwordAttack && _coreNativeIceSwordOperations.TryBeginIceSwordChoice(iceSwordAttack, amount))
+        if (attack is NativeOwners.CardAttackHandle iceSwordAttack && _coreNativeIceSwordOperations.TryBeginIceSwordChoice(iceSwordAttack, amount))
         {
             return true;
         }
 
-        if (attack is global::CardGame.Core.NativeOwners.CardAttackHandle qilinBowAttack && _coreNativeQilinBowOperations.TryBeginQilinBowChoice(qilinBowAttack))
+        if (attack is NativeOwners.CardAttackHandle qilinBowAttack && _coreNativeQilinBowOperations.TryBeginQilinBowChoice(qilinBowAttack))
         {
             return true;
         }
@@ -99,7 +95,7 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
 
             if (propagatedTargets.Length > 0)
             {
-                _coreMatchLogOperations.AddLog("ChainDamage", $"{(target.Name)} 受到{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetDamageNatureLabel(nature))}伤害，向 {(propagatedTargets.Length)} 名连环角色传导同量伤害。", source.Seat, target.Seat);
+                _coreMatchLogOperations.AddLog("ChainDamage", $"{(target.Name)} 受到{(CoreNativeCardClassificationsRuntime.GetDamageNatureLabel(nature))}伤害，向 {(propagatedTargets.Length)} 名连环角色传导同量伤害。", source.Seat, target.Seat);
             }
         }
 
@@ -145,7 +141,7 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
                 _coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerAccess._playPhaseDamageDealtByCurrentPlayer += amount;
             if (!attack.IsSourceLess)
                 _coreProgramPersistentCombatPoliciesOperations.AccumulateProgramPlayDamageHandLimit(source.Seat, amount);
-            var natureLabel = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetDamageNatureLabel(nature);
+            var natureLabel = CoreNativeCardClassificationsRuntime.GetDamageNatureLabel(nature);
             _coreMatchLogOperations.AddLog("Damage", attack.IsSourceLess ? $"{(target.Name)} 受到 {(amount)} 点无来源{(natureLabel)}伤害，剩余 {(target.Hp)} 点体力。" : $"{(target.Name)} 受到 {(source.Name)} 造成的 {(amount)} 点{(natureLabel)}伤害，剩余 {(target.Hp)} 点体力。", attack.IsSourceLess ? null : source.Seat, target.Seat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DamageAppliedEvent(source.Seat, target.Seat, amount, target.Hp, nature) { SourceLess = attack.IsSourceLess, ArmorPayment = armorPayment, SourceCardUseResolutionId = sourceCardUseResolutionId });
             if (amount > 0 && _coreCurrentCardEnhancementsOperations.HasCurrentCardEnhancement(attack.ResolutionId, CurrentCardEnhancement.DrawAfterDamage))

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeResponseMaterialQueriesRuntime
@@ -69,7 +65,7 @@ internal sealed partial class CoreNativeResponseMaterialQueriesRuntime
     {
         var identities = _coreActionQueriesOperations.GetProgramCardIdentityMatches(responder, card);
         if (identities.Count != 0)
-            return identities.Any(match => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(match.Identity.OutputKind, requiredCardKind));
+            return identities.Any(match => CoreNativeCardClassificationsRuntime.MatchesRequiredCard(match.Identity.OutputKind, requiredCardKind));
         return _coreActionQueriesOperations.GetProgramViewAsConversions(responder, card, requiredCardKind, forResponse: true).Count != 0;
     }
 
@@ -78,10 +74,10 @@ internal sealed partial class CoreNativeResponseMaterialQueriesRuntime
         var identities = _coreActionQueriesOperations.GetProgramCardIdentityMatches(responder, responseCard);
         if (identities.Count != 0)
         {
-            return identities.Any(match => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(match.Identity.OutputKind, requiredCardKind)) ? requiredCardKind : throw new InvalidOperationException($"The mandatory identity of response card {(responseCard.Id)} cannot satisfy {(requiredCardKind)}.");
+            return identities.Any(match => CoreNativeCardClassificationsRuntime.MatchesRequiredCard(match.Identity.OutputKind, requiredCardKind)) ? requiredCardKind : throw new InvalidOperationException($"The mandatory identity of response card {(responseCard.Id)} cannot satisfy {(requiredCardKind)}.");
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(responseCard.Kind, requiredCardKind))
+        if (CoreNativeCardClassificationsRuntime.MatchesRequiredCard(responseCard.Kind, requiredCardKind))
         {
             return requiredCardKind;
         }
@@ -97,6 +93,6 @@ internal sealed partial class CoreNativeResponseMaterialQueriesRuntime
         if (_characterZhugeLiangWumiaoOperations.IsWuZglCopyBlocked(responder.Seat, card.Id) || !_coreRecordedSuitSlashOperations.IsRecordedSuitResponseAllowed(responder, [card], requiredCardKind))
             return false;
         var identities = _coreActionQueriesOperations.GetProgramCardIdentityMatches(responder, card);
-        return identities.Count != 0 ? identities.Any(match => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(match.Identity.OutputKind, requiredCardKind)) : global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(card.Kind, requiredCardKind) || CanConvertResponse(responder, card, requiredCardKind);
+        return identities.Count != 0 ? identities.Any(match => CoreNativeCardClassificationsRuntime.MatchesRequiredCard(match.Identity.OutputKind, requiredCardKind)) : CoreNativeCardClassificationsRuntime.MatchesRequiredCard(card.Kind, requiredCardKind) || CanConvertResponse(responder, card, requiredCardKind);
     }
 }

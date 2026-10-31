@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOldHandDispositionRuntime
@@ -26,7 +21,7 @@ internal sealed partial class CoreGameEngineOldHandDispositionRuntime
             OldIds = OldHandDispositionIds(f.OwnerSeat, _coreActualTurnProgressPhaseTurnNumberAccess._turnNumber)
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { OldHandDisposition = r });
-        _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDiscardPhase;
+        _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= GameEngine.DelayedTurnEffects.SkipDiscardPhase;
         if (r.OldIds.Count == 0 || !_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != f.OwnerSeat))
         {
             FinishOldHandDisposition(f);
@@ -37,7 +32,7 @@ internal sealed partial class CoreGameEngineOldHandDispositionRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal static Dictionary<string, string> OldHandParameters(ProgramSkillFrame f, string branch) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OldHandDisposition.OldHandParameters(f, branch);
+    internal static Dictionary<string, string> OldHandParameters(ProgramSkillFrame f, string branch) => RuntimeSkills.RuntimeRules_Core_OldHandDisposition.OldHandParameters(f, branch);
     internal int[] RemainingOldHandIds(ProgramSkillFrame f) => f.OldHandDisposition!.OldIds.Except(f.OldHandDisposition.DisposedIds).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(f.OwnerSeat)).ToArray();
     internal IReadOnlyList<PromptChoice> OldHandChoices(ProgramSkillFrame f)
     {
@@ -99,7 +94,7 @@ internal sealed partial class CoreGameEngineOldHandDispositionRuntime
     [ProgramAnswer("old-hand-disposition")]
     internal void ResolveOldHandDisposition(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OldHandDisposition: not null } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !OldHandDispositionCurrent(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], OldHandChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OldHandDisposition: not null } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !OldHandDispositionCurrent(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], OldHandChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Old-hand disposition lost its current exact private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.OldHandDisposition!;
@@ -237,13 +232,13 @@ internal sealed partial class CoreGameEngineOldHandDispositionRuntime
     {
         var r = f.OldHandDisposition!;
         if (r.Stage == "mode")
-            return decision.Choices.First(c => c.Parameters["branch"] == (_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != f.OwnerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], p)) ? "give" : "discard"));
+            return decision.Choices.First(c => c.Parameters["branch"] == (_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != f.OwnerSeat && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], p)) ? "give" : "discard"));
         if (r.Stage == "give")
-            return decision.Choices.OrderByDescending(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenBy(c => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+            return decision.Choices.OrderByDescending(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenBy(c => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
         if (r.Stage == "target")
-            return decision.Choices.Where(c => c.Targets.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenBy(c => c.Targets.Single()).First();
+            return decision.Choices.Where(c => c.Targets.Count == 1).OrderBy(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenBy(c => c.Targets.Single()).First();
         return decision.Choices.FirstOrDefault(c => c.Parameters["branch"] == "foreign-discard") ?? decision.Choices.First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IOldHandDispositionHost.ReplaceDiscardWithOldHandDisposition(ProgramSkillFrame f) => ReplaceDiscardWithOldHandDisposition(f);
+    SkillProgramStepOutcome IOldHandDispositionHost.ReplaceDiscardWithOldHandDisposition(ProgramSkillFrame f) => ReplaceDiscardWithOldHandDisposition(f);
 }

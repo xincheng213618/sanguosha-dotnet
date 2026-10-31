@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -31,7 +28,7 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
     }
 
     internal OriginalHandPermanentBonus[] OriginalHandInheritableBonuses(int owner, string skill, string stateId) => _coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandPermanentBonuses.Values.Where(b => b.RecipientSeat == owner && b.SourceSkillId == skill && b.StateId == stateId).OrderBy(b => b.BonusId).ToArray();
-    internal static bool IsOriginalHandTrigger(SkillProgramTrigger trigger, SkillProgramEffectOp op) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OriginalHandEntities.IsOriginalHandTrigger(trigger, op);
+    internal static bool IsOriginalHandTrigger(SkillProgramTrigger trigger, SkillProgramEffectOp op) => RuntimeSkills.RuntimeRules_Core_OriginalHandEntities.IsOriginalHandTrigger(trigger, op);
     internal OriginalHandLossEligibleEvent? OriginalHandLossEligibility(int owner, string skill, string state, string binding, long sequence) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OriginalHandLossEligibleEvent>().SingleOrDefault(e => e.OwnerSeat == owner && e.SkillId == skill && e.StateId == state && e.BindingId == binding && e.MovementSequence == sequence);
     internal void ObserveOriginalHandMovement(CardMovementRecord movement)
     {
@@ -62,7 +59,7 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
     {
         if (trigger.Effects is not [var effect] || !OriginalHandEntitiesComposition.IsOperation(effect.Op))
             return true;
-        var key = new global::CardGame.Core.GameEngine.OriginalHandStateKey(ownerSeat, effect.SourceBind ?? skillId, effect.StateId!);
+        var key = new GameEngine.OriginalHandStateKey(ownerSeat, effect.SourceBind ?? skillId, effect.StateId!);
         if (effect.Op == SkillProgramEffectOp.InitializeOriginalHandEntities)
             return context.Window == SkillProgramTriggerWindow.GameStarting && !_coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandEntityStates.ContainsKey(key);
         if (effect.Op == SkillProgramEffectOp.AwakenWhenOriginalHandEmpty)
@@ -81,13 +78,13 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (!_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.GameStarting) || f.InstructionIndex != 1 || !IsOriginalHandTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f), SkillProgramEffectOp.InitializeOriginalHandEntities) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("Original-hand initialization requires its exact native game-start candidate.");
-        var key = new global::CardGame.Core.GameEngine.OriginalHandStateKey(f.OwnerSeat, f.SkillId, stateId);
+        var key = new GameEngine.OriginalHandStateKey(f.OwnerSeat, f.SkillId, stateId);
         if (_coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandEntityStates.ContainsKey(key))
             throw new InvalidOperationException("An original-hand state cannot initialize twice.");
-        var entities = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Reason == CardMoveReasons.InitialDeal && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat)).OrderBy(m => m.Sequence).Select(m => new global::CardGame.Core.GameEngine.OriginalHandEntity(m.CardId, m.Sequence, _coreCardMovementJournalCardMovementsAccess._cardMovements.FirstOrDefault(lost => lost.Sequence > m.Sequence && lost.CardId == m.CardId && lost.From == CardLocation.Hand(f.OwnerSeat) && lost.To != lost.From)?.Sequence)).ToArray();
+        var entities = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Reason == CardMoveReasons.InitialDeal && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat)).OrderBy(m => m.Sequence).Select(m => new GameEngine.OriginalHandEntity(m.CardId, m.Sequence, _coreCardMovementJournalCardMovementsAccess._cardMovements.FirstOrDefault(lost => lost.Sequence > m.Sequence && lost.CardId == m.CardId && lost.From == CardLocation.Hand(f.OwnerSeat) && lost.To != lost.From)?.Sequence)).ToArray();
         if (entities.Select(e => e.CardId).Distinct().Count() != entities.Length)
             throw new InvalidOperationException("The initial deal contains duplicate original physical entities.");
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         _coreGameEngineOriginalHandEntitiesOriginalHandEntityStatesOriginalHandPermanentBonusesAccess._originalHandEntityStates.Add(key, new(f.Id, source, f.GameplayHash, Array.AsReadOnly(entities)));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OriginalHandEntitiesInitializedEvent(f.Id, source, f.GameplayHash, stateId, entities.Length, entities.Count(e => e.FirstLossSequence is null)));
         return SkillProgramStepOutcome.Continue;
@@ -104,7 +101,7 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
         var r = new ProgramOriginalHandBenefitReceipt
         {
             InstructionIndex = 1,
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             StateId = stateId,
             MovementWindowId = context.ParentFrameId,
@@ -128,7 +125,7 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
         var r = new ProgramOriginalHandInheritanceReceipt
         {
             InstructionIndex = 1,
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             StateId = stateId,
             DeathWindowId = window.Id,
@@ -289,7 +286,7 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 590)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 610)]
     internal bool CanContinueOriginalHandEntityProgram(ProgramSkillFrame f) => f.OriginalHandBenefit is { DrawIssued: true } && _coreOriginalHandEntityObserversOperations.ValidOriginalHandBenefitReceipt(f) || f.OriginalHandInheritance is not null && _coreOriginalHandEntityObserversOperations.ValidOriginalHandInheritanceReceipt(f) || f.OriginalHandAwakening is not null && _coreOriginalHandAwakeningOperations.ValidOriginalHandAwakeningReceipt(f);
-    SkillProgramStepOutcome global::CardGame.Core.IOriginalHandEntitiesProgramHost.ExecuteOriginalHandEntityOperation(ProgramSkillFrame f, SkillProgramEffect e) => e.Op switch
+    SkillProgramStepOutcome IOriginalHandEntitiesProgramHost.ExecuteOriginalHandEntityOperation(ProgramSkillFrame f, SkillProgramEffect e) => e.Op switch
     {
         SkillProgramEffectOp.InitializeOriginalHandEntities => InitializeOriginalHandEntities(f, e.StateId!),
         SkillProgramEffectOp.OfferOriginalHandLossBenefit => BeginOriginalHandBenefit(f, e.StateId!),
@@ -297,5 +294,5 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
         SkillProgramEffectOp.AwakenWhenOriginalHandEmpty => _coreOriginalHandAwakeningOperations.BeginOriginalHandAwakening(f, e),
         _ => throw new InvalidOperationException("Unknown original-hand operation.")};
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeContributions, 40)]
-    internal void AddGetOriginalHandAttackRangeBonusAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{(player.Seat)}:original-hand:attack-range", GetOriginalHandAttackRangeBonus(player.Seat));
+    internal void AddGetOriginalHandAttackRangeBonusAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{(player.Seat)}:original-hand:attack-range", GetOriginalHandAttackRangeBonus(player.Seat));
 }

@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangZengouRuntime
 {
     internal const string WushuangZengou = "wushuang:skill-3287";
     internal static bool UsesActualDodgeZengou(string skillId) => skillId is WushuangZengou or "ol:zengou";
-    SkillProgramStepOutcome global::CardGame.Core.IWushuangZengouHost.Resolve(ProgramSkillFrame f) => BeginWushuangZengou(f);
+    SkillProgramStepOutcome IWushuangZengouHost.Resolve(ProgramSkillFrame f) => BeginWushuangZengou(f);
     internal ProgramCardTriggerWindowFrame? WushuangZengouWindow(ProgramSkillWindowContext? context)
     {
         var w = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context?.ParentFrameId);
-        if (w is not { ResponseCompletion: { CostsDrained: true, OriginalContinuation: ProgramCardContinuation.Dodge or ProgramCardContinuation.GroupResponse } completion } || w.Action is not { EffectiveKind: CardKind.Dodge, Type: CardActionType.Response } action || action.ActorSeat != action.ProviderSeat || action.RequesterSeat is not null || action.ResponderSeat != action.ActorSeat || w.AttackOwnerFrameId is not { } parent || completion.AttackOwnerFrameId != parent || completion.ActionId != action.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(parent)is not { CardAttack: { EffectiveCardKind: { } kind } attack, Action: { } original } || !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && completion.OriginalContinuation == ProgramCardContinuation.Dodge || kind == CardKind.ArrowBarrage && completion.OriginalContinuation == ProgramCardContinuation.GroupResponse) || attack.TargetSeat != action.ActorSeat || action.ParentActionId != original.ActionId || action.OpponentSeat != attack.SourceSeat || !_coreResponseCompletionOperations.ValidResponseCompletionWindow(w))
+        if (w is not { ResponseCompletion: { CostsDrained: true, OriginalContinuation: ProgramCardContinuation.Dodge or ProgramCardContinuation.GroupResponse } completion } || w.Action is not { EffectiveKind: CardKind.Dodge, Type: CardActionType.Response } action || action.ActorSeat != action.ProviderSeat || action.RequesterSeat is not null || action.ResponderSeat != action.ActorSeat || w.AttackOwnerFrameId is not { } parent || completion.AttackOwnerFrameId != parent || completion.ActionId != action.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(parent)is not { CardAttack: { EffectiveCardKind: { } kind } attack, Action: { } original } || !(CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && completion.OriginalContinuation == ProgramCardContinuation.Dodge || kind == CardKind.ArrowBarrage && completion.OriginalContinuation == ProgramCardContinuation.GroupResponse) || attack.TargetSeat != action.ActorSeat || action.ParentActionId != original.ActionId || action.OpponentSeat != attack.SourceSeat || !_coreResponseCompletionOperations.ValidResponseCompletionWindow(w))
             return null;
         return w;
     }
@@ -74,7 +70,7 @@ internal sealed partial class CoreGameEngineWushuangZengouRuntime
     internal void AnswerWushuangZengou(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Zengou lost its program parent.");
-        if (f.WushuangZengou is not { Stage: "choosing" } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WushuangZengouChoices(f).Where(c => c.Id == selected.Id).ToArray()) || WushuangZengouWindow(f.WindowContext)?.Action.ActionId != r.ActionId)
+        if (f.WushuangZengou is not { Stage: "choosing" } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WushuangZengouChoices(f).Where(c => c.Id == selected.Id).ToArray()) || WushuangZengouWindow(f.WindowContext)?.Action.ActionId != r.ActionId)
             throw new InvalidOperationException("Zengou lost its exact unpaid Dodge use or published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, r.DodgerSeat))
@@ -156,7 +152,7 @@ internal sealed partial class CoreGameEngineWushuangZengouRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    internal bool ContinueWushuangZengouDodge(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal bool ContinueWushuangZengouDodge(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         if (continuation is not (ProgramCardContinuation.Dodge or ProgramCardContinuation.GroupResponse) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.WushuangZengouInvalidation is not { } proof || proof.Payment.ActionId != action.ActionId)
             return false;

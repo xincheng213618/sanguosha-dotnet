@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreTrustedMovementDiagnosticsRuntime))]
-internal sealed class CoreNativeMaterialSlashCoreTrustedMovementDiagnosticsAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreTrustedMovementDiagnosticsRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreNativeMaterialSlashCoreTrustedMovementDiagnosticsOperations
+[Core.ProgramCapability(typeof(CoreTrustedMovementDiagnosticsRuntime))]
+internal sealed class CoreNativeMaterialSlashCoreTrustedMovementDiagnosticsAdapter(Func<CoreTrustedMovementDiagnosticsRuntime> targetFactory) : ICoreNativeMaterialSlashCoreTrustedMovementDiagnosticsOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreTrustedMovementDiagnosticsRuntime> _targetFactory = targetFactory;
-    public global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord> CardMovements { get => this._targetFactory().CardMovements; }
+    private readonly Func<CoreTrustedMovementDiagnosticsRuntime> _targetFactory = targetFactory;
+    public IReadOnlyList<CardMovementRecord> CardMovements { get => this._targetFactory().CardMovements; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime))]
-internal sealed class CoreNativeMaterialSlashCoreProgramTargetRulesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreNativeMaterialSlashCoreProgramTargetRulesOperations
+[Core.ProgramCapability(typeof(CoreProgramTargetRulesRuntime))]
+internal sealed class CoreNativeMaterialSlashCoreProgramTargetRulesAdapter(Func<CoreProgramTargetRulesRuntime> targetFactory) : ICoreNativeMaterialSlashCoreProgramTargetRulesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
+    private readonly Func<CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
+    public ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
 }

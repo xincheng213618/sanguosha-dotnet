@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,7 +9,7 @@ internal sealed partial class CharacterXiahouDunMouMobileRuntime
     internal const string MouXiahouDunCollectReason = "skill-program.mou-mobile:qingjian.collect", MouXiahouDunGiftReason = "skill-program.mou-mobile:qingjian.give";
     internal bool HasMouXiahouDunCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.CollectMouXiahouDunQingjian) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouXiahouDunGanglie);
 
-    internal static CardConversionSource MouXiahouDunSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xiahou_dun_mou_mobile_MouXiahouDunMobile.MouXiahouDunSource(f);
+    internal static CardConversionSource MouXiahouDunSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_xiahou_dun_mou_mobile_MouXiahouDunMobile.MouXiahouDunSource(f);
     internal SkillProgramStepOutcome StartMouXiahouDunMobile(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -119,7 +116,7 @@ internal sealed partial class CharacterXiahouDunMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouXiahouDunMobile!;
-        if (!ValidMouXiahouDun(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXiahouDunChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidMouXiahouDun(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXiahouDunChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Xiahou Dun requires its exact current choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == MouXiahouDunMobileStage.SelectTargets)
@@ -193,9 +190,9 @@ internal sealed partial class CharacterXiahouDunMouMobileRuntime
     {
         var r = f.MouXiahouDunMobile!;
         if (r.Stage == MouXiahouDunMobileStage.SelectTargets)
-            return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "toggle" && !r.Targets.Contains(c.Targets.Single()) && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "confirm") ?? p.Choices.First();
-        return p.Choices.OrderByDescending(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenBy(c => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count).First();
+            return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "toggle" && !r.Targets.Contains(c.Targets.Single()) && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "confirm") ?? p.Choices.First();
+        return p.Choices.OrderByDescending(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenBy(c => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouXiahouDunMobileHost.Start(ProgramSkillFrame f, SkillProgramEffectOp op) => StartMouXiahouDunMobile(f, op);
+    SkillProgramStepOutcome IMouXiahouDunMobileHost.Start(ProgramSkillFrame f, SkillProgramEffectOp op) => StartMouXiahouDunMobile(f, op);
 }

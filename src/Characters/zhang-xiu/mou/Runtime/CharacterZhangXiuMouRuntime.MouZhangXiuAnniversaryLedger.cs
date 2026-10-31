@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangXiuMouRuntime
@@ -16,11 +12,11 @@ internal sealed partial class CharacterZhangXiuMouRuntime
     }
 
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedAfterCategory, 36600)]
-    internal bool MouZhangXiuAnniversaryFinalizedDamageUse(ProgramTargetCardWindowQuery query) => HasMouZhangXiuAnniversary && MouZhangXiuAnniversaryRuntime.DamageCard(query.Kind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind);
+    internal bool MouZhangXiuAnniversaryFinalizedDamageUse(ProgramTargetCardWindowQuery query) => HasMouZhangXiuAnniversary && MouZhangXiuAnniversaryRuntime.DamageCard(query.Kind) && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 36600)]
     internal void ObserveMouZhangXiuAnniversaryDamage(IGameEvent payload)
     {
-        if (!HasMouZhangXiuAnniversary || payload is not DamageAppliedEvent { Amount: > 0 } applied || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not global::CardGame.Core.NativeOwners.CardAttackHandle card || !card.DamageWasApplied || card.IsProgramSkillDamage || card.IsProgramJudgmentDamage || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.ParentFrameId != card.ResolutionId || damage.TargetSeat != applied.TargetSeat || damage.SourceSeat != applied.SourceSeat || damage.Amount != applied.Amount || !_coreProgramEventHistoryOperations.ProgramEventHistory<DamageRequestedEvent>().Any(e => e.ResolutionId == damage.Id && e.TargetSeat == applied.TargetSeat && e.SourceSeat == applied.SourceSeat && e.Amount == applied.Amount && e.SourceCard == card.EffectiveCardKind && e.SourceLess == card.IsSourceLess))
+        if (!HasMouZhangXiuAnniversary || payload is not DamageAppliedEvent { Amount: > 0 } applied || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not NativeOwners.CardAttackHandle card || !card.DamageWasApplied || card.IsProgramSkillDamage || card.IsProgramJudgmentDamage || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.ParentFrameId != card.ResolutionId || damage.TargetSeat != applied.TargetSeat || damage.SourceSeat != applied.SourceSeat || damage.Amount != applied.Amount || !_coreProgramEventHistoryOperations.ProgramEventHistory<DamageRequestedEvent>().Any(e => e.ResolutionId == damage.Id && e.TargetSeat == applied.TargetSeat && e.SourceSeat == applied.SourceSeat && e.Amount == applied.Amount && e.SourceCard == card.EffectiveCardKind && e.SourceLess == card.IsSourceLess))
             return;
         if (card.EffectiveCardKind is not { } effectiveKind)
             return;

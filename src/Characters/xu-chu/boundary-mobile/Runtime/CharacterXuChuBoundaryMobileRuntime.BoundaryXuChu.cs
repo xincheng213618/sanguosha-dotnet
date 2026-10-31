@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXuChuBoundaryMobileRuntime
 {
-    void global::CardGame.Core.IBoundaryXuChuHost.SubstituteBoundaryXuChuDraw(ProgramSkillFrame f) => SubstituteBoundaryXuChuDraw(f);
+    void IBoundaryXuChuHost.SubstituteBoundaryXuChuDraw(ProgramSkillFrame f) => SubstituteBoundaryXuChuDraw(f);
     internal ProgramLifecycleTriggerWindowFrame BoundaryXuChuDrawParent(ProgramSkillFrame f)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == f.Id);
@@ -24,7 +20,7 @@ internal sealed partial class CharacterXuChuBoundaryMobileRuntime
         if (parent.ActualPhaseSubstitution is not null || f.InstructionIndex != 4 || gained.CardIds.Count == 0 || gained.CardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Processing) || f.ChoiceBindings.SingleOrDefault(b => b.Name == BoundaryXuChuMobile.Choice)?.OptionId != BoundaryXuChuMobile.Skip)
             throw new InvalidOperationException("Mobile Luoyi can substitute Draw only once after choosing its actual nonempty public gain.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { ActualPhaseSubstitution = new(parent.Id, f.Id, f.OwnerSeat, f.SkillId, f.SkillInstanceId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, SkillProgramTurnPhase.Draw) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, parent.Window, SkillProgramTurnPhase.Draw));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, parent.Window, SkillProgramTurnPhase.Draw));
     }
 
     internal bool BoundaryXuChuCommittedDraw(ProgramSkillFrame f)
@@ -65,7 +61,7 @@ internal sealed partial class CharacterXuChuBoundaryMobileRuntime
         var gained = _coreProgramLifecycleOperations.GetProgramCardSet(f, BoundaryXuChuMobile.Gained).CardIds.Select(_coreAdvancedLifecycleOperations.GetAdvancedCard).ToArray();
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var normalCount = Math.Max(0, checked((parent.FrozenBaseDrawCount ?? _coreActualTurnsOperations.GetTurnDrawCount(owner)) + parent.NormalDrawAdjustment));
-        var attack = gained.Any(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) || c.Kind == CardKind.Duel);
+        var attack = gained.Any(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) || c.Kind == CardKind.Duel);
         var opportunity = attack ? 11d : _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > 0 ? 6d : 0d;
         choice = gained.Length * 8d + opportunity > normalCount * 8d ? skip : normal;
         return true;

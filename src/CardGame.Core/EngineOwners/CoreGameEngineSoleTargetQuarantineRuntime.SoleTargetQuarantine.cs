@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSoleTargetQuarantineRuntime
@@ -141,7 +137,7 @@ internal sealed partial class CoreGameEngineSoleTargetQuarantineRuntime
         }
     }
 
-    internal bool MatchesSoleTargetQuarantineReturn(DeferredTurnEndFrame parent, CardsMovedTriggerWindowFrame child) => parent.SoleTargetQuarantineReturns is { CurrentBatch: { } batch } cursor && parent.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && parent.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Finished && cursor.Index > 0 && cursor.Index <= cursor.Receipts.Count && cursor.MovementChildFrameId == child.Id && cursor.MovementBatchId == child.Batch.Id && child.SoleTargetQuarantineEndReturn == parent.Id && child.ResumeProgramFrameId is null && child.Batch.ParentFrameId == parent.Id && child.Batch.AwaitingProgramFrameId is null && global::CardGame.Core.EngineOwners.CoreGameEngineDeferredTurnEndPreludesRuntime.SameDeferredTurnEndBatch(batch, child.Batch);
+    internal bool MatchesSoleTargetQuarantineReturn(DeferredTurnEndFrame parent, CardsMovedTriggerWindowFrame child) => parent.SoleTargetQuarantineReturns is { CurrentBatch: { } batch } cursor && parent.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && parent.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Finished && cursor.Index > 0 && cursor.Index <= cursor.Receipts.Count && cursor.MovementChildFrameId == child.Id && cursor.MovementBatchId == child.Batch.Id && child.SoleTargetQuarantineEndReturn == parent.Id && child.ResumeProgramFrameId is null && child.Batch.ParentFrameId == parent.Id && child.Batch.AwaitingProgramFrameId is null && CoreGameEngineDeferredTurnEndPreludesRuntime.SameDeferredTurnEndBatch(batch, child.Batch);
     internal void ReturnSoleTargetQuarantineMovement(CardsMovedTriggerWindowFrame child)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DeferredTurnEndFrame parent || !MatchesSoleTargetQuarantineReturn(parent, child) || child.CandidateIndex != child.Candidates.Count)
@@ -152,7 +148,7 @@ internal sealed partial class CoreGameEngineSoleTargetQuarantineRuntime
 
     internal void RefreshSoleProtectionObservers(CardUseFrame use)
     {
-        var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Last(w => w.ParentFrameId == use.Id && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) == SkillProgramTriggerWindow.CardUseTargetsFinalized);
+        var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Last(w => w.ParentFrameId == use.Id && CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) == SkillProgramTriggerWindow.CardUseTargetsFinalized);
         var extra = _coreCardActionsOperations.CollectSharedCardActionCandidates(use.Action!, SkillProgramTriggerWindow.CardUseTargetsFinalized, _coreSoleTargetProtectionOperations.SoleProtectionMainTargets(use), null, window.Continuation).Where(c => _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program!.Triggers.Single(t => t.Id == c.TriggerId).Effects.Any(e => e.Op == SkillProgramEffectOp.ProtectOtherSoleCardTarget) && use.SoleTargetProtectionSources?.Contains(new(c.SkillId, c.TriggerId, c.OwnerSeat, c.SkillInstanceId)) != true && !window.Candidates.Skip(window.CandidateIndex + 1).Any(old => old.OwnerSeat == c.OwnerSeat && old.SkillId == c.SkillId && old.TriggerId == c.TriggerId && old.SkillInstanceId == c.SkillInstanceId)).Select(c => c with { FrozenContext = c.FrozenContext!with { ParentFrameId = window.Id, CardUse = c.FrozenContext.CardUse!with { ParentCardUseFrameId = use.Id } } }).ToArray();
         if (extra.Length > 0)
             _coreRuntimeOperations.ReplaceRuntimeFrame(window.Id, window with { Candidates = Array.AsReadOnly(window.Candidates.Concat(extra).ToArray()) });

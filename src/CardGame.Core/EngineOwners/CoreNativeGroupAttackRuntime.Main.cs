@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeGroupAttackRuntime
 {
-    internal void BeginGroupAttackResponse(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal void BeginGroupAttackResponse(NativeOwners.GroupCardHandle group)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack)
         {
             throw new InvalidOperationException("The group attack is not the current card resolution.");
         }
@@ -63,7 +59,7 @@ internal sealed partial class CoreNativeGroupAttackRuntime
         ContinueGroupAttackResponseAfterEffect(group);
     }
 
-    internal void ContinueGroupAttackResponseAfterEffect(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal void ContinueGroupAttackResponseAfterEffect(NativeOwners.GroupCardHandle group)
     {
         var target = _coreMatchParticipantsPlayersAccess._players[group.TargetSeats[group.TargetIndex]];
         var attack = group.CurrentAttack ?? throw new InvalidOperationException("A resumed group effect lost its exact target attack.");

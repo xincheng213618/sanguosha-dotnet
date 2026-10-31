@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -43,11 +40,11 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
         return Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(v => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, v)).Select(v => new PromptChoice(new($"le-chengyan.{(u.Id)}.victim.{(p.BorrowedCursor)}.{(v.Seat)}"), $"令{(actor.Name)}对{(v.Name)}使用杀", [], [v.Seat], new Dictionary<string, string> { ["program-action"] = "le-chengyan-borrowed-victim", ["frame-id"] = u.Id.ToString(CultureInfo.InvariantCulture), ["target-index"] = p.BorrowedCursor.ToString(CultureInfo.InvariantCulture) })).ToArray());
     }
 
-    internal bool HasLeChengyanBorrowedPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { LeChengyanEffect: { AwaitingVictim: true } } u && ValidLeChengyanEffect(u) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } d && d.PlayerSeat == u.SourceSeat && d.Choices.Count > 0 && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(d.Choices, LeChengyanBorrowedChoices(u));
+    internal bool HasLeChengyanBorrowedPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { LeChengyanEffect: { AwaitingVictim: true } } u && ValidLeChengyanEffect(u) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } d && d.PlayerSeat == u.SourceSeat && d.Choices.Count > 0 && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(d.Choices, LeChengyanBorrowedChoices(u));
     [ProgramAnswer("le-chengyan-borrowed-victim")]
     internal void AnswerLeChengyanBorrowedVictim(PromptChoice selected)
     {
-        if (!HasLeChengyanBorrowedPrompt() || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame { LeChengyanEffect: { } p } u || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], LeChengyanBorrowedChoices(u).Where(c => c.Id == selected.Id).ToArray()))
+        if (!HasLeChengyanBorrowedPrompt() || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame { LeChengyanEffect: { } p } u || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], LeChengyanBorrowedChoices(u).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Chengyan auxiliary target must belong to its current paid Use and native Borrowed Sword option.");
         var victim = selected.Targets.Single();
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -68,14 +65,14 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
         return true;
     }
 
-    internal bool FinishLeChengyanBorrowedNative(global::CardGame.Core.NativeOwners.BorrowedSwordHandle borrowed)
+    internal bool FinishLeChengyanBorrowedNative(NativeOwners.BorrowedSwordHandle borrowed)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(borrowed.ResolutionId)is not { LeChengyanEffect: { AwaitingBorrowedEffect: true, EffectKind: CardKind.BorrowedSword } p } u || !ValidLeChengyanEffect(u))
             return false;
         if (borrowed.WeaponOwnerSeat != p.Targets[p.BorrowedCursor] || borrowed.SlashTargetSeat != p.AuxiliaryVictimSeat)
             throw new InvalidOperationException("Chengyan Borrowed Sword returned to a different original target or auxiliary victim.");
         _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword = null;
-        if (global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest?.BorrowedSword, borrowed))
+        if (CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest?.BorrowedSword, borrowed))
             _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = null;
         _coreNativeCardUseCompletionOperations.FinishCardUse(u.Id, LeChengyanOriginalCard(u), u.CardKind);
         return true;

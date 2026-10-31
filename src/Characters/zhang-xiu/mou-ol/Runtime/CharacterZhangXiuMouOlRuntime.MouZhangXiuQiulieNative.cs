@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangXiuMouOlRuntime
@@ -41,13 +37,13 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
 
     internal bool IsMouZhangXiuOlSlash(CardUseFrame use)
     {
-        if (use.MouZhangXiuOlQiulie is not { } o || use.CardId != 0 || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || o.UseId != use.Id || a.ProviderSeat != o.Source.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouZhangXiuOl: { Stage: MouZhangXiuOlStage.NativeUse, NativeReturned: false } r } parent || !ValidMouZhangXiuOl(parent) || o.Source != r.Source || o.GameplayHash != parent.GameplayHash || r.UseId != use.Id || r.ActionId != a.ActionId || o.TargetSeat != r.TargetSeat || o.Phase != r.Phase || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlQiulieIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (use.MouZhangXiuOlQiulie is not { } o || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || o.UseId != use.Id || a.ProviderSeat != o.Source.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouZhangXiuOl: { Stage: MouZhangXiuOlStage.NativeUse, NativeReturned: false } r } parent || !ValidMouZhangXiuOl(parent) || o.Source != r.Source || o.GameplayHash != parent.GameplayHash || r.UseId != use.Id || r.ActionId != a.ActionId || o.TargetSeat != r.TargetSeat || o.Phase != r.Phase || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlQiulieIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat);
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 33000)]
-    internal bool FinishMouZhangXiuOlSlashAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishMouZhangXiuOlSlashAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouZhangXiuOlQiulie: not null } use || !IsMouZhangXiuOlSlash(use))
@@ -87,7 +83,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 33000)]
-    internal bool ReturnMouZhangXiuOlSlashAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnMouZhangXiuOlSlashAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouZhangXiuOl: { Stage: MouZhangXiuOlStage.NativeUse, NativeReturned: true } r } f || r.UseId != completion.ResolutionId)
             return false;
@@ -132,7 +128,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
     internal SkillProgramStepOutcome BeginMouZhangXiuOlDefense(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
+        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
         if (f.MouZhangXiuOl is not null || f.InstructionIndex != 1 || f.ActivationId != f.TriggerId || f.WindowContext is not { } w || !CanRunIssuedMouZhangXiuOl(c, w))
             throw new InvalidOperationException("Qiulie defense requires its signed, paid, current native Slash.");
         var use = MouZhangXiuOlContextUse(c, w)!;

@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_CardUsePayments
 {
     // This producer already owns payment children on its exact Program return

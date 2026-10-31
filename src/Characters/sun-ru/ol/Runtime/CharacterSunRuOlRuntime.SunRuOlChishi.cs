@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunRuOlRuntime
 {
     internal const string SunRuOlChishiDrawReason = "skill-program.sun-ru.ol.chishi.draw";
-    internal CardConversionSource SunRuOlSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.ISunRuOlProgramHost.RewardCurrentTurnLastZoneLoss(ProgramSkillFrame f) => BeginSunRuOlChishi(f);
-    SkillProgramStepOutcome global::CardGame.Core.ISunRuOlProgramHost.AbolishEquipmentSlotsForDistinctBenefits(ProgramSkillFrame f) => BeginSunRuOlWeimian(f);
-    internal static bool IsSunRuOlChishiTrigger(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlChishi.IsSunRuOlChishiTrigger(t);
+    internal CardConversionSource SunRuOlSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome ISunRuOlProgramHost.RewardCurrentTurnLastZoneLoss(ProgramSkillFrame f) => BeginSunRuOlChishi(f);
+    SkillProgramStepOutcome ISunRuOlProgramHost.AbolishEquipmentSlotsForDistinctBenefits(ProgramSkillFrame f) => BeginSunRuOlWeimian(f);
+    internal static bool IsSunRuOlChishiTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlChishi.IsSunRuOlChishiTrigger(t);
     internal bool SunRuOlActualTurn(SunRuOlTurnToken t) => t.TurnNumber > 0 && t.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && t.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(t.OwnerSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Any(e => e.TurnNumber == t.TurnNumber && e.ActorSeat == t.OwnerSeat);
-    internal static bool SunRuOlLostLastZone(CardMovementBatchContext batch, int seat) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlChishi.SunRuOlLostLastZone(batch, seat);
+    internal static bool SunRuOlLostLastZone(CardMovementBatchContext batch, int seat) => RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlChishi.SunRuOlLostLastZone(batch, seat);
     internal CardMovementBatchContext CaptureSunRuOlChishiBatch(CardMovementBatchContext batch)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RewardCurrentTurnLastZoneLoss))
@@ -45,12 +41,12 @@ internal sealed partial class CharacterSunRuOlRuntime
     internal SkillProgramStepOutcome BeginSunRuOlChishi(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SunRuOlChishi is not null || f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { MovementBatch.SunRuOlLastZoneLoss: { } turn } context || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(native => native.Id == context.ParentFrameId)is not { } w || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) || !CanRunSunRuOlChishiCandidate(w.Candidates[w.CandidateIndex], context))
+        if (f.SunRuOlChishi is not null || f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { MovementBatch.SunRuOlLastZoneLoss: { } turn } context || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(native => native.Id == context.ParentFrameId)is not { } w || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) || !CanRunSunRuOlChishiCandidate(w.Candidates[w.CandidateIndex], context))
             throw new InvalidOperationException("Chishi requires one real last-zone loss of the actual current-turn actor.");
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SunRuOlChishi = new(SunRuOlSource(f), f.GameplayHash, f.InstructionIndex, w.Id, turn, before, before) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SunRuOlChishiAppliedEvent(f.Id, SunRuOlSource(f), w.Id, turn));
-        var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(turn.TurnNumber, turn.OwnerSeat, f.Id, f.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), SkillRuleQuery.HandLimit, SkillRuleOperation.Add, 2, affectedSeat: turn.OwnerSeat);
+        var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(turn.TurnNumber, turn.OwnerSeat, f.Id, f.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), SkillRuleQuery.HandLimit, SkillRuleOperation.Add, 2, affectedSeat: turn.OwnerSeat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnRuleModifierGrantedEvent(granted));
         _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[turn.OwnerSeat], 2, true, new(SunRuOlChishiDrawReason));
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);

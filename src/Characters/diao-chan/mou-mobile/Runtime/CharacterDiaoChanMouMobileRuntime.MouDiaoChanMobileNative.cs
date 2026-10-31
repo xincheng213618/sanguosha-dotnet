@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanMouMobileRuntime
@@ -54,7 +50,7 @@ internal sealed partial class CharacterDiaoChanMouMobileRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 31700)]
-    internal bool ReturnMouDiaoChanRingAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnMouDiaoChanRingAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDiaoChanMobile: { Stage: MouDiaoChanMobileStage.Duels } r } f || r.UseId != completion.ResolutionId)
             return false;

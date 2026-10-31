@@ -1,9 +1,9 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_NamedDefenseAndPublicDraft
 {
-    internal static string DefenseNameUsage(string ledger, CardKind kind) => $"declared-name:{ledger}:{CardGame.Core.RuntimeSkills.RuntimeRules_Core_AlternativeViewAsCosts.ProgramBasicCardName(kind)}";
+    internal static string DefenseNameUsage(string ledger, CardKind kind) => $"declared-name:{ledger}:{RuntimeRules_Core_AlternativeViewAsCosts.ProgramBasicCardName(kind)}";
 
     internal static PromptChoice NamedDraftChoice(ProgramSkillFrame frame, string action, string label, int? card = null, int? slot = null, CardKind? name = null, int? seat = null) =>
         new(new ChoiceId($"named-draft.{frame.Id}.{action}.{card?.ToString() ?? slot?.ToString() ?? name?.ToString() ?? seat?.ToString() ?? "none"}"), label,

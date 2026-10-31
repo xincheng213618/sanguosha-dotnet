@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,7 +9,7 @@ internal sealed partial class CharacterLuZhiMouMobileRuntime
     internal const string MouLuZhiDiscardReason = "skill-program.mou-mobile:zhenliang.discard", MouLuZhiDrawReason = "skill-program.mou-mobile:lu-zhi.draw";
     internal bool HasMouLuZhiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeMouLuZhiMingren) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouLuZhiZhenliangYang);
 
-    internal static CardConversionSource MouLuZhiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_zhi_mou_mobile_MouLuZhi.MouLuZhiSource(f);
+    internal static CardConversionSource MouLuZhiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lu_zhi_mou_mobile_MouLuZhi.MouLuZhiSource(f);
     internal MouLuZhiRen[] LiveMouLuZhiRen(int owner)
     {
         if (!HasMouLuZhiCapability || !_cardZonesOperations._cardZones.HasPrivatePersistentCards(owner))
@@ -102,7 +99,7 @@ internal sealed partial class CharacterLuZhiMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouLuZhi ?? throw new InvalidOperationException("Lu Zhi lost its owning choice.");
-        if (!ValidMouLuZhi(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouLuZhiChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidMouLuZhi(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouLuZhiChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Lu Zhi only accepts its current private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == MouLuZhiStage.RenChoice)
@@ -220,6 +217,6 @@ internal sealed partial class CharacterLuZhiMouMobileRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.InitializeMouLuZhiMingren, SkillProgramEffectOp.ExchangeMouLuZhiMingren, SkillProgramEffectOp.ResolveMouLuZhiZhenliangYang, SkillProgramEffectOp.ResolveMouLuZhiZhenliangYin)]
-    internal PromptChoice AiMouLuZhi(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderByDescending(c => c.Targets.Count == 1 && (f.MouLuZhi!.Op == SkillProgramEffectOp.ResolveMouLuZhiZhenliangYang ? !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) : global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]))).ThenBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).First();
-    SkillProgramStepOutcome global::CardGame.Core.IMouLuZhiHost.Start(ProgramSkillFrame f, SkillProgramEffectOp op) => StartMouLuZhi(f, op);
+    internal PromptChoice AiMouLuZhi(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderByDescending(c => c.Targets.Count == 1 && (f.MouLuZhi!.Op == SkillProgramEffectOp.ResolveMouLuZhiZhenliangYang ? !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) : CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]))).ThenBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).First();
+    SkillProgramStepOutcome IMouLuZhiHost.Start(ProgramSkillFrame f, SkillProgramEffectOp op) => StartMouLuZhi(f, op);
 }

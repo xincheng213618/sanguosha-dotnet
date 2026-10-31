@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCardConversionsRuntime
@@ -10,18 +6,18 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
     internal const string SpGuanYuWushengSkillId = "sp:guan-yu-wusheng";
     internal const string NuzhanSkillId = "sp:nuzhan";
     internal bool IgnoresSpGuanYuWushengDistance(CharacterState player, Card card) => _coreNationalSkillsOperations.HasRuntimeSkill(player, SpGuanYuWushengSkillId) && card.Suit == Suit.Diamond;
-    internal global::CardGame.Core.GameEngine.NuzhanModifiers GetNuzhanModifiers(long frameId, CharacterState source)
+    internal GameEngine.NuzhanModifiers GetNuzhanModifiers(long frameId, CharacterState source)
     {
         if (!_coreNationalSkillsOperations.HasRuntimeSkill(source, NuzhanSkillId))
             return default;
         var action = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == frameId).Action;
-        if (action is null || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.PhysicalCards.Count != 1 || !action.ConversionChain.Any(conversion => conversion.OwnerSeat == source.Seat))
+        if (action is null || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.PhysicalCards.Count != 1 || !action.ConversionChain.Any(conversion => conversion.OwnerSeat == source.Seat))
         {
             return default;
         }
 
         var physical = action.PhysicalCards[0];
-        var modifiers = new global::CardGame.Core.GameEngine.NuzhanModifiers(IgnoresSlashLimit: CardCatalog.Get(physical.CardKind).CategoryName == "锦囊牌", DamageBonus: _coreEquipmentContentOperations.EquipmentRules.IsEquipment(physical.CardKind) ? 1 : 0, PhysicalCardId: physical.CardId);
+        var modifiers = new GameEngine.NuzhanModifiers(IgnoresSlashLimit: CardCatalog.Get(physical.CardKind).CategoryName == "锦囊牌", DamageBonus: _coreEquipmentContentOperations.EquipmentRules.IsEquipment(physical.CardKind) ? 1 : 0, PhysicalCardId: physical.CardId);
         if (!modifiers.IgnoresSlashLimit && modifiers.DamageBonus == 0)
             return default;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NuzhanAppliedEvent(frameId, source.Seat, modifiers.PhysicalCardId, modifiers.IgnoresSlashLimit, modifiers.DamageBonus));
@@ -58,7 +54,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         return $"【{(_contentRegistryOperations._contentRegistry!.Skills[source.SkillId].Name)}】{(description)}";
     }
 
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramCardIdentityMatch> FindProgramCardIdentityMatches(CharacterState owner, Card card)
+    internal IReadOnlyList<GameEngine.ProgramCardIdentityMatch> FindProgramCardIdentityMatches(CharacterState owner, Card card)
     {
         var identityLocation = _cardZonesOperations._cardZones.GetLocation(card.Id);
         var identityHand = identityLocation == CardLocation.Hand(owner.Seat);
@@ -85,7 +81,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
             return[];
         var inputKind = _coreWenhePoisonOperations.EffectiveConversionInputKind(owner, card);
         var context = _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner);
-        return bindings.ProgramInstances.Where(instance => instance.Program.CardIdentities.Count != 0 && instance.SkillId != "anniversary:luansuo").SelectMany(instance => instance.Program.CardIdentities.Where(identity => ((identityHand || identityGrain) && identity.Zones.Contains(identityLocation.Zone) || identityHu && identity.Zones.Contains(CardZoneKind.Hand) || instance.Program.CardPolicies.Any(p => p.Kind == SkillProgramCardPolicyKind.AlcoholKingIdentityRank) && identity.InputKinds.SequenceEqual([CardKind.Alcohol]) && identity.OutputKind == CardKind.Slash && identity.Zones.Contains(CardZoneKind.Hand)) && identity.Condition.Evaluate(context) && (identity.InputKinds.Count == 0 || ProgramCardKindMatch.Contains(identity.InputKinds, inputKind)) && (identity.InputSuits.Count == 0 || identity.InputSuits.Contains(card.Suit))).Select(identity => new global::CardGame.Core.GameEngine.ProgramCardIdentityMatch(instance.Program, identity, new CardConversionSource(instance.SkillId, identity.Id, owner.Seat, instance.SkillInstanceId)))).OrderBy(match => match.Source.SkillId, StringComparer.Ordinal).ThenBy(match => match.Source.BindingId, StringComparer.Ordinal).ThenBy(match => match.Source.SkillInstanceId, StringComparer.Ordinal).ToArray();
+        return bindings.ProgramInstances.Where(instance => instance.Program.CardIdentities.Count != 0 && instance.SkillId != "anniversary:luansuo").SelectMany(instance => instance.Program.CardIdentities.Where(identity => ((identityHand || identityGrain) && identity.Zones.Contains(identityLocation.Zone) || identityHu && identity.Zones.Contains(CardZoneKind.Hand) || instance.Program.CardPolicies.Any(p => p.Kind == SkillProgramCardPolicyKind.AlcoholKingIdentityRank) && identity.InputKinds.SequenceEqual([CardKind.Alcohol]) && identity.OutputKind == CardKind.Slash && identity.Zones.Contains(CardZoneKind.Hand)) && identity.Condition.Evaluate(context) && (identity.InputKinds.Count == 0 || ProgramCardKindMatch.Contains(identity.InputKinds, inputKind)) && (identity.InputSuits.Count == 0 || identity.InputSuits.Contains(card.Suit))).Select(identity => new GameEngine.ProgramCardIdentityMatch(instance.Program, identity, new CardConversionSource(instance.SkillId, identity.Id, owner.Seat, instance.SkillInstanceId)))).OrderBy(match => match.Source.SkillId, StringComparer.Ordinal).ThenBy(match => match.Source.BindingId, StringComparer.Ordinal).ThenBy(match => match.Source.SkillInstanceId, StringComparer.Ordinal).ToArray();
     }
 
     internal IReadOnlyList<CardConversionSource> GetProgramCardIdentitySources(CharacterState owner, Card card, CardKind effectiveKind, bool forResponse)
@@ -95,7 +91,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         var matches = _coreActionQueriesOperations.GetProgramCardIdentityMatches(owner, card);
         if (matches.Count == 0)
             return[];
-        return matches.Where(match => match.Identity.OutputKind == effectiveKind || forResponse && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(match.Identity.OutputKind, effectiveKind) || !forResponse && match.Identity.OutputKind == CardKind.Slash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind)).Select(match => match.Source).ToArray();
+        return matches.Where(match => match.Identity.OutputKind == effectiveKind || forResponse && CoreNativeCardClassificationsRuntime.MatchesRequiredCard(match.Identity.OutputKind, effectiveKind) || !forResponse && match.Identity.OutputKind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind)).Select(match => match.Source).ToArray();
     }
 
     internal bool HasProgramCardIdentity(CharacterState owner, Card card) => _coreActionQueriesOperations.GetProgramCardIdentityMatches(owner, card).Count != 0;
@@ -116,7 +112,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
     {
         if (requestedUseTarget is { } requested && (forResponse || dyingUse || outputKind != CardKind.Peach || !_coreWenyiPeachSuppliesOperations.IsWenyiPeachSupplyQuery(owner, requested)))
             return[];
-        if (_coreCardDeclarationsOperations.UnclaimedDeclarationPayment(owner.Seat, card.Id)is { } paid && (paid.DeclaredKind == outputKind || forResponse && outputKind == CardKind.Slash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(paid.DeclaredKind)))
+        if (_coreCardDeclarationsOperations.UnclaimedDeclarationPayment(owner.Seat, card.Id)is { } paid && (paid.DeclaredKind == outputKind || forResponse && outputKind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(paid.DeclaredKind)))
             return[paid.Source];
         var houChengWine = _characterHouChengAnniversaryOperations.AnniversaryHouChengWineSources(owner, card, outputKind, forResponse, dyingUse);
         if (houChengWine.Count != 0)
@@ -147,9 +143,9 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         var configured = registered.Count == 0 ? Array.Empty<CardConversionSource>() : registered.Where(item =>
         {
             var(instance, rule) = item;
-            return (!wuyouJuewuIdentity || instance.SkillId == "wumiao:juewu" && rule.RankTwoDamageUse) && instance.SkillId != "wushuang:skill-3252" && rule.KenshangUse != true && !(rule.VariableInputCount && rule.CostDestination == SkillProgramCardDestination.DrawPileBottom) && global::CardGame.Core.EngineOwners.CharacterZhaoYunOlGod2016Runtime.EffectiveProgramViewAsInputCount(owner, rule) == 1 && (rule.OutputKind == outputKind || _coreProgramCardLegalityOperations.CardLegality.AllowsNativeSlashAlias(new(owner, instance, rule, outputKind, forResponse)) || instance.SkillId == "le:fule" && outputKind == CardKind.Slash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _characterCaoZhiLeOperations.FuleSlashAliasAllowed(owner, forResponse) || rule.EqualNameLengthUse && outputKind == CardKind.Slash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _characterMiHengLeOperations.SiruiSlashAliasAllowed(owner, forResponse) || rule.RankTwoDamageUse && outputKind == CardKind.Slash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _characterGuanYuWumiaoOperations.JuewuSlashAliasAllowed(owner, forResponse) || forResponse && rule.ExtendedUse && outputKind == CardKind.Slash && rule.OutputKind == CardKind.FireSlash || forResponse && rule.DeclarationValidation is not null && outputKind == CardKind.Slash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind)) && rule.SourceZones.Contains(zone.Value) && _characterHuJinDingOlOperations.MatchesZhongshenRoundGain(owner, card, rule) && (zone != CardZoneKind.Judgment || rule.LastInSourceZone == true) && (requestedUseTarget is not null ? rule.ForResponse || rule.ForPlay : dyingUse ? rule.ForResponse || rule.UseOnly && rule.ForPlay : forResponse ? rule.ForResponse && (!rule.UseOnly || _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, outputKind) || rule.RankTwoDamageUse && _characterGuanYuWumiaoOperations.IsJuewuTrueSlashUse(owner) || rule.EqualNameLengthUse && _characterMiHengLeOperations.IsSiruiTrueResponseUse(owner, rule.OutputKind, dyingUse, requestedUseTarget) || (rule.ConversionStateId is not null || rule.UnusedOutputNameThisGame || rule.LastInSourceZone == true) && outputKind == CardKind.Nullification) : rule.ForPlay) && (rule.DeclarationValidation is null || _coreCardDeclarationsOperations.CanDeclareCard(owner, instance.SkillId)) && !_coreProgramCardLegalityOperations.CardLegality.IsConfiguredConversionForbidden(ProgramCardLegalityStage.NamedConversionBan, new(owner, card, instance, rule, forResponse, dyingUse, requestedUseTarget)) && (rule.TieredRoundConversion is null || !card.IsGeneralWeapon) && !_coreProgramCardLegalityOperations.CardLegality.IsConfiguredConversionForbidden(ProgramCardLegalityStage.ConfiguredConversionBan, new(owner, card, instance, rule, forResponse, dyingUse, requestedUseTarget)) && (!rule.UnusedOutputThisTurn || !_coreAlternativeViewAsCostsOperations.HasProgramUsedBasicCardThisTurn(owner.Seat, outputKind)) && (inputKind != outputKind || rule.InheritPreviousPlaySuit || rule.ConversionStateId is not null || rule.AllowSameKind) && !_coreProgramCardLegalityOperations.CardLegality.IsConfiguredConversionForbidden(ProgramCardLegalityStage.ConversionUsageBan, new(owner, card, instance, rule, forResponse, dyingUse, requestedUseTarget)) && (rule.Condition.Kind == SkillProgramConditionKind.Always || rule.Condition.Evaluate(context ??= _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner))) && (rule.InputKinds.Count == 0 || ProgramCardKindMatch.Contains(rule.InputKinds, inputKind)) && (rule.InputCategories.Count == 0 || rule.InputCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(inputKind, category))) && (rule.InputSuits.Count == 0 || rule.InputSuits.Contains(rule.UseEffectiveInputSuit == true ? _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card) : card.Suit));
+            return (!wuyouJuewuIdentity || instance.SkillId == "wumiao:juewu" && rule.RankTwoDamageUse) && instance.SkillId != "wushuang:skill-3252" && rule.KenshangUse != true && !(rule.VariableInputCount && rule.CostDestination == SkillProgramCardDestination.DrawPileBottom) && CharacterZhaoYunOlGod2016Runtime.EffectiveProgramViewAsInputCount(owner, rule) == 1 && (rule.OutputKind == outputKind || _coreProgramCardLegalityOperations.CardLegality.AllowsNativeSlashAlias(new(owner, instance, rule, outputKind, forResponse)) || instance.SkillId == "le:fule" && outputKind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _characterCaoZhiLeOperations.FuleSlashAliasAllowed(owner, forResponse) || rule.EqualNameLengthUse && outputKind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _characterMiHengLeOperations.SiruiSlashAliasAllowed(owner, forResponse) || rule.RankTwoDamageUse && outputKind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _characterGuanYuWumiaoOperations.JuewuSlashAliasAllowed(owner, forResponse) || forResponse && rule.ExtendedUse && outputKind == CardKind.Slash && rule.OutputKind == CardKind.FireSlash || forResponse && rule.DeclarationValidation is not null && outputKind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind)) && rule.SourceZones.Contains(zone.Value) && _characterHuJinDingOlOperations.MatchesZhongshenRoundGain(owner, card, rule) && (zone != CardZoneKind.Judgment || rule.LastInSourceZone == true) && (requestedUseTarget is not null ? rule.ForResponse || rule.ForPlay : dyingUse ? rule.ForResponse || rule.UseOnly && rule.ForPlay : forResponse ? rule.ForResponse && (!rule.UseOnly || _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, outputKind) || rule.RankTwoDamageUse && _characterGuanYuWumiaoOperations.IsJuewuTrueSlashUse(owner) || rule.EqualNameLengthUse && _characterMiHengLeOperations.IsSiruiTrueResponseUse(owner, rule.OutputKind, dyingUse, requestedUseTarget) || (rule.ConversionStateId is not null || rule.UnusedOutputNameThisGame || rule.LastInSourceZone == true) && outputKind == CardKind.Nullification) : rule.ForPlay) && (rule.DeclarationValidation is null || _coreCardDeclarationsOperations.CanDeclareCard(owner, instance.SkillId)) && !_coreProgramCardLegalityOperations.CardLegality.IsConfiguredConversionForbidden(ProgramCardLegalityStage.NamedConversionBan, new(owner, card, instance, rule, forResponse, dyingUse, requestedUseTarget)) && (rule.TieredRoundConversion is null || !card.IsGeneralWeapon) && !_coreProgramCardLegalityOperations.CardLegality.IsConfiguredConversionForbidden(ProgramCardLegalityStage.ConfiguredConversionBan, new(owner, card, instance, rule, forResponse, dyingUse, requestedUseTarget)) && (!rule.UnusedOutputThisTurn || !_coreAlternativeViewAsCostsOperations.HasProgramUsedBasicCardThisTurn(owner.Seat, outputKind)) && (inputKind != outputKind || rule.InheritPreviousPlaySuit || rule.ConversionStateId is not null || rule.AllowSameKind) && !_coreProgramCardLegalityOperations.CardLegality.IsConfiguredConversionForbidden(ProgramCardLegalityStage.ConversionUsageBan, new(owner, card, instance, rule, forResponse, dyingUse, requestedUseTarget)) && (rule.Condition.Kind == SkillProgramConditionKind.Always || rule.Condition.Evaluate(context ??= _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner))) && (rule.InputKinds.Count == 0 || ProgramCardKindMatch.Contains(rule.InputKinds, inputKind)) && (rule.InputCategories.Count == 0 || rule.InputCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(inputKind, category))) && (rule.InputSuits.Count == 0 || rule.InputSuits.Contains(rule.UseEffectiveInputSuit == true ? _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card) : card.Suit));
         }).Select(item => new CardConversionSource(item.Source.SkillId, item.Rule.Id, owner.Seat, item.Source.SkillInstanceId)).Where(source => !_coreProgramCardLegalityOperations.CardLegality.IsConversionSourceForbidden(ProgramCardLegalityStage.DyingConversionBan, new(owner, card, source, forResponse, dyingUse))).Where(source => !_coreProgramCardLegalityOperations.CardLegality.IsConversionSourceForbidden(ProgramCardLegalityStage.ConversionSourceBan, new(owner, card, source, forResponse, dyingUse))).ToArray();
-        var turnScoped = wuyouJuewuIdentity || !hasTurnConversions || forResponse || zone != CardZoneKind.Hand ? Array.Empty<CardConversionSource>() : _turnCardUseEffectsOperations._turnCardUseEffects.GetConversions(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, owner.Seat, outputKind, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card))).Select(item => new CardConversionSource(item.Source.SkillId, $"{(item.Source.BindingId)}.turn-{(item.EffectIndex)}", item.Source.OwnerSeat, item.Source.SkillInstanceId)).ToArray();
+        var turnScoped = wuyouJuewuIdentity || !hasTurnConversions || forResponse || zone != CardZoneKind.Hand ? Array.Empty<CardConversionSource>() : _turnCardUseEffectsOperations._turnCardUseEffects.GetConversions(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, owner.Seat, outputKind, CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card))).Select(item => new CardConversionSource(item.Source.SkillId, $"{(item.Source.BindingId)}.turn-{(item.EffectIndex)}", item.Source.OwnerSeat, item.Source.SkillInstanceId)).ToArray();
         var paidColor = hasTurnConversions && !wuyouJuewuIdentity ? _corePaidColorConversionsOperations.GetPaidColorTurnDuelConversions(owner, card, outputKind, forResponse, zone.Value) : Array.Empty<CardConversionSource>();
         if (configured.Length == 0 && turnScoped.Length == 0 && paidColor.Count == 0)
             return[];
@@ -166,17 +162,17 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         var bindings = _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances;
         var leiluan = _characterKongShuOlOperations.LeiluanSelections(owner, outputKind, forResponse, ignoreSuitUseProhibition);
         var jinzhi = _coreWushuangJinzhiOperations.WushuangJinzhiSelections(owner, outputKind, forResponse);
-        if (leiluan.Count == 0 && jinzhi.Count == 0 && !bindings.Any(instance => instance.Program.ViewAs.Any(rule => global::CardGame.Core.EngineOwners.CharacterZhaoYunOlGod2016Runtime.EffectiveProgramViewAsInputCount(owner, rule) > 1 && !rule.VariableInputCount)))
+        if (leiluan.Count == 0 && jinzhi.Count == 0 && !bindings.Any(instance => instance.Program.ViewAs.Any(rule => CharacterZhaoYunOlGod2016Runtime.EffectiveProgramViewAsInputCount(owner, rule) > 1 && !rule.VariableInputCount)))
             return[];
         var context = _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner);
         var dyingUse = forResponse && outputKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == owner.Seat;
         var eligibleHand = _characterLuSuMobileShiOperations.AppendShiLsPlayableCards(owner, _corePhysicalOwnedCardQueriesOperations.GetHand(owner)).Concat(_characterGongsunZanMouMobileOperations.MouGszHuCards(owner)).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Concat(_characterHuCheErMouOperations.KongwuUsableWoodenOxGrain(owner)).Where(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, card) && !HasProgramCardIdentity(owner, card)).OrderBy(card => card.Id).ToArray();
         var selections = new List<ProgramMultiCardViewAsSelection>();
         foreach (var instance in bindings.Where(instance => instance.Program.ViewAs.Count != 0))
-            foreach (var rule in instance.Program.ViewAs.Where(rule => global::CardGame.Core.EngineOwners.CharacterZhaoYunOlGod2016Runtime.EffectiveProgramViewAsInputCount(owner, rule) > 1 && !rule.VariableInputCount && (rule.OutputKind == outputKind || forResponse && rule.ExtendedUse && outputKind == CardKind.Slash && rule.OutputKind == CardKind.FireSlash || !forResponse && rule.RoundDistinctBasicUse is not null && outputKind == CardKind.Slash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind)) && (requestedUseTarget is not null ? rule.ForResponse || rule.ForPlay : forResponse ? rule.ForResponse || rule.RoundDistinctBasicUse is not null && dyingUse && rule.ForPlay : rule.ForPlay) && (rule.RoundDistinctBasicUse is not null || !_coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, outputKind, forResponse ? CardActionType.Response : CardActionType.Use)) && (rule.XieweiBaitBasicUse is null || _characterGuanHaiOlOperations.XieweiNativeDirection(owner, outputKind, forResponse)) && _coreRoundDistinctBasicUseOperations.CanUseRoundDistinctBasicConversion(owner, instance, rule, forResponse, dyingUse) && rule.Condition.Evaluate(context)))
+            foreach (var rule in instance.Program.ViewAs.Where(rule => CharacterZhaoYunOlGod2016Runtime.EffectiveProgramViewAsInputCount(owner, rule) > 1 && !rule.VariableInputCount && (rule.OutputKind == outputKind || forResponse && rule.ExtendedUse && outputKind == CardKind.Slash && rule.OutputKind == CardKind.FireSlash || !forResponse && rule.RoundDistinctBasicUse is not null && outputKind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind)) && (requestedUseTarget is not null ? rule.ForResponse || rule.ForPlay : forResponse ? rule.ForResponse || rule.RoundDistinctBasicUse is not null && dyingUse && rule.ForPlay : rule.ForPlay) && (rule.RoundDistinctBasicUse is not null || !_coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, outputKind, forResponse ? CardActionType.Response : CardActionType.Use)) && (rule.XieweiBaitBasicUse is null || _characterGuanHaiOlOperations.XieweiNativeDirection(owner, outputKind, forResponse)) && _coreRoundDistinctBasicUseOperations.CanUseRoundDistinctBasicConversion(owner, instance, rule, forResponse, dyingUse) && rule.Condition.Evaluate(context)))
             {
                 var candidates = eligibleHand.Where(card => (rule.SourceZones.Contains(_cardZonesOperations._cardZones.GetLocation(card.Id).Zone) || _characterGongsunZanMouMobileOperations.MouGszHuHandSource(owner, card, rule.SourceZones) || rule.RoundDistinctBasicUse is not null && _coreRoundDistinctBasicUseOperations.IsRoundDistinctBasicMaterial(owner, card)) && (rule.InputKinds.Count == 0 || ProgramCardKindMatch.Contains(rule.InputKinds, _coreWenhePoisonOperations.EffectiveConversionInputKind(owner, card))) && (rule.InputSuits.Count == 0 || rule.InputSuits.Contains(rule.UseEffectiveInputSuit == true ? _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card) : card.Suit))).ToArray();
-                var inputCount = global::CardGame.Core.EngineOwners.CharacterZhaoYunOlGod2016Runtime.EffectiveProgramViewAsInputCount(owner, rule);
+                var inputCount = CharacterZhaoYunOlGod2016Runtime.EffectiveProgramViewAsInputCount(owner, rule);
                 if (candidates.Length < inputCount)
                     continue;
                 var source = new CardConversionSource(instance.SkillId, rule.Id, owner.Seat, instance.SkillInstanceId);
@@ -188,7 +184,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         return selections.Concat(leiluan).Concat(jinzhi).Where(item => _coreProgramCardLegalityOperations.IsProgramViewAsAllowed(owner, outputKind, item.Cards.Select(c => c.Id).ToArray(), item.Source, forResponse, dyingUse, requestedUseTarget)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || !forResponse || _coreRecordedSuitSlashOperations.IsRecordedSuitResponseAllowed(owner, item.Cards, outputKind)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || !_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(owner.Seat, outputKind, item.Cards.Select(c => c.Id), forResponse && !dyingUse)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || !forResponse || !_characterCuiYanOlOperations.IsCuiYanNativeResponseForbidden(owner, outputKind, item.Cards)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || forResponse || ignoreSuitUseProhibition || !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, item.Cards.Select(c => c.Id).ToArray())).OrderBy(item => item.Source.SkillId, StringComparer.Ordinal).ThenBy(item => item.Source.BindingId, StringComparer.Ordinal).ThenBy(item => string.Join(',', item.Cards.Select(card => card.Id)), StringComparer.Ordinal).ToArray();
     }
 
-    internal static IReadOnlyList<IReadOnlyList<Card>> EnumerateCardCombinations(IReadOnlyList<Card> cards, int count) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CardConversions.EnumerateCardCombinations(cards, count);
+    internal static IReadOnlyList<IReadOnlyList<Card>> EnumerateCardCombinations(IReadOnlyList<Card> cards, int count) => RuntimeSkills.RuntimeRules_Core_CardConversions.EnumerateCardCombinations(cards, count);
     internal ProgramMultiCardViewAsSelection? FindProgramMultiCardViewAsSelection(CharacterState owner, IReadOnlyList<int> cardIds, CardKind outputKind, bool forResponse, CardConversionSource source)
     {
         if (cardIds.Count == 0 || cardIds.Distinct().Count() != cardIds.Count)
@@ -232,7 +228,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
     }
 
     internal string ProgramConversionName(CardConversionSource source) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(source.SkillId)?.Name ?? source.SkillId;
-    internal void ResolveProgramMultiCardSlash(CharacterState source, CharacterState target, ProgramMultiCardViewAsSelection selection, global::CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowedSword = null, bool enforceOwnTurnSlashLimit = true)
+    internal void ResolveProgramMultiCardSlash(CharacterState source, CharacterState target, ProgramMultiCardViewAsSelection selection, NativeOwners.BorrowedSwordHandle? borrowedSword = null, bool enforceOwnTurnSlashLimit = true)
     {
         var effectiveKind = _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(selection) || _corePlayCardHistoryOperations.ViewAsRule(selection.Source)is { RoundDistinctBasicUse: not null } or { LeiluanBasicUse: not null } ? selection.OutputKind : CardKind.Slash;
         var current = FindProgramMultiCardViewAsSelection(source, selection.Cards.Select(card => card.Id).ToArray(), effectiveKind, forResponse: false, selection.Source);
@@ -287,9 +283,9 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
                 _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.ResponseFinished);
     }
 
-    internal void ResolveDuelProgramMultiCardResponse(global::CardGame.Core.NativeOwners.DuelHandle duel, CharacterState responder, ProgramMultiCardViewAsSelection selection)
+    internal void ResolveDuelProgramMultiCardResponse(NativeOwners.DuelHandle duel, CharacterState responder, ProgramMultiCardViewAsSelection selection)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveDuel, duel) || responder.Seat != duel.ResponderSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveDuel, duel) || responder.Seat != duel.ResponderSeat)
             throw new InvalidOperationException("The configured Duel response is not current.");
         var responseAction = MoveProgramMultiCardResponse(responder, selection, duel.ResolutionId, duel.OpponentSeat);
         _coreMatchLogOperations.AddLog("CardResponded", $"{(responder.Name)} 发动【{(ProgramConversionName(selection.Source))}】，将 {(selection.Cards.Count)} 张手牌当【杀】应战【决斗】。", responder.Seat, duel.OpponentSeat);
@@ -307,9 +303,9 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         _coreNativeDuelOperations.ContinueDuelAfterSuccessfulSlash(duel, responder.Seat);
     }
 
-    internal void ResolveGroupProgramMultiCardResponse(global::CardGame.Core.NativeOwners.GroupCardHandle group, CharacterState responder, ProgramMultiCardViewAsSelection selection)
+    internal void ResolveGroupProgramMultiCardResponse(NativeOwners.GroupCardHandle group, CharacterState responder, ProgramMultiCardViewAsSelection selection)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack || group.RequiredCardKind != selection.OutputKind || group.CurrentAttack is not { } attack || responder.Seat != attack.TargetSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack || group.RequiredCardKind != selection.OutputKind || group.CurrentAttack is not { } attack || responder.Seat != attack.TargetSeat)
             throw new InvalidOperationException("The configured group response is not current.");
         var responseAction = MoveProgramMultiCardResponse(responder, selection, group.ResolutionId, group.SourceSeat);
         _coreMatchLogOperations.AddLog("CardResponded", $"{(responder.Name)} 发动【{(ProgramConversionName(selection.Source))}】，将 {(selection.Cards.Count)} 张手牌当【杀】响应【{(group.Card.DisplayName)}】。", responder.Seat, group.SourceSeat);
@@ -329,14 +325,14 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
 
     internal IReadOnlyList<Card> FindSlashUseCards(CharacterState owner, bool ignoreSuitUseProhibition = false)
     {
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.All(kind => _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, kind, CardActionType.Use)))
+        if (CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.All(kind => _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, kind, CardActionType.Use)))
             return[];
         var cards = _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(owner).Where(card =>
         {
             if (_coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, card))
                 return false;
             var identities = _coreActionQueriesOperations.GetProgramCardIdentityMatches(owner, card);
-            return identities.Count != 0 ? identities.Any(match => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(match.Identity.OutputKind)) : global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, CardKind.Slash, forResponse: false).Count != 0;
+            return identities.Count != 0 ? identities.Any(match => CoreNativeCardClassificationsRuntime.IsSlashCard(match.Identity.OutputKind)) : CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, CardKind.Slash, forResponse: false).Count != 0;
         });
         cards = cards.Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(owner)).Where(card => _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, CardKind.Slash, forResponse: false).Count != 0));
         cards = cards.Concat(_coreLastZoneConversionsOperations.GetLastZoneJudgmentConversionCards(owner, forResponse: false));
@@ -344,8 +340,8 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         return cards.Where(card => !_coreProgramCardLegalityOperations.IsProgramEntityPhysicalRestricted(owner.Seat, card.Id) && !_characterZhugeLiangWumiaoOperations.IsWuZglCopyBlocked(owner.Seat, card.Id)).Where(card => ignoreSuitUseProhibition || !_coreProgramParticipantPhaseOperationsOperations.IsTurnSuitUseForbidden(owner.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(owner, _characterWuJingOlOperations.WuJingLiubingUseCard(owner, card, card.Kind)))).DistinctBy(card => card.Id).ToArray();
     }
 
-    internal static bool IsFactionSlashUse(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending) => pending.IsProgramSkillUse || pending.IsBorrowedSwordUse || pending.IsQinglongCrescentBladeUse;
-    internal IReadOnlyList<Card> GetFactionSlashSlashCards(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider)
+    internal static bool IsFactionSlashUse(NativeOwners.FactionCardRequestHandle pending) => pending.IsProgramSkillUse || pending.IsBorrowedSwordUse || pending.IsQinglongCrescentBladeUse;
+    internal IReadOnlyList<Card> GetFactionSlashSlashCards(NativeOwners.FactionCardRequestHandle pending, CharacterState provider)
     {
         var cards = (pending.IsAssistedProgramUse ? _coreAssistedFactionSlashOperations.GetAssistedFactionSlashCards(pending, provider).Select(variant => variant.Card).DistinctBy(card => card.Id).ToArray() : IsFactionSlashUse(pending) ? _coreActionQueriesOperations.GetSlashUseCards(provider, ignoreSuitUseProhibition: true) : _coreNativeResponseMaterialQueriesOperations.GetResponseCards(provider, CardKind.Slash)).Where(card => (!IsFactionSlashUse(pending) || !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(pending.OwnerSeat, [card.Id])) && _coreTurnRedSlashBenefitsOperations.IsRedSlashProviderPaymentLegal(pending, GetFactionSlashEffectiveSlashKind(pending, provider, card), [card])).ToArray();
         if (!_characterCuiYanOlOperations.HasCuiYanCapability || !IsFactionSlashUse(pending) || pending.IsAssistedProgramUse)
@@ -353,17 +349,17 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         return cards.Where(card => _coreCuiYanNativeQueriesOperations.HasCuiYanAllowedFactionSlashVariant(pending, provider, card)).ToArray();
     }
 
-    internal CardKind GetFactionSlashEffectiveSlashKind(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, Card card)
+    internal CardKind GetFactionSlashEffectiveSlashKind(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, Card card)
     {
         if (_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(provider, card) && !_coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(provider, card, card.Kind, false))
             return CardKind.Slash;
         var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(provider, card).FirstOrDefault();
         if (identity is not null)
             return identity.Identity.OutputKind;
-        return IsFactionSlashUse(pending) ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) ? card.Kind : CardKind.Slash : _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(provider, card, CardKind.Slash);
+        return IsFactionSlashUse(pending) ? CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) ? card.Kind : CardKind.Slash : _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(provider, card, CardKind.Slash);
     }
 
-    internal static void AddConversionParameters(IDictionary<string, string> parameters, CardConversionSource source) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CardConversions.AddConversionParameters(parameters, source);
+    internal static void AddConversionParameters(IDictionary<string, string> parameters, CardConversionSource source) => RuntimeSkills.RuntimeRules_Core_CardConversions.AddConversionParameters(parameters, source);
     internal IEnumerable<PromptChoice> CreateConversionChoiceVariants(CharacterState owner, Card card, CardKind effectiveKind, bool forResponse, string baseChoiceId, string description, IReadOnlyList<int> cards, IReadOnlyList<int> targets, IReadOnlyDictionary<string, string> baseParameters, bool dyingUse = false)
     {
         var hasIdentity = HasProgramCardIdentity(owner, card);
@@ -394,7 +390,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
             if (!_characterHanDangMouMobileOperations.IsMouHanDangPublishedResponseAllowed(owner, card, source, forResponse, dyingUse))
                 continue;
             var parameters = new Dictionary<string, string>(baseParameters);
-            var sourceKind = source is not null && (_characterMiHengLeOperations.IsSiruiSource(source) || _characterGuanYuWumiaoOperations.IsJuewuSource(source)) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind) ? _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind : effectiveKind;
+            var sourceKind = source is not null && (_characterMiHengLeOperations.IsSiruiSource(source) || _characterGuanYuWumiaoOperations.IsJuewuSource(source)) && CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind) ? _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind : effectiveKind;
             if (sourceKind != effectiveKind)
             {
                 if (parameters.ContainsKey("response-card-kind"))
@@ -411,7 +407,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
             if (source is not null && _characterMiHengLeOperations.IsSiruiSource(source) && _characterMiHengLeOperations.SiruiExplicitForcedSlashFrontier(owner))
                 suffix += ".sirui-" + sourceKind;
             var choiceDescription = sourceKind == effectiveKind ? description : description.Replace("【杀】", "【" + CardCatalog.Get(sourceKind).DisplayName + "】", StringComparison.Ordinal);
-            if (source is not null && _characterMiHengLeOperations.IsSiruiSource(source) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(sourceKind) && _characterMiHengLeOperations.SiruiExplicitForcedSlashFrontier(owner) && targets is [var targetSeat])
+            if (source is not null && _characterMiHengLeOperations.IsSiruiSource(source) && CoreNativeCardClassificationsRuntime.IsSlashCard(sourceKind) && _characterMiHengLeOperations.SiruiExplicitForcedSlashFrontier(owner) && targets is [var targetSeat])
             {
                 var convertedCardDescription = $"将【{(card.DisplayName)}】当作【{(CardCatalog.Get(sourceKind).DisplayName)}】使用";
                 if (baseParameters.GetValueOrDefault("action") == "qinglong-slash")
@@ -473,7 +469,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
         _coreGameEngineCardConversionsHasSelectedResponseConversionChoiceHasSelectedUseConversionChoiceSelectedResponseConversionSelectedUseConversionAccess._hasSelectedResponseConversionChoice = false;
         if (selectedChoice)
         {
-            if (selected is null && !_coreWenhePoisonOperations.IsWenhePhysicalPoison(provider, responseCard) && !hasIdentity && !_coreLastZoneConversionsOperations.IsLastZoneJudgmentCard(provider, responseCard) && (!_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(provider, responseCard) || _coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(provider, responseCard, effectiveKind, true)) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(responseCard, effectiveKind) && _characterHanDangMouMobileOperations.IsMouHanDangNativeResponseAllowed(provider, responseCard, _coreDyingCursorRuntimeOperations.ActiveDying is not null && effectiveKind is CardKind.Peach or CardKind.Alcohol))
+            if (selected is null && !_coreWenhePoisonOperations.IsWenhePhysicalPoison(provider, responseCard) && !hasIdentity && !_coreLastZoneConversionsOperations.IsLastZoneJudgmentCard(provider, responseCard) && (!_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(provider, responseCard) || _coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(provider, responseCard, effectiveKind, true)) && CoreNativeCardClassificationsRuntime.IsNativeResponseCard(responseCard, effectiveKind) && _characterHanDangMouMobileOperations.IsMouHanDangNativeResponseAllowed(provider, responseCard, _coreDyingCursorRuntimeOperations.ActiveDying is not null && effectiveKind is CardKind.Peach or CardKind.Alcohol))
                 return null;
             if (selected is not null && candidates.Contains(selected))
             {

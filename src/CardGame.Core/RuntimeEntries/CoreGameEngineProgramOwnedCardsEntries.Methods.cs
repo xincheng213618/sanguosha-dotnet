@@ -2,9 +2,9 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramOwnedCardsEntries
 {
-    internal global::CardGame.Core.SkillProgramEffect GetOwnedSelectionEffect(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().GetOwnedSelectionEffect(frame);
-    internal int GetProgramOwnerLostHp(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().GetProgramOwnerLostHp(frame);
-    internal void PublishProgramOwnedCardSelection(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishProgramOwnedCardSelection(frame);
-    internal void ResolveProgramOwnedCardSelection(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.PromptChoice selected) => _resolve().ResolveProgramOwnedCardSelection(frame, effect, selected);
-    internal global::CardGame.Core.SkillProgramStepOutcome SelectProgramOwnedCards(global::CardGame.Core.ProgramSkillFrame frame, int cardOwnerSeat, int amount, global::CardGame.Core.SkillProgramNumberExpression? expression, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardZoneKind> zones, string resultBind, int minimumCards, int maximumCards, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind> cardKinds, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Suit> suits) => _resolve().SelectProgramOwnedCards(frame, cardOwnerSeat, amount, expression, zones, resultBind, minimumCards, maximumCards, cardKinds, suits);
+    internal SkillProgramEffect GetOwnedSelectionEffect(ProgramSkillFrame frame) => _resolve().GetOwnedSelectionEffect(frame);
+    internal int GetProgramOwnerLostHp(ProgramSkillFrame frame) => _resolve().GetProgramOwnerLostHp(frame);
+    internal void PublishProgramOwnedCardSelection(ProgramSkillFrame frame) => _resolve().PublishProgramOwnedCardSelection(frame);
+    internal void ResolveProgramOwnedCardSelection(ProgramSkillFrame frame, SkillProgramEffect effect, PromptChoice selected) => _resolve().ResolveProgramOwnedCardSelection(frame, effect, selected);
+    internal SkillProgramStepOutcome SelectProgramOwnedCards(ProgramSkillFrame frame, int cardOwnerSeat, int amount, SkillProgramNumberExpression? expression, IReadOnlyList<CardZoneKind> zones, string resultBind, int minimumCards, int maximumCards, IReadOnlyList<CardKind> cardKinds, IReadOnlyList<Suit> suits) => _resolve().SelectProgramOwnedCards(frame, cardOwnerSeat, amount, expression, zones, resultBind, minimumCards, maximumCards, cardKinds, suits);
 }

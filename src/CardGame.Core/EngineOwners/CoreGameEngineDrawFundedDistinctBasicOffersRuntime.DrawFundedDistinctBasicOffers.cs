@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
 {
-    internal const string DrawFundedBasicChoiceMarker = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DrawFundedDistinctBasicOffers.DrawFundedBasicChoiceMarker;
+    internal const string DrawFundedBasicChoiceMarker = RuntimeSkills.RuntimeRules_Core_DrawFundedDistinctBasicOffers.DrawFundedBasicChoiceMarker;
     internal const string DrawFundedBasicDrawReason = "skill-program.draw-funded-distinct-basic.draw";
     internal bool DrawFundedDistinctBasicQualified(CharacterState actor)
     {
@@ -17,11 +14,11 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(actor);
         if (hand.Count == 0 || hand.Count != actor.Hp)
             return false;
-        var color = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, hand[0]));
-        return color is not null && hand.All(card => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) == color);
+        var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, hand[0]));
+        return color is not null && hand.All(card => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) == color);
     }
 
-    internal bool DrawFundedDistinctBasicNameAvailable(int actorSeat, string ledger, CardKind kind) => !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawFundedDistinctBasicIssuedEvent>().Any(e => e.ActorSeat == actorSeat && e.MethodLedgerId == ledger && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.ActualTurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.NormalizedName == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind)) && !_resolutionStackOperations._resolutionStack.OfType<DrawFundedDistinctBasicFrame>().Any(f => f.Payment.Source.OwnerSeat == actorSeat && f.Payment.MethodLedgerId == ledger && f.Payment.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && f.Payment.ActualTurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && f.Payment.NormalizedName == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind));
+    internal bool DrawFundedDistinctBasicNameAvailable(int actorSeat, string ledger, CardKind kind) => !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawFundedDistinctBasicIssuedEvent>().Any(e => e.ActorSeat == actorSeat && e.MethodLedgerId == ledger && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.ActualTurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.NormalizedName == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind)) && !_resolutionStackOperations._resolutionStack.OfType<DrawFundedDistinctBasicFrame>().Any(f => f.Payment.Source.OwnerSeat == actorSeat && f.Payment.MethodLedgerId == ledger && f.Payment.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && f.Payment.ActualTurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && f.Payment.NormalizedName == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind));
     internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> DrawFundedDistinctBasicRules(CharacterState actor, CardKind? output = null, bool responseUse = false, bool dyingUse = false)
     {
         if (!DrawFundedDistinctBasicQualified(actor))
@@ -48,7 +45,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
         if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.IsMouLuSuUseQuery(actor) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
             return result;
         var card = new Card(0, kind, Suit.None, 0);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var targets = _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, card, source, effectiveKind: kind);
             foreach (var target in targets)
@@ -105,7 +102,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
         return true;
     }
 
-    internal global::CardGame.Core.GameEngine.DrawFundedBasicNeed? DrawFundedDistinctBasicContext(PendingDecision prompt, ResolutionFrame? suppliedTop = null)
+    internal GameEngine.DrawFundedBasicNeed? DrawFundedDistinctBasicContext(PendingDecision prompt, ResolutionFrame? suppliedTop = null)
     {
         var top = suppliedTop ?? _resolutionStackOperations._resolutionStack.LastOrDefault();
         if (top is null || top is DrawFundedDistinctBasicFrame or RequestedDeckBasicFrame)
@@ -118,7 +115,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
             return new(DrawFundedDistinctBasicIntent.Dying, dying.FrameId, top.Id, null, dying.ResponderIndex, dying.VictimSeat);
         if (prompt.Kind == DecisionKind.RespondSlash && _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true, ActiveAttack: null } borrowed && borrowed.WeaponOwnerSeat == prompt.PlayerSeat && borrowed.ResolutionId == ownerId && _coreNativeBorrowedSwordOperations.GetWeapon(_coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat])is not null)
             return new(DrawFundedDistinctBasicIntent.BorrowedSword, ownerId, top.Id, parentAction, 0, borrowed.SlashTargetSeat);
-        if (prompt.Kind == DecisionKind.QinglongCrescentBlade && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } blade && blade.Attack.SourceSeat == prompt.PlayerSeat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack) && blade.Attack.ResolutionId == ownerId)
+        if (prompt.Kind == DecisionKind.QinglongCrescentBlade && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } blade && blade.Attack.SourceSeat == prompt.PlayerSeat && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack) && blade.Attack.ResolutionId == ownerId)
             return new(DrawFundedDistinctBasicIntent.Qinglong, ownerId, top.Id, parentAction, 0, blade.Attack.TargetSeat);
         if (prompt.Kind != DecisionKind.ProgramTrigger || top is not ProgramSkillFrame program)
             return null;
@@ -146,7 +143,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
         return null;
     }
 
-    internal bool DrawFundedDistinctBasicNativeResponseLegal(CharacterState actor, global::CardGame.Core.GameEngine.DrawFundedBasicNeed need, CardKind kind, int? targetSeat)
+    internal bool DrawFundedDistinctBasicNativeResponseLegal(CharacterState actor, GameEngine.DrawFundedBasicNeed need, CardKind kind, int? targetSeat)
     {
         if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
             return false;
@@ -158,12 +155,12 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
             return kind == CardKind.Peach && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == need.ParentFrameId)is ProgramSkillFrame wenyi && need.RequestFrameId == wenyi.Id && wenyi.InstructionIndex == need.Cursor && _characterHuanShuJunOlOperations.TryGetWenyiPeachRequest(wenyi, out var wenyiActor, out var wenyiTarget) && wenyiActor == actor.Seat && wenyiTarget == seat && _coreWenyiPeachSuppliesOperations.WenyiPeachUseLegal(actor.Seat, seat, []);
         if (need.Intent == DrawFundedDistinctBasicIntent.Dying)
             return _coreDyingCursorRuntimeOperations.ActiveDying is { } d && d.FrameId == need.ParentFrameId && d.ResponderIndex == need.Cursor && d.ResponderSeat == actor.Seat && d.VictimSeat == seat && _coreMatchParticipantsPlayersAccess._players[seat].Hp <= 0 && (kind == CardKind.Peach && _coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(actor.Seat, seat) || kind == CardKind.Alcohol && actor.Seat == seat && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat));
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], kind, Suit.None))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], kind, Suit.None))
             return false;
         if (need.Intent == DrawFundedDistinctBasicIntent.BorrowedSword)
             return _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true, ActiveAttack: null } b && b.ResolutionId == need.ParentFrameId && b.WeaponOwnerSeat == actor.Seat && b.SlashTargetSeat == seat && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], kind, Suit.None, false, null, 0, []);
         if (need.Intent == DrawFundedDistinctBasicIntent.Qinglong)
-            return _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.ResolutionId == need.ParentFrameId && q.Attack.SourceSeat == actor.Seat && q.Attack.TargetSeat == seat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], kind, null, false, Suit.None, 0);
+            return _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.ResolutionId == need.ParentFrameId && q.Attack.SourceSeat == actor.Seat && q.Attack.TargetSeat == seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], kind, null, false, Suit.None, 0);
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == need.ParentFrameId)is not ProgramSkillFrame program || program.InstructionIndex != need.Cursor)
             return false;
         if (_characterSunYuanOlOperations.TryGetSayingSlashRequest(program, out var sayingActor, out var sayingTargets))
@@ -181,9 +178,9 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
         return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: []);
     }
 
-    internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> DrawFundedDistinctBasicForcedSlashRules(CharacterState actor, CharacterState target, bool qinglong) => DrawFundedDistinctBasicRules(actor).Where(r => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Rule.OutputKind) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, r.Rule.OutputKind, Suit.None) && (qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, r.Rule.OutputKind, null, false, Suit.None, 0) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, r.Rule.OutputKind, Suit.None, false, null, 0, [])));
-    internal bool HasDrawFundedDistinctBasicProgramSlash(CharacterState actor, IEnumerable<int> targets) => DrawFundedDistinctBasicRules(actor).Any(r => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Rule.OutputKind) && targets.Any(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, s, Suit.None) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[s], new(0, r.Rule.OutputKind, Suit.None, 0), effectiveKind: r.Rule.OutputKind, noEffectiveRank: true, physicalCardIds: [])));
-    internal IReadOnlyList<PromptChoice> DrawFundedDistinctBasicResponseChoices(PendingDecision prompt, global::CardGame.Core.GameEngine.DrawFundedBasicNeed need)
+    internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> DrawFundedDistinctBasicForcedSlashRules(CharacterState actor, CharacterState target, bool qinglong) => DrawFundedDistinctBasicRules(actor).Where(r => CoreNativeCardClassificationsRuntime.IsSlashCard(r.Rule.OutputKind) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, r.Rule.OutputKind, Suit.None) && (qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, r.Rule.OutputKind, null, false, Suit.None, 0) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, r.Rule.OutputKind, Suit.None, false, null, 0, [])));
+    internal bool HasDrawFundedDistinctBasicProgramSlash(CharacterState actor, IEnumerable<int> targets) => DrawFundedDistinctBasicRules(actor).Any(r => CoreNativeCardClassificationsRuntime.IsSlashCard(r.Rule.OutputKind) && targets.Any(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, s, Suit.None) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[s], new(0, r.Rule.OutputKind, Suit.None, 0), effectiveKind: r.Rule.OutputKind, noEffectiveRank: true, physicalCardIds: [])));
+    internal IReadOnlyList<PromptChoice> DrawFundedDistinctBasicResponseChoices(PendingDecision prompt, GameEngine.DrawFundedBasicNeed need)
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
         var choices = new List<PromptChoice>();
@@ -204,7 +201,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
                     ["original-frame-id"] = need.ParentFrameId!.Value.ToString(CultureInfo.InvariantCulture),
                     ["native-target-seat"] = seat.ToString(CultureInfo.InvariantCulture)
                 };
-                global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, source);
+                CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, source);
                 choices.Add(new(new($"draw-funded.{(need.Intent)}.{(need.ParentFrameId)}.{(source.BindingId)}.{(source.SkillInstanceId)}.{(seat)}"), $"发动【{(_coreCardConversionsOperations.ProgramConversionName(source))}】，摸一张牌，视为使用【{(CardCatalog.Get(rule.OutputKind).DisplayName)}】。", [], (need.Intent is DrawFundedDistinctBasicIntent.OwnSlashDodge or DrawFundedDistinctBasicIntent.Dying) ? [] : [seat], p));
             }
         }
@@ -223,8 +220,8 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
         };
     }
 
-    internal static bool IsDrawFundedDistinctBasicAnswer(PromptChoice choice) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DrawFundedDistinctBasicOffers.IsDrawFundedDistinctBasicAnswer(choice);
-    internal static PendingDecision DrawFundedDistinctBasicNativeDecision(PendingDecision prompt) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DrawFundedDistinctBasicOffers.DrawFundedDistinctBasicNativeDecision(prompt);
+    internal static bool IsDrawFundedDistinctBasicAnswer(PromptChoice choice) => RuntimeSkills.RuntimeRules_Core_DrawFundedDistinctBasicOffers.IsDrawFundedDistinctBasicAnswer(choice);
+    internal static PendingDecision DrawFundedDistinctBasicNativeDecision(PendingDecision prompt) => RuntimeSkills.RuntimeRules_Core_DrawFundedDistinctBasicOffers.DrawFundedDistinctBasicNativeDecision(prompt);
     internal bool HasDrawFundedDistinctBasicDodge(CharacterState actor) => _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, CardKind.Dodge) && DrawFundedDistinctBasicRules(actor, CardKind.Dodge, true).Any();
     internal bool HasDrawFundedDistinctBasicDyingResponse(CharacterState actor) => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && DrawFundedDistinctBasicRules(actor, dyingUse: true).Any(r => DrawFundedDistinctBasicNativeResponseLegal(actor, new(DrawFundedDistinctBasicIntent.Dying, d.FrameId, d.FrameId, null, d.ResponderIndex, d.VictimSeat), r.Rule.OutputKind, d.VictimSeat));
 }

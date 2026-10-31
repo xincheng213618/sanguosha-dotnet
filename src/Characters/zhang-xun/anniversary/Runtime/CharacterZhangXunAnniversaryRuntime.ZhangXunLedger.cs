@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangXunAnniversaryRuntime
@@ -18,12 +14,12 @@ internal sealed partial class CharacterZhangXunAnniversaryRuntime
         return history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == lease.FrameId && e.OwnerSeat == lease.Source.OwnerSeat && e.SkillId == lease.Source.SkillId && e.BindingId == lease.Source.BindingId && e.SkillInstanceId == lease.Source.SkillInstanceId && e.Window == SkillProgramTriggerWindow.TurnEnding) == 1;
     }
 
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ZhangXunDueLease> ActiveZhangXunLeases()
+    internal IReadOnlyList<GameEngine.ZhangXunDueLease> ActiveZhangXunLeases()
     {
         if (!HasAnniversaryZhangXunCapability || !_characterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess._hasIssuedAnniversaryZhangXun)
             return[];
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var result = new List<global::CardGame.Core.GameEngine.ZhangXunDueLease>();
+        var result = new List<GameEngine.ZhangXunDueLease>();
         var ordinal = 0;
         for (var i = 0; i < history.Length; i++)
         {
@@ -50,7 +46,7 @@ internal sealed partial class CharacterZhangXunAnniversaryRuntime
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 45200)]
-    internal bool ZhangXunCardDistance(ProgramCardDistanceQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && HasZhangXunSlashBenefit(q.Actor.Seat);
+    internal bool ZhangXunCardDistance(ProgramCardDistanceQuery q) => CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && HasZhangXunSlashBenefit(q.Actor.Seat);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 45200)]
     [ProgramDistanceRule(ProgramDistanceStage.VirtualSlash, 45200)]
     [ProgramDistanceRule(ProgramDistanceStage.ProvidedSlash, 45200)]
@@ -58,9 +54,9 @@ internal sealed partial class CharacterZhangXunAnniversaryRuntime
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPhysicalSlash, 45200)]
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPaidWeaponSlash, 45200)]
     [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 45200)]
-    internal bool ZhangXunSlashDistance(ProgramSlashDistanceQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && HasZhangXunSlashBenefit(q.Actor.Seat);
+    internal bool ZhangXunSlashDistance(ProgramSlashDistanceQuery q) => CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && HasZhangXunSlashBenefit(q.Actor.Seat);
     internal bool LegalZhangXunFollowupTarget(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && owner != target && !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Slash, CardActionType.Use) && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, ignoreDistance: true, countsTowardLimit: false) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, target, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None);
-    internal IReadOnlyList<ZhangXunSuizhengDamageWitness> ZhangXunVictims(global::CardGame.Core.GameEngine.ZhangXunDueLease due, int cutoff)
+    internal IReadOnlyList<ZhangXunSuizhengDamageWitness> ZhangXunVictims(GameEngine.ZhangXunDueLease due, int cutoff)
     {
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         if (cutoff < due.StartIndex || cutoff > history.Length)
@@ -82,7 +78,7 @@ internal sealed partial class CharacterZhangXunAnniversaryRuntime
         }
     }
 
-    internal global::CardGame.Core.GameEngine.ZhangXunDueLease? ExactZhangXunCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
+    internal GameEngine.ZhangXunDueLease? ExactZhangXunCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
     {
         if (!HasAnniversaryZhangXunCapability || !_characterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess._hasIssuedAnniversaryZhangXun || c.SkillId != AnniversaryZhangXunComposition.Skill || c.BindingId != AnniversaryZhangXunComposition.Followup || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || w.Window != SkillProgramTriggerWindow.PlayEnding || w.OwnerSeat != c.OwnerSeat || w.SourceSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || w.OccurrenceIndex != c.OccurrenceIndex || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(f => f.Id == w.ParentFrameId)is not { Window: SkillProgramTriggerWindow.PlayEnding } parent || parent.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != c)
             return null;
@@ -96,7 +92,7 @@ internal sealed partial class CharacterZhangXunAnniversaryRuntime
         if (due is null || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
             return false;
         if (ZhangXunPhaseUsed(due.Lease.FrameId, due.DueTurn, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId))
-            return _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.ZhangXunSuizheng is { } r && r.LeaseId == due.Lease.FrameId && r.ParentWindowId == w.ParentFrameId && r.ActualTurn == due.DueTurn && r.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c));
+            return _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.ZhangXunSuizheng is { } r && r.LeaseId == due.Lease.FrameId && r.ParentWindowId == w.ParentFrameId && r.ActualTurn == due.DueTurn && r.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c));
         return ZhangXunVictims(due, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Count()).Count > 0;
     }
 

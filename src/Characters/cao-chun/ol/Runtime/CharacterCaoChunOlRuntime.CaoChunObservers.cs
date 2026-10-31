@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoChunOlRuntime
@@ -50,7 +46,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
         }
     }
 
-    internal static bool ShanjiaHeld(CardLocation location, int owner) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cao_chun_ol_CaoChunObservers.ShanjiaHeld(location, owner);
+    internal static bool ShanjiaHeld(CardLocation location, int owner) => RuntimeSkills.RuntimeRules_cao_chun_ol_CaoChunObservers.ShanjiaHeld(location, owner);
     internal void ObserveCaoChunMovement(CardMovementBatchContext batch)
     {
         if (!HasCaoChunCapability)
@@ -82,10 +78,10 @@ internal sealed partial class CharacterCaoChunOlRuntime
             return null;
         if (action.Type == CardActionType.Use)
         {
-            if (responseKind is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(nativeParentId)is not { Action: { } actual } use || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action))
+            if (responseKind is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(nativeParentId)is not { Action: { } actual } use || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action))
                 return null;
         }
-        else if (responseKind is not { } kind || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, kind) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, action)))
+        else if (responseKind is not { } kind || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, kind) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, action)))
             return null;
         var hand = action.PhysicalCards.Where(c => c.From.OwnerSeat == action.ActorSeat && c.From.Zone is CardZoneKind.Hand or CardZoneKind.WoodenOxGrain).ToArray();
         if (hand.Length == 0 || hand.Select(c => c.CardId).Distinct().Count() != hand.Length)
@@ -110,9 +106,9 @@ internal sealed partial class CharacterCaoChunOlRuntime
     internal bool ValidCaoChunPayment(CaoChunHandUsePayment p)
     {
         var d = p.Debt;
-        if (d.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || d.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || d.Source.OwnerSeat != p.Action.ActorSeat || p.Action.ActorSeat != p.Action.ProviderSeat || p.HandMaterials.Count == 0 || p.Before > p.After || p.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, p.Action)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShanjiaDebtArmedEvent>().Count(e => e.Source == d.Source && e.GameplayHash == d.GameplayHash && e.ActivationFrameId == d.ActivationFrameId && e.ActualTurn == d.ActualTurn && e.PhaseInstance == d.PhaseInstance && e.FrozenX == d.FrozenX) != 1)
+        if (d.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || d.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || d.Source.OwnerSeat != p.Action.ActorSeat || p.Action.ActorSeat != p.Action.ProviderSeat || p.HandMaterials.Count == 0 || p.Before > p.After || p.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, p.Action)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShanjiaDebtArmedEvent>().Count(e => e.Source == d.Source && e.GameplayHash == d.GameplayHash && e.ActivationFrameId == d.ActivationFrameId && e.ActualTurn == d.ActualTurn && e.PhaseInstance == d.PhaseInstance && e.FrozenX == d.FrozenX) != 1)
             return false;
-        if (p.Action.Type == CardActionType.Use && (_coreCardUseLifecycleOperations.LifecycleCardUse(p.NativeParentId)is not { Action: { } a } || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(a, p.Action)))
+        if (p.Action.Type == CardActionType.Use && (_coreCardUseLifecycleOperations.LifecycleCardUse(p.NativeParentId)is not { Action: { } a } || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(a, p.Action)))
             return false;
         if (p.Action.Type == CardActionType.Response && (p.ResponseKind is not { } kind || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(p.Action, kind)))
             return false;
@@ -127,10 +123,10 @@ internal sealed partial class CharacterCaoChunOlRuntime
     [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 90)]
     internal bool HasIssuedCaoChunDebtCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
-        if (context.Window != SkillProgramTriggerWindow.CardUseBeforeTargetEffects || context.CaoChunPayment is not { } p || CaoChunDebtCandidate(p) != candidate || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program?.GameplayHash != candidate.GameplayHash || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseBeforeTargetEffects || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(window.Action, p.Action) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
+        if (context.Window != SkillProgramTriggerWindow.CardUseBeforeTargetEffects || context.CaoChunPayment is not { } p || CaoChunDebtCandidate(p) != candidate || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program?.GameplayHash != candidate.GameplayHash || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseBeforeTargetEffects || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(window.Action, p.Action) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return false;
         var current = window.Candidates[window.CandidateIndex];
-        return global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(current) == candidate && current.FrozenContext?.CaoChunPayment == p && context.CardUse?.CardActionId == p.Action.ActionId && window.ParentFrameId == p.NativeParentId;
+        return CoreGameEngineCardActionsRuntime.ToSharedCandidate(current) == candidate && current.FrozenContext?.CaoChunPayment == p && context.CardUse?.CardActionId == p.Action.ActionId && window.ParentFrameId == p.NativeParentId;
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 490)]
@@ -163,7 +159,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
             return r.Payment is { } p && ValidCaoChunPayment(p) && r.Stage == CaoChunStage.DebtChoice;
         }
 
-        return f.InstructionIndex == 0 && f.WindowContext?.CaoChunPayment is { } issued && ValidCaoChunPayment(issued) && CaoChunDebtCandidate(issued)is { } c && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c);
+        return f.InstructionIndex == 0 && f.WindowContext?.CaoChunPayment is { } issued && ValidCaoChunPayment(issued) && CaoChunDebtCandidate(issued)is { } c && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c);
     }
 
     internal bool CaoChunFirstChild(ProgramSkillFrame root, ResolutionFrame child)

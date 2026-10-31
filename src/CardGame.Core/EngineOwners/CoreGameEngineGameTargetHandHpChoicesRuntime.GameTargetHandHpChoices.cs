@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGameTargetHandHpChoicesRuntime
 {
-    internal static string GameHandHpUsage(string state, int target) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GameTargetHandHpChoices.GameHandHpUsage(state, target);
+    internal static string GameHandHpUsage(string state, int target) => RuntimeSkills.RuntimeRules_Core_GameTargetHandHpChoices.GameHandHpUsage(state, target);
     internal bool HasIssuedGameHandHpTarget(int owner, string skill, string state, int target) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GameTargetHandHpChoiceIssuedEvent>().Any(e => e.OwnerSeat == owner && e.SkillId == skill && e.StateId == state && e.TargetSeat == target);
     internal bool CanSelectGameHandHpTarget(int owner, string skill, string state, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Count != _coreMatchParticipantsPlayersAccess._players[target].Hp && !HasIssuedGameHandHpTarget(owner, skill, state, target);
-    internal static string GameHandHpReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GameTargetHandHpChoices.GameHandHpReason(f);
+    internal static string GameHandHpReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_GameTargetHandHpChoices.GameHandHpReason(f);
     internal Card[] GameHandHpDiscardCards(ProgramSkillFrame f) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.GameTargetHandHp!.TargetSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(f.GameTargetHandHp.TargetSeat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(f.GameTargetHandHp.TargetSeat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && (f.GameTargetHandHp.TargetSeat != f.OwnerSeat || !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(f.OwnerSeat, f.SkillId, f.SkillInstanceId, c))).ToArray();
     internal SkillProgramStepOutcome BeginGameTargetHandHp(ProgramSkillFrame supplied, string state)
     {
@@ -72,7 +69,7 @@ internal sealed partial class CoreGameEngineGameTargetHandHpChoicesRuntime
     internal void ResolveGameHandHpDiscard(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("No owning game-target choice.");
-        if (f.GameTargetHandHp is not { Stage: "choosing", Draw: false } r || !ValidGameHandHpReceipt(f) || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], GameHandHpChoices(f).Where(c => c.Id == choice.Id).ToArray()) || choice.Cards is not [var id])
+        if (f.GameTargetHandHp is not { Stage: "choosing", Draw: false } r || !ValidGameHandHpReceipt(f) || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], GameHandHpChoices(f).Where(c => c.Id == choice.Id).ToArray()) || choice.Cards is not [var id])
             throw new InvalidOperationException("The mandatory discard changed its exact target or material.");
         var ids = r.CardIds.Append(id).ToArray();
         var locations = r.Locations.Append(_cardZonesOperations._cardZones.GetLocation(id)).ToArray();

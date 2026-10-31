@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenJiaoMobileShiRuntime
 {
     internal const string QingYanSkill = ChenJiaoComposition.QingYanSkill, CeDuanSkill = ChenJiaoComposition.CeDuanSkill;
-    internal static CardConversionSource ChenJiaoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IChenJiaoHost.ResolveQingYan(ProgramSkillFrame frame) => BeginChenJiao(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IChenJiaoHost.ResolveCeDuan(ProgramSkillFrame frame) => BeginChenJiao(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IChenJiaoHost.SettleCeDuan(ProgramSkillFrame frame) => SettleChenJiaoCeDuan(frame);
+    internal static CardConversionSource ChenJiaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IChenJiaoHost.ResolveQingYan(ProgramSkillFrame frame) => BeginChenJiao(frame);
+    SkillProgramStepOutcome IChenJiaoHost.ResolveCeDuan(ProgramSkillFrame frame) => BeginChenJiao(frame);
+    SkillProgramStepOutcome IChenJiaoHost.SettleCeDuan(ProgramSkillFrame frame) => SettleChenJiaoCeDuan(frame);
     // 清严 arms only while it is not失效 and the hand can still pay the escalating
     // show count X = min(times activated this round + 1, 5).
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 68100, SkillProgramEffectOp.ResolveChenJiaoQingYan)]
@@ -142,7 +139,7 @@ internal sealed partial class CharacterChenJiaoMobileShiRuntime
     [ProgramAnswer(ChenJiaoComposition.ProgramAction)]
     internal void AnswerChenJiao(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ChenJiao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ChenJiaoChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ChenJiao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ChenJiaoChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Chen Jiao choice lost its current frame or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

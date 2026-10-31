@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreRecoveryReplacementCoreProgramCardUsePaymentsOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreRecoveryReplacementCoreProgramCardUsePaymentsOperations : IProgramRuntimeOperations
 {
-    bool ObservesPaidCardUseChildren(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.RecoveryPaidCardUseContinuation continuation);
-    global::CardGame.Core.ProgramCardUsePayments CardUsePayments { get; }
+    bool ObservesPaidCardUseChildren(CardUseFrame use, RecoveryPaidCardUseContinuation continuation);
+    ProgramCardUsePayments CardUsePayments { get; }
 }
 
-internal interface ICoreRecoveryReplacementCoreProgramRuntimeHooksOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreRecoveryReplacementCoreProgramRuntimeHooksOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramRuntimeHooks RuntimeHooks { get; }
+    ProgramRuntimeHooks RuntimeHooks { get; }
 }

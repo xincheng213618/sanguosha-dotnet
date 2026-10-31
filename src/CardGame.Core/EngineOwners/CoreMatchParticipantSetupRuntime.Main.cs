@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreMatchParticipantSetupRuntime
@@ -83,7 +79,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
             var factionPlayer = _coreMatchParticipantsPlayersAccess._players.Where(_coreMatchSetupDefinitionsOperations.RequiresGodFactionSelection).OrderBy(player => player.Seat).FirstOrDefault();
             if (factionPlayer is not null)
             {
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GodFactionSelectionRequestedEvent(factionPlayer.Seat, global::CardGame.Core.EngineOwners.CoreMainDefinitions.GodFactionChoices));
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GodFactionSelectionRequestedEvent(factionPlayer.Seat, CoreMainDefinitions.GodFactionChoices));
                 if (factionPlayer.IsHuman)
                 {
                     RequestHumanGodFactionSelection(factionPlayer);
@@ -126,7 +122,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
 
     internal void RequestHumanGodFactionSelection(CharacterState player)
     {
-        var choices = global::CardGame.Core.EngineOwners.CoreMainDefinitions.GodFactionChoices.Select(factionId => new PromptChoice(new ChoiceId($"setup.god-faction.{(factionId)}"), $"选择{(global::CardGame.Core.EngineOwners.CoreMatchPresentationRuntime.GetFactionName(factionId))}势力", [], [], new Dictionary<string, string> { ["action"] = "select-god-faction", ["faction-id"] = factionId })).ToArray();
+        var choices = CoreMainDefinitions.GodFactionChoices.Select(factionId => new PromptChoice(new ChoiceId($"setup.god-faction.{(factionId)}"), $"选择{(CoreMatchPresentationRuntime.GetFactionName(factionId))}势力", [], [], new Dictionary<string, string> { ["action"] = "select-god-faction", ["faction-id"] = factionId })).ToArray();
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.SelectFaction, player.Seat, $"{(player.General.Name)}为神势力武将。请选择本局归属的魏、蜀、吴、群势力；该选择会影响主公技等势力判定，但不会改写武将的印刷势力。", [], [])
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
@@ -144,7 +140,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
             throw new InvalidOperationException($"Seat {(player.Seat)} does not currently require a god-faction choice.");
         }
 
-        if (!global::CardGame.Core.EngineOwners.CoreMainDefinitions.GodFactionChoices.Contains(factionId, StringComparer.Ordinal))
+        if (!CoreMainDefinitions.GodFactionChoices.Contains(factionId, StringComparer.Ordinal))
         {
             throw new InvalidOperationException($"Faction '{(factionId)}' is not a legal god-faction choice.");
         }
@@ -155,7 +151,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
         // Public logs must not reveal a hidden general or its private faction choice.
         if (player.GeneralRevealed)
         {
-            _coreMatchLogOperations.AddLog("GodFactionSelected", $"{(player.Name)} 为神势力武将 {(player.General.Name)} 选择了{(global::CardGame.Core.EngineOwners.CoreMatchPresentationRuntime.GetFactionName(factionId))}势力。", player.Seat);
+            _coreMatchLogOperations.AddLog("GodFactionSelected", $"{(player.Name)} 为神势力武将 {(player.General.Name)} 选择了{(CoreMatchPresentationRuntime.GetFactionName(factionId))}势力。", player.Seat);
         }
 
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GodFactionSelectedEvent(player.Seat, factionId));
@@ -165,7 +161,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
     internal void RequestHumanGeneralSelection(CharacterState player, IReadOnlyList<GeneralDefinition> candidates, IReadOnlyDictionary<string, string> candidateIds, bool fullRoster = false)
     {
         var facts = new ModeGeneralSelectionFacts(player.Role, player.GeneralSelected, player.General.Name, player.General.BaseHp);
-        var choices = candidates.Select(general => _coreModeRulesOperations.ModeSetupPresentation.GeneralChoice(facts, new(general.Id, general.Name, general.SkillSummary, general.FactionId, global::CardGame.Core.EngineOwners.CoreMatchPresentationRuntime.GetFactionName(general.FactionId ?? string.Empty), general.BaseHp, general.InitialHp, candidateIds[general.Id]), fullRoster)).ToArray();
+        var choices = candidates.Select(general => _coreModeRulesOperations.ModeSetupPresentation.GeneralChoice(facts, new(general.Id, general.Name, general.SkillSummary, general.FactionId, CoreMatchPresentationRuntime.GetFactionName(general.FactionId ?? string.Empty), general.BaseHp, general.InitialHp, candidateIds[general.Id]), fullRoster)).ToArray();
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.SelectGeneral, player.Seat, _coreModeRulesOperations.ModeSetupPresentation.SelectionPrompt(facts), [], [])
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),

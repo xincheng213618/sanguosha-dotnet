@@ -1,9 +1,9 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreJudgmentEffectiveCardsState : global::CardGame.Core.EngineStates.Contracts.ICoreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess
+internal sealed class CoreJudgmentEffectiveCardsState : Contracts.ICoreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess
 {
-    private global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.CardKind> _judgmentEffectiveCardKinds = [];
-    internal ref readonly global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.CardKind> ReferenceToJudgmentEffectiveCardKinds => ref _judgmentEffectiveCardKinds;
+    private Dictionary<int, CardKind> _judgmentEffectiveCardKinds = [];
+    internal ref readonly Dictionary<int, CardKind> ReferenceToJudgmentEffectiveCardKinds => ref _judgmentEffectiveCardKinds;
 
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.CardKind> global::CardGame.Core.EngineStates.Contracts.ICoreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess._judgmentEffectiveCardKinds => ref _judgmentEffectiveCardKinds;
+    ref readonly Dictionary<int, CardKind> Contracts.ICoreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess._judgmentEffectiveCardKinds => ref _judgmentEffectiveCardKinds;
 }

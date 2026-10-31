@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramBooleanStateExpirationRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CoreGameEngineProgramBooleanStateExpirationRuntime
         _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(frame);
         if (!Enum.IsDefined(expiration))
             throw new InvalidOperationException("Unknown boolean state expiration.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame);
+        var source = CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame);
         foreach (var stateId in stateIds.Distinct(StringComparer.Ordinal))
         {
             _ = _coreProgramPersistentStateOperations.GetProgramBooleanStateDefinition(frame, stateId);
@@ -23,7 +19,7 @@ internal sealed partial class CoreGameEngineProgramBooleanStateExpirationRuntime
 
     internal void ExpireProgramBooleanStateLeases(int turnNumber, int turnSeat) => ExpireProgramBooleanStateLeases(item => item.Expiration == SkillProgramDamageModifierExpiration.CurrentTurnEnd && item.TurnNumber == turnNumber && item.TurnSeat == turnSeat);
     internal void ExpireProgramBooleanStateLeasesAtOwnerTurnStart(int ownerSeat, bool ownerDied = false) => ExpireProgramBooleanStateLeases(item => item.Source.OwnerSeat == ownerSeat && (ownerDied || item.Expiration == SkillProgramDamageModifierExpiration.NextOwnerTurnStart && item.TurnNumber < _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber));
-    internal void ExpireProgramBooleanStateLeases(Func<global::CardGame.Core.GameEngine.ProgramBooleanStateLease, bool> expires)
+    internal void ExpireProgramBooleanStateLeases(Func<GameEngine.ProgramBooleanStateLease, bool> expires)
     {
         var expired = _coreGameEngineProgramBooleanStateExpirationProgramBooleanStateLeasesAccess._programBooleanStateLeases.Where(expires).ToArray();
         _coreGameEngineProgramBooleanStateExpirationProgramBooleanStateLeasesAccess._programBooleanStateLeases.RemoveAll(item => expires(item));

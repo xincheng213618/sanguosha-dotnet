@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_HpConditionalSkillGrants
 {
     internal static string HpConditionalGrantId(int ownerSeat, HpConditionalSkillGrantSource source) =>

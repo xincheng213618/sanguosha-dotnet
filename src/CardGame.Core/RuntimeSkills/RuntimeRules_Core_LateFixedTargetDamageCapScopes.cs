@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_LateFixedTargetDamageCapScopes
 {
     internal static string FixedDamageCapChainHash(IReadOnlyList<int> targets) =>

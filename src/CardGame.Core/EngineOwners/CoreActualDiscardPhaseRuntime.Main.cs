@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreActualDiscardPhaseRuntime
@@ -47,7 +43,7 @@ internal sealed partial class CoreActualDiscardPhaseRuntime
         // retired its actual phase. Its native parent only needs to close.
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return;
-        if (_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDiscardPhase))
+        if (_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDiscardPhase))
         {
             if (_programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, SkillProgramTurnPhase.Discard, (int)_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects)))
                 return;
@@ -114,7 +110,7 @@ internal sealed partial class CoreActualDiscardPhaseRuntime
             return;
         }
 
-        var discarded = hand.OrderBy(card => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(card, player)).ThenBy(card => card.Id).Take(count).ToArray();
+        var discarded = hand.OrderBy(card => CoreNativeAiDecisionsRuntime.GetKeepValue(card, player)).ThenBy(card => card.Id).Take(count).ToArray();
         _coreNativeLogicalDiscardsOperations.MoveLogicalDiscardCards(player.Seat, player.Seat, discarded, CardLocation.Hand(player.Seat), CardMoveReasons.HandLimitDiscard);
         _coreMatchLogOperations.AddLog("CardsDiscarded", $"{(player.Name)} 自动弃置 {(discarded.Length)} 张手牌。", player.Seat);
     }

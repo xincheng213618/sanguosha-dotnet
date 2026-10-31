@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunHongOlRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterSunHongOlRuntime
     internal const string XianbiDiscardReason = "skill-program.sun-hong.xianbi.discard";
     internal const string XianbiDrawReason = "skill-program.sun-hong.xianbi.draw";
     internal const string XianbiObtainReason = "skill-program.sun-hong.xianbi.obtain";
-    internal CardConversionSource XianbiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource XianbiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool SunHongTargetBlocked(int owner, int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<ZenrunTargetBlockedEvent>().Any(e => e.OwnerSeat == owner && e.TargetSeat == target && e.Source.OwnerSeat == owner && e.Source.SkillId == "ol:zenrun");
     internal bool XianbiCanDiscard(int owner, Card card) => !card.IsGeneralWeapon && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, card, CardLocation.Hand(owner), OwnedCardMoveIntent.Discard);
     internal bool XianbiTargetLegal(int owner, int target)
@@ -24,11 +20,11 @@ internal sealed partial class CharacterSunHongOlRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 27570, SkillProgramEffectOp.ResolveXianbiHandAdjustmentAndRandomReturns)]
     internal bool CanActivateXianbi(CharacterState owner) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && owner.IsAlive && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == owner.Seat && _coreMatchParticipantsPlayersAccess._players.Any(p => XianbiTargetLegal(owner.Seat, p.Seat));
-    SkillProgramStepOutcome global::CardGame.Core.ISunHongXianbiHost.Resolve(ProgramSkillFrame frame) => BeginXianbi(frame);
+    SkillProgramStepOutcome ISunHongXianbiHost.Resolve(ProgramSkillFrame frame) => BeginXianbi(frame);
     internal SkillProgramStepOutcome BeginXianbi(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.Xianbi is not null || f.InstructionIndex != 1 || f.SkillId != "ol:xianbi" || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "adjust-and-return" || f.TriggerId is not null || f.WindowContext is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanActivateXianbi(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (f.Xianbi is not null || f.InstructionIndex != 1 || f.SkillId != "ol:xianbi" || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "adjust-and-return" || f.TriggerId is not null || f.WindowContext is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanActivateXianbi(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("Xianbi needs its own real live Play activation and an unequal legal role.");
         var r = new XianbiReceipt(XianbiSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, XianbiStage.Target)
         {
@@ -88,7 +84,7 @@ internal sealed partial class CharacterSunHongOlRuntime
     [ProgramAnswer("sun-hong-xianbi")]
     internal void AnswerXianbi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Xianbi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !XianbiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Xianbi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !XianbiChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xianbi needs its current exact own private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -299,6 +295,6 @@ internal sealed partial class CharacterSunHongOlRuntime
     {
         if (f.Xianbi!.Stage == XianbiStage.Target)
             return prompt.Choices.OrderByDescending(c => _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count > _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count ? 100 + _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count : _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count - _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count).First();
-        return prompt.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "pay") ?? prompt.Choices.Where(c => c.Parameters.GetValueOrDefault("branch") == "pick").OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
+        return prompt.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "pay") ?? prompt.Choices.Where(c => c.Parameters.GetValueOrDefault("branch") == "pick").OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
     }
 }

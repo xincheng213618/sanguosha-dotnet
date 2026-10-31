@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHanDangMouMobileRuntime
 {
     internal const string MouHanDangGongqi = "mou-mobile:gongqi", MouHanDangJiefan = "mou-mobile:jiefan";
-    internal const string MouHanDangDiscardReason = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.MouHanDangDiscardReason, MouHanDangDrawReason = "skill-program.mou-mobile:jiefan.Draw";
+    internal const string MouHanDangDiscardReason = RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.MouHanDangDiscardReason, MouHanDangDrawReason = "skill-program.mou-mobile:jiefan.Draw";
     internal bool HasMouHanDangCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHanDangGongqi) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouHanDangJiefan);
 
-    internal static CardConversionSource MouHanDangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_han_dang_mou_mobile_MouHanDang.MouHanDangSource(f);
+    internal static CardConversionSource MouHanDangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_han_dang_mou_mobile_MouHanDang.MouHanDangSource(f);
     internal Card[] MouHanDangDiscardCards(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat])).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard)).OrderBy(c => c.Id).ToArray();
     internal SkillProgramStepOutcome StartMouHanDang(ProgramSkillFrame supplied, bool gongqi)
     {
@@ -67,7 +64,7 @@ internal sealed partial class CharacterHanDangMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouHanDang;
-        if (r is null || !ValidMouHanDang(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouHanDangChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (r is null || !ValidMouHanDang(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouHanDangChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Mou Han Dang accepts only its current published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == MouHanDangStage.ModeChoice)
@@ -108,7 +105,7 @@ internal sealed partial class CharacterHanDangMouMobileRuntime
         if (r.Gongqi)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHanDangGongqiGrantedEvent(f.Id, r.Source, r.GameplayHash, r.Phase, card.Id, suit, m.Sequence));
-            _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Name)} 发动【弓骑】：本阶段其用牌只能以虚拟牌或{((global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(suit) ? "红色" : "黑色"))}手牌响应。", f.OwnerSeat);
+            _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Name)} 发动【弓骑】：本阶段其用牌只能以虚拟牌或{((CoreNativeCardClassificationsRuntime.IsRedSuit(suit) ? "红色" : "黑色"))}手牌响应。", f.OwnerSeat);
         }
 
         SealMouHanDangMovements(f.Id, before);
@@ -164,6 +161,6 @@ internal sealed partial class CharacterHanDangMouMobileRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouHanDangGongqi, SkillProgramEffectOp.ResolveMouHanDangJiefan)]
     internal PromptChoice AiMouHanDang(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "draw") ?? p.Choices.First();
-    SkillProgramStepOutcome global::CardGame.Core.IMouHanDangHost.Gongqi(ProgramSkillFrame f) => StartMouHanDang(f, true);
-    SkillProgramStepOutcome global::CardGame.Core.IMouHanDangHost.Jiefan(ProgramSkillFrame f) => StartMouHanDang(f, false);
+    SkillProgramStepOutcome IMouHanDangHost.Gongqi(ProgramSkillFrame f) => StartMouHanDang(f, true);
+    SkillProgramStepOutcome IMouHanDangHost.Jiefan(ProgramSkillFrame f) => StartMouHanDang(f, false);
 }

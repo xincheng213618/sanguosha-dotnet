@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePassiveDamageCapsRuntime
 {
-    internal (CardUseEffectSource Source, int Cap)? GetPassiveProgramDamageCap(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal (CardUseEffectSource Source, int Cap)? GetPassiveProgramDamageCap(GameEngine.IDamageAttempt attack)
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat) || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive)
             return null;
@@ -47,9 +43,9 @@ internal sealed partial class CoreGameEnginePassiveDamageCapsRuntime
     }
 
     internal int? GetIncomingFixedDamageCap(CharacterState target, IReadOnlySet<string>? visibleSkillIds = null) => FindPassiveProgramDamageCap(target, null, visibleSkillIds)?.Cap;
-    internal bool HasNextRecipientPassiveDamageCap(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool HasNextRecipientPassiveDamageCap(GameEngine.IDamageAttempt attack)
     {
-        var state = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? (_coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats, _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex) : (_coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats, _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex);
+        var state = attack is NativeOwners.ProgramAttackHandle ? (_coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats, _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex) : (_coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats, _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex);
         var next = (state.ChainedTargetSeats ?? []).Skip(state.ChainedTargetIndex).FirstOrDefault(seat => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive, -1);
         return next >= 0 && GetIncomingFixedDamageCap(_coreMatchParticipantsPlayersAccess._players[next])is not null;
     }

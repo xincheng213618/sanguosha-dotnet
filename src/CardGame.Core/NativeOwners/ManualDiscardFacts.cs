@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ManualDiscardFacts(global::CardGame.Core.EngineStates.CoreMatchOutcomeState matchOutcomeState, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineTurnHandCategoryRestrictionsEntries> getCoreGameEngineTurnHandCategoryRestrictionsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEnginePlannedPhaseQuantitiesEntries> getCoreGameEnginePlannedPhaseQuantitiesRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeRuleQueriesEntries> getCoreNativeRuleQueriesRuntime) : IManualDiscardFacts
+internal sealed class ManualDiscardFacts(EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreGameEngineTurnHandCategoryRestrictionsEntries> getCoreGameEngineTurnHandCategoryRestrictionsRuntime, Func<RuntimeEntries.CoreGameEnginePlannedPhaseQuantitiesEntries> getCoreGameEnginePlannedPhaseQuantitiesRuntime, Func<RuntimeEntries.CoreNativeRuleQueriesEntries> getCoreNativeRuleQueriesRuntime) : IManualDiscardFacts
 {
     public Winner Winner => matchOutcomeState.ReferenceToWinner;
     public EngineStatus Status => matchOutcomeState.ReferenceToStatus;

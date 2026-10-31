@@ -1,26 +1,22 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeQinglongRuntime
 {
-    internal bool CanUseQinglongCrescentBladeTarget(CharacterState source, CharacterState target, CardKind? effectiveKind = null, bool? effectiveColor = null, bool allowAnyColor = true, Suit? physicalSuit = null, int? effectiveRank = null, IReadOnlyList<int>? physicalCardIds = null) => source.IsAlive && target.IsAlive && source.Seat != target.Seat && _coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.QinglongCrescentBlade) && (effectiveKind is { } kind ? !_coreCardUseModulesOperations.IsCardUseForbidden(source.Seat, kind, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(source.Seat, target.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target) : global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(candidate => CanUseQinglongCrescentBladeTarget(source, target, candidate, effectiveColor, allowAnyColor, physicalSuit, effectiveRank, physicalCardIds)));
-    internal IReadOnlyList<Card> GetQinglongCrescentBladeSlashCards(CharacterState source, CharacterState target) => CanUseQinglongCrescentBladeTarget(source, target) ? _coreActionQueriesOperations.GetSlashUseCards(source).Where(card => _coreProgramCardUseRulesOperations.GetSlashUseVariants2(source, _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(source, card)).Concat(_characterMiHengLeOperations.SiruiPhysicalSlashVariants(source, card).Concat(_characterGuanYuWumiaoOperations.JuewuPhysicalSlashVariants(source, card)).Concat(_characterCaoZhiLeOperations.FulePhysicalSlashVariants(source, card).Concat(_coreProgramCardLegalityOperations.CardLegality.NativeSlashVariants(new(source, card))))).DistinctBy(v => v.EffectiveKind).Any(variant => CanUseQinglongCrescentBladeTarget(source, target, variant.EffectiveKind, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, card)), allowAnyColor: false, physicalSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(source, card), effectiveRank: _coreFinalTargetSlashOperations.SpecificSlashRank(source, card, variant.EffectiveKind), physicalCardIds: [card.Id]))).ToArray() : [];
-    internal bool CanRequestQinglongCrescentBladeFactionSlash(global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending)
+    internal bool CanUseQinglongCrescentBladeTarget(CharacterState source, CharacterState target, CardKind? effectiveKind = null, bool? effectiveColor = null, bool allowAnyColor = true, Suit? physicalSuit = null, int? effectiveRank = null, IReadOnlyList<int>? physicalCardIds = null) => source.IsAlive && target.IsAlive && source.Seat != target.Seat && _coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.QinglongCrescentBlade) && (effectiveKind is { } kind ? !_coreCardUseModulesOperations.IsCardUseForbidden(source.Seat, kind, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(source.Seat, target.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target) : CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(candidate => CanUseQinglongCrescentBladeTarget(source, target, candidate, effectiveColor, allowAnyColor, physicalSuit, effectiveRank, physicalCardIds)));
+    internal IReadOnlyList<Card> GetQinglongCrescentBladeSlashCards(CharacterState source, CharacterState target) => CanUseQinglongCrescentBladeTarget(source, target) ? _coreActionQueriesOperations.GetSlashUseCards(source).Where(card => _coreProgramCardUseRulesOperations.GetSlashUseVariants2(source, _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(source, card)).Concat(_characterMiHengLeOperations.SiruiPhysicalSlashVariants(source, card).Concat(_characterGuanYuWumiaoOperations.JuewuPhysicalSlashVariants(source, card)).Concat(_characterCaoZhiLeOperations.FulePhysicalSlashVariants(source, card).Concat(_coreProgramCardLegalityOperations.CardLegality.NativeSlashVariants(new(source, card))))).DistinctBy(v => v.EffectiveKind).Any(variant => CanUseQinglongCrescentBladeTarget(source, target, variant.EffectiveKind, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, card)), allowAnyColor: false, physicalSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(source, card), effectiveRank: _coreFinalTargetSlashOperations.SpecificSlashRank(source, card, variant.EffectiveKind), physicalCardIds: [card.Id]))).ToArray() : [];
+    internal bool CanRequestQinglongCrescentBladeFactionSlash(NativeOwners.QinglongCrescentBladeHandle pending)
     {
         var source = _coreMatchParticipantsPlayersAccess._players[pending.Attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[pending.Attack.TargetSeat];
         return _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is null && !pending.FactionSlashAttempted && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(source, CardKind.Slash)is not null && CanUseQinglongCrescentBladeTarget(source, target) && _coreProgramFactionPoliciesOperations.GetFactionSlashCandidateSeats(source.Seat).Count > 0;
     }
 
-    internal bool TryBeginQinglongCrescentBladeChoice(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryBeginQinglongCrescentBladeChoice(NativeOwners.CardAttackHandle attack)
     {
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
-        var effectiveKind = global::CardGame.Core.EngineOwners.CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack);
+        var effectiveKind = CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack);
         if (!_coreNativeDamageHandlesOperations.UsesFormalQinglongCrescentBlade || effectiveKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash))
         {
             return false;
@@ -46,21 +42,21 @@ internal sealed partial class CoreNativeQinglongRuntime
         return true;
     }
 
-    internal IReadOnlyList<PromptChoice> QinglongPhysicalSlashChoices(global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending, IReadOnlyList<Card> slashes)
+    internal IReadOnlyList<PromptChoice> QinglongPhysicalSlashChoices(NativeOwners.QinglongCrescentBladeHandle pending, IReadOnlyList<Card> slashes)
     {
         var attack = pending.Attack;
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
         return slashes.SelectMany(card => new[] { _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(source, card) }.Concat(_characterMiHengLeOperations.SiruiPhysicalSlashVariants(source, card).Concat(_characterGuanYuWumiaoOperations.JuewuPhysicalSlashVariants(source, card)).Concat(_characterCaoZhiLeOperations.FulePhysicalSlashVariants(source, card).Concat(_coreProgramCardLegalityOperations.CardLegality.NativeSlashVariants(new(source, card)))).Select(variant => variant.EffectiveKind)).Distinct().SelectMany(followupKind =>
         {
-            var cardDescription = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) ? $"使用【{(CardCatalog.Get(card.Kind).DisplayName)}】" : $"将【{(card.DisplayName)}】当作【杀】使用";
+            var cardDescription = CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) ? $"使用【{(CardCatalog.Get(card.Kind).DisplayName)}】" : $"将【{(card.DisplayName)}】当作【杀】使用";
             return _coreCardConversionsOperations.CreateConversionChoiceVariants(source, card, followupKind, forResponse: false, $"qinglong.slash.resolution-{(attack.ResolutionId)}.card-{(card.Id)}", $"{(cardDescription)}，继续攻击 {(target.Name)}。", [card.Id], [target.Seat], new Dictionary<string, string> { ["action"] = "qinglong-slash", ["response-card-kind"] = followupKind.ToString() });
         })).ToArray();
     }
 
-    internal void PublishQinglongCrescentBladeChoice(global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending, bool includeFactionSlash)
+    internal void PublishQinglongCrescentBladeChoice(NativeOwners.QinglongCrescentBladeHandle pending, bool includeFactionSlash)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, pending) || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack))
         {
             throw new InvalidOperationException("The Qinglong Crescent Blade choice has no current Slash continuation.");
         }
@@ -68,7 +64,7 @@ internal sealed partial class CoreNativeQinglongRuntime
         var attack = pending.Attack;
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
-        var effectiveKind = global::CardGame.Core.EngineOwners.CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack);
+        var effectiveKind = CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack);
         var slashes = GetQinglongCrescentBladeSlashCards(source, target);
         var choices = QinglongPhysicalSlashChoices(pending, slashes).ToList();
         if (includeFactionSlash && CanRequestQinglongCrescentBladeFactionSlash(pending))
@@ -96,7 +92,7 @@ internal sealed partial class CoreNativeQinglongRuntime
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade ?? throw new InvalidOperationException("There is no Qinglong Crescent Blade choice to resolve.");
         var attack = pending.Attack;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.QinglongCrescentBlade } decision || decision.PlayerSeat != attack.SourceSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.QinglongCrescentBlade } decision || decision.PlayerSeat != attack.SourceSeat)
         {
             throw new InvalidOperationException("The Qinglong Crescent Blade choice is not the current Slash continuation.");
         }
@@ -130,8 +126,8 @@ internal sealed partial class CoreNativeQinglongRuntime
             }
 
             slash = GetQinglongCrescentBladeSlashCards(source, target).SingleOrDefault(card => card.Id == selected.Cards[0]) ?? throw new InvalidOperationException("The selected Qinglong Crescent Blade Slash is no longer available.");
-            effectiveSlashKind = _coreProgramCardLegalityOperations.CardLegality.SelectNativeSlashKind(new(source, slash, _characterCaoZhiLeOperations.FuleSelectedSlashKind(source, slash, _characterGuanYuWumiaoOperations.JuewuSelectedSlashKind(source, slash, _characterMiHengLeOperations.SiruiSelectedSlashKind(source, slash, _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(source, slash), global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var siruiSelectedSource) ? siruiSelectedSource : null), siruiSelectedSource), siruiSelectedSource), siruiSelectedSource));
-            if (!CanUseQinglongCrescentBladeTarget(source, target, effectiveSlashKind, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, slash)), false, _coreNativeCardAppearanceOperations.EffectiveSuit(source, slash), _coreFinalTargetSlashOperations.SpecificSlashRank(source, slash, effectiveSlashKind ?? CardKind.Slash), [slash.Id]))
+            effectiveSlashKind = _coreProgramCardLegalityOperations.CardLegality.SelectNativeSlashKind(new(source, slash, _characterCaoZhiLeOperations.FuleSelectedSlashKind(source, slash, _characterGuanYuWumiaoOperations.JuewuSelectedSlashKind(source, slash, _characterMiHengLeOperations.SiruiSelectedSlashKind(source, slash, _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(source, slash), CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var siruiSelectedSource) ? siruiSelectedSource : null), siruiSelectedSource), siruiSelectedSource), siruiSelectedSource));
+            if (!CanUseQinglongCrescentBladeTarget(source, target, effectiveSlashKind, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, slash)), false, _coreNativeCardAppearanceOperations.EffectiveSuit(source, slash), _coreFinalTargetSlashOperations.SpecificSlashRank(source, slash, effectiveSlashKind ?? CardKind.Slash), [slash.Id]))
                 throw new InvalidOperationException("The selected Qinglong Crescent Blade Slash kind is prohibited for its target.");
         }
         else if (requestsFactionSlash)
@@ -165,10 +161,10 @@ internal sealed partial class CoreNativeQinglongRuntime
         _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
 
-    internal void BeginQinglongCrescentBladeFollowup(global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending, Card slash, CardKind effectiveSlashKind, int physicalOwnerSeat, IReadOnlyList<Card> physicalCards, global::CardGame.Core.NativeOwners.FactionCardRequestHandle? jijiang = null, CardConversionSource? conversionSource = null, bool skipInvocation = false)
+    internal void BeginQinglongCrescentBladeFollowup(NativeOwners.QinglongCrescentBladeHandle pending, Card slash, CardKind effectiveSlashKind, int physicalOwnerSeat, IReadOnlyList<Card> physicalCards, NativeOwners.FactionCardRequestHandle? jijiang = null, CardConversionSource? conversionSource = null, bool skipInvocation = false)
     {
         var attack = pending.Attack;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, pending) || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack))
         {
             throw new InvalidOperationException("The Qinglong Crescent Blade follow-up is not current.");
         }

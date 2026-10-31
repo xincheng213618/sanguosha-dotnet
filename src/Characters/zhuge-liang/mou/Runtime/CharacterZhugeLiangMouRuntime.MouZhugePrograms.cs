@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeLiangMouRuntime
@@ -38,10 +33,10 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
         {
             true,
             false
-        }.Any(red => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Any(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)) == red) && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, "mou:zhijue", "color:" + red, SkillUsageScope.Turn) == 0);
+        }.Any(red => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Any(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)) == red) && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, "mou:zhijue", "color:" + red, SkillUsageScope.Turn) == 0);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouZhugeProgramHost.ExecuteMouZhuge(ProgramSkillFrame frame, SkillProgramEffect effect) => ExecuteMouZhuge(frame, effect);
+    SkillProgramStepOutcome IMouZhugeProgramHost.ExecuteMouZhuge(ProgramSkillFrame frame, SkillProgramEffect effect) => ExecuteMouZhuge(frame, effect);
     internal SkillProgramStepOutcome ExecuteMouZhuge(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         if (effect.Op == SkillProgramEffectOp.MouWujingDraw)
@@ -55,7 +50,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
         if (effect.Op == SkillProgramEffectOp.MouZhitianView)
         {
             var cards = MouZhitianTop(frame.OwnerSeat);
-            PublishMouPrompt(frame, [new(new($"mou-top.{(frame.Id)}.confirm"), "已观看牌堆顶，继续出牌", [], [], new Dictionary<string, string> { ["program-action"] = "mou-zhitian-confirm" })], "牌堆顶按从顶至底显示：" + string.Join("、", cards.Select(card => $"{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))}{(card.RankText)}【{(card.DisplayName)}】")));
+            PublishMouPrompt(frame, [new(new($"mou-top.{(frame.Id)}.confirm"), "已观看牌堆顶，继续出牌", [], [], new Dictionary<string, string> { ["program-action"] = "mou-zhitian-confirm" })], "牌堆顶按从顶至底显示：" + string.Join("、", cards.Select(card => $"{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))}{(card.RankText)}【{(card.DisplayName)}】")));
             return SkillProgramStepOutcome.AwaitChoice;
         }
 

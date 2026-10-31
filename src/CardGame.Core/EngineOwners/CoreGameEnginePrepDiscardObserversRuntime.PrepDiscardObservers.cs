@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePrepDiscardObserversRuntime
@@ -19,7 +15,7 @@ internal sealed partial class CoreGameEnginePrepDiscardObserversRuntime
                     continue;
                 if (rootIndex == _resolutionStackOperations._resolutionStack.Count - 1)
                     return root;
-                if (!global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[rootIndex + 1], root))
+                if (!CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[rootIndex + 1], root))
                     continue;
                 if (PrepDiscardObserverSuffix(rootIndex))
                     return root;
@@ -55,7 +51,7 @@ internal sealed partial class CoreGameEnginePrepDiscardObserversRuntime
                 before = outcome.SequenceBefore;
                 after = outcome.SequenceAfter;
                 payer = outcome.RecipientSeat;
-                reason = global::CardGame.Core.EngineOwners.CoreGameEnginePrepDiscardImmediateDrawDefinitions.PrepDiscardImmediateDrawReason.Value;
+                reason = CoreGameEnginePrepDiscardImmediateDrawDefinitions.PrepDiscardImmediateDrawReason.Value;
             }
             else
                 continue;
@@ -99,7 +95,7 @@ internal sealed partial class CoreGameEnginePrepDiscardObserversRuntime
         for (var index = rootIndex + 1; index < _resolutionStackOperations._resolutionStack.Count; index++)
         {
             // The exact paid or native-attempt root edge is checked above.
-            if (!global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) && !_corePaidColorDamageClaimObserversOperations.PaidColorDamageClaimObserverEdge(index))
+            if (!CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) && !_corePaidColorDamageClaimObserversOperations.PaidColorDamageClaimObserverEdge(index))
                 return false;
             if (_resolutionStackOperations._resolutionStack[index] is DyingFrame dying && (_coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(index, dying) || _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(index, dying) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(index, dying) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(index, dying)))
                 break;

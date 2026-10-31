@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDrawFundedDistinctBasicReturnsRuntime
@@ -77,7 +73,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicReturnsRuntim
             return false;
         if (paid.Payment.Intent != DrawFundedDistinctBasicIntent.ProgramNearestSlash)
             return true;
-        var native = global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime.DrawFundedDistinctBasicNativeDecision(global::CardGame.Core.EngineOwners.CoreGameEngineRequestedDeckBasicOwnershipRuntime.RequestedDeckBasicNativeDecision(paid.OriginalDecision));
+        var native = CoreGameEngineDrawFundedDistinctBasicOffersRuntime.DrawFundedDistinctBasicNativeDecision(CoreGameEngineRequestedDeckBasicOwnershipRuntime.RequestedDeckBasicNativeDecision(paid.OriginalDecision));
         return native.Kind == DecisionKind.ProgramTrigger && native.Choices.Count > 0 && native.Choices.All(choice => choice.Parameters.GetValueOrDefault("frame-id") == parent.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) && choice.Parameters.GetValueOrDefault("seat") == paid.Payment.Source.OwnerSeat.ToString(System.Globalization.CultureInfo.InvariantCulture)) && native.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "request-slash-nearest-decline");
     }
 

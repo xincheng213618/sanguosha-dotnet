@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEnginePairObtainFixedRecipientReceiptsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEnginePairObtainFixedRecipientReceiptsRuntime))]
 internal sealed partial class CoreGameEnginePairObtainFixedRecipientReceiptsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePairObtainFixedRecipientReceiptsRuntime> _resolve;
-    private CoreGameEnginePairObtainFixedRecipientReceiptsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePairObtainFixedRecipientReceiptsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEnginePairObtainFixedRecipientReceiptsRuntime> _resolve;
+    private CoreGameEnginePairObtainFixedRecipientReceiptsEntries(Func<EngineOwners.CoreGameEnginePairObtainFixedRecipientReceiptsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEnginePairObtainFixedRecipientReceiptsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePairObtainFixedRecipientReceiptsRuntime> resolve) => new(resolve);
+    internal static CoreGameEnginePairObtainFixedRecipientReceiptsEntries Create(Func<EngineOwners.CoreGameEnginePairObtainFixedRecipientReceiptsRuntime> resolve) => new(resolve);
 }

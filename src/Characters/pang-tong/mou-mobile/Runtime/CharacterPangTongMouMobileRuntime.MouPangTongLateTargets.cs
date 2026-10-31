@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangTongMouMobileRuntime
@@ -33,9 +29,9 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
     internal bool MouPtLateNotification(ProgramSkillWindowContext c, CardUseFrame use, CardConversionSource source, string hash) => c.MouPangTongLateTargetSeat is { } target && c.TargetSeat == target && use.Action is { } action && use.TargetSeats.Contains(target) && !MouPtVisited(use.Id, source.OwnerSeat, target) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongLateTargetNotifiedEvent>().Contains(new(use.Id, action.ActionId, target, source, hash));
     internal ProgramCardTriggerWindowFrame AppendMouPtLateTargets(ProgramCardTriggerWindowFrame frame)
     {
-        if (!HasMouPangTongCapability || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(frame) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(frame.ParentFrameId)is not { Action: { Type: CardActionType.Use, EffectiveKind: CardKind.IronChain } } use || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
+        if (!HasMouPangTongCapability || CoreGameEngineCardActionsRuntime.GetCardActionWindow(frame) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(frame.ParentFrameId)is not { Action: { Type: CardActionType.Use, EffectiveKind: CardKind.IronChain } } use || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
             return frame;
-        var action = global::CardGame.Core.EngineOwners.CoreGameEngineActorHandLimitTargetProgramsRuntime.ActorHandLimitTargetCollectionAction(use);
+        var action = CoreGameEngineActorHandLimitTargetProgramsRuntime.ActorHandLimitTargetCollectionAction(use);
         var added = new List<ProgramCardTriggerCandidate>();
         foreach (var notice in _coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongLateTargetNotifiedEvent>().Where(e => e.UseId == use.Id && e.ActionId == action.ActionId && use.TargetSeats.Contains(e.TargetSeat)))
         {

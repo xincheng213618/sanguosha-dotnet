@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
@@ -45,7 +41,7 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
         foreach (var action in actions.ToArray().Where(a => a.CardId is not null && a.ProgramActivationId is null && a.Kind != LegalActionKind.Recast))
         {
             var(kind, suit) = _coreNextActualUseTargetAdjustmentsOperations.TargetAdjustmentAppearance(actor, action);
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || suit != Suit.None || _coreEquipmentContentOperations.EquipmentRules.IsEquipment(kind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(kind))
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || suit != Suit.None || _coreEquipmentContentOperations.EquipmentRules.IsEquipment(kind) || CoreNativeCardClassificationsRuntime.IsDelayedCard(kind))
                 continue;
             var normal = action.Kind is LegalActionKind.DrawTwo or LegalActionKind.Peach or LegalActionKind.Alcohol ? new[]
             {
@@ -70,7 +66,7 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
         }
     }
 
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> ShenZfOrdinaryTrickOptions(CharacterState actor, IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> ordinary, Suit? suit, bool? color, Suit? shield, bool excludeOwner)
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> ShenZfOrdinaryTrickOptions(CharacterState actor, IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> ordinary, Suit? suit, bool? color, Suit? shield, bool excludeOwner)
     {
         if (!HasShenZfXunshi(actor) || suit is not (null or Suit.None) || suit is null && color is not null)
             return ordinary;

@@ -1,21 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuanJiOlRuntime
 {
     internal const string YuanJiPairReason = "skill-program.yuan-ji.jieyan.draw", YuanJiJinghuaReason = "skill-program.yuan-ji.jinghua.draw", YuanJiShuiyueReason = "skill-program.yuan-ji.shuiyue.draw", YuanJiBottomReason = "skill-program.yuan-ji.jinghua.return", YuanJiTopReason = "skill-program.yuan-ji.shuiyue.return";
-    SkillProgramStepOutcome global::CardGame.Core.IYuanJiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveYuanJi(f, op);
+    SkillProgramStepOutcome IYuanJiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveYuanJi(f, op);
     internal SkillProgramStepOutcome ResolveYuanJi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.YuanJi is not null || f.InstructionIndex != 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != op || f.WindowContext is not { } c)
             throw new InvalidOperationException("YuanJi requires the exact first committed native instruction and lifecycle window.");
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex);
+        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex);
         if (!YuanJiWindowCandidate(candidate, c, out var parent) || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2].Id != parent.Id)
             throw new InvalidOperationException("YuanJi lost its immediate native owning boundary.");
         var loss = op == SkillProgramEffectOp.ResolveJieyanOppositeEndDrawPair ? JieyanOpportunity(candidate) : null;
@@ -169,7 +166,7 @@ internal sealed partial class CharacterYuanJiOlRuntime
     [ProgramAnswer("yuan-ji-order")]
     internal void AnswerYuanJiOrder(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YuanJi: { Stage: YuanJiStage.ReturnOrder } r } f || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(YuanJiOrderChoices(f).Where(c => c.Id == choice.Id).ToArray(), [choice]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YuanJi: { Stage: YuanJiStage.ReturnOrder } r } f || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(YuanJiOrderChoices(f).Where(c => c.Id == choice.Id).ToArray(), [choice]))
             throw new InvalidOperationException("YuanJi return order requires the exact current private original entities.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var id = choice.Cards.Single();

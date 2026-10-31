@@ -1,19 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZouShiLeRuntime
 {
     internal const string HuoxinObtainReason = "skill-program.le-zou-shi.huoxin.obtain";
-    internal static CardConversionSource HuoxinSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zou_shi_le_LeZouShiHuoxin.HuoxinSource(f);
+    internal static CardConversionSource HuoxinSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zou_shi_le_LeZouShiHuoxin.HuoxinSource(f);
     internal bool TryGetHuoxinUse(int owner, ProgramSkillWindowContext context, out ProgramCardTriggerWindowFrame window)
     {
         window = null !;
-        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } use || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != SkillProgramTriggerWindow.CardUseCommitted || w.Action.ActionId != use.CardActionId || w.Action.ActorSeat != owner || use.ActorSeat != owner || w.Action.EffectiveKind != use.EffectiveKind || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(w.Action.EffectiveKind) == SkillProgramCardCategory.Equipment || w.Action.Type == CardActionType.Response && w.CompletedResponseReturn is not { IsCommitted: true })
+        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } use || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != SkillProgramTriggerWindow.CardUseCommitted || w.Action.ActionId != use.CardActionId || w.Action.ActorSeat != owner || use.ActorSeat != owner || w.Action.EffectiveKind != use.EffectiveKind || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(w.Action.EffectiveKind) == SkillProgramCardCategory.Equipment || w.Action.Type == CardActionType.Response && w.CompletedResponseReturn is not { IsCommitted: true })
             return false;
         if (w.Action.Type == CardActionType.Use && w.CompletedResponseReturn is not null)
             return false;
@@ -84,7 +81,7 @@ internal sealed partial class CharacterZouShiLeRuntime
     [ProgramAnswer("le-zou-shi")]
     internal void AnswerHuoxin(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Huoxin: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HuoxinChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Huoxin: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HuoxinChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Huoxin cannot answer an unpublished target, hidden slot or stale material choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         switch (choice.Parameters["branch"])

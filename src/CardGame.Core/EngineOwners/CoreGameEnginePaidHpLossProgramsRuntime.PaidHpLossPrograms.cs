@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -48,7 +45,7 @@ internal sealed partial class CoreGameEnginePaidHpLossProgramsRuntime
         var before = owner.Hp;
         owner.Hp = Math.Max(0, before - n);
         // Freeze actual physical HP apply before any fact, rule callback or child.
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { HpLossQuantity = null, PaidHpLossReceipt = new(d.InstructionIndex, d.ResultBind, f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, plan.Activation!.UsageGroup, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, n, before, owner.Hp, before - owner.Hp) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { HpLossQuantity = null, PaidHpLossReceipt = new(d.InstructionIndex, d.ResultBind, f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, plan.Activation!.UsageGroup, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, n, before, owner.Hp, before - owner.Hp) });
         _coreHpChangeProgramsOperations.RecordHpChange(f.Id, null, f.OwnerSeat, before, owner.Hp, HpChangeKind.Loss);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillHpLostEvent(f.Id, f.SkillId, f.OwnerSeat, before - owner.Hp, owner.Hp));
         if (owner.Hp == 0)
@@ -67,7 +64,7 @@ internal sealed partial class CoreGameEnginePaidHpLossProgramsRuntime
     internal bool HasValidPaidHpLossReceipt(ProgramSkillFrame f, ProgramExecutionPlan plan)
     {
         var p = f.PaidHpLossReceipt;
-        return p is not null && PaidHpLossProgram.IsExactChain(plan.Instructions) && plan.Activation is { UsesPerGame: 1, MinCards: 0, MaxCards: 0, MinTargets: 0, MaxTargets: 0 } a && f.TriggerId is null && f.WindowContext is null && f.HpLossQuantity is null && p.InstructionIndex == 1 && p.ResultBind == plan.Instructions[0].ResultBind && p.OwnerSeat == f.OwnerSeat && p.SkillId == f.SkillId && p.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && p.SkillInstanceId == f.SkillInstanceId && p.GameplayHash == f.GameplayHash && p.UsageGroup == a.UsageGroup && p.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && p.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && p.TurnOwnerSeat == f.OwnerSeat && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(f.OwnerSeat, f.SkillId, a.UsageGroup, SkillUsageScope.Game) == 1 && p.Requested > 0 && p.Requested <= p.HpBefore && p.HpAfter == p.HpBefore - p.Requested && p.HpAfter >= 0 && p.ActualLost == p.HpBefore - p.HpAfter && p.ActualLost > 0 && f.InstructionIndex is >= 1 and <= 4 && HasExactPaidHpLossGrant(f, p, p.DistanceGrantSequence, 2, SkillRuleQuery.OutgoingDistance, -p.ActualLost) && HasExactPaidHpLossGrant(f, p, p.SlashGrantSequence, 3, SkillRuleQuery.SlashLimit, p.ActualLost) && (!p.DrawIssued || f.InstructionIndex >= 2) && (!p.DrawReturned || p.DrawIssued) && (p.DistanceGrantSequence is null || p.DrawReturned && f.InstructionIndex >= 3) && (p.SlashGrantSequence is null || p.DistanceGrantSequence is not null && f.InstructionIndex == 4);
+        return p is not null && PaidHpLossProgram.IsExactChain(plan.Instructions) && plan.Activation is { UsesPerGame: 1, MinCards: 0, MaxCards: 0, MinTargets: 0, MaxTargets: 0 } a && f.TriggerId is null && f.WindowContext is null && f.HpLossQuantity is null && p.InstructionIndex == 1 && p.ResultBind == plan.Instructions[0].ResultBind && p.OwnerSeat == f.OwnerSeat && p.SkillId == f.SkillId && p.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && p.SkillInstanceId == f.SkillInstanceId && p.GameplayHash == f.GameplayHash && p.UsageGroup == a.UsageGroup && p.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && p.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && p.TurnOwnerSeat == f.OwnerSeat && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(f.OwnerSeat, f.SkillId, a.UsageGroup, SkillUsageScope.Game) == 1 && p.Requested > 0 && p.Requested <= p.HpBefore && p.HpAfter == p.HpBefore - p.Requested && p.HpAfter >= 0 && p.ActualLost == p.HpBefore - p.HpAfter && p.ActualLost > 0 && f.InstructionIndex is >= 1 and <= 4 && HasExactPaidHpLossGrant(f, p, p.DistanceGrantSequence, 2, SkillRuleQuery.OutgoingDistance, -p.ActualLost) && HasExactPaidHpLossGrant(f, p, p.SlashGrantSequence, 3, SkillRuleQuery.SlashLimit, p.ActualLost) && (!p.DrawIssued || f.InstructionIndex >= 2) && (!p.DrawReturned || p.DrawIssued) && (p.DistanceGrantSequence is null || p.DrawReturned && f.InstructionIndex >= 3) && (p.SlashGrantSequence is null || p.DistanceGrantSequence is not null && f.InstructionIndex == 4);
     }
 
     internal bool HasExactPaidHpLossGrant(ProgramSkillFrame f, ProgramPaidHpLossReceipt p, long? sequence, int index, SkillRuleQuery query, int amount)
@@ -75,10 +72,10 @@ internal sealed partial class CoreGameEnginePaidHpLossProgramsRuntime
         if (sequence is null)
             return !_turnCardUseEffectsOperations._turnCardUseEffects.RuleModifiers.Any(m => m.ParentFrameId == f.Id && m.EffectIndex == index);
         var m = _turnCardUseEffectsOperations._turnCardUseEffects.RuleModifiers.SingleOrDefault(m => m.GrantSequence == sequence);
-        return m is not null && m.ParentFrameId == f.Id && m.EffectIndex == index && m.TurnNumber == p.TurnNumber && m.TurnSeat == p.TurnOwnerSeat && m.Source == global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f) && m.Query == query && m.Operation == SkillRuleOperation.Add && m.Amount == amount && m.AffectedSeat is null && (m.CardKinds?.Count ?? 0) == 0 && m.PaidHpLossOrigin == CreatePaidHpLossModifierOrigin(f, p);
+        return m is not null && m.ParentFrameId == f.Id && m.EffectIndex == index && m.TurnNumber == p.TurnNumber && m.TurnSeat == p.TurnOwnerSeat && m.Source == CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f) && m.Query == query && m.Operation == SkillRuleOperation.Add && m.Amount == amount && m.AffectedSeat is null && (m.CardKinds?.Count ?? 0) == 0 && m.PaidHpLossOrigin == CreatePaidHpLossModifierOrigin(f, p);
     }
 
-    internal static ProgramHpLossModifierOrigin CreatePaidHpLossModifierOrigin(ProgramSkillFrame f, ProgramPaidHpLossReceipt p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PaidHpLossPrograms.CreatePaidHpLossModifierOrigin(f, p);
+    internal static ProgramHpLossModifierOrigin CreatePaidHpLossModifierOrigin(ProgramSkillFrame f, ProgramPaidHpLossReceipt p) => RuntimeSkills.RuntimeRules_Core_PaidHpLossPrograms.CreatePaidHpLossModifierOrigin(f, p);
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 770)]
     internal bool CanContinueIssuedHpLoss(ProgramSkillFrame f)
@@ -112,7 +109,7 @@ internal sealed partial class CoreGameEnginePaidHpLossProgramsRuntime
         if (!HasValidPaidHpLossReceipt(a, plan) || p.ResultBind != bind || !p.DrawReturned || a.InstructionIndex != (distance ? 3 : 4) || (distance ? p.DistanceGrantSequence is not null : p.DistanceGrantSequence is null || p.SlashGrantSequence is not null))
             throw new InvalidOperationException("HP loss grant is not its exact issued tail.");
         _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(a);
-        var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, a.Id, a.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(a), distance ? SkillRuleQuery.OutgoingDistance : SkillRuleQuery.SlashLimit, SkillRuleOperation.Add, distance ? -p.ActualLost : p.ActualLost, hpLossOrigin: CreatePaidHpLossModifierOrigin(a, p));
+        var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, a.Id, a.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(a), distance ? SkillRuleQuery.OutgoingDistance : SkillRuleQuery.SlashLimit, SkillRuleOperation.Add, distance ? -p.ActualLost : p.ActualLost, hpLossOrigin: CreatePaidHpLossModifierOrigin(a, p));
         _coreRuntimeOperations.ReplaceRuntimeTop(a with { PaidHpLossReceipt = distance ? p with { DistanceGrantSequence = grant.GrantSequence } : p with { SlashGrantSequence = grant.GrantSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnRuleModifierGrantedEvent(grant));
     }

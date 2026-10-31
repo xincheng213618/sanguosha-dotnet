@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
-internal sealed partial class CoreEndingHandCountProgramsRuntime : global::CardGame.Core.IEndingHandCountProgramHost
+[Core.ProgramRuntimeModule, Core.ProgramCapability]
+internal sealed partial class CoreEndingHandCountProgramsRuntime : IEndingHandCountProgramHost
 {
-    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreEndingHandCountProgramsEndingHandCountHistoriesAccess _coreEndingHandCountProgramsEndingHandCountHistoriesAccess;
-    internal CoreEndingHandCountProgramsRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineOwners.IKernelRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreEndingHandCountProgramsEndingHandCountHistoriesAccess coreEndingHandCountProgramsEndingHandCountHistoriesAccess)
+    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
+    private readonly RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
+    private readonly IKernelRuleProgressionOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess;
+    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly EngineStates.Contracts.ICoreEndingHandCountProgramsEndingHandCountHistoriesAccess _coreEndingHandCountProgramsEndingHandCountHistoriesAccess;
+    internal CoreEndingHandCountProgramsRuntime(IKernelFrameStoreAccess resolutionStackOperations, RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations, IKernelRuleProgressionOperations kernelCoreGameEngineRuleProgressionOperations, EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess coreActualTurnProgressCurrentSeatTurnNumberAccess, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, EngineStates.Contracts.ICoreEndingHandCountProgramsEndingHandCountHistoriesAccess coreEndingHandCountProgramsEndingHandCountHistoriesAccess)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreProgramLifecycleOperations = coreProgramLifecycleOperations;

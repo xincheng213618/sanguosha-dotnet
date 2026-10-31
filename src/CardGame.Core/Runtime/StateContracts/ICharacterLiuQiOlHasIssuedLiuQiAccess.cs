@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterLiuQiOlHasIssuedLiuQiAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterLiuQiOlHasIssuedLiuQiAccess : IProgramRuntimeOperations
 {
     ref bool _hasIssuedLiuQi { get; }
 }

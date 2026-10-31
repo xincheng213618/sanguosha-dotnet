@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreShanheS5QuyiCoreNativeRuleQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreShanheS5QuyiCoreNativeRuleQueriesOperations : IProgramRuntimeOperations
 {
     int GetCombatDistance(int sourceSeat, int targetSeat);
 }

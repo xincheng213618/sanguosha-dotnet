@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceLiuSandaoRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceLiuSandaoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => ResolveShanheSourceLiuSandao(frame, operation);
+    SkillProgramStepOutcome IShanheSourceLiuSandaoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => ResolveShanheSourceLiuSandao(frame, operation);
     internal int SourceHuchenEnemyKills(int ownerSeat) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlayerDiedEvent>().Count(fact => fact.KillerSeat == ownerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(fact.VictimSeat) && _coreTeamActivityProgramsOperations.PublicTeamEnemy(ownerSeat, _coreMatchParticipantsPlayersAccess._players[fact.VictimSeat]));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 24790, SkillProgramEffectOp.AdjustShanheSourceHuchenDraw)]
     internal bool CanOfferSourceHuchen(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => context.Window == SkillProgramTriggerWindow.DrawPhaseStarting && context.OwnerSeat == candidate.OwnerSeat && candidate.OwnerSeat == _coreActualTurnProgressCurrentSeatAccess._currentSeat && SourceHuchenEnemyKills(candidate.OwnerSeat) > 0;

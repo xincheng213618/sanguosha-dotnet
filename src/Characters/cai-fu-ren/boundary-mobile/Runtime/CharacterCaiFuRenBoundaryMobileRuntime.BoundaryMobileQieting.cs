@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -21,11 +18,11 @@ internal sealed partial class CharacterCaiFuRenBoundaryMobileRuntime
         return start < 0 || end <= start || history.Skip(start + 1).Take(end - start - 1).OfType<DamageAppliedEvent>().Any(damage => !damage.SourceLess && damage.Amount > 0 && damage.SourceSeat == qualification.TurnOwnerSeat && damage.TargetSeat != qualification.TurnOwnerSeat);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryMobileQietingHost.Begin(ProgramSkillFrame frame) => _characterCaiFuRenOlOperations.BeginOrdinaryQieting(frame);
+    SkillProgramStepOutcome IBoundaryMobileQietingHost.Begin(ProgramSkillFrame frame) => _characterCaiFuRenOlOperations.BeginOrdinaryQieting(frame);
     internal IReadOnlyList<PromptChoice> BoundaryMobileQietingHandChoices(ProgramSkillFrame frame) => frame.OrdinaryQieting is { Paid: true, Option: "hand", Stage: OrdinaryQietingStage.Viewing, MobileSelection: { } selection } receipt ? Array.AsReadOnly(selection.Viewed.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(receipt.Qualification.TurnOwnerSeat)).Select(id => new PromptChoice(new($"ordinary-qieting.{(frame.Id)}.hand.{(id)}"), $"获得【{(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).DisplayName)}】", [id], [frame.OwnerSeat], new Dictionary<string, string> { ["program-action"] = "ordinary-qieting", ["frame-id"] = frame.Id.ToString(CultureInfo.InvariantCulture), ["option"] = "take-hand", ["source-zone"] = "Hand", ["card-owner-seat"] = receipt.Qualification.TurnOwnerSeat.ToString(CultureInfo.InvariantCulture) })).ToArray()) : [];
     internal void AnswerBoundaryMobileQieting(ProgramSkillFrame frame, PromptChoice choice)
     {
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !_characterCaiFuRenOlOperations.OrdinaryQietingChoices(frame).Any(candidate => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([candidate], [choice])) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !_characterCaiFuRenOlOperations.OrdinaryQietingChoices(frame).Any(candidate => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([candidate], [choice])) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
             throw new InvalidOperationException("Mobile Qieting requires the current original single option or one viewed entity.");
         var receipt = frame.OrdinaryQieting!;
         var option = choice.Parameters["option"];

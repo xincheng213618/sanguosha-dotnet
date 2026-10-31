@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,8 +8,8 @@ internal sealed partial class CharacterPangJiOlRuntime
     internal const string DouyuDrawReason = "skill-program.pang-ji.douyu.draw";
     internal bool HasDouyuCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveDouyuPreRevealSwapAndWinDraw);
 
-    internal static CardConversionSource DouyuSource(ProgramTriggerCandidate c) => global::CardGame.Core.RuntimeSkills.RuntimeRules_pang_ji_ol_Douyu.DouyuSource(c);
-    internal static CardConversionSource DouyuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_pang_ji_ol_Douyu.DouyuSource(f);
+    internal static CardConversionSource DouyuSource(ProgramTriggerCandidate c) => RuntimeSkills.RuntimeRules_pang_ji_ol_Douyu.DouyuSource(c);
+    internal static CardConversionSource DouyuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_pang_ji_ol_Douyu.DouyuSource(f);
     internal ResolutionFrame DouyuParent(long id) => _resolutionStackOperations._resolutionStack.Single(f => f.Id == id && (f is PindianFrame || f is ProgramSkillFrame { SimultaneousPindian: not null }));
     internal IReadOnlyList<DouyuOpportunity> CollectDouyuOpportunities(int source, IReadOnlyList<int> participants)
     {
@@ -239,13 +236,13 @@ internal sealed partial class CharacterPangJiOlRuntime
     [ProgramWindowReturn(SkillProgramTriggerWindow.PindianBeforeReveal, SkillProgramTriggerWindow.PindianResultDetermined)]
     internal void ReturnDouyuBinding(ProgramSkillFrame frame, bool completed)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DouyuWindowFrame w || frame.WindowContext is not { Douyu: { } c } context || w.Id != context.ParentFrameId || w.ParentFrameId != c.ContestId || w.CandidateIndex >= w.Entries.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, w.Entries[w.CandidateIndex].Candidate))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DouyuWindowFrame w || frame.WindowContext is not { Douyu: { } c } context || w.Id != context.ParentFrameId || w.ParentFrameId != c.ContestId || w.CandidateIndex >= w.Entries.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, w.Entries[w.CandidateIndex].Candidate))
             throw new InvalidOperationException("Douyu lost its exact native private/result window return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(w with { CandidateIndex = w.CandidateIndex + 1 });
         ContinueDouyuWindow(w.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDouyuHost.Resolve(ProgramSkillFrame frame) => ResolveDouyu(frame);
+    SkillProgramStepOutcome IDouyuHost.Resolve(ProgramSkillFrame frame) => ResolveDouyu(frame);
     internal SkillProgramStepOutcome ResolveDouyu(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -299,7 +296,7 @@ internal sealed partial class CharacterPangJiOlRuntime
     [ProgramAnswer("douyu")]
     internal void AnswerDouyu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Douyu: { Stage: DouyuStage.OpponentChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !DouyuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Douyu: { Stage: DouyuStage.OpponentChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !DouyuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("Douyu requires its actual owner's private published opponent choice.");
         var parent = DouyuParent(r.ContestId);
         var contest = parent.DouyuContest!;

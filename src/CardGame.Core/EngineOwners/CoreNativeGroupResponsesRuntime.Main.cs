@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeGroupResponsesRuntime
 {
-    internal void ResolveGroupResponse(global::CardGame.Core.NativeOwners.GroupCardHandle group, CharacterState responder, Card? selectedResponse)
+    internal void ResolveGroupResponse(NativeOwners.GroupCardHandle group, CharacterState responder, Card? selectedResponse)
     {
         if (selectedResponse is not null && _characterLiuQiOlOperations.IsWenjiResponseForbidden2(group.ResolutionId, responder.Seat))
             throw new InvalidOperationException("Wenji forbids this exact group response.");
         if (selectedResponse is { } declaredResponse && _coreCardDeclarationsOperations.TryBeginCardDeclaration(responder, declaredResponse, group.RequiredCardKind!.Value, _coreCardDeclarationsOperations.PeekDeclarationConversion(responder, declaredResponse, group.RequiredCardKind.Value, false), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Group, responder.Seat), [group.SourceSeat]))
             return;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack || group.CurrentAttack is not { } attack || responder.Seat != attack.TargetSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack || group.CurrentAttack is not { } attack || responder.Seat != attack.TargetSeat)
         {
             throw new InvalidOperationException("The group attack response does not belong to the current target.");
         }
@@ -30,7 +26,7 @@ internal sealed partial class CoreNativeGroupResponsesRuntime
             _coreAlternativeViewAsCostsOperations.PaySingleCardResponse(responseCard, responder, responseCardKind, responseConversion);
             var incomingName = CardCatalog.Get(group.Card.Kind).DisplayName;
             var responseName = CardCatalog.Get(responseCardKind).DisplayName;
-            var responseDescription = _coreCardDeclarationsOperations.PublicDeclarationDescription(responseCard, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(responseCard, requiredCardKind) ? $"打出【{(responseName)}】" : $"将【{(responseCard.DisplayName)}】当作【{(responseName)}】");
+            var responseDescription = _coreCardDeclarationsOperations.PublicDeclarationDescription(responseCard, CoreNativeCardClassificationsRuntime.IsNativeResponseCard(responseCard, requiredCardKind) ? $"打出【{(responseName)}】" : $"将【{(responseCard.DisplayName)}】当作【{(responseName)}】");
             _coreMatchLogOperations.AddLog("CardResponded", $"{(responder.Name)} {(responseDescription)}响应【{(incomingName)}】。", responder.Seat, group.SourceSeat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(responseCard.Id, responder.Seat, group.SourceSeat, responseCardKind));
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(responder.Seat, responseCardKind);
@@ -56,9 +52,9 @@ internal sealed partial class CoreNativeGroupResponsesRuntime
         }
     }
 
-    internal void ResolveGroupZhangbaResponse(global::CardGame.Core.NativeOwners.GroupCardHandle group, CharacterState responder, IReadOnlyList<Card> pair)
+    internal void ResolveGroupZhangbaResponse(NativeOwners.GroupCardHandle group, CharacterState responder, IReadOnlyList<Card> pair)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack || group.RequiredCardKind != CardKind.Slash || group.CurrentAttack is not { } attack || responder.Seat != attack.TargetSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack || group.RequiredCardKind != CardKind.Slash || group.CurrentAttack is not { } attack || responder.Seat != attack.TargetSeat)
         {
             throw new InvalidOperationException("The Zhangba group response is not current.");
         }

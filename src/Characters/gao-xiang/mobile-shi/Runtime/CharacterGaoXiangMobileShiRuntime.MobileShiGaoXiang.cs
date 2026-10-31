@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGaoXiangMobileShiRuntime
 {
     internal const string ShiZxChiyuan = ShiGaoXiangComposition.ChiyuanSkill, ShiZxErdi = ShiGaoXiangComposition.ErdiSkill;
-    SkillProgramStepOutcome global::CardGame.Core.IShiGaoXiangHost.ResolveChiyuan(ProgramSkillFrame frame) => BeginShiZxChiyuan(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiGaoXiangHost.ResolveErdi(ProgramSkillFrame frame) => BeginShiZxErdi(frame);
+    SkillProgramStepOutcome IShiGaoXiangHost.ResolveChiyuan(ProgramSkillFrame frame) => BeginShiZxChiyuan(frame);
+    SkillProgramStepOutcome IShiGaoXiangHost.ResolveErdi(ProgramSkillFrame frame) => BeginShiZxErdi(frame);
     // ---- 驰援: once per play phase, hand one card to a wounded-less character
     // and virtually use a normal Slash at a character whose attack range covers
     // the receiver. If that Slash drew blood the receiver recovers one; if it

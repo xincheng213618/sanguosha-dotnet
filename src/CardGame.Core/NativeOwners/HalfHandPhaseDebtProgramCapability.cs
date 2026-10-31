@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class HalfHandPhaseDebtProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineHalfHandPhaseDebtProgramsEntries> getCoreGameEngineHalfHandPhaseDebtProgramsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineHalfHandTargetSupportEntries> getCoreGameEngineHalfHandTargetSupportRuntime) : IHalfHandPhaseDebtProgramHost
+internal sealed class HalfHandPhaseDebtProgramCapability(Func<RuntimeEntries.CoreGameEngineHalfHandPhaseDebtProgramsEntries> getCoreGameEngineHalfHandPhaseDebtProgramsRuntime, Func<RuntimeEntries.CoreGameEngineHalfHandTargetSupportEntries> getCoreGameEngineHalfHandTargetSupportRuntime) : IHalfHandPhaseDebtProgramHost
 {
     public SkillProgramStepOutcome DrawExtraAndArmHalfHandSupport(ProgramSkillFrame f, SkillProgramEffect e) => getCoreGameEngineHalfHandPhaseDebtProgramsRuntime().DrawExtraHalfHandSupport(f, e);
     public SkillProgramStepOutcome GiveHalfHandAndIssueTargetSupport(ProgramSkillFrame f, SkillProgramEffect e) => getCoreGameEngineHalfHandPhaseDebtProgramsRuntime().GiveHalfHandSupport(f, e);

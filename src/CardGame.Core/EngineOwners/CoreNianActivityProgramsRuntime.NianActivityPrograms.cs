@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNianActivityProgramsRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CoreNianActivityProgramsRuntime
     [ProgramTargetRule(ProgramTargetRulePoint.DirectedProhibition, 20)]
     [ProgramTargetRule(ProgramTargetRulePoint.DeclaredGlobalProhibition, 10)]
     internal bool NianDongmianDirectedTargetProhibited(ProgramDirectedTargetQuery query) => NianDongmianForbidsTarget(query.ActorSeat, query.TargetSeat);
-    SkillProgramStepOutcome global::CardGame.Core.INianActivityProgramHost.ExecuteNianActivity(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteNianActivity(f, e);
+    SkillProgramStepOutcome INianActivityProgramHost.ExecuteNianActivity(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteNianActivity(f, e);
     internal bool NianEnabled(CharacterState player, string id) => player.IsAlive && _contentRegistryOperations._contentRegistry.Skills.ContainsKey(id) && _coreNationalSkillsOperations.HasRuntimeSkill(player, id);
     internal bool NianOwnActualTurn(int seat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat == seat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase is not (TurnPhase.NotStarted or TurnPhase.Finished);
     internal bool NianPhaseWasActuallySkipped(int seat, SkillProgramTurnPhase phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<NianActualPhaseSkippedEvent>().Any(e => e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == seat && e.Phase == phase);
@@ -116,7 +112,7 @@ internal sealed partial class CoreNianActivityProgramsRuntime
     [ProgramDistanceRule(ProgramDistanceStage.CardUseLimitExemption, 10)]
     internal bool NianShouyiUnlimitedCardDistance(CharacterState player) => NianEnabled(player, "nian:shouyi");
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 250)]
-    internal int NianBaonuDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && !attack.IsChainPropagation && attack.CardUserSeat == attack.SourceSeat && attack.EffectiveCardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].Hp < 5 && NianEnabled(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], "nian:baonu") ? 1 : 0;
+    internal int NianBaonuDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && !attack.IsChainPropagation && attack.CardUserSeat == attack.SourceSeat && attack.EffectiveCardKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].Hp < 5 && NianEnabled(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], "nian:baonu") ? 1 : 0;
     internal CardMovementBatchContext CaptureNianOwnedTransferBatch(CardMovementBatchContext batch, ProgramSkillFrame? origin)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RecoverNianJingjueLoss) || !_coreMatchParticipantsPlayersAccess._players.Any(p => NianEnabled(p, "nian:jingjue")))
@@ -155,7 +151,7 @@ internal sealed partial class CoreNianActivityProgramsRuntime
             var entryBatch = _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.SingleOrDefault(b => b.Id != batch.Id && b.Movements.Contains(entry) && b.ParentFrameId == batch.ParentFrameId && b.ParentBatchId == batch.ParentBatchId && b.TurnNumber == batch.TurnNumber && b.OriginSkillId == origin.SkillId && b.OriginSkillInstanceId == origin.SkillInstanceId && b.OriginOwnerSeat == origin.OwnerSeat);
             if (entryBatch is null)
                 continue;
-            proofs.Add(new(exit.CardId, owner, entry.From, recipient, entryBatch.Id, entry.Sequence, exit.Sequence, origin.Id, new(origin.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(origin), origin.OwnerSeat, origin.SkillInstanceId), origin.GameplayHash, origin.InstructionIndex - 1));
+            proofs.Add(new(exit.CardId, owner, entry.From, recipient, entryBatch.Id, entry.Sequence, exit.Sequence, origin.Id, new(origin.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(origin), origin.OwnerSeat, origin.SkillInstanceId), origin.GameplayHash, origin.InstructionIndex - 1));
         }
 
         return proofs.Count == 0 ? batch : batch with

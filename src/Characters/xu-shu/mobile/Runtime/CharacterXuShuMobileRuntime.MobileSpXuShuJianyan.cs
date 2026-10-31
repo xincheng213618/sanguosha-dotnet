@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXuShuMobileRuntime
 {
     internal const string MobileSpXuShuJianyanSkill = "mobile:jianyan", MobileSpXuShuJianyanBind = "mobile-jianyan-revealed";
     internal const string MobileSpXuShuJianyanRevealReason = "skill-program.mobile:jianyan.reveal", MobileSpXuShuJianyanGiftReason = "skill-program.mobile:jianyan.obtain", MobileSpXuShuJianyanCleanupReason = "skill-program.mobile:jianyan.unmatched";
-    SkillProgramStepOutcome global::CardGame.Core.IMobileSpXuShuJianyanHost.Begin(ProgramSkillFrame f) => BeginMobileSpXuShuJianyan(f);
+    SkillProgramStepOutcome IMobileSpXuShuJianyanHost.Begin(ProgramSkillFrame f) => BeginMobileSpXuShuJianyan(f);
     internal SkillProgramStepOutcome BeginMobileSpXuShuJianyan(ProgramSkillFrame f)
     {
         if (f.SkillId != MobileSpXuShuJianyanSkill || f.TriggerId is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.MobileSpXuShuJianyan is not null)
@@ -129,7 +124,7 @@ internal sealed partial class CharacterXuShuMobileRuntime
         }
 
         var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile)[^1];
-        var matched = global::CardGame.Core.EngineOwners.CoreGameEngineFixedSlashAndDeclaredDeckProgramsRuntime.MatchesDeclaredDeckCriterion(card, r.Criterion);
+        var matched = CoreGameEngineFixedSlashAndDeclaredDeckProgramsRuntime.MatchesDeclaredDeckCriterion(card, r.Criterion);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileSpXuShuJianyan = r with { Stage = matched ? "recipient" : "search", RevealedIds = r.RevealedIds.Append(card.Id).ToArray(), MatchedCardId = matched ? card.Id : null }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Processing, new(MobileSpXuShuJianyanRevealReason), (batch, records) =>
@@ -142,7 +137,7 @@ internal sealed partial class CharacterXuShuMobileRuntime
         r = f.MobileSpXuShuJianyan!;
         var binding = new ProgramSkillCardSetBinding(MobileSpXuShuJianyanBind, Array.AsReadOnly(r.RevealedIds.ToArray()), SkillProgramCardSetVisibility.Public, Array.AsReadOnly(Enumerable.Repeat(CardLocation.Processing, r.RevealedIds.Count).ToArray()));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CardSetBindings = Array.AsReadOnly(f.CardSetBindings.Where(b => b.Name != MobileSpXuShuJianyanBind).Append(binding).ToArray()) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, MobileSpXuShuJianyanBind, [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, MobileSpXuShuJianyanBind, [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
         // The scheduler resumes this same instruction after the actual reveal
         // movement children. Every failed reveal stays in Processing until gift.
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id))

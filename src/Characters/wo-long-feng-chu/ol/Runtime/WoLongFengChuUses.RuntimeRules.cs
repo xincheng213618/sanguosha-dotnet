@@ -1,10 +1,9 @@
-using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_wo_long_feng_chu_ol_WoLongFengChuUses
 {
     internal static string EquipmentSlotNamedLabel(EquipmentSlot slot) => slot switch

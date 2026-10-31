@@ -1,22 +1,19 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGanNingMouMobileRuntime
 {
     internal const string MouGnDiscard = "skill-program.mou-mobile:qixi.discard", MouGnStore = "skill-program.mou-mobile:fenwei.store", MouGnDraw = "skill-program.mou-mobile:fenwei.draw", MouGnObtain = "skill-program.mou-mobile:fenwei.obtain", MouGnSpend = "skill-program.mou-mobile:fenwei.discard";
-    internal static CardConversionSource MouGnSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_gan_ning_mou_mobile_MouGanNingMobile.MouGnSource(f);
+    internal static CardConversionSource MouGnSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_gan_ning_mou_mobile_MouGanNingMobile.MouGnSource(f);
     internal bool HasMouGanNingMobile => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouGanNingFenwei);
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouGanNingHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouGn(f, op);
+    SkillProgramStepOutcome IMouGanNingHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouGn(f, op);
     internal bool IsIssuedMouGanNingPile(PublicPersistentPileSource p) => p.SkillId == MouGanNingMobileComposition.Fenwei && p.Capacity == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGanNingWeiPlacedEvent>().Any(e => e.RecipientSeat == p.OwnerSeat && e.To == p.Location && p.SkillInstanceId == MouGnPileInstance(e.FrameId, e.RecipientSeat) && _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.GetValueOrDefault((p.OwnerSeat, p.SkillId, p.SkillInstanceId)) == p && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.Sequence && m.CardId == e.CardId && m.From == e.From && m.To == e.To && m.Reason.Value == MouGnStore));
-    internal static string MouGnPileInstance(long id, int seat) => global::CardGame.Core.RuntimeSkills.RuntimeRules_gan_ning_mou_mobile_MouGanNingMobile.MouGnPileInstance(id, seat);
+    internal static string MouGnPileInstance(long id, int seat) => RuntimeSkills.RuntimeRules_gan_ning_mou_mobile_MouGanNingMobile.MouGnPileInstance(id, seat);
     internal MouGanNingWeiPlacedEvent? MouGnWei(int target, int? owner = null, string? instance = null) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouGanNingWeiPlacedEvent>().LastOrDefault(e => e.RecipientSeat == target && (owner is null || e.Source.OwnerSeat == owner) && (instance is null || e.Source.SkillInstanceId == instance) && _cardZonesOperations._cardZones.GetLocation(e.CardId) == e.To && _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.GetValueOrDefault((target, MouGanNingMobileComposition.Fenwei, MouGnPileInstance(e.FrameId, target)))is { } pile && IsIssuedMouGanNingPile(pile));
-    internal CardUseFrame? MouGnParent(ProgramSkillWindowContext c) => c is { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects, CardUse: { } use } && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == use.ParentCardUseFrameId)is CardUseFrame parent && parent.Action is { Type: CardActionType.Use } a && a.ActionId == use.CardActionId && a.ActorSeat == use.ActorSeat && a.EffectiveKind == use.EffectiveKind && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind) == SkillProgramCardCategory.Trick ? parent : null;
+    internal CardUseFrame? MouGnParent(ProgramSkillWindowContext c) => c is { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects, CardUse: { } use } && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == use.ParentCardUseFrameId)is CardUseFrame parent && parent.Action is { Type: CardActionType.Use } a && a.ActionId == use.CardActionId && a.ActorSeat == use.ActorSeat && a.EffectiveKind == use.EffectiveKind && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind) == SkillProgramCardCategory.Trick ? parent : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 31900, SkillProgramEffectOp.ResolveMouGanNingWeiTarget)]
     internal bool CanOfferMouGnWei(int owner, ProgramSkillWindowContext c) => MouGnParent(c)is { } parent && parent.TargetSeats.Any(t => _coreMatchParticipantsPlayersAccess._players[t].IsAlive && MouGnWei(t, owner)is { } e && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[owner], MouGanNingMobileComposition.Fenwei, e.Source.SkillInstanceId));
     internal SkillProgramStepOutcome BeginMouGn(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -68,10 +65,10 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
         var list = new List<PromptChoice>();
         if (r.Stage == MouGanNingStage.Guess && _coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive)
         {
-            var mask = _coreProgramEventHistoryOperations.ProgramEventHistory<MouGanNingGuessedEvent>().Where(e => e.Phase == r.Phase && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGanNingStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == f.OwnerSeat)).Aggregate(0, (m, e) => m | 1 << Array.IndexOf(global::CardGame.Core.EngineOwners.CharacterGanNingMouMobileDefinitions.MouGnSuits, e.Suit));
-            foreach (var(suit, index)in global::CardGame.Core.EngineOwners.CharacterGanNingMouMobileDefinitions.MouGnSuits.Select((s, i) => (s, i)))
+            var mask = _coreProgramEventHistoryOperations.ProgramEventHistory<MouGanNingGuessedEvent>().Where(e => e.Phase == r.Phase && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGanNingStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == f.OwnerSeat)).Aggregate(0, (m, e) => m | 1 << Array.IndexOf(CharacterGanNingMouMobileDefinitions.MouGnSuits, e.Suit));
+            foreach (var(suit, index)in CharacterGanNingMouMobileDefinitions.MouGnSuits.Select((s, i) => (s, i)))
                 if ((mask & 1 << index) == 0)
-                    list.Add(MouGnChoice(f, "guess", $"猜测{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitName(suit))}最多", suit: suit.ToString()));
+                    list.Add(MouGnChoice(f, "guess", $"猜测{(CoreNativeCardClassificationsRuntime.GetSuitName(suit))}最多", suit: suit.ToString()));
         }
 
         if (r.Stage == MouGanNingStage.Repeat)
@@ -138,7 +135,7 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
     [ProgramAnswer("mou-gan-ning")]
     internal void AnswerMouGn(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouGanNing: { } r } f || !ValidMouGn(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouGanNingStage.Guess ? r.TargetSeat : f.OwnerSeat) || !MouGnChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouGanNing: { } r } f || !ValidMouGn(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouGanNingStage.Guess ? r.TargetSeat : f.OwnerSeat) || !MouGnChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Gan Ning choice lost its original chooser or actual card slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -147,11 +144,11 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
         {
             var suit = Enum.Parse<Suit>(choice.Parameters["suit"]);
             var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]);
-            var counts = global::CardGame.Core.EngineOwners.CharacterGanNingMouMobileDefinitions.MouGnSuits.Select(s => hand.Count(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c) == s)).ToArray();
-            var correct = counts[Array.IndexOf(global::CardGame.Core.EngineOwners.CharacterGanNingMouMobileDefinitions.MouGnSuits, suit)] == counts.Max();
+            var counts = CharacterGanNingMouMobileDefinitions.MouGnSuits.Select(s => hand.Count(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c) == s)).ToArray();
+            var correct = counts[Array.IndexOf(CharacterGanNingMouMobileDefinitions.MouGnSuits, suit)] == counts.Max();
             r = r with
             {
-                GuessedMask = r.GuessedMask | 1 << Array.IndexOf(global::CardGame.Core.EngineOwners.CharacterGanNingMouMobileDefinitions.MouGnSuits, suit),
+                GuessedMask = r.GuessedMask | 1 << Array.IndexOf(CharacterGanNingMouMobileDefinitions.MouGnSuits, suit),
                 Wrong = r.Wrong + (correct ? 0 : 1),
                 Stage = correct ? MouGanNingStage.Discard : MouGanNingStage.Repeat
             };
@@ -365,12 +362,12 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
         {
             var target = r.Targets[r.TargetIndex];
             var parent = _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId);
-            var friendly = global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target]);
-            return p.Choices.Single(c => c.Parameters["branch"] == (friendly && parent?.Action is { } a && (global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(a.EffectiveKind) || a.EffectiveKind == CardKind.Dismantlement || a.EffectiveKind == CardKind.Snatch) ? "cancel" : "obtain"));
+            var friendly = CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target]);
+            return p.Choices.Single(c => c.Parameters["branch"] == (friendly && parent?.Action is { } a && (CoreGameEngineMouLuMengRuntime.IsDamageCardKind(a.EffectiveKind) || a.EffectiveKind == CardKind.Dismantlement || a.EffectiveKind == CardKind.Snatch) ? "cancel" : "obtain"));
         }
 
         if (r.Stage == MouGanNingStage.PlaceTarget)
-            return p.Choices.OrderByDescending(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenBy(c => c.Targets.Single()).First();
+            return p.Choices.OrderByDescending(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenBy(c => c.Targets.Single()).First();
         return p.Choices.First();
     }
 }

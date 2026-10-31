@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_OverflowTargetCancellationObservers
 {
     internal static bool SameOverflowAction(CardActionContext a, CardActionContext b) =>
@@ -15,7 +15,7 @@ internal static class RuntimeRules_Core_OverflowTargetCancellationObservers
     internal static bool SameOverflowIssuance(OverflowTargetCancellationReceipt a, OverflowTargetCancellationReceipt b) =>
         a.InstructionIndex == b.InstructionIndex && a.Source == b.Source && a.GameplayHash == b.GameplayHash &&
         a.WindowFrameId == b.WindowFrameId && a.CardUseFrameId == b.CardUseFrameId && a.ActionId == b.ActionId &&
-        a.ProviderSeat == b.ProviderSeat && a.EffectiveKind == b.EffectiveKind && CardGame.Core.RuntimeSkills.RuntimeRules_Core_OverflowTargetCancellationObservers.SameOverflowAction(a.ActionBeforeCancellation, b.ActionBeforeCancellation) &&
+        a.ProviderSeat == b.ProviderSeat && a.EffectiveKind == b.EffectiveKind && RuntimeRules_Core_OverflowTargetCancellationObservers.SameOverflowAction(a.ActionBeforeCancellation, b.ActionBeforeCancellation) &&
         a.HandCount == b.HandCount && a.HandLimit == b.HandLimit && a.RecipientSeat == b.RecipientSeat && a.SequenceBefore == b.SequenceBefore &&
         a.OriginalTargetSeats.SequenceEqual(b.OriginalTargetSeats) && a.BeforeTargetSeats.SequenceEqual(b.BeforeTargetSeats) &&
         a.CanceledPrimaryTargetSeats.SequenceEqual(b.CanceledPrimaryTargetSeats) && a.ResultTargetSeats.SequenceEqual(b.ResultTargetSeats) &&

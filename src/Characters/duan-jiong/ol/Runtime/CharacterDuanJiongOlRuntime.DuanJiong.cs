@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,8 +8,8 @@ internal sealed partial class CharacterDuanJiongOlRuntime
     internal const string SaoguDiscardReason = "skill-program.duan-jiong.saogu.discard", SaoguDrawReason = "skill-program.duan-jiong.saogu.draw";
     internal bool HasDuanJiongSaoguCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveSaoguConversionSweep);
 
-    internal static CardConversionSource DuanJiongSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_duan_jiong_ol_DuanJiong.DuanJiongSource(f);
-    internal static int SaoguSuitBit(Suit suit) => global::CardGame.Core.RuntimeSkills.RuntimeRules_duan_jiong_ol_DuanJiong.SaoguSuitBit(suit);
+    internal static CardConversionSource DuanJiongSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_duan_jiong_ol_DuanJiong.DuanJiongSource(f);
+    internal static int SaoguSuitBit(Suit suit) => RuntimeSkills.RuntimeRules_duan_jiong_ol_DuanJiong.SaoguSuitBit(suit);
     internal int SaoguDiscardedSuitMask(int actor, ActualDiscardRecoveryPhaseKey phase) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DuanJiongSaoguDiscardSuitEvent>().Where(e => e.OwnerSeat == actor && e.Phase == phase).Aggregate(0, (bits, e) => bits | SaoguSuitBit(e.Suit));
     internal void CaptureDuanJiongSaoguBatch(CardMovementBatchContext batch)
     {
@@ -20,7 +17,7 @@ internal sealed partial class CharacterDuanJiongOlRuntime
             return;
         foreach (var m in batch.Movements)
         {
-            var source = _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m) ?? (_coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(m) && global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(m.Reason) ? m.From : (CardLocation? )null);
+            var source = _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m) ?? (_coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(m) && CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(m.Reason) ? m.From : (CardLocation? )null);
             if (!_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || source is not { OwnerSeat: { } actor } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DuanJiongSaoguDiscardSuitEvent>().Any(e => e.MovementSequence == m.Sequence))
                 continue;
             var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[actor], _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId));
@@ -29,7 +26,7 @@ internal sealed partial class CharacterDuanJiongOlRuntime
     }
 
     internal IReadOnlyList<DuanJiongSaoguCard> SaoguDiscardable(int actor, int forbidden, string skill, string instance) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[actor]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(actor)).Where(c => !c.IsGeneralWeapon && (SaoguSuitBit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[actor], c)) & forbidden) == 0 && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(actor, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(actor, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(actor, skill, instance, c)).Select(c => new DuanJiongSaoguCard(c.Id, _cardZonesOperations._cardZones.GetLocation(c.Id), c.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[actor], c))).ToArray());
-    SkillProgramStepOutcome global::CardGame.Core.IDuanJiongProgramHost.Resolve(ProgramSkillFrame f) => BeginDuanJiongSaogu(f);
+    SkillProgramStepOutcome IDuanJiongProgramHost.Resolve(ProgramSkillFrame f) => BeginDuanJiongSaogu(f);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 27060, SkillProgramEffectOp.ResolveSaoguConversionSweep)]
     internal bool AllowsDuanJiongSaogu(CharacterState owner) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == owner.Seat && _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Any(i => i.SkillId == "ol:saogu" && (_coreProgramPersistentStateOperations.GetProgramBooleanState2(owner.Seat, i.SkillId, i.SkillInstanceId, "yin") || SaoguDiscardable(owner.Seat, SaoguDiscardedSuitMask(owner.Seat, phase), i.SkillId, i.SkillInstanceId).Count >= 2));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27060)]
@@ -106,7 +103,7 @@ internal sealed partial class CharacterDuanJiongOlRuntime
     [ProgramAnswer("duan-jiong-saogu")]
     internal void AnswerSaogu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuanJiongSaogu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == DuanJiongSaoguStage.DelegateChoice ? f.OwnerSeat : r.ActorSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], SaoguChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuanJiongSaogu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == DuanJiongSaoguStage.DelegateChoice ? f.OwnerSeat : r.ActorSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], SaoguChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Saogu requires the exact original chooser, materials and native targets.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == DuanJiongSaoguStage.UseChoice)
@@ -265,7 +262,7 @@ internal sealed partial class CharacterDuanJiongOlRuntime
     {
         var view = _corePlayerViewProjectionOperations.CreateSnapshot(p.PlayerSeat);
         double Hostility(int seat) => _coreAiBrainsAiBrainsAccess._aiBrains[p.PlayerSeat].ScoreProgramTarget(view, seat, new(0, 0, 0, 0, 0, 1, false, false));
-        return p.Choices.OrderBy(c => c.Cards.Sum(id => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(id), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])) - c.Targets.Sum(Hostility)).First();
+        return p.Choices.OrderBy(c => c.Cards.Sum(id => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(id), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])) - c.Targets.Sum(Hostility)).First();
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 2600)]

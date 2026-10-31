@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXunYuMouRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterXunYuMouRuntime
         var plans = new List<MouXyPlan>();
         foreach (var o in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, physicalSuit: Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: []))
         {
-            if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(o.EffectiveCardKind))
+            if (!CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(o.EffectiveCardKind))
                 continue;
             var normal = _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(o.EffectiveCardKind, r.Actor, o.TargetSeats);
             plans.Add(new(o.EffectiveCardKind, o.ActionKind, o.TargetCardId, o.RequiredCardKind, false) { Targets = normal });

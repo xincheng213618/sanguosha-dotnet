@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5ZhangliangRuntime
@@ -81,7 +77,7 @@ internal sealed partial class CoreGameEngineShanheS5ZhangliangRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { SelectedTargetSeats = Array.AsReadOnly(new[] { context.TargetSeat!.Value }) });
     }
 
-    void global::CardGame.Core.IOwnTurnEnemyHandGainProgramHost.BindOwnTurnEnemyHandGain(ProgramSkillFrame frame) => BindOwnTurnEnemyHandGain(frame);
+    void IOwnTurnEnemyHandGainProgramHost.BindOwnTurnEnemyHandGain(ProgramSkillFrame frame) => BindOwnTurnEnemyHandGain(frame);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 200)]
     internal void CollectWindow_CollectOwnTurnEnemyHandGainCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result) => result.AddRange(CollectOwnTurnEnemyHandGainCandidates(batch));
     [ProgramPipelineHook(ProgramPipelinePhase.ExcludeOrdinaryMovementCandidate, 500)]

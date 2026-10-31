@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuCheErMouRuntime
@@ -56,7 +52,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
 
     internal bool IsIssuedMouHuCheErUse(CardUseFrame use)
     {
-        if (use.MouHuCheErSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.UnlimitedUse != true || o.UseId != use.Id || o.ActionId != current.ActionId || current.ProviderSeat != o.Source.OwnerSeat || current.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuCheErSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouHuCheEr: { Stage: MouHuCheErStage.NativeSlash, Returned: false } r } parent || !ValidMouHuCheEr(parent) || r.UseId != use.Id || r.ActionId != current.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.Index != o.Index || r.Target != o.Target)
+        if (use.MouHuCheErSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.UnlimitedUse != true || o.UseId != use.Id || o.ActionId != current.ActionId || current.ProviderSeat != o.Source.OwnerSeat || current.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuCheErSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouHuCheEr: { Stage: MouHuCheErStage.NativeSlash, Returned: false } r } parent || !ValidMouHuCheEr(parent) || r.UseId != use.Id || r.ActionId != current.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.Index != o.Index || r.Target != o.Target)
             return false;
         var original = current;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -74,7 +70,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
     internal bool IsMouHuCheErUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouHuCheErUse(use);
     internal Card MouHuCheErRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouHuCheErUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Kongwu requires its own native zero-material representation.");
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 35800)]
-    internal bool FinishMouHuCheErAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishMouHuCheErAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || !IsMouHuCheErUse(attack.ResolutionId))
@@ -115,7 +111,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 35800)]
-    internal bool ReturnMouHuCheErAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt c)
+    internal bool ReturnMouHuCheErAttack(GameEngine.AttackCompletionReceipt c)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouHuCheEr: { Returned: true, Stage: MouHuCheErStage.NativeSlash } r } f || c.ResolutionId != r.UseId)
             return false;

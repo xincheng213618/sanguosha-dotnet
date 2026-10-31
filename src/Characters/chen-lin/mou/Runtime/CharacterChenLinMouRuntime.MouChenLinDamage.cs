@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenLinMouRuntime
@@ -25,10 +21,10 @@ internal sealed partial class CharacterChenLinMouRuntime
             _ => throw new InvalidOperationException("Yaozuo damage needs its native owning attack frame.")});
     }
 
-    internal int MouChenLinDamageCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
-    internal MouChenLinDamageTicketEvent[] AvailableMouChenLinTickets(global::CardGame.Core.GameEngine.IDamageAttempt a) => a.IsSourceLess ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinDamageTicketEvent>().Where(t => t.Source.OwnerSeat == a.SourceSeat && t.Target == a.TargetSeat && t.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _contentRegistryOperations._contentRegistry.GetSkill(t.Source.SkillId).Program?.GameplayHash == t.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinInvitationClosedEvent>().Count(e => e.FrameId == t.FrameId) == 1 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinDamageTicketConsumedEvent>().Any(e => e.FrameId == t.FrameId && e.Target == t.Target)).ToArray();
+    internal int MouChenLinDamageCursor(GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
+    internal MouChenLinDamageTicketEvent[] AvailableMouChenLinTickets(GameEngine.IDamageAttempt a) => a.IsSourceLess ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinDamageTicketEvent>().Where(t => t.Source.OwnerSeat == a.SourceSeat && t.Target == a.TargetSeat && t.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _contentRegistryOperations._contentRegistry.GetSkill(t.Source.SkillId).Program?.GameplayHash == t.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinInvitationClosedEvent>().Count(e => e.FrameId == t.FrameId) == 1 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinDamageTicketConsumedEvent>().Any(e => e.FrameId == t.FrameId && e.Target == t.Target)).ToArray();
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 37000)]
-    internal int ApplyMouChenLinNextDamage(global::CardGame.Core.GameEngine.IDamageAttempt a)
+    internal int ApplyMouChenLinNextDamage(GameEngine.IDamageAttempt a)
     {
         if (!HasMouChenLin || a.IsSourceLess || a.DamageAmount <= 0)
             return 0;
@@ -63,18 +59,18 @@ internal sealed partial class CharacterChenLinMouRuntime
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenLinDamageTicketConsumedEvent(ticket, r.Target, attack.ResolutionId, r.ChainCursor));
     }
 
-    internal void SetMouChenLinChainAmount(global::CardGame.Core.GameEngine.IDamageAttempt a, int amount)
+    internal void SetMouChenLinChainAmount(GameEngine.IDamageAttempt a, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(a, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !a.IsChainPropagation || amount < 0)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(a, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !a.IsChainPropagation || amount < 0)
             throw new InvalidOperationException("Yaozuo can rebase only its exact current native chained recipient.");
-        if (a is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (a is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(a.ResolutionId, s => s with { DamageAmount = amount });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(a.ResolutionId, s => s!with { DamageAmount = amount });
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 37000)]
-    internal void PrepareMouChenLinChain(global::CardGame.Core.GameEngine.IDamageAttempt a)
+    internal void PrepareMouChenLinChain(GameEngine.IDamageAttempt a)
     {
         if (!HasMouChenLin || MouChenLinDamageState(a.ResolutionId)is not { } r)
             return;
@@ -86,7 +82,7 @@ internal sealed partial class CharacterChenLinMouRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 37000)]
-    internal void ApplyMouChenLinChain(global::CardGame.Core.GameEngine.IDamageAttempt a)
+    internal void ApplyMouChenLinChain(GameEngine.IDamageAttempt a)
     {
         if (HasMouChenLin && a.IsChainPropagation && a.DamageAmountFinalized)
             SetMouChenLinChainAmount(a, checked(a.DamageAmount + ApplyMouChenLinNextDamage(a)));

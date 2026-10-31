@@ -1,35 +1,31 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MouLidanRuntime))]
-internal sealed class CharacterChengYuMouOlMouLidanAdapter(global::System.Func<global::CardGame.Core.MouLidanRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterChengYuMouOlMouLidanOperations
+[Core.ProgramCapability(typeof(MouLidanRuntime))]
+internal sealed class CharacterChengYuMouOlMouLidanAdapter(Func<MouLidanRuntime> targetFactory) : ICharacterChengYuMouOlMouLidanOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MouLidanRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MouLidanRuntime Get() => this._targetFactory();
+    private readonly Func<MouLidanRuntime> _targetFactory = targetFactory;
+    public MouLidanRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MouDanchiRuntime))]
-internal sealed class CharacterChengYuMouOlMouDanchiAdapter(global::System.Func<global::CardGame.Core.MouDanchiRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterChengYuMouOlMouDanchiOperations
+[Core.ProgramCapability(typeof(MouDanchiRuntime))]
+internal sealed class CharacterChengYuMouOlMouDanchiAdapter(Func<MouDanchiRuntime> targetFactory) : ICharacterChengYuMouOlMouDanchiOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MouDanchiRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MouDanchiRuntime Get() => this._targetFactory();
+    private readonly Func<MouDanchiRuntime> _targetFactory = targetFactory;
+    public MouDanchiRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime))]
-internal sealed class CharacterChengYuMouOlCoreNativeRuleQueriesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterChengYuMouOlCoreNativeRuleQueriesOperations
+[Core.ProgramCapability(typeof(CoreNativeRuleQueriesRuntime))]
+internal sealed class CharacterChengYuMouOlCoreNativeRuleQueriesAdapter(Func<CoreNativeRuleQueriesRuntime> targetFactory) : ICharacterChengYuMouOlCoreNativeRuleQueriesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> _targetFactory = targetFactory;
+    private readonly Func<CoreNativeRuleQueriesRuntime> _targetFactory = targetFactory;
     public int GetCombatDistance(int sourceSeat, int targetSeat) => this._targetFactory().GetCombatDistance(sourceSeat, targetSeat);
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime))]
-internal sealed class CharacterChengYuMouOlCoreProgramTargetRulesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterChengYuMouOlCoreProgramTargetRulesOperations
+[Core.ProgramCapability(typeof(CoreProgramTargetRulesRuntime))]
+internal sealed class CharacterChengYuMouOlCoreProgramTargetRulesAdapter(Func<CoreProgramTargetRulesRuntime> targetFactory) : ICharacterChengYuMouOlCoreProgramTargetRulesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
+    private readonly Func<CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
+    public ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
 }

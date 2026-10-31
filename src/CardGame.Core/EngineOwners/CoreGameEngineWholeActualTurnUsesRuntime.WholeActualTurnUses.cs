@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWholeActualTurnUsesRuntime
@@ -24,9 +20,9 @@ internal sealed partial class CoreGameEngineWholeActualTurnUsesRuntime
         return CapturedWholeActualTurnUsePrefixOrdinal(current, action.ActorSeat, null);
     }
 
-    internal int? CapturedWholeActualTurnTrickUseOrdinal(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int? CapturedWholeActualTurnTrickUseOrdinal(GameEngine.IDamageAttempt attack)
     {
-        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasWholeActualTurnTrickDamageModifiers || !HasOngoingWholeActualUseTurn || attack is not global::CardGame.Core.NativeOwners.CardAttackHandle || attack.EffectiveCardKind is not { } kind || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind) != SkillProgramCardCategory.Trick)
+        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasWholeActualTurnTrickDamageModifiers || !HasOngoingWholeActualUseTurn || attack is not NativeOwners.CardAttackHandle || attack.EffectiveCardKind is not { } kind || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind) != SkillProgramCardCategory.Trick)
             return null;
         var owner = _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == attack.ResolutionId);
         var instruction = owner is ProgramSkillFrame { CardAttack: { ProgramUseInstructionIndex: { } index } } ? index : (int? )null;

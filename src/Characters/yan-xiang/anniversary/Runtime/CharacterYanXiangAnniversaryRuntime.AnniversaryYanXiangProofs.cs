@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanXiangAnniversaryRuntime
@@ -19,8 +15,8 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
         if (index < 1)
             return false;
         if (operation == SkillProgramEffectOp.ResolveAnniversaryYanXiangYuzhengReward)
-            return f.SkillId == AnniversaryYanXiangComposition.Yuzheng && f.TriggerId is "issued-use-reward" or "issued-response-reward" && w.Window is SkillProgramTriggerWindow.CardUseCompleted or SkillProgramTriggerWindow.CardResponseCompleted && _resolutionStackOperations._resolutionStack[index - 1] is ProgramCardTriggerWindowFrame p && p.Id == w.ParentFrameId && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(p.Candidates[p.CandidateIndex]));
-        return operation == SkillProgramEffectOp.ResolveAnniversaryYanXiangSuishi && f.SkillId == AnniversaryYanXiangComposition.Suishi && f.TriggerId is "own-ending-damage-name" or "other-ending-damage-name" && w.Window == SkillProgramTriggerWindow.TurnEnding && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame ending && ending.Id == w.ParentFrameId && ending.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && ending.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && w.SourceSeat == ending.OwnerSeat && w.TargetSeat == ending.OwnerSeat && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && w.OccurrenceIndex == candidate.OccurrenceIndex && w.Facts == (ending.Items[ending.ItemIndex].Facts ?? ending.Facts);
+            return f.SkillId == AnniversaryYanXiangComposition.Yuzheng && f.TriggerId is "issued-use-reward" or "issued-response-reward" && w.Window is SkillProgramTriggerWindow.CardUseCompleted or SkillProgramTriggerWindow.CardResponseCompleted && _resolutionStackOperations._resolutionStack[index - 1] is ProgramCardTriggerWindowFrame p && p.Id == w.ParentFrameId && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(p.Candidates[p.CandidateIndex]));
+        return operation == SkillProgramEffectOp.ResolveAnniversaryYanXiangSuishi && f.SkillId == AnniversaryYanXiangComposition.Suishi && f.TriggerId is "own-ending-damage-name" or "other-ending-damage-name" && w.Window == SkillProgramTriggerWindow.TurnEnding && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame ending && ending.Id == w.ParentFrameId && ending.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && ending.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && w.SourceSeat == ending.OwnerSeat && w.TargetSeat == ending.OwnerSeat && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && w.OccurrenceIndex == candidate.OccurrenceIndex && w.Facts == (ending.Items[ending.ItemIndex].Facts ?? ending.Facts);
     }
 
     internal bool ValidYanXiang(ProgramSkillFrame f)
@@ -54,7 +50,7 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
                 return false;
             if (r.Stage != AnniversaryYanXiangStage.DamageName && (r.Name is not { } name || !YanXiangDamageNames().Contains(name) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYanXiangNameDeclaredEvent>().Count(e => e == new AnniversaryYanXiangNameDeclaredEvent(f.Id, r.Actor, name)) != 1))
                 return false;
-            if (r.Plan is { } p && (p.CardId <= 0 || p.From.OwnerSeat != r.Actor || p.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(p.Kind) != r.Name || p.Targets.Distinct().Count() != p.Targets.Count || p.Targets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t))))
+            if (r.Plan is { } p && (p.CardId <= 0 || p.From.OwnerSeat != r.Actor || p.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(p.Kind) != r.Name || p.Targets.Distinct().Count() != p.Targets.Count || p.Targets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t))))
                 return false;
             if (r.Stage is AnniversaryYanXiangStage.IssuingUse or AnniversaryYanXiangStage.NativeUse or AnniversaryYanXiangStage.NativeTail && r.Plan is null)
                 return false;
@@ -78,9 +74,9 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
         if (child is CardUseFrame use)
             return r.Stage == AnniversaryYanXiangStage.NativeUse && IsYanXiangNativeUse(use);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryYanXiangStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.Actor && draw.Context.RequestedCount == r.Requested && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryYanXiangStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.Actor && draw.Context.RequestedCount == r.Requested && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } p && YanXiangMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+            return f.PendingMovementContinuation is { } p && YanXiangMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame recovery)
             return recovery.ParentFrameId == f.Id && recovery.Return.ResumeFrameId == f.Id && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is HpChangedTriggerWindowFrame hp)

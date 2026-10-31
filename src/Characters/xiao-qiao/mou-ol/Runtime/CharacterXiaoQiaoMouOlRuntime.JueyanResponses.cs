@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiaoQiaoMouOlRuntime
@@ -41,20 +36,20 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
                 ["output-kind"] = kind.ToString(),
                 ["dying-use"] = dying ? "true" : "false"
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, conversion);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, conversion);
             return new PromptChoice(new($"jueyan.response.{(actor.Seat)}.{(card.Id)}.{(kind)}.{(source.SkillInstanceId)}"), $"绝颜：展示并保留【{(card.DisplayName)}】，视为使用之。", [card.Id], [], parameters);
         }).ToArray());
     }
 
     internal bool BeginMouXqJueyanResponse(PromptChoice selected)
     {
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || selected.Cards is not [var id] || !Enum.TryParse<CardKind>(selected.Parameters.GetValueOrDefault("output-kind"), out var kind))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || selected.Cards is not [var id] || !Enum.TryParse<CardKind>(selected.Parameters.GetValueOrDefault("output-kind"), out var kind))
             throw new InvalidOperationException("Jueyan needs its actual published Hand response choice.");
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
         var dying = selected.Parameters.GetValueOrDefault("dying-use") == "true";
-        if (!MouXqJueyanResponseChoices(actor, kind, dying).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || prompt.Kind != (dying ? DecisionKind.RescueDying : kind == CardKind.Dodge ? DecisionKind.RespondDodge : DecisionKind.Nullification))
+        if (!MouXqJueyanResponseChoices(actor, kind, dying).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || prompt.Kind != (dying ? DecisionKind.RescueDying : kind == CardKind.Dodge ? DecisionKind.RespondDodge : DecisionKind.Nullification))
             throw new InvalidOperationException("Jueyan cannot replace pure Played or another native responder.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
         var program = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!;
         var parent = dying ? _coreDyingCursorRuntimeOperations.ActiveDying!.Id : kind == CardKind.Nullification ? _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow!.Id : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack!.ResolutionId;
         var target = dying ? _coreDyingCursorRuntimeOperations.ActiveDying!.VictimSeat : kind == CardKind.Nullification ? _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow!.SourceSeat : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack!.SourceSeat;
@@ -78,7 +73,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             return false;
         return r.DecisionKind switch
         {
-            DecisionKind.RespondDodge => parent is ResponseWindowFrame w && w.ParentFrameId == r.ParentFrameId && w.ResponderSeat == f.OwnerSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(r.ParentFrameId)is { CardAttack: { } attack } && attack.TargetSeat == f.OwnerSeat && attack.SourceSeat == r.TargetSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash),
+            DecisionKind.RespondDodge => parent is ResponseWindowFrame w && w.ParentFrameId == r.ParentFrameId && w.ResponderSeat == f.OwnerSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(r.ParentFrameId)is { CardAttack: { } attack } && attack.TargetSeat == f.OwnerSeat && attack.SourceSeat == r.TargetSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash),
             DecisionKind.Nullification => parent is NullificationWindowFrame n && n.Id == r.ParentFrameId && n.SourceSeat == r.TargetSeat && n.CandidateIndex < n.CandidateSeats.Count && n.CandidateSeats[n.CandidateIndex] == f.OwnerSeat,
             DecisionKind.RescueDying => parent is DyingFrame dying && dying.Id == r.ParentFrameId && dying.VictimSeat == r.TargetSeat && dying.ResponderSeat == f.OwnerSeat,
             _ => IsMouXqForcedRequest(r, parent)};
@@ -210,7 +205,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _coreDelayedNullificationOperations.NullificationParentActionId(pending), CardActionType.Response, actor.Seat, actor.Seat, null, actor.Seat, pending.SourceSeat, CardKind.Nullification, [], [], [grant.Source], effectiveSuit: Suit.None, effectiveRank: 0));
         SignMouXqResponse(pending, grant, action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(0, actor.Seat, pending.SourceSeat, CardKind.Nullification));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, actor.Seat, 0, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, actor.Seat, 0, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(action));
         _characterCaoXiOlOperations.CaptureCaoXiNativeCounterspellOffset(pending, action, false);

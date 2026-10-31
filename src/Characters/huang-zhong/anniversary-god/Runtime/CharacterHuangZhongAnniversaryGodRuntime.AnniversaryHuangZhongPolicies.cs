@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
 {
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 39600)]
-    internal int AnniversaryHzDijiDamage(global::CardGame.Core.GameEngine.IDamageAttempt a) => ActiveAnniversaryHzBody(a.TargetSeat, AnniversaryHzBody.Diji).Count();
+    internal int AnniversaryHzDijiDamage(GameEngine.IDamageAttempt a) => ActiveAnniversaryHzBody(a.TargetSeat, AnniversaryHzBody.Diji).Count();
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 39600)]
-    internal bool ObserveAnniversaryHzApplied(global::CardGame.Core.GameEngine.IDamageAttempt a, long damageId)
+    internal bool ObserveAnniversaryHzApplied(GameEngine.IDamageAttempt a, long damageId)
     {
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == damageId)is not DamageFrame { Amount: > 0 } damage)
             return false;
@@ -63,7 +59,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
 
     internal void IssueAnniversaryHzActualUse(CardActionContext a, long parent)
     {
-        if (a.Type == CardActionType.Use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && ActiveAnniversaryHzZhanjue(a.ActorSeat, 1)is { } issue && _coreCardUseLifecycleOperations.LifecycleCardUse(parent)is { Action: { } current } use && current.ActionId == a.ActionId)
+        if (a.Type == CardActionType.Use && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && ActiveAnniversaryHzZhanjue(a.ActorSeat, 1)is { } issue && _coreCardUseLifecycleOperations.LifecycleCardUse(parent)is { Action: { } current } use && current.ActionId == a.ActionId)
         {
             var noResponse = new IssuedCardNoResponse(a.ActionId, parent, issue.Source, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(parent, f => f with { AnniversaryHzSlashIssueId = issue.Id, IssuedNoResponse = f.IssuedNoResponse ?? noResponse });
@@ -126,7 +122,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
         return true;
     }
 
-    internal bool HasAnniversaryHzIneffectiveResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal bool HasAnniversaryHzIneffectiveResponse(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         if (continuation != ProgramCardContinuation.Dodge || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.AnniversaryHzResponses is not { } proofs)
             return false;
@@ -138,7 +134,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
         return true;
     }
 
-    internal bool ContinueAnniversaryHzIneffectiveDodge(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal bool ContinueAnniversaryHzIneffectiveDodge(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         if (!HasAnniversaryHzIneffectiveResponse(attack, action, continuation))
             return false;
@@ -206,10 +202,10 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 39600)]
-    internal bool AnniversaryHzUseDistance(ProgramCardDistanceQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && (q.CardUseFrameId is { } id ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.AnniversaryHzSlashIssueId is not null : ActiveAnniversaryHzZhanjue(q.Actor.Seat, 1)is not null);
+    internal bool AnniversaryHzUseDistance(ProgramCardDistanceQuery q) => CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && (q.CardUseFrameId is { } id ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.AnniversaryHzSlashIssueId is not null : ActiveAnniversaryHzZhanjue(q.Actor.Seat, 1)is not null);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 39600)]
     [ProgramDistanceRule(ProgramDistanceStage.VirtualSlash, 39600)]
     [ProgramDistanceRule(ProgramDistanceStage.ProvidedSlash, 39600)]
     [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 39600)]
-    internal bool AnniversaryHzSlashDistance(ProgramSlashDistanceQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && (q.ExistingUseFrameId is { } id ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.AnniversaryHzSlashIssueId is not null : ActiveAnniversaryHzZhanjue(q.Actor.Seat, 1)is not null);
+    internal bool AnniversaryHzSlashDistance(ProgramSlashDistanceQuery q) => CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && (q.ExistingUseFrameId is { } id ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.AnniversaryHzSlashIssueId is not null : ActiveAnniversaryHzZhanjue(q.Actor.Seat, 1)is not null);
 }

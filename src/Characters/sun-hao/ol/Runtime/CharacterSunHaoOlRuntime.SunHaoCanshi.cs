@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunHaoOlRuntime
 {
     internal const string SunHaoCanshiDiscardReason = "skill-program.sun-hao.canshi.discard";
-    internal static CardConversionSource SunHaoSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_hao_ol_SunHaoCanshi.SunHaoSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.ISunHaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginSunHao(f, op);
-    internal bool SunHaoCanshiUseKind(CardActionContext a, string skillId) => skillId == SunHaoComposition.MobileCanshi ? a.Type == CardActionType.Use ? global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind)is SkillProgramCardCategory.Basic or SkillProgramCardCategory.Trick : a.Type == CardActionType.Response && a.EffectiveKind is CardKind.Dodge or CardKind.Nullification : skillId == "ol:sun-hao-canshi" && (a.Type == CardActionType.Use ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind) : a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Nullification);
+    internal static CardConversionSource SunHaoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_sun_hao_ol_SunHaoCanshi.SunHaoSource(f);
+    SkillProgramStepOutcome ISunHaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginSunHao(f, op);
+    internal bool SunHaoCanshiUseKind(CardActionContext a, string skillId) => skillId == SunHaoComposition.MobileCanshi ? a.Type == CardActionType.Use ? CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind)is SkillProgramCardCategory.Basic or SkillProgramCardCategory.Trick : a.Type == CardActionType.Response && a.EffectiveKind is CardKind.Dodge or CardKind.Nullification : skillId == "ol:sun-hao-canshi" && (a.Type == CardActionType.Use ? CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind) : a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Nullification);
     internal IReadOnlyList<SunHaoCanshiGrantedEvent> CurrentSunHaoGrants(int owner)
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber <= 0)
@@ -42,7 +39,7 @@ internal sealed partial class CharacterSunHaoOlRuntime
     [ProgramIssuedTrigger(540)]
     internal bool IsIssuedSunHaoCanshiCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
     {
-        if (candidate.SkillId is not ("ol:sun-hao-canshi" or SunHaoComposition.MobileCanshi) || candidate.BindingId != "issued-turn-use-discard" || c is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } card } || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CharacterMaMiDiOlRuntime.MaMiDiCandidateMatches(candidate, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex])) || _coreCardActionsOperations.CreateCardActionProgramContext2(w, w.Candidates[w.CandidateIndex]) != c || w.Action.ActionId != card.CardActionId || w.Action.ActorSeat != candidate.OwnerSeat || !SunHaoCanshiUseKind(w.Action, candidate.SkillId) || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+        if (candidate.SkillId is not ("ol:sun-hao-canshi" or SunHaoComposition.MobileCanshi) || candidate.BindingId != "issued-turn-use-discard" || c is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } card } || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CharacterMaMiDiOlRuntime.MaMiDiCandidateMatches(candidate, CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex])) || _coreCardActionsOperations.CreateCardActionProgramContext2(w, w.Candidates[w.CandidateIndex]) != c || w.Action.ActionId != card.CardActionId || w.Action.ActorSeat != candidate.OwnerSeat || !SunHaoCanshiUseKind(w.Action, candidate.SkillId) || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return false;
         if (w.Action.Type == CardActionType.Use)
         {
@@ -123,7 +120,7 @@ internal sealed partial class CharacterSunHaoOlRuntime
     [ProgramAnswer("sun-hao-canshi")]
     internal void AnswerSunHao(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunHaoCanshi: { Stage: SunHaoCanshiStage.SelectDiscard } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !SunHaoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunHaoCanshi: { Stage: SunHaoCanshiStage.SelectDiscard } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !SunHaoChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Canshi requires the exact current owner's legal private HE payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var id = choice.Cards.Single();
@@ -229,7 +226,7 @@ internal sealed partial class CharacterSunHaoOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveSunHaoCanshiUseDiscard)]
-    internal PromptChoice AiSunHao(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Cards is [var id] ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    internal PromptChoice AiSunHao(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Cards is [var id] ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     internal bool HasSunHaoCanshiIssuedDistance(long? useId, int actorSeat, int targetSeat)
     {
         if (!HasSunHaoCanshiCapability || useId is not { } id || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { } action } use || action.ActorSeat != actorSeat || use.SourceSeat != actorSeat)

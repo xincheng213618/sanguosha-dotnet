@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,11 +7,11 @@ internal sealed partial class CharacterSunRuOlRuntime
 {
     internal const string SunRuOlRefreshDiscardReason = "skill-program.sun-ru.ol.weimian.discard";
     internal const string SunRuOlRefreshDrawReason = "skill-program.sun-ru.ol.weimian.draw";
-    internal static int SunRuOlBitCount(int mask) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlWeimian.SunRuOlBitCount(mask);
+    internal static int SunRuOlBitCount(int mask) => RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlWeimian.SunRuOlBitCount(mask);
     internal static EquipmentSlot[] SunRuOlSlots => Enum.GetValues<EquipmentSlot>();
 
-    internal static string SunRuOlSlotName(EquipmentSlot s) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlWeimian.SunRuOlSlotName(s);
-    internal static string SunRuOlBenefitName(int b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlWeimian.SunRuOlBenefitName(b);
+    internal static string SunRuOlSlotName(EquipmentSlot s) => RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlWeimian.SunRuOlSlotName(s);
+    internal static string SunRuOlBenefitName(int b) => RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlWeimian.SunRuOlBenefitName(b);
     internal int SunRuOlAvailableSlotMask(int seat) => SunRuOlSlots.Select((slot, index) => _coreMatchParticipantsPlayersAccess._players[seat].EquipmentSlotCapacity(slot) > 0 ? 1 << index : 0).Aggregate(0, (a, b) => a | b);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 26110, SkillProgramEffectOp.AbolishEquipmentSlotsForDistinctBenefits)]
     internal bool CanActivateSunRuOlWeimian(int ownerSeat) => SunRuOlAvailableSlotMask(ownerSeat) != 0;
@@ -76,7 +73,7 @@ internal sealed partial class CharacterSunRuOlRuntime
     [ProgramAnswer("sunru-ol-weimian")]
     internal void AnswerSunRuOlChoice(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunRuOlWeimian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SunRuOlWeimianStage.Slots ? f.OwnerSeat : r.RecipientSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], SunRuOlChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunRuOlWeimian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SunRuOlWeimianStage.Slots ? f.OwnerSeat : r.RecipientSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], SunRuOlChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Weimian lost the current private chooser or exact distinct native choices.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var value = int.Parse(choice.Parameters["value"], CultureInfo.InvariantCulture);

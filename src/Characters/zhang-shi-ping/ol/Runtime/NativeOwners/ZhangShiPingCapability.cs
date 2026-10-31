@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ZhangShiPingCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZhangShiPingOlEntries> getCharacterZhangShiPingOlRuntime) : IZhangShiPingProgramHost
+internal sealed class ZhangShiPingCapability(Func<RuntimeEntries.CharacterZhangShiPingOlEntries> getCharacterZhangShiPingOlRuntime) : IZhangShiPingProgramHost
 {
     public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {

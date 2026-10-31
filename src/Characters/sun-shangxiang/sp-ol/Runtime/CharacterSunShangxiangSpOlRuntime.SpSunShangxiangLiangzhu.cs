@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,10 +7,10 @@ internal sealed partial class CharacterSunShangxiangSpOlRuntime
 {
     internal bool HasSpSunShangxiangLiangzhu => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveSpSunShangxiangLiangzhu);
 
-    internal static CardConversionSource SpSunShangxiangSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource SpSunShangxiangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static bool IsSpSunShangxiangLiangzhuTrigger(SkillProgramTrigger t) => t.Effects is [{ Op: SkillProgramEffectOp.ResolveSpSunShangxiangLiangzhu }];
-    SkillProgramStepOutcome global::CardGame.Core.ISpSunShangxiangOlHost.Liangzhu(ProgramSkillFrame f) => BeginSpSunShangxiangLiangzhu(f);
-    SkillProgramStepOutcome global::CardGame.Core.ISpSunShangxiangOlHost.CompleteFanxiang(ProgramSkillFrame f) => CompleteSpSunShangxiangFanxiang(f);
+    SkillProgramStepOutcome ISpSunShangxiangOlHost.Liangzhu(ProgramSkillFrame f) => BeginSpSunShangxiangLiangzhu(f);
+    SkillProgramStepOutcome ISpSunShangxiangOlHost.CompleteFanxiang(ProgramSkillFrame f) => CompleteSpSunShangxiangFanxiang(f);
     internal void CaptureSpSunShangxiangRecovery(HpChangeContext change)
     {
         if (!HasSpSunShangxiangLiangzhu || change.Kind != HpChangeKind.Recovery || change.Amount <= 0 || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != change.TargetSeat || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase))
@@ -38,7 +35,7 @@ internal sealed partial class CharacterSunShangxiangSpOlRuntime
     internal SkillProgramStepOutcome BeginSpSunShangxiangLiangzhu(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SpSunShangxiangLiangzhu is not null || f.InstructionIndex != 1 || f.ActivationId != f.TriggerId || f.WindowContext is not { } w || !CanRunSpSunShangxiangLiangzhu(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority), w))
+        if (f.SpSunShangxiangLiangzhu is not null || f.InstructionIndex != 1 || f.ActivationId != f.TriggerId || f.WindowContext is not { } w || !CanRunSpSunShangxiangLiangzhu(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority), w))
             throw new InvalidOperationException("Liangzhu cannot repeat or borrow another native recovery occurrence.");
         var r = new SpSunShangxiangLiangzhuReceipt(SpSunShangxiangSource(f), f.GameplayHash, w.ParentFrameId, w.TargetSeat!.Value);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SpSunShangxiangLiangzhu = r });
@@ -86,7 +83,7 @@ internal sealed partial class CharacterSunShangxiangSpOlRuntime
     [ProgramAnswer("sp-sun-shangxiang-liangzhu")]
     internal void AnswerSpSunShangxiangLiangzhu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SpSunShangxiangLiangzhu: { Stage: SpSunShangxiangLiangzhuStage.Choosing } r } f || !ValidSpSunShangxiangLiangzhu(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !SpSunShangxiangLiangzhuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SpSunShangxiangLiangzhu: { Stage: SpSunShangxiangLiangzhuStage.Choosing } r } f || !ValidSpSunShangxiangLiangzhu(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !SpSunShangxiangLiangzhuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Liangzhu lost its exact optional source-owner choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -142,7 +139,7 @@ internal sealed partial class CharacterSunShangxiangSpOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveSpSunShangxiangLiangzhu)]
-    internal PromptChoice AiSpSunShangxiangLiangzhu(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "help" && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.SpSunShangxiangLiangzhu!.RecoveredSeat])) ?? p.Choices.Single(c => c.Parameters["branch"] == "self");
+    internal PromptChoice AiSpSunShangxiangLiangzhu(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "help" && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.SpSunShangxiangLiangzhu!.RecoveredSeat])) ?? p.Choices.Single(c => c.Parameters["branch"] == "self");
     [ProgramTriggerProof(ProgramTriggerProofPhase.HpChangeOwner, 90, ProgramTriggerProofMatch.Decision)]
     internal bool? ProveSpLiangzhuHealth(SkillProgramTrigger trigger, ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => IsSpSunShangxiangLiangzhuTrigger(trigger) ? CanRunSpSunShangxiangLiangzhu(candidate, context) : null;
 }

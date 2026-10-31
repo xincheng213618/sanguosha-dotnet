@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoShuangOlRuntime
 {
-    internal CardConversionSource CaoShuangSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.ICaoShuangProgramHost.InheritDeadGeneralChosenSkill(ProgramSkillFrame f) => BeginCaoShuangTuogu(f);
-    SkillProgramStepOutcome global::CardGame.Core.ICaoShuangProgramHost.PlaceDamagedCardAsDelayedTrick(ProgramSkillFrame f) => BeginCaoShuangShanzhuan(f);
+    internal CardConversionSource CaoShuangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome ICaoShuangProgramHost.InheritDeadGeneralChosenSkill(ProgramSkillFrame f) => BeginCaoShuangTuogu(f);
+    SkillProgramStepOutcome ICaoShuangProgramHost.PlaceDamagedCardAsDelayedTrick(ProgramSkillFrame f) => BeginCaoShuangShanzhuan(f);
     internal string[] CaoShuangPrintedInheritanceSkills(int victim) => _coreMatchParticipantsPlayersAccess._players[victim].General.Skills.Concat(_coreMatchParticipantsPlayersAccess._players[victim].SecondaryGeneral?.Skills ?? []).Where(s => s.ContentId is not null && (s.Tags & (SkillTag.Limited | SkillTag.Awakening | SkillTag.Lord)) == 0 && !s.Name.Contains("隐匿", StringComparison.Ordinal) && !s.Description.Contains("隐匿", StringComparison.Ordinal)).Select(s => s.ContentId!).Distinct(StringComparer.Ordinal).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26060)]
     internal bool CanOfferCaoShuang(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
@@ -25,7 +22,7 @@ internal sealed partial class CharacterCaoShuangOlRuntime
     internal SkillProgramStepOutcome BeginCaoShuangTuogu(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.CaoShuangTuogu is not null || f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { Window: SkillProgramTriggerWindow.CharacterDied, TargetSeat: { } victim } context || _resolutionStackOperations._resolutionStack.OfType<ProgramKillTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } kill || kill.VictimSeat != victim || kill.CandidateIndex >= kill.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, kill.Candidates[kill.CandidateIndex]) || kill.Contexts[kill.CandidateIndex] != context || _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().SingleOrDefault(d => d.Id == kill.DeathFrameId)is not { KillerProgramsResolved: false } death || death.VictimSeat != victim || _coreMatchParticipantsPlayersAccess._players[victim].IsAlive || victim == f.OwnerSeat)
+        if (f.CaoShuangTuogu is not null || f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { Window: SkillProgramTriggerWindow.CharacterDied, TargetSeat: { } victim } context || _resolutionStackOperations._resolutionStack.OfType<ProgramKillTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } kill || kill.VictimSeat != victim || kill.CandidateIndex >= kill.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, kill.Candidates[kill.CandidateIndex]) || kill.Contexts[kill.CandidateIndex] != context || _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().SingleOrDefault(d => d.Id == kill.DeathFrameId)is not { KillerProgramsResolved: false } death || death.VictimSeat != victim || _coreMatchParticipantsPlayersAccess._players[victim].IsAlive || victim == f.OwnerSeat)
             throw new InvalidOperationException("Tuogu requires the exact current other-death candidate and deceased general.");
         var ids = CaoShuangPrintedInheritanceSkills(victim);
         if (ids.Length == 0)
@@ -53,7 +50,7 @@ internal sealed partial class CharacterCaoShuangOlRuntime
     [ProgramAnswer("caoshuang-tuogu")]
     internal void AnswerCaoShuangTuogu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoShuangTuogu: { Granted: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.VictimSeat || _coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoShuangTuoguChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoShuangTuogu: { Granted: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.VictimSeat || _coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoShuangTuoguChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Only the exact deceased chooser can select its frozen printed Tuogu skill.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))

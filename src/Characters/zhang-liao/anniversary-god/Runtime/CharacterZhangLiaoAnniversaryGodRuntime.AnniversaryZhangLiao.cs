@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
     internal const string AnnZlDiscard = "skill-program.anniversary-zhang-liao.discard";
     internal const string AnnZlDraw = "skill-program.anniversary-cuixi.draw";
     internal static CardConversionSource AnnZlSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryZhangLiaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnnZl(f, op);
+    SkillProgramStepOutcome IAnniversaryZhangLiaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnnZl(f, op);
     internal int AnnZlAbolished(int seat) => Enum.GetValues<EquipmentSlot>().Count(s => _coreMatchParticipantsPlayersAccess._players[seat].EquipmentSlotCapacity(s) == 0);
     internal IEnumerable<EquipmentSlot> AnnZlAvailable(int seat) => Enum.GetValues<EquipmentSlot>().Where(s => _coreMatchParticipantsPlayersAccess._players[seat].EquipmentSlotCapacity(s) > 0);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 40750, SkillProgramEffectOp.ResolveAnniversaryZhangLiaoCuixi, SkillProgramEffectOp.ResolveAnniversaryZhangLiaoDuorui, SkillProgramEffectOp.ResolveAnniversaryZhangLiaoZhiti)]
@@ -213,7 +210,7 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
     internal void ApplyAnniversaryCuixiDrawSkip(int currentSeat)
     {
         if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuixiBranchEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Target == currentSeat && e.Branch == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryZhangLiaoStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source == e.Source && s.ActualTurn == e.ActualTurn && s.Target == currentSeat && s.Operation == SkillProgramEffectOp.ResolveAnniversaryZhangLiaoCuixi)))
-            _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase;
+            _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= GameEngine.DelayedTurnEffects.SkipDrawPhase;
     }
 
     internal IEnumerable<AnniversaryDuoruiLeaseEvent> ActiveAnnZlLeases() => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryDuoruiLeaseEvent>().Where(e => !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryDuoruiExpiredEvent>().Any(x => x.LeaseFrameId == e.FrameId));

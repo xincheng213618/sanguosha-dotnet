@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGaoXiangAnniversaryRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
             return false;
         if (!r.Committed)
             return r.Stage == GaoXiangChiyingStage.Victims && r.Index == 0 && r.Discards.Count == 0 && r.Gains.Count == 0 && plans.Length == 0 && victims.Length == 0 && moves.Length == 0;
-        if (plans is not [var plan] || plan != new GaoXiangChiyingCommittedEvent(f.Id, r.Actor, r.Victims.Count) || victims.Length != r.Victims.Count || victims.Where((e, index) => e != new GaoXiangChiyingVictimEvent(f.Id, index, r.Actor, r.Victims[index])).Any() || r.Discards.Select(m => m.Ordinal).Distinct().Count() != r.Discards.Count || r.Discards.Select(m => m.CardId).Distinct().Count() != r.Discards.Count || r.Gains.Select(m => m.CardId).Distinct().Count() != r.Gains.Count || moves.Length != r.Discards.Count + r.Gains.Count || r.Discards.Any(m => m.Ordinal < 0 || m.Ordinal >= r.Victims.Count || m.Ordinal > r.Index || m.Victim != r.Victims[m.Ordinal] || m.From.OwnerSeat != m.Victim || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !GaoXiangMoveExists(f, m, false)) || r.Gains.Any(m => !r.Discards.Any(d => d.Ordinal == m.Ordinal && d.Victim == m.Victim && d.CardId == m.CardId && d.PrintedKind == m.PrintedKind && d.To == CardLocation.DiscardPile) || r.Actor == f.OwnerSeat || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(m.PrintedKind) != SkillProgramCardCategory.Basic || m.From != CardLocation.DiscardPile || !GaoXiangMoveExists(f, m, true)))
+        if (plans is not [var plan] || plan != new GaoXiangChiyingCommittedEvent(f.Id, r.Actor, r.Victims.Count) || victims.Length != r.Victims.Count || victims.Where((e, index) => e != new GaoXiangChiyingVictimEvent(f.Id, index, r.Actor, r.Victims[index])).Any() || r.Discards.Select(m => m.Ordinal).Distinct().Count() != r.Discards.Count || r.Discards.Select(m => m.CardId).Distinct().Count() != r.Discards.Count || r.Gains.Select(m => m.CardId).Distinct().Count() != r.Gains.Count || moves.Length != r.Discards.Count + r.Gains.Count || r.Discards.Any(m => m.Ordinal < 0 || m.Ordinal >= r.Victims.Count || m.Ordinal > r.Index || m.Victim != r.Victims[m.Ordinal] || m.From.OwnerSeat != m.Victim || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !GaoXiangMoveExists(f, m, false)) || r.Gains.Any(m => !r.Discards.Any(d => d.Ordinal == m.Ordinal && d.Victim == m.Victim && d.CardId == m.CardId && d.PrintedKind == m.PrintedKind && d.To == CardLocation.DiscardPile) || r.Actor == f.OwnerSeat || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(m.PrintedKind) != SkillProgramCardCategory.Basic || m.From != CardLocation.DiscardPile || !GaoXiangMoveExists(f, m, true)))
             return false;
         if (r.Stage == GaoXiangChiyingStage.Card)
             return r.Gains.Count == 0 && r.Discards.All(m => m.Ordinal < r.Index);
@@ -48,7 +44,7 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
         if (f.GaoXiangChiying is not { Stage: GaoXiangChiyingStage.DiscardChildren or GaoXiangChiyingStage.GainChildren } r || !ValidGaoXiang(f))
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (r.Stage != GaoXiangChiyingStage.DiscardChildren || !r.Discards.Any(m => m.Ordinal == r.Index && m.PrintedKind == CardKind.SilverLion && m.From.Zone == CardZoneKind.Equipment))

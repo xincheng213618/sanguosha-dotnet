@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_pan_shu_ol_PanShuPrograms
 {
     internal static bool IsOtherLastHandLossTrigger(SkillProgramTrigger trigger) =>

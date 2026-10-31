@@ -1,114 +1,110 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreProgramLifecycleProgramPhaseSchedulingOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramPhaseSchedulingOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramPhaseSchedulingRuntime Get();
+    ProgramPhaseSchedulingRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleCorePlayerViewProjectionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleCorePlayerViewProjectionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
+    GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
 }
 
-internal interface ICoreProgramLifecycleProgramBindingOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramBindingOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramBindingRuntime Get();
+    ProgramBindingRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramTargetSelectionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramTargetSelectionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTargetSelectionRuntime Get();
+    ProgramTargetSelectionRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramOwnedZoneDiscardOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramOwnedZoneDiscardOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramOwnedZoneDiscardRuntime Get();
+    ProgramOwnedZoneDiscardRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleCorePublicDamagePredictionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleCorePublicDamagePredictionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.PlayerSkillContext CreateAiSkillContext(global::CardGame.Core.CharacterState player, int viewerSeat, global::CardGame.Core.GameSnapshot? snapshot = default);
-    global::System.Func<int, int, int>? CreatePublicSourceOccurrenceDamageBonus(int viewerSeat);
-    global::CardGame.Core.PublicDamagePrediction PredictPublicActionDamage(int viewerSeat, global::CardGame.Core.LegalAction action, int targetSeat);
+    PlayerSkillContext CreateAiSkillContext(CharacterState player, int viewerSeat, GameSnapshot? snapshot = default);
+    Func<int, int, int>? CreatePublicSourceOccurrenceDamageBonus(int viewerSeat);
+    PublicDamagePrediction PredictPublicActionDamage(int viewerSeat, LegalAction action, int targetSeat);
 }
 
-internal interface ICoreProgramLifecycleProgramTriggerOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramTriggerOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTriggerRuntime Get();
+    ProgramTriggerRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramRandomCardAcquisitionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramRandomCardAcquisitionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramRandomCardAcquisitionRuntime Get();
+    ProgramRandomCardAcquisitionRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramDamageCardClaimOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramDamageCardClaimOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramDamageCardClaimRuntime Get();
+    ProgramDamageCardClaimRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramWindowCursorOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramWindowCursorOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramWindowCursorRuntime Get();
+    ProgramWindowCursorRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramPindianOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramPindianOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramPindianRuntime Get();
+    ProgramPindianRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramTurnWindowEntryOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramTurnWindowEntryOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTurnWindowEntryRuntime Get();
+    ProgramTurnWindowEntryRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramTriggerFactProjectorOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramTriggerFactProjectorOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTriggerFactProjector Get();
+    ProgramTriggerFactProjector Get();
 }
 
-internal interface ICoreProgramLifecycleProgramJudgmentOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramJudgmentOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramJudgmentRuntime Get();
+    ProgramJudgmentRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramDrawOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramDrawOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramDrawRuntime Get();
+    ProgramDrawRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramPhaseBoundaryOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramPhaseBoundaryOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramPhaseBoundaryRuntime Get();
+    ProgramPhaseBoundaryRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramDrawDiscardWindowEntryOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramDrawDiscardWindowEntryOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramDrawDiscardWindowEntryRuntime Get();
+    ProgramDrawDiscardWindowEntryRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramHealthStateOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramHealthStateOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramHealthStateRuntime Get();
+    ProgramHealthStateRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleCoreNativeRuleQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleCoreNativeRuleQueriesOperations : IProgramRuntimeOperations
 {
     int GetAttackRange(int sourceSeat);
 }
 
-internal interface ICoreProgramLifecycleProgramBoundCardOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramBoundCardOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramBoundCardRuntime Get();
+    ProgramBoundCardRuntime Get();
 }
 
-internal interface ICoreProgramLifecycleProgramActivationWindowOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramLifecycleProgramActivationWindowOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramActivationWindowRuntime Get();
+    ProgramActivationWindowRuntime Get();
 }

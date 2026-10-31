@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiaoQiaoMouOlRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             return[];
         var actions = new List<LegalAction>();
         var required = new Dictionary<(LegalActionKind, int? ), CardKind?>();
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+        if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
         {
             foreach (var p in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: false, conversionSource: source).Where(p => p.ActionKind != LegalActionKind.Recast))
             {
@@ -21,7 +17,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
                 required[(p.ActionKind, p.TargetCardId)] = p.RequiredCardKind;
             }
         }
-        else if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        else if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var card = new Card(0, kind, Suit.None, 0);
             var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, physicalSuit: Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: [], conversionSource: source)).ToArray();
@@ -99,7 +95,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             return;
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
         {
             var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, targets[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: p.Kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], p.Kind), programSkillCardUseFrameId: f.Id);
@@ -144,10 +140,10 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 34000)]
-    internal bool FinishMouXqJueyanAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishMouXqJueyanAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (attack.Card is not null || !IsMouXqJueyanUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && kind is not (CardKind.Duel or CardKind.FireAttack))
+        if (attack.Card is not null || !IsMouXqJueyanUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && kind is not (CardKind.Duel or CardKind.FireAttack))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);

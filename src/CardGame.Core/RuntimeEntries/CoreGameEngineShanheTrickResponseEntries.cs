@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineShanheTrickResponseRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineShanheTrickResponseRuntime))]
 internal sealed partial class CoreGameEngineShanheTrickResponseEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheTrickResponseRuntime> _resolve;
-    private CoreGameEngineShanheTrickResponseEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheTrickResponseRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineShanheTrickResponseRuntime> _resolve;
+    private CoreGameEngineShanheTrickResponseEntries(Func<EngineOwners.CoreGameEngineShanheTrickResponseRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineShanheTrickResponseEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheTrickResponseRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineShanheTrickResponseEntries Create(Func<EngineOwners.CoreGameEngineShanheTrickResponseRuntime> resolve) => new(resolve);
 }

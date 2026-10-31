@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuLieMouRuntime
@@ -45,23 +41,23 @@ internal sealed partial class CharacterHuLieMouRuntime
     internal bool IsMouHuLieUsedDiscard(CardMovementBatchContext batch, CardMovementRecord move, MouHuLieYu yu) => batch.ParentFrameId is { } parent && move.CardId == yu.CardId && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && batch.Movements.Contains(move) && _cardZonesOperations._cardZones.GetLocation(move.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == move.CardId) == move && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuLieUsedDiscardEvent>().Count(e => e == new MouHuLieUsedDiscardEvent(yu, batch.Id, parent, batch.TurnNumber, move.CardId, move.Sequence)) == 1;
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 37500)]
     internal int[]? MouHuLieUsedIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, ProgramInstructionFeatures features) => !features.HasOperation(SkillProgramEffectOp.RegiveMouHuLieChuanyu) ? null : CurrentMouHuLieYu(candidate.OwnerSeat, candidate.SkillInstanceId)is { } yu ? batch.Movements.Select((m, i) => (m, i)).Where(x => IsMouHuLieUsedDiscard(batch, x.m, yu)).Select(x => x.i).ToArray() : [];
-    int global::CardGame.Core.IMouHuLieFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
+    int IMouHuLieFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
 
-    int global::CardGame.Core.IMouHuLieFacts.Turn => _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber;
+    int IMouHuLieFacts.Turn => _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber;
 
-    long global::CardGame.Core.IMouHuLieFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+    long IMouHuLieFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
-    bool global::CardGame.Core.IMouHuLieFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouHuLieFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    bool global::CardGame.Core.IMouHuLieFacts.Alive(int s) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive;
-    bool global::CardGame.Core.IMouHuLieFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
-    string global::CardGame.Core.IMouHuLieFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
-    int global::CardGame.Core.IMouHuLieFacts.HandCount(int s) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Count;
-    int global::CardGame.Core.IMouHuLieFacts.Keep(int actor, int id) => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[actor]);
-    bool global::CardGame.Core.IMouHuLieFacts.Friendly(int actor, int target) => actor == target || (_coreAiBrainsAiBrainsAccess._aiBrains.TryGetValue(actor, out var brain) ? brain.ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(actor), target, new(0, 0, 0, 1, 0, 0, false, false)) > 0 : _coreMatchParticipantsPlayersAccess._players[actor].TeamRevealed && _coreMatchParticipantsPlayersAccess._players[target].TeamRevealed && _coreMatchParticipantsPlayersAccess._players[actor].TeamId is { } t && _coreMatchParticipantsPlayersAccess._players[target].TeamId == t);
-    SkillProgram global::CardGame.Core.IMouHuLieFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    IEnumerable<T> global::CardGame.Core.IMouHuLieFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    bool global::CardGame.Core.IMouHuLieFacts.Parent(ProgramSkillFrame f)
+    bool IMouHuLieFacts.Alive(int s) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive;
+    bool IMouHuLieFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
+    string IMouHuLieFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
+    int IMouHuLieFacts.HandCount(int s) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Count;
+    int IMouHuLieFacts.Keep(int actor, int id) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[actor]);
+    bool IMouHuLieFacts.Friendly(int actor, int target) => actor == target || (_coreAiBrainsAiBrainsAccess._aiBrains.TryGetValue(actor, out var brain) ? brain.ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(actor), target, new(0, 0, 0, 1, 0, 0, false, false)) > 0 : _coreMatchParticipantsPlayersAccess._players[actor].TeamRevealed && _coreMatchParticipantsPlayersAccess._players[target].TeamRevealed && _coreMatchParticipantsPlayersAccess._players[actor].TeamId is { } t && _coreMatchParticipantsPlayersAccess._players[target].TeamId == t);
+    SkillProgram IMouHuLieFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
+    IEnumerable<T> IMouHuLieFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    bool IMouHuLieFacts.Parent(ProgramSkillFrame f)
     {
         if (f.TriggerId != f.ActivationId || f.WindowContext is not { } w || w.OwnerSeat != f.OwnerSeat)
             return false;
@@ -76,41 +72,41 @@ internal sealed partial class CharacterHuLieMouRuntime
             _ => null
         };
         if (candidate is not null)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
-        return w.Window == SkillProgramTriggerWindow.AfterDamageApplied && ((global::CardGame.Core.IMouHuLieFacts)this).Damage(new(f.OwnerSeat, f.SkillId, f.ActivationId, f.SkillInstanceId, f.GameplayHash, 0, w.OccurrenceIndex), w)is not null;
+            return CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
+        return w.Window == SkillProgramTriggerWindow.AfterDamageApplied && ((IMouHuLieFacts)this).Damage(new(f.OwnerSeat, f.SkillId, f.ActivationId, f.SkillInstanceId, f.GameplayHash, 0, w.OccurrenceIndex), w)is not null;
     }
 
-    IReadOnlyList<int> global::CardGame.Core.IMouHuLieFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
-    IReadOnlyList<int> global::CardGame.Core.IMouHuLieFacts.ActionOrder(IEnumerable<int> seats) => Array.AsReadOnly(seats.Distinct().OrderBy(s => _coreTableOrderOperations.RelativeTableOrder(_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, s)).ToArray());
-    IReadOnlyList<MouHuLieCard> global::CardGame.Core.IMouHuLieFacts.Owned(int owner, bool handOnly) => !((global::CardGame.Core.IMouHuLieFacts)this).Alive(owner) ? [] : Array.AsReadOnly((handOnly ? new[] { CardZoneKind.Hand } : new[] { CardZoneKind.Hand, CardZoneKind.Equipment }).SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, owner)).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, new(z, owner), OwnedCardMoveIntent.Transfer)).Select(c => new MouHuLieCard(c.Id, c.Kind, new(z, owner), c.DisplayName))).ToArray());
-    MouHuLieCard global::CardGame.Core.IMouHuLieFacts.Current(int id)
+    IReadOnlyList<int> IMouHuLieFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
+    IReadOnlyList<int> IMouHuLieFacts.ActionOrder(IEnumerable<int> seats) => Array.AsReadOnly(seats.Distinct().OrderBy(s => _coreTableOrderOperations.RelativeTableOrder(_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, s)).ToArray());
+    IReadOnlyList<MouHuLieCard> IMouHuLieFacts.Owned(int owner, bool handOnly) => !((IMouHuLieFacts)this).Alive(owner) ? [] : Array.AsReadOnly((handOnly ? new[] { CardZoneKind.Hand } : new[] { CardZoneKind.Hand, CardZoneKind.Equipment }).SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, owner)).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, new(z, owner), OwnedCardMoveIntent.Transfer)).Select(c => new MouHuLieCard(c.Id, c.Kind, new(z, owner), c.DisplayName))).ToArray());
+    MouHuLieCard IMouHuLieFacts.Current(int id)
     {
         var c = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
         return new(id, c.Kind, _cardZonesOperations._cardZones.GetLocation(id), c.DisplayName);
     }
 
-    MouHuLieYu? global::CardGame.Core.IMouHuLieFacts.ActiveYu(int owner, string instance) => CurrentMouHuLieYu(owner, instance);
-    MouHuLieYu? global::CardGame.Core.IMouHuLieFacts.UsedYu(ProgramSkillWindowContext w, int owner, string instance)
+    MouHuLieYu? IMouHuLieFacts.ActiveYu(int owner, string instance) => CurrentMouHuLieYu(owner, instance);
+    MouHuLieYu? IMouHuLieFacts.UsedYu(ProgramSkillWindowContext w, int owner, string instance)
     {
-        if (w.Window != SkillProgramTriggerWindow.DiscardPileReceived || w.MovementBatch is not { } b || w.MovementIndex is not { } i || i < 0 || i >= b.Movements.Count || ((global::CardGame.Core.IMouHuLieFacts)this).ActiveYu(owner, instance)is not { } yu)
+        if (w.Window != SkillProgramTriggerWindow.DiscardPileReceived || w.MovementBatch is not { } b || w.MovementIndex is not { } i || i < 0 || i >= b.Movements.Count || ((IMouHuLieFacts)this).ActiveYu(owner, instance)is not { } yu)
             return null;
         var m = b.Movements[i];
         return IsMouHuLieUsedDiscard(b, m, yu) ? yu : null;
     }
 
-    int? global::CardGame.Core.IMouHuLieFacts.YitouTarget(ProgramSkillWindowContext w, int owner)
+    int? IMouHuLieFacts.YitouTarget(ProgramSkillWindowContext w, int owner)
     {
-        if (w.Window != SkillProgramTriggerWindow.PlayPhaseStarting || w.TargetSeat is not { } target || target == owner || !((global::CardGame.Core.IMouHuLieFacts)this).Alive(target) || _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != target || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Count != _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Max(p => _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count))
+        if (w.Window != SkillProgramTriggerWindow.PlayPhaseStarting || w.TargetSeat is not { } target || target == owner || !((IMouHuLieFacts)this).Alive(target) || _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != target || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Count != _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Max(p => _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count))
             return null;
         return target;
     }
 
-    MouHuLieDamageEvent? global::CardGame.Core.IMouHuLieFacts.Damage(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => MouHuLieDamageReceipt(c, w);
-    bool global::CardGame.Core.IMouHuLieFacts.CanSlash(ProgramSkillFrame f) => CanMouHuLieSlash(f);
-    void global::CardGame.Core.IMouHuLieNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
-    void global::CardGame.Core.IMouHuLieNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
-    bool global::CardGame.Core.IMouHuLieNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    void global::CardGame.Core.IMouHuLieNative.Give(ProgramSkillFrame f)
+    MouHuLieDamageEvent? IMouHuLieFacts.Damage(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => MouHuLieDamageReceipt(c, w);
+    bool IMouHuLieFacts.CanSlash(ProgramSkillFrame f) => CanMouHuLieSlash(f);
+    void IMouHuLieNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    void IMouHuLieNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+    bool IMouHuLieNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
+    void IMouHuLieNative.Give(ProgramSkillFrame f)
     {
         if (!MouHuLieRules.Valid(f) || f.MouHuLie is not { Stage: MouHuLieStage.GiveChildren } r || !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive)
             throw new InvalidOperationException("Chuanyu/Yitou needs its accepted real recipient.");
@@ -133,7 +129,7 @@ internal sealed partial class CharacterHuLieMouRuntime
         }, disclosure: CardMovementDisclosure.FaceUp);
     }
 
-    void global::CardGame.Core.IMouHuLieNative.Clear(ProgramSkillFrame f, MouHuLieCard card)
+    void IMouHuLieNative.Clear(ProgramSkillFrame f, MouHuLieCard card)
     {
         if (!MouHuLieRules.Valid(f) || f.MouHuLie is not { Stage: MouHuLieStage.ClearChildren } r || r.Yu?.CardId != card.Id || r.Index < 1 || r.Cards[r.Index - 1] != card || _cardZonesOperations._cardZones.GetLocation(card.Id) != card.From || card.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment or CardZoneKind.DrawPile))
             throw new InvalidOperationException("Chuanyu may discard only its own marked actual reachable entity.");
@@ -144,7 +140,7 @@ internal sealed partial class CharacterHuLieMouRuntime
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.DiscardPile, new("skill-program.mou:chuanyu.round-deck-discard"), Paid, disclosure: CardMovementDisclosure.FaceUp);
     }
 
-    void global::CardGame.Core.IMouHuLieNative.Use(ProgramSkillFrame f) => IssueMouHuLieSlash(f);
+    void IMouHuLieNative.Use(ProgramSkillFrame f) => IssueMouHuLieSlash(f);
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 4300)]
     internal CardMovementBatchContext CompleteMovementBatchCaptureMouHuLieUsedDiscard(CardMovementBatchBuilder batch, CardMovementBatchContext completed)
     {

@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineLateFixedTargetDamageCapScopesRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineLateFixedTargetDamageCapScopesRuntime))]
 internal sealed partial class CoreGameEngineLateFixedTargetDamageCapScopesEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineLateFixedTargetDamageCapScopesRuntime> _resolve;
-    private CoreGameEngineLateFixedTargetDamageCapScopesEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineLateFixedTargetDamageCapScopesRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineLateFixedTargetDamageCapScopesRuntime> _resolve;
+    private CoreGameEngineLateFixedTargetDamageCapScopesEntries(Func<EngineOwners.CoreGameEngineLateFixedTargetDamageCapScopesRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineLateFixedTargetDamageCapScopesEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineLateFixedTargetDamageCapScopesRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineLateFixedTargetDamageCapScopesEntries Create(Func<EngineOwners.CoreGameEngineLateFixedTargetDamageCapScopesRuntime> resolve) => new(resolve);
 }

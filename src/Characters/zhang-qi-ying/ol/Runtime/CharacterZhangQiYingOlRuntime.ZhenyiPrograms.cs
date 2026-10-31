@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangQiYingOlRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CharacterZhangQiYingOlRuntime
     [ProgramAnswer("zhenyi-judgment")]
     internal void ResolveZhenyiJudgment(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangQiYing: { Stage: "judgment-choice" } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhenyiJudgmentChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangQiYing: { Stage: "judgment-choice" } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhenyiJudgmentChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Zhenyi judgment lost its exact actual chooser.");
         AssertZhangQiYing(f);
         var j = f.WindowContext!.Judgment!;

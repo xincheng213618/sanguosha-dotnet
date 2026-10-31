@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
@@ -44,7 +40,7 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(window with { Step = ResolutionFrameStep.Completed });
             _coreRuntimeOperations.PopResolutionFrame(window.Id, ResolutionFrameKind.NullificationWindow);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationResolvedEvent(window.ParentFrameId, window.EffectCardId, window.EffectCardKind, window.EffectNullified, window.ChainDepth) { WindowFrameId = window.Id, TargetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(window) });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationResolvedEvent(window.ParentFrameId, window.EffectCardId, window.EffectCardKind, window.EffectNullified, window.ChainDepth) { WindowFrameId = window.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(window) });
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             if (window.GroupTargetReturn is not null)
             {
@@ -93,7 +89,7 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
 
     internal bool PolicyCounterspellDyingProgramRidesOn(ProgramSkillFrame response, DyingFrame dying)
     {
-        if (dying.Continuation != DyingContinuationKind.ProgramSkill || dying.KillerSeat is not null || dying.ResponderIndex < 0 || dying.ResponderIndex >= dying.ResponderSeats.Count || response.WindowContext is not { } context || context.ParentFrameId != dying.Id || context.TargetSeat != dying.VictimSeat || context.OwnerSeat != response.OwnerSeat || context.SourceSeat is not null || context.DamageFrameId is not null || response.OwnerSeat != dying.ResponderSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(response.OwnerSeat) || string.IsNullOrWhiteSpace(response.TriggerId) || string.IsNullOrWhiteSpace(response.SkillInstanceId) || response.ActivationId != response.TriggerId || context.Window is not (SkillProgramTriggerWindow.SelfDyingResponse or SkillProgramTriggerWindow.DyingResponse) || context.Window == SkillProgramTriggerWindow.SelfDyingResponse && response.OwnerSeat != dying.VictimSeat || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(response.SkillId)?.Program is not { } definition || definition.GameplayHash != response.GameplayHash || definition.Triggers.SingleOrDefault(binding => binding.Id == response.TriggerId)is not { } trigger || trigger.Window != context.Window || !_coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[response.OwnerSeat], context.Window, context.OccurrenceIndex).Any(candidate => global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(response, candidate)))
+        if (dying.Continuation != DyingContinuationKind.ProgramSkill || dying.KillerSeat is not null || dying.ResponderIndex < 0 || dying.ResponderIndex >= dying.ResponderSeats.Count || response.WindowContext is not { } context || context.ParentFrameId != dying.Id || context.TargetSeat != dying.VictimSeat || context.OwnerSeat != response.OwnerSeat || context.SourceSeat is not null || context.DamageFrameId is not null || response.OwnerSeat != dying.ResponderSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(response.OwnerSeat) || string.IsNullOrWhiteSpace(response.TriggerId) || string.IsNullOrWhiteSpace(response.SkillInstanceId) || response.ActivationId != response.TriggerId || context.Window is not (SkillProgramTriggerWindow.SelfDyingResponse or SkillProgramTriggerWindow.DyingResponse) || context.Window == SkillProgramTriggerWindow.SelfDyingResponse && response.OwnerSeat != dying.VictimSeat || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(response.SkillId)?.Program is not { } definition || definition.GameplayHash != response.GameplayHash || definition.Triggers.SingleOrDefault(binding => binding.Id == response.TriggerId)is not { } trigger || trigger.Window != context.Window || !_coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[response.OwnerSeat], context.Window, context.OccurrenceIndex).Any(candidate => CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(response, candidate)))
             return false;
         return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Any(fact => fact.FrameId == response.Id && fact.SkillId == response.SkillId && fact.BindingId == response.TriggerId && fact.SkillInstanceId == response.SkillInstanceId && fact.OwnerSeat == response.OwnerSeat && fact.Window == context.Window);
     }
@@ -102,16 +98,16 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
     {
         var child = _resolutionStackOperations._resolutionStack[index];
         var parent = _resolutionStackOperations._resolutionStack[index - 1];
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineCharacterTurnedOverProgramsRuntime.CharacterTurnedOverFrameRidesOn(child, parent))
+        if (!CoreGameEngineCharacterTurnedOverProgramsRuntime.CharacterTurnedOverFrameRidesOn(child, parent))
             return false;
         if (child is ProgramLifecycleTriggerWindowFrame window && parent is ProgramSkillFrame response)
         {
-            if (index < 2 || _resolutionStackOperations._resolutionStack[index - 2] is not DyingFrame dying || !PolicyCounterspellDyingProgramRidesOn(response, dying) || response.WindowContext?.Window != SkillProgramTriggerWindow.SelfDyingResponse || window.ResumeProgramFrameId != response.Id || window.OwnerSeat != response.OwnerSeat || response.InstructionIndex < 1 || ProgramInstructionResolver.Default.Resolve(response, _contentRegistryOperations._contentRegistry.GetSkill(response.SkillId).Program!).GetPausedInstruction(response.InstructionIndex).Effect is not { Op: SkillProgramEffectOp.TurnOver } effect || global::CardGame.Core.EngineOwners.CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(response, effect.Target) != window.OwnerSeat)
+            if (index < 2 || _resolutionStackOperations._resolutionStack[index - 2] is not DyingFrame dying || !PolicyCounterspellDyingProgramRidesOn(response, dying) || response.WindowContext?.Window != SkillProgramTriggerWindow.SelfDyingResponse || window.ResumeProgramFrameId != response.Id || window.OwnerSeat != response.OwnerSeat || response.InstructionIndex < 1 || ProgramInstructionResolver.Default.Resolve(response, _contentRegistryOperations._contentRegistry.GetSkill(response.SkillId).Program!).GetPausedInstruction(response.InstructionIndex).Effect is not { Op: SkillProgramEffectOp.TurnOver } effect || CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(response, effect.Target) != window.OwnerSeat)
                 return false;
             return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CharacterStateChangedEvent>().Any(fact => fact.Change.Id == window.Id && fact.Change.ParentFrameId == response.Id && fact.Change.TargetSeat == window.OwnerSeat && fact.Change.Window == SkillProgramTriggerWindow.CharacterTurnedOver && fact.Change.TurnedOver is { } face && face.WasFaceDown != face.IsFaceDown);
         }
 
-        return child is ProgramSkillFrame observer && parent is ProgramLifecycleTriggerWindowFrame owner && owner.CandidateIndex >= 0 && owner.CandidateIndex < owner.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(observer, owner.Candidates[owner.CandidateIndex]) && observer.WindowContext is { Window: SkillProgramTriggerWindow.CharacterTurnedOver } context && context.ParentFrameId == owner.Id && context.OwnerSeat == observer.OwnerSeat && context.TargetSeat == owner.OwnerSeat;
+        return child is ProgramSkillFrame observer && parent is ProgramLifecycleTriggerWindowFrame owner && owner.CandidateIndex >= 0 && owner.CandidateIndex < owner.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(observer, owner.Candidates[owner.CandidateIndex]) && observer.WindowContext is { Window: SkillProgramTriggerWindow.CharacterTurnedOver } context && context.ParentFrameId == owner.Id && context.OwnerSeat == observer.OwnerSeat && context.TargetSeat == owner.OwnerSeat;
     }
 
     internal bool PolicyCounterspellVirtualAlcoholRide(int dyingIndex, DyingFrame dying)
@@ -124,14 +120,14 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
             var parent = _resolutionStackOperations._resolutionStack[index - 1];
             if (child is ProgramSkillFrame observer && parent is HpChangedTriggerWindowFrame hp)
             {
-                if (hp.CandidateIndex < 0 || hp.CandidateIndex >= hp.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(observer, hp.Candidates[hp.CandidateIndex]) || observer.WindowContext is not { HpChange: { } change } context || context.ParentFrameId != hp.Id || change != hp.Change || context.Window is not (SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged))
+                if (hp.CandidateIndex < 0 || hp.CandidateIndex >= hp.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(observer, hp.Candidates[hp.CandidateIndex]) || observer.WindowContext is not { HpChange: { } change } context || context.ParentFrameId != hp.Id || change != hp.Change || context.Window is not (SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHealthChanged))
                     return false;
                 continue;
             }
 
             if (child is ProgramSkillFrame observerMove && parent is CardsMovedTriggerWindowFrame moved)
             {
-                if (moved.CandidateIndex < 0 || moved.CandidateIndex >= moved.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(observerMove, moved.Candidates[moved.CandidateIndex]) || observerMove.WindowContext is not { MovementBatch: { } batch } contextMove || contextMove.ParentFrameId != moved.Id || batch.Id != moved.Batch.Id || contextMove.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived))
+                if (moved.CandidateIndex < 0 || moved.CandidateIndex >= moved.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(observerMove, moved.Candidates[moved.CandidateIndex]) || observerMove.WindowContext is not { MovementBatch: { } batch } contextMove || contextMove.ParentFrameId != moved.Id || batch.Id != moved.Batch.Id || contextMove.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived))
                     return false;
                 continue;
             }
@@ -165,7 +161,7 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
                 return false;
             }
 
-            if (child is DyingFrame dying && parent is ProgramSkillFrame losing && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.ParentFrameId == losing.Id && dying.KillerSeat is null && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(losing.SkillId)?.Program is { } program && program.GameplayHash == losing.GameplayHash && losing.InstructionIndex > 0 && ProgramInstructionResolver.Default.Resolve(losing, program).GetPausedInstruction(losing.InstructionIndex).Effect is { Op: SkillProgramEffectOp.LoseHp } effect && global::CardGame.Core.EngineOwners.CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(losing, effect.Target) == dying.VictimSeat && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSkillHpLostEvent>().Any(fact => fact.FrameId == losing.Id && fact.SkillId == losing.SkillId && fact.TargetSeat == dying.VictimSeat && fact.Amount > 0 && fact.RemainingHp <= 0))
+            if (child is DyingFrame dying && parent is ProgramSkillFrame losing && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.ParentFrameId == losing.Id && dying.KillerSeat is null && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(losing.SkillId)?.Program is { } program && program.GameplayHash == losing.GameplayHash && losing.InstructionIndex > 0 && ProgramInstructionResolver.Default.Resolve(losing, program).GetPausedInstruction(losing.InstructionIndex).Effect is { Op: SkillProgramEffectOp.LoseHp } effect && CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(losing, effect.Target) == dying.VictimSeat && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSkillHpLostEvent>().Any(fact => fact.FrameId == losing.Id && fact.SkillId == losing.SkillId && fact.TargetSeat == dying.VictimSeat && fact.Amount > 0 && fact.RemainingHp <= 0))
                 continue;
             if (child is ProgramSkillFrame responseProgram && parent is DyingFrame responseDying && PolicyCounterspellDyingProgramRidesOn(responseProgram, responseDying))
             {
@@ -196,14 +192,14 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
 
             if (child is ProgramSkillFrame hpObserver && parent is HpChangedTriggerWindowFrame hpWindow)
             {
-                if (hpWindow.CandidateIndex < 0 || hpWindow.CandidateIndex >= hpWindow.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(hpObserver, hpWindow.Candidates[hpWindow.CandidateIndex]) || hpObserver.WindowContext is not { HpChange: { } change } hpContext || hpContext.ParentFrameId != hpWindow.Id || change != hpWindow.Change)
+                if (hpWindow.CandidateIndex < 0 || hpWindow.CandidateIndex >= hpWindow.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(hpObserver, hpWindow.Candidates[hpWindow.CandidateIndex]) || hpObserver.WindowContext is not { HpChange: { } change } hpContext || hpContext.ParentFrameId != hpWindow.Id || change != hpWindow.Change)
                     return false;
                 continue;
             }
 
             if (child is ProgramSkillFrame movementObserver && parent is CardsMovedTriggerWindowFrame movementWindow)
             {
-                if (movementWindow.CandidateIndex < 0 || movementWindow.CandidateIndex >= movementWindow.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(movementObserver, movementWindow.Candidates[movementWindow.CandidateIndex]) || movementObserver.WindowContext is not { MovementBatch: { } batch } movementContext || movementContext.ParentFrameId != movementWindow.Id || batch.Id != movementWindow.Batch.Id || movementContext.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived))
+                if (movementWindow.CandidateIndex < 0 || movementWindow.CandidateIndex >= movementWindow.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(movementObserver, movementWindow.Candidates[movementWindow.CandidateIndex]) || movementObserver.WindowContext is not { MovementBatch: { } batch } movementContext || movementContext.ParentFrameId != movementWindow.Id || batch.Id != movementWindow.Batch.Id || movementContext.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained or SkillProgramTriggerWindow.DiscardPileReceived))
                     return false;
                 continue;
             }
@@ -213,11 +209,11 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
             if (child is ProgramSkillFrame candidateProgram && parent is ProgramLifecycleTriggerWindowFrame candidateEntry && candidateProgram.WindowContext is { Window: SkillProgramTriggerWindow.DyingEntering } candidateContext && candidateContext.ParentFrameId == candidateEntry.Id && candidateEntry.Window == SkillProgramTriggerWindow.DyingEntering && candidateEntry.Continuation == ProgramLifecycleContinuation.ResumeDyingEntry && candidateEntry.CandidateIndex >= 0 && candidateEntry.CandidateIndex < candidateEntry.Candidates.Count)
             {
                 var candidate = candidateEntry.Candidates[candidateEntry.CandidateIndex];
-                if (index >= 2 && _resolutionStackOperations._resolutionStack[index - 2] is DyingFrame entrySource && candidateEntry.ResumeDyingFrameId == entrySource.Id && candidateEntry.OwnerSeat == entrySource.VictimSeat && candidateContext.OwnerSeat == candidateProgram.OwnerSeat && candidateContext.TargetSeat == entrySource.VictimSeat && candidateContext.SourceSeat == entrySource.KillerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(candidateProgram, candidate))
+                if (index >= 2 && _resolutionStackOperations._resolutionStack[index - 2] is DyingFrame entrySource && candidateEntry.ResumeDyingFrameId == entrySource.Id && candidateEntry.OwnerSeat == entrySource.VictimSeat && candidateContext.OwnerSeat == candidateProgram.OwnerSeat && candidateContext.TargetSeat == entrySource.VictimSeat && candidateContext.SourceSeat == entrySource.KillerSeat && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(candidateProgram, candidate))
                     continue;
             }
 
-            if (_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(child, parent) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(child, parent) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent) || _coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(child, parent) || _corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(child, parent))
+            if (_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(child, parent) || CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(child, parent) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent) || _coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(child, parent) || _corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(child, parent))
                 continue;
             return false;
         }

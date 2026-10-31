@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
@@ -38,7 +34,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
         // override. Resolve only material already visible in the viewer's own
         // zones; an arbitrary foreign ID must never probe the zone registry.
         var ownMaterial = action.PlayedCardKind is null && action.Kind == LegalActionKind.Slash && action.CardId is { } materialId ? self.Hand.Concat(self.WoodenOxGrain ?? []).Concat(self.Equipment).Concat(self.AuthorityCards ?? []).FirstOrDefault(card => card.Id == materialId) : null;
-        var nativeSlashKind = ownMaterial is { Kind: var printedKind } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(printedKind) ? printedKind : CardKind.Slash;
+        var nativeSlashKind = ownMaterial is { Kind: var printedKind } && CoreNativeCardClassificationsRuntime.IsSlashCard(printedKind) ? printedKind : CardKind.Slash;
         var kind = action.PlayedCardKind ?? action.Kind switch
         {
             LegalActionKind.Slash => nativeSlashKind,
@@ -48,7 +44,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
             LegalActionKind.FireAttack => CardKind.FireAttack,
             _ => (CardKind? )null
         };
-        if (kind is not { } damageKind || !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(damageKind) || damageKind is CardKind.Duel or CardKind.BarbarianAssault or CardKind.ArrowBarrage or CardKind.FireAttack))
+        if (kind is not { } damageKind || !(CoreNativeCardClassificationsRuntime.IsSlashCard(damageKind) || damageKind is CardKind.Duel or CardKind.BarbarianAssault or CardKind.ArrowBarrage or CardKind.FireAttack))
         {
             var harmlessTarget = view.Players.Single(player => player.Seat == targetSeat);
             return new(harmlessTarget.Hp, harmlessTarget.Armor, 0, 0, 0, harmlessTarget.Hp, harmlessTarget.Armor, harmlessTarget.MaxHp);
@@ -56,7 +52,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
 
         var ownHand = self.Hand;
         var paidHand = action.CardId is { } id && ownHand.Any(card => card.Id == id) ? 1 : 0;
-        var amount = kind is { } card && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card) ? checked(1 + (_coreMatchParticipantsPlayersAccess._players[viewerSeat].HasAlcoholEffect ? Math.Max(1, _coreMatchParticipantsPlayersAccess._players[viewerSeat].AlcoholDamageBonus) : 0)) : 1;
+        var amount = kind is { } card && CoreNativeCardClassificationsRuntime.IsSlashCard(card) ? checked(1 + (_coreMatchParticipantsPlayersAccess._players[viewerSeat].HasAlcoholEffect ? Math.Max(1, _coreMatchParticipantsPlayersAccess._players[viewerSeat].AlcoholDamageBonus) : 0)) : 1;
         amount = checked(amount + _coreShanheLeizhenOperations.ShanheLeizhenPublicActionBonus(viewerSeat, kind));
         if (damageKind == CardKind.Duel && _coreShanheS5ShuangxiongOperations.TryGetShanheS5ShuangxiongPublicDuelBaseDamage(viewerSeat, action, out var scaled))
             amount = scaled;
@@ -65,13 +61,13 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
         return _coreWushuangPublicPredictionOperations.AttachWushuangPublicCombatPrediction(view, viewerSeat, action, targetSeat, amount, damageKind, paidHand, prediction);
     }
 
-    internal PublicDamagePrediction PredictPublicIncomingDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, int viewerSeat, int? sourceSeat = null, int? targetSeat = null, int? damageAmount = null)
+    internal PublicDamagePrediction PredictPublicIncomingDamage(GameEngine.IDamageAttempt attack, int viewerSeat, int? sourceSeat = null, int? targetSeat = null, int? damageAmount = null)
     {
         var source = sourceSeat ?? attack.SourceSeat;
         var target = targetSeat ?? attack.TargetSeat;
         var view = _corePlayerViewProjectionOperations.CreateSnapshot(viewerSeat);
         var amount = damageAmount ?? attack.DamageAmount;
-        var cardUse = attack is global::CardGame.Core.NativeOwners.CardAttackHandle && !attack.IsDelayedJudgmentDamage && !attack.IsProgramJudgmentDamage && attack.CardUserSeat == source;
+        var cardUse = attack is NativeOwners.CardAttackHandle && !attack.IsDelayedJudgmentDamage && !attack.IsProgramJudgmentDamage && attack.CardUserSeat == source;
         var legacy = PredictVisibleDamage(view, source, target, amount, attack.EffectiveCardKind, cardUse, attack.IsSourceLess, attack.IsChainPropagation, attack.DamageAmountFinalized, 0, attack.IgnoresArmor, _coreNativeCardClassificationsOperations.GetDamageNature(attack), attack);
         if (!_coreWushuangModeProjectionOperations.IsWushuangMode || view.Players.Count != 2 || source == target)
             return legacy;
@@ -85,7 +81,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
         };
     }
 
-    internal PublicDamagePrediction PredictVisibleDamage(GameSnapshot view, int sourceSeat, int targetSeat, int amount, CardKind? kind, bool cardUse, bool sourceLess, bool chain, bool finalized, int paidHandCards, bool ignoresEquipmentArmor, DamageNature? damageNature = null, global::CardGame.Core.GameEngine.IDamageAttempt? issuedAttack = null, bool wushuangTactics = false, Suit prospectiveSuit = Suit.None, int additionalIncomingSegments = 0, int priorTargetSegments = 0)
+    internal PublicDamagePrediction PredictVisibleDamage(GameSnapshot view, int sourceSeat, int targetSeat, int amount, CardKind? kind, bool cardUse, bool sourceLess, bool chain, bool finalized, int paidHandCards, bool ignoresEquipmentArmor, DamageNature? damageNature = null, GameEngine.IDamageAttempt? issuedAttack = null, bool wushuangTactics = false, Suit prospectiveSuit = Suit.None, int additionalIncomingSegments = 0, int priorTargetSegments = 0)
     {
         var target = view.Players.Single(player => player.Seat == targetSeat);
         var source = view.Players.Single(player => player.Seat == sourceSeat);
@@ -100,7 +96,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
         var cardLayer = amount;
         var additional = 0;
         if (!finalized)
-            additional = checked(additional + global::CardGame.Core.EngineOwners.CoreGameEngineQibaoDaoRuntime.QiBaoDaoDamageBonus(cardUse && kind is { } slash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(slash), sourceLess, chain, _coreAdvancedWeaponsOperations.HasWeaponAbility(sourceState, CardKind.QiBaoDao), !target.HpUndefined, target.Hp, target.MaxHp));
+            additional = checked(additional + CoreGameEngineQibaoDaoRuntime.QiBaoDaoDamageBonus(cardUse && kind is { } slash && CoreNativeCardClassificationsRuntime.IsSlashCard(slash), sourceLess, chain, _coreAdvancedWeaponsOperations.HasWeaponAbility(sourceState, CardKind.QiBaoDao), !target.HpUndefined, target.Hp, target.MaxHp));
         if (!finalized && !sourceLess && source.IsAlive)
         {
             if (cardUse && !chain && kind is { } card)
@@ -110,7 +106,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
                 {
                     if (modifier.CapsToAmount)
                         continue;
-                    var eligible = modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource ? modifier.Condition is SkillProgramDamageModifierCondition.SourcePreviousRoundNoDamage or SkillProgramDamageModifierCondition.SourcePreviousRoundDamageBelowThree ? _coreShanheBadaoOperations.MatchesShanheBadaoDamageModifier(modifier, sourceSeat, chain) : modifier.Condition == SkillProgramDamageModifierCondition.DirectSkillDamage ? issuedAttack is { } skillAttack && _coreDirectSkillDamageOperations.IsDirectSkillDamage(skillAttack) : global::CardGame.Core.EngineOwners.CoreGameEnginePassiveRulePoliciesRuntime.MatchesPerOccurrenceSourceDamageModifier(modifier, !source.HpUndefined, source.Hp, Math.Max(0, source.HandCount - paidHandCards), modifier.Condition == SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan && sourceSeat != targetSeat ? _coreNativeRuleQueriesOperations.GetCombatDistance(sourceSeat, targetSeat) : 0, _coreActualRoundProgressRoundNumberAccess._roundNumber) : modifier.SourceScope == SkillProgramDamageModifierSourceScope.OwnerUsed && cardUse && !chain && kind is { } effective && ProgramCardKindMatch.MatchesDamageModifier(modifier, effective) && (modifier.Condition switch
+                    var eligible = modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource ? modifier.Condition is SkillProgramDamageModifierCondition.SourcePreviousRoundNoDamage or SkillProgramDamageModifierCondition.SourcePreviousRoundDamageBelowThree ? _coreShanheBadaoOperations.MatchesShanheBadaoDamageModifier(modifier, sourceSeat, chain) : modifier.Condition == SkillProgramDamageModifierCondition.DirectSkillDamage ? issuedAttack is { } skillAttack && _coreDirectSkillDamageOperations.IsDirectSkillDamage(skillAttack) : CoreGameEnginePassiveRulePoliciesRuntime.MatchesPerOccurrenceSourceDamageModifier(modifier, !source.HpUndefined, source.Hp, Math.Max(0, source.HandCount - paidHandCards), modifier.Condition == SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan && sourceSeat != targetSeat ? _coreNativeRuleQueriesOperations.GetCombatDistance(sourceSeat, targetSeat) : 0, _coreActualRoundProgressRoundNumberAccess._roundNumber) : modifier.SourceScope == SkillProgramDamageModifierSourceScope.OwnerUsed && cardUse && !chain && kind is { } effective && ProgramCardKindMatch.MatchesDamageModifier(modifier, effective) && (modifier.Condition switch
                     {
                         SkillProgramDamageModifierCondition.Always => true,
                         SkillProgramDamageModifierCondition.OwnerUsedFromRound => _coreActualRoundProgressRoundNumberAccess._roundNumber >= modifier.MinimumRound,
@@ -145,7 +141,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
         cardLayer = Math.Max(0, cardLayer);
         if (!sourceLess && (HasVisiblePolicy(sourceState, sourceVisible, SkillProgramCardPolicyKind.DamageBecomesHpLoss) || sourceSeat != targetSeat && (HasVisiblePolicy(sourceState, sourceVisible, SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss) || HasVisiblePolicy(targetState, targetVisible, SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss))))
             return PublicDamagePrediction.Calculate(target.Hp, target.Armor, cardLayer, PublicDamagePaymentKind.HpLoss, target.MaxHp);
-        if (!sourceLess && source.IsAlive && cardUse && !chain && !finalized && _coreActualRoundProgressRoundNumberAccess._roundNumber >= 1 && kind is { } replacementKind && !target.HpUndefined && _coreProgramCardPoliciesOperations.CardPolicies(sourceState, SkillProgramCardPolicyKind.FirstRoundCardDamageBecomesMaximumHpLoss, replacementKind).Any(binding => sourceVisible.Contains(binding.Source.SkillId) && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(sourceSeat, binding.Source.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineCardDamageMaximumHpReplacementRuntime.MaximumHpReplacementUsage(binding.Policy.Id), SkillUsageScope.Round) == 0))
+        if (!sourceLess && source.IsAlive && cardUse && !chain && !finalized && _coreActualRoundProgressRoundNumberAccess._roundNumber >= 1 && kind is { } replacementKind && !target.HpUndefined && _coreProgramCardPoliciesOperations.CardPolicies(sourceState, SkillProgramCardPolicyKind.FirstRoundCardDamageBecomesMaximumHpLoss, replacementKind).Any(binding => sourceVisible.Contains(binding.Source.SkillId) && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(sourceSeat, binding.Source.SkillId, CoreGameEngineCardDamageMaximumHpReplacementRuntime.MaximumHpReplacementUsage(binding.Policy.Id), SkillUsageScope.Round) == 0))
             return PublicDamagePrediction.Calculate(target.Hp, target.Armor, cardLayer, PublicDamagePaymentKind.MaximumHpLoss, target.MaxHp);
         var full = Math.Max(0, checked(cardLayer + additional));
         var fixedWushuang = wushuangTactics && !sourceLess && source.WushuangTacticIds?.Contains(2210) == true;
@@ -160,7 +156,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
         return PublicDamagePrediction.Calculate(target.Hp, target.Armor, full, maxHp: target.MaxHp, bypassArmor: bypass, armorDamageMultiplier: armorMultiplier);
     }
 
-    internal static HashSet<string> VisiblePredictionSkillIds(PlayerSnapshot player) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PublicDamagePrediction.VisiblePredictionSkillIds(player);
+    internal static HashSet<string> VisiblePredictionSkillIds(PlayerSnapshot player) => RuntimeSkills.RuntimeRules_Core_PublicDamagePrediction.VisiblePredictionSkillIds(player);
     internal Func<int, int, int>? CreatePublicSourceOccurrenceDamageBonus(int viewerSeat)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasSourceDistanceDamageModifiers && !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasSourceHpDamageModifiers && !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasSourceRoundDamageModifiers)
@@ -176,7 +172,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
             var modifiers = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[sourceSeat]).ProgramInstances.Where(instance => sourceSeat == viewerSeat || visibleSkills[sourceSeat].Contains(instance.SkillId)).SelectMany(instance => instance.Program.DamageModifiers).Where(modifier => modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource && modifier.Condition is SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan or SkillProgramDamageModifierCondition.SourceHpAtMost or SkillProgramDamageModifierCondition.SourceRoundIsOdd or SkillProgramDamageModifierCondition.SourceRoundIsEven).ToArray();
             var distance = sourceSeat != targetSeat && modifiers.Any(modifier => modifier.Condition == SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan) ? _coreNativeRuleQueriesOperations.GetCombatDistance(sourceSeat, targetSeat) : 0;
             var source = view.Players[sourceSeat];
-            return modifiers.Where(modifier => global::CardGame.Core.EngineOwners.CoreGameEnginePassiveRulePoliciesRuntime.MatchesPerOccurrenceSourceDamageModifier(modifier, !source.HpUndefined, source.Hp, 0, distance, _coreActualRoundProgressRoundNumberAccess._roundNumber)).Sum(modifier => modifier.Amount);
+            return modifiers.Where(modifier => CoreGameEnginePassiveRulePoliciesRuntime.MatchesPerOccurrenceSourceDamageModifier(modifier, !source.HpUndefined, source.Hp, 0, distance, _coreActualRoundProgressRoundNumberAccess._roundNumber)).Sum(modifier => modifier.Amount);
         };
     }
 }

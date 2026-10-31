@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_TurnDefaultStats
 {
     internal static IReadOnlyList<int> NewTurnDefaultSlots() => Array.AsReadOnly(new[] { 1, 2, 3, 4 });

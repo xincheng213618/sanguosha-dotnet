@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSuitPreventionBenefitObserversRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CoreGameEngineSuitPreventionBenefitObserversRuntim
         if (root.MatchedJudgmentPlacement is null || root.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context)
             return false;
         var i = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        return i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is TurnEndingBoundaryFrame parent && parent.Id == context.ParentFrameId && parent.OwnerSeat == root.OwnerSeat && parent.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && parent.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && parent.ItemIndex >= 0 && parent.ItemIndex < parent.Items.Count && parent.Items[parent.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, candidate);
+        return i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is TurnEndingBoundaryFrame parent && parent.Id == context.ParentFrameId && parent.OwnerSeat == root.OwnerSeat && parent.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && parent.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && parent.ItemIndex >= 0 && parent.ItemIndex < parent.Items.Count && parent.Items[parent.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, candidate);
     }
 
     internal bool SuitPlacementFirstChild(ProgramSkillFrame root, ResolutionFrame child)
@@ -50,7 +46,7 @@ internal sealed partial class CoreGameEngineSuitPreventionBenefitObserversRuntim
 
     internal bool SuitPlacementMovementRoot(ProgramSkillFrame root, CardsMovedTriggerWindowFrame child) => child.Batch.Id == child.Id && child.Batch.ParentFrameId == root.Id && (child.Batch.AwaitingProgramFrameId is null || child.Batch.AwaitingProgramFrameId == root.Id) && child.Batch.OriginOwnerSeat == root.OwnerSeat && child.Batch.OriginSkillId == root.SkillId && child.Batch.OriginSkillInstanceId == root.SkillInstanceId && child.Batch.Movements.Count > 0 && child.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m));
     internal bool SuitPlacementDamageEdge(DamageFrame damage, ProgramSkillFrame root) => root.AttackAttempt is { } attack && damage.ParentFrameId == root.Id && damage.SourceSeat == attack.SourceSeat && damage.TargetSeat == attack.TargetSeat && damage.Amount == attack.DamageAmount && damage.Nature == attack.Nature && root.AttackReturn is not null && attack.DamageWasApplied;
-    internal static bool SuitPlacementBeforeDamageEdge(BeforeDamageProgramWindowFrame before, ProgramSkillFrame root) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SuitPreventionBenefitObservers.SuitPlacementBeforeDamageEdge(before, root);
+    internal static bool SuitPlacementBeforeDamageEdge(BeforeDamageProgramWindowFrame before, ProgramSkillFrame root) => RuntimeSkills.RuntimeRules_Core_SuitPreventionBenefitObservers.SuitPlacementBeforeDamageEdge(before, root);
     internal bool SuitPlacementPipelineEdge(int index)
     {
         var child = _resolutionStackOperations._resolutionStack[index];
@@ -60,11 +56,11 @@ internal sealed partial class CoreGameEngineSuitPreventionBenefitObserversRuntim
         if (child is BeforeDamageProgramWindowFrame before && parent is ProgramSkillFrame attack)
             return SuitPlacementBeforeDamageEdge(before, attack);
         if (child is ProgramSkillFrame prevention && parent is BeforeDamageProgramWindowFrame beforeParent)
-            return beforeParent.CandidateIndex >= 0 && beforeParent.CandidateIndex < beforeParent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(prevention, beforeParent.Candidates[beforeParent.CandidateIndex].Candidate) && prevention.WindowContext is { Window: SkillProgramTriggerWindow.BeforeDamageApplied } c && c.ParentFrameId == beforeParent.Id && c.TargetSeat == beforeParent.TargetSeat && c.Amount == beforeParent.Amount;
+            return beforeParent.CandidateIndex >= 0 && beforeParent.CandidateIndex < beforeParent.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(prevention, beforeParent.Candidates[beforeParent.CandidateIndex].Candidate) && prevention.WindowContext is { Window: SkillProgramTriggerWindow.BeforeDamageApplied } c && c.ParentFrameId == beforeParent.Id && c.TargetSeat == beforeParent.TargetSeat && c.Amount == beforeParent.Amount;
         if (child is DamageTriggerWindowFrame after && parent is DamageFrame applied)
             return after.ParentFrameId == applied.Id && after.SourceSeat == applied.SourceSeat && after.TargetSeat == applied.TargetSeat && after.SourceCardId is null && after.SourceCard is null;
         if (child is ProgramSkillFrame effect && parent is DamageTriggerWindowFrame window)
-            return window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(effect, window.Candidates[window.CandidateIndex].ToProgramCandidate()) && effect.WindowContext is { } c && c.ParentFrameId == window.Id && c.Window == window.TriggerWindow && c.TargetSeat == window.TargetSeat;
+            return window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(effect, window.Candidates[window.CandidateIndex].ToProgramCandidate()) && effect.WindowContext is { } c && c.ParentFrameId == window.Id && c.Window == window.TriggerWindow && c.TargetSeat == window.TargetSeat;
         if (child is DyingFrame dying && parent is DamageFrame fatal)
             return dying.Continuation == DyingContinuationKind.Damage && dying.ParentFrameId == fatal.Id && dying.VictimSeat == fatal.TargetSeat && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlayerDyingEvent>().Any(e => e.ResolutionId == dying.Id && e.VictimSeat == dying.VictimSeat);
         return _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);

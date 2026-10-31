@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangYueyingMouMobileRuntime
 {
     internal bool HasMouHuangYueyingMobile => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuangYueyingJizhi) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.PlaceMouHuangYueyingQicaiEquipment);
 
-    internal static CardConversionSource MouHySource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huang_yueying_mou_mobile_MouHuangYueyingMobileJizhi.MouHySource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IMouHuangYueyingMobileHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    internal static CardConversionSource MouHySource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_huang_yueying_mou_mobile_MouHuangYueyingMobileJizhi.MouHySource(f);
+    SkillProgramStepOutcome IMouHuangYueyingMobileHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.ResolveMouHuangYueyingJizhi => BeginMouHyJizhi(f),
         SkillProgramEffectOp.PlaceMouHuangYueyingQicaiEquipment => BeginMouHyQicai(f),
         _ => BeginMouHyQiTransfer(f)};
-    bool global::CardGame.Core.IMouHuangYueyingMobileQuery.CanPlace(int owner, int target) => MouHyEquipmentChoices(owner, target).Any();
+    bool IMouHuangYueyingMobileQuery.CanPlace(int owner, int target) => MouHyEquipmentChoices(owner, target).Any();
     internal SkillProgramStepOutcome BeginMouHyJizhi(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

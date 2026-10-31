@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangAuditARuntime
 {
     internal const string WushuangAuditedTiaoxin = "wushuang:skill-3001";
-    void global::CardGame.Core.IWushuangTiaoxinExpansionHost.Record(ProgramSkillFrame frame) => RecordWushuangTiaoxinExpansion(frame);
+    void IWushuangTiaoxinExpansionHost.Record(ProgramSkillFrame frame) => RecordWushuangTiaoxinExpansion(frame);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 63000)]
     internal bool AllowsWushuangTiaoxinPhase(ProgramActivationLegalityContext gate)
     {

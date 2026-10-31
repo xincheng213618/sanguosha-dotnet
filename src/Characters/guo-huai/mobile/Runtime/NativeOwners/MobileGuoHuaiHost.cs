@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MobileGuoHuaiHost(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterGuoHuaiMobileEntries> getCharacterGuoHuaiMobileRuntime) : IMobileGuoHuaiHost
+internal sealed class MobileGuoHuaiHost(Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, Func<RuntimeEntries.CharacterGuoHuaiMobileEntries> getCharacterGuoHuaiMobileRuntime) : IMobileGuoHuaiHost
 {
     public void Prepare(ProgramSkillFrame supplied)
     {

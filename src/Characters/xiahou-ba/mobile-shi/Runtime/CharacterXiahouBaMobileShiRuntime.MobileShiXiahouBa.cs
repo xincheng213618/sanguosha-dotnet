@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouBaMobileShiRuntime
 {
     internal const string ShiXbLibbing = ShiXiahouBaComposition.LibbingSkill, ShiXbPoxi = ShiXiahouBaComposition.PoxiSkill;
-    internal static CardConversionSource ShiXbSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiXbSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasShiXbCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShiXbLibbing);
 
     internal (int Last, int Count1, int Count2, int Count3) ShiXbLibbingState(int ownerSeat)
@@ -57,11 +54,11 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
         // The innermost incoming Use only: a nested unrelated Use cannot inherit the outer ban.
         if (_resolutionStackOperations._resolutionStack.LastOrDefault(x => x is CardUseFrame { ShiXiahouBaPoxi: not null })is not CardUseFrame { Action: { } action, ShiXiahouBaPoxi: { } poxi })
             return false;
-        return global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) && action.Type == CardActionType.Use && action.ActorSeat == sourceSeat && sourceSeat == poxi.Source.OwnerSeat && action.ActionId == poxi.ActionId && targetSeats.Contains(responderSeat) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[responderSeat]).Count <= _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[sourceSeat]).Count;
+        return CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) && action.Type == CardActionType.Use && action.ActorSeat == sourceSeat && sourceSeat == poxi.Source.OwnerSeat && action.ActionId == poxi.ActionId && targetSeats.Contains(responderSeat) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[responderSeat]).Count <= _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[sourceSeat]).Count;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IShiXiahouBaProgramHost.ResolveLibbing(ProgramSkillFrame frame) => BeginShiXb(frame, SkillProgramEffectOp.ResolveShiXbLibbing);
-    SkillProgramStepOutcome global::CardGame.Core.IShiXiahouBaProgramHost.ResolvePoxi(ProgramSkillFrame frame) => BeginShiXb(frame, SkillProgramEffectOp.ResolveShiXbPoxi);
+    SkillProgramStepOutcome IShiXiahouBaProgramHost.ResolveLibbing(ProgramSkillFrame frame) => BeginShiXb(frame, SkillProgramEffectOp.ResolveShiXbLibbing);
+    SkillProgramStepOutcome IShiXiahouBaProgramHost.ResolvePoxi(ProgramSkillFrame frame) => BeginShiXb(frame, SkillProgramEffectOp.ResolveShiXbPoxi);
     internal SkillProgramStepOutcome BeginShiXb(ProgramSkillFrame input, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -94,7 +91,7 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
     {
         var(batch, index) = f.WindowContext is { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } movementBatch, MovementIndex: { } movementIndex } && movementIndex >= 0 && movementIndex < movementBatch.Movements.Count ? (movementBatch, movementIndex) : throw new InvalidOperationException("Poxi lost its exact discarded-slash movement.");
         var move = batch.Movements[index];
-        if (move.To != CardLocation.DiscardPile || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) || _cardZonesOperations._cardZones.GetLocation(move.CardId) != CardLocation.DiscardPile || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId).Kind))
+        if (move.To != CardLocation.DiscardPile || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) || _cardZonesOperations._cardZones.GetLocation(move.CardId) != CardLocation.DiscardPile || !CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId).Kind))
             throw new InvalidOperationException("Poxi lost its discarded original Slash.");
         return new("poxi", _coreActualTurnProgressTurnNumberAccess._turnNumber)
         {
@@ -221,7 +218,7 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
     [ProgramAnswer(ShiXiahouBaComposition.ProgramAction)]
     internal void AnswerShiXb(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiXiahouBa: { Operation: "poxi" } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiXbChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiXiahouBa: { Operation: "poxi" } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiXbChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Shi Xiahou Ba choice lost its current frame, chooser or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect, ShiXiahouBa = r with { Stage = ShiXiahouBaComposition.PoxiStageIssuingUse, TargetSeat = int.Parse(selected.Parameters["target"], CultureInfo.InvariantCulture) } });
@@ -314,7 +311,7 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 68000)]
     internal bool ContinuePaidShiXb(ProgramSkillFrame f) => f.ShiXiahouBa is { Operation: "poxi", Stage: not ShiXiahouBaComposition.PoxiStageFinished };
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 68000)]
-    internal int ShiXbLibbingDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.CardAttackHandle card && card.CardUserSeat is { } user && user >= 0 && attack.EffectiveCardKind is { } kind && ShiXiahouBaComposition.IsDamageCardKind(kind) ? ShiXbLibbingState(user).Count3 : 0;
+    internal int ShiXbLibbingDamageBonus(GameEngine.IDamageAttempt attack) => attack is NativeOwners.CardAttackHandle card && card.CardUserSeat is { } user && user >= 0 && attack.EffectiveCardKind is { } kind && ShiXiahouBaComposition.IsDamageCardKind(kind) ? ShiXbLibbingState(user).Count3 : 0;
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MatchBatch, 68000)]
     internal bool ShiXbNativeMaterialBatch(CardUseFrame use, CardMovementBatchContext batch) => use.ShiXiahouBaPoxi is { } n && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.FrameId)is { ShiXiahouBa: { UseId: var useId } } && useId == use.Id && batch.ParentFrameId == use.Id && batch.Movements.Any(m => m.CardId == n.CardId && m.From == CardLocation.DiscardPile && m.To == CardLocation.Processing && m.Reason.Value == ShiXiahouBaComposition.PoxiUseMoveReason);
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 68000)]
@@ -324,6 +321,6 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
     internal PromptChoice ChooseShiXbAi(PendingDecision decision, ProgramSkillFrame f)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        return decision.Choices.OrderBy(choice => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(owner, _coreMatchParticipantsPlayersAccess._players[choice.Targets.Single()])).ThenBy(choice => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[choice.Targets.Single()]).Count).First();
+        return decision.Choices.OrderBy(choice => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(owner, _coreMatchParticipantsPlayersAccess._players[choice.Targets.Single()])).ThenBy(choice => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[choice.Targets.Single()]).Count).First();
     }
 }

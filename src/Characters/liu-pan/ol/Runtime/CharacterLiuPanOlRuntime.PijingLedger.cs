@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuPanOlRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
     internal bool LiuPanNormalizeImplicitDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => HasLiuPanCapability;
     internal bool HasLiuPanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolvePijingTargetTogglesAndRandomGifts);
 
-    internal static CardConversionSource PijingSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_pan_ol_PijingLedger.PijingSource(f);
+    internal static CardConversionSource PijingSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_liu_pan_ol_PijingLedger.PijingSource(f);
     internal bool TryGetPijingUse(ProgramSkillWindowContext context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window)
     {
         use = null !;
@@ -30,7 +26,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
 
     internal CardUseFrame RequirePijingUse(ProgramSkillFrame f, out ProgramCardTriggerWindowFrame window)
     {
-        if (f.WindowContext is not { } c || !TryGetPijingUse(c, out var u, out window) || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), c, window))
+        if (f.WindowContext is not { } c || !TryGetPijingUse(c, out var u, out window) || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), c, window))
             throw new InvalidOperationException("Pijing lost its exact current native designation candidate.");
         var at = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         if (at < 2 || _resolutionStackOperations._resolutionStack[at - 1].Id != window.Id || _resolutionStackOperations._resolutionStack[at - 2].Id != u.Id)
@@ -38,13 +34,13 @@ internal sealed partial class CharacterLiuPanOlRuntime
         return u;
     }
 
-    internal bool PijingInitialEligible(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == "ol:pijing" && c.BindingId == "toggle-targets" && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && TryGetPijingUse(context, out var u, out var w) && u.SourceSeat == c.OwnerSeat && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(c, context, w) && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(u.CardKind)) && u.CardKind != CardKind.Nullification && u.Action!.EffectiveDesignatedTargetSeats.Count > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<PijingStartedEvent>().Any(e => !e.Reciprocal && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber) && PijingInitialOptions(u, []).Count > 0;
+    internal bool PijingInitialEligible(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == "ol:pijing" && c.BindingId == "toggle-targets" && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && TryGetPijingUse(context, out var u, out var w) && u.SourceSeat == c.OwnerSeat && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(c, context, w) && (CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(u.CardKind)) && u.CardKind != CardKind.Nullification && u.Action!.EffectiveDesignatedTargetSeats.Count > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<PijingStartedEvent>().Any(e => !e.Reciprocal && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber) && PijingInitialOptions(u, []).Count > 0;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27410)]
     internal bool QualifyPijing(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => t.Effects is [{ Op: SkillProgramEffectOp.ResolvePijingTargetTogglesAndRandomGifts }] ? PijingInitialEligible(c, context) : t.Effects is not [{ Op: SkillProgramEffectOp.ResolvePijingNextSoleTargetChoice }] || IsIssuedPijingCandidate(c, context);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 20)]
     internal void CollectIssuedPijingNextUseCandidates(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result)
     {
-        if (!HasLiuPanCapability || window != SkillProgramTriggerWindow.CardUseTargetsFinalized || action.Type != CardActionType.Use || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Basic && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind) || action.EffectiveDesignatedTargetSeats.Count != 1 || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(u => u.Action?.ActionId == action.ActionId)is not { } use || !_coreMatchParticipantsPlayersAccess._players[action.ActorSeat].IsAlive)
+        if (!HasLiuPanCapability || window != SkillProgramTriggerWindow.CardUseTargetsFinalized || action.Type != CardActionType.Use || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Basic && !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind) || action.EffectiveDesignatedTargetSeats.Count != 1 || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(u => u.Action?.ActionId == action.ActionId)is not { } use || !_coreMatchParticipantsPlayersAccess._players[action.ActorSeat].IsAlive)
             return;
         if (use.PijingNextUses is null)
         {
@@ -127,7 +123,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
                 continue;
             if (fact is PijingRedirectedEvent e && e.UseId == use.Id)
             {
-                if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || e.ActionId != r.ActionId || e.TargetIndex < 0 || e.TargetIndex >= actual.Length || actual[e.TargetIndex] != e.PreviousSeat || e.Source.OwnerSeat != e.PreviousSeat || _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash != e.GameplayHash)
+                if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || e.ActionId != r.ActionId || e.TargetIndex < 0 || e.TargetIndex >= actual.Length || actual[e.TargetIndex] != e.PreviousSeat || e.Source.OwnerSeat != e.PreviousSeat || _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash != e.GameplayHash)
                     return false;
                 actual[e.TargetIndex] = e.Seat;
             }
@@ -135,7 +131,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
             if (fact is LiuliRedirectedEvent liuli && liuli.ResolutionId == use.Id)
             {
                 var at = Array.IndexOf(actual, liuli.OriginalTargetSeat);
-                if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || at < 0)
+                if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || at < 0)
                     return false;
                 actual[at] = liuli.NewTargetSeat;
             }

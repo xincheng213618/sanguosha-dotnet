@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanYuRuntimeRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IGuanYuVariantHost.ExecuteGuanYuVariant(ProgramSkillFrame frame, SkillProgramEffectOp op) => ExecuteGuanYuVariant(frame, op);
+    SkillProgramStepOutcome IGuanYuVariantHost.ExecuteGuanYuVariant(ProgramSkillFrame frame, SkillProgramEffectOp op) => ExecuteGuanYuVariant(frame, op);
     internal IReadOnlyList<int> ExclusiveSupportTargets(int recipient, string? skill = null) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DemonSupportGrantedEvent>().Where(e => e.RecipientSeat == recipient && (skill is null || e.SkillId == skill) && _coreMatchParticipantsPlayersAccess._players[e.OwnerSeat].IsAlive).Select(e => e.OwnerSeat).Distinct().Order().ToArray();
     internal CardActionContext GuanParentAction(ProgramSkillFrame frame)
     {
@@ -42,7 +38,7 @@ internal sealed partial class CharacterGuanYuRuntimeRuntime
         if (ops.Contains(SkillProgramEffectOp.RewriteWeilinTargetHand))
             return context.CardUse is { } use && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == use.CardActionId && e.Action.ConversionChain.Any(s => s.SkillId == candidate.SkillId && s.OwnerSeat == owner && s.BindingId != "weilin-hand-slash"));
         if (ops.Contains(SkillProgramEffectOp.KillRoundFocusSlashVictim))
-            return context.TargetSeat is { } victim && DemonFocus(victim)is { } focus && focus.Source.OwnerSeat == owner && context.SourceSeat == owner && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsChainPropagation: false, IsSourceLess: false, EffectiveCardKind: { } kind } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
+            return context.TargetSeat is { } victim && DemonFocus(victim)is { } focus && focus.Source.OwnerSeat == owner && context.SourceSeat == owner && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsChainPropagation: false, IsSourceLess: false, EffectiveCardKind: { } kind } && CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
         return true;
     }
 
@@ -51,7 +47,7 @@ internal sealed partial class CharacterGuanYuRuntimeRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (frame.SkillId != supplied.SkillId || frame.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.GameplayHash)
             throw new InvalidOperationException("Guan rule lost its original content binding.");
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+        var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
         switch (op)
         {
             case SkillProgramEffectOp.ArmPhaseSlashFocus:
@@ -62,7 +58,7 @@ internal sealed partial class CharacterGuanYuRuntimeRuntime
             case SkillProgramEffectOp.RecordPhaseFocusedSlash:
                 var focus = GuanPhaseFocus(frame.OwnerSeat) ?? throw new InvalidOperationException("Focused Slash lost its phase lease.");
                 var slash = GuanParentAction(frame);
-                if (slash.ActorSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(slash.EffectiveKind) || !slash.EffectiveDesignatedTargetSeats.Contains(focus.TargetSeat))
+                if (slash.ActorSeat != frame.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(slash.EffectiveKind) || !slash.EffectiveDesignatedTargetSeats.Contains(focus.TargetSeat))
                     throw new InvalidOperationException("Focused Slash requires the accepted designated target.");
                 if (!_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GuanFocusedSlashEvent>().Any(e => e.ActionId == slash.ActionId && e.OwnerSeat == frame.OwnerSeat))
                 {

@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEndRefillNextTurnRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IEndRefillNextTurnProgramHost.RefillAndScheduleNextTurnSelfOnly(ProgramSkillFrame f) => BeginEndRefillNextTurn(f);
-    internal static string EndRefillReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_EndRefillNextTurn.EndRefillReason(f);
+    SkillProgramStepOutcome IEndRefillNextTurnProgramHost.RefillAndScheduleNextTurnSelfOnly(ProgramSkillFrame f) => BeginEndRefillNextTurn(f);
+    internal static string EndRefillReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_EndRefillNextTurn.EndRefillReason(f);
     internal bool IsExactOwnAfterTurnEndedProgram(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.AfterTurnEnded } context && _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is { } parent && parent.OwnerSeat == f.OwnerSeat && parent.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && parent.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && parent.AfterTurnEnded?.CurrentChild?.FrameId == f.Id && _coreAfterTurnEndedProgramsOperations.MatchesAfterTurnEndedChild(parent, f, context);
     internal SkillProgramStepOutcome BeginEndRefillNextTurn(ProgramSkillFrame supplied)
     {
@@ -19,7 +16,7 @@ internal sealed partial class CoreGameEngineEndRefillNextTurnRuntime
         var r = new EndRefillNextTurnReceipt
         {
             WindowFrameId = f.WindowContext!.ParentFrameId,
-            Source = global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f),
+            Source = CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f),
             GameplayHash = f.GameplayHash,
             ActualTurnNumber = _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber,
             ActualTurnOwnerSeat = _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat,
@@ -64,7 +61,7 @@ internal sealed partial class CoreGameEngineEndRefillNextTurnRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("End refill lost its frame.");
         RequireEndRefillNextTurnReceipt(f);
-        if (f.EndRefillNextTurn!.Stage != EndRefillNextTurnStage.Target || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], f.EndRefillNextTurn.Choices.Where(c => c.Id == choice.Id).ToArray()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], EndRefillNextTurnChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (f.EndRefillNextTurn!.Stage != EndRefillNextTurnStage.Target || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], f.EndRefillNextTurn.Choices.Where(c => c.Id == choice.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], EndRefillNextTurnChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("End refill selected a stale participant or an already issued draw.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Targets.Count == 0)
@@ -132,7 +129,7 @@ internal sealed partial class CoreGameEngineEndRefillNextTurnRuntime
     internal void RequireEndRefillNextTurnReceipt(ProgramSkillFrame f)
     {
         var r = f.EndRefillNextTurn ?? throw new InvalidOperationException("End refill lost its receipt.");
-        if (!IsExactOwnAfterTurnEndedProgram(f) || f.InstructionIndex != 1 || f.TriggerId is null || r.WindowFrameId != f.WindowContext!.ParentFrameId || r.Source != global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.RefillAndScheduleNextTurnSelfOnly || r.Targets.Count != r.Targets.Distinct().Count() || r.Targets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EndRefillNextTurnOfferedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Receipt.WindowFrameId == r.WindowFrameId && e.Receipt.Source == r.Source && e.Receipt.GameplayHash == r.GameplayHash && e.Receipt.ActualTurnNumber == r.ActualTurnNumber && e.Receipt.Targets.SequenceEqual(r.Targets)) != 1)
+        if (!IsExactOwnAfterTurnEndedProgram(f) || f.InstructionIndex != 1 || f.TriggerId is null || r.WindowFrameId != f.WindowContext!.ParentFrameId || r.Source != CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.RefillAndScheduleNextTurnSelfOnly || r.Targets.Count != r.Targets.Distinct().Count() || r.Targets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EndRefillNextTurnOfferedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Receipt.WindowFrameId == r.WindowFrameId && e.Receipt.Source == r.Source && e.Receipt.GameplayHash == r.GameplayHash && e.Receipt.ActualTurnNumber == r.ActualTurnNumber && e.Receipt.Targets.SequenceEqual(r.Targets)) != 1)
             throw new InvalidOperationException("End refill lost its actual parent, source, candidate or instruction.");
         var issued = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EndRefillNextTurnIssuedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
         if (r.Stage == EndRefillNextTurnStage.Target)
@@ -158,7 +155,7 @@ internal sealed partial class CoreGameEngineEndRefillNextTurnRuntime
         return true;
     }
 
-    internal static bool SameEndRefillReceipt(EndRefillNextTurnReceipt a, EndRefillNextTurnReceipt b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_EndRefillNextTurn.SameEndRefillReceipt(a, b);
+    internal static bool SameEndRefillReceipt(EndRefillNextTurnReceipt a, EndRefillNextTurnReceipt b) => RuntimeSkills.RuntimeRules_Core_EndRefillNextTurn.SameEndRefillReceipt(a, b);
     internal void ConsumeEndRefillNextTurn(CharacterState current)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RefillAndScheduleNextTurnSelfOnly))

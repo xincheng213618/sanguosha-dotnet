@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheYingxiangRuntime
 {
     internal const string ShanheYingxiangId = "shanhe:companion-yingxiang";
     internal const string ShanheQingjueDiscardReason = "skill-program.shanhe-yingxiang.qingjue-discard";
-    SkillProgramStepOutcome global::CardGame.Core.IShanheYingxiangHost.ResolveYingxiang(ProgramSkillFrame frame, bool used) => BeginShanheYingxiang(frame, used);
+    SkillProgramStepOutcome IShanheYingxiangHost.ResolveYingxiang(ProgramSkillFrame frame, bool used) => BeginShanheYingxiang(frame, used);
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 5406)]
     internal void RecordShanheYingxiangGift(CardMovedEvent fact)
     {
@@ -72,7 +68,7 @@ internal sealed partial class CoreGameEngineShanheYingxiangRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (frame.ShanheYingxiang is not null || frame.WindowContext is not { } context)
             throw new InvalidOperationException("Yingxiang requires its original unpaid trigger window.");
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+        var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
         var action = used ? ShanheYingxiangUsedAction(frame.OwnerSeat, context) : null;
         if (used && action is null || !used && (context.MovementBatch is not { } batch || !HasShanheYingxiangNonUseLoss(frame.OwnerSeat, batch)))
             return SkillProgramStepOutcome.Continue;
@@ -132,7 +128,7 @@ internal sealed partial class CoreGameEngineShanheYingxiangRuntime
     [ProgramAnswer("shanhe-yingxiang")]
     internal void AnswerShanheYingxiang(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheYingxiang: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheYingxiangChoices(frame).Where(item => item.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheYingxiang: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheYingxiangChoices(frame).Where(item => item.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Yingxiang lost its private payer, exact card selection or living recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var value = int.Parse(choice.Parameters["value"], System.Globalization.CultureInfo.InvariantCulture);
@@ -206,7 +202,7 @@ internal sealed partial class CoreGameEngineShanheYingxiangRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShanheYingxiang: { } receipt } frame && frame.Id == frameId)
         {
-            if (receipt.Source != new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || receipt.GameplayHash != frame.GameplayHash || frame.WindowContext?.ParentFrameId != receipt.ParentWindowId || receipt.Cards is not System.Collections.IList { IsReadOnly: true } || receipt.Cards.Count > 2)
+            if (receipt.Source != new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || receipt.GameplayHash != frame.GameplayHash || frame.WindowContext?.ParentFrameId != receipt.ParentWindowId || receipt.Cards is not System.Collections.IList { IsReadOnly: true } || receipt.Cards.Count > 2)
                 throw new InvalidOperationException("Yingxiang lost its original frame, content identity or frozen paid selection.");
             if (_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frameId) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frameId, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(frameId, CharacterStateContinuation.Program))
                 return;
@@ -288,7 +284,7 @@ internal sealed partial class CoreGameEngineShanheYingxiangRuntime
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShanheYingxiangMovement)]
     internal PromptChoice AiShanheYingxiang(PendingDecision prompt, ProgramSkillFrame frame) => prompt.Choices.OrderByDescending(choice => choice.Parameters["branch"] switch
     {
-        "card" => 10 - global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]),
+        "card" => 10 - CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]),
         "pay" => frame.ShanheYingxiang!.Cards.Count == 0 ? -10 : 1,
         "option" => choice.Parameters["value"] == "2" ? 20 : 10,
         "recipient" => _coreTeamActivityProgramsOperations.OtherRevealedPublicTeamAlly(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[choice.Targets.Single()]) ? 20 : 0,

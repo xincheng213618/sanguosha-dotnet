@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenDengOlRuntime
@@ -143,7 +139,7 @@ internal sealed partial class CharacterChenDengOlRuntime
 
     internal void CommitFengjiOption(ProgramSkillFrame active, FengjiOptionKind option, bool accepted, int recipientSeat)
     {
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramFengjiOptionChosenEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualRoundProgressRoundNumberAccess._roundNumber, option, accepted, recipientSeat));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramFengjiOptionChosenEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualRoundProgressRoundNumberAccess._roundNumber, option, accepted, recipientSeat));
         var label = option == FengjiOptionKind.Draw ? "摸牌阶段摸牌数" : "出牌阶段使用【杀】的次数上限";
         _coreMatchLogOperations.AddLog("SkillEffect", accepted ? $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 丰积：{(label)}本轮 -1，{(_coreMatchParticipantsPlayersAccess._players[recipientSeat].Name)} 的该数值本轮 +2。" : $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 丰积：{(label)}本轮 +1。", active.OwnerSeat, accepted ? recipientSeat : active.OwnerSeat);
     }

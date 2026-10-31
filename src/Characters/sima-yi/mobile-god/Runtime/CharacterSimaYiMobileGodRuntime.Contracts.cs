@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICharacterSimaYiMobileGodMobileSimaRenjieOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterSimaYiMobileGodMobileSimaRenjieOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MobileSimaRenjieRuntime Get();
+    MobileSimaRenjieRuntime Get();
 }

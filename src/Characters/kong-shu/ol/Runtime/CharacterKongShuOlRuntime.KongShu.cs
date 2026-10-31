@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterKongShuOlRuntime
 {
     internal const string LeiluanDrawReason = "skill-program.kong-shu.leiluan.draw", LeiluanGainReason = "skill-program.kong-shu.leiluan.gain", FuchaoDrawReason = "skill-program.kong-shu.fuchao.draw", FuchaoDiscardReason = "skill-program.kong-shu.fuchao.discard";
-    internal static CardConversionSource KongShuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_kong_shu_ol_KongShu.KongShuSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IKongShuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginKongShu(f, op);
+    internal static CardConversionSource KongShuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_kong_shu_ol_KongShu.KongShuSource(f);
+    SkillProgramStepOutcome IKongShuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginKongShu(f, op);
     internal SkillProgramStepOutcome BeginKongShu(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -46,7 +43,7 @@ internal sealed partial class CharacterKongShuOlRuntime
                 }.Concat(KongShuLivingChained()).ToArray()
             };
         }
-        else if (context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } completed || completed.ActorSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(completed.EffectiveKind, [SkillProgramCardCategory.Basic]))
+        else if (context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } completed || completed.ActorSeat != f.OwnerSeat || !CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(completed.EffectiveKind, [SkillProgramCardCategory.Basic]))
             throw new InvalidOperationException("Fuchao lost the final actual basic-use actor.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { KongShu = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KongShuStartedEvent(f.Id, r.Source, r.GameplayHash, op, r.WindowId, r.ActualTurn, r.TurnOwner, r.Round));
@@ -103,7 +100,7 @@ internal sealed partial class CharacterKongShuOlRuntime
     [ProgramAnswer("kong-shu")]
     internal void AnswerKongShu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { KongShu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == KongShuStage.RoundDiscard ? r.Payer : f.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], KongShuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { KongShu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == KongShuStage.RoundDiscard ? r.Payer : f.OwnerSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], KongShuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Kong Shu lost her exact native private chooser or material selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];

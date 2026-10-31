@@ -1,20 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWoLongFengChuOlRuntime
 {
     internal const string EquipmentSlotNamedTier = "equipment-slot-named-tier";
-    internal static string EquipmentSlotNamedLabel(EquipmentSlot slot) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wo_long_feng_chu_ol_WoLongFengChuUses.EquipmentSlotNamedLabel(slot);
+    internal static string EquipmentSlotNamedLabel(EquipmentSlot slot) => RuntimeSkills.RuntimeRules_wo_long_feng_chu_ol_WoLongFengChuUses.EquipmentSlotNamedLabel(slot);
     internal bool IsEquipmentSlotNamedSkill(string skill) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(skill)?.Program?.Activations.Any(a => ProgramInstructionResolver.Default.Features(a).HasOperation(SkillProgramEffectOp.PayEquipmentSlotForNamedUse)) == true;
     internal EquipmentSlotNamedUsePayment? UnconsumedEquipmentSlotPayment(CardConversionSource source) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EquipmentSlotNamedUsePaidEvent>().Select(e => e.Payment).LastOrDefault(p => p.Source == source && p.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && p.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && p.ActualTurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EquipmentSlotNamedUseConsumedEvent>().Any(e => e.PaymentFrameId == p.FrameId) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<EquipmentSlotNamedUseCancelledEvent>().Any(e => e.PaymentFrameId == p.FrameId));
-    internal bool EquipmentSlotNamedYin(int seat, string skill, string instance) => _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates.GetValueOrDefault(new global::CardGame.Core.GameEngine.ProgramBooleanStateKey(seat, skill, instance, "yin"));
+    internal bool EquipmentSlotNamedYin(int seat, string skill, string instance) => _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates.GetValueOrDefault(new GameEngine.ProgramBooleanStateKey(seat, skill, instance, "yin"));
     internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> PaidEquipmentSlotNamedZeroRules(CharacterState owner, CardKind? output, bool responseUse, bool dyingUse)
     {
         if (!owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
@@ -46,7 +41,7 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
 
         var yin = EquipmentSlotNamedYin(actor.Seat, source.SkillId, source.SkillInstanceId);
         var basic = CardUseCategoryCatalog.Get(rule.OutputKind) == CardUseCategories.Basic;
-        available = yin == basic && !EquipmentSlotNamedNameUsed(actor.Seat, rule.OutputKind) && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(actor.Seat, source.SkillId, global::CardGame.Core.EngineOwners.CoreProgramTieredRoundConversionRuntime.TieredRoundUsage(policy), SkillUsageScope.Round) == 0 && Enum.GetValues<EquipmentSlot>().Any(slot => actor.EquipmentSlotCapacity(slot) > 0);
+        available = yin == basic && !EquipmentSlotNamedNameUsed(actor.Seat, rule.OutputKind) && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(actor.Seat, source.SkillId, CoreProgramTieredRoundConversionRuntime.TieredRoundUsage(policy), SkillUsageScope.Round) == 0 && Enum.GetValues<EquipmentSlot>().Any(slot => actor.EquipmentSlotCapacity(slot) > 0);
         return true;
     }
 
@@ -87,15 +82,15 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
         return true;
     }
 
-    internal static string EquipmentSlotNamedTargetSignature(LegalAction? action, PromptChoice? choice) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wo_long_feng_chu_ol_WoLongFengChuUses.EquipmentSlotNamedTargetSignature(action, choice);
-    internal static string EquipmentSlotNamedDecisionSignature(PendingDecision decision) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wo_long_feng_chu_ol_WoLongFengChuUses.EquipmentSlotNamedDecisionSignature(decision);
+    internal static string EquipmentSlotNamedTargetSignature(LegalAction? action, PromptChoice? choice) => RuntimeSkills.RuntimeRules_wo_long_feng_chu_ol_WoLongFengChuUses.EquipmentSlotNamedTargetSignature(action, choice);
+    internal static string EquipmentSlotNamedDecisionSignature(PendingDecision decision) => RuntimeSkills.RuntimeRules_wo_long_feng_chu_ol_WoLongFengChuUses.EquipmentSlotNamedDecisionSignature(decision);
     internal bool EquipmentSlotNamedChoiceIsPayable(CharacterState actor, CardConversionSource source, CardKind kind, EquipmentSlotNamedUseIntent intent, IReadOnlyList<int> targets, EquipmentSlot slot)
     {
         if (actor.EquipmentSlotCapacity(slot) <= 0 || intent is EquipmentSlotNamedUseIntent.BorrowedSword or EquipmentSlotNamedUseIntent.Qinglong && slot == EquipmentSlot.Weapon)
             return false;
         if (kind == CardKind.Snatch)
-            return targets.Count == 1 && (_coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance2(actor.Seat, Suit.None) || _coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], kind) || _coreProvenanceCardPoliciesOperations.HasProvenanceUseDistance2(actor, []) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.IgnoreUseDistance, kind) || global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], excludedEquipmentSlot: slot)) == 1);
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            return targets.Count == 1 && (_coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance2(actor.Seat, Suit.None) || _coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], kind) || _coreProvenanceCardPoliciesOperations.HasProvenanceUseDistance2(actor, []) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.IgnoreUseDistance, kind) || CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], excludedEquipmentSlot: slot)) == 1);
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return true;
         var logical = new Card(0, kind, Suit.None, 0);
         return targets.Count > 0 && targets.All(target => _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], logical, source, kind, noEffectiveRank: true, physicalCardIds: [], excludedEquipmentSlot: slot) && (intent is EquipmentSlotNamedUseIntent.Qinglong or EquipmentSlotNamedUseIntent.BorrowedSword or EquipmentSlotNamedUseIntent.SayingSlash || _coreRuleQueriesOperations.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[target], false, kind, effectiveRank: 0, excludedEquipmentSlot: slot, physicalCardIds: [])));
@@ -166,7 +161,7 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
             throw new InvalidOperationException("Youlong requires its exact remaining slot choice on its original unpaid frame.");
         var actor = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var policy = _corePlayCardHistoryOperations.ViewAsRule(draft.Source)!.TieredRoundConversion!;
-        if (!_skillRuntimeStateOperations._skillRuntimeState.TryConsumeUsage(actor.Seat, draft.Source.SkillId, global::CardGame.Core.EngineOwners.CoreProgramTieredRoundConversionRuntime.TieredRoundUsage(policy), SkillUsageScope.Round, 1))
+        if (!_skillRuntimeStateOperations._skillRuntimeState.TryConsumeUsage(actor.Seat, draft.Source.SkillId, CoreProgramTieredRoundConversionRuntime.TieredRoundUsage(policy), SkillUsageScope.Round, 1))
             throw new InvalidOperationException("A Youlong face cannot pay its actual-round allowance twice.");
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var previous = actor.EquipmentSlotCapacity(slot);
@@ -190,7 +185,7 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
             return false;
         var paid = UnconsumedEquipmentSlotPayment(source) ?? throw new InvalidOperationException("The native Youlong use has no exact unconsumed paid slot invoice.");
         var policy = _corePlayCardHistoryOperations.ViewAsRule(source)!.TieredRoundConversion!;
-        if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == paid.FrameId) || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(source.OwnerSeat, source.SkillId, global::CardGame.Core.EngineOwners.CoreProgramTieredRoundConversionRuntime.TieredRoundUsage(policy), SkillUsageScope.Round) != 1)
+        if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == paid.FrameId) || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(source.OwnerSeat, source.SkillId, CoreProgramTieredRoundConversionRuntime.TieredRoundUsage(policy), SkillUsageScope.Round) != 1)
             throw new InvalidOperationException("The native Youlong use cannot start before its once-paid cost frame returns.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new EquipmentSlotNamedUseConsumedEvent(paid.FrameId));
         return true;
@@ -297,9 +292,9 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
         if (_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, draft.EffectiveKind, CardActionType.Use) || draft.PlayAction is not { } action)
             return false;
         var kind = draft.EffectiveKind;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+        if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
             return _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: true).Any(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && o.TargetSeats.SequenceEqual(action.TargetSeats));
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return action.TargetSeats.Count > 0 && action.TargetSeats.All(t => _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], new(0, kind, Suit.None, 0), draft.Source, kind, noEffectiveRank: true, physicalCardIds: []) && _coreRuleQueriesOperations.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[t], _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, draft.Source), kind, effectiveRank: 0, physicalCardIds: []));
         if (kind == CardKind.Peach)
             return _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None);

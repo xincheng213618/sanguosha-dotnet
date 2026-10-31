@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuBuOlMagicRuntime
@@ -69,7 +65,7 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
         return true;
     }
 
-    internal bool IsMoLuBuOpeningDelayedForbidden(int actor, CardKind kind) => IsMoLuBuOpeningPlay(actor) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(kind);
+    internal bool IsMoLuBuOpeningDelayedForbidden(int actor, CardKind kind) => IsMoLuBuOpeningPlay(actor) && CoreNativeCardClassificationsRuntime.IsDelayedCard(kind);
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeTurnUseBan, 10)]
     internal bool MoLuBuOpeningCardUseForbidden(ProgramCardUseQuery query) => query.ActionType == CardActionType.Use && IsMoLuBuOpeningDelayedForbidden(query.ActorSeat, query.Kind);
 }

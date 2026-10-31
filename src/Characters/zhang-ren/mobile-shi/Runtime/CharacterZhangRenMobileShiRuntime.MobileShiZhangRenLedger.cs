@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangRenMobileShiRuntime
 {
     internal bool HasShiZrCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShiZrFuan);
 
-    internal global::CardGame.Core.GameEngine.ShiZrFuanRecordInfo? ShiZrFuanRecord(int seat)
+    internal GameEngine.ShiZrFuanRecordInfo? ShiZrFuanRecord(int seat)
     {
-        global::CardGame.Core.GameEngine.ShiZrFuanRecordInfo? record = null;
+        GameEngine.ShiZrFuanRecordInfo? record = null;
         foreach (var payload in _coreAlternatingBenefitsOperations.CompleteProgramEventHistory())
         {
             if (payload is ShiZrFuanRecordedEvent { OwnerSeat: var owner } rec && owner == seat)
@@ -61,7 +57,7 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 68200)]
-    internal int ShiZrYinXianDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.CardAttackHandle card && card.CardUserSeat is { } user && user >= 0 && attack.EffectiveCardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat is { } target && target != user && ShiZrYinXianFarthest(user, target) ? 1 : 0;
+    internal int ShiZrYinXianDamageBonus(GameEngine.IDamageAttempt attack) => attack is NativeOwners.CardAttackHandle card && card.CardUserSeat is { } user && user >= 0 && attack.EffectiveCardKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat is { } target && target != user && ShiZrYinXianFarthest(user, target) ? 1 : 0;
     internal bool IsShiZrFuanStrikeUse(long useFrameId) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZrFuanStrikeIssuedEvent>().Any(entry => entry.UseId == useFrameId);
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 68200)]
     internal bool ShiZrFuanUseDistance(ProgramCardDistanceQuery query) => query.CardUseFrameId is { } id && IsShiZrFuanStrikeUse(id);

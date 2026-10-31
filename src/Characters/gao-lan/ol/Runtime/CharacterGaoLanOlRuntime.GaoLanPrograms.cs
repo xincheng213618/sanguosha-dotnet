@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGaoLanOlRuntime
@@ -30,5 +26,5 @@ internal sealed partial class CharacterGaoLanOlRuntime
         _coreProgramLifecycleOperations.DrawProgramCards(frame.Id, frame.OwnerSeat, draw, null, null, SkillProgramCardSetVisibility.Private, new($"skill-program.{(frame.SkillId)}.xizhen"));
     }
 
-    void global::CardGame.Core.IGaoLanProgramHost.XizhenResponseBenefit(ProgramSkillFrame frame) => XizhenProgramResponseBenefit(frame);
+    void IGaoLanProgramHost.XizhenResponseBenefit(ProgramSkillFrame frame) => XizhenProgramResponseBenefit(frame);
 }

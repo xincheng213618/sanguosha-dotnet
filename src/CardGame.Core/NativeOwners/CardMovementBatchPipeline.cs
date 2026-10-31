@@ -2,7 +2,7 @@
 
 namespace CardGame.Core.NativeOwners;
 
-internal sealed class CardMovementBatchPipeline(global::System.Func<global::CardGame.Core.ProgramPipelineHooks> getProgramPipelineHooks) : ICardMovementBatchPipeline
+internal sealed class CardMovementBatchPipeline(Func<ProgramPipelineHooks> getProgramPipelineHooks) : ICardMovementBatchPipeline
     {
         public void Begin(CardMovementBatchBuilder batch) => getProgramPipelineHooks().BeginMovementBatch(batch);
         public void ObserveCommitted(CardMovementBatchBuilder batch, CardMovementRecord movement) =>

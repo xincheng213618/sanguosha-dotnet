@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangGanOlRuntime
@@ -40,7 +36,7 @@ internal sealed partial class CharacterJiangGanOlRuntime
             Suit.Club,
             Suit.Diamond
         };
-        var choices = suits.Select(suit => new PromptChoice(new ChoiceId($"daoshu-suit.frame-{(frame.Id)}.{(suit)}"), $"选择{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(suit))}。", [], [frame.SelectedTargetSeats is [var target] ? target : frame.OwnerSeat], new Dictionary<string, string> { ["program-action"] = "daoshu-suit", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["suit"] = suit.ToString() })).ToArray();
+        var choices = suits.Select(suit => new PromptChoice(new ChoiceId($"daoshu-suit.frame-{(frame.Id)}.{(suit)}"), $"选择{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(suit))}。", [], [frame.SelectedTargetSeats is [var target] ? target : frame.OwnerSeat], new Dictionary<string, string> { ["program-action"] = "daoshu-suit", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["suit"] = suit.ToString() })).ToArray();
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, frame.OwnerSeat, $"【{(presentation.Name)}】请选择一种花色。", [], [], frame.OwnerSeat)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
@@ -60,7 +56,7 @@ internal sealed partial class CharacterJiangGanOlRuntime
         if (paused.Effect is not { Op: SkillProgramEffectOp.DaoshuGuessAndTake } || selected.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture))
             throw new InvalidOperationException("The Daoshu suit choice does not match its suspended instruction.");
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (active.SelectedTargetSeats is not [var target] || !System.Enum.TryParse<Suit>(selected.Parameters.GetValueOrDefault("suit"), out var chosenSuit))
+        if (active.SelectedTargetSeats is not [var target] || !Enum.TryParse<Suit>(selected.Parameters.GetValueOrDefault("suit"), out var chosenSuit))
             throw new InvalidOperationException("The Daoshu suit choice lost its target or suit.");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != frame.OwnerSeat)
             throw new InvalidOperationException("The Daoshu guesser changed while suspended.");
@@ -88,7 +84,7 @@ internal sealed partial class CharacterJiangGanOlRuntime
         _corePhysicalMovementFacadesOperations.MoveCard(taken, CardLocation.Hand(target), CardLocation.Processing, new($"skill-program.{(frame.SkillId)}.daoshu-take"), movement => _characterBianFuRenOlOperations.RecordBianFuRenOwnedTransferProducer(movement, owner.Seat, frame.Id));
         _corePhysicalMovementFacadesOperations.MoveCard(taken, CardLocation.Processing, CardLocation.Hand(owner.Seat), new($"skill-program.{(frame.SkillId)}.daoshu-take"));
         var takenSuit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(owner, taken);
-        _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 发动【盗书】，选择{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(chosenSuit))}，获得 {(targetState.Name)} 的一张手牌。", owner.Seat, target);
+        _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 发动【盗书】，选择{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(chosenSuit))}，获得 {(targetState.Name)} 的一张手牌。", owner.Seat, target);
         if (takenSuit == chosenSuit)
         {
             // Correct guess: the activation is refunded so the skill may
@@ -101,7 +97,7 @@ internal sealed partial class CharacterJiangGanOlRuntime
             if (_coreGameEngineSkillProgramsProgramPhaseUsesProgramUsesAccess._programPhaseUses.TryGetValue(usageKey, out var phaseUsed) && phaseUsed > 0)
                 _coreGameEngineSkillProgramsProgramPhaseUsesProgramUsesAccess._programPhaseUses[usageKey] = phaseUsed - 1;
             _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 的【盗书】猜中花色，对 {(targetState.Name)} 造成1点伤害，此技能视为未发动过。", owner.Seat, target);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDaoshuEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, target, chosenSuit, true, true, null, Array.Empty<int>()));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDaoshuEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, target, chosenSuit, true, true, null, Array.Empty<int>()));
             _coreSkillProgramsOperations.BeginProgramSkillDamage(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), target, 1);
             return;
         }
@@ -116,7 +112,7 @@ internal sealed partial class CharacterJiangGanOlRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { DaoshuGuess = null });
             _coreProgramCategoryChallengesOperations.RevealProgramBoundCards(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), "daoshu-reveal");
             _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 的【盗书】未猜中花色，没有其他花色的手牌，展示了所有手牌。", owner.Seat, target);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDaoshuEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, target, chosenSuit, true, false, null, Array.AsReadOnly(handCards.Select(card => card.Id).ToArray())));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDaoshuEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, target, chosenSuit, true, false, null, Array.AsReadOnly(handCards.Select(card => card.Id).ToArray())));
             if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
                 _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
             return;
@@ -172,10 +168,10 @@ internal sealed partial class CharacterJiangGanOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { DaoshuGuess = null });
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(owner.Seat), CardLocation.Hand(state.TargetSeat), new($"skill-program.{(frame.SkillId)}.daoshu-give"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, owner.Seat, state.TargetSeat, [card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 的【盗书】未猜中花色，交给 {(target.Name)} 【{(card.DisplayName)}】。", owner.Seat, state.TargetSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDaoshuEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, state.TargetSeat, state.ChosenSuit, true, false, card.Id, Array.Empty<int>()));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDaoshuEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, state.TargetSeat, state.ChosenSuit, true, false, card.Id, Array.Empty<int>()));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IJiangGanProgramHost.DaoshuGuessAndTake(ProgramSkillFrame frame, SkillProgramEffect effect) => DaoshuProgramGuessAndTake(frame, effect);
+    SkillProgramStepOutcome IJiangGanProgramHost.DaoshuGuessAndTake(ProgramSkillFrame frame, SkillProgramEffect effect) => DaoshuProgramGuessAndTake(frame, effect);
 }

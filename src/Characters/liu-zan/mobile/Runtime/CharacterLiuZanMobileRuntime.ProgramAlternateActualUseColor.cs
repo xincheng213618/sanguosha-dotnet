@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuZanMobileRuntime
@@ -48,5 +44,5 @@ internal sealed partial class CharacterLiuZanMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AlternateActualUseColorDrawGrantedEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, frame.OwnerSeat, pair.Current.ActionId, pair.Previous.ActionId, frame.SkillId, frame.SkillInstanceId));
     }
 
-    void global::CardGame.Core.IAlternateActualUseColorProgramHost.GrantAlternateActualUseColorDraw(ProgramSkillFrame frame) => GrantAlternateActualUseColorDraw(frame);
+    void IAlternateActualUseColorProgramHost.GrantAlternateActualUseColorDraw(ProgramSkillFrame frame) => GrantAlternateActualUseColorDraw(frame);
 }

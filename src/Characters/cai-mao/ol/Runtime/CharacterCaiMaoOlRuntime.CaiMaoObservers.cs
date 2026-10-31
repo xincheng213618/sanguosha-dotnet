@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiMaoOlRuntime
@@ -37,7 +33,7 @@ internal sealed partial class CharacterCaiMaoOlRuntime
         for (var i = 0; i < r.Reveals.Count; i++)
         {
             var e = r.Reveals[i];
-            if (!r.Targets.Contains(e.HolderSeat) || e.HandEntry < 0 || e.Bind != CaiMaoRevealPrefix + i || f.CardSetBindings.SingleOrDefault(b => b.Name == e.Bind)is not { Visibility: SkillProgramCardSetVisibility.Public } binding || !binding.CardIds.SequenceEqual([e.CardId]) || !binding.SourceLocations.SequenceEqual([CardLocation.Hand(e.HolderSeat)]) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardsRevealedEvent>().Count(v => v.FrameId == f.Id && v.SkillId == f.SkillId && v.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && v.Bind == e.Bind && v.Cards is [var card] && card.Id == e.CardId && card.Kind == e.PrintedKind) != 1)
+            if (!r.Targets.Contains(e.HolderSeat) || e.HandEntry < 0 || e.Bind != CaiMaoRevealPrefix + i || f.CardSetBindings.SingleOrDefault(b => b.Name == e.Bind)is not { Visibility: SkillProgramCardSetVisibility.Public } binding || !binding.CardIds.SequenceEqual([e.CardId]) || !binding.SourceLocations.SequenceEqual([CardLocation.Hand(e.HolderSeat)]) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardsRevealedEvent>().Count(v => v.FrameId == f.Id && v.SkillId == f.SkillId && v.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && v.Bind == e.Bind && v.Cards is [var card] && card.Id == e.CardId && card.Kind == e.PrintedKind) != 1)
                 return false;
         }
 

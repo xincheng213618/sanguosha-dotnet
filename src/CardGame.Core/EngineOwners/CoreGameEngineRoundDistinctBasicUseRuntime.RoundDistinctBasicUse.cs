@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRoundDistinctBasicUseRuntime
 {
-    internal bool RoundDistinctBasicNameUsed(int ownerSeat, string skillId, ProgramRoundDistinctBasicUsePolicy policy, CardKind outputKind) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundDistinctBasicUseAcceptedEvent>().Any(e => e.Receipt.ActorSeat == ownerSeat && e.Receipt.Source.SkillId == skillId && e.Receipt.StateId == policy.StateId && e.Receipt.LedgerId == policy.LedgerId && e.Receipt.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.Receipt.CanonicalName == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(outputKind));
+    internal bool RoundDistinctBasicNameUsed(int ownerSeat, string skillId, ProgramRoundDistinctBasicUsePolicy policy, CardKind outputKind) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundDistinctBasicUseAcceptedEvent>().Any(e => e.Receipt.ActorSeat == ownerSeat && e.Receipt.Source.SkillId == skillId && e.Receipt.StateId == policy.StateId && e.Receipt.LedgerId == policy.LedgerId && e.Receipt.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.Receipt.CanonicalName == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(outputKind));
     internal bool CanUseRoundDistinctBasicConversion(CharacterState owner, IndexedSkillProgramInstance instance, SkillProgramViewAs rule, bool forResponse, bool dyingUse = false)
     {
         if (rule.RoundDistinctBasicUse is not { } policy)
@@ -31,8 +27,8 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicUseRuntime
             return true;
         if (cards.Count != 2 || cards.Select(c => c.Id).Distinct().Count() != 2 || cards.Any(c => !IsRoundDistinctBasicMaterial(owner, c)))
             return false;
-        var color = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, cards[0]));
-        return color is not null && global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, cards[1])) == color;
+        var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, cards[0]));
+        return color is not null && CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, cards[1])) == color;
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 330)]
@@ -50,7 +46,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicUseRuntime
         }
         else if (payload is CardActionAcceptedEvent { Action: { Type: CardActionType.Response } action } && action.ConversionChain.Any(s => _corePlayCardHistoryOperations.ViewAsRule(s)?.RoundDistinctBasicUse is not null))
         {
-            if (action.EffectiveKind != CardKind.Dodge || action.ActorSeat != action.ProviderSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) || attack.TargetSeat != action.ActorSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || action.ParentActionId != use.Action?.ActionId || action.OpponentSeat != attack.SourceSeat || !_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], CardKind.Dodge))
+            if (action.EffectiveKind != CardKind.Dodge || action.ActorSeat != action.ProviderSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) || attack.TargetSeat != action.ActorSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || action.ParentActionId != use.Action?.ActionId || action.OpponentSeat != attack.SourceSeat || !_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], CardKind.Dodge))
                 throw new InvalidOperationException("A pair conversion cannot turn a provision into a Dodge use.");
             IssueRoundDistinctBasicUse(use, action, true);
         }
@@ -73,7 +69,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicUseRuntime
 
         if (RoundDistinctBasicNameUsed(action.ActorSeat, source.SkillId, policy, action.EffectiveKind))
             throw new InvalidOperationException("This method already used the canonical basic name in this actual round.");
-        var receipt = new RoundDistinctBasicUseReceipt(source, program.GameplayHash, policy.StateId, policy.LedgerId, _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, action.ActionId, use.Id, action.ActorSeat, action.EffectiveKind, global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind), color, response, action.ParentActionId, action.OpponentSeat, !response && action.EffectiveKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == action.ActorSeat && use.TargetSeats.SequenceEqual([dying.VictimSeat]) ? dying.FrameId : null);
+        var receipt = new RoundDistinctBasicUseReceipt(source, program.GameplayHash, policy.StateId, policy.LedgerId, _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, action.ActionId, use.Id, action.ActorSeat, action.EffectiveKind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind), color, response, action.ParentActionId, action.OpponentSeat, !response && action.EffectiveKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == action.ActorSeat && use.TargetSeats.SequenceEqual([dying.VictimSeat]) ? dying.FrameId : null);
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { RoundDistinctBasicUsesIssued = true, RoundDistinctBasicUses = (use.RoundDistinctBasicUses ?? []).Append(receipt).ToArray() });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoundDistinctBasicUseAcceptedEvent(receipt));
     }
@@ -115,13 +111,13 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicUseRuntime
             var matching = accepted.Where(e => e.Fact.Receipt == r).ToArray();
             if (matching is not [var issued] || issued.Turn is not { } nativeTurn || issued.Round is not { } nativeRound || r.ActualTurnNumber != nativeTurn.TurnNumber || r.ActualTurnOwnerSeat != nativeTurn.ActorSeat || r.RoundNumber != nativeRound.RoundNumber || facts.Count(e => e.Receipt.CardActionId == r.CardActionId) != 1)
                 throw new InvalidOperationException("A pair conversion changed the real turn or round preceding its accepted fact.");
-            if (r.OwnerFrameId != use.Id || r.CardActionId <= 0 || r.RoundNumber < 1 || r.RoundNumber > _coreActualRoundProgressRoundNumberAccess._roundNumber || r.Source.OwnerSeat != r.ActorSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.ActorSeat) || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || r.CanonicalName != global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.EffectiveKind) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program is not { } program || program.GameplayHash != r.GameplayHash || program.ViewAs.SingleOrDefault(v => v.Id == r.Source.BindingId)is not { RoundDistinctBasicUse: { } policy } rule || policy.StateId != r.StateId || policy.LedgerId != r.LedgerId || rule.OutputKind != r.EffectiveKind || facts.Count(e => e.Receipt == r) != 1 || facts.Count(e => e.Receipt.RoundNumber == r.RoundNumber && e.Receipt.ActorSeat == r.ActorSeat && e.Receipt.Source.SkillId == r.Source.SkillId && e.Receipt.StateId == r.StateId && e.Receipt.LedgerId == r.LedgerId && e.Receipt.CanonicalName == r.CanonicalName) != 1)
+            if (r.OwnerFrameId != use.Id || r.CardActionId <= 0 || r.RoundNumber < 1 || r.RoundNumber > _coreActualRoundProgressRoundNumberAccess._roundNumber || r.Source.OwnerSeat != r.ActorSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.ActorSeat) || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || r.CanonicalName != CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.EffectiveKind) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program is not { } program || program.GameplayHash != r.GameplayHash || program.ViewAs.SingleOrDefault(v => v.Id == r.Source.BindingId)is not { RoundDistinctBasicUse: { } policy } rule || policy.StateId != r.StateId || policy.LedgerId != r.LedgerId || rule.OutputKind != r.EffectiveKind || facts.Count(e => e.Receipt == r) != 1 || facts.Count(e => e.Receipt.RoundNumber == r.RoundNumber && e.Receipt.ActorSeat == r.ActorSeat && e.Receipt.Source.SkillId == r.Source.SkillId && e.Receipt.StateId == r.StateId && e.Receipt.LedgerId == r.LedgerId && e.Receipt.CanonicalName == r.CanonicalName) != 1)
                 throw new InvalidOperationException("A pair conversion lost its stable accepted round ledger or content identity.");
             CardActionContext? action;
             if (r.IsResponseUse)
             {
                 action = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Where(e => e.Action.ActionId == r.CardActionId).Select(e => e.Action).SingleOrDefault();
-                if (action is null || action.Type != CardActionType.Response || r.EffectiveKind != CardKind.Dodge || action.ActorSeat != r.ActorSeat || action.ResponderSeat != r.ActorSeat || action.ParentActionId != use.Action?.ActionId || action.OpponentSeat != r.OpponentSeat || action.ParentActionId != r.ParentActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+                if (action is null || action.Type != CardActionType.Response || r.EffectiveKind != CardKind.Dodge || action.ActorSeat != r.ActorSeat || action.ResponderSeat != r.ActorSeat || action.ParentActionId != use.Action?.ActionId || action.OpponentSeat != r.OpponentSeat || action.ParentActionId != r.ParentActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
                     throw new InvalidOperationException("A pair Dodge receipt lost its original native Slash parent.");
             }
             else

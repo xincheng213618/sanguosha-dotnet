@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanYuWumiaoRuntime
@@ -64,7 +60,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
         bool At(long id) => top?.Id == id || top is ResponseWindowFrame response && response.ParentFrameId == id;
         if (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { ActiveAttack: null, AwaitingSlashChoice: true } borrowed && borrowed.WeaponOwnerSeat == owner.Seat && At(borrowed.ResolutionId))
             return true;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && At(qinglong.Attack.ResolutionId))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && At(qinglong.Attack.ResolutionId))
             return true;
         if (top is not ProgramSkillFrame program || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(program)is not { } effect)
             return false;
@@ -90,14 +86,14 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     {
         var top = _resolutionStackOperations._resolutionStack.LastOrDefault();
         bool At(long id) => top?.Id == id || top is ResponseWindowFrame response && response.ParentFrameId == id;
-        return _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { ActiveAttack: null, AwaitingSlashChoice: true } borrowed && borrowed.WeaponOwnerSeat == owner.Seat && At(borrowed.ResolutionId) || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && At(qinglong.Attack.ResolutionId);
+        return _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { ActiveAttack: null, AwaitingSlashChoice: true } borrowed && borrowed.WeaponOwnerSeat == owner.Seat && At(borrowed.ResolutionId) || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && At(qinglong.Attack.ResolutionId);
     }
 
-    internal IReadOnlyList<SlashUseVariant> JuewuPhysicalSlashVariants(CharacterState owner, Card card) => global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, false).Any(source => IsJuewuSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind)).Select(kind => new SlashUseVariant(kind, AdditionalConversionSource: null, UsesZhuqueFan: false)).ToArray();
+    internal IReadOnlyList<SlashUseVariant> JuewuPhysicalSlashVariants(CharacterState owner, Card card) => CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, false).Any(source => IsJuewuSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind)).Select(kind => new SlashUseVariant(kind, AdditionalConversionSource: null, UsesZhuqueFan: false)).ToArray();
     internal CardKind JuewuSelectedSlashKind(CharacterState owner, Card card, CardKind fallback, CardConversionSource? explicitSource = null)
     {
         var selected = explicitSource ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion;
-        return IsJuewuSource(selected) && _corePlayCardHistoryOperations.ViewAsRule(selected!)is { } rule && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, rule.OutputKind, false).Contains(selected!) ? rule.OutputKind : fallback;
+        return IsJuewuSource(selected) && _corePlayCardHistoryOperations.ViewAsRule(selected!)is { } rule && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, rule.OutputKind, false).Contains(selected!) ? rule.OutputKind : fallback;
     }
 
     [ProgramCardLegality(ProgramCardLegalityStage.ConfiguredConversionBan, 50)]

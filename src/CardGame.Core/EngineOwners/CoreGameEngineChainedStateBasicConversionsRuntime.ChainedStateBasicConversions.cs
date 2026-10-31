@@ -1,26 +1,23 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
 {
-    internal const string ChainedStateBasicMarker = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ChainedStateBasicConversions.ChainedStateBasicMarker;
+    internal const string ChainedStateBasicMarker = RuntimeSkills.RuntimeRules_Core_ChainedStateBasicConversions.ChainedStateBasicMarker;
     internal bool CanPayChainedStateBasic(CharacterState actor, bool desired) => actor.IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && actor.IsChained != desired && _coreEquipmentSlotGroupProgramsOperations.ResolveEnteringChain(actor, desired || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.ForceChained)) == desired;
     internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> ChainedStateBasicRules(CharacterState actor, CardKind? output = null, bool dodge = false)
     {
         foreach (var instance in _coreNationalSkillsOperations.GetSkillBindingShard(actor).ProgramInstances)
             foreach (var rule in instance.Program.ViewAs.Where(r => r.ChainedStateCost.HasValue))
-                if ((output is null || rule.OutputKind == output) && (dodge ? rule.ForResponse && rule.OutputKind == CardKind.Dodge : rule.ForPlay && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind)) && rule.UseOnly && rule.InputCount == 0 && rule.Condition.Evaluate(_coreNativeSkillContextQueriesOperations.CreateSkillContext(actor)) && CanPayChainedStateBasic(actor, rule.ChainedStateCost!.Value) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, rule.OutputKind, CardActionType.Use) && _characterZhouYuOlMouOperations.IsMouGuquCardlessAllowed(actor, rule.OutputKind, dodge))
+                if ((output is null || rule.OutputKind == output) && (dodge ? rule.ForResponse && rule.OutputKind == CardKind.Dodge : rule.ForPlay && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind)) && rule.UseOnly && rule.InputCount == 0 && rule.Condition.Evaluate(_coreNativeSkillContextQueriesOperations.CreateSkillContext(actor)) && CanPayChainedStateBasic(actor, rule.ChainedStateCost!.Value) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, rule.OutputKind, CardActionType.Use) && _characterZhouYuOlMouOperations.IsMouGuquCardlessAllowed(actor, rule.OutputKind, dodge))
                     yield return (new(instance.SkillId, rule.Id, actor.Seat, instance.SkillInstanceId), rule, instance.Program.GameplayHash);
     }
 
     internal IReadOnlyList<LegalAction> ChainedStateBasicNativePlayActions(CharacterState actor, CardConversionSource source, CardKind kind)
     {
-        if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.IsMouLuSuUseQuery(actor) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
+        if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.IsMouLuSuUseQuery(actor) || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
             return[];
         var card = new Card(0, kind, Suit.None, 0);
         var targets = _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, card, source, effectiveKind: kind);
@@ -77,7 +74,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
         return true;
     }
 
-    internal global::CardGame.Core.GameEngine.ChainedStateBasicNeed? ChainedStateBasicContext(PendingDecision prompt, ResolutionFrame? suppliedTop = null)
+    internal GameEngine.ChainedStateBasicNeed? ChainedStateBasicContext(PendingDecision prompt, ResolutionFrame? suppliedTop = null)
     {
         var top = suppliedTop ?? _resolutionStackOperations._resolutionStack.LastOrDefault();
         if (top is null || top is ChainedStateBasicFrame or DrawFundedDistinctBasicFrame or RequestedDeckBasicFrame)
@@ -88,7 +85,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
             return new(ChainedStateBasicIntent.OwnSlashDodge, ownerId, top.Id, parentAction, attack.SuccessfulDodgeResponses, attack.SourceSeat);
         if (prompt.Kind == DecisionKind.RespondSlash && _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true, ActiveAttack: null } borrowed && borrowed.ResolutionId == ownerId && borrowed.WeaponOwnerSeat == prompt.PlayerSeat && _coreNativeBorrowedSwordOperations.GetWeapon(_coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat])is not null)
             return new(ChainedStateBasicIntent.BorrowedSword, ownerId, top.Id, parentAction, 0, borrowed.SlashTargetSeat);
-        if (prompt.Kind == DecisionKind.QinglongCrescentBlade && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } blade && blade.Attack.ResolutionId == ownerId && blade.Attack.SourceSeat == prompt.PlayerSeat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack))
+        if (prompt.Kind == DecisionKind.QinglongCrescentBlade && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } blade && blade.Attack.ResolutionId == ownerId && blade.Attack.SourceSeat == prompt.PlayerSeat && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack))
             return new(ChainedStateBasicIntent.Qinglong, ownerId, top.Id, parentAction, 0, blade.Attack.TargetSeat);
         if (prompt.Kind != DecisionKind.ProgramTrigger || top is not ProgramSkillFrame program)
             return null;
@@ -114,18 +111,18 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
         return null;
     }
 
-    internal bool ChainedStateBasicNativeResponseLegal(CharacterState actor, global::CardGame.Core.GameEngine.ChainedStateBasicNeed need, CardKind kind, int? targetSeat)
+    internal bool ChainedStateBasicNativeResponseLegal(CharacterState actor, GameEngine.ChainedStateBasicNeed need, CardKind kind, int? targetSeat)
     {
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
             return false;
         if (need.Intent == ChainedStateBasicIntent.OwnSlashDodge)
             return kind == CardKind.Dodge && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is null && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.ResolutionId == need.ParentFrameId && attack.SuccessfulDodgeResponses == need.Cursor && attack.SourceSeat == targetSeat;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || targetSeat is not { } seat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, seat, Suit.None) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], kind, Suit.None))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || targetSeat is not { } seat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, seat, Suit.None) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], kind, Suit.None))
             return false;
         if (need.Intent == ChainedStateBasicIntent.BorrowedSword)
             return _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true, ActiveAttack: null } b && b.ResolutionId == need.ParentFrameId && b.WeaponOwnerSeat == actor.Seat && b.SlashTargetSeat == seat && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], kind, Suit.None, false, null, 0, []);
         if (need.Intent == ChainedStateBasicIntent.Qinglong)
-            return _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.ResolutionId == need.ParentFrameId && q.Attack.SourceSeat == actor.Seat && q.Attack.TargetSeat == seat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], kind, null, false, Suit.None, 0);
+            return _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.ResolutionId == need.ParentFrameId && q.Attack.SourceSeat == actor.Seat && q.Attack.TargetSeat == seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], kind, null, false, Suit.None, 0);
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == need.ParentFrameId)is not ProgramSkillFrame program || program.InstructionIndex != need.Cursor)
             return false;
         if (_characterSunYuanOlOperations.TryGetSayingSlashRequest(program, out var sayingActor, out var sayingTargets))
@@ -143,7 +140,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
         return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: []);
     }
 
-    internal IReadOnlyList<PromptChoice> ChainedStateBasicResponseChoices(PendingDecision prompt, global::CardGame.Core.GameEngine.ChainedStateBasicNeed need)
+    internal IReadOnlyList<PromptChoice> ChainedStateBasicResponseChoices(PendingDecision prompt, GameEngine.ChainedStateBasicNeed need)
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
         var choices = new List<PromptChoice>();
@@ -162,7 +159,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
                     ["original-frame-id"] = need.ParentFrameId!.Value.ToString(CultureInfo.InvariantCulture),
                     ["native-target-seat"] = target.ToString(CultureInfo.InvariantCulture)
                 };
-                global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, source);
+                CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, source);
                 choices.Add(new(new($"chained-state.{(need.Intent)}.{(need.ParentFrameId)}.{(source.BindingId)}.{(source.SkillInstanceId)}.{(target)}"), $"发动【{(_coreCardConversionsOperations.ProgramConversionName(source))}】，{((rule.ChainedStateCost == true ? "进入" : "解除"))}连环状态，视为使用【{(CardCatalog.Get(rule.OutputKind).DisplayName)}】。", [], need.Intent == ChainedStateBasicIntent.OwnSlashDodge ? [] : [target], p));
             }
 
@@ -192,14 +189,14 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
     internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> ChainedStateBasicForcedSlashRules(CharacterState actor, CharacterState target, bool qinglong) => ChainedStateBasicRules(actor).Where(r => !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, r.Rule.OutputKind, Suit.None) && (qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, r.Rule.OutputKind, null, false, Suit.None, 0) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, r.Rule.OutputKind, Suit.None, false, null, 0, [])));
     internal IReadOnlyList<PromptChoice> ChainedStateBasicForcedSlashChoices(CharacterState actor, CharacterState target, long originalId, bool qinglong)
     {
-        var need = new global::CardGame.Core.GameEngine.ChainedStateBasicNeed(qinglong ? ChainedStateBasicIntent.Qinglong : ChainedStateBasicIntent.BorrowedSword, originalId, _resolutionStackOperations._resolutionStack.OfType<ResponseWindowFrame>().LastOrDefault(r => r.ParentFrameId == originalId)?.Id ?? originalId, _coreCardUseLifecycleOperations.LifecycleCardUse(originalId)?.Action?.ActionId, 0, target.Seat);
+        var need = new GameEngine.ChainedStateBasicNeed(qinglong ? ChainedStateBasicIntent.Qinglong : ChainedStateBasicIntent.BorrowedSword, originalId, _resolutionStackOperations._resolutionStack.OfType<ResponseWindowFrame>().LastOrDefault(r => r.ParentFrameId == originalId)?.Id ?? originalId, _coreCardUseLifecycleOperations.LifecycleCardUse(originalId)?.Action?.ActionId, 0, target.Seat);
         return ChainedStateBasicResponseChoices(new(qinglong ? DecisionKind.QinglongCrescentBlade : DecisionKind.RespondSlash, actor.Seat, "原生杀使用请求", [], [target.Seat]), need);
     }
 
     internal bool HasChainedStateBasicProgramSlash(CharacterState actor, IEnumerable<int> targets) => ChainedStateBasicRules(actor).Any(r => targets.Any(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, t, Suit.None) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], new(0, r.Rule.OutputKind, Suit.None, 0), effectiveKind: r.Rule.OutputKind, noEffectiveRank: true, physicalCardIds: [])));
-    internal static bool IsChainedStateBasicAnswer(PromptChoice choice) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ChainedStateBasicConversions.IsChainedStateBasicAnswer(choice);
+    internal static bool IsChainedStateBasicAnswer(PromptChoice choice) => RuntimeSkills.RuntimeRules_Core_ChainedStateBasicConversions.IsChainedStateBasicAnswer(choice);
     internal bool IsChainedStateBasicAnswer(ChoiceId id) => _corePendingDecisionPolicyPipelineOperations._pendingDecision?.Choices.Any(c => c.Id == id && IsChainedStateBasicAnswer(c)) == true;
-    internal static PendingDecision ChainedStateBasicNativeDecision(PendingDecision prompt) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ChainedStateBasicConversions.ChainedStateBasicNativeDecision(prompt);
+    internal static PendingDecision ChainedStateBasicNativeDecision(PendingDecision prompt) => RuntimeSkills.RuntimeRules_Core_ChainedStateBasicConversions.ChainedStateBasicNativeDecision(prompt);
     internal CommandResult SubmitChainedStateBasicAnswer(int actorSeat, PromptId promptId, ChoiceId choiceId)
     {
         if (!_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._started)
@@ -212,18 +209,18 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
 
     internal CommandResult SubmitChainedStateBasicAnswer(int actorSeat, PendingDecision prompt, PromptChoice choice)
     {
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsHuman || prompt.PlayerSeat != actorSeat || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PromptId != prompt.PromptId || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || choice.Cards.Count != 0 || !Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("output-kind"), out var kind) || !int.TryParse(choice.Parameters.GetValueOrDefault("native-target-seat"), out var target) || ChainedStateBasicContext(prompt)is not { } need || !ChainedStateBasicResponseChoices(prompt, need).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsHuman || prompt.PlayerSeat != actorSeat || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PromptId != prompt.PromptId || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || choice.Cards.Count != 0 || !Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("output-kind"), out var kind) || !int.TryParse(choice.Parameters.GetValueOrDefault("native-target-seat"), out var target) || ChainedStateBasicContext(prompt)is not { } need || !ChainedStateBasicResponseChoices(prompt, need).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             return _kernelCoreMainOperations.Reject(CommandErrorCode.IllegalAction, "The chained-state answer changed its human actor, source, real cost or original native need.");
         return _kernelCoreMainOperations.Accept(() =>
         {
-            BeginChainedStateBasic(_coreMatchParticipantsPlayersAccess._players[actorSeat], global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice), kind, need.Intent == ChainedStateBasicIntent.OwnSlashDodge ? [target] : choice.Targets, prompt, need);
+            BeginChainedStateBasic(_coreMatchParticipantsPlayersAccess._players[actorSeat], CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice), kind, need.Intent == ChainedStateBasicIntent.OwnSlashDodge ? [target] : choice.Targets, prompt, need);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
             if (_coreMatchDefinitionOptionsAccess._options.AdvanceAfterHumanCommands)
                 _kernelCoreGameEngineRuntimeOperations.AdvanceToHumanBoundary();
         });
     }
 
-    internal void BeginChainedStateBasic(CharacterState actor, CardConversionSource source, CardKind kind, IReadOnlyList<int> targets, PendingDecision original, global::CardGame.Core.GameEngine.ChainedStateBasicNeed need)
+    internal void BeginChainedStateBasic(CharacterState actor, CardConversionSource source, CardKind kind, IReadOnlyList<int> targets, PendingDecision original, GameEngine.ChainedStateBasicNeed need)
     {
         var accepted = ChainedStateBasicRules(actor, kind, need.Intent == ChainedStateBasicIntent.OwnSlashDodge).SingleOrDefault(r => r.Source == source);
         if (accepted.Rule is null || original.PlayerSeat != actor.Seat || _resolutionStackOperations._resolutionStack.OfType<ChainedStateBasicFrame>().Any(f => f.Payment.OriginalPromptId == original.PromptId))
@@ -388,7 +385,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat].IsHuman || ChainedStateBasicContext(prompt)is not { } need)
             return false;
-        var choice = prompt.Choices.FirstOrDefault(c => IsChainedStateBasicAnswer(c) && ChainedStateBasicResponseChoices(prompt, need).Any(v => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([v], [c])));
+        var choice = prompt.Choices.FirstOrDefault(c => IsChainedStateBasicAnswer(c) && ChainedStateBasicResponseChoices(prompt, need).Any(v => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([v], [c])));
         if (choice is null || !Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("output-kind"), out var kind) || !int.TryParse(choice.Parameters.GetValueOrDefault("native-target-seat"), out var target))
             return false;
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
@@ -424,7 +421,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
                 return false;
         }
 
-        BeginChainedStateBasic(actor, global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice), kind, need.Intent == ChainedStateBasicIntent.OwnSlashDodge ? [target] : choice.Targets, prompt, need);
+        BeginChainedStateBasic(actor, CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice), kind, need.Intent == ChainedStateBasicIntent.OwnSlashDodge ? [target] : choice.Targets, prompt, need);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
         return true;
     }

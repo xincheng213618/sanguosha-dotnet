@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDamageColorDuelProgramsRuntime
@@ -84,6 +80,6 @@ internal sealed partial class CoreGameEngineDamageColorDuelProgramsRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDamageColorDuelProgramHost.DrawByDamageCardColor(ProgramSkillFrame frame) => BeginDamageAppearanceDraw(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IDamageColorDuelProgramHost.UseSelectedActorDuel(ProgramSkillFrame frame) => BeginSelectedActorDuel(frame);
+    SkillProgramStepOutcome IDamageColorDuelProgramHost.DrawByDamageCardColor(ProgramSkillFrame frame) => BeginDamageAppearanceDraw(frame);
+    SkillProgramStepOutcome IDamageColorDuelProgramHost.UseSelectedActorDuel(ProgramSkillFrame frame) => BeginSelectedActorDuel(frame);
 }

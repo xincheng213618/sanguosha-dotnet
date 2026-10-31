@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramPhaseColorRestrictionsRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CoreGameEngineProgramPhaseColorRestrictionsRuntime
         var binding = _coreProgramLifecycleOperations.GetProgramCardSet(active, sourceBind);
         if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || targetSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || binding.CardIds.Count != 1 || binding.FrozenRevealedSuit is not { } suit || suit == Suit.None)
             throw new InvalidOperationException("A phase color restriction requires a frozen paid color and the current Play phase.");
-        var restriction = new ProgramPhaseColorRestriction(active.SkillId, active.SkillInstanceId, active.OwnerSeat, targetSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(suit));
+        var restriction = new ProgramPhaseColorRestriction(active.SkillId, active.SkillInstanceId, active.OwnerSeat, targetSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, CoreNativeCardClassificationsRuntime.IsRedSuit(suit));
         _coreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess._programPhaseColorRestrictions.Add(restriction);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramPhaseColorRestrictionGrantedEvent(restriction));
     }
@@ -23,7 +19,7 @@ internal sealed partial class CoreGameEngineProgramPhaseColorRestrictionsRuntime
         if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || card.Suit == Suit.None)
             return false;
         foreach (var restriction in _coreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess._programPhaseColorRestrictions)
-            if (restriction.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && restriction.TargetSeat == player.Seat && restriction.IsRed == global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(player, card)))
+            if (restriction.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && restriction.TargetSeat == player.Seat && restriction.IsRed == CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(player, card)))
                 return true;
         return false;
     }
@@ -39,7 +35,7 @@ internal sealed partial class CoreGameEngineProgramPhaseColorRestrictionsRuntime
     {
         if (payload is TurnStartedEvent)
             _coreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess._programPhaseColorRestrictions.Clear();
-        if (payload is not CardUseDeclaredEvent use || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (payload is not CardUseDeclaredEvent use || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             return;
         for (var index = 0; index < _coreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess._programPhaseColorRestrictions.Count; index++)
             if (_coreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess._programPhaseColorRestrictions[index].TargetSeat == use.SourceSeat && _coreGameEngineProgramPhaseColorRestrictionsProgramPhaseColorRestrictionsAccess._programPhaseColorRestrictions[index].TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber)

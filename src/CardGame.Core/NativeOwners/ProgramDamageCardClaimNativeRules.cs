@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramDamageCardClaimNativeRules(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreDamageCursorRuntimeEntries> getCoreDamageCursorRuntimeRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeDamageHandlesEntries> getCoreNativeDamageHandlesRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeCardContinuationCursorsEntries> getCoreNativeCardContinuationCursorsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineExtraEffectMaterialClaimsEntries> getCoreGameEngineExtraEffectMaterialClaimsRuntime) : IProgramDamageCardClaimNativeRules
+internal sealed class ProgramDamageCardClaimNativeRules(Func<RuntimeEntries.CoreDamageCursorRuntimeEntries> getCoreDamageCursorRuntimeRuntime, Func<RuntimeEntries.CoreNativeDamageHandlesEntries> getCoreNativeDamageHandlesRuntime, Func<RuntimeEntries.CoreNativeCardContinuationCursorsEntries> getCoreNativeCardContinuationCursorsRuntime, Func<RuntimeEntries.CoreGameEngineExtraEffectMaterialClaimsEntries> getCoreGameEngineExtraEffectMaterialClaimsRuntime) : IProgramDamageCardClaimNativeRules
 {
     public DamageTriggerWindowFrame? CurrentDamageWindow => getCoreDamageCursorRuntimeRuntime().ActiveDamageTrigger;
 
     public ProgramDamageCardOwner SelectAttackOwner(DamageTriggerWindowFrame window)
     {
         var attack = getCoreNativeDamageHandlesRuntime().GetDamageTriggerAttack(window);
-        return new(attack.ResolutionId, attack is global::CardGame.Core.NativeOwners.CardAttackHandle);
+        return new(attack.ResolutionId, attack is CardAttackHandle);
     }
 
     public long? ActiveGroupOwnerId => getCoreNativeCardContinuationCursorsRuntime().ActiveGroupCard?.OwnerFrameId;

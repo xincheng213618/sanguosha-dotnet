@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiAnniversaryGodRuntime
 {
     internal const string ShenDaTuoYu = "anniversary-god:tuoyu", ShenDaXianjin = "anniversary-god:xianjin", ShenDaQijing = "anniversary-god:qijing", ShenDaCuixin = "anniversary-god:cuixin";
-    internal static CardConversionSource ShenDaSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShenDaSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal ShenDengAiDomain[] ShenDaDeveloped(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiDevelopedEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.Domain).Distinct().ToArray();
     internal int ShenDaDamageCount(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Count(e => e.Amount > 0 && (e.TargetSeat == owner || !e.SourceLess && e.SourceSeat == owner));
     internal bool ShenDaAwakened(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiAwakenedEvent>().Any(e => e.OwnerSeat == owner);
@@ -39,21 +36,21 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
         ShenDengAiDomain.Fengtian => "丰田",
         _ => "峻山"
     };
-    SkillProgramStepOutcome global::CardGame.Core.IShenDengAiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenDa(f, op);
+    SkillProgramStepOutcome IShenDengAiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenDa(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 38500)]
     internal bool CanOfferShenDengAi(ProgramTriggerLegalityContext g)
     {
-        if (global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaTuoYu(g.SkillId))
+        if (CharacterDengAiHappyGodRuntime.IsShenDaTuoYu(g.SkillId))
             return g.Trigger.Id == "initialize-domains" || ShenDaDeveloped(g.OwnerSeat).Length > 0 && (g.SkillId == "happy:tuoyu" ? _corePhysicalOwnedCardQueriesOperations.GetHand(g.Owner).Count > 0 : ShenDaUnassigned(g.OwnerSeat).Length > 0);
-        if (global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaXianjin(g.SkillId))
+        if (CharacterDengAiHappyGodRuntime.IsShenDaXianjin(g.SkillId))
         {
             var count = ShenDaDamageCount(g.OwnerSeat);
             return count > 0 && count % 2 == 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiXianjinReservedEvent>().Any(e => e.OwnerSeat == g.OwnerSeat && e.DamageCount >= count) && (g.Context.SourceSeat == g.OwnerSeat || g.Context.TargetSeat == g.OwnerSeat);
         }
 
-        if (global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaQijing(g.SkillId))
+        if (CharacterDengAiHappyGodRuntime.IsShenDaQijing(g.SkillId))
             return !ShenDaAwakened(g.OwnerSeat) && ShenDaDeveloped(g.OwnerSeat).Length == 3;
-        if (global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaCuixin(g.SkillId))
+        if (CharacterDengAiHappyGodRuntime.IsShenDaCuixin(g.SkillId))
             return ShenDaCuixinOriginal(g.Context, g.OwnerSeat, g.SkillId)is { } use && ShenDaRepeatPlans(g.OwnerSeat, use.CardKind, use.TargetSeats).Count > 0;
         return true;
     }
@@ -173,7 +170,7 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     [ProgramAnswer("shen-deng-ai")]
     internal void AnswerShenDa(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenDengAi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShenDaChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenDengAi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShenDaChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shen Deng Ai requires its original private chooser and current legal option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -300,7 +297,7 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 38500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 38500)]
-    internal bool ContinueIssuedShenDa(ProgramSkillFrame f) => f.ShenDengAi is { Stage: ShenDengAiStage.DrawAttempt or ShenDengAiStage.DrawChildren or ShenDengAiStage.NativeUse or ShenDengAiStage.NativeChildren } || global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaQijing(f.SkillId) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiAwakenedEvent>().Any(e => e.FrameId == f.Id);
+    internal bool ContinueIssuedShenDa(ProgramSkillFrame f) => f.ShenDengAi is { Stage: ShenDengAiStage.DrawAttempt or ShenDengAiStage.DrawChildren or ShenDengAiStage.NativeUse or ShenDengAiStage.NativeChildren } || CharacterDengAiHappyGodRuntime.IsShenDaQijing(f.SkillId) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiAwakenedEvent>().Any(e => e.FrameId == f.Id);
 
     [ProgramAiChoice(SkillProgramEffectOp.AllocateShenDengAiTuoYu)]
     internal PromptChoice ChooseShenDaAllocation(PendingDecision p, ProgramSkillFrame f) => ChooseShenDa(p, f);

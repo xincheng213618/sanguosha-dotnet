@@ -1,16 +1,16 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreGameEngineSourceCursesState : global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSourceCursesSourceCursesAccess
+internal sealed class CoreGameEngineSourceCursesState : Contracts.ICoreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess, Contracts.ICoreGameEngineSourceCursesSourceCursesAccess
 {
-    private global::System.Collections.Generic.List<global::CardGame.Core.SourceCurseLoss> _sourceCurseLosses = [];
-    internal ref readonly global::System.Collections.Generic.List<global::CardGame.Core.SourceCurseLoss> ReferenceToSourceCurseLosses => ref _sourceCurseLosses;
+    private List<SourceCurseLoss> _sourceCurseLosses = [];
+    internal ref readonly List<SourceCurseLoss> ReferenceToSourceCurseLosses => ref _sourceCurseLosses;
 
-    private global::System.Collections.Generic.List<global::CardGame.Core.SourceCurseDeposit> _sourceCurses = [];
-    internal ref readonly global::System.Collections.Generic.List<global::CardGame.Core.SourceCurseDeposit> ReferenceToSourceCurses => ref _sourceCurses;
+    private List<SourceCurseDeposit> _sourceCurses = [];
+    internal ref readonly List<SourceCurseDeposit> ReferenceToSourceCurses => ref _sourceCurses;
 
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.SourceCurseLoss> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurseLosses => ref _sourceCurseLosses;
+    ref readonly List<SourceCurseLoss> Contracts.ICoreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurseLosses => ref _sourceCurseLosses;
 
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.SourceCurseDeposit> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses => ref _sourceCurses;
+    ref readonly List<SourceCurseDeposit> Contracts.ICoreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses => ref _sourceCurses;
 
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.SourceCurseDeposit> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineSourceCursesSourceCursesAccess._sourceCurses => ref _sourceCurses;
+    ref readonly List<SourceCurseDeposit> Contracts.ICoreGameEngineSourceCursesSourceCursesAccess._sourceCurses => ref _sourceCurses;
 }

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineCardConversionsSelectedUseConversionAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineCardConversionsSelectedUseConversionAccess : IProgramRuntimeOperations
 {
-    ref global::CardGame.Core.CardConversionSource? _selectedUseConversion { get; }
+    ref CardConversionSource? _selectedUseConversion { get; }
 }

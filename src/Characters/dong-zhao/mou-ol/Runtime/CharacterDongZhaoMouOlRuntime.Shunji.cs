@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhaoMouOlRuntime
 {
-    internal static CardConversionSource MouDongZhaoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MouDongZhaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasMouDongZhao => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouDongZhaoShunji) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouDongZhaoYishi);
 
     internal Card[] MouDongZhaoHE(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner])).ToArray();
@@ -16,7 +13,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
     internal bool MouShunjiSpent(int owner, int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoShunjiAcceptedEvent>().Any(e => e.Source.OwnerSeat == owner && e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.TargetSeat == target);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 33500, SkillProgramEffectOp.ResolveMouDongZhaoShunji)]
     internal bool CanOfferMouShunji(ProgramTriggerLegalityContext c) => c.SkillId == MouDongZhaoComposition.Shunji && c.Owner.IsAlive && _coreActualRoundProgressRoundNumberAccess._roundNumber > 0 && c.Context is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, TargetSeat: { } target } && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !MouShunjiSpent(c.OwnerSeat, target);
-    internal bool ExactMouShunjiWindow(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0 } c && _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == c.ParentFrameId)is DamageTriggerWindowFrame window && window.TriggerWindow == c.Window && window.ParentFrameId == c.DamageFrameId && window.TargetSeat == c.TargetSeat && window.Candidates.Any(candidate => candidate.ToProgramCandidate()is { } native && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, native)) && _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == window.ParentFrameId)is DamageFrame damage && damage.TargetSeat == c.TargetSeat && damage.Amount == c.Amount;
+    internal bool ExactMouShunjiWindow(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0 } c && _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == c.ParentFrameId)is DamageTriggerWindowFrame window && window.TriggerWindow == c.Window && window.ParentFrameId == c.DamageFrameId && window.TargetSeat == c.TargetSeat && window.Candidates.Any(candidate => candidate.ToProgramCandidate()is { } native && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, native)) && _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == window.ParentFrameId)is DamageFrame damage && damage.TargetSeat == c.TargetSeat && damage.Amount == c.Amount;
     internal SkillProgramStepOutcome BeginMouShunji(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -80,7 +77,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
     [ProgramAnswer("mou-dong-zhao")]
     internal void AnswerMouDongZhao(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDongZhao: { } r } f || !ValidMouDongZhao(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouDongZhaoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDongZhao: { } r } f || !ValidMouDongZhao(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouDongZhaoChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("OL Dong Zhao requires its current canonical native choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var verb = selected.Parameters["verb"];
@@ -158,7 +155,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
         return AiMouYishi(prompt, f);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouDongZhaoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => operation switch
+    SkillProgramStepOutcome IMouDongZhaoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => operation switch
     {
         SkillProgramEffectOp.ResolveMouDongZhaoShunji => BeginMouShunji(frame),
         SkillProgramEffectOp.ResolveMouDongZhaoYishi => BeginMouYishi(frame),

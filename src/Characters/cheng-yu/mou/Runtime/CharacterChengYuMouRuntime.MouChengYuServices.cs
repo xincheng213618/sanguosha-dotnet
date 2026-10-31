@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengYuMouRuntime
@@ -18,37 +14,37 @@ internal sealed partial class CharacterChengYuMouRuntime
         return true;
     }
 
-    int global::CardGame.Core.IMouChengYuAnniversaryFacts.Turn => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber;
+    int IMouChengYuAnniversaryFacts.Turn => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber;
 
-    int global::CardGame.Core.IMouChengYuAnniversaryFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
+    int IMouChengYuAnniversaryFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
 
-    long global::CardGame.Core.IMouChengYuAnniversaryFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+    long IMouChengYuAnniversaryFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
-    int global::CardGame.Core.IMouChengYuAnniversaryFacts.LivingCount => _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive);
+    int IMouChengYuAnniversaryFacts.LivingCount => _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive);
 
-    bool global::CardGame.Core.IMouChengYuAnniversaryFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouChengYuAnniversaryFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    bool global::CardGame.Core.IMouChengYuAnniversaryFacts.Enabled => HasMouChengYuAnniversary;
+    bool IMouChengYuAnniversaryFacts.Enabled => HasMouChengYuAnniversary;
 
-    bool global::CardGame.Core.IMouChengYuAnniversaryFacts.Alive(int s) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive;
-    bool global::CardGame.Core.IMouChengYuAnniversaryFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
-    bool global::CardGame.Core.IMouChengYuAnniversaryFacts.OwnPlay(int s) => s == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play;
-    string global::CardGame.Core.IMouChengYuAnniversaryFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
-    CardKind global::CardGame.Core.IMouChengYuAnniversaryFacts.CardName(CardKind k) => global::CardGame.Core.EngineOwners.CoreGameEngineNamedAmbushRuntime.AmbushCardName(k);
-    SkillProgram? global::CardGame.Core.IMouChengYuAnniversaryFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
-    SkillPromptPresentation global::CardGame.Core.IMouChengYuAnniversaryFacts.Presentation(string id)
+    bool IMouChengYuAnniversaryFacts.Alive(int s) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive;
+    bool IMouChengYuAnniversaryFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
+    bool IMouChengYuAnniversaryFacts.OwnPlay(int s) => s == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play;
+    string IMouChengYuAnniversaryFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
+    CardKind IMouChengYuAnniversaryFacts.CardName(CardKind k) => CoreGameEngineNamedAmbushRuntime.AmbushCardName(k);
+    SkillProgram? IMouChengYuAnniversaryFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
+    SkillPromptPresentation IMouChengYuAnniversaryFacts.Presentation(string id)
     {
         var s = _contentRegistryOperations._contentRegistry.GetSkill(id);
         return new(s.Id, s.Name, s.Name, s.Description);
     }
 
-    IEnumerable<T> global::CardGame.Core.IMouChengYuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    IReadOnlyList<int> global::CardGame.Core.IMouChengYuAnniversaryFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
-    IReadOnlyList<ProgramTriggerCandidate> global::CardGame.Core.IMouChengYuAnniversaryFacts.Candidates(int owner, SkillProgramTriggerWindow window) => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[owner], window);
-    bool global::CardGame.Core.IMouChengYuAnniversaryFacts.Parent(ProgramSkillFrame f)
+    IEnumerable<T> IMouChengYuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IReadOnlyList<int> IMouChengYuAnniversaryFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
+    IReadOnlyList<ProgramTriggerCandidate> IMouChengYuAnniversaryFacts.Candidates(int owner, SkillProgramTriggerWindow window) => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[owner], window);
+    bool IMouChengYuAnniversaryFacts.Parent(ProgramSkillFrame f)
     {
         if (f.TriggerId is null)
-            return f.SkillId == MouChengYuAnniversaryRuntime.Gaojian && f.ActivationId == "reveal-and-advise" && f.WindowContext is null && ((global::CardGame.Core.IMouChengYuAnniversaryFacts)this).History<ProgramSkillStartedEvent>().Count(s => s.FrameId == f.Id && s.OwnerSeat == f.OwnerSeat && s.SkillId == f.SkillId && s.ActivationId == f.ActivationId) == 1;
+            return f.SkillId == MouChengYuAnniversaryRuntime.Gaojian && f.ActivationId == "reveal-and-advise" && f.WindowContext is null && ((IMouChengYuAnniversaryFacts)this).History<ProgramSkillStartedEvent>().Count(s => s.FrameId == f.Id && s.OwnerSeat == f.OwnerSeat && s.SkillId == f.SkillId && s.ActivationId == f.ActivationId) == 1;
         var at = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         if (at < 1 || f.SkillId != MouChengYuAnniversaryRuntime.Shizha || f.ActivationId != f.TriggerId || f.WindowContext is not { } w || w.OwnerSeat != f.OwnerSeat)
             return false;
@@ -67,11 +63,11 @@ internal sealed partial class CharacterChengYuMouRuntime
         return false;
     }
 
-    MouCyUse? global::CardGame.Core.IMouChengYuAnniversaryFacts.Use(ProgramSkillWindowContext c) => MouCyUse(c);
-    bool global::CardGame.Core.IMouChengYuAnniversaryFacts.At(int id, CardLocation location) => _cardZonesOperations._cardZones.GetLocation(id) == location;
-    bool global::CardGame.Core.IMouChengYuAnniversaryFacts.SameChoice(PromptChoice a, PromptChoice b) => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([a], [b]);
-    bool global::CardGame.Core.IMouChengYuAnniversaryFacts.DamageCard(CardKind k) => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(k) || global::CardGame.Core.EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(k) || k == CardKind.Lightning;
-    IReadOnlyList<MouCyCard> global::CardGame.Core.IMouChengYuAnniversaryNative.Peek(ProgramSkillFrame f)
+    MouCyUse? IMouChengYuAnniversaryFacts.Use(ProgramSkillWindowContext c) => MouCyUse(c);
+    bool IMouChengYuAnniversaryFacts.At(int id, CardLocation location) => _cardZonesOperations._cardZones.GetLocation(id) == location;
+    bool IMouChengYuAnniversaryFacts.SameChoice(PromptChoice a, PromptChoice b) => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([a], [b]);
+    bool IMouChengYuAnniversaryFacts.DamageCard(CardKind k) => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(k) || CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(k) || k == CardKind.Lightning;
+    IReadOnlyList<MouCyCard> IMouChengYuAnniversaryNative.Peek(ProgramSkillFrame f)
     {
         if (!MouChengYuAnniversary.Valid(f) || f.MouChengYuAnniversary!.Stage != MouCyStage.Peek)
             throw new InvalidOperationException("Shizha requires its paid HP window before privately viewing the real deck.");
@@ -79,7 +75,7 @@ internal sealed partial class CharacterChengYuMouRuntime
         return Array.AsReadOnly(_cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).TakeLast(3).Reverse().Select(c => new MouCyCard(c.Id, c.Kind, c.DisplayName)).ToArray());
     }
 
-    MouCyCard? global::CardGame.Core.IMouChengYuAnniversaryNative.Reveal(ProgramSkillFrame f)
+    MouCyCard? IMouChengYuAnniversaryNative.Reveal(ProgramSkillFrame f)
     {
         if (!MouChengYuAnniversary.Valid(f) || f.MouChengYuAnniversary is not { Stage: MouCyStage.RevealChildren, Target: >= 0 } r || !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive)
             throw new InvalidOperationException("Gaojian requires its current living target and own reveal slot.");
@@ -94,7 +90,7 @@ internal sealed partial class CharacterChengYuMouRuntime
         return new(id, move.CardKind, _coreAdvancedLifecycleOperations.GetAdvancedCard(id).DisplayName);
     }
 
-    void global::CardGame.Core.IMouChengYuAnniversaryNative.Move(ProgramSkillFrame f, int id, CardLocation from, CardLocation to)
+    void IMouChengYuAnniversaryNative.Move(ProgramSkillFrame f, int id, CardLocation from, CardLocation to)
     {
         if (!MouChengYuAnniversary.Valid(f) || f.MouChengYuAnniversary is not { } r || r.CardId != id || _cardZonesOperations._cardZones.GetLocation(id) != from || (r.Stage switch
         {
@@ -112,17 +108,17 @@ internal sealed partial class CharacterChengYuMouRuntime
         }, disclosure: r.Stage == MouCyStage.ObtainChildren ? CardMovementDisclosure.Unspecified : CardMovementDisclosure.FaceUp);
     }
 
-    void global::CardGame.Core.IMouChengYuAnniversaryNative.Invalidate(ProgramSkillFrame f, MouCyUseInvalidatedEvent proof) => ApplyMouCyInvalidation(f, proof);
-    void global::CardGame.Core.IMouChengYuAnniversaryNative.Damage(ProgramSkillFrame f, int target, int amount)
+    void IMouChengYuAnniversaryNative.Invalidate(ProgramSkillFrame f, MouCyUseInvalidatedEvent proof) => ApplyMouCyInvalidation(f, proof);
+    void IMouChengYuAnniversaryNative.Damage(ProgramSkillFrame f, int target, int amount)
     {
         if (!MouChengYuAnniversary.Valid(f) || f.MouChengYuAnniversary is not { Stage: MouCyStage.Damage, DamageCard: true } r || r.Target != target || r.RevealCount != amount)
             throw new InvalidOperationException("Gaojian damage requires the actual revealed damage card and total count.");
         _coreSkillProgramsOperations.BeginProgramSkillDamage(f, target, amount, nature: DamageNature.Fire);
     }
 
-    bool global::CardGame.Core.IMouChengYuAnniversaryNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    void global::CardGame.Core.IMouChengYuAnniversaryNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
-    void global::CardGame.Core.IMouChengYuAnniversaryNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    bool IMouChengYuAnniversaryNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
+    void IMouChengYuAnniversaryNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+    void IMouChengYuAnniversaryNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     [ProgramViewContributor(ProgramViewContribution.PrivateCards, 36800)]
     internal CardSnapshot[] MouCyPrivateTop(int viewer) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OwnerSeat == viewer && f.MouChengYuAnniversary is { Stage: MouCyStage.Peek } && MouChengYuAnniversary.Valid(f)).SelectMany(f => f.MouChengYuAnniversary!.View).Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.DrawPile).DistinctBy(c => c.Id).Select(c => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Id))).ToArray();
     [ProgramViewContributor(ProgramViewContribution.NamedAmbushPiles, 36800)]

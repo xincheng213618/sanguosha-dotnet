@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSkillProgramsRuntime
 {
-    internal ProgramLegalityRouter ProgramLegality => _programLegalityOperations._programLegality ??= _nativeCardGameCoreProgramLegalityRouterOperations.CreateProgramLegalityRouter(global::CardGame.Core.EngineOwners.CoreGameEngineSkillProgramsDefinitions.ProgramLegalityMetadata.Value, _kernelCoreProgramRuntimeModulesOperations.ResolveRuntimeHandlerTarget);
+    internal ProgramLegalityRouter ProgramLegality => _programLegalityOperations._programLegality ??= _nativeCardGameCoreProgramLegalityRouterOperations.CreateProgramLegalityRouter(CoreGameEngineSkillProgramsDefinitions.ProgramLegalityMetadata.Value, _kernelCoreProgramRuntimeModulesOperations.ResolveRuntimeHandlerTarget);
 
     internal const string SimpleProgramPindianResultBind = "__active-pindian-result";
     internal IReadOnlyList<SkillProgram> EnabledSkillPrograms(CharacterState player) => _coreNationalSkillsOperations.GetSkillBindingShard(player).Programs;
@@ -55,7 +51,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
                 var requiredCards = GetProgramActivationMinimumCards(owner.Seat, program.Id, activation);
                 if (!ProgramLegality.CanActivate(ProgramActivationLegalityPhase.BeforeCondition, legality))
                     continue;
-                if (!EvaluateProgramActivationCondition(activation.Condition, context, program.Id, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(owner, program.Id)) || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramMarkerPaymentsRuntime.CanPayProgramMarkerCost(owner, activation.MarkerCost) || activation.UsesPerTurn is { } limit && _coreGameEngineSkillProgramsProgramContributionUsesProgramPhaseUsesProgramUsesAccess._programUses.GetValueOrDefault((owner.Seat, program.Id, activation.UsageGroup)) >= limit || _coreProgramSelectionModulesOperations.ProgramSelections.PhaseLimit(selection)is { } phaseLimit && _coreGameEngineSkillProgramsProgramContributionUsesProgramPhaseUsesProgramUsesAccess._programPhaseUses.GetValueOrDefault((owner.Seat, program.Id, activation.UsageGroup)) >= phaseLimit || activation.UsesPerGame is { } gameLimit && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, program.Id, activation.UsageGroup, SkillUsageScope.Game) >= gameLimit)
+                if (!EvaluateProgramActivationCondition(activation.Condition, context, program.Id, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(owner, program.Id)) || !CoreGameEngineProgramMarkerPaymentsRuntime.CanPayProgramMarkerCost(owner, activation.MarkerCost) || activation.UsesPerTurn is { } limit && _coreGameEngineSkillProgramsProgramContributionUsesProgramPhaseUsesProgramUsesAccess._programUses.GetValueOrDefault((owner.Seat, program.Id, activation.UsageGroup)) >= limit || _coreProgramSelectionModulesOperations.ProgramSelections.PhaseLimit(selection)is { } phaseLimit && _coreGameEngineSkillProgramsProgramContributionUsesProgramPhaseUsesProgramUsesAccess._programPhaseUses.GetValueOrDefault((owner.Seat, program.Id, activation.UsageGroup)) >= phaseLimit || activation.UsesPerGame is { } gameLimit && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, program.Id, activation.UsageGroup, SkillUsageScope.Game) >= gameLimit)
                     continue;
                 if (!features.Legality.CanStart(ownerLegality))
                     continue;
@@ -172,7 +168,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
     {
         null => activation.MinCards,
         SkillProgramCardCountExpression.NextPhaseActivationOrdinal => checked(_coreGameEngineSkillProgramsProgramContributionUsesProgramPhaseUsesProgramUsesAccess._programPhaseUses.GetValueOrDefault((ownerSeat, skillId, activation.UsageGroup)) + 1),
-        SkillProgramCardCountExpression.OwnerHpAtLeastOne => global::CardGame.Core.EngineOwners.CharacterZhaoYunOlGod2016Runtime.HpScaledCardCount(_coreMatchParticipantsPlayersAccess._players[ownerSeat]),
+        SkillProgramCardCountExpression.OwnerHpAtLeastOne => CharacterZhaoYunOlGod2016Runtime.HpScaledCardCount(_coreMatchParticipantsPlayersAccess._players[ownerSeat]),
         _ => throw new InvalidOperationException("Unsupported activation card-count expression.")};
     internal bool CanSelectProgramActivationCard(ProgramExecutionPlan plan, Card card, int ownerSeat, string skillId)
     {
@@ -185,7 +181,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
             return false;
         if (!_coreProgramSelectionModulesOperations.ProgramSelections.AllowsCard(ProgramSelectionStage.CardAfterDiscard, selection, card))
             return false;
-        return (activation.CardKinds.Count == 0 || ProgramCardKindMatch.Contains(activation.CardKinds, card.Kind)) && (activation.CardSuits.Count == 0 || activation.CardSuits.Contains(_coreProgramSelectionModulesOperations.ProgramSelections.CardSuit(selection, card))) && (activation.CardCategories.Count == 0 || activation.CardCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, category)));
+        return (activation.CardKinds.Count == 0 || ProgramCardKindMatch.Contains(activation.CardKinds, card.Kind)) && (activation.CardSuits.Count == 0 || activation.CardSuits.Contains(_coreProgramSelectionModulesOperations.ProgramSelections.CardSuit(selection, card))) && (activation.CardCategories.Count == 0 || activation.CardCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, category)));
     }
 
     internal SkillProgramAiHint CreateProgramAiHint(SkillProgram program, SkillProgramActivation activation, PlayerSkillContext context, bool faceDown)
@@ -374,7 +370,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
     internal SkillProgramStepOutcome BeginProgramSkillDamage(ProgramSkillFrame frame, int targetSeat, int amount, ProgramParticipantReference? sourceReference = null, DamageNature? nature = null, bool sourceLess = false, int? explicitSourceSeat = null)
     {
         var insertion = _coreProgramDamageInsertionRuntimeOperations.DamageInsertions.Describe(frame);
-        var judgmentNested = frame.WindowContext?.Judgment is { } frozenJudgment && _coreJudgmentCursorRuntimeOperations.ActiveJudgment is { } pendingJudgment && pendingJudgment.Id == frozenJudgment.JudgmentFrameId && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, _coreNativeDamageHandlesOperations.GetJudgmentAttack(pendingJudgment));
+        var judgmentNested = frame.WindowContext?.Judgment is { } frozenJudgment && _coreJudgmentCursorRuntimeOperations.ActiveJudgment is { } pendingJudgment && pendingJudgment.Id == frozenJudgment.JudgmentFrameId && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, _coreNativeDamageHandlesOperations.GetJudgmentAttack(pendingJudgment));
         var damageWindowNested = frame.WindowContext?.Window == SkillProgramTriggerWindow.AfterDamageApplied && _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } outerWindow && outerWindow.Id == frame.WindowContext.ParentFrameId;
         _ = _coreRecoveryDamageEdgesOperations.TryDescribeRecoveryDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat, out var recoveryOrigin, out var recoveryDamageWindowId);
         NativeDrawThresholdDyingOrigin? drawDyingOrigin = null;
@@ -384,11 +380,11 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
         var state = new AttackAttemptState(explicitSourceSeat ?? (sourceReference is { } reference ? _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, reference) : frame.OwnerSeat), targetSeat, amount, nature ?? DamageNature.Normal, sourceLess, frame.WindowContext?.Window == SkillProgramTriggerWindow.JudgmentFinalized ? frame.WindowContext.ParentFrameId : null);
         var parentAttackId = _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId;
         _coreRuntimeOperations.ReplaceRuntimeTop(current with { AttackAttempt = state, AttackReturn = new(parentAttackId, damageWindowNested ? frame.WindowContext!.ParentFrameId : recoveryDamageWindowId, judgmentNested ? frame.WindowContext!.Judgment!.JudgmentFrameId : null) { RecoveryOrigin = recoveryOrigin, NativeDrawDyingOrigin = drawDyingOrigin, Insertion = insertion } });
-        global::CardGame.Core.GameEngine.IDamageAttempt attack = _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(frame.Id);
+        GameEngine.IDamageAttempt attack = _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(frame.Id);
         if (frame.WindowContext?.Judgment is { } judgment)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJudgmentDamageRequestedEvent(frame.WindowContext.ParentFrameId, judgment.JudgmentFrameId, frame.SkillId, frame.TriggerId!, attack.SourceSeat, targetSeat, amount, nature ?? DamageNature.Normal));
-            _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].Name)} 的【{(_contentRegistryOperations._contentRegistry!.Skills[frame.SkillId].Name)}】将对 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 造成 {(amount)} 点{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetDamageNatureLabel(nature ?? DamageNature.Normal))}伤害。", attack.SourceSeat, targetSeat);
+            _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].Name)} 的【{(_contentRegistryOperations._contentRegistry!.Skills[frame.SkillId].Name)}】将对 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 造成 {(amount)} 点{(CoreNativeCardClassificationsRuntime.GetDamageNatureLabel(nature ?? DamageNature.Normal))}伤害。", attack.SourceSeat, targetSeat);
         }
 
         if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
@@ -504,7 +500,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal static bool BoundEquipmentUseMatches(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending, CardUseFrame use) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SkillPrograms.BoundEquipmentUseMatches(frame, effect, pending, use);
+    internal static bool BoundEquipmentUseMatches(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending, CardUseFrame use) => RuntimeSkills.RuntimeRules_Core_SkillPrograms.BoundEquipmentUseMatches(frame, effect, pending, use);
 
     [NativeUseReturn(150)]
     internal void ContinueProgramAfterBoundEquipmentUse(CardUseFrame completed)
@@ -541,14 +537,14 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal void CompleteProgramSkillAfterDying(global::CardGame.Core.GameEngine.DyingCompletionReceipt dying)
+    internal void CompleteProgramSkillAfterDying(GameEngine.DyingCompletionReceipt dying)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != dying.ParentFrameId)
             throw new InvalidOperationException("Program dying resolution lost its continuation.");
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal static bool IsAwaitingProgramMovement(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SkillPrograms.IsAwaitingProgramMovement(frame);
+    internal static bool IsAwaitingProgramMovement(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_Core_SkillPrograms.IsAwaitingProgramMovement(frame);
 
-    internal static PromptChoice CreateProgramPlayChoice(LegalAction action) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SkillPrograms.CreateProgramPlayChoice(action);
+    internal static PromptChoice CreateProgramPlayChoice(LegalAction action) => RuntimeSkills.RuntimeRules_Core_SkillPrograms.CreateProgramPlayChoice(action);
 }

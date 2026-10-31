@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWeiYanHappyGodRuntime
@@ -18,7 +14,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
 
     internal bool ValidHappyWeiYanCancellation(HappyWeiYanCancellation proof, CardActionContext action, long parent)
     {
-        if (proof.ParentId != parent || proof.Source.SkillId != HappyWeiYanComposition.Ezhi || proof.Source.BindingId != "bone-use" || proof.Source.OwnerSeat == action.ActorSeat || proof.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || proof.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(proof.Source.SkillId).Program!.GameplayHash || !global::CardGame.Core.EngineOwners.CharacterHuangZhongAnniversaryGodRuntime.SameAnniversaryHzAction(proof.Action, action) || action.PhysicalCards.Count == 0 || proof.Draw is not { } draw || !ValidHappyWeiYanDraw(draw, proof.Source.OwnerSeat, proof.FrameId) || draw.SequenceAfter > proof.Before || proof.After <= proof.Before || proof.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || proof.Bone.Holder != action.ActorSeat || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(proof.Bone.PrintedKind) != global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) || HappyBoneAt(proof.Bone.CardId, CardLocation.Equipment(action.ActorSeat), proof.Before)is not { } original || original.Sequence != proof.Bone.Sequence || original.Source != proof.Bone.Source || original.PrintedKind != proof.Bone.PrintedKind || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == proof.Bone.CardId && m.CardKind == proof.Bone.PrintedKind && m.From == CardLocation.Equipment(action.ActorSeat) && m.Reason.Value == HappyEzhiDiscard && m.Sequence > proof.Before && m.Sequence <= proof.After) != 1)
+        if (proof.ParentId != parent || proof.Source.SkillId != HappyWeiYanComposition.Ezhi || proof.Source.BindingId != "bone-use" || proof.Source.OwnerSeat == action.ActorSeat || proof.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || proof.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(proof.Source.SkillId).Program!.GameplayHash || !CharacterHuangZhongAnniversaryGodRuntime.SameAnniversaryHzAction(proof.Action, action) || action.PhysicalCards.Count == 0 || proof.Draw is not { } draw || !ValidHappyWeiYanDraw(draw, proof.Source.OwnerSeat, proof.FrameId) || draw.SequenceAfter > proof.Before || proof.After <= proof.Before || proof.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || proof.Bone.Holder != action.ActorSeat || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(proof.Bone.PrintedKind) != CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) || HappyBoneAt(proof.Bone.CardId, CardLocation.Equipment(action.ActorSeat), proof.Before)is not { } original || original.Sequence != proof.Bone.Sequence || original.Source != proof.Bone.Source || original.PrintedKind != proof.Bone.PrintedKind || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == proof.Bone.CardId && m.CardKind == proof.Bone.PrintedKind && m.From == CardLocation.Equipment(action.ActorSeat) && m.Reason.Value == HappyEzhiDiscard && m.Sequence > proof.Before && m.Sequence <= proof.After) != 1)
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == proof.FrameId && e.OwnerSeat == proof.Source.OwnerSeat && e.SkillId == proof.Source.SkillId && e.BindingId == proof.Source.BindingId && e.SkillInstanceId == proof.Source.SkillInstanceId && e.Window == SkillProgramTriggerWindow.CardUseCommitted) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyWeiYanEzhiPaidEvent>().Count(e => e == new HappyWeiYanEzhiPaidEvent(proof.FrameId, proof.Source, proof.GameplayHash, proof.ActualTurn, proof.WindowId, parent, action.ActionId, action.ActorSeat, action.EffectiveKind, proof.Bone.CardId, proof.Bone.PrintedKind, proof.Before, proof.After, true)) == 1;
     }
@@ -45,7 +41,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         return true;
     }
 
-    internal bool HasHappyWeiYanIneffectiveResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal bool HasHappyWeiYanIneffectiveResponse(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         if (continuation != ProgramCardContinuation.Dodge || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.HappyWeiYanResponses is not { } proofs)
             return false;
@@ -57,7 +53,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         return true;
     }
 
-    internal bool ContinueHappyWeiYanIneffectiveDodge(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal bool ContinueHappyWeiYanIneffectiveDodge(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         if (!HasHappyWeiYanIneffectiveResponse(attack, action, continuation))
             return false;

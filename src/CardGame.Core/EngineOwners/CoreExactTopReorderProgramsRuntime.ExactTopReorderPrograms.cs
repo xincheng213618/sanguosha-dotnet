@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreExactTopReorderProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IExactTopReorderProgramEffectHost.ReorderTopCardsExactly(ProgramSkillFrame frame, int maximumCards, SkillProgramNumberExpression? numberExpression, int exactTopCount) => _coreProgramTopReorderOperations.BeginProgramTopReorder(frame, maximumCards, numberExpression, exactTopCount);
+    SkillProgramStepOutcome IExactTopReorderProgramEffectHost.ReorderTopCardsExactly(ProgramSkillFrame frame, int maximumCards, SkillProgramNumberExpression? numberExpression, int exactTopCount) => _coreProgramTopReorderOperations.BeginProgramTopReorder(frame, maximumCards, numberExpression, exactTopCount);
     internal CardSnapshot[] GetExactTopPrivatelyViewedCards(int viewerSeat) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { TopReorder.RequiredTopCount: not null } frame && frame.OwnerSeat == viewerSeat && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTopReorder, PlayerSeat: var seat } && seat == viewerSeat ? frame.TopReorder!.ViewedCardIds.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Single(card => card.Id == id))).ToArray() : [];
     internal void ValidateExactTopReorder(ProgramSkillFrame frame)
     {

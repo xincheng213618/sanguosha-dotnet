@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWeiYanHappyGodRuntime
@@ -71,7 +67,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
             return dragon;
         if (action.Kind is not (LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage))
             return _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(action.PlayedCardKind ?? card.Kind, actor.Seat, action.TargetSeats);
-        return Array.AsReadOnly(Enumerable.Range(1, _coreMatchDefinitionPlayerCountAccess._playerCount - 1).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(actor.Seat, offset)]).Where(p => p.IsAlive && !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, card.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, card.Kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(actor.Seat, p.Seat, card.Kind))).Select(p => p.Seat).ToArray());
+        return Array.AsReadOnly(Enumerable.Range(1, _coreMatchDefinitionPlayerCountAccess._playerCount - 1).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(actor.Seat, offset)]).Where(p => p.IsAlive && !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, card.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, card.Kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(actor.Seat, p.Seat, card.Kind))).Select(p => p.Seat).ToArray());
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 42301)]

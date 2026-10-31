@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ActualPhaseEndIssuedItems(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterYaDanOlEntries> getCharacterYaDanOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterSimaShiMouEntries> getCharacterSimaShiMouRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterHuangZuMobileShiEntries> getCharacterHuangZuMobileShiRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterLuYuShengMobileShiEntries> getCharacterLuYuShengMobileShiRuntime) : IActualPhaseEndIssuedItems
+internal sealed class ActualPhaseEndIssuedItems(Func<RuntimeEntries.CharacterYaDanOlEntries> getCharacterYaDanOlRuntime, Func<RuntimeEntries.CharacterSimaShiMouEntries> getCharacterSimaShiMouRuntime, Func<RuntimeEntries.CharacterHuangZuMobileShiEntries> getCharacterHuangZuMobileShiRuntime, Func<RuntimeEntries.CharacterLuYuShengMobileShiEntries> getCharacterLuYuShengMobileShiRuntime) : IActualPhaseEndIssuedItems
 {
     public IReadOnlyList<ActualPhaseEndItem> Qingya(ActualDiscardRecoveryPhaseKey phase) => getCharacterYaDanOlRuntime().CollectQingyaPhaseEndCandidates(phase);
     public IReadOnlyList<ActualPhaseEndItem> MouSimaShi(ActualDiscardRecoveryPhaseKey phase) => getCharacterSimaShiMouRuntime().CollectMouSimaShiPhaseEndCandidates(phase);

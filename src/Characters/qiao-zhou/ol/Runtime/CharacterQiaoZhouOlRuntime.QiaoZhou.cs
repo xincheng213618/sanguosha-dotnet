@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQiaoZhouOlRuntime
@@ -13,8 +9,8 @@ internal sealed partial class CharacterQiaoZhouOlRuntime
     internal const string QiaoZhouPreparationReason = "skill-program.ol:xingbu.preparation-discard";
     internal bool HasQiaoZhouCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveXingbuThreeCardForecast);
 
-    internal CardConversionSource QiaoZhouSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IQiaoZhouProgramHost.Forecast(ProgramSkillFrame frame) => BeginQiaoZhouForecast(frame);
+    internal CardConversionSource QiaoZhouSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IQiaoZhouProgramHost.Forecast(ProgramSkillFrame frame) => BeginQiaoZhouForecast(frame);
     internal QiaoZhouForecastGrantedEvent[] QiaoZhouMarks()
     {
         if (!HasQiaoZhouCapability)
@@ -35,7 +31,7 @@ internal sealed partial class CharacterQiaoZhouOlRuntime
         _coreProgramLifecycleOperations.RevealProgramTopCards(f.Id, f.OwnerSeat, 3, null, QiaoZhouTableBind, SkillProgramCardSetVisibility.Public);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var cards = _coreProgramLifecycleOperations.GetProgramCardSet(f, QiaoZhouTableBind).CardIds.Select(id => new QiaoZhouRevealedCard(id, _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Suit, _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == id).Sequence)).ToArray();
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { QiaoZhouForecast = f.QiaoZhouForecast!with { Cards = cards, RedCount = cards.Count(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit)), SequenceAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { QiaoZhouForecast = f.QiaoZhouForecast!with { Cards = cards, RedCount = cards.Count(c => CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit)), SequenceAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         ContinueQiaoZhouForecast(f.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }
@@ -95,7 +91,7 @@ internal sealed partial class CharacterQiaoZhouOlRuntime
     [ProgramAnswer("qiao-zhou-forecast")]
     internal void AnswerQiaoZhouForecast(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { QiaoZhouForecast.Stage: QiaoZhouForecastStage.Recipient } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], QiaoZhouForecastChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { QiaoZhouForecast.Stage: QiaoZhouForecastStage.Recipient } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], QiaoZhouForecastChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xingbu lost its exact living, unmarked recipient choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

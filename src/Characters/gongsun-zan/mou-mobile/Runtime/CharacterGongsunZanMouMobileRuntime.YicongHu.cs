@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGongsunZanMouMobileRuntime
 {
     internal CardConversionSource MouGszHuAccess(PublicPersistentPileSource p) => new(p.SkillId, "hu-original", p.OwnerSeat, p.SkillInstanceId);
     internal IReadOnlyList<Card> AppendMouGszHuPlayable(CharacterState owner, IReadOnlyList<Card> cards) => _coreCardDeclarationsOperations.AvailableDeclarationCard(owner)is not null ? cards : cards.Concat(MouGszHuCards(owner)).DistinctBy(c => c.Id).ToArray();
-    internal IReadOnlyList<NativePublicPileCardSelection> MouGszHuOriginalChoices(NativePublicPileCardRequest request) => HasMouGszMobile && _coreTableSeatQueriesOperations.IsValidPlayerSeat(request.ProviderSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(request.ActorSeat) && _coreMatchParticipantsPlayersAccess._players[request.ActorSeat].IsAlive && Enum.IsDefined(request.Direction) ? MouGszHuPiles(request.ProviderSeat).Where(IsLiveMouGszHuPile).SelectMany(p => _corePublicPileSourcesOperations.PublicPileCards(p).Where(c => request.RequiredKind is null || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(c.Kind, request.RequiredKind.Value)).Select(c => new NativePublicPileCardSelection(p, MouGszHuAccess(p), c, request))).ToArray() : [];
+    internal IReadOnlyList<NativePublicPileCardSelection> MouGszHuOriginalChoices(NativePublicPileCardRequest request) => HasMouGszMobile && _coreTableSeatQueriesOperations.IsValidPlayerSeat(request.ProviderSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(request.ActorSeat) && _coreMatchParticipantsPlayersAccess._players[request.ActorSeat].IsAlive && Enum.IsDefined(request.Direction) ? MouGszHuPiles(request.ProviderSeat).Where(IsLiveMouGszHuPile).SelectMany(p => _corePublicPileSourcesOperations.PublicPileCards(p).Where(c => request.RequiredKind is null || CoreNativeCardClassificationsRuntime.MatchesRequiredCard(c.Kind, request.RequiredKind.Value)).Select(c => new NativePublicPileCardSelection(p, MouGszHuAccess(p), c, request))).ToArray() : [];
     internal bool IsMouGszHuOriginalChoice(NativePublicPileCardRequest request, NativePublicPileCardSelection choice) => choice.Request == request && choice.AccessSource.SkillId == MouGongsunZanMobileComposition.Yicong && choice.AccessSource.BindingId == "hu-original" && MouGszHuOriginalChoices(request).Contains(choice);
     internal bool IsMouGszHuOriginalPayment(NativePublicPileCardPayment p) => p.Source.SkillId == MouGongsunZanMobileComposition.Yicong && p.Source.BindingId == "hu-original" && IsIssuedMouGszHuPile(p.Pile) && p.Source == MouGszHuAccess(p.Pile) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == p.SequenceAfter && m.CardId == p.Card.Id && m.CardKind == p.Card.Kind && m.From == p.Pile.Location && m.To == CardLocation.Processing);
     internal bool MouGszHuHandSource(CharacterState owner, Card card, IReadOnlyList<CardZoneKind> zones) => zones.Contains(CardZoneKind.Hand) && IsMouGszHuCard(owner, card.Id);
@@ -23,9 +19,9 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
             throw new InvalidOperationException("Hu needs the actual native output kind at payment.");
         if (conversion is null)
         {
-            if (materials is [var original] && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(original.Kind, kind) || original.Kind == CardKind.Slash && kind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(provider)))
+            if (materials is [var original] && (CoreNativeCardClassificationsRuntime.MatchesRequiredCard(original.Kind, kind) || original.Kind == CardKind.Slash && kind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(provider)))
                 return true;
-            if (!forResponse && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && materials.Count == 2 && _coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(provider) && materials.All(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(provider, _cardZonesOperations._cardZones.GetLocation(c.Id)) || IsMouGszHuCard(provider, c.Id)))
+            if (!forResponse && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && materials.Count == 2 && _coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(provider) && materials.All(c => CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(provider, _cardZonesOperations._cardZones.GetLocation(c.Id)) || IsMouGszHuCard(provider, c.Id)))
                 return true;
             throw new InvalidOperationException("Only an original Hu or the native Zhangba equipment path may omit its conversion source.");
         }

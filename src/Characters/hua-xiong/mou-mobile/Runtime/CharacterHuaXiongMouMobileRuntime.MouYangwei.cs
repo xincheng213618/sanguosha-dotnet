@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaXiongMouMobileRuntime
@@ -47,5 +42,5 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 20)]
-    internal bool DistanceCardUseExemption20HasMouHuaXiongWei(ProgramCardDistanceQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && HasMouHuaXiongWei(q.Actor.Seat);
+    internal bool DistanceCardUseExemption20HasMouHuaXiongWei(ProgramCardDistanceQuery q) => CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && HasMouHuaXiongWei(q.Actor.Seat);
 }

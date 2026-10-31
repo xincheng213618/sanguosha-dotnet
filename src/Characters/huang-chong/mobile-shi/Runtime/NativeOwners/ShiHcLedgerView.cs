@@ -3,8 +3,8 @@
 namespace CardGame.Core.NativeOwners;
 
 internal sealed record ShiHcLedgerView(
-        IReadOnlyList<global::CardGame.Core.GameEngine.ShiHcLedgerGrant> CujunGrants,
-        IReadOnlyList<global::CardGame.Core.GameEngine.ShiHcLedgerPlayStart> PlayStarts,
+        IReadOnlyList<GameEngine.ShiHcLedgerGrant> CujunGrants,
+        IReadOnlyList<GameEngine.ShiHcLedgerPlayStart> PlayStarts,
         IReadOnlyList<ShiHcSiliSlashArmedEvent> ArmedSlashes,
         IReadOnlyList<ShiHcSiliDrawGrantedEvent> DrawGrants,
         IReadOnlyList<long> ConsumedDrawFrameIds,
@@ -13,7 +13,7 @@ internal sealed record ShiHcLedgerView(
         IReadOnlyList<ShiHcCujunClaimIssuedEvent> Claims,
         IReadOnlyList<long> SettledClaimFrameIds)
     {
-        internal static readonly global::CardGame.Core.NativeOwners.ShiHcLedgerView Empty = new([], [], [], [], [], [], [], [], []);
+        internal static readonly ShiHcLedgerView Empty = new([], [], [], [], [], [], [], [], []);
 
         internal ShiHcCujunClaimIssuedEvent? PendingClaim(int ownerSeat, int turnNumber) => Claims.FirstOrDefault(claim =>
             claim.OwnerSeat == ownerSeat && claim.TurnNumber == turnNumber && !SettledClaimFrameIds.Contains(claim.FrameId));

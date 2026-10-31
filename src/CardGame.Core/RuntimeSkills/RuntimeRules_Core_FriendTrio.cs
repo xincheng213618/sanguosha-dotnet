@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_FriendTrio
 {
     internal static bool IsFriendTrioOperation(SkillProgramEffectOp op) => op is >= SkillProgramEffectOp.BeginFriendPrediction and <= SkillProgramEffectOp.GainFriendCategoryMark;

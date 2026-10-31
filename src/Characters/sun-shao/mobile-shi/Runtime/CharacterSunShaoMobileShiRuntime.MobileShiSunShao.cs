@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunShaoMobileShiRuntime
 {
     internal const string ShiSsGanjue = ShiSunShaoComposition.GanjueSkill, ShiSsZhuji = ShiSunShaoComposition.ZhujiSkill;
-    internal static CardConversionSource ShiSsSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IShiSunShaoHost.ResolveGanjue(ProgramSkillFrame frame) => BeginShiSsGanjue(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiSunShaoHost.ResolveZhuji(ProgramSkillFrame frame) => BeginShiSsZhuji(frame);
+    internal static CardConversionSource ShiSsSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IShiSunShaoHost.ResolveGanjue(ProgramSkillFrame frame) => BeginShiSsGanjue(frame);
+    SkillProgramStepOutcome IShiSunShaoHost.ResolveZhuji(ProgramSkillFrame frame) => BeginShiSsZhuji(frame);
     internal SkillProgramStepOutcome BeginShiSsGanjue(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -83,7 +80,7 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
         foreach (var card in sameSuit)
             _corePhysicalMovementFacadesOperations.MoveCard(card, _cardZonesOperations._cardZones.GetLocation(card.Id), CardLocation.DiscardPile, new CardMoveReason(ShiSunShaoComposition.ZhujiDiscardReason));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiSsZhujiDiscardedEvent(f.Id, f.OwnerSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, chosenCardId, chosen.Suit, sameSuit.Length));
-        _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 的“筑墼”弃置了 {(sameSuit.Length)} 张 {(global::CardGame.Core.EngineOwners.CharacterZhangRenMobileShiRuntime.DescribeSuit(chosen.Suit))} 手牌。", f.OwnerSeat);
+        _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 的“筑墼”弃置了 {(sameSuit.Length)} 张 {(CharacterZhangRenMobileShiRuntime.DescribeSuit(chosen.Suit))} 手牌。", f.OwnerSeat);
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { SunShao = r with { ChosenCardId = chosenCardId, StrikeSuit = chosen.Suit, DiscardedCount = sameSuit.Length } });
         ApplyShiSsZhujiEquip(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }
@@ -160,7 +157,7 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
                 var target = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
                 var before = target.Armor;
                 target.Armor = checked(before + 1);
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ArmorGrantedEvent(active.Id, active.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(active), active.OwnerSeat, 1, before, before + 1));
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ArmorGrantedEvent(active.Id, active.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(active), active.OwnerSeat, 1, before, before + 1));
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiSsZhujiBonusEvent(f.Id, f.OwnerSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, "armor", 1));
                 _coreMatchLogOperations.AddLog("ArmorGranted", $"{(target.Name)} 获得 1 点护甲，现有 {(target.Armor)} 点。", f.OwnerSeat);
                 break;
@@ -181,11 +178,11 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
         switch (r.Operation, r.Stage)
         {
             case ("ganjue", ShiSsStage.GanjueMaterial):
-                return _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(card => new PromptChoice(new($"shi-sun-shao.{(f.Id)}.material.{(card.Id)}"), $"将装备区里的【{(CardCatalog.Get(card.Kind).DisplayName)}】（{(global::CardGame.Core.EngineOwners.CharacterZhangRenMobileShiRuntime.DescribeSuit(card.Suit))}）当作【杀】使用", [card.Id], [], new Dictionary<string, string> { ["program-action"] = ShiSunShaoComposition.ProgramAction, ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = "material", ["card-id"] = card.Id.ToString(CultureInfo.InvariantCulture), })).ToArray();
+                return _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(card => new PromptChoice(new($"shi-sun-shao.{(f.Id)}.material.{(card.Id)}"), $"将装备区里的【{(CardCatalog.Get(card.Kind).DisplayName)}】（{(CharacterZhangRenMobileShiRuntime.DescribeSuit(card.Suit))}）当作【杀】使用", [card.Id], [], new Dictionary<string, string> { ["program-action"] = ShiSunShaoComposition.ProgramAction, ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = "material", ["card-id"] = card.Id.ToString(CultureInfo.InvariantCulture), })).ToArray();
             case ("zhuji", ShiSsStage.ZhujiAsk):
                 return[MakeShiSsChoice(f, "arm", "发动“筑墼”：弃置一种花色的所有手牌并获得同花色装备"), MakeShiSsChoice(f, "pass", "不发动“筑墼”"), ];
             case ("zhuji", ShiSsStage.ZhujiHand):
-                return _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(card => new PromptChoice(new($"shi-sun-shao.{(f.Id)}.hand.{(card.Id)}"), $"选择这张手牌，弃置所有{(global::CardGame.Core.EngineOwners.CharacterZhangRenMobileShiRuntime.DescribeSuit(card.Suit))}手牌（{(DescribeShiSsCard(card))}）", [card.Id], [], new Dictionary<string, string> { ["program-action"] = ShiSunShaoComposition.ProgramAction, ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = "hand", ["card-id"] = card.Id.ToString(CultureInfo.InvariantCulture), })).ToArray();
+                return _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(card => new PromptChoice(new($"shi-sun-shao.{(f.Id)}.hand.{(card.Id)}"), $"选择这张手牌，弃置所有{(CharacterZhangRenMobileShiRuntime.DescribeSuit(card.Suit))}手牌（{(DescribeShiSsCard(card))}）", [card.Id], [], new Dictionary<string, string> { ["program-action"] = ShiSunShaoComposition.ProgramAction, ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = "hand", ["card-id"] = card.Id.ToString(CultureInfo.InvariantCulture), })).ToArray();
             case ("zhuji", ShiSsStage.ZhujiBonus):
                 return[MakeShiSsChoice(f, "draw", "摸两张牌"), MakeShiSsChoice(f, "recover", "回复1点体力"), MakeShiSsChoice(f, "armor", "获得1点护甲"), ];
             default:
@@ -220,7 +217,7 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
     [ProgramAnswer(ShiSunShaoComposition.ProgramAction)]
     internal void AnswerShiSs(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunShao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiSsChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunShao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiSsChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Shi Sun Shao choice lost its current frame or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeGuoOlRuntime
@@ -10,11 +6,11 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedInstantTrickRequirement, 60)]
     internal bool QirangTargetFinalizedInstantTrickRequirementTargetWindow(ProgramTargetCardWindowQuery query) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AddTargetForQirangPhysicalTrick);
     internal const string QirangGainReason = "skill-program.qirang.deck-trick";
-    internal static CardConversionSource ZhugeGuoSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhuge_guo_ol_ZhugeGuoPrograms.ZhugeGuoSource(f);
+    internal static CardConversionSource ZhugeGuoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhuge_guo_ol_ZhugeGuoPrograms.ZhugeGuoSource(f);
     internal bool TryQirangEquipmentParent(int owner, ProgramSkillWindowContext context, out CardUseFrame use)
     {
         use = null !;
-        if (context.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || context.CardUse is not { } identity || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } actual || action.ActionId != identity.CardActionId || action.ActorSeat != owner || actual.SourceSeat != owner || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(action.EffectiveKind) || actual.CardKind != action.EffectiveKind || action.PhysicalCards is not [var physical] || physical.CardId != actual.CardId || _cardZonesOperations._cardZones.GetLocation(physical.CardId) != CardLocation.Processing || actual.QirangEquipmentOrigin is not { } origin || origin.CardUseFrameId != actual.Id || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(origin.OriginalAction, action) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QirangEquipmentOriginCapturedEvent>().Count(e => e == new QirangEquipmentOriginCapturedEvent(actual.Id, action.ActionId, owner, physical.CardId, origin.MovementBefore)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == physical.CardId && m.From == physical.From && m.To == CardLocation.Processing && m.Sequence > origin.MovementBefore && m.Reason == CardMoveReasons.EquipmentUse) != 1 || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != actual.Id || window.Action.ActionId != action.ActionId)
+        if (context.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || context.CardUse is not { } identity || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } actual || action.ActionId != identity.CardActionId || action.ActorSeat != owner || actual.SourceSeat != owner || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(action.EffectiveKind) || actual.CardKind != action.EffectiveKind || action.PhysicalCards is not [var physical] || physical.CardId != actual.CardId || _cardZonesOperations._cardZones.GetLocation(physical.CardId) != CardLocation.Processing || actual.QirangEquipmentOrigin is not { } origin || origin.CardUseFrameId != actual.Id || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(origin.OriginalAction, action) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QirangEquipmentOriginCapturedEvent>().Count(e => e == new QirangEquipmentOriginCapturedEvent(actual.Id, action.ActionId, owner, physical.CardId, origin.MovementBefore)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == physical.CardId && m.From == physical.From && m.To == CardLocation.Processing && m.Sequence > origin.MovementBefore && m.Reason == CardMoveReasons.EquipmentUse) != 1 || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != actual.Id || window.Action.ActionId != action.ActionId)
             return false;
         use = actual;
         return true;
@@ -83,7 +79,7 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
 
         if (e.Op != SkillProgramEffectOp.ObtainDeckTrickForActualEquipmentUse || !TryQirangEquipmentParent(f.OwnerSeat, context, out var equipment))
             throw new InvalidOperationException("Qirang gain requires actual equipment Use payment.");
-        var trick = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Trick);
+        var trick = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Trick);
         if (trick is null)
         {
             _coreSkillProgramsOperations.FinishProgramSkill(f, true);
@@ -121,13 +117,13 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
     {
         _characterZhugeGuoOlHasIssuedZhugeGuoStateAccess._hasIssuedZhugeGuoState = true;
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(r.GainedKind!.Value))
+        if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(r.GainedKind!.Value))
         {
             var lease = new QirangEntityLease(r.Source, r.GameplayHash, f.OwnerSeat, r.GainedCardId!.Value, r.GainedKind.Value, r.UseId!.Value, r.ActionId!.Value, movement.Sequence);
             owner.QirangEntityLeases = (owner.QirangEntityLeases ?? []).Append(lease).ToArray();
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QirangEntityLeaseIssuedEvent(lease));
         }
-        else if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(r.GainedKind!.Value) && (owner.YuhuaDelayDebts?.Count ?? 0) < 4)
+        else if (CoreNativeCardClassificationsRuntime.IsDelayedCard(r.GainedKind!.Value) && (owner.YuhuaDelayDebts?.Count ?? 0) < 4)
         {
             var debt = new YuhuaDelayDebt(r.Source, r.GameplayHash, f.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, r.UseId!.Value, r.ActionId!.Value, r.GainedCardId!.Value, movement.Sequence);
             owner.YuhuaDelayDebts = (owner.YuhuaDelayDebts ?? []).Append(debt).ToArray();
@@ -138,7 +134,7 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
     internal bool TryQirangExtraParent(int owner, string skill, string instance, ProgramSkillWindowContext context, out CardUseFrame use)
     {
         use = null !;
-        if (!_coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(owner, context, out var actual, out _) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(actual.CardKind) || actual.QirangQualification is not { } q || q.CardUseFrameId != actual.Id || q.Lease.Source.SkillId != skill || q.Lease.Source.SkillInstanceId != instance || q.Lease.OwnerSeat != owner || actual.Action is not { Type: CardActionType.Use } action || action.ActorSeat != owner || action.ProviderSeat != owner || action.PhysicalCards is not [var physical] || physical.CardId != q.Lease.CardId || physical.From != CardLocation.Hand(owner) || physical.CardKind != q.Lease.PrintedKind || action.EffectiveKind != q.Lease.PrintedKind || action.ActionId != q.OriginalAction.ActionId || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(q.OriginalAction, action) || !ValidQirangQualification(q) || _coreRoundGainedTrickTargetsOperations.RoundGainedOriginalTargets(actual).Count != (actual.CardKind == CardKind.BorrowedSword ? 2 : 1))
+        if (!_coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(owner, context, out var actual, out _) || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(actual.CardKind) || actual.QirangQualification is not { } q || q.CardUseFrameId != actual.Id || q.Lease.Source.SkillId != skill || q.Lease.Source.SkillInstanceId != instance || q.Lease.OwnerSeat != owner || actual.Action is not { Type: CardActionType.Use } action || action.ActorSeat != owner || action.ProviderSeat != owner || action.PhysicalCards is not [var physical] || physical.CardId != q.Lease.CardId || physical.From != CardLocation.Hand(owner) || physical.CardKind != q.Lease.PrintedKind || action.EffectiveKind != q.Lease.PrintedKind || action.ActionId != q.OriginalAction.ActionId || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(q.OriginalAction, action) || !ValidQirangQualification(q) || _coreRoundGainedTrickTargetsOperations.RoundGainedOriginalTargets(actual).Count != (actual.CardKind == CardKind.BorrowedSword ? 2 : 1))
             return false;
         use = actual;
         return true;
@@ -183,7 +179,7 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         RequireZhugeGuo(f);
         var r = f.ZhugeGuo!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], QirangExtraChoices(f).Where(c => c.Id == choice.Id).ToArray()) || !TryQirangExtraParent(f.OwnerSeat, f.SkillId, f.SkillInstanceId, f.WindowContext!, out var use))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], QirangExtraChoices(f).Where(c => c.Id == choice.Id).ToArray()) || !TryQirangExtraParent(f.OwnerSeat, f.SkillId, f.SkillInstanceId, f.WindowContext!, out var use))
             throw new InvalidOperationException("Qirang changed its original physical Use or legal target pair.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Targets.Count > 0)
@@ -260,5 +256,5 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
         }
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IZhugeGuoProgramHost.BeginZhugeGuo(ProgramSkillFrame f, SkillProgramEffect e) => BeginZhugeGuo(f, e);
+    SkillProgramStepOutcome IZhugeGuoProgramHost.BeginZhugeGuo(ProgramSkillFrame f, SkillProgramEffect e) => BeginZhugeGuo(f, e);
 }

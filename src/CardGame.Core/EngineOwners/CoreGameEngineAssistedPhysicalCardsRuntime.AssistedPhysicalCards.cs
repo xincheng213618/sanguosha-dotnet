@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
 {
 
-    internal static bool AssistedChoicesEqual(IReadOnlyList<PromptChoice> actual, IReadOnlyList<PromptChoice> expected) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_AssistedPhysicalCards.AssistedChoicesEqual(actual, expected);
-    internal int[] AssistedPhysicalSlashTargets(int actorSeat) => _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && target.IsAlive && target.Seat != actorSeat && (_characterGuanYuWumiaoOperations.HasPublicWuyouContributionPotential(_coreMatchParticipantsPlayersAccess._players[actorSeat]) || _characterXiaoQiaoLeOperations.HasWeiwanUseDistance(_coreMatchParticipantsPlayersAccess._players[actorSeat], target, CardKind.Slash) || (_characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(_coreMatchParticipantsPlayersAccess._players[actorSeat]) || _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(_coreMatchParticipantsPlayersAccess._players[actorSeat])) || _coreProvenanceCardPoliciesOperations.HasPotentialProvenanceSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat]) || _coreProgramDodgeResponsesOperations.IsWithinAttackRange(actorSeat, target.Seat) || _coreFinalTargetSlashOperations.HasPotentialRankSlashRange(_coreMatchParticipantsPlayersAccess._players[actorSeat], target, CardKind.Slash) || _coreLiYiNativeQueriesOperations.HasLiYiProspectiveWeaponSlashTarget(_coreMatchParticipantsPlayersAccess._players[actorSeat], target) || global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(k => _characterMiHengLeOperations.HasSiruiSlashDistance(_coreMatchParticipantsPlayersAccess._players[actorSeat], k)))).Select(target => target.Seat).ToArray();
+    internal static bool AssistedChoicesEqual(IReadOnlyList<PromptChoice> actual, IReadOnlyList<PromptChoice> expected) => RuntimeSkills.RuntimeRules_Core_AssistedPhysicalCards.AssistedChoicesEqual(actual, expected);
+    internal int[] AssistedPhysicalSlashTargets(int actorSeat) => _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && target.IsAlive && target.Seat != actorSeat && (_characterGuanYuWumiaoOperations.HasPublicWuyouContributionPotential(_coreMatchParticipantsPlayersAccess._players[actorSeat]) || _characterXiaoQiaoLeOperations.HasWeiwanUseDistance(_coreMatchParticipantsPlayersAccess._players[actorSeat], target, CardKind.Slash) || (_characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(_coreMatchParticipantsPlayersAccess._players[actorSeat]) || _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(_coreMatchParticipantsPlayersAccess._players[actorSeat])) || _coreProvenanceCardPoliciesOperations.HasPotentialProvenanceSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat]) || _coreProgramDodgeResponsesOperations.IsWithinAttackRange(actorSeat, target.Seat) || _coreFinalTargetSlashOperations.HasPotentialRankSlashRange(_coreMatchParticipantsPlayersAccess._players[actorSeat], target, CardKind.Slash) || _coreLiYiNativeQueriesOperations.HasLiYiProspectiveWeaponSlashTarget(_coreMatchParticipantsPlayersAccess._players[actorSeat], target) || CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(k => _characterMiHengLeOperations.HasSiruiSlashDistance(_coreMatchParticipantsPlayersAccess._players[actorSeat], k)))).Select(target => target.Seat).ToArray();
     internal SkillProgramStepOutcome RequestProgramSlashAgainstChosenTarget(ProgramSkillFrame frame, int actorSeat, string bind, bool actorChoosesTarget)
     {
         if (_characterJiangWeiBoundaryMobileOperations.TryBeginMobileJiangWeiTiaoxin(frame, actorSeat, bind, actorChoosesTarget, out var mobileOutcome))
@@ -50,7 +46,7 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
         var choices = new List<PromptChoice>();
         foreach (var card in _coreActionQueriesOperations.GetSlashUseCards(actor))
         {
-            var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(actor, card).FirstOrDefault(item => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(item.Identity.OutputKind));
+            var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(actor, card).FirstOrDefault(item => CoreNativeCardClassificationsRuntime.IsSlashCard(item.Identity.OutputKind));
             var baseKind = identity?.Identity.OutputKind ?? _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(actor, card);
             foreach (var kind in _coreNativeTargetLegalityOperations.GetSlashUseKinds(actor, baseKind))
             {
@@ -63,14 +59,14 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
         }
 
         foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor)).DistinctBy(card => card.Id))
-            foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => kind != CardKind.Slash))
+            foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => kind != CardKind.Slash))
                 foreach (var conversion in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, forResponse: false))
                 {
                     if (_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) || !AssistedSlashPaymentHasRange(actor, targetSeat, [card], conversion) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[targetSeat], card, conversion, kind))
                         continue;
                     var parameters = Parameters("use");
                     parameters["effective-kind"] = kind.ToString();
-                    global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, conversion);
+                    CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, conversion);
                     choices.Add(new PromptChoice(new ChoiceId($"assisted-slash.{(frame.Id)}.typed.{(kind)}.{(conversion.SkillId)}.{(conversion.BindingId)}.{(card.Id)}"), $"将牌当【{(CardCatalog.Get(kind).DisplayName)}】使用", [card.Id], [targetSeat], parameters));
                 }
 
@@ -85,14 +81,14 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
             choices.Add(new PromptChoice(new ChoiceId($"assisted-slash.{(frame.Id)}.zhangba.{(string.Join('-', ids))}"), "使用丈八蛇矛：将两张手牌当【杀】使用", ids, [targetSeat], parameters));
         }
 
-        foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+        foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
             foreach (var selection in _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(actor, kind, false).Where(item => _corePlayCardHistoryOperations.ViewAsRule(item.Source)is { RoundDistinctBasicUse: null, LeiluanBasicUse: null } || item.OutputKind == kind))
             {
                 if (!AssistedSlashPaymentHasRange(actor, targetSeat, selection.Cards) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[targetSeat], selection.Cards[0], selection.Source, kind, noEffectiveRank: selection.Cards.Count > 1, physicalCardIds: selection.Cards.Select(c => c.Id).ToArray()))
                     continue;
                 var parameters = Parameters("use");
                 parameters["effective-kind"] = kind.ToString();
-                global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
+                CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
                 var ids = selection.Cards.Select(card => card.Id).ToArray();
                 choices.Add(new PromptChoice(new ChoiceId($"assisted-slash.{(frame.Id)}.multi.{(selection.Source.SkillId)}.{(selection.Source.BindingId)}.{(string.Join('-', ids))}"), "将所选牌当【杀】使用", ids, [targetSeat], parameters));
             }
@@ -109,7 +105,7 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
         return choices.Where(c => c.Parameters.GetValueOrDefault("request-option") != "use" || !_coreWuJingQueriesOperations.IsTurnSlashChoiceUseForbidden(actor.Seat, c) && !_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(actor.Seat, Enum.Parse<CardKind>(c.Parameters["effective-kind"]), c.Cards)).ToArray();
     }
 
-    internal bool AssistedSlashPaymentHasRange(CharacterState actor, int targetSeat, IReadOnlyList<Card> cards, CardConversionSource? conversionSource = null) => _characterHuangfuSongWumiaoOperations.HasWuHfOrWuyouMaterialPrivilege(actor, CardKind.Slash, cards.Select(c => c.Id).ToArray()) || _characterXiaoQiaoLeOperations.HasWeiwanUseDistance(actor, _coreMatchParticipantsPlayersAccess._players[targetSeat], CardKind.Slash) || (_characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(actor) || _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(actor)) || global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(k => _characterMiHengLeOperations.HasSiruiSlashDistance(actor, k, cards.Select(c => c.Id).ToArray(), conversionSource)) || _characterSunYuanOlOperations.HasSayingRoundRange(actor.Seat, targetSeat) || (_coreProvenanceCardPoliciesOperations.HasProvenanceUseDistance2(actor, cards.Select(c => c.Id).ToArray()) || _coreGrantedEntityPhasesOperations.HasGrantedPhaseEntityDistance(actor, cards.Select(c => c.Id).ToArray())) || cards.Count == 1 && _coreFinalTargetSlashOperations.HasRankSlashRange(actor, CardKind.Slash) && cards[0].Rank > 0 || !cards.Any(card => _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Equipment(actor.Seat) && _coreFieldEquipmentOperations.FieldEquipmentSlot(card) == EquipmentSlot.Weapon) || _coreLiYiNativeQueriesOperations.HasLiYiWeaponPaymentRange(actor, targetSeat, cards) || _coreNativeRuleQueriesOperations.GetCombatDistance(actor.Seat, targetSeat) <= 1;
+    internal bool AssistedSlashPaymentHasRange(CharacterState actor, int targetSeat, IReadOnlyList<Card> cards, CardConversionSource? conversionSource = null) => _characterHuangfuSongWumiaoOperations.HasWuHfOrWuyouMaterialPrivilege(actor, CardKind.Slash, cards.Select(c => c.Id).ToArray()) || _characterXiaoQiaoLeOperations.HasWeiwanUseDistance(actor, _coreMatchParticipantsPlayersAccess._players[targetSeat], CardKind.Slash) || (_characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(actor) || _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(actor)) || CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(k => _characterMiHengLeOperations.HasSiruiSlashDistance(actor, k, cards.Select(c => c.Id).ToArray(), conversionSource)) || _characterSunYuanOlOperations.HasSayingRoundRange(actor.Seat, targetSeat) || (_coreProvenanceCardPoliciesOperations.HasProvenanceUseDistance2(actor, cards.Select(c => c.Id).ToArray()) || _coreGrantedEntityPhasesOperations.HasGrantedPhaseEntityDistance(actor, cards.Select(c => c.Id).ToArray())) || cards.Count == 1 && _coreFinalTargetSlashOperations.HasRankSlashRange(actor, CardKind.Slash) && cards[0].Rank > 0 || !cards.Any(card => _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Equipment(actor.Seat) && _coreFieldEquipmentOperations.FieldEquipmentSlot(card) == EquipmentSlot.Weapon) || _coreLiYiNativeQueriesOperations.HasLiYiWeaponPaymentRange(actor, targetSeat, cards) || _coreNativeRuleQueriesOperations.GetCombatDistance(actor.Seat, targetSeat) <= 1;
 
     internal void PublishAssistedPhysicalSlashPrompt(ProgramSkillFrame frame)
     {

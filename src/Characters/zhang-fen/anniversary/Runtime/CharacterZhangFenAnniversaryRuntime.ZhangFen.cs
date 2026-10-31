@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangFenAnniversaryRuntime
 {
-    internal static CardConversionSource ZhangFenSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryZhangFenHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhangFen(f, op);
-    internal bool ZhangFenSlashDamage(int owner, ProgramSkillWindowContext w) => w.SourceSeat == owner && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is global::CardGame.Core.NativeOwners.CardAttackHandle a && !a.IsSourceLess && a.SourceSeat == owner && w.TargetSeat == a.TargetSeat && a.DamageWasApplied && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveCardKind ?? CardKind.Slash);
+    internal static CardConversionSource ZhangFenSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryZhangFenHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhangFen(f, op);
+    internal bool ZhangFenSlashDamage(int owner, ProgramSkillWindowContext w) => w.SourceSeat == owner && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is NativeOwners.CardAttackHandle a && !a.IsSourceLess && a.SourceSeat == owner && w.TargetSeat == a.TargetSeat && a.DamageWasApplied && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveCardKind ?? CardKind.Slash);
     internal int ZhangFenDestroyedCount(int owner, ProgramSkillWindowContext w) => w.MovementBatch is { } batch ? batch.Movements.Where((m, index) => (w.MovementIndex is null || w.MovementIndex == index) && m.From == CardLocation.Equipment(owner) && IsDagongCheDestroyedMaterial(m)).Sum(m => _coreProgramEventHistoryOperations.ProgramEventHistory<DagongCheDestroyedEvent>().Single(e => e.CardId == m.CardId).Upgrades) : 0;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 43500, SkillProgramEffectOp.ResolveAnniversaryZhangFenWanglu, SkillProgramEffectOp.ResolveAnniversaryZhangFenXianzhu, SkillProgramEffectOp.ResolveAnniversaryDagongCheAttack, SkillProgramEffectOp.ResolveAnniversaryZhangFenChaixie)]
     internal bool CanOfferZhangFen(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => t.Id switch

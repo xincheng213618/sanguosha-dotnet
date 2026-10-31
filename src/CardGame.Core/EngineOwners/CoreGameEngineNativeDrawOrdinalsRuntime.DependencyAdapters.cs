@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.NativeDrawOrdinalTriggerRuntime))]
-internal sealed class CoreNativeDrawOrdinalsNativeDrawOrdinalTriggerAdapter(global::System.Func<global::CardGame.Core.NativeDrawOrdinalTriggerRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreNativeDrawOrdinalsNativeDrawOrdinalTriggerOperations
+[Core.ProgramCapability(typeof(NativeDrawOrdinalTriggerRuntime))]
+internal sealed class CoreNativeDrawOrdinalsNativeDrawOrdinalTriggerAdapter(Func<NativeDrawOrdinalTriggerRuntime> targetFactory) : ICoreNativeDrawOrdinalsNativeDrawOrdinalTriggerOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.NativeDrawOrdinalTriggerRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.NativeDrawOrdinalTriggerRuntime Get() => this._targetFactory();
+    private readonly Func<NativeDrawOrdinalTriggerRuntime> _targetFactory = targetFactory;
+    public NativeDrawOrdinalTriggerRuntime Get() => this._targetFactory();
 }

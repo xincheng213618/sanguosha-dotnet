@@ -1,18 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
 {
     internal const string QiaoRuiAction = "anniversary-qiao-rui", QiaoRuiDraw = "skill-program.anniversary:aishou.draw", QiaoRuiDiscard = "skill-program.anniversary:aishou.discard", QiaoRuiClaim = "skill-program.anniversary:saowei.obtain";
-    internal static CardConversionSource QiaoRuiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource QiaoRuiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasAnniversaryQiaoRuiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouDraw);
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryQiaoRuiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginQiaoRui(f, op);
+    SkillProgramStepOutcome IAnniversaryQiaoRuiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginQiaoRui(f, op);
     internal int[] QiaoRuiMarkedHand(int owner, long cutoff)
     {
         if (!HasAnniversaryQiaoRuiCapability)
@@ -45,7 +40,7 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
         return marks.Length > 0 && QiaoRuiMarkedHand(owner, after).Length == 0 && b.Movements.Any(m => marks.Contains(m.CardId) && m.From == CardLocation.Hand(owner) && m.To != m.From);
     }
 
-    internal CardUseFrame? QiaoRuiOriginalSlash(ProgramSkillWindowContext? w) => w is { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } c } && _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } a } u && a.ActionId == c.CardActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) ? u : null;
+    internal CardUseFrame? QiaoRuiOriginalSlash(ProgramSkillWindowContext? w) => w is { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } c } && _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } a } u && a.ActionId == c.CardActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) ? u : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 49400, SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouDraw, SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouPrepare, SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouLastLoss, SkillProgramEffectOp.ResolveAnniversaryQiaoRuiSaowei)]
     internal bool CanOfferQiaoRui(ProgramTriggerLegalityContext c) => c.Trigger.Effects[0].Op switch
     {

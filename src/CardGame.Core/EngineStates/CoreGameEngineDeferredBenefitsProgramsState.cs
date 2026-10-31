@@ -1,16 +1,16 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreGameEngineDeferredBenefitsProgramsState : global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramNextTurnRuleModifiersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess
+internal sealed class CoreGameEngineDeferredBenefitsProgramsState : Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramNextTurnRuleModifiersAccess, Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess
 {
-    private global::System.Collections.Generic.List<global::CardGame.Core.ProgramFactionRecoveryDebt> _programFactionRecoveryDebts = [];
-    internal ref readonly global::System.Collections.Generic.List<global::CardGame.Core.ProgramFactionRecoveryDebt> ReferenceToProgramFactionRecoveryDebts => ref _programFactionRecoveryDebts;
+    private List<ProgramFactionRecoveryDebt> _programFactionRecoveryDebts = [];
+    internal ref readonly List<ProgramFactionRecoveryDebt> ReferenceToProgramFactionRecoveryDebts => ref _programFactionRecoveryDebts;
 
-    private global::System.Collections.Generic.List<global::CardGame.Core.ProgramNextTurnRuleModifier> _programNextTurnRuleModifiers = [];
-    internal ref readonly global::System.Collections.Generic.List<global::CardGame.Core.ProgramNextTurnRuleModifier> ReferenceToProgramNextTurnRuleModifiers => ref _programNextTurnRuleModifiers;
+    private List<ProgramNextTurnRuleModifier> _programNextTurnRuleModifiers = [];
+    internal ref readonly List<ProgramNextTurnRuleModifier> ReferenceToProgramNextTurnRuleModifiers => ref _programNextTurnRuleModifiers;
 
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.ProgramNextTurnRuleModifier> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramNextTurnRuleModifiersAccess._programNextTurnRuleModifiers => ref _programNextTurnRuleModifiers;
+    ref readonly List<ProgramNextTurnRuleModifier> Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramNextTurnRuleModifiersAccess._programNextTurnRuleModifiers => ref _programNextTurnRuleModifiers;
 
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.ProgramFactionRecoveryDebt> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess._programFactionRecoveryDebts => ref _programFactionRecoveryDebts;
+    ref readonly List<ProgramFactionRecoveryDebt> Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess._programFactionRecoveryDebts => ref _programFactionRecoveryDebts;
 
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.ProgramNextTurnRuleModifier> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess._programNextTurnRuleModifiers => ref _programNextTurnRuleModifiers;
+    ref readonly List<ProgramNextTurnRuleModifier> Contracts.ICoreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess._programNextTurnRuleModifiers => ref _programNextTurnRuleModifiers;
 }

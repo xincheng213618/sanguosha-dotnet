@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuLiAnniversaryRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiPoolNameEvent(owner, name));
     }
 
-    internal bool LiuLiNameChosen(int owner, CardKind kind) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiNameChosenEvent>().Any(e => e.Source.OwnerSeat == owner && e.Name == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind) && LiuLiChosenProof(e));
+    internal bool LiuLiNameChosen(int owner, CardKind kind) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiNameChosenEvent>().Any(e => e.Source.OwnerSeat == owner && e.Name == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind) && LiuLiChosenProof(e));
     internal IReadOnlyList<AnniversaryLiuLiPlan> LiuLiPlans(int owner)
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[owner];
@@ -53,7 +49,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
         var p = r.Plan!;
         if (!ValidLiuLi(f) || r.Stage != AnniversaryLiuLiStage.IssuingUse || !LiuLiPlans(f.OwnerSeat).Any(plan => LiuLiPlansEqual(plan, p)))
             throw new InvalidOperationException("Dehua lost its currently legal unused damage-name native plan.");
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
         {
             IssueLiuLiSlash(f);
             return;
@@ -102,7 +98,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     }
     internal bool IsAnniversaryLiuLiVirtualUse(CardUseFrame use)
     {
-        if (use.VirtualOrdinaryTrickOrigin is not { SkillId: AnniversaryLiuLiComposition.Dehua } o || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ParentProgramFrameId)is not ProgramSkillFrame { AnniversaryLiuLi: { Plan: { } p } r } f || !ValidLiuLi(f) || r.Stage is not (AnniversaryLiuLiStage.IssuingUse or AnniversaryLiuLiStage.NativeUse) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(p.Kind) || use.CardKind != p.Kind || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0, RequesterSeat: null, ResponderSeat: null, OpponentSeat: null } a || a.ActionId != o.CardActionId || a.ProviderSeat != f.OwnerSeat || a.EffectiveKind != p.Kind || a.EffectiveSuit is not (null or Suit.None) || a.EffectiveRank is not (null or 0) || a.EffectiveIsRed == true || !a.TargetSeats.SequenceEqual(use.TargetSeats) || o.OwnerSeat != f.OwnerSeat || o.InitialActorSeat != f.OwnerSeat || o.InitialTargetSeat != f.OwnerSeat || o.BindingId != f.ActivationId || o.SkillInstanceId != f.SkillInstanceId || o.GameplayHash != f.GameplayHash || o.InstructionIndex != f.InstructionIndex || o.LifecycleFrameId != 0 || o.TurnNumber != r.Turn || r.UseId != 0 && (r.UseId != use.Id || r.ActionId != a.ActionId))
+        if (use.VirtualOrdinaryTrickOrigin is not { SkillId: AnniversaryLiuLiComposition.Dehua } o || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ParentProgramFrameId)is not ProgramSkillFrame { AnniversaryLiuLi: { Plan: { } p } r } f || !ValidLiuLi(f) || r.Stage is not (AnniversaryLiuLiStage.IssuingUse or AnniversaryLiuLiStage.NativeUse) || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(p.Kind) || use.CardKind != p.Kind || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0, RequesterSeat: null, ResponderSeat: null, OpponentSeat: null } a || a.ActionId != o.CardActionId || a.ProviderSeat != f.OwnerSeat || a.EffectiveKind != p.Kind || a.EffectiveSuit is not (null or Suit.None) || a.EffectiveRank is not (null or 0) || a.EffectiveIsRed == true || !a.TargetSeats.SequenceEqual(use.TargetSeats) || o.OwnerSeat != f.OwnerSeat || o.InitialActorSeat != f.OwnerSeat || o.InitialTargetSeat != f.OwnerSeat || o.BindingId != f.ActivationId || o.SkillInstanceId != f.SkillInstanceId || o.GameplayHash != f.GameplayHash || o.InstructionIndex != f.InstructionIndex || o.LifecycleFrameId != 0 || o.TurnNumber != r.Turn || r.UseId != 0 && (r.UseId != use.Id || r.ActionId != a.ActionId))
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, f.OwnerSeat, f.OwnerSeat) : a.ActorSeat == f.OwnerSeat;
     }
@@ -142,7 +138,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     internal void SettleLiuLiName(ProgramSkillFrame f)
     {
         var r = f.AnniversaryLiuLi!;
-        var name = global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.Plan!.Kind);
+        var name = CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.Plan!.Kind);
         if (!ValidLiuLi(f) || r.Stage != AnniversaryLiuLiStage.ReturnedUse || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiNameChosenEvent>().Any(e => e.FrameId == f.Id) || LiuLiNameChosen(f.OwnerSeat, name))
             throw new InvalidOperationException("Dehua cannot settle a name twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiNameChosenEvent(f.Id, r.Source, r.Hash, name, r.UseId, r.ActionId));

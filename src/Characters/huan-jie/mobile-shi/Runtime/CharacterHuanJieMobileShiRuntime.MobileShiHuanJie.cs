@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuanJieMobileShiRuntime
 {
     internal const string ShiHjGongmou = "mobile:shi-gongmou", ShiHjZhengshuo = "mobile:shi-zhengshuo";
     internal const string ShiHjExchange = "skill-program.mobile-shi-huan-jie.exchange", ShiHjDiscard = "skill.mobile-shi-huan-jie.discard", ShiHjDraw = "skill-program.mobile-shi-huan-jie.draw";
-    internal static CardConversionSource ShiHjSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiHuanJieHost.Begin(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginShiHj(frame, op);
+    internal static CardConversionSource ShiHjSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMobileShiHuanJieHost.Begin(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginShiHj(frame, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 48300)]
     internal bool CanOfferShiHj(ProgramTriggerLegalityContext q) => q.SkillId != ShiHjGongmou || _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != q.OwnerSeat);
     internal SkillProgramStepOutcome BeginShiHj(ProgramSkillFrame input, SkillProgramEffectOp op)
@@ -70,7 +66,7 @@ internal sealed partial class CharacterHuanJieMobileShiRuntime
     [ProgramAnswer("mobile-shi-huan-jie")]
     internal void AnswerShiHj(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiHuanJie.Stage: MobileShiHuanJieStage.Target } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiHjChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiHuanJie.Stage: MobileShiHuanJieStage.Target } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiHjChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Gongmou requires its exact current living target choice.");
         RequireShiHj(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

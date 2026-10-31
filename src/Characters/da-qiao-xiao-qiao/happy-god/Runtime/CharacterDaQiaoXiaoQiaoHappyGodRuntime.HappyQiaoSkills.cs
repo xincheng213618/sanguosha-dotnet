@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
 {
     internal const string HappyQiaoAction = "happy-qiao-skills";
-    internal static CardConversionSource HappyQiaoSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IHappyQiaoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginHappyQiaoSkill(frame, operation);
+    internal static CardConversionSource HappyQiaoSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    SkillProgramStepOutcome IHappyQiaoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginHappyQiaoSkill(frame, operation);
     [ProgramPipelineHook(ProgramPipelinePhase.HealthChangeSubject, 42400)]
     internal bool HappyQiaoHealthSubject(int target) => _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.HappyQiaoHealth is not null && _coreNationalSkillsOperations.HasRuntimeSkill(p, HappyQiaoComposition.Tongxin));
     internal CardUseFrame? HappyQiaoCausingUse(HpChangeContext change)
@@ -21,7 +18,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         {
             var damageOwner = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id)is DamageFrame damage ? damage.ParentFrameId : id;
             var attack = _coreLastDamageSourceReciprocityObserversOperations.LastDamageSourceOriginalAttack(damageOwner);
-            return attack is global::CardGame.Core.NativeOwners.CardAttackHandle ? _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId) : null;
+            return attack is NativeOwners.CardAttackHandle ? _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId) : null;
         }
 
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id)is RecoveryReplacementFrame recovery)
@@ -72,7 +69,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
     internal bool HappyQiaoOriginalHealthCandidate(ProgramSkillFrame frame)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is HpChangedTriggerWindowFrame hp && hp.Id == frame.WindowContext?.ParentFrameId && hp.Change == frame.WindowContext.HpChange && hp.CandidateIndex < hp.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, hp.Candidates[hp.CandidateIndex]);
+        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is HpChangedTriggerWindowFrame hp && hp.Id == frame.WindowContext?.ParentFrameId && hp.Change == frame.WindowContext.HpChange && hp.CandidateIndex < hp.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, hp.Candidates[hp.CandidateIndex]);
     }
 
     internal bool HappyQiaoEqualHealable(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].HappyQiaoHealth is { } h && h.DaQiaoHp == h.XiaoQiaoHp && h.AnyWounded;
@@ -114,7 +111,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
     [ProgramAnswer(HappyQiaoAction)]
     internal void AnswerHappyQiaoSkill(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyQiao: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !HappyQiaoChoices(frame).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [answer])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyQiao: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !HappyQiaoChoices(frame).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [answer])))
             throw new InvalidOperationException("Happy Qiao requires her exact original live private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaDaiMobileRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IMobileMaDaiProgramHost.ReduceDamageTargetMaximum(ProgramSkillFrame frame) => ReduceMobileMaDaiTargetMaximum(frame);
+    SkillProgramStepOutcome IMobileMaDaiProgramHost.ReduceDamageTargetMaximum(ProgramSkillFrame frame) => ReduceMobileMaDaiTargetMaximum(frame);
     // Before-damage facts have no captured damage-distance value: qualify the actual
     // source here, once, before issuing the original owner judgment.
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 72901, SkillProgramEffectOp.ReduceMobileMaDaiDamageTargetMaximumHp)]
-    internal bool CanOfferMobileMaDaiQianxi(ProgramTriggerLegalityContext gate) => gate.SkillId == MobileMaDaiComposition.Skill && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsSourceLess: false, IsChainPropagation: false, DamageWasApplied: false, Card: not null, EffectiveCardKind: { } kind } attack && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.SourceSeat == gate.OwnerSeat && attack.CardUserSeat == gate.OwnerSeat && attack.TargetSeat != gate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat] is { IsAlive: true } && _coreNativeRuleQueriesOperations.GetCombatDistance(gate.OwnerSeat, attack.TargetSeat) == 1;
+    internal bool CanOfferMobileMaDaiQianxi(ProgramTriggerLegalityContext gate) => gate.SkillId == MobileMaDaiComposition.Skill && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsSourceLess: false, IsChainPropagation: false, DamageWasApplied: false, Card: not null, EffectiveCardKind: { } kind } attack && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.SourceSeat == gate.OwnerSeat && attack.CardUserSeat == gate.OwnerSeat && attack.TargetSeat != gate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat] is { IsAlive: true } && _coreNativeRuleQueriesOperations.GetCombatDistance(gate.OwnerSeat, attack.TargetSeat) == 1;
     internal SkillProgramStepOutcome ReduceMobileMaDaiTargetMaximum(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

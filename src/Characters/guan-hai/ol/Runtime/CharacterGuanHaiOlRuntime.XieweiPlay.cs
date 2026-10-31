@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanHaiOlRuntime
@@ -32,7 +28,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     }
 
     internal int[] XieweiPlayTargets(CharacterState actor, ProgramMultiCardViewAsSelection s) => _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, p, CardKind.Slash, Suit.None, effectiveColor: null, physicalCardIds: s.Cards.Select(c => c.Id).ToArray())).Select(p => p.Seat).ToArray();
-    internal int XieweiTargetMaximum(CharacterState actor) => Math.Max(1, global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateCardTargetCount(actor, CardKind.Slash))) + (_coreNextCardTargetAdjustmentsOperations.HasLegacyNextCardTargetAdjustment(actor) || _coreNextActualUseTargetAdjustmentsOperations.HasNextActualUseAdjustment(actor) ? 1 : 0);
+    internal int XieweiTargetMaximum(CharacterState actor) => Math.Max(1, CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateCardTargetCount(actor, CardKind.Slash))) + (_coreNextCardTargetAdjustmentsOperations.HasLegacyNextCardTargetAdjustment(actor) || _coreNextActualUseTargetAdjustmentsOperations.HasNextActualUseAdjustment(actor) ? 1 : 0);
     internal CommandError? ValidateXieweiPlay(CharacterState actor, LegalAction a, IReadOnlyList<int> ids, IReadOnlyList<int> targets)
     {
         if (_coreSkillProgramsOperations.ValidateProgramSelection(a, ids, targets)is { } error)
@@ -135,7 +131,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 230)]
     internal bool IsIssuedXieweiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (c.SkillId != "ol:xiewei" || context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.OwnerSeat != c.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) != c || IssuedXieweiPayment(w.Action)is not { } p || p.Source.SkillInstanceId != c.SkillInstanceId || p.OwnerSeat != c.OwnerSeat || p.GameplayHash != c.GameplayHash || context.CardUse?.CardActionId != p.ActionId || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveXieweiTwoHandBaitBasicUse }])
+        if (c.SkillId != "ol:xiewei" || context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.OwnerSeat != c.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) != c || IssuedXieweiPayment(w.Action)is not { } p || p.Source.SkillInstanceId != c.SkillInstanceId || p.OwnerSeat != c.OwnerSeat || p.GameplayHash != c.GameplayHash || context.CardUse?.CardActionId != p.ActionId || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveXieweiTwoHandBaitBasicUse }])
             return false;
         return !_coreProgramEventHistoryOperations.ProgramEventHistory<XieweiCommittedEvent>().Any(e => e.PaymentId == p.Id);
     }

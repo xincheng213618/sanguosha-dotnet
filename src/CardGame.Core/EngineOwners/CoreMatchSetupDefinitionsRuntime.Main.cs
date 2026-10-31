@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreMatchSetupDefinitionsRuntime
 {
-    internal static void ValidateOptions(GameOptions options, ContentRegistry registry) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.ValidateOptions(options, () => ModeFeatureComposition.ValidateInitialOptions(options, registry, ModeConfigurationValidationPhase.Adapter));
+    internal static void ValidateOptions(GameOptions options, ContentRegistry registry) => RuntimeSkills.RuntimeRules_Core_CommonRules.ValidateOptions(options, () => ModeFeatureComposition.ValidateInitialOptions(options, registry, ModeConfigurationValidationPhase.Adapter));
     internal static ContentModeDefinition ResolveModeDefinition(ContentRegistry contentRegistry, GameOptions options)
     {
         ModeFeatureComposition.ValidateInitialOptions(options, contentRegistry, ModeConfigurationValidationPhase.BeforeModeResolution);
@@ -29,5 +25,5 @@ internal sealed partial class CoreMatchSetupDefinitionsRuntime
     internal IReadOnlyList<string> GetModeFactionIds() => _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.FactionCounts is { } factionCounts ? factionCounts.Keys.OrderBy(factionId => factionId, StringComparer.Ordinal).ToArray() : [];
     internal string? GetEffectiveFactionId(CharacterState player) => _coreModeRulesOperations.ModeFactionPolicy.EffectiveFaction(new(player.TeamId, player.NationalFactionId, player.NativeEffectiveFactionOverrideId, _corePrivateGeneralLibrariesOperations.GetPrivateGeneralLibraryFaction(player), player.ChosenFactionId, player.General.FactionId));
     internal bool RequiresGodFactionSelection(CharacterState player) => _coreNativeDamageHandlesOperations.SupportsGodFactionSelection && player.GeneralSelected && string.Equals(player.General.FactionId, "god", StringComparison.Ordinal) && player.ChosenFactionId is null;
-    internal string ChooseAutomaticGodFaction(CharacterState player) => global::CardGame.Core.EngineOwners.CoreMainDefinitions.GodFactionChoices[(int)(((uint)_coreMatchDefinitionModeDefinitionOptionsAccess._options.Seed + (uint)player.Seat) % (uint)global::CardGame.Core.EngineOwners.CoreMainDefinitions.GodFactionChoices.Count)];
+    internal string ChooseAutomaticGodFaction(CharacterState player) => CoreMainDefinitions.GodFactionChoices[(int)(((uint)_coreMatchDefinitionModeDefinitionOptionsAccess._options.Seed + (uint)player.Seat) % (uint)CoreMainDefinitions.GodFactionChoices.Count)];
 }

@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreRecastBoundCardProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IRecastBoundCardProgramEffectHost.RecastBoundCard(ProgramSkillFrame frame, string sourceBind) => BeginProgramBoundCardRecast(frame.Id, sourceBind);
+    SkillProgramStepOutcome IRecastBoundCardProgramEffectHost.RecastBoundCard(ProgramSkillFrame frame, string sourceBind) => BeginProgramBoundCardRecast(frame.Id, sourceBind);
     internal SkillProgramStepOutcome BeginProgramBoundCardRecast(long frameId, string sourceBind)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);

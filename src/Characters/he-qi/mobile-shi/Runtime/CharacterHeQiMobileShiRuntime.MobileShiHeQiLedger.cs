@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHeQiMobileShiRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
     internal const string ShiHqDrawReason = "skill.mobile-shi-he-qi.yingji-draw", ShiHqCleanupReason = "skill.mobile-shi-he-qi.yingji-cleanup";
     internal bool HasShiHqCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiHeQiQizhouMark);
 
-    internal static CardConversionSource ShiHqSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiHqSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal ShiHqYingjiMarkedEvent? ShiHqMark(int id) => !HasShiHqCapability ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHqYingjiMarkedEvent>().LastOrDefault(m => m.CardId == id && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiHqYingjiClearedEvent>().Any(c => c.MarkId == m.MarkId));
     internal bool HasShiHqYingji(int id) => ShiHqMark(id)is not null;
     [ProgramPipelineHook(ProgramPipelinePhase.CardEntitySkillLabel, 49000)]

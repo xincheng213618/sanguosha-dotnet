@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoZhongOlRuntime
@@ -25,10 +21,10 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
             _ => throw new InvalidOperationException("Yintian requires its exact native damage owner.")});
     }
 
-    internal int YintianDamageCursor(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation ? -1 : attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
+    internal int YintianDamageCursor(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation ? -1 : attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
     internal bool YintianGrantConsumed(long grantId) => _coreProgramEventHistoryOperations.ProgramEventHistory<YintianChargeConsumedEvent>().Any(e => e.GrantId == grantId);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 130)]
-    internal int YintianDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int YintianDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (!HasYintianCapability || attack.IsSourceLess || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || attack.DamageAmount <= 0)
             return 0;
@@ -73,23 +69,23 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YintianChargeConsumedEvent(receipt.GrantId, receipt.InvoiceId, receipt.AttackId, damage.Id, receipt.SourceSeat, applied.TargetSeat, receipt.ChainCursor, applied.Amount));
     }
 
-    internal void SetYintianChainDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount)
+    internal void SetYintianChainDamage(GameEngine.IDamageAttempt attack, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !attack.IsChainPropagation || amount < 0)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !attack.IsChainPropagation || amount < 0)
             throw new InvalidOperationException("Yintian may only rebase its exact native chained recipient.");
-        if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (attack is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, state => state with { DamageAmount = amount });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, state => state!with { DamageAmount = amount });
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 50)]
-    internal void PrepareYintianChainAdvance(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void PrepareYintianChainAdvance(GameEngine.IDamageAttempt attack)
     {
         if (!HasYintianCapability || YintianDamageState(attack.ResolutionId)is not { } r)
             return;
-        var seats = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
-        var cursor = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
+        var seats = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
+        var cursor = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
         if (seats is null || !seats.Skip(cursor).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive))
             return;
         // The first recipient's finalized amount is the propagation base. A
@@ -104,7 +100,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 30)]
-    internal void ApplyYintianChainedDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void ApplyYintianChainedDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (!HasYintianCapability || !attack.IsChainPropagation || attack.IsSourceLess)
             return;
@@ -114,11 +110,11 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
             SetYintianChainDamage(attack, checked(attack.DamageAmount + YintianDamageBonus(attack)));
     }
 
-    internal ProgramSkillFrame CaptureYintianProgramDamageCompleted(ProgramSkillFrame frame, global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal ProgramSkillFrame CaptureYintianProgramDamageCompleted(ProgramSkillFrame frame, GameEngine.IDamageAttempt attack)
     {
         if (frame.YintianDamage is not { } receipt)
             return frame;
-        if (attack is not global::CardGame.Core.NativeOwners.ProgramAttackHandle || frame.Id != attack.ResolutionId || frame.AttackAttempt is null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || receipt.AttackId != frame.Id || receipt.SourceSeat != attack.SourceSeat || (receipt.TransferredTargetSeat ?? receipt.TargetSeat) != attack.TargetSeat || receipt.ChainCursor != YintianDamageCursor(attack) || !ValidYintianDamageReceipt(receipt))
+        if (attack is not NativeOwners.ProgramAttackHandle || frame.Id != attack.ResolutionId || frame.AttackAttempt is null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || !CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || receipt.AttackId != frame.Id || receipt.SourceSeat != attack.SourceSeat || (receipt.TransferredTargetSeat ?? receipt.TargetSeat) != attack.TargetSeat || receipt.ChainCursor != YintianDamageCursor(attack) || !ValidYintianDamageReceipt(receipt))
             throw new InvalidOperationException("Yintian's program damage return lost its exact completed attempt.");
         return frame with
         {

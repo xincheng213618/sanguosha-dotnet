@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineTurnDefaultStatsValidationRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineTurnDefaultStatsValidationRuntime))]
 internal sealed partial class CoreGameEngineTurnDefaultStatsValidationEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnDefaultStatsValidationRuntime> _resolve;
-    private CoreGameEngineTurnDefaultStatsValidationEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnDefaultStatsValidationRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineTurnDefaultStatsValidationRuntime> _resolve;
+    private CoreGameEngineTurnDefaultStatsValidationEntries(Func<EngineOwners.CoreGameEngineTurnDefaultStatsValidationRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineTurnDefaultStatsValidationEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnDefaultStatsValidationRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineTurnDefaultStatsValidationEntries Create(Func<EngineOwners.CoreGameEngineTurnDefaultStatsValidationRuntime> resolve) => new(resolve);
 }

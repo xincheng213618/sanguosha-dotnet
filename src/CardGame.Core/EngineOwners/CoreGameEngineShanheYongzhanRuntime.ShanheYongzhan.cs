@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
@@ -31,5 +28,5 @@ internal sealed partial class CoreGameEngineShanheYongzhanRuntime
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == receipt.DyingParentFrameId && _coreProgramEventHistoryOperations.ProgramEventHistory<DyingResolvedEvent>().Count(fact => fact.ResolutionId == receipt.DyingFrameId && fact.VictimSeat == receipt.VictimSeat && fact.Survived) == 1;
     }
 
-    internal bool IsShanheYongzhanDyingExitReturn(ProgramSkillFrame frame) => frame.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(parent => parent.Id == context.ParentFrameId)is { } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]) && IsShanheYongzhanDyingExitContext(parent.Candidates[parent.CandidateIndex], context);
+    internal bool IsShanheYongzhanDyingExitReturn(ProgramSkillFrame frame) => frame.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(parent => parent.Id == context.ParentFrameId)is { } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]) && IsShanheYongzhanDyingExitContext(parent.Candidates[parent.CandidateIndex], context);
 }

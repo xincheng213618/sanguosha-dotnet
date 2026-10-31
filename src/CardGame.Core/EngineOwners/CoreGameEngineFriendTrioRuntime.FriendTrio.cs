@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -26,8 +23,8 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
     }
 
     internal bool FriendXuanjianIgnoresDistance(CharacterState owner, CardConversionSource? source) => source?.SkillId == "equipment:xuanjian" && _coreNationalSkillsOperations.HasRuntimeSkill(owner, "friend:gongli-xu-shu") && HasFriendTrioAlly(owner, "pang-tong");
-    internal static bool IsFriendTrioOperation(SkillProgramEffectOp op) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_FriendTrio.IsFriendTrioOperation(op);
-    internal PlayerMarkerKind FriendCategoryMarker(CardKind kind) => _coreEquipmentContentOperations.EquipmentRules.IsEquipment(kind) ? PlayerMarkerKind.QihuiEquipment : global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(kind, [SkillProgramCardCategory.Basic]) ? PlayerMarkerKind.QihuiBasic : PlayerMarkerKind.QihuiTrick;
+    internal static bool IsFriendTrioOperation(SkillProgramEffectOp op) => RuntimeSkills.RuntimeRules_Core_FriendTrio.IsFriendTrioOperation(op);
+    internal PlayerMarkerKind FriendCategoryMarker(CardKind kind) => _coreEquipmentContentOperations.EquipmentRules.IsEquipment(kind) ? PlayerMarkerKind.QihuiEquipment : CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(kind, [SkillProgramCardCategory.Basic]) ? PlayerMarkerKind.QihuiBasic : PlayerMarkerKind.QihuiTrick;
     internal bool IsFriendActualCardUse(CardActionContext? action) => action is not null && (action.Type == CardActionType.Use || action.Type == CardActionType.Response && (action.ActorSeat == action.ProviderSeat || _characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(action)) && action.RequesterSeat is null && (action.EffectiveKind == CardKind.Nullification || _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action.EffectiveKind)));
     internal CardActionContext? FriendCardAction(ProgramSkillWindowContext context) => context.CardUse is { } use ? _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)?.Action ?? _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().LastOrDefault(e => e.Action.ActionId == use.CardActionId)?.Action : null;
     internal void BeginFriendXuanjianUse(ProgramSkillFrame f)
@@ -41,7 +38,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FriendTrio = f.FriendTrio!with { Stage = FriendTrioStage.EquipmentUse, Before = _coreCardMovementJournalMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var id = _coreNativeCardUseOperations.BeginCardUse(card, f.OwnerSeat, [], conversionSource: source);
         var action = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(u => u.Id == id).Action!;
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f = f with { FriendTrio = f.FriendTrio!with { IssuedUseFrameId = id, IssuedActionId = action.ActionId } });
@@ -61,7 +58,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
         {
             SkillProgramEffectOp.BeginFriendPrediction => context.Window != SkillProgramTriggerWindow.RoundStarting || _coreActualRoundProgressRoundNumberAccess._roundNumber == 1,
             SkillProgramEffectOp.ObserveFriendPrediction => IsFriendActualCardUse(FriendCardAction(context)) && _coreGameEngineFriendTrioFriendFangqiuSpentFriendPredictionCountsFriendPredictionsFriendQihuiUnlimitedAccess._friendPredictions.TryGetValue((p.Seat, candidate.SkillInstanceId), out var policy) && policy.Index < policy.Predictions.Count && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FriendPredictionObservedEvent>().Any(x => x.PredictionId == policy.PredictionId && x.ActionId == FriendCardAction(context)!.ActionId),
-            SkillProgramEffectOp.ReclaimFriendXuanjian => global::CardGame.Core.EngineOwners.CoreGameEngineFriendTrioDefinitions.FriendCategoryMarkers.Sum(m => p.Markers.GetValueOrDefault(m)) >= 2 && context.MovementBatch is { } b && b.Movements.Any(m => m.To == CardLocation.DiscardPile && _coreCardAttackStateOperations.GetAttackCard(m.CardId).Kind == CardKind.Xuanjian && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile),
+            SkillProgramEffectOp.ReclaimFriendXuanjian => CoreGameEngineFriendTrioDefinitions.FriendCategoryMarkers.Sum(m => p.Markers.GetValueOrDefault(m)) >= 2 && context.MovementBatch is { } b && b.Movements.Any(m => m.To == CardLocation.DiscardPile && _coreCardAttackStateOperations.GetAttackCard(m.CardId).Kind == CardKind.Xuanjian && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile),
             SkillProgramEffectOp.GainFriendCategoryMark => IsFriendActualCardUse(FriendCardAction(context)) && !p.Markers.ContainsKey(FriendCategoryMarker(FriendCardAction(context)!.EffectiveKind)),
             _ => true
         };
@@ -146,7 +143,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
                 throw new InvalidOperationException("Qihui requires an actual own use.");
             var marker = FriendCategoryMarker(FriendCardAction(c)!.EffectiveKind);
             _coreStrategicProgramsOperations.SetStrategicMarker(f.OwnerSeat, marker, f.OwnerSeat, 1, f);
-            if (global::CardGame.Core.EngineOwners.CoreGameEngineFriendTrioDefinitions.FriendCategoryMarkers.Sum(m => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(m)) < 3)
+            if (CoreGameEngineFriendTrioDefinitions.FriendCategoryMarkers.Sum(m => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(m)) < 3)
             {
                 FinishFriendTrio(f);
                 return SkillProgramStepOutcome.AwaitChild;
@@ -166,7 +163,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
         PlayerMarkerKind.QihuiEquipment => "equipment",
         _ => "trick"
     };
-    internal static string FriendValueLabel(string v) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_FriendTrio.FriendValueLabel(v);
+    internal static string FriendValueLabel(string v) => RuntimeSkills.RuntimeRules_Core_FriendTrio.FriendValueLabel(v);
     internal int FriendPredictionCount(ProgramSkillFrame f) => Math.Clamp(_coreGameEngineFriendTrioFriendFangqiuSpentFriendPredictionCountsFriendPredictionsFriendQihuiUnlimitedAccess._friendPredictionCounts.GetValueOrDefault((f.OwnerSeat, f.SkillInstanceId), 3) + (_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], "friend:gongli-zhuge-liang") && HasFriendTrioAlly(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], "pang-tong") ? 1 : 0), 1, 7);
     internal IReadOnlyList<PromptChoice> FriendTrioChoices(ProgramSkillFrame f)
     {
@@ -228,7 +225,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
                         Add(choice.Cards[0].ToString(CultureInfo.InvariantCulture), choice.Label, [choice.Cards[0]]);
                 break;
             case FriendTrioStage.RemoveMarks:
-                foreach (var m in global::CardGame.Core.EngineOwners.CoreGameEngineFriendTrioDefinitions.FriendCategoryMarkers.Where(m => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(m) > 0))
+                foreach (var m in CoreGameEngineFriendTrioDefinitions.FriendCategoryMarkers.Where(m => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(m) > 0))
                     Add(m.ToString(), "移除" + PlayerMarkerCatalog.GetDisplayName(m));
                 break;
             case FriendTrioStage.Benefit:
@@ -278,7 +275,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         var r = f.FriendTrio!;
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FriendTrioChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FriendTrioChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Friend choice changed its frozen draft.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var value = choice.Parameters["value"];
@@ -394,7 +391,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
         {
             var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]);
             var index = frame.FriendTrio!.Values.Count;
-            var value = hand.Count > index ? frame.FriendTrio.Mode == "color" ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(hand[index].Suit) ? "red" : "black" : FriendCategoryValue(hand[index].Kind) : "basic";
+            var value = hand.Count > index ? frame.FriendTrio.Mode == "color" ? CoreNativeCardClassificationsRuntime.IsRedSuit(hand[index].Suit) ? "red" : "black" : FriendCategoryValue(hand[index].Kind) : "basic";
             return decision.Choices.FirstOrDefault(c => c.Parameters["value"] == value) ?? decision.Choices[0];
         }
 
@@ -403,7 +400,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
 
     internal void GainFriendMatchingDeckCards(ProgramSkillFrame f, string mode, string value, int count)
     {
-        var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => mode == "category" ? FriendCategoryValue(c.Kind) == value : value == "red" ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) : !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) && c.Suit != Suit.None).ToList();
+        var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => mode == "category" ? FriendCategoryValue(c.Kind) == value : value == "red" ? CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) : !CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) && c.Suit != Suit.None).ToList();
         var selected = new List<Card>();
         for (var i = 0; i < count && cards.Count > 0; i++)
         {
@@ -553,7 +550,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    internal bool FriendXuanjianFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => child is CardUseFrame { Action: { } a } u && parent is ProgramSkillFrame { FriendTrio: { Stage: FriendTrioStage.EquipmentUse } r } f && r.Operation == SkillProgramEffectOp.EquipFriendXuanjian && r.IssuedUseFrameId == u.Id && r.IssuedActionId == a.ActionId && r.Cards is [var card] && u.CardId == card && a.ActorSeat == f.OwnerSeat && a.EffectiveKind == CardKind.Xuanjian && a.ConversionChain.Any(s => s.OwnerSeat == f.OwnerSeat && s.SkillId == f.SkillId && s.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && s.SkillInstanceId == f.SkillInstanceId) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FriendXuanjianUseIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.UseFrameId == u.Id && e.ActionId == a.ActionId && e.CardId == card) == 1;
+    internal bool FriendXuanjianFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => child is CardUseFrame { Action: { } a } u && parent is ProgramSkillFrame { FriendTrio: { Stage: FriendTrioStage.EquipmentUse } r } f && r.Operation == SkillProgramEffectOp.EquipFriendXuanjian && r.IssuedUseFrameId == u.Id && r.IssuedActionId == a.ActionId && r.Cards is [var card] && u.CardId == card && a.ActorSeat == f.OwnerSeat && a.EffectiveKind == CardKind.Xuanjian && a.ConversionChain.Any(s => s.OwnerSeat == f.OwnerSeat && s.SkillId == f.SkillId && s.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && s.SkillInstanceId == f.SkillInstanceId) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FriendXuanjianUseIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.UseFrameId == u.Id && e.ActionId == a.ActionId && e.CardId == card) == 1;
     [NativeUseReturn(140)]
     internal void ReturnFriendXuanjianUse(CardUseFrame use)
     {
@@ -567,7 +564,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
         ReturnFriendTrioMovement(f);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IFriendTrioProgramHost.ExecuteFriendTrio(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteFriendTrio(f, op);
+    SkillProgramStepOutcome IFriendTrioProgramHost.ExecuteFriendTrio(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteFriendTrio(f, op);
     [ProgramDistanceRule(ProgramDistanceStage.ConvertedSlashExemption, 30)]
     internal bool FriendXuanjianIgnoresDistanceQuery(ProgramSlashConversionDistanceQuery q) => FriendXuanjianIgnoresDistance(q.Owner, q.Source);
 }

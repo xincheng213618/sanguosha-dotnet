@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOverflowTargetCancellationRuntime
@@ -10,13 +6,13 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationRuntime
     internal const string OverflowMaterialReason = "skill-program.overflow-target-cancellation.give";
     internal long OverflowMovementSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static IReadOnlyList<int> OverflowPrimaryTargets(CardKind kind, IReadOnlyList<int> targets) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OverflowTargetCancellation.OverflowPrimaryTargets(kind, targets);
-    internal static IReadOnlyList<int> OverflowRetainedTargets(CardKind kind, int owner, IReadOnlyList<int> targets) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OverflowTargetCancellation.OverflowRetainedTargets(kind, owner, targets);
+    internal static IReadOnlyList<int> OverflowPrimaryTargets(CardKind kind, IReadOnlyList<int> targets) => RuntimeSkills.RuntimeRules_Core_OverflowTargetCancellation.OverflowPrimaryTargets(kind, targets);
+    internal static IReadOnlyList<int> OverflowRetainedTargets(CardKind kind, int owner, IReadOnlyList<int> targets) => RuntimeSkills.RuntimeRules_Core_OverflowTargetCancellation.OverflowRetainedTargets(kind, owner, targets);
     internal bool TryGetOverflowTargetUse(int owner, ProgramSkillWindowContext context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window)
     {
         use = null !;
         window = null !;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || context.OwnerSeat != owner || identity.ActorSeat != owner || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } found || found.ParentFrameId != identity.ParentCardUseFrameId || found.CompletedResponseReturn is not null || found.Continuation is not (ProgramCardContinuation.Slash or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.FinalizedSimpleCard or ProgramCardContinuation.DelayedCard or ProgramCardContinuation.FinalizedDelayedPlacement) || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(found) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(found.ParentFrameId)is not { Action: { Type: CardActionType.Use } action } actual || action.ActionId != identity.CardActionId || action.ActorSeat != owner || actual.SourceSeat != owner || identity.EffectiveKind != actual.CardKind || action.ResponderSeat is not null || action.OpponentSeat is not null || action.EffectiveKind != actual.CardKind || found.Action.ActionId != action.ActionId || found.Action.ActorSeat != owner || !found.Action.TargetSeats.SequenceEqual(actual.TargetSeats) || !action.TargetSeats.SequenceEqual(actual.TargetSeats) || actual.TargetSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || action.PhysicalCards.Any(c => c.CardId <= 0) || action.PhysicalCards.DistinctBy(c => c.CardId).Count() != action.PhysicalCards.Count || actual.CardKind == CardKind.BorrowedSword && actual.TargetSeats.Count % 2 != 0)
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || context.OwnerSeat != owner || identity.ActorSeat != owner || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } found || found.ParentFrameId != identity.ParentCardUseFrameId || found.CompletedResponseReturn is not null || found.Continuation is not (ProgramCardContinuation.Slash or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.FinalizedSimpleCard or ProgramCardContinuation.DelayedCard or ProgramCardContinuation.FinalizedDelayedPlacement) || CoreGameEngineCardActionsRuntime.GetCardActionWindow(found) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(found.ParentFrameId)is not { Action: { Type: CardActionType.Use } action } actual || action.ActionId != identity.CardActionId || action.ActorSeat != owner || actual.SourceSeat != owner || identity.EffectiveKind != actual.CardKind || action.ResponderSeat is not null || action.OpponentSeat is not null || action.EffectiveKind != actual.CardKind || found.Action.ActionId != action.ActionId || found.Action.ActorSeat != owner || !found.Action.TargetSeats.SequenceEqual(actual.TargetSeats) || !action.TargetSeats.SequenceEqual(actual.TargetSeats) || actual.TargetSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || action.PhysicalCards.Any(c => c.CardId <= 0) || action.PhysicalCards.DistinctBy(c => c.CardId).Count() != action.PhysicalCards.Count || actual.CardKind == CardKind.BorrowedSword && actual.TargetSeats.Count % 2 != 0)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == found.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != actual.Id)
@@ -67,7 +63,7 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationRuntime
         var beforeAction = use.Action!;
         var retained = OverflowRetainedTargets(use.CardKind, frame.OwnerSeat, use.TargetSeats);
         var materials = recipient is { } recipientSeat && _coreMatchParticipantsPlayersAccess._players[recipientSeat].IsAlive ? beforeAction.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, id)).ToArray() : [];
-        var receipt = new OverflowTargetCancellationReceipt(1, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, window.Id, use.Id, beforeAction.ActionId, beforeAction.ProviderSeat, use.CardKind, beforeAction, hand, limit, recipient, OverflowMovementSequence, OverflowMovementSequence, null)
+        var receipt = new OverflowTargetCancellationReceipt(1, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, window.Id, use.Id, beforeAction.ActionId, beforeAction.ProviderSeat, use.CardKind, beforeAction, hand, limit, recipient, OverflowMovementSequence, OverflowMovementSequence, null)
         {
             OriginalTargetSeats = original.TargetSeats,
             BeforeTargetSeats = use.TargetSeats,
@@ -77,7 +73,7 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { OverflowTargetCancellation = receipt, PendingMovementContinuation = materials.Length > 0 ? new(frame.OwnerSeat, 0, null) : null });
         var updated = _coreDesignatedExtraTargetsOperations.CloneDesignatedExtraTargetAction(beforeAction, retained);
-        _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(use with { TargetSeats = retained, TargetIndex = 0, Action = updated, TargetsAdjusted = true, SlashTargetsCancelled = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && retained.Count == 0, SequentialTrick = retained.Count == 0 ? null : use.SequentialTrick, PreparedTargetAttacks = use.PreparedTargetAttacks is { } prepared ? Array.AsReadOnly(prepared.Where(attack => retained.Contains(attack.TargetSeat)).ToArray()) : null, Continuations = use.Continuations with { FangtianHalberd = use.Continuations.FangtianHalberd is { Active: true } multi ? multi with { TargetSeats = retained } : use.Continuations.FangtianHalberd } }, updated);
+        _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(use with { TargetSeats = retained, TargetIndex = 0, Action = updated, TargetsAdjusted = true, SlashTargetsCancelled = CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && retained.Count == 0, SequentialTrick = retained.Count == 0 ? null : use.SequentialTrick, PreparedTargetAttacks = use.PreparedTargetAttacks is { } prepared ? Array.AsReadOnly(prepared.Where(attack => retained.Contains(attack.TargetSeat)).ToArray()) : null, Continuations = use.Continuations with { FangtianHalberd = use.Continuations.FangtianHalberd is { Active: true } multi ? multi with { TargetSeats = retained } : use.Continuations.FangtianHalberd } }, updated);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OverflowUseTargetsCanceledEvent(frame.Id, receipt));
         if (materials.Length > 0)
         {
@@ -148,5 +144,5 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IOverflowTargetCancellationHost.BeginOverflowTargetCancellation(ProgramSkillFrame frame) => BeginOverflowTargetCancellation(frame);
+    SkillProgramStepOutcome IOverflowTargetCancellationHost.BeginOverflowTargetCancellation(ProgramSkillFrame frame) => BeginOverflowTargetCancellation(frame);
 }

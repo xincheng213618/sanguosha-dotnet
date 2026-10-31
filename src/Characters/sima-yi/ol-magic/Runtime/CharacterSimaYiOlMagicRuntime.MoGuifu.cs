@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaYiOlMagicRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     {
         if (q.Instance.SkillId != MoSimaYiComposition.Guifu)
             return false;
-        if (!q.Owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(q.Owner, q.Instance.SkillId, q.Instance.SkillInstanceId) || !MoGuifuMaterial(q.Owner, q.Card.Id, q.Rule.OutputKind) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(q.Owner, _cardZonesOperations._cardZones.GetLocation(q.Card.Id)) || _coreProgramNativeSlashQueriesOperations.IsNativePureProviderFrontier(q.Owner.Seat))
+        if (!q.Owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(q.Owner, q.Instance.SkillId, q.Instance.SkillInstanceId) || !MoGuifuMaterial(q.Owner, q.Card.Id, q.Rule.OutputKind) || !CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(q.Owner, _cardZonesOperations._cardZones.GetLocation(q.Card.Id)) || _coreProgramNativeSlashQueriesOperations.IsNativePureProviderFrontier(q.Owner.Seat))
             return true;
         if (q.RequestedUseTarget is not null)
             return q.Rule.OutputKind != CardKind.Peach || q.ForResponse || q.DyingUse || !_coreWenyiPeachSuppliesOperations.IsWenyiPeachSupplyQuery(q.Owner, q.RequestedUseTarget.Value);
@@ -28,7 +24,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
             return _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.ResponderSeat != q.Owner.Seat || q.Rule.OutputKind == CardKind.Alcohol && dying.VictimSeat != q.Owner.Seat;
         if (!q.ForResponse)
             return false;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Rule.OutputKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(q.Rule.OutputKind))
             return !_coreProgramNativeSlashQueriesOperations.IsNativeForcedSlashUseFrontier(q.Owner);
         return q.Rule.OutputKind != CardKind.Nullification && !(q.Rule.OutputKind == CardKind.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(q.Owner, CardKind.Dodge));
     }
@@ -59,18 +55,18 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeAlcoholDebit, 33900)]
     internal bool MoGuifuSlashDebitExempt(long useId, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action is { Type: CardActionType.Use } a && a.ActorSeat == actor && a.ConversionChain.Any(IsMoGuifuSource) && _coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiNameUsedEvent>().Any(e => e.ActionId == a.ActionId && e.ActorSeat == actor);
     [ProgramCardLegality(ProgramCardLegalityStage.NativeSlashAliasAllowance, 33900)]
-    internal bool MoGuifuNativeSlashAlias(ProgramNativeSlashAliasQuery q) => q.Instance.SkillId == MoSimaYiComposition.Guifu && q.RequestedKind == CardKind.Slash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Rule.OutputKind) && _coreProgramNativeSlashQueriesOperations.IsNativeForcedSlashUseFrontier(q.Owner);
+    internal bool MoGuifuNativeSlashAlias(ProgramNativeSlashAliasQuery q) => q.Instance.SkillId == MoSimaYiComposition.Guifu && q.RequestedKind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(q.Rule.OutputKind) && _coreProgramNativeSlashQueriesOperations.IsNativeForcedSlashUseFrontier(q.Owner);
     [ProgramCardLegality(ProgramCardLegalityStage.NativeSlashVariants, 33900)]
-    internal IReadOnlyList<SlashUseVariant> MoGuifuPhysicalSlashVariants(ProgramNativeSlashMaterialQuery q) => global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(q.Owner, q.Card, kind, false).Any(s => IsMoGuifuSource(s) && _corePlayCardHistoryOperations.ViewAsRule(s)!.OutputKind == kind)).Select(kind => new SlashUseVariant(kind, null, false)).ToArray();
+    internal IReadOnlyList<SlashUseVariant> MoGuifuPhysicalSlashVariants(ProgramNativeSlashMaterialQuery q) => CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(q.Owner, q.Card, kind, false).Any(s => IsMoGuifuSource(s) && _corePlayCardHistoryOperations.ViewAsRule(s)!.OutputKind == kind)).Select(kind => new SlashUseVariant(kind, null, false)).ToArray();
     [ProgramCardLegality(ProgramCardLegalityStage.NativeSlashOutputBan, 33900)]
     internal bool MoGuifuNativeOutputBan(ProgramNativeSlashConversionQuery q) => IsMoGuifuSource(q.Source) && _coreProgramNativeSlashQueriesOperations.IsNativeForcedSlashUseFrontier(q.Owner) && _corePlayCardHistoryOperations.ViewAsRule(q.Source!)!.OutputKind != q.Kind;
     [ProgramCardLegality(ProgramCardLegalityStage.UnspecifiedNativeSlashBan, 33900)]
-    internal bool MoGuifuUnspecifiedForcedSlashBan(ProgramNativeSlashConversionQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && _coreProgramNativeSlashQueriesOperations.IsNativeForcedSlashUseFrontier(q.Owner) && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(q.Card, q.Kind) && MoGuifuPhysicalSlashVariants(new(q.Owner, q.Card)).Count != 0;
+    internal bool MoGuifuUnspecifiedForcedSlashBan(ProgramNativeSlashConversionQuery q) => CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && _coreProgramNativeSlashQueriesOperations.IsNativeForcedSlashUseFrontier(q.Owner) && !CoreNativeCardClassificationsRuntime.IsNativeResponseCard(q.Card, q.Kind) && MoGuifuPhysicalSlashVariants(new(q.Owner, q.Card)).Count != 0;
     [ProgramCardLegality(ProgramCardLegalityStage.SelectedNativeSlashKind, 33900)]
     internal CardKind MoGuifuSelectedSlashKind(ProgramSelectedNativeSlashQuery q)
     {
         var source = q.Source ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion;
-        return source is not null && IsMoGuifuSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)is { } rule && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _coreActionQueriesOperations.GetProgramViewAsConversions(q.Owner, q.Card, rule.OutputKind, false).Contains(source) ? rule.OutputKind : q.Fallback;
+        return source is not null && IsMoGuifuSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)is { } rule && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _coreActionQueriesOperations.GetProgramViewAsConversions(q.Owner, q.Card, rule.OutputKind, false).Contains(source) ? rule.OutputKind : q.Fallback;
     }
 
     [ProgramCardLegality(ProgramCardLegalityStage.AiNativeSlashKind, 33900)]
@@ -89,7 +85,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
         {
             if (_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card))
                 continue;
-            foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+            foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
                 foreach (var source in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, false).Where(s => IsMoGuifuSource(s) && _corePlayCardHistoryOperations.ViewAsRule(s)!.OutputKind == kind))
                 {
                     actions.RemoveAll(a => a.CardId == card.Id && a.ConversionSource == source);

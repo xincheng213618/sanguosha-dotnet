@@ -3,7 +3,7 @@ internal sealed partial class QuHuangRuntime
 {
     private bool HasQuHuangCapability=>phaseLedger.HasCapability;
     private static CardConversionSource QuHuangSource(ProgramSkillFrame f) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_qu_huang_ol_QuHuangLedger.QuHuangSource(f);
+        RuntimeSkills.RuntimeRules_qu_huang_ol_QuHuangLedger.QuHuangSource(f);
     private bool IsQuHuangMovementTrigger(SkillProgramTrigger t)=>t.Window==SkillProgramTriggerWindow.CardsMoved&&t.Effects is[{ }e]&&e.Op is SkillProgramEffectOp.ResolveQiejianLastHandLoss or SkillProgramEffectOp.ResolveNishouEquipmentLossChoice;
     private void CaptureQuHuangEquipmentBatch(CardMovementBatchContext batch,ProgramSkillFrame? originProgram)
     {

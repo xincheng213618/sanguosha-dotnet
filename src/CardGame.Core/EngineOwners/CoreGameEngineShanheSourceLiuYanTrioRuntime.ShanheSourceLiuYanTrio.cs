@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceLiuYanTrioRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CoreGameEngineShanheSourceLiuYanTrioRuntime
             terms.Add(new($"source-jingqi:{(holder.Seat)}:{(_coreNationalSkillsOperations.GetRuntimeSkillInstanceId(holder, "shanhe:source-jingqi-1161"))}", -1));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceXiechanHost.ResolvePindianDuel(ProgramSkillFrame frame) => ResolveSourceXiechanDuel(frame);
+    SkillProgramStepOutcome IShanheSourceXiechanHost.ResolvePindianDuel(ProgramSkillFrame frame) => ResolveSourceXiechanDuel(frame);
     internal SkillProgramStepOutcome ResolveSourceXiechanDuel(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.OwnedDrawPhaseRuntime))]
-internal sealed class CoreDrawPhaseAttemptsOwnedDrawPhaseAdapter(global::System.Func<global::CardGame.Core.OwnedDrawPhaseRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreDrawPhaseAttemptsOwnedDrawPhaseOperations
+[Core.ProgramCapability(typeof(OwnedDrawPhaseRuntime))]
+internal sealed class CoreDrawPhaseAttemptsOwnedDrawPhaseAdapter(Func<OwnedDrawPhaseRuntime> targetFactory) : ICoreDrawPhaseAttemptsOwnedDrawPhaseOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.OwnedDrawPhaseRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.OwnedDrawPhaseRuntime Get() => this._targetFactory();
+    private readonly Func<OwnedDrawPhaseRuntime> _targetFactory = targetFactory;
+    public OwnedDrawPhaseRuntime Get() => this._targetFactory();
 }

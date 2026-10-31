@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePindianRevealWindowsRuntime
@@ -94,7 +90,7 @@ internal sealed partial class CoreGameEnginePindianRevealWindowsRuntime
 
     internal void CompletePindianRevealBinding(ProgramSkillFrame f)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not PindianRevealWindowFrame w || f.WindowContext is not { } c || w.Id != c.ParentFrameId || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not PindianRevealWindowFrame w || f.WindowContext is not { } c || w.Id != c.ParentFrameId || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]))
             throw new InvalidOperationException("The completed reveal program lost its exact native candidate.");
         CompletePindianRevealBinding(w.Candidates[w.CandidateIndex], c);
     }
@@ -102,7 +98,7 @@ internal sealed partial class CoreGameEnginePindianRevealWindowsRuntime
     internal void AddRaoshePindianRankAndRestoreGushe(ProgramSkillFrame f, string skillId)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { Window: SkillProgramTriggerWindow.PindianCardsRevealed } c || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not PindianRevealWindowFrame w || w.Id != c.ParentFrameId || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]))
+        if (f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { Window: SkillProgramTriggerWindow.PindianCardsRevealed } c || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not PindianRevealWindowFrame w || w.Id != c.ParentFrameId || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]))
             throw new InvalidOperationException("JiCi lost its own exact actual reveal.");
         var card = w.Cards.Single(card => card.Seat == f.OwnerSeat);
         var bonus = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.RaoShe);

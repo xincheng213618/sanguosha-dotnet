@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuZhangOlRuntime
 {
-    internal bool IsFengweiCardDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack.Card is not null || attack.PhysicalCards.Count > 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } use && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) && use.CardKind == attack.EffectiveCardKind;
+    internal bool IsFengweiCardDamage(GameEngine.IDamageAttempt attack) => attack.Card is not null || attack.PhysicalCards.Count > 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } use && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) && use.CardKind == attack.EffectiveCardKind;
     internal FengweiDamageReceipt? FengweiDamageState(long id) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id) switch
     {
         CardUseFrame f => f.FengweiDamage,
@@ -26,9 +22,9 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             _ => throw new InvalidOperationException("Fengwei requires the actual damage attempt's owning frame.")});
     }
 
-    internal int FengweiDamageCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
+    internal int FengweiDamageCursor(GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 190)]
-    internal int FengweiDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int FengweiDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (!HasFengweiCapability)
             return 0;
@@ -50,23 +46,23 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         return bonus;
     }
 
-    internal void SetFengweiChainAmount(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount)
+    internal void SetFengweiChainAmount(GameEngine.IDamageAttempt attack, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !attack.IsChainPropagation || amount < 0)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !attack.IsChainPropagation || amount < 0)
             throw new InvalidOperationException("Fengwei can only restore its exact native chained recipient.");
-        if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (attack is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, s => s with { DamageAmount = amount });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, s => s!with { DamageAmount = amount });
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 20)]
-    internal void PrepareFengweiChainAdvance(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void PrepareFengweiChainAdvance(GameEngine.IDamageAttempt attack)
     {
         if (!HasFengweiCapability || FengweiDamageState(attack.ResolutionId)is not { } r)
             return;
-        var seats = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
-        var next = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
+        var seats = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
+        var next = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
         if (seats is null || !seats.Skip(next).Any(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive))
             return;
         if (attack.IsChainPropagation && r.Cursor == FengweiDamageCursor(attack) && (r.TransferredTarget ?? r.TargetSeat) == attack.TargetSeat)
@@ -79,7 +75,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 50)]
-    internal void ApplyFengweiChainedDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void ApplyFengweiChainedDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (HasFengweiCapability && attack.IsChainPropagation && attack.DamageAmountFinalized)
             SetFengweiChainAmount(attack, checked(attack.DamageAmount + FengweiDamageBonus(attack)));

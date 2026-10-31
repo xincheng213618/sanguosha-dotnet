@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouEnAnniversaryRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
             return true;
         }
 
-        return f.SkillId == AnniversaryXiahouEnComposition.Shiwu && f.TriggerId == AnniversaryXiahouEnComposition.Death && f.InstructionIndex is 0 or 1 && f.WindowContext is { Window: SkillProgramTriggerWindow.OwnerDied, SourceSeat: { } killer } context && killer != f.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<ProgramDeathTriggerWindowFrame>().LastOrDefault()is { } window && window.Id == context.ParentFrameId && window.OwnerSeat == f.OwnerSeat && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]);
+        return f.SkillId == AnniversaryXiahouEnComposition.Shiwu && f.TriggerId == AnniversaryXiahouEnComposition.Death && f.InstructionIndex is 0 or 1 && f.WindowContext is { Window: SkillProgramTriggerWindow.OwnerDied, SourceSeat: { } killer } context && killer != f.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<ProgramDeathTriggerWindowFrame>().LastOrDefault()is { } window && window.Id == context.ParentFrameId && window.OwnerSeat == f.OwnerSeat && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]);
     }
 
     internal bool XiahouEnFirstObserverChild(ProgramSkillFrame f, ResolutionFrame child)

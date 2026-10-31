@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuYuShengOlRuntime
 {
     internal const string LuYuShengDrawReason = "skill-program.lu-yu-sheng.draw", LuYuShengBottomDiscardReason = "skill-program.lu-yu-sheng.cangxin.discard", LuYuShengRunweiDiscardReason = "skill-program.lu-yu-sheng.runwei.discard";
-    internal CardConversionSource LuYuShengSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.ILuYuShengHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginLuYuSheng(f, op);
+    internal CardConversionSource LuYuShengSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome ILuYuShengHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginLuYuSheng(f, op);
     internal bool LuYuShengParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
     {
         if (c.OwnerSeat != candidate.OwnerSeat)
@@ -102,7 +99,7 @@ internal sealed partial class CharacterLuYuShengOlRuntime
     [ProgramAnswer("lu-yu-sheng")]
     internal void AnswerLuYuSheng(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LuYuSheng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != LuYuShengChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LuYuShengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LuYuSheng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != LuYuShengChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LuYuShengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Lu Yu Sheng lost its actual private chooser or original exposed entities.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var option = choice.Parameters["option"];

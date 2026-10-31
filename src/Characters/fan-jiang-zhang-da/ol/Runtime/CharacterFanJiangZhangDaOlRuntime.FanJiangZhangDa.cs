@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFanJiangZhangDaOlRuntime
@@ -11,8 +7,8 @@ internal sealed partial class CharacterFanJiangZhangDaOlRuntime
 
     internal bool JueshengSpent(int seat) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JueshengSpentEvent>().Any(e => e.OwnerSeat == seat && e.SkillId == "ol:juesheng");
     internal bool CanIssueJueshengDuel(int actor, int target) => _coreDamageColorDuelProgramsOperations.CanIssueSelectedActorDuel(target, actor);
-    SkillProgramStepOutcome global::CardGame.Core.IFanJiangZhangDaHost.Resolve(ProgramSkillFrame f) => BeginJuesheng(f);
-    bool global::CardGame.Core.IJueshengTargetQuery.Allows(int actor, int target) => CanIssueJueshengDuel(actor, target);
+    SkillProgramStepOutcome IFanJiangZhangDaHost.Resolve(ProgramSkillFrame f) => BeginJuesheng(f);
+    bool IJueshengTargetQuery.Allows(int actor, int target) => CanIssueJueshengDuel(actor, target);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 27350, SkillProgramEffectOp.ResolveJueshengLimitedDuel)]
     internal bool CanActivateJuesheng(CharacterState owner) => !JueshengSpent(owner.Seat) && _coreMatchParticipantsPlayersAccess._players.Any(p => CanIssueJueshengDuel(owner.Seat, p.Seat));
     internal SkillProgramStepOutcome BeginJuesheng(ProgramSkillFrame supplied)
@@ -99,7 +95,7 @@ internal sealed partial class CharacterFanJiangZhangDaOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 27350)]
-    internal bool ReturnJueshengAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnJueshengAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Juesheng: { Stage: JueshengStage.NativeUse, NativeCompleted: true } r } || completion.ResolutionId != r.Origin.UseId)
             return false;

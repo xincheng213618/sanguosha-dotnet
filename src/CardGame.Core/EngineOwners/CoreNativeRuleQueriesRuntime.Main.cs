@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeRuleQueriesRuntime
@@ -32,13 +28,13 @@ internal sealed partial class CoreNativeRuleQueriesRuntime
             return 0;
         }
 
-        return global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(_coreMatchParticipantsPlayersAccess._players[sourceSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat]));
+        return CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(_coreMatchParticipantsPlayersAccess._players[sourceSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat]));
     }
 
     internal int GetAttackRange(int sourceSeat)
     {
         _coreTableSeatQueriesOperations.ValidatePlayerSeat(sourceSeat, "sourceSeat");
-        return global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(_coreMatchParticipantsPlayersAccess._players[sourceSeat]));
+        return CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(_coreMatchParticipantsPlayersAccess._players[sourceSeat]));
     }
 
     internal int GetAliveSeatDistance(int sourceSeat, int targetSeat)
@@ -64,5 +60,5 @@ internal sealed partial class CoreNativeRuleQueriesRuntime
         return distance;
     }
 
-    internal int GetHandLimit(CharacterState player) => global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateHandLimit(player));
+    internal int GetHandLimit(CharacterState player) => CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateHandLimit(player));
 }

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,7 +9,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal const string WuZhangFeiSampleReason = "skill-program.wu-zhang-fei.zisheng.obtain";
     internal bool HasWuZhangFeiUseCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveWuZhangFeiUseSample);
 
-    internal static CardConversionSource WuZhangFeiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiUse.WuZhangFeiSource(f);
+    internal static CardConversionSource WuZhangFeiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiUse.WuZhangFeiSource(f);
     internal CardActionContext CaptureWuZhangFeiUseRankAction(CardActionContext action)
     {
         if (!HasWuZhangFeiUseCapability)
@@ -94,7 +91,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
             return _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.NullificationResponse);
         if (!_coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.Dodge))
             return false;
-        return _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } incoming } attack } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == action.ActorSeat;
+        return _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } incoming } attack } && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == action.ActorSeat;
     }
 
     internal void CaptureWuZhangFeiUseQualification(CardActionContext action, SkillProgramTriggerWindow window)
@@ -162,14 +159,14 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal bool WuZhangFeiUseWindowMatches(ProgramCardTriggerWindowFrame window, WuZhangFeiUseQualification q) => global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) == SkillProgramTriggerWindow.CardUseCommitted && window.Action.ActionId == q.ActionId && window.Action.ActorSeat == q.Source.OwnerSeat && window.Action.ProviderSeat == q.ProviderSeat && IsWuZhangFeiTrueUse(window.Action) && window.Action.PhysicalCards.Count == q.MaterialCount && _coreProgramEventHistoryOperations.ProgramEventHistory<WuZhangFeiUseRankCapturedEvent>().Count(e => e.ActionId == q.ActionId && e.ActorSeat == q.Source.OwnerSeat && e.ProviderSeat == q.ProviderSeat && e.RankSum == q.RankSum && e.MaterialCount == q.MaterialCount) == 1;
+    internal bool WuZhangFeiUseWindowMatches(ProgramCardTriggerWindowFrame window, WuZhangFeiUseQualification q) => CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) == SkillProgramTriggerWindow.CardUseCommitted && window.Action.ActionId == q.ActionId && window.Action.ActorSeat == q.Source.OwnerSeat && window.Action.ProviderSeat == q.ProviderSeat && IsWuZhangFeiTrueUse(window.Action) && window.Action.PhysicalCards.Count == q.MaterialCount && _coreProgramEventHistoryOperations.ProgramEventHistory<WuZhangFeiUseRankCapturedEvent>().Count(e => e.ActionId == q.ActionId && e.ActorSeat == q.Source.OwnerSeat && e.ProviderSeat == q.ProviderSeat && e.RankSum == q.RankSum && e.MaterialCount == q.MaterialCount) == 1;
 
     internal IReadOnlyList<PromptChoice> WuZhangFeiSampleChoices(ProgramSkillFrame f) => f.WuZhangFeiUse!.Sample.Select(id => new PromptChoice(new($"wu-zhang-fei.sample.{(f.Id)}.{(id)}"), $"获得【{(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).DisplayName)}】。", [id], [], new Dictionary<string, string> { ["program-action"] = "wu-zhang-fei-sample", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture) })).ToArray();
     [ProgramAnswer("wu-zhang-fei-sample")]
     internal void AnswerWuZhangFeiSample(PromptChoice choice)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
-        if (f.WuZhangFeiUse is not { Stage: WuZhangFeiUseStage.Selecting } r || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuZhangFeiSampleChoices(f).Where(item => item.Id == choice.Id).ToArray()) || choice.Cards is not [var id] || choice.Targets.Count != 0 || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DrawPile)
+        if (f.WuZhangFeiUse is not { Stage: WuZhangFeiUseStage.Selecting } r || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuZhangFeiSampleChoices(f).Where(item => item.Id == choice.Id).ToArray()) || choice.Cards is not [var id] || choice.Targets.Count != 0 || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DrawPile)
             throw new InvalidOperationException("Zisheng sample must be one of its original real private deck entities.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
@@ -195,7 +192,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveWuZhangFeiUseSample)]
-    internal PromptChoice SelectAiWuZhangFeiSample(PendingDecision decision, ProgramSkillFrame frame) => decision.Choices.OrderByDescending(choice => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat])).ThenBy(choice => choice.Cards.Single()).First();
+    internal PromptChoice SelectAiWuZhangFeiSample(PendingDecision decision, ProgramSkillFrame frame) => decision.Choices.OrderByDescending(choice => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat])).ThenBy(choice => choice.Cards.Single()).First();
     internal bool WuZhangFeiOperationRootMatches(ProgramSkillFrame f)
     {
         if ((f.WuZhangFeiUse is null) == (f.WuZhangFeiXianlue is null) || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash)
@@ -281,17 +278,17 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
         if ((f.WuZhangFeiUse is null && f.WuZhangFeiXianlue is null) || !WuZhangFeiOperationRootMatches(f))
             return false;
         if (f.WuZhangFeiXianlue is { Stage: WuZhangFeiXianlueStage.Drawing } && f.NativeDraw is not null)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
+            return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
             return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
-        return child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(move => WuZhangFeiOperationMovement(f, move));
+        return child is CardsMovedTriggerWindowFrame moved && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(move => WuZhangFeiOperationMovement(f, move));
     }
 
-    internal bool WuZhangFeiObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame parent && (this.WuZhangFeiFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child]) || parent.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child])) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
+    internal bool WuZhangFeiObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame parent && (this.WuZhangFeiFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child]) || parent.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child])) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? WuZhangFeiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.WuZhangFeiFirstChild(f, child), (index) => this.WuZhangFeiObserverSuffix(index));
     internal bool IsWuZhangFeiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {
@@ -304,5 +301,5 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 29060)]
     internal bool AdvanceWuZhangFeiChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuZhangFeiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    SkillProgramStepOutcome global::CardGame.Core.IWuZhangFeiUseHost.Sample(ProgramSkillFrame frame) => BeginWuZhangFeiUse(frame);
+    SkillProgramStepOutcome IWuZhangFeiUseHost.Sample(ProgramSkillFrame frame) => BeginWuZhangFeiUse(frame);
 }

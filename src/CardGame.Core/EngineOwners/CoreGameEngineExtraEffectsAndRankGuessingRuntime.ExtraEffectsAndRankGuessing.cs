@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,9 +10,9 @@ internal sealed partial class CoreGameEngineExtraEffectsAndRankGuessingRuntime
     internal const string RankGuessRevealReason = "skill-program.rank-guess.reveal";
     internal const string RankGuessGainReason = "skill-program.rank-guess.gain";
     internal const string ExtraEffectCostReason = "skill-program.extra-effect.cost";
-    SkillProgramStepOutcome global::CardGame.Core.IExtraEffectsAndRankGuessHost.BeginExtraEffectsAndRankGuess(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginExtraEffectsAndRankGuess(effect, frame);
-    internal CardConversionSource ExtraEffectsSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal static bool ExtraEffectCardKind(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ExtraEffectsAndRankGuessing.ExtraEffectCardKind(kind);
+    SkillProgramStepOutcome IExtraEffectsAndRankGuessHost.BeginExtraEffectsAndRankGuess(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginExtraEffectsAndRankGuess(effect, frame);
+    internal CardConversionSource ExtraEffectsSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static bool ExtraEffectCardKind(CardKind kind) => RuntimeSkills.RuntimeRules_Core_ExtraEffectsAndRankGuessing.ExtraEffectCardKind(kind);
     internal bool TryGetExtraEffectUse(int owner, ProgramSkillWindowContext? context, out CardUseFrame use)
     {
         use = null !;
@@ -129,7 +126,7 @@ internal sealed partial class CoreGameEngineExtraEffectsAndRankGuessingRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Rank/effect choice lost its owner.");
         RequireExtraEffectsAndRankGuess(f);
         var r = f.ExtraEffectsAndRankGuess!;
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ExtraEffectsAndRankGuessChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ExtraEffectsAndRankGuessChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Rank/effect choice is stale or already paid.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];

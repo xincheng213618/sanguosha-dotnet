@@ -1,8 +1,8 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreMatchOutcomeStatusWinnerAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreMatchOutcomeStatusWinnerAccess : IProgramRuntimeOperations
 {
-    ref global::CardGame.Core.EngineStatus _status { get; }
+    ref EngineStatus _status { get; }
 
-    ref global::CardGame.Core.Winner _winner { get; }
+    ref Winner _winner { get; }
 }

@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime))]
 internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime> _resolve;
-    private CoreGameEngineDrawFundedDistinctBasicOffersEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime> _resolve;
+    private CoreGameEngineDrawFundedDistinctBasicOffersEntries(Func<EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineDrawFundedDistinctBasicOffersEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineDrawFundedDistinctBasicOffersEntries Create(Func<EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime> resolve) => new(resolve);
 }

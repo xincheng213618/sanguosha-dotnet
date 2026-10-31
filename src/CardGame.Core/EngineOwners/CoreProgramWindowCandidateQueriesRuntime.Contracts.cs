@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreProgramWindowCandidateQueriesProgramTriggerOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramWindowCandidateQueriesProgramTriggerOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTriggerRuntime Get();
+    ProgramTriggerRuntime Get();
 }
 
-internal interface ICoreProgramWindowCandidateQueriesProgramTriggerFactProjectorOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramWindowCandidateQueriesProgramTriggerFactProjectorOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTriggerFactProjector Get();
+    ProgramTriggerFactProjector Get();
 }

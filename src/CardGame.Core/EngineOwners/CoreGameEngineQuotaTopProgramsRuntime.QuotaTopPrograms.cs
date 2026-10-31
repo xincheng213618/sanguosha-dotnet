@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineQuotaTopProgramsRuntime
@@ -107,10 +103,10 @@ internal sealed partial class CoreGameEngineQuotaTopProgramsRuntime
             draft = frame.QuotaTop!;
         }
 
-        IReadOnlyList<PromptChoice> choices = draft.Stage == "loss-choice" ? _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != frame.OwnerSeat).Select(p => global::CardGame.Core.EngineOwners.CoreGameEngineNamedDefenseAndPublicDraftRuntime.NamedDraftChoice(frame, "quota-top-loss", p.Name, seat: p.Seat)).ToArray() : remaining.Select(id =>
+        IReadOnlyList<PromptChoice> choices = draft.Stage == "loss-choice" ? _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != frame.OwnerSeat).Select(p => CoreGameEngineNamedDefenseAndPublicDraftRuntime.NamedDraftChoice(frame, "quota-top-loss", p.Name, seat: p.Seat)).ToArray() : remaining.Select(id =>
         {
             var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Single(card => card.Id == id);
-            return global::CardGame.Core.EngineOwners.CoreGameEngineNamedDefenseAndPublicDraftRuntime.NamedDraftChoice(frame, draft.Stage == "gain" ? "quota-top-gain" : "quota-top-order", $"{((draft.Stage == "gain" ? "获得" : "置于牌堆顶"))}【{(card.DisplayName)}】（{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}）", id);
+            return CoreGameEngineNamedDefenseAndPublicDraftRuntime.NamedDraftChoice(frame, draft.Stage == "gain" ? "quota-top-gain" : "quota-top-order", $"{((draft.Stage == "gain" ? "获得" : "置于牌堆顶"))}【{(card.DisplayName)}】（{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}）", id);
         }).ToArray();
         if (choices.Count == 0)
         {
@@ -228,6 +224,6 @@ internal sealed partial class CoreGameEngineQuotaTopProgramsRuntime
     }
 
     internal CardSnapshot[] GetQuotaPrivatelyViewedCards(int viewerSeat) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(frame => frame.OwnerSeat == viewerSeat && frame.QuotaTop is { Stage: "gain" or "order" }).SelectMany(frame => frame.QuotaTop!.ViewedIds.Except(frame.QuotaTop.ObtainedIds)).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DrawPile).Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Single(card => card.Id == id))).ToArray();
-    SkillProgramStepOutcome global::CardGame.Core.IQuotaTopProgramHost.PeekTurnQuotaTop(ProgramSkillFrame frame, int count) => BeginQuotaTop(frame, count);
-    void global::CardGame.Core.IQuotaTopProgramHost.NullifyFirstTurnTargetByHand(ProgramSkillFrame frame) => NullifyProgramFirstTurnTarget(frame);
+    SkillProgramStepOutcome IQuotaTopProgramHost.PeekTurnQuotaTop(ProgramSkillFrame frame, int count) => BeginQuotaTop(frame, count);
+    void IQuotaTopProgramHost.NullifyFirstTurnTargetByHand(ProgramSkillFrame frame) => NullifyProgramFirstTurnTarget(frame);
 }

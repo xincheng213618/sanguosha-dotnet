@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYaDanOlRuntime
@@ -24,9 +20,9 @@ internal sealed partial class CharacterYaDanOlRuntime
 
     internal CardUseFrame? QingyaQualifiedUse(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (context.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || context.OwnerSeat != c.OwnerSeat || context.CardUse is not { } cu || _coreCardUseLifecycleOperations.LifecycleCardUse(cu.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.ActorSeat != c.OwnerSeat || use.SourceSeat != c.OwnerSeat || a.ActionId != cu.CardActionId || use.TargetSeats is not [var target] || target == c.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive)
+        if (context.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || context.OwnerSeat != c.OwnerSeat || context.CardUse is not { } cu || _coreCardUseLifecycleOperations.LifecycleCardUse(cu.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.ActorSeat != c.OwnerSeat || use.SourceSeat != c.OwnerSeat || a.ActionId != cu.CardActionId || use.TargetSeats is not [var target] || target == c.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive)
             return null;
-        if (context.ParentFrameId != 0 && (_resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != context.Window || window.ParentFrameId != use.Id || window.Action.ActionId != a.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]) != c))
+        if (context.ParentFrameId != 0 && (_resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != context.Window || window.ParentFrameId != use.Id || window.Action.ActionId != a.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]) != c))
             return null;
         return use;
     }

@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineComparedBlackSlashPoliciesRuntime
 {
     internal bool HasComparedBlackSlashPolicies => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.NullifyBlackSlashByCurrentHp) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.ProhibitBlackSlashResponseByCurrentHand);
 
-    internal bool ApplyComparedBlackSlashPolicies(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool ApplyComparedBlackSlashPolicies(NativeOwners.CardAttackHandle attack)
     {
-        if (!HasComparedBlackSlashPolicies || attack.IsSourceLess || attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use || action.ActionId < 1 || action.ActorSeat != use.SourceSeat || attack.CardUserSeat != use.SourceSeat || action.EffectiveKind != kind || !use.TargetSeats.Contains(attack.TargetSeat) || action.EffectiveIsRed != false || (action.PhysicalCards.Count == 0 && action.EffectiveSuit is not (Suit.Spade or Suit.Club)))
+        if (!HasComparedBlackSlashPolicies || attack.IsSourceLess || attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use || action.ActionId < 1 || action.ActorSeat != use.SourceSeat || attack.CardUserSeat != use.SourceSeat || action.EffectiveKind != kind || !use.TargetSeats.Contains(attack.TargetSeat) || action.EffectiveIsRed != false || (action.PhysicalCards.Count == 0 && action.EffectiveSuit is not (Suit.Spade or Suit.Club)))
             return false;
         var existing = _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ComparedBlackSlash;
         if (existing is not null)
@@ -43,5 +39,5 @@ internal sealed partial class CoreGameEngineComparedBlackSlashPoliciesRuntime
         return receipt.Ineffective;
     }
 
-    internal static void ValidateComparedBlackSlashPolicy(string path, SkillProgramCardPolicy policy) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ComparedBlackSlashPolicies.ValidateComparedBlackSlashPolicy(path, policy);
+    internal static void ValidateComparedBlackSlashPolicy(string path, SkillProgramCardPolicy policy) => RuntimeSkills.RuntimeRules_Core_ComparedBlackSlashPolicies.ValidateComparedBlackSlashPolicy(path, policy);
 }

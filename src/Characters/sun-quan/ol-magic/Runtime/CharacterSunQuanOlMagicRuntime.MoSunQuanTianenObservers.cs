@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunQuanOlMagicRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         if (r.Stage == MoTianenStage.QuanyuChild)
             return MoQuanyuChildRidesOn(child, f);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => r.Movements.Any(p => p.CardId == m.CardId && p.PrintedKind == m.CardKind && p.From == m.From && p.To == m.To && p.Reason == m.Reason.Value && p.Sequence == m.Sequence));
+            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => r.Movements.Any(p => p.CardId == m.CardId && p.PrintedKind == m.CardKind && p.From == m.From && p.To == m.To && p.Reason == m.Reason.Value && p.Sequence == m.Sequence));
         if (child is RecoveryReplacementFrame recovery)
             return IsMoSunQuanPaidRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
@@ -32,7 +28,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.Window == state.Window);
     }
 
-    internal bool MoSunQuanPaidObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame p && (p.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(p, _resolutionStackOperations2._resolutionStack()[n]) || this.MoQuanyuFirstChild(p, _resolutionStackOperations2._resolutionStack()[n]) || this.MoTianenFirstChild(p, _resolutionStackOperations2._resolutionStack()[n]) || this.MoQiangangFirstChild(p, _resolutionStackOperations2._resolutionStack()[n])) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
+    internal bool MoSunQuanPaidObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame p && (p.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(p, _resolutionStackOperations2._resolutionStack()[n]) || this.MoQuanyuFirstChild(p, _resolutionStackOperations2._resolutionStack()[n]) || this.MoTianenFirstChild(p, _resolutionStackOperations2._resolutionStack()[n]) || this.MoQiangangFirstChild(p, _resolutionStackOperations2._resolutionStack()[n])) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? MoSunQuanPaidObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.MoTianenFirstChild(f, child) || this.MoQiangangFirstChild(f, child), (index) => this.MoSunQuanPaidObserverSuffix(index));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 640)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 580)]

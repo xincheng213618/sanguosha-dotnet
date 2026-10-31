@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
 {
     internal bool HasMoLuBu => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeMoLuBuQiAndOpeningPlay);
 
-    internal static CardConversionSource MoLuBuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_bu_ol_magic_MoLuBuQi.MoLuBuSource(f);
+    internal static CardConversionSource MoLuBuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lu_bu_ol_magic_MoLuBuQi.MoLuBuSource(f);
     // Registration only; the query still belongs to legacy GameEngine.MoLuBuQi.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 60)]
     internal void ProjectMoLuBuQiCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
@@ -52,7 +49,7 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoLuBuActualUseQiEvent(action.ActionId, action.ActorSeat, action.PhysicalCards.Any(c => HasMoLuBuQi(c.CardId))));
     }
 
-    internal bool IsMoLuBuTrueUse(CardActionContext action) => action.Type == CardActionType.Use || action.EffectiveKind == CardKind.Nullification && _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.NullificationResponse) || _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } incoming } attack } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == action.ActorSeat;
+    internal bool IsMoLuBuTrueUse(CardActionContext action) => action.Type == CardActionType.Use || action.EffectiveKind == CardKind.Nullification && _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.NullificationResponse) || _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } incoming } attack } && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == action.ActorSeat;
     internal SkillProgramStepOutcome InitializeMoLuBu(ProgramSkillFrame f)
     {
         if (f.SkillId != MoLuBuComposition.Duoqi || f.TriggerId != "initial-qi-opening-play" || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { MoLuBuInitialQi: { } initial } || _coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
@@ -137,7 +134,7 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     [ProgramAnswer("mo-lu-bu")]
     internal void AnswerMoLuBu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoLuBu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MoLuBuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoLuBu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MoLuBuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Lu Bu lost its current canonical private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == MoLuBuStage.QiChoice)
@@ -248,8 +245,8 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     [ProgramContinuation(ProgramContinuationKind.Movement, 30800)]
     internal bool ReturnMoLuBuMovement(ProgramSkillFrame f) => f.MoLuBu is not null && ResumeMoLuBu(f.Id);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMoLuBuDuoqi, SkillProgramEffectOp.ResolveMoLuBuKuangmoDeath)]
-    internal PromptChoice ChooseMoLuBuAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Targets is [var target] && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? p.Choices[0];
-    SkillProgramStepOutcome global::CardGame.Core.IMoLuBuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    internal PromptChoice ChooseMoLuBuAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Targets is [var target] && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? p.Choices[0];
+    SkillProgramStepOutcome IMoLuBuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.InitializeMoLuBuQiAndOpeningPlay => InitializeMoLuBu(f),
         SkillProgramEffectOp.ResolveMoLuBuDuoqi => BeginMoDuoqi(f),

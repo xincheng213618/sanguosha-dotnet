@@ -1,8 +1,7 @@
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_DamageArmorPayments
 {
     internal static bool DamageAppliedMatchesArmorPayment(DamageAppliedEvent applied,

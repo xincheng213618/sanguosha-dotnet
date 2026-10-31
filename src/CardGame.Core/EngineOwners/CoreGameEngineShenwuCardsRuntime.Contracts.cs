@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreShenwuCardsCoreProgramLifecycleOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreShenwuCardsCoreProgramLifecycleOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramInteractionRouter ProgramInteractions { get; }
+    ProgramInteractionRouter ProgramInteractions { get; }
 }

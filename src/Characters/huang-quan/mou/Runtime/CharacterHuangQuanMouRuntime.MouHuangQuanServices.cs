@@ -1,35 +1,31 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangQuanMouRuntime
 {
-    bool global::CardGame.Core.IMouHuangQuanFacts.GameOver => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouHuangQuanFacts.GameOver => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    int global::CardGame.Core.IMouHuangQuanFacts.Turn => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber;
+    int IMouHuangQuanFacts.Turn => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber;
 
-    int global::CardGame.Core.IMouHuangQuanFacts.TurnOwner => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
+    int IMouHuangQuanFacts.TurnOwner => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
 
-    long global::CardGame.Core.IMouHuangQuanFacts.MovementSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+    long IMouHuangQuanFacts.MovementSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
-    bool global::CardGame.Core.IMouHuangQuanFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
-    bool global::CardGame.Core.IMouHuangQuanFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
-    string global::CardGame.Core.IMouHuangQuanFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
-    string global::CardGame.Core.IMouHuangQuanFacts.CardName(int id) => _coreAdvancedLifecycleOperations.GetAdvancedCard(id).DisplayName;
-    IReadOnlyList<int> global::CardGame.Core.IMouHuangQuanFacts.Living => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
+    bool IMouHuangQuanFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
+    bool IMouHuangQuanFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
+    string IMouHuangQuanFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
+    string IMouHuangQuanFacts.CardName(int id) => _coreAdvancedLifecycleOperations.GetAdvancedCard(id).DisplayName;
+    IReadOnlyList<int> IMouHuangQuanFacts.Living => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
 
-    ContentSkillDefinition global::CardGame.Core.IMouHuangQuanFacts.Skill(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id);
-    IEnumerable<T> global::CardGame.Core.IMouHuangQuanFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    bool global::CardGame.Core.IMouHuangQuanFacts.ParentMatches(ProgramSkillFrame f) => MouHqParent(f);
-    MouHqOriginalUse? global::CardGame.Core.IMouHuangQuanFacts.OriginalUse(int owner, ProgramSkillWindowContext? context) => TryMouHqOriginalUse(owner, context, out var u, out _) ? new(u.Id, u.Action!.ActionId, u.SourceSeat == owner) : null;
-    IReadOnlyList<MouHqGift> global::CardGame.Core.IMouHuangQuanFacts.Gifts(int giver) => _coreMatchParticipantsPlayersAccess._players[giver].MouHqActualGifts ?? [];
-    IReadOnlyList<MouHqEntity> global::CardGame.Core.IMouHuangQuanFacts.TransferEntities(ProgramSkillFrame f, int actor) => Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, actor, actor, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Transfer, destination: SkillProgramCardDestination.OwnerHand).Select(c => new MouHqEntity(c.Cards.Single(), _cardZonesOperations._cardZones.GetLocation(c.Cards.Single()))).ToArray());
-    double global::CardGame.Core.IMouHuangQuanFacts.HelpValue(int actor, int target) => _coreAiBrainsAiBrainsAccess._aiBrains[actor].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(actor), target, new(0, 0, 0, 0, 1, 0, true, false));
-    int global::CardGame.Core.IMouHuangQuanFacts.KeepValue(int actor, int card) => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(card), _coreMatchParticipantsPlayersAccess._players[actor]);
-    bool global::CardGame.Core.IMouHuangQuanFacts.MovementRecoveryChild(ProgramSkillFrame f, ResolutionFrame child)
+    ContentSkillDefinition IMouHuangQuanFacts.Skill(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id);
+    IEnumerable<T> IMouHuangQuanFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    bool IMouHuangQuanFacts.ParentMatches(ProgramSkillFrame f) => MouHqParent(f);
+    MouHqOriginalUse? IMouHuangQuanFacts.OriginalUse(int owner, ProgramSkillWindowContext? context) => TryMouHqOriginalUse(owner, context, out var u, out _) ? new(u.Id, u.Action!.ActionId, u.SourceSeat == owner) : null;
+    IReadOnlyList<MouHqGift> IMouHuangQuanFacts.Gifts(int giver) => _coreMatchParticipantsPlayersAccess._players[giver].MouHqActualGifts ?? [];
+    IReadOnlyList<MouHqEntity> IMouHuangQuanFacts.TransferEntities(ProgramSkillFrame f, int actor) => Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, actor, actor, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Transfer, destination: SkillProgramCardDestination.OwnerHand).Select(c => new MouHqEntity(c.Cards.Single(), _cardZonesOperations._cardZones.GetLocation(c.Cards.Single()))).ToArray());
+    double IMouHuangQuanFacts.HelpValue(int actor, int target) => _coreAiBrainsAiBrainsAccess._aiBrains[actor].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(actor), target, new(0, 0, 0, 0, 1, 0, true, false));
+    int IMouHuangQuanFacts.KeepValue(int actor, int card) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(card), _coreMatchParticipantsPlayersAccess._players[actor]);
+    bool IMouHuangQuanFacts.MovementRecoveryChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.MouHuangQuan is not { Paid: true, Stage: MouHqStage.GiveChildren or MouHqStage.ReplyChildren } r)
             return false;
@@ -48,7 +44,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         return false;
     }
 
-    void global::CardGame.Core.IMouHuangQuanNative.Give(ProgramSkillFrame f, int giver, int recipient, IReadOnlyList<int> ids, bool reply, long before)
+    void IMouHuangQuanNative.Give(ProgramSkillFrame f, int giver, int recipient, IReadOnlyList<int> ids, bool reply, long before)
     {
         if (ids.Count == 0)
             return;
@@ -62,8 +58,8 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         }, disclosure: CardMovementDisclosure.FaceDown);
     }
 
-    bool global::CardGame.Core.IMouHuangQuanNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id);
-    void global::CardGame.Core.IMouHuangQuanNative.OriginalEffect(ProgramSkillFrame f) => IssueMouHqOriginalEffect(f);
-    void global::CardGame.Core.IMouHuangQuanNative.Finish(ProgramSkillFrame f, bool accepted) => _coreSkillProgramsOperations.FinishProgramSkill(f, accepted);
-    void global::CardGame.Core.IMouHuangQuanNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    bool IMouHuangQuanNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id);
+    void IMouHuangQuanNative.OriginalEffect(ProgramSkillFrame f) => IssueMouHqOriginalEffect(f);
+    void IMouHuangQuanNative.Finish(ProgramSkillFrame f, bool accepted) => _coreSkillProgramsOperations.FinishProgramSkill(f, accepted);
+    void IMouHuangQuanNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
 }

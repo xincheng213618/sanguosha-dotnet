@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuBuMobileGodRuntime
@@ -21,16 +17,16 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
             yield return new FiniteRuleQueryContribution($"mobile-wuqian:{(player.Seat)}:victims", SkillRuleOperation.Add, count);
     }
 
-    internal bool MobileLbHasDamageHand(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(owner, c)));
+    internal bool MobileLbHasDamageHand(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Any(c => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(owner, c)));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 40325)]
     internal bool AllowsMobileLbDamageGain(ProgramTriggerLegalityContext g) => g.SkillId != MobileLbWuqian || g.Trigger.Effects.All(e => e.Op != SkillProgramEffectOp.GainMobileShenLuBuDamageCard) || !MobileLbHasDamageHand(g.Owner);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShenLuBuHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileLb(f, op);
+    SkillProgramStepOutcome IMobileShenLuBuHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileLb(f, op);
     internal SkillProgramStepOutcome BeginMobileLb(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.MobileLuBu is not null || f.SkillId != MobileLbWuqian || f.InstructionIndex != 1)
             throw new InvalidOperationException("Mobile Wuqian requires its original paid program instruction.");
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var target = op == SkillProgramEffectOp.ResolveMobileShenLuBuWuqian ? f.SelectedTargetSeats.Single() : f.OwnerSeat;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileLuBu = new(source, f.GameplayHash, f.InstructionIndex, op, target, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence) });
         if (op == SkillProgramEffectOp.ResolveMobileShenLuBuWuqian)
@@ -53,7 +49,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
                 throw new InvalidOperationException("Wuqian's gain requires its actual ending stage.");
             if (!MobileLbHasDamageHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))
             {
-                var candidates = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile)).Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(c.Kind)).ToArray();
+                var candidates = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile)).Where(c => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(c.Kind)).ToArray();
                 if (candidates.Length > 0)
                 {
                     var chosen = candidates[_randomOperations._random.Next(candidates.Length)];
@@ -104,7 +100,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
     {
         if (!HasMobileWuqianCapability)
             return;
-        if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { } use && global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(use.CardKind))
+        if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { } use && CoreGameEngineMouLuMengRuntime.IsDamageCardKind(use.CardKind))
         {
             var issued = ActiveMobileWuqian(use.SourceSeat).Select(e => e.FrameId).ToArray();
             if (issued.Length == 0)
@@ -133,7 +129,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
 
     internal void ValidateMobileLbUse(CardUseFrame use, MobileLuBuUseReceipt r)
     {
-        if (r.UseFrameId != use.Id || r.ActionId != use.Action?.ActionId || !global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(r.Kind) || r.IssuedFrames.Count == 0 || r.IssuedFrames.Distinct().Count() != r.IssuedFrames.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.SourceSeat == r.ActorSeat && e.CardKind == r.Kind) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileLuBuUseCapturedEvent>().Count(e => e.UseFrameId == use.Id && e.ActorSeat == r.ActorSeat && e.ActionId == r.ActionId && e.Kind == r.Kind) != 1 || r.IssuedFrames.Any(id => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileLuBuWuqianIssuedEvent>().Count(e => e.FrameId == id && e.Source.OwnerSeat == r.ActorSeat) != 1))
+        if (r.UseFrameId != use.Id || r.ActionId != use.Action?.ActionId || !CoreGameEngineMouLuMengRuntime.IsDamageCardKind(r.Kind) || r.IssuedFrames.Count == 0 || r.IssuedFrames.Distinct().Count() != r.IssuedFrames.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.SourceSeat == r.ActorSeat && e.CardKind == r.Kind) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileLuBuUseCapturedEvent>().Count(e => e.UseFrameId == use.Id && e.ActorSeat == r.ActorSeat && e.ActionId == r.ActionId && e.Kind == r.Kind) != 1 || r.IssuedFrames.Any(id => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileLuBuWuqianIssuedEvent>().Count(e => e.FrameId == id && e.Source.OwnerSeat == r.ActorSeat) != 1))
             throw new InvalidOperationException("Mobile Wuqian retirement lost the actual declared damage-card Use and its frozen original issues.");
     }
 

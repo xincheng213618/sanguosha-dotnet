@@ -1,15 +1,4 @@
 #nullable enable
-using AcquisitionNode = CardGame.Core.ProgramStageNode<CardGame.Core.ProgramSeatAcquisitionCall, CardGame.Core.ProgramSeatAcquisitionReceipt, CardGame.Core.ProgramSeatAcquisitionStage>;
-using AttackReceipt = CardGame.Core.GameEngine.AttackCompletionReceipt;
-using CardGame.Core.Campaigns;
-using System.Collections.Frozen;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.ExceptionServices;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 public sealed partial class GameEngine
@@ -31,11 +20,11 @@ internal sealed record FactionProviderRewardReceipt(long OwnerFrameId, int DrawC
 
     internal readonly record struct ProjectionDependency(long Revision, bool Alive, int Hp, Role Role, bool PrimarySelected, bool PrimaryRevealed, bool SecondarySelected, bool SecondaryRevealed);
     internal sealed record NativeFactionAvatar(PrivateGeneralLibrarySource Source, string GeneralId, string? SkillId, string? SelectedFactionId);
-    internal sealed record NativeFactionObservation(string? FactionId, global::CardGame.Core.GameEngine.NativeFactionAvatar? Avatar);
+    internal sealed record NativeFactionObservation(string? FactionId, NativeFactionAvatar? Avatar);
     internal sealed record NamedNextSlashReserve(int OwnerSeat, string SkillId, int TurnNumber, int TurnSeat, int Amount);
     internal sealed record OriginalHandStateKey(int OwnerSeat, string SkillId, string StateId);
     internal sealed record OriginalHandEntity(int CardId, long DealSequence, long? FirstLossSequence);
-    internal sealed record OriginalHandEntityState(long InitializationFrameId, CardConversionSource Source, string GameplayHash, IReadOnlyList<global::CardGame.Core.GameEngine.OriginalHandEntity> Entities);
+    internal sealed record OriginalHandEntityState(long InitializationFrameId, CardConversionSource Source, string GameplayHash, IReadOnlyList<OriginalHandEntity> Entities);
 internal interface IDamageAttempt
     {
         long ResolutionId { get; }
@@ -68,8 +57,8 @@ internal interface IDamageAttempt
         void CaptureDamageDistance(int distance);
         void MarkDyingResolvedForDamage(long damageFrameId);
         bool HasResolvedDyingForDamage(long damageFrameId);
-        void RedirectFinalizedDamageTarget(int targetSeat, global::CardGame.Core.GameEngine.ProgramDamageTransferFollowup followup);
-        bool TryConsumeProgramDamageTransferFollowup(out global::CardGame.Core.GameEngine.ProgramDamageTransferFollowup followup);
+        void RedirectFinalizedDamageTarget(int targetSeat, ProgramDamageTransferFollowup followup);
+        bool TryConsumeProgramDamageTransferFollowup(out ProgramDamageTransferFollowup followup);
         void SetChainedTargets(IReadOnlyList<int> targetSeats);
         bool TryAdvanceChainedTarget(Func<int, bool> isAlive, bool resetDamageForTargetModifiers,
             out int fromSeat);
@@ -101,7 +90,7 @@ internal sealed record SourceDingxiUsePlan(int CardId, CardKind Kind, LegalActio
     internal sealed record ProgramSuppression(int SourceSeat, int TargetSeat, string SkillId, int CreatedTurn, IReadOnlyList<string> GrantIds);
     internal sealed record TurnDefaultStatKey(int OwnerSeat, string SkillId, string StateId);
     internal sealed record TurnDefaultStatAssignment(int Value, long FrameId, int SlotIndex);
-    internal sealed record TurnDefaultStatState(CardConversionSource Source, string GameplayHash, int ActualTurnNumber, bool HasPool, IReadOnlyList<int> Slots, int UsedSlotMask, IReadOnlyDictionary<TurnDefaultStatKind, global::CardGame.Core.GameEngine.TurnDefaultStatAssignment> Assigned, IReadOnlyList<int> NextSlots);
+    internal sealed record TurnDefaultStatState(CardConversionSource Source, string GameplayHash, int ActualTurnNumber, bool HasPool, IReadOnlyList<int> Slots, int UsedSlotMask, IReadOnlyDictionary<TurnDefaultStatKind, TurnDefaultStatAssignment> Assigned, IReadOnlyList<int> NextSlots);
 internal sealed record NativeEquipmentSuspensionProjection(ResolutionFrame Parent, CardUseFrame AttackRoot,
         SkillInvocationFrame Invocation, NativeEquipmentInvocationReceipt Receipt, int ParentIndex);
 internal sealed record NativeFactionSkillSuspensionProjection(ResolutionFrame Parent,

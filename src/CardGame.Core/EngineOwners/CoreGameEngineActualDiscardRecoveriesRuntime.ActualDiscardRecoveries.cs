@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -22,7 +19,7 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime
         if (f.ActualDiscardRecovery is not null || f.WindowContext is not { MovementBatch: { } batch, SourceSeat: { } source } context || !CanOfferActualDiscardRecovery(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), context))
             throw new InvalidOperationException("Discard recovery requires its unpaid exact original batch/source opportunity.");
         var phase = batch.DiscardRecoveryPhase!;
-        var receipt = new ProgramActualDiscardRecoveryReceipt(f.InstructionIndex, context.ParentFrameId, batch.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, stateId, phase, source, _coreActualDiscardRecoveryPhasesOperations.ActualDiscardRecoveryEntities(batch, source), ActualDiscardRecoveryStage.SelectingReturn);
+        var receipt = new ProgramActualDiscardRecoveryReceipt(f.InstructionIndex, context.ParentFrameId, batch.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, stateId, phase, source, _coreActualDiscardRecoveryPhasesOperations.ActualDiscardRecoveryEntities(batch, source), ActualDiscardRecoveryStage.SelectingReturn);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ActualDiscardRecovery = receipt });
         PublishActualDiscardRecoveryPrompt(f);
         return SkillProgramStepOutcome.AwaitChoice;
@@ -143,9 +140,9 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime
     {
         if (f.ActualDiscardRecovery!.Stage == ActualDiscardRecoveryStage.SelectingClaim)
             return p.Choices.Single(c => c.Parameters["option"] == "claim");
-        return p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+        return p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IActualDiscardRecoveryProgramHost.PlaceCapturedEquipmentAndDraw(ProgramSkillFrame f, int target, string bind, int draw) => _coreCapturedEquipmentDrawsOperations.BeginCapturedEquipmentAndDraw(f, target, bind, draw);
-    SkillProgramStepOutcome global::CardGame.Core.IActualDiscardRecoveryProgramHost.RestoreActualDiscardBatch(ProgramSkillFrame f, string stateId) => BeginActualDiscardRecovery(f, stateId);
+    SkillProgramStepOutcome IActualDiscardRecoveryProgramHost.PlaceCapturedEquipmentAndDraw(ProgramSkillFrame f, int target, string bind, int draw) => _coreCapturedEquipmentDrawsOperations.BeginCapturedEquipmentAndDraw(f, target, bind, draw);
+    SkillProgramStepOutcome IActualDiscardRecoveryProgramHost.RestoreActualDiscardBatch(ProgramSkillFrame f, string stateId) => BeginActualDiscardRecovery(f, stateId);
 }

@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaChengOlRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IMaChengHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginChenglie(f, op);
+    SkillProgramStepOutcome IMaChengHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginChenglie(f, op);
     internal SkillProgramStepOutcome BeginChenglie(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var outcome = op == SkillProgramEffectOp.ResolveChenglieRedHolderOutcome;
         if (f.Chenglie is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context)
             throw new InvalidOperationException("Chenglie requires its exact original native single instruction.");
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
+        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
         CardUseFrame use;
         if (outcome)
             use = ChenglieOutcomeUse(candidate, context) ?? throw new InvalidOperationException("Chenglie cannot borrow an unissued completed-use entitlement.");
@@ -110,7 +106,7 @@ internal sealed partial class CharacterMaChengOlRuntime
     [ProgramAnswer("chenglie")]
     internal void AnswerChenglie(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Chenglie: { } r } f || !ChenglieChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Chenglie: { } r } f || !ChenglieChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Chenglie requires its original chooser, exact current secret entity or native target.");
         var expected = r.Stage == ChenglieStage.Gift ? RequireChenglieParent(f).ChenglieLease!.Cards[r.Index].HolderSeat : f.OwnerSeat;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != expected)
@@ -212,7 +208,7 @@ internal sealed partial class CharacterMaChengOlRuntime
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { Chenglie = active.Chenglie!with { Revealed = cards.Select(c => c.Id).ToArray(), Pool = cards.Select(c => c.Id).ToArray() } });
         if (cards.Count > 0)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "chenglie-top", Array.AsReadOnly(cards.Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray())));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "chenglie-top", Array.AsReadOnly(cards.Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray())));
         FinishChenglieMovement(f.Id);
     }
 
@@ -301,7 +297,7 @@ internal sealed partial class CharacterMaChengOlRuntime
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, location, new(ChenglieAssignReason), m =>
         {
             RecordChenglieMove(f.Id, m);
-            var attachment = new ChenglieAttachment(r.Index, target, card.Id, card.Kind, card.Suit, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit), location, m.Sequence);
+            var attachment = new ChenglieAttachment(r.Index, target, card.Id, card.Kind, card.Suit, CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit), location, m.Sequence);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChenglieAttachmentPlacedEvent(r.SetupFrameId, use.Id, r.ActionId, r.Index, target, card.Id, card.Kind, card.Suit, attachment.Red, location, m.Sequence));
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { ChenglieLease = u.ChenglieLease!with { Cards = u.ChenglieLease.Cards.Append(attachment).ToArray() } });
         });
@@ -536,7 +532,7 @@ internal sealed partial class CharacterMaChengOlRuntime
         if (r.Stage == ChenglieStage.Targets)
             return p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "target") ?? p.Choices[0];
         if (r.Stage == ChenglieStage.Gift)
-            return p.Choices.OrderBy(c => c.Cards.Count == 0 ? 0 : global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).First();
+            return p.Choices.OrderBy(c => c.Cards.Count == 0 ? 0 : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).First();
         return p.Choices[0];
     }
 }

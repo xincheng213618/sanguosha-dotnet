@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMuShunAnniversaryRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterMuShunAnniversaryRuntime
     internal bool HasMuShunCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryMuShunJinjian);
     internal bool HasMuShunShizhaoCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryMuShunShizhao);
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryMuShunHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => operation == SkillProgramEffectOp.ResolveAnniversaryMuShunJinjian ? BeginMuShunJinjian(frame) : ResolveMuShunShizhao(frame);
+    SkillProgramStepOutcome IAnniversaryMuShunHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => operation == SkillProgramEffectOp.ResolveAnniversaryMuShunJinjian ? BeginMuShunJinjian(frame) : ResolveMuShunShizhao(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 45300)]
     internal bool QualifyMuShun(ProgramTriggerLegalityContext g)
     {
@@ -91,7 +87,7 @@ internal sealed partial class CharacterMuShunAnniversaryRuntime
     [ProgramAnswer(MuShunAction)]
     internal void AnswerMuShun(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MuShunJinjian.Stage: MuShunContestStage.Choice } f || !ValidMuShunJinjian(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MuShunChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MuShunJinjian.Stage: MuShunContestStage.Choice } f || !ValidMuShunJinjian(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MuShunChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Jinjian lost its exact original damage-source choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

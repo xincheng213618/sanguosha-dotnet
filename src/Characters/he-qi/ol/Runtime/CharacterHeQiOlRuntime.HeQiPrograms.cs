@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHeQiOlRuntime
 {
-    internal static CardConversionSource HeQiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource HeQiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static string HeQiReason(HeQiStage stage) => "skill-program.he-qi." + stage;
     internal int HeQiEmptySlots(int seat) => ShanxiRuntime.EmptySlots(seat, _coreProgramSelectionModulesOperations.ProgramSelectionQueries);
     internal bool HeQiTargetAllowed(int owner, int target) => ShanxiRuntime.AllowsTarget(owner, target, _coreProgramSelectionModulesOperations.ProgramSelectionQueries);
@@ -88,7 +84,7 @@ internal sealed partial class CharacterHeQiOlRuntime
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         RequireHeQi(f);
         var r = f.HeQi!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HeQiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HeQiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Joint hand choice changed its frozen opaque slots.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Stage == HeQiStage.SelectingReveal && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
@@ -209,7 +205,7 @@ internal sealed partial class CharacterHeQiOlRuntime
             throw new InvalidOperationException("HeQi cannot resume without its exact paid entities.");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHeQiProgramHost.BeginHeQi(ProgramSkillFrame f, int target) => BeginHeQi(f, target);
+    SkillProgramStepOutcome IHeQiProgramHost.BeginHeQi(ProgramSkillFrame f, int target) => BeginHeQi(f, target);
     [PublicHandRevealReturn("joint-hands-dodges")]
     internal void ContinueHeQiAfterPublicReveal(ProgramSkillFrame f)
     {

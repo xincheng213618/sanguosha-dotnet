@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYangWanOlRuntime
@@ -51,7 +47,7 @@ internal sealed partial class CharacterYangWanOlRuntime
         }
 
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 诱言：从牌堆中获得 {(gained)} 张与弃置牌花色不同的牌。", active.OwnerSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYouyanGainEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, discardedSuitMask, gained));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYouyanGainEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, discardedSuitMask, gained));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return SkillProgramStepOutcome.AwaitChild;

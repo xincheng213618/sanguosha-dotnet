@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntime
 {
     internal const string NextActualUseAdjustmentBinding = "next-actual-use-target-adjustment";
-    void global::CardGame.Core.INextActualUseTargetAdjustmentProgramHost.GrantNextActualUseTargetAdjustment(ProgramSkillFrame frame, SkillProgramEffect effect) => GrantNextActualUseTargetAdjustment(frame, effect);
+    void INextActualUseTargetAdjustmentProgramHost.GrantNextActualUseTargetAdjustment(ProgramSkillFrame frame, SkillProgramEffect effect) => GrantNextActualUseTargetAdjustment(frame, effect);
     internal void GrantNextActualUseTargetAdjustment(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(frame);
@@ -95,7 +91,7 @@ internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntim
             if (kind == CardKind.BorrowedSword)
             {
                 normal = action.TargetSeats.ToArray();
-                foreach (var holder in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != actor.Seat && !normal.Where((_, i) => i % 2 == 0).Contains(p.Seat) && _coreNativeBorrowedSwordOperations.GetWeapon(p)is not null && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, p.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, suit)))
+                foreach (var holder in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != actor.Seat && !normal.Where((_, i) => i % 2 == 0).Contains(p.Seat) && _coreNativeBorrowedSwordOperations.GetWeapon(p)is not null && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, p.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(suit)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, suit)))
                     foreach (var victim in _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(holder, p)))
                         Add([..normal, holder.Seat, victim.Seat]);
                 if (normal.Length >= 4)
@@ -133,7 +129,7 @@ internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntim
     {
         if (action.CardId != 0)
             return _coreNextCardTargetAdjustmentsOperations.CanBeExtraNextCardTarget(actor, target, action, kind, suit);
-        if (!target.IsAlive || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, suit))
+        if (!target.IsAlive || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(suit)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, suit))
             return false;
         return action.Kind switch
         {
@@ -149,13 +145,13 @@ internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntim
         };
     }
 
-    internal static SkillProgramEffect? NextActualUseSelectedProducer(ProgramExecutionPlan plan) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NextActualUseTargetAdjustments.NextActualUseSelectedProducer(plan);
+    internal static SkillProgramEffect? NextActualUseSelectedProducer(ProgramExecutionPlan plan) => RuntimeSkills.RuntimeRules_Core_NextActualUseTargetAdjustments.NextActualUseSelectedProducer(plan);
     internal bool CanUseNextActualUseSelectedSlash(CharacterState owner, CharacterState target, ProgramMultiCardViewAsSelection selection) => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, target, selection.OutputKind, _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(owner, selection), _coreGuanHaiBridgesOperations.ProgramMultiCardColor(owner, selection), physicalCardIds: selection.Cards.Select(c => c.Id).ToArray()) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner.Seat, target.Seat, selection.OutputKind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, selection.OutputKind, _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(owner, selection), _coreGuanHaiBridgesOperations.ProgramMultiCardColor(owner, selection)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, target.Seat, _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(owner, selection));
     internal ProgramNextActualUseAdjustment? FreezeNextActualUseProgramSelection(CharacterState owner, ProgramExecutionPlan plan, IReadOnlyList<int> targets)
     {
         if (targets.Count <= plan.Activation!.MaxTargets)
             return null;
-        if (_coreHpLossSlashMaterialsOperations.HasHpLossSlashTargets(owner) && global::CardGame.Core.EngineOwners.CoreGameEngineHpLossSlashMaterialsRuntime.HpLossSlashProgramProducer(plan)is not null)
+        if (_coreHpLossSlashMaterialsOperations.HasHpLossSlashTargets(owner) && CoreGameEngineHpLossSlashMaterialsRuntime.HpLossSlashProgramProducer(plan)is not null)
             return null;
         var grant = CurrentNextActualUseAdjustment(owner.Seat) ?? throw new InvalidOperationException("The selected new adjustment expired before its producer started.");
         var effect = NextActualUseSelectedProducer(plan) ?? throw new InvalidOperationException("The producer cannot adjust targets.");
@@ -294,7 +290,7 @@ internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntim
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { NextActualUseAdjustment = receipt with { Stage = ProgramNextActualUseAdjustmentStage.Applied, CardUseFrameId = use.Id } });
     }
 
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> NextActualUseOrdinaryTrickOptions(CharacterState actor, IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> ordinary, Suit? suit, bool? color, Suit? shieldSuit, bool excludeOwner)
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> NextActualUseOrdinaryTrickOptions(CharacterState actor, IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> ordinary, Suit? suit, bool? color, Suit? shieldSuit, bool excludeOwner)
     {
         ordinary = _characterZhangFeiAnniversaryGodOperations.ShenZfOrdinaryTrickOptions(actor, ordinary, suit, color, shieldSuit, excludeOwner);
         if (CurrentNextActualUseAdjustment(actor.Seat)is null)
@@ -348,7 +344,7 @@ internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntim
     }
 
     internal bool IsNextActualUseTrickForbidden(int seat, CardKind kind) => _turnCardUseEffectsOperations._turnCardUseEffects.ActionProhibitions.Any(p => p.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && p.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && p.Source.OwnerSeat == seat && p.ActionTypes.Contains(CardActionType.Use) && ProgramCardKindMatch.Contains(p.CardKinds, kind) && _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.Activations.Any(a => a.Effects.Any(e => e.Op == SkillProgramEffectOp.GrantNextActualUseTargetAdjustment)) == true);
-    internal long? NextActualUseAdjustedSlashParent(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal long? NextActualUseAdjustedSlashParent(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).AdjustedSlashReturn is not { } typed)
             return null;

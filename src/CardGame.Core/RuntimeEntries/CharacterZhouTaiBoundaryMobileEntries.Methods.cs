@@ -2,5 +2,5 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhouTaiBoundaryMobileEntries
 {
-    internal bool CanRunBoundaryZhouTaiFenji(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanRunBoundaryZhouTaiFenji(candidate, context);
+    internal bool CanRunBoundaryZhouTaiFenji(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().CanRunBoundaryZhouTaiFenji(candidate, context);
 }

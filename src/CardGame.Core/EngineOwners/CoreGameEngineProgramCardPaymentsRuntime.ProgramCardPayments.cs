@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramCardPaymentsRuntime
@@ -27,16 +23,16 @@ internal sealed partial class CoreGameEngineProgramCardPaymentsRuntime
         if (!_coreMatchParticipantsPlayersAccess._players[subjectSeat].IsAlive || !_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[subjectSeat]).Any(card => card.Id == equipmentCardId))
             return false;
         var subject = _coreMatchParticipantsPlayersAccess._players[subjectSeat];
-        var projectedRange = global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(subject, equipmentCardId));
-        var projectedCount = _coreMatchParticipantsPlayersAccess._players.Count(player => player.IsAlive && player.Seat != subjectSeat && (_characterSunYuanOlOperations.HasSayingRoundRange(subjectSeat, player.Seat) || _coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(subjectSeat, player.Seat) || global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(subject, player, equipmentCardId)) <= projectedRange));
+        var projectedRange = CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(subject, equipmentCardId));
+        var projectedCount = _coreMatchParticipantsPlayersAccess._players.Count(player => player.IsAlive && player.Seat != subjectSeat && (_characterSunYuanOlOperations.HasSayingRoundRange(subjectSeat, player.Seat) || _coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(subjectSeat, player.Seat) || CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(subject, player, equipmentCardId)) <= projectedRange));
         return projectedCount < CountLivingInAttackRange(subjectSeat);
     }
 
     internal void SetProgramAttackRangeCoverage(long frameId, string name, int subjectSeat, int beforeCount, int afterCount) => _programPaidCardOperations.Get().SetProgramAttackRangeCoverage(frameId, name, subjectSeat, beforeCount, afterCount);
-    internal static bool IsProgramAttackRangeCoverageDecreased(ProgramSkillFrame frame, string bind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.IsProgramAttackRangeCoverageDecreased(frame, bind);
-    internal static bool MatchesProgramCardCategory(CardKind kind, IReadOnlyList<SkillProgramCardCategory> categories) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardCategory(kind, categories);
-    internal static bool MatchesSkillProgramCardCategory(CardKind kind, SkillProgramCardCategory category) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesSkillProgramCardCategory(kind, category);
-    internal static bool MatchesProgramCardFilter(CardKind kind, IReadOnlyList<SkillProgramCardCategory> categories, IReadOnlyList<CardKind> kinds) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardFilter(kind, categories, kinds);
+    internal static bool IsProgramAttackRangeCoverageDecreased(ProgramSkillFrame frame, string bind) => RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.IsProgramAttackRangeCoverageDecreased(frame, bind);
+    internal static bool MatchesProgramCardCategory(CardKind kind, IReadOnlyList<SkillProgramCardCategory> categories) => RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardCategory(kind, categories);
+    internal static bool MatchesSkillProgramCardCategory(CardKind kind, SkillProgramCardCategory category) => RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesSkillProgramCardCategory(kind, category);
+    internal static bool MatchesProgramCardFilter(CardKind kind, IReadOnlyList<SkillProgramCardCategory> categories, IReadOnlyList<CardKind> kinds) => RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardFilter(kind, categories, kinds);
     internal bool CanEnterEquipmentSlot(int recipientSeat, Card card) => _programPaidCardOperations.Get().CanEnterEquipmentSlot(recipientSeat, card);
-    internal static SkillProgramCardCategory GetProgramCardCategory(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.GetProgramCardCategory(kind);
+    internal static SkillProgramCardCategory GetProgramCardCategory(CardKind kind) => RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.GetProgramCardCategory(kind);
 }

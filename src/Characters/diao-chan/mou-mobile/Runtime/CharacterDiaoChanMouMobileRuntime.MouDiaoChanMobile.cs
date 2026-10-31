@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CharacterDiaoChanMouMobileRuntime
 {
     internal const string MouDiaoChanLijian = "mou-mobile:lijian", MouDiaoChanBiyue = "mou-mobile:biyue";
     internal const string MouDiaoChanCostReason = "skill-program.mou-mobile:lijian.discard";
-    internal static CardConversionSource MouDiaoChanSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_diao_chan_mou_mobile_MouDiaoChanMobile.MouDiaoChanSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IMouDiaoChanMobileHost.Start(ProgramSkillFrame f, SkillProgramEffectOp op) => StartMouDiaoChanMobile(f, op);
+    internal static CardConversionSource MouDiaoChanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_diao_chan_mou_mobile_MouDiaoChanMobile.MouDiaoChanSource(f);
+    SkillProgramStepOutcome IMouDiaoChanMobileHost.Start(ProgramSkillFrame f, SkillProgramEffectOp op) => StartMouDiaoChanMobile(f, op);
     internal Card[] MouDiaoChanCosts(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner])).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard)).ToArray();
     internal int MouDiaoChanPhaseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouDiaoChanMobileStartedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Op == SkillProgramEffectOp.ResolveMouDiaoChanLijian && e.Phase == phase);
     [ProgramPhaseUsedProjection(31700)]
@@ -90,7 +87,7 @@ internal sealed partial class CharacterDiaoChanMouMobileRuntime
     [ProgramAnswer("mou-diao-chan-mobile")]
     internal void AnswerMouDiaoChan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDiaoChanMobile: { } r } f || !ValidMouDiaoChan(f) || !MouDiaoChanChoices(f).Any(c => c.Id == choice.Id && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDiaoChanMobile: { } r } f || !ValidMouDiaoChan(f) || !MouDiaoChanChoices(f).Any(c => c.Id == choice.Id && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Mou Diao Chan lost her exact private selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -205,11 +202,11 @@ internal sealed partial class CharacterDiaoChanMouMobileRuntime
         {
             if (r.Targets.Count >= 2)
                 return p.Choices.Single(c => c.Parameters["branch"] == "targets-done");
-            return p.Choices.Where(c => c.Targets.Count == 1 && !r.Targets.Contains(c.Targets[0])).OrderBy(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) ? 1 : 0).ThenBy(c => c.Targets[0]).First();
+            return p.Choices.Where(c => c.Targets.Count == 1 && !r.Targets.Contains(c.Targets[0])).OrderBy(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) ? 1 : 0).ThenBy(c => c.Targets[0]).First();
         }
 
         if (r.Cards.Count == r.Targets.Count - 1)
             return p.Choices.Single(c => c.Parameters["branch"] == "pay");
-        return p.Choices.Where(c => c.Cards.Count == 1 && !r.Cards.Contains(c.Cards[0])).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Cards[0]).First();
+        return p.Choices.Where(c => c.Cards.Count == 1 && !r.Cards.Contains(c.Cards[0])).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Cards[0]).First();
     }
 }

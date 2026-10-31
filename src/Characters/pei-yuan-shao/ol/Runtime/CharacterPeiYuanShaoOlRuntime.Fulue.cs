@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPeiYuanShaoOlRuntime
 {
     internal const string FulueObtainReason = "skill-program.pei-yuan-shao.fulue.obtain";
     internal const string FulueCounterBind = "fulue-counter";
-    internal static FulueOption OtherFulueOption(FulueOption option) => global::CardGame.Core.RuntimeSkills.RuntimeRules_pei_yuan_shao_ol_Fulue.OtherFulueOption(option);
+    internal static FulueOption OtherFulueOption(FulueOption option) => RuntimeSkills.RuntimeRules_pei_yuan_shao_ol_Fulue.OtherFulueOption(option);
     internal bool FulueOptionAvailable(CardConversionSource source, int turn, FulueOption option) => !_coreProgramEventHistoryOperations.ProgramEventHistory<FulueOptionExecutedEvent>().Any(e => e.Entry.Source.OwnerSeat == source.OwnerSeat && e.Entry.Source.SkillId == source.SkillId && e.Entry.ActualTurn == turn && e.Entry.Option == option);
-    internal static bool FulueCardKind(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_pei_yuan_shao_ol_Fulue.FulueCardKind(kind);
+    internal static bool FulueCardKind(CardKind kind) => RuntimeSkills.RuntimeRules_pei_yuan_shao_ol_Fulue.FulueCardKind(kind);
     internal CardUseFrame? FulueContextUse(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
         if (context.CardUse is not { } card || context.OwnerSeat != c.OwnerSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } use || action.ActionId != card.CardActionId || !FulueCardKind(use.CardKind) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action) || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != use.Id || window.Action.ActionId != action.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
@@ -72,13 +68,13 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27120)]
     internal bool QualifyFulue(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => !t.Effects.Any(e => PeiYuanShaoComposition.Handles(e.Op)) || (t.Effects[0].Op == SkillProgramEffectOp.OfferFulueSingleTargetOption ? FulueOriginalCandidate(c, context) : CanRunIssuedFulueCandidate(c, context));
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 150)]
-    internal int FulueDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is global::CardGame.Core.NativeOwners.CardAttackHandle && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { FulueEntries: not null } use && FulueUseProof(use) ? use.FulueEntries!.Count(e => e.Option == FulueOption.Damage) : 0;
-    SkillProgramStepOutcome global::CardGame.Core.IPeiYuanShaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginFulue(f, op);
+    internal int FulueDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { FulueEntries: not null } use && FulueUseProof(use) ? use.FulueEntries!.Count(e => e.Option == FulueOption.Damage) : 0;
+    SkillProgramStepOutcome IPeiYuanShaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginFulue(f, op);
     internal SkillProgramStepOutcome BeginFulue(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var context = f.WindowContext ?? throw new InvalidOperationException("Fulue requires its genuine native card window.");
-        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
+        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
         if (f.Fulue is not null || f.InstructionIndex != 1 || !(op == SkillProgramEffectOp.OfferFulueSingleTargetOption ? FulueOriginalCandidate(c, context) : CanRunIssuedFulueCandidate(c, context)))
             throw new InvalidOperationException("Fulue lost its exact unconsumed native candidate.");
         var use = FulueContextUse(c, context)!;
@@ -93,7 +89,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
         }
 
         var counter = op == SkillProgramEffectOp.ResolveFulueCounterOption;
-        var source = counter ? use.FulueCounter!.Source : new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var source = counter ? use.FulueCounter!.Source : new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var user = counter ? use.FulueCounter!.ActorSeat : action.ActorSeat;
         var target = counter ? use.FulueCounter!.TargetSeat : use.TargetSeats.Single();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Fulue = new(use.Id, action.ActionId, source, f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, user, target, counter, FulueStage.Option) });
@@ -166,7 +162,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
     [ProgramAnswer("fulue")]
     internal void AnswerFulue(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Fulue: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.UserSeat || !FulueChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Fulue: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.UserSeat || !FulueChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Fulue needs its exact original user's current published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -228,7 +224,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.OfferFulueSingleTargetOption, SkillProgramEffectOp.ResolveFulueCounterOption)]
-    internal PromptChoice ChooseFulueAi(PendingDecision p, ProgramSkillFrame f) => f.Fulue?.Stage == FulueStage.Obtain ? p.Choices.OrderByDescending(c => c.Cards.Count > 0 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.Fulue.TargetSeat]) : 2).First() : p.Choices.First(c => c.Parameters["branch"] != "skip");
+    internal PromptChoice ChooseFulueAi(PendingDecision p, ProgramSkillFrame f) => f.Fulue?.Stage == FulueStage.Obtain ? p.Choices.OrderByDescending(c => c.Cards.Count > 0 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.Fulue.TargetSeat]) : 2).First() : p.Choices.First(c => c.Parameters["branch"] != "skip");
     [ProgramIssuedTrigger(590, ProgramIssuedTriggerMatch.Decision)]
     internal bool? DecideIssuedTrigger590(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => IsIssuedFulueCandidate(candidate) ? CanRunIssuedFulueCandidate(candidate, context) : null;
 }

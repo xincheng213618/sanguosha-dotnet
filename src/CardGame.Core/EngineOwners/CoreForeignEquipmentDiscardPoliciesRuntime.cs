@@ -1,23 +1,19 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
-internal sealed partial class CoreForeignEquipmentDiscardPoliciesRuntime : global::CardGame.Core.IOwnedCardMoveLegacyFacts
+[Core.ProgramRuntimeModule, Core.ProgramCapability]
+internal sealed partial class CoreForeignEquipmentDiscardPoliciesRuntime : IOwnedCardMoveLegacyFacts
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterBianFuRenOlEntries _characterBianFuRenOlOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterDongBaiOlEntries _characterDongBaiOlOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterPangTongAnniversaryGodEntries _characterPangTongAnniversaryGodOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterZhangFenAnniversaryEntries _characterZhangFenAnniversaryOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineTurnHandCategoryRestrictionsEntries _coreTurnHandCategoryRestrictionsOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreForeignEquipmentDiscardPoliciesRuntime(global::CardGame.Core.RuntimeEntries.CharacterBianFuRenOlEntries characterBianFuRenOlOperations, global::CardGame.Core.RuntimeEntries.CharacterDongBaiOlEntries characterDongBaiOlOperations, global::CardGame.Core.RuntimeEntries.CharacterPangTongAnniversaryGodEntries characterPangTongAnniversaryGodOperations, global::CardGame.Core.RuntimeEntries.CharacterZhangFenAnniversaryEntries characterZhangFenAnniversaryOperations, global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineTurnHandCategoryRestrictionsEntries coreTurnHandCategoryRestrictionsOperations, global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.RuntimeAccess.IClosedOwnedCardMoveQueriesSource _closedOwnedCardMoveQueriesSource)
+    private readonly RuntimeEntries.CharacterBianFuRenOlEntries _characterBianFuRenOlOperations;
+    private readonly RuntimeEntries.CharacterDongBaiOlEntries _characterDongBaiOlOperations;
+    private readonly RuntimeEntries.CharacterPangTongAnniversaryGodEntries _characterPangTongAnniversaryGodOperations;
+    private readonly RuntimeEntries.CharacterZhangFenAnniversaryEntries _characterZhangFenAnniversaryOperations;
+    private readonly IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries _coreProgramCardPoliciesOperations;
+    private readonly RuntimeEntries.CoreGameEngineTurnHandCategoryRestrictionsEntries _coreTurnHandCategoryRestrictionsOperations;
+    private readonly RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations;
+    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreForeignEquipmentDiscardPoliciesRuntime(RuntimeEntries.CharacterBianFuRenOlEntries characterBianFuRenOlOperations, RuntimeEntries.CharacterDongBaiOlEntries characterDongBaiOlOperations, RuntimeEntries.CharacterPangTongAnniversaryGodEntries characterPangTongAnniversaryGodOperations, RuntimeEntries.CharacterZhangFenAnniversaryEntries characterZhangFenAnniversaryOperations, IKernelContentRegistryAccess contentRegistryOperations, RuntimeEntries.CoreGameEngineProgramCardPoliciesEntries coreProgramCardPoliciesOperations, RuntimeEntries.CoreGameEngineTurnHandCategoryRestrictionsEntries coreTurnHandCategoryRestrictionsOperations, RuntimeEntries.CorePhysicalOwnedCardQueriesEntries corePhysicalOwnedCardQueriesOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, RuntimeAccess.IClosedOwnedCardMoveQueriesSource _closedOwnedCardMoveQueriesSource)
     {
         this._characterBianFuRenOlOperations = characterBianFuRenOlOperations;
         this._characterDongBaiOlOperations = characterDongBaiOlOperations;
@@ -31,5 +27,5 @@ internal sealed partial class CoreForeignEquipmentDiscardPoliciesRuntime : globa
         this._closedOwnedCardMoveQueriesSource = _closedOwnedCardMoveQueriesSource;
     }
 
-    private readonly global::CardGame.Core.RuntimeAccess.IClosedOwnedCardMoveQueriesSource _closedOwnedCardMoveQueriesSource;
+    private readonly RuntimeAccess.IClosedOwnedCardMoveQueriesSource _closedOwnedCardMoveQueriesSource;
 }

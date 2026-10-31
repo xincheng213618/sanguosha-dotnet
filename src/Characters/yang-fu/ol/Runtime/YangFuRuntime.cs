@@ -7,7 +7,7 @@ internal sealed class YangFuRuntime(IProgramRuntimeFrames frames, IProgramRuntim
 {
     private const string BingzhongDrawReason = "skill-program.yang-fu.bingzhong.draw",SuyiEquipmentBind = "suyi-equipment";
     private static CardConversionSource YangFuSource(ProgramSkillFrame f) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_yang_fu_ol_YangFu.YangFuSource(f);
+        RuntimeSkills.RuntimeRules_yang_fu_ol_YangFu.YangFuSource(f);
     private YangFuReceipt NewYangFuReceipt(ProgramSkillFrame f, SkillProgramEffectOp op, YangFuStage stage, int target, int x,
         int? ordinal = null, CardUseFrame? use = null) => new(YangFuSource(f), f.GameplayHash, op, facts.TurnNumber, f.WindowContext?.ParentFrameId ?? 0,
             target, x, ordinal, use?.Id, use?.Action?.ActionId, stage, use?.TargetSeats ?? [], [], facts.MovementSequence, facts.MovementSequence);

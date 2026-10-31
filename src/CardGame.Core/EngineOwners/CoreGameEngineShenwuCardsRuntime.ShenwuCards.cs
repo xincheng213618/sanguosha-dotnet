@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShenwuCardsRuntime
 {
     internal const string ShenwuTransplantSkill = "shenwu:transplant-wood-resolution";
-    internal static string ShenwuTransplantGrant(long id) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ShenwuCards.ShenwuTransplantGrant(id);
+    internal static string ShenwuTransplantGrant(long id) => RuntimeSkills.RuntimeRules_Core_ShenwuCards.ShenwuTransplantGrant(id);
     internal string ShenwuTransplantSource(long id) => $"turn:{(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber)}:{(_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)}:card-use:shenwu-transplant:{(id)}";
     internal void AddShenwuTrickActions(List<LegalAction> actions, CharacterState actor, IEnumerable<Card> playableCards)
     {
@@ -19,12 +14,12 @@ internal sealed partial class CoreGameEngineShenwuCardsRuntime
                 continue;
             if (card.Kind == CardKind.SowBeans)
             {
-                if (!_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, actor.Seat, card.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, card.Kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))))
+                if (!_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, actor.Seat, card.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, card.Kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))))
                     actions.Add(new(LegalActionKind.SowBeans, card.Id, null, "使用【撒豆成兵】"));
                 continue;
             }
 
-            foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(target => target.IsAlive && target.Seat != actor.Seat && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(target).Count != 0 && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, card.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, card.Kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))))
+            foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(target => target.IsAlive && target.Seat != actor.Seat && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(target).Count != 0 && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, card.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, card.Kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))))
                 actions.Add(new(LegalActionKind.TransplantWood, card.Id, target.Seat, $"对 {(target.Name)} 使用【移花接木】"));
         }
     }
@@ -55,7 +50,7 @@ internal sealed partial class CoreGameEngineShenwuCardsRuntime
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ParentFrameId) ?? throw new InvalidOperationException("Sow beans lost its native owner.");
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.ResolvingEffect);
-        var seat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? use.SourceSeat;
+        var seat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? use.SourceSeat;
         var target = _coreMatchParticipantsPlayersAccess._players[seat];
         if (target.IsAlive)
         {
@@ -70,7 +65,7 @@ internal sealed partial class CoreGameEngineShenwuCardsRuntime
     internal void ResolveShenwuTransplantWoodEffect(NullificationWindowFrame pending)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ParentFrameId) ?? throw new InvalidOperationException("Transplant wood lost its native owner.");
-        var actor = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Transplant wood lost its exact target.");
+        var actor = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Transplant wood lost its exact target.");
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) || actor == use.SourceSeat || use.ShenwuTransplant is not null || use.Action is null)
             throw new InvalidOperationException("Transplant wood changed its native target or issuance.");
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.ResolvingEffect);
@@ -101,7 +96,7 @@ internal sealed partial class CoreGameEngineShenwuCardsRuntime
     internal bool AllowsShenwuTransplantActivation(ProgramActivationLegalityContext gate) => gate.SkillId != ShenwuTransplantSkill;
     internal bool IsShenwuTransplantProgram(ProgramSkillFrame frame)
     {
-        if (frame.ShenwuTransplantReturn is not { } receipt || frame.SkillId != ShenwuTransplantSkill || frame.TriggerId is not null || frame.ActivationId != "card-effect" || frame.SelectedCardIds.Count != 0 || !frame.SelectedTargetSeats.SequenceEqual(new[] { receipt.ActorSeat }) || frame.SkillInstanceId != ShenwuTransplantGrant(receipt.CardUseFrameId) || _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.CardUseFrameId)is not { Step: ResolutionFrameStep.ResolvingEffect, ShenwuTransplant: { } state, Action: { } action } use || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.TransplantWood || state.ProgramFrameId != frame.Id || state.ActionId != action.ActionId || state.ActionId != receipt.ActionId || state.TargetIndex != receipt.TargetIndex || use.TargetIndex != receipt.TargetIndex || state.ActorSeat != receipt.ActorSeat || use.TargetIndex < 0 || use.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != receipt.ActorSeat || frame.OwnerSeat != use.SourceSeat || frame.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(ShenwuTransplantSkill).Program!.GameplayHash)
+        if (frame.ShenwuTransplantReturn is not { } receipt || frame.SkillId != ShenwuTransplantSkill || frame.TriggerId is not null || frame.ActivationId != "card-effect" || frame.SelectedCardIds.Count != 0 || !frame.SelectedTargetSeats.SequenceEqual(new[] { receipt.ActorSeat }) || frame.SkillInstanceId != ShenwuTransplantGrant(receipt.CardUseFrameId) || _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.CardUseFrameId)is not { Step: ResolutionFrameStep.ResolvingEffect, ShenwuTransplant: { } state, Action: { } action } use || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.TransplantWood || state.ProgramFrameId != frame.Id || state.ActionId != action.ActionId || state.ActionId != receipt.ActionId || state.TargetIndex != receipt.TargetIndex || use.TargetIndex != receipt.TargetIndex || state.ActorSeat != receipt.ActorSeat || use.TargetIndex < 0 || use.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != receipt.ActorSeat || frame.OwnerSeat != use.SourceSeat || frame.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(ShenwuTransplantSkill).Program!.GameplayHash)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == use.Id && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].SkillGrants.Grants.Any(grant => grant.GrantId == frame.SkillInstanceId && grant.SkillId == frame.SkillId && grant.SkillInstanceId == frame.SkillInstanceId && grant.SourceId == ShenwuTransplantSource(receipt.CardUseFrameId) && grant.TurnExpiry == new SkillGrantTurnExpiry(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat));

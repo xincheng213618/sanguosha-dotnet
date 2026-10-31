@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuSuMobileShiRuntime
 {
     internal bool ShiLsUseMaterialsMatch(CardUseFrame use, CardMovementBatchContext b)
     {
-        if (use.Action is not { Type: CardActionType.Use } a || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardKind != a.EffectiveKind || use.SourceSeat != a.ActorSeat || b.ParentFrameId != use.Id || b.ParentBatchId is not null || b.AwaitingProgramFrameId is not null || b.NativeDrawInvocation is not null || b.NativeBuZhiDiscardInvocation is not null || b.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || b.Movements.Count == 0 || b.Movements.Count != a.PhysicalCards.Count || b.Movements.Select(m => m.CardId).Distinct().Count() != b.Movements.Count)
+        if (use.Action is not { Type: CardActionType.Use } a || CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardKind != a.EffectiveKind || use.SourceSeat != a.ActorSeat || b.ParentFrameId != use.Id || b.ParentBatchId is not null || b.AwaitingProgramFrameId is not null || b.NativeDrawInvocation is not null || b.NativeBuZhiDiscardInvocation is not null || b.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || b.Movements.Count == 0 || b.Movements.Count != a.PhysicalCards.Count || b.Movements.Select(m => m.CardId).Distinct().Count() != b.Movements.Count)
             return false;
         var reason = _coreEquipmentContentOperations.EquipmentRules.IsEquipment(use.CardKind) ? CardMoveReasons.EquipmentUse : CardMoveReasons.Use;
         foreach (var m in b.Movements)
@@ -39,7 +35,7 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MatchBatch, 48900)]
-    internal bool IsShiLsUsePaymentBatch(CardUseFrame use, CardMovementBatchContext b) => use.ShiLuSuPayment is { } paid && ShiLsUseMaterialsMatch(use, b) && global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, b, paid) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsUsePaymentCapturedEvent>().Count(e => e.UseId == use.Id && e.ActionId == use.Action!.ActionId && e.BatchId == b.Id) == 1;
+    internal bool IsShiLsUsePaymentBatch(CardUseFrame use, CardMovementBatchContext b) => use.ShiLuSuPayment is { } paid && ShiLsUseMaterialsMatch(use, b) && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, b, paid) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsUsePaymentCapturedEvent>().Count(e => e.UseId == use.Id && e.ActionId == use.Action!.ActionId && e.BatchId == b.Id) == 1;
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.TrailingTail, 48900)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.HpObserverTail, 48900)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SharedProcessingTail, 48900)]

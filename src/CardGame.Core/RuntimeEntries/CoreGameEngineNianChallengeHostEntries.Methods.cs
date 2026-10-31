@@ -2,5 +2,5 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineNianChallengeHostEntries
 {
-    internal global::CardGame.Core.INianChallengeFeature? NianFeature { get => _resolve().NianFeature; }
+    internal INianChallengeFeature? NianFeature { get => _resolve().NianFeature; }
 }

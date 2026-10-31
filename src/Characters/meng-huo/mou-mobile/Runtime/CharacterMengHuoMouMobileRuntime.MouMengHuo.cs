@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMengHuoMouMobileRuntime
 {
     internal bool HasMouMengHuoCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouMengHuoZaiqi);
 
-    internal static CardConversionSource MouMhSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_meng_huo_mou_mobile_MouMengHuo.MouMhSource(f);
+    internal static CardConversionSource MouMhSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_meng_huo_mou_mobile_MouMengHuo.MouMhSource(f);
     internal int MouMhCharge(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(PlayerMarkerKind.MouMengHuoCharge);
     internal MouMengHuoTurnKey? MouMhTurn()
     {
@@ -56,7 +52,7 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
         return _coreProgramEventHistoryOperations.ProgramEventHistory<MouMengHuoBarbarianUsedEvent>().Any(e => e.ActorSeat == actor && e.Phase == phase);
     }
 
-    internal bool RestoreMouMengHuoDamageSource(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal bool RestoreMouMengHuoDamageSource(NativeOwners.GroupCardHandle group)
     {
         if (!HasMouMengHuoCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)is not { CardKind: CardKind.BarbarianAssault, Action: { } a, MouMengHuoDamageSource: { } r } use || r.UseId != use.Id || r.ActionId != a.ActionId || r.OriginalActorSeat != a.ActorSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouMengHuoAttributionIssuedEvent>().Any(e => e.Attribution == r))
             return false;
@@ -77,7 +73,7 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
         return MouMhCharge(g.OwnerSeat) > 0 && g.Context.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && g.Context.SourceSeat == g.OwnerSeat;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouMengHuoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveMouMh(f, op);
+    SkillProgramStepOutcome IMouMengHuoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveMouMh(f, op);
     internal SkillProgramStepOutcome ResolveMouMh(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

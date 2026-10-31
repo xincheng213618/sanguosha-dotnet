@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiMouOlRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CharacterDengAiMouOlRuntime
         return f is { MouDengAiOl: { Operation: SkillProgramEffectOp.UseMouDengAiJiewan } r } && ValidMouDengAiOl(f) && f.OwnerSeat == q.Actor.Seat && r.Stage is MouDengAiOlStage.Cost or MouDengAiOlStage.Material or MouDengAiOlStage.Snatch or MouDengAiOlStage.Issuing or MouDengAiOlStage.NativeUse && r.Distance > 0 && _coreNativeRuleQueriesOperations.GetCombatDistance(q.Actor.Seat, q.Target.Seat) <= r.Distance;
     }
 
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> MouDengAiSnatchOptions(ProgramSkillFrame f, int id)
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> MouDengAiSnatchOptions(ProgramSkillFrame f, int id)
     {
         if (_cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(f.OwnerSeat))
             return[];
@@ -29,7 +25,7 @@ internal sealed partial class CharacterDengAiMouOlRuntime
         return _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(owner, CardKind.Snatch, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: color, hasActualColor: true, physicalCardIds: [id], includeNextActualUseAdjustment: true, conversionSource: MouDengAiSource(f));
     }
 
-    internal void IssueMouDengAiSnatch(ProgramSkillFrame f, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption selected)
+    internal void IssueMouDengAiSnatch(ProgramSkillFrame f, GameEngine.ProgramOrdinaryTrickUseOption selected)
     {
         var r = f.MouDengAiOl!;
         if (!ValidMouDengAiOl(f) || !r.Paid || r.Stage != MouDengAiOlStage.Snatch || _cardZonesOperations._cardZones.GetLocation(r.CardId) != CardLocation.Hand(f.OwnerSeat))
@@ -45,7 +41,7 @@ internal sealed partial class CharacterDengAiMouOlRuntime
         if (id != o.UseId || !IsMouDengAiSnatch(id))
             throw new InvalidOperationException("Jiewan's declaration changed its original native identity.");
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(f.OwnerSeat), CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramViewAsConvertedEvent(id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, [card.Id], CardKind.Snatch, true, option.TargetSeats));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramViewAsConvertedEvent(id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, [card.Id], CardKind.Snatch, true, option.TargetSeats));
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(id, card, f.OwnerSeat, option.TargetSeats, option.ActionKind, option.TargetCardId, option.RequiredCardKind, CardKind.Snatch);
     }
 

@@ -1,10 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuZhiWeiOlRuntime
@@ -42,7 +38,7 @@ internal sealed partial class CharacterLuZhiWeiOlRuntime
         if (f.Qingzhong is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting, QingzhongPhase: { } phase } w || phase.OwnerSeat != f.OwnerSeat || w.SourceSeat != f.OwnerSeat || phase.ActualTurnNumber != _coreActualTurnProgressTurnNumberAccess._turnNumber || f.InstructionIndex != 1)
             throw new InvalidOperationException("Qingzhong requires its original unpaid own Play-start boundary.");
         var ending = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!.Triggers.Single(t => t.Effects is [{ Op: SkillProgramEffectOp.SettleQingzhongActualPlayDebt }]);
-        var debt = new QingzhongPlayDebt(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, w.ParentFrameId, phase, ending.Id, f.InstructionIndex);
+        var debt = new QingzhongPlayDebt(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, w.ParentFrameId, phase, ending.Id, f.InstructionIndex);
         _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].ArmQingzhongDebt(debt);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Qingzhong = new(debt, QingzhongStage.DrawChildren, f.InstructionIndex, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, 0), PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QingzhongDebtArmedEvent(debt));
@@ -150,6 +146,6 @@ internal sealed partial class CharacterLuZhiWeiOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILuZhiWeiProgramHost.DrawAndArmQingzhongActualPlayDebt(ProgramSkillFrame f) => DrawAndArmQingzhongActualPlayDebt(f);
-    SkillProgramStepOutcome global::CardGame.Core.ILuZhiWeiProgramHost.SettleQingzhongActualPlayDebt(ProgramSkillFrame f) => SettleQingzhongActualPlayDebt(f);
+    SkillProgramStepOutcome ILuZhiWeiProgramHost.DrawAndArmQingzhongActualPlayDebt(ProgramSkillFrame f) => DrawAndArmQingzhongActualPlayDebt(f);
+    SkillProgramStepOutcome ILuZhiWeiProgramHost.SettleQingzhongActualPlayDebt(ProgramSkillFrame f) => SettleQingzhongActualPlayDebt(f);
 }

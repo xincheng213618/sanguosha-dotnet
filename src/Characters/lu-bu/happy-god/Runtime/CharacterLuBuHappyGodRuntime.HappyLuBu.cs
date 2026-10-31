@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,11 +7,11 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
 {
     internal const string HappyLuBuBasicReason = "skill-program.happy-wuqian.basic";
     internal bool HasHappyLuBuWuqianCapability(CharacterState source) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse) && _coreNativeSkillContextQueriesOperations.HasProgramSkill(source, HappyLuBuComposition.Wuqian);
-    internal static CardConversionSource HappyLuBuSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IHappyLuBuHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyLuBu(f, op);
+    internal static CardConversionSource HappyLuBuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IHappyLuBuHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyLuBu(f, op);
     internal bool HappyLuBuFirstUse(CardUseFrame use)
     {
-        if (use.SourceSeat < 0 || !_coreCurrentTurnUseKindsOperations.HasOngoingActualUseTurn || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.CardKind != CardKind.Duel)
+        if (use.SourceSeat < 0 || !_coreCurrentTurnUseKindsOperations.HasOngoingActualUseTurn || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.CardKind != CardKind.Duel)
             return false;
         return _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent or TurnEndedEvent).OfType<CurrentTurnCardUseKindsRecordedEvent>().Where(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.ActorSeat == use.SourceSeat && e.RoundActionType == CardActionType.Use && (use.CardKind == CardKind.Duel ? e.EffectiveCardKind == CardKind.Duel : e.EffectiveCardKind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash)).FirstOrDefault()?.OriginFrameId == use.Id;
     }
@@ -50,7 +47,7 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
         if (op == SkillProgramEffectOp.ResetHappyShenLuBuShenfen)
         {
             var parent = _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId) ?? throw new InvalidOperationException("Shenfen lost its real completed turn.");
-            if (!_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent) || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(parent)) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp != _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp)
+            if (!_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent) || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(parent)) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp != _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp)
                 throw new InvalidOperationException("Shenfen reset requires actual completed-turn full HP.");
             var group = HappyLuBuShenfenActivation().UsageGroup;
             var before = _skillRuntimeStateOperations._skillRuntimeState.GetUsage(f.OwnerSeat, f.SkillId, group, SkillUsageScope.Game);
@@ -85,7 +82,7 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        var candidates = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Basic).ToArray();
+        var candidates = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Basic).ToArray();
         if (candidates.Length > 0)
         {
             var card = candidates[_randomOperations._random.Next(candidates.Length)];
@@ -107,7 +104,7 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
     {
         if (!_coreDesignatedExtraTargetsOperations.CanBeDistanceFreeDesignatedTarget(use, target))
             return false;
-        return !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || _coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat], target, new(-1, use.CardKind, use.Action!.EffectiveSuit ?? Suit.None, use.Action.EffectiveRank ?? 0), use.Action.ConversionChain.FirstOrDefault(), use.CardKind, existingUseFrameId: use.Id, specificEffectiveRank: use.Action.EffectiveRank, physicalCardIds: use.Action.PhysicalCards.Select(c => c.CardId).ToArray());
+        return !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || _coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat], target, new(-1, use.CardKind, use.Action!.EffectiveSuit ?? Suit.None, use.Action.EffectiveRank ?? 0), use.Action.ConversionChain.FirstOrDefault(), use.CardKind, existingUseFrameId: use.Id, specificEffectiveRank: use.Action.EffectiveRank, physicalCardIds: use.Action.PhysicalCards.Select(c => c.CardId).ToArray());
     }
 
     internal IReadOnlyList<PromptChoice> HappyLuBuChoices(ProgramSkillFrame f)
@@ -164,7 +161,7 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
     internal void AnswerHappyLuBuTarget(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Wuqian lost its target parent.");
-        if (!HappyLuBuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
+        if (!HappyLuBuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
             throw new InvalidOperationException("Wuqian requires its exact published target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         ApplyHappyLuBuUse(f, chosen.Targets.Count == 0 ? null : chosen.Targets.Single());
@@ -196,9 +193,9 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
     internal PromptChoice HappyLuBuAi(PendingDecision p) => p.Choices.First();
     internal int HappyLuBuRequiredResponseCount(int skillOwner, int source, int responder, CardKind incoming, CardKind required)
     {
-        if (skillOwner != source || incoming == CardKind.Duel && required != CardKind.Slash || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && required != CardKind.Dodge)
+        if (skillOwner != source || incoming == CardKind.Duel && required != CardKind.Slash || CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && required != CardKind.Dodge)
             return 1;
         var id = incoming == CardKind.Duel ? _coreNativeCardContinuationCursorsOperations.ActiveDuel?.ResolutionId : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.ResolutionId;
-        return id is { } useId && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { HappyLuBuWuqian: { Applied: true } r } use && r.Source.OwnerSeat == source && use.SourceSeat == source && r.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && (incoming == CardKind.Duel ? use.CardKind == CardKind.Duel : global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind)) && use.TargetSeats.Contains(responder) ? 2 : 1;
+        return id is { } useId && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { HappyLuBuWuqian: { Applied: true } r } use && r.Source.OwnerSeat == source && use.SourceSeat == source && r.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && (incoming == CardKind.Duel ? use.CardKind == CardKind.Duel : CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind)) && use.TargetSeats.Contains(responder) ? 2 : 1;
     }
 }

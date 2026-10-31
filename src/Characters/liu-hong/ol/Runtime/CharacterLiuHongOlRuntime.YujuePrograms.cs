@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuHongOlRuntime
 {
-    internal static string YujueSlotDisplayName(EquipmentSlot slot) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_hong_ol_Yujue_Programs.YujueSlotDisplayName(slot);
+    internal static string YujueSlotDisplayName(EquipmentSlot slot) => RuntimeSkills.RuntimeRules_liu_hong_ol_Yujue_Programs.YujueSlotDisplayName(slot);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 40, SkillProgramEffectOp.YujueResolve)]
     internal bool CanRunYujueResolve(int ownerSeat)
     {
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive)
             return false;
         var owner = _coreMatchParticipantsPlayersAccess._players[ownerSeat];
-        if (!global::CardGame.Core.EngineOwners.CharacterLiuHongOlDefinitions.YujueSlotOrder.Any(slot => owner.EquipmentSlotCapacity(slot) > 0))
+        if (!CharacterLiuHongOlDefinitions.YujueSlotOrder.Any(slot => owner.EquipmentSlotCapacity(slot) > 0))
             return false;
         return _coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && player.Seat != ownerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(player).Count > 0);
     }
@@ -46,7 +42,7 @@ internal sealed partial class CharacterLiuHongOlRuntime
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
-        var slots = global::CardGame.Core.EngineOwners.CharacterLiuHongOlDefinitions.YujueSlotOrder.Where(slot => owner.EquipmentSlotCapacity(slot) > 0).ToArray();
+        var slots = CharacterLiuHongOlDefinitions.YujueSlotOrder.Where(slot => owner.EquipmentSlotCapacity(slot) > 0).ToArray();
         var choices = slots.Select(slot => new PromptChoice(new ChoiceId($"yujue-slot.frame-{(active.Id)}.{(slot)}"), $"废除你的{(YujueSlotDisplayName(slot))}。", [], [], new Dictionary<string, string> { ["program-action"] = "yujue-slot", ["frame-id"] = active.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["slot"] = slot.ToString() })).ToList<PromptChoice>();
         choices.Add(new PromptChoice(new ChoiceId($"yujue-decline.frame-{(active.Id)}"), "不发动【鬻爵】。", [], [], new Dictionary<string, string> { ["program-action"] = "yujue-decline", ["frame-id"] = active.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) }));
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, active.OwnerSeat, $"【{(presentation.Name)}】你可以废除一个装备栏，然后令一名有手牌的其他角色交给你一张手牌，其获得“执笏”直到你的下回合开始。", [], [], active.OwnerSeat)
@@ -102,11 +98,11 @@ internal sealed partial class CharacterLiuHongOlRuntime
             return;
         }
 
-        if (!System.Enum.TryParse<EquipmentSlot>(selected.Parameters.GetValueOrDefault("slot"), out var slot) || !global::CardGame.Core.EngineOwners.CharacterLiuHongOlDefinitions.YujueSlotOrder.Contains(slot) || _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].EquipmentSlotCapacity(slot) <= 0)
+        if (!Enum.TryParse<EquipmentSlot>(selected.Parameters.GetValueOrDefault("slot"), out var slot) || !CharacterLiuHongOlDefinitions.YujueSlotOrder.Contains(slot) || _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].EquipmentSlotCapacity(slot) <= 0)
             throw new InvalidOperationException("The Yujue slot is no longer available.");
         if (!CanRunYujueResolve(active.OwnerSeat))
             throw new InvalidOperationException("The Yujue invocation lost its prerequisites.");
-        var source = new CardConversionSource(active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId);
+        var source = new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId);
         var pending = new YujuePendingState(slot.ToString(), null, source, active.GameplayHash, active.InstructionIndex);
         AbolishYujueSlot(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), slot);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYujueSlotPaidEvent(active.Id, source, active.GameplayHash, active.InstructionIndex, slot.ToString()));
@@ -212,7 +208,7 @@ internal sealed partial class CharacterLiuHongOlRuntime
     internal void CompleteYujueInvocation(ProgramSkillFrame frame, YujuePendingState pending, bool given, int? targetSeat, int? givenCardId)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYujueInvokedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, pending.AbolishedSlot, targetSeat ?? -1, givenCardId ?? -1));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYujueInvokedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, pending.AbolishedSlot, targetSeat ?? -1, givenCardId ?? -1));
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { YujuePending = null, ReexecuteParticipantInstruction = false });
         if (given && targetSeat is { } seat)
         {
@@ -220,14 +216,14 @@ internal sealed partial class CharacterLiuHongOlRuntime
             _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[seat].Name)} 获得“执笏”，直到 {(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 的下回合开始。", active.OwnerSeat, seat);
         }
 
-        _coreMatchLogOperations.AddLog("SkillTriggered", given ? $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 的【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】结算完成：废除{(YujueSlotDisplayName(System.Enum.Parse<EquipmentSlot>(pending.AbolishedSlot)))}，获得一张手牌。" : $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 的【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】结算完成：废除{(YujueSlotDisplayName(System.Enum.Parse<EquipmentSlot>(pending.AbolishedSlot)))}。", active.OwnerSeat, targetSeat);
+        _coreMatchLogOperations.AddLog("SkillTriggered", given ? $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 的【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】结算完成：废除{(YujueSlotDisplayName(Enum.Parse<EquipmentSlot>(pending.AbolishedSlot)))}，获得一张手牌。" : $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 的【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】结算完成：废除{(YujueSlotDisplayName(Enum.Parse<EquipmentSlot>(pending.AbolishedSlot)))}。", active.OwnerSeat, targetSeat);
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
 
     internal PromptChoice SelectAiYujueSlotChoice(PendingDecision decision)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat];
-        var ranked = global::CardGame.Core.EngineOwners.CharacterLiuHongOlDefinitions.YujueAiAbolishPreference.Where(slot => owner.EquipmentSlotCapacity(slot) > 0).Select((slot, index) => (Slot: slot, Index: index, Equipped: _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Any(card => _coreEquipmentContentOperations.EquipmentRules.Get(card.Kind).Slot == slot))).OrderBy(entry => entry.Equipped ? 1 : 0).ThenBy(entry => entry.Index).First();
+        var ranked = CharacterLiuHongOlDefinitions.YujueAiAbolishPreference.Where(slot => owner.EquipmentSlotCapacity(slot) > 0).Select((slot, index) => (Slot: slot, Index: index, Equipped: _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Any(card => _coreEquipmentContentOperations.EquipmentRules.Get(card.Kind).Slot == slot))).OrderBy(entry => entry.Equipped ? 1 : 0).ThenBy(entry => entry.Index).First();
         return decision.Choices.Single(choice => choice.Parameters.GetValueOrDefault("slot") == ranked.Slot.ToString());
     }
 

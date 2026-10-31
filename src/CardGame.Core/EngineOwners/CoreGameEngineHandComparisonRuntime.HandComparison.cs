@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineHandComparisonRuntime
@@ -88,9 +84,9 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
         return designated.Contains(actor.Seat) || targets.Count == 0 && IsImplicitSelfCardUse(kind);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHandComparisonProgramHost.CompareSelectedHandWithHpHand(ProgramSkillFrame f, SkillProgramEffect e) => CompareSelectedHandWithHpHand(f, e);
-    void global::CardGame.Core.IHandComparisonProgramHost.AdjustPersistentHandLimit(ProgramSkillFrame f, int targetSeat, int amount, string stateId) => AdjustPersistentHandLimit(f, targetSeat, amount, stateId);
-    void global::CardGame.Core.IHandComparisonProgramHost.ProhibitSelfCardTargetsForTurn(ProgramSkillFrame f)
+    SkillProgramStepOutcome IHandComparisonProgramHost.CompareSelectedHandWithHpHand(ProgramSkillFrame f, SkillProgramEffect e) => CompareSelectedHandWithHpHand(f, e);
+    void IHandComparisonProgramHost.AdjustPersistentHandLimit(ProgramSkillFrame f, int targetSeat, int amount, string stateId) => AdjustPersistentHandLimit(f, targetSeat, amount, stateId);
+    void IHandComparisonProgramHost.ProhibitSelfCardTargetsForTurn(ProgramSkillFrame f)
     {
         _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(f);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSelfCardTargetsProhibitedEvent(f.OwnerSeat, f.SkillId, f.SkillInstanceId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat));
@@ -132,7 +128,7 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
             foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetHand(target))
                 Add("discard", ("hand-" + _corePhysicalOwnedCardQueriesOperations.GetHand(target).ToList().IndexOf(card)), "弃置第" + (_corePhysicalOwnedCardQueriesOperations.GetHand(target).ToList().IndexOf(card) + 1) + "张手牌", [], [target.Seat]);
             foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetEquipment(target).Where(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(f.OwnerSeat, card, CardLocation.Equipment(target.Seat), OwnedCardMoveIntent.Discard)))
-                Add("discard", ("equipment-" + card.Id), "弃置【" + card.DisplayName + " " + global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit) + card.RankText + "】", [card.Id], [target.Seat]);
+                Add("discard", ("equipment-" + card.Id), "弃置【" + card.DisplayName + " " + CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit) + card.RankText + "】", [card.Id], [target.Seat]);
         }
 
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
@@ -268,7 +264,7 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
 
         var own = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Single(c => c.Id == d.SourceCardId);
         var revealed = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[d.TargetSeat]).Where(c => d.RevealedIds.Contains(c.Id)).ToArray();
-        var color = revealed.Any(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[d.TargetSeat], c)) == global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], own)));
+        var color = revealed.Any(c => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[d.TargetSeat], c)) == CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], own)));
         var rank = revealed.Any(c => (_characterGuanYuWumiaoOperations.JuewuForeignHandRank(_coreMatchParticipantsPlayersAccess._players[d.TargetSeat], c) ?? c.Rank) == (_characterGuanYuWumiaoOperations.JuewuForeignHandRank(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], own) ?? own.Rank));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramHandComparisonResolvedEvent(f.OwnerSeat, f.SkillId, f.SkillInstanceId, effect.StateId!, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, d.SourceCardId, d.TargetSeat, d.RevealedIds, color, rank));
         if (!color && !rank)

@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSoleTargetReplacementCandidatesEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineSoleTargetReplacementCandidatesRuntime> _resolve;
-    private CoreGameEngineSoleTargetReplacementCandidatesEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineSoleTargetReplacementCandidatesRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineSoleTargetReplacementCandidatesRuntime> _resolve;
+    private CoreGameEngineSoleTargetReplacementCandidatesEntries(Func<EngineOwners.CoreGameEngineSoleTargetReplacementCandidatesRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineSoleTargetReplacementCandidatesEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineSoleTargetReplacementCandidatesRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineSoleTargetReplacementCandidatesEntries Create(Func<EngineOwners.CoreGameEngineSoleTargetReplacementCandidatesRuntime> resolve) => new(resolve);
 }

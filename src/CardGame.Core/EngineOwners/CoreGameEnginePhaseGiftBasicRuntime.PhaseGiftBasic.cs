@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePhaseGiftBasicRuntime
@@ -46,6 +42,6 @@ internal sealed partial class CoreGameEnginePhaseGiftBasicRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { ChoiceBindings = Array.AsReadOnly(active.ChoiceBindings.Append(new ProgramChoiceResultBinding(resultBind, receipt.PreviousCount < threshold && receipt.PreviousCount + receipt.ActualCount >= threshold ? "crossed" : "not-crossed", active.OwnerSeat)).ToArray()) });
     }
 
-    void global::CardGame.Core.IPhaseGiftBasicProgramHost.AccumulatePaidPhaseGift(ProgramSkillFrame frame, string resultBind, int threshold) => AccumulatePaidPhaseGift(frame, resultBind, threshold);
-    SkillProgramStepOutcome global::CardGame.Core.IPhaseGiftBasicProgramHost.OfferVirtualBasicCard(ProgramSkillFrame frame) => _coreVirtualBasicOffersOperations.OfferVirtualBasicCard(frame);
+    void IPhaseGiftBasicProgramHost.AccumulatePaidPhaseGift(ProgramSkillFrame frame, string resultBind, int threshold) => AccumulatePaidPhaseGift(frame, resultBind, threshold);
+    SkillProgramStepOutcome IPhaseGiftBasicProgramHost.OfferVirtualBasicCard(ProgramSkillFrame frame) => _coreVirtualBasicOffersOperations.OfferVirtualBasicCard(frame);
 }

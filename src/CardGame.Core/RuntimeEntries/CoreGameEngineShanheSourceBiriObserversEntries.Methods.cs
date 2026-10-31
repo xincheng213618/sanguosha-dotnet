@@ -4,8 +4,8 @@ internal sealed partial class CoreGameEngineShanheSourceBiriObserversEntries
 {
     internal bool AdvanceShanheSourceBiriChildren() => _resolve().AdvanceShanheSourceBiriChildren();
     internal bool IsShanheSourceBiriObserverDying() => _resolve().IsShanheSourceBiriObserverDying();
-    internal bool IsShanheSourceBiriRecoveryParent(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().IsShanheSourceBiriRecoveryParent(frame, recovery);
-    internal bool ShanheSourceBiriFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().ShanheSourceBiriFirstChild(root, child);
+    internal bool IsShanheSourceBiriRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery) => _resolve().IsShanheSourceBiriRecoveryParent(frame, recovery);
+    internal bool ShanheSourceBiriFirstChild(ProgramSkillFrame root, ResolutionFrame child) => _resolve().ShanheSourceBiriFirstChild(root, child);
     internal bool ShanheSourceBiriObserverEdge(int index) => _resolve().ShanheSourceBiriObserverEdge(index);
-    internal global::CardGame.Core.ProgramSkillFrame? ShanheSourceBiriObserverRoot() => _resolve().ShanheSourceBiriObserverRoot();
+    internal ProgramSkillFrame? ShanheSourceBiriObserverRoot() => _resolve().ShanheSourceBiriObserverRoot();
 }

@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFaZhengMouMobileRuntime
 {
     internal const string MouFaZhengGiftReason = "skill-program.mou-mobile:xuanhuo.give", MouFaZhengTakeReason = "skill-program.mou-mobile:xuanhuo.take", MouFaZhengRepayReason = "skill-program.mou-mobile:enyuan.give";
-    SkillProgramStepOutcome global::CardGame.Core.IMouFaZhengHost.Start(ProgramSkillFrame f, SkillProgramEffectOp op) => StartMouFaZheng(f, op);
+    SkillProgramStepOutcome IMouFaZhengHost.Start(ProgramSkillFrame f, SkillProgramEffectOp op) => StartMouFaZheng(f, op);
     internal bool CanMouFaZhengMark(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && target != owner && !MouFaZhengMarks().Any(m => m.TargetSeat == target);
     internal IReadOnlyList<PromptChoice> MouFaZhengPayments(ProgramSkillFrame f, int target) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Transfer, destination: SkillProgramCardDestination.SelectedTargetHand, destinationSeat: target);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 31800, SkillProgramEffectOp.IssueMouFaZhengXuanhuo)]
@@ -43,7 +40,7 @@ internal sealed partial class CharacterFaZhengMouMobileRuntime
         }
         else
         {
-            if (f.ActivationId != f.TriggerId || f.WindowContext is not { } w || !CanOfferMouFaZheng(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, w.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), w))
+            if (f.ActivationId != f.TriggerId || f.WindowContext is not { } w || !CanOfferMouFaZheng(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, w.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), w))
                 throw new InvalidOperationException("Mou Fa Zheng cannot borrow another gain or Preparation window.");
             r = r with
             {
@@ -57,7 +54,7 @@ internal sealed partial class CharacterFaZhengMouMobileRuntime
                 };
             else
             {
-                var q = MouFaZhengQualification(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, w.OccurrenceIndex), w)!;
+                var q = MouFaZhengQualification(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, w.OccurrenceIndex), w)!;
                 r = r with
                 {
                     MarkId = q.MarkId,
@@ -125,7 +122,7 @@ internal sealed partial class CharacterFaZhengMouMobileRuntime
     [ProgramAnswer("mou-fa-zheng")]
     internal void AnswerMouFaZheng(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouFaZheng: { } r } f || !ValidMouFaZheng(f) || !MouFaZhengChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouFaZheng: { } r } f || !ValidMouFaZheng(f) || !MouFaZhengChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Mou Fa Zheng lost his exact current HE payment choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == MouFaZhengStage.Target)
@@ -318,5 +315,5 @@ internal sealed partial class CharacterFaZhengMouMobileRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.IssueMouFaZhengXuanhuo, SkillProgramEffectOp.ResolveMouFaZhengEnyuan)]
-    internal PromptChoice AiMouFaZheng(PendingDecision p, ProgramSkillFrame f) => f.MouFaZheng!.Stage == MouFaZhengStage.Target ? p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) ? 1 : 0).ThenBy(c => c.Targets[0]).First() : p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    internal PromptChoice AiMouFaZheng(PendingDecision p, ProgramSkillFrame f) => f.MouFaZheng!.Stage == MouFaZhengStage.Target ? p.Choices.OrderBy(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) ? 1 : 0).ThenBy(c => c.Targets[0]).First() : p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 }

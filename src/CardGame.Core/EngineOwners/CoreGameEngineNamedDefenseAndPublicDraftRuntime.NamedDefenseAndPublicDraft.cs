@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNamedDefenseAndPublicDraftRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.INamedDefenseAndPublicDraftHost.BeginNamedTargetDefense(ProgramSkillFrame frame, string ledgerId, IReadOnlyList<CardKind> names) => BeginNamedTargetDefense(frame, ledgerId, names);
-    SkillProgramStepOutcome global::CardGame.Core.INamedDefenseAndPublicDraftHost.BeginLowHandPublicDraft(ProgramSkillFrame frame) => BeginLowHandPublicDraft(frame);
-    internal static string DefenseNameUsage(string ledger, CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NamedDefenseAndPublicDraft.DefenseNameUsage(ledger, kind);
+    SkillProgramStepOutcome INamedDefenseAndPublicDraftHost.BeginNamedTargetDefense(ProgramSkillFrame frame, string ledgerId, IReadOnlyList<CardKind> names) => BeginNamedTargetDefense(frame, ledgerId, names);
+    SkillProgramStepOutcome INamedDefenseAndPublicDraftHost.BeginLowHandPublicDraft(ProgramSkillFrame frame) => BeginLowHandPublicDraft(frame);
+    internal static string DefenseNameUsage(string ledger, CardKind kind) => RuntimeSkills.RuntimeRules_Core_NamedDefenseAndPublicDraft.DefenseNameUsage(ledger, kind);
     internal CardUseFrame NamedDefenseUse(ProgramSkillFrame frame)
     {
         var context = frame.WindowContext;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } use } || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.EffectiveKind) || use.EventTargetSeat != frame.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(parent => parent.Id == use.ParentCardUseFrameId)is not { Action: { } action } parent || action.ActionId != use.CardActionId || action.ActorSeat != use.ActorSeat || action.EffectiveKind != use.EffectiveKind || !parent.TargetSeats.Contains(frame.OwnerSeat))
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } use } || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.EffectiveKind) || use.EventTargetSeat != frame.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(parent => parent.Id == use.ParentCardUseFrameId)is not { Action: { } action } parent || action.ActionId != use.CardActionId || action.ActorSeat != use.ActorSeat || action.EffectiveKind != use.EffectiveKind || !parent.TargetSeats.Contains(frame.OwnerSeat))
             throw new InvalidOperationException("A named defense requires its target's frozen actual Slash.");
         return parent;
     }
@@ -40,7 +36,7 @@ internal sealed partial class CoreGameEngineNamedDefenseAndPublicDraftRuntime
             return;
         }
 
-        var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[actor]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[actor])).Where(card => global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(card.Kind) == defense.Name).OrderBy(card => card.Id).ToArray();
+        var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[actor]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[actor])).Where(card => CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(card.Kind) == defense.Name).OrderBy(card => card.Id).ToArray();
         var choices = cards.Select(card => NamedDraftChoice(frame, "named-defense-pay", $"弃置【{(card.DisplayName)}】并获得对方一张牌", card.Id)).ToList();
         choices.Add(NamedDraftChoice(frame, "named-defense-decline", "令此杀对目标无效"));
         PublishNamedDraftPrompt(frame, actor, $"弃置一张【{(CardCatalog.Get(defense.Name!.Value).DisplayName)}】，或令此杀对目标无效。", choices, true);
@@ -139,7 +135,7 @@ internal sealed partial class CoreGameEngineNamedDefenseAndPublicDraftRuntime
             return;
         }
 
-        PublishNamedDraftPrompt(frame, frame.OwnerSeat, $"选择展示的手牌（{(draft.CardIds.Count)}/{(draft.RecipientSeats.Count)}）。", cards.Select(card => NamedDraftChoice(frame, "public-draft-show", $"展示【{(card.DisplayName)}】（{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}）", card.Id)).ToArray(), true);
+        PublishNamedDraftPrompt(frame, frame.OwnerSeat, $"选择展示的手牌（{(draft.CardIds.Count)}/{(draft.RecipientSeats.Count)}）。", cards.Select(card => NamedDraftChoice(frame, "public-draft-show", $"展示【{(card.DisplayName)}】（{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}）", card.Id)).ToArray(), true);
     }
 
     internal void ContinuePublicHandDraft(ProgramSkillFrame frame)
@@ -161,11 +157,11 @@ internal sealed partial class CoreGameEngineNamedDefenseAndPublicDraftRuntime
         PublishNamedDraftPrompt(frame, recipient, "从展示的牌中选择获得一张。", cards.Select(id =>
         {
             var card = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Single(card => card.Id == id);
-            return NamedDraftChoice(frame, "public-draft-gain", $"获得【{(card.DisplayName)}】（{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}）", id);
+            return NamedDraftChoice(frame, "public-draft-gain", $"获得【{(card.DisplayName)}】（{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}）", id);
         }).ToArray(), false);
     }
 
-    internal static PromptChoice NamedDraftChoice(ProgramSkillFrame frame, string action, string label, int? card = null, int? slot = null, CardKind? name = null, int? seat = null) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NamedDefenseAndPublicDraft.NamedDraftChoice(frame, action, label, card, slot, name, seat);
+    internal static PromptChoice NamedDraftChoice(ProgramSkillFrame frame, string action, string label, int? card = null, int? slot = null, CardKind? name = null, int? seat = null) => RuntimeSkills.RuntimeRules_Core_NamedDefenseAndPublicDraft.NamedDraftChoice(frame, action, label, card, slot, name, seat);
     internal void PublishNamedDraftPrompt(ProgramSkillFrame frame, int chooser, string text, IReadOnlyList<PromptChoice> choices, bool privacy)
     {
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId);
@@ -217,7 +213,7 @@ internal sealed partial class CoreGameEngineNamedDefenseAndPublicDraftRuntime
                 if (from.OwnerSeat != actor || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
                     throw new InvalidOperationException("The named cost is not the actor's owned card.");
                 var card = _cardZonesOperations._cardZones.CardsAt(from).Single(card => card.Id == id);
-                if (global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(card.Kind) != defense.Name)
+                if (CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(card.Kind) != defense.Name)
                     throw new InvalidOperationException("The real cost has another name.");
                 _coreNativePromptBoundaryOperations.ClearPendingDecision();
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { NamedTargetDefense = defense with { Stage = 2 } });

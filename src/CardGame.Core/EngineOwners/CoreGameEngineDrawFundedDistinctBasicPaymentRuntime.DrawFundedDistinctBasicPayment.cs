@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntime
 {
-    internal bool IsDrawFundedDistinctBasicAnswer(ChoiceId choice) => _corePendingDecisionPolicyPipelineOperations._pendingDecision?.Choices.Any(c => c.Id == choice && global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime.IsDrawFundedDistinctBasicAnswer(c)) == true;
+    internal bool IsDrawFundedDistinctBasicAnswer(ChoiceId choice) => _corePendingDecisionPolicyPipelineOperations._pendingDecision?.Choices.Any(c => c.Id == choice && CoreGameEngineDrawFundedDistinctBasicOffersRuntime.IsDrawFundedDistinctBasicAnswer(c)) == true;
     internal CommandResult SubmitDrawFundedDistinctBasicAnswer(int actorSeat, PromptId promptId, ChoiceId choiceId)
     {
         if (!_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._started)
@@ -16,15 +12,15 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
             return _kernelCoreMainOperations.Reject(CommandErrorCode.IllegalAction, "游戏已经结束。");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || prompt.PlayerSeat != actorSeat || prompt.PromptId != promptId)
             return _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidPrompt, "摸牌转换必须回答当前精确提示。");
-        var choice = prompt.Choices.SingleOrDefault(c => c.Id == choiceId && global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime.IsDrawFundedDistinctBasicAnswer(c));
+        var choice = prompt.Choices.SingleOrDefault(c => c.Id == choiceId && CoreGameEngineDrawFundedDistinctBasicOffersRuntime.IsDrawFundedDistinctBasicAnswer(c));
         return choice is null ? _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "该摸牌转换选择未发布。") : SubmitDrawFundedDistinctBasicAnswer(actorSeat, prompt, choice);
     }
 
     internal CommandResult SubmitDrawFundedDistinctBasicAnswer(int actorSeat, PendingDecision prompt, PromptChoice choice)
     {
-        if (prompt.PlayerSeat != actorSeat || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PromptId != prompt.PromptId || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || choice.Cards.Count != 0 || !Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("output-kind"), out var kind) || !int.TryParse(choice.Parameters.GetValueOrDefault("native-target-seat"), out var target) || _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicContext(prompt)is not { } need || !_coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicResponseChoices(prompt, need).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (prompt.PlayerSeat != actorSeat || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PromptId != prompt.PromptId || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || choice.Cards.Count != 0 || !Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("output-kind"), out var kind) || !int.TryParse(choice.Parameters.GetValueOrDefault("native-target-seat"), out var target) || _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicContext(prompt)is not { } need || !_coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicResponseChoices(prompt, need).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             return _kernelCoreMainOperations.Reject(CommandErrorCode.IllegalAction, "The draw-funded answer changed its published original need, qualification, source, name or target.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
         return _kernelCoreMainOperations.Accept(() =>
         {
             BeginDrawFundedDistinctBasic(_coreMatchParticipantsPlayersAccess._players[actorSeat], source, kind, (need.Intent is DrawFundedDistinctBasicIntent.OwnSlashDodge or DrawFundedDistinctBasicIntent.Dying) ? [target] : choice.Targets, prompt, need);
@@ -34,13 +30,13 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
         });
     }
 
-    internal void BeginDrawFundedDistinctBasic(CharacterState actor, CardConversionSource source, CardKind kind, IReadOnlyList<int> targets, PendingDecision original, global::CardGame.Core.GameEngine.DrawFundedBasicNeed need)
+    internal void BeginDrawFundedDistinctBasic(CharacterState actor, CardConversionSource source, CardKind kind, IReadOnlyList<int> targets, PendingDecision original, GameEngine.DrawFundedBasicNeed need)
     {
         var accepted = _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicRules(actor, kind, need.Intent == DrawFundedDistinctBasicIntent.OwnSlashDodge, need.Intent == DrawFundedDistinctBasicIntent.Dying).SingleOrDefault(r => r.Source == source);
         if (accepted.Rule is null || original.PlayerSeat != actor.Seat || _resolutionStackOperations._resolutionStack.OfType<DrawFundedDistinctBasicFrame>().Any(f => f.Payment.OriginalPromptId == original.PromptId))
             throw new InvalidOperationException("A draw-funded use cannot accept an unavailable source or pay the same original prompt twice.");
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-        var payment = new DrawFundedDistinctBasicPayment(id, source, accepted.Hash, accepted.Rule.DrawFundedDistinctBasic!.MethodLedgerId, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, need.Intent, kind, global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind), need.ParentFrameId, need.RequestFrameId, need.ParentActionId, targets.Count == 1 ? targets[0] : need.FixedTargetSeat, need.Cursor, original.PromptId, original.Revision, 0, 0, 0);
+        var payment = new DrawFundedDistinctBasicPayment(id, source, accepted.Hash, accepted.Rule.DrawFundedDistinctBasic!.MethodLedgerId, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, need.Intent, kind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind), need.ParentFrameId, need.RequestFrameId, need.ParentActionId, targets.Count == 1 ? targets[0] : need.FixedTargetSeat, need.Cursor, original.PromptId, original.Revision, 0, 0, 0);
         if (need.Intent == DrawFundedDistinctBasicIntent.WenyiPeach)
             _coreWenyiPeachSuppliesOperations.ReserveWenyiDrawFundedPeach(original, need, source, kind);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -133,7 +129,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
 
     internal bool ValidDrawFundedDistinctBasicPayment(DrawFundedDistinctBasicPayment p)
     {
-        if (p.PaymentFrameId <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(p.Source.OwnerSeat) || string.IsNullOrWhiteSpace(p.Source.SkillInstanceId) || p.NormalizedName != global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(p.EffectiveKind) || p.Cursor < 0 || p.ActualDrawCount is < 0 or > 1 || p.SequenceAfter < p.SequenceBefore || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(p.Source.SkillId)?.Program is not { } program || program.GameplayHash != p.GameplayHash || program.ViewAs.SingleOrDefault(r => r.Id == p.Source.BindingId)is not { DrawFundedDistinctBasic: { } policy } rule || policy.MethodLedgerId != p.MethodLedgerId || rule.OutputKind != p.EffectiveKind || rule.InputCount != 0)
+        if (p.PaymentFrameId <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(p.Source.OwnerSeat) || string.IsNullOrWhiteSpace(p.Source.SkillInstanceId) || p.NormalizedName != CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(p.EffectiveKind) || p.Cursor < 0 || p.ActualDrawCount is < 0 or > 1 || p.SequenceAfter < p.SequenceBefore || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(p.Source.SkillId)?.Program is not { } program || program.GameplayHash != p.GameplayHash || program.ViewAs.SingleOrDefault(r => r.Id == p.Source.BindingId)is not { DrawFundedDistinctBasic: { } policy } rule || policy.MethodLedgerId != p.MethodLedgerId || rule.OutputKind != p.EffectiveKind || rule.InputCount != 0)
             return false;
         var started = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawFundedDistinctBasicStartedEvent>().Where(e => e.PaymentFrameId == p.PaymentFrameId).ToArray();
         var paid = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawFundedDistinctBasicPaidEvent>().Where(e => e.PaymentFrameId == p.PaymentFrameId).ToArray();
@@ -187,7 +183,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
 
         if (p.Intent == DrawFundedDistinctBasicIntent.Qinglong && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.ResolutionId == p.ParentFrameId)
         {
-            _corePendingDecisionPolicyPipelineOperations._pendingDecision = global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime.DrawFundedDistinctBasicNativeDecision(frame.OriginalDecision);
+            _corePendingDecisionPolicyPipelineOperations._pendingDecision = CoreGameEngineDrawFundedDistinctBasicOffersRuntime.DrawFundedDistinctBasicNativeDecision(frame.OriginalDecision);
             _coreNativeQinglongOperations.ResolveQinglongCrescentBladeChoice(frame.OriginalDecision.Choices.Single(c => c.Parameters.GetValueOrDefault("action") == "qinglong-skip"));
             return;
         }

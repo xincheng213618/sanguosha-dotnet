@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangYanOlRuntime
 {
     internal const string ZhangYanObtainReason = "skill-program.zhang-yan.suji.obtain";
-    internal CardConversionSource ZhangYanSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IZhangYanHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhangYan(f, op);
+    internal CardConversionSource ZhangYanSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IZhangYanHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhangYan(f, op);
     internal bool ZhangYanPlayParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.PlayPhaseStarting && c.OwnerSeat == candidate.OwnerSeat && c.SourceSeat == c.TargetSeat && c.SourceSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is PlayPhaseStartingBoundaryFrame w && w.OwnerSeat == c.SourceSeat && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex].Candidate == candidate;
     internal bool CanZhangYanSujiMaterial(int actor, Card card, CardLocation from, int target) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && actor != target && from.OwnerSeat == actor && from.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _cardZonesOperations._cardZones.GetLocation(card.Id) == from && _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[actor], card)is Suit.Spade or Suit.Club && !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor, [card.Id]) && (from.Zone != CardZoneKind.Hand || !_coreCardUseModulesOperations.IsTurnHandCardRestricted(_coreMatchParticipantsPlayersAccess._players[actor], card)) && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(actor, SkillProgramCardTargetRestriction.SelfOnly) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[target], card, effectiveKind: CardKind.Slash, physicalCardIds: [card.Id], excludedEquipmentId: from.Zone == CardZoneKind.Equipment ? card.Id : null) && _coreRuleQueriesOperations.CanSpendSlashUse(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[target], true, CardKind.Slash, card, excludedEquipmentId: from.Zone == CardZoneKind.Equipment ? card.Id : null, physicalCardIds: [card.Id]);
     internal int[] ZhangYanSujiTargets(int actor, Card card, CardLocation from) => _coreMatchParticipantsPlayersAccess._players.Where(p => CanZhangYanSujiMaterial(actor, card, from, p.Seat)).Select(p => p.Seat).ToArray();
@@ -110,7 +107,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
     [ProgramAnswer("zhang-yan")]
     internal void AnswerZhangYan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangYan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ZhangYanChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhangYanChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangYan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ZhangYanChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhangYanChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Zhang Yan lost its exact native chooser or sealed legal choices.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -238,11 +235,11 @@ internal sealed partial class CharacterZhangYanOlRuntime
     {
         if (f.ZhangYan!.Stage == ZhangYanStage.LangdaoVotes)
         {
-            var allied = global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]);
+            var allied = CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]);
             var option = allied ? LangdaoOption.Damage : LangdaoOption.ExtraTarget;
             return p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("option") == option.ToString()) ?? p.Choices.First();
         }
 
-        return p.Choices.FirstOrDefault(c => c.Targets.Count == 1 && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("option") == "finish") ?? p.Choices.First();
+        return p.Choices.FirstOrDefault(c => c.Targets.Count == 1 && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("option") == "finish") ?? p.Choices.First();
     }
 }

@@ -29,7 +29,7 @@ internal static class MobileShiYuJiComposition
     internal const string FujiDodgeDrawTrigger = "fuji-dodge-draw";
 
     internal static CardKind Name(CardKind kind) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Mobile_Shi_Yu_Ji.NormalizedName(kind);
+        RuntimeSkills.RuntimeRules_Mobile_Shi_Yu_Ji.NormalizedName(kind);
 
     private static bool IsSingleCommittedUse(SkillProgramTrigger trigger) =>
         trigger.Window == SkillProgramTriggerWindow.CardUseCommitted && trigger.Subject is null &&

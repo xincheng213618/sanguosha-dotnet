@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaTuoMobileGodRuntime
 {
     internal const string MobileHtWuling = "mobile-god:wuling", MobileHtYouyi = "mobile-god:youyi", MobileHtEffects = "mobile-god:wuling-effects", MobileHtDeer = "mobile-god:wuling-deer";
-    internal static CardConversionSource MobileHtSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MobileHtSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal MobileWulingTaughtEvent? MobileHtCourse(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingTaughtEvent>().LastOrDefault(c => c.TargetSeat == seat && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingAdvancedEvent>().LastOrDefault(e => e.CourseId == c.CourseId)?.Active == true);
     internal int MobileHtCourseIndex(long id) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingAdvancedEvent>().Last(e => e.CourseId == id).Index;
     internal MobileWulingAnimal[] MobileHtCourseOrder(long id) => _characterHuaTuoMobileGodMobileWulingCoursesAccess._mobileWulingCourses.TryGetValue(id, out var c) ? c.Order.ToArray() : throw new InvalidOperationException("Wuling lost its private accepted persistent course.");
@@ -37,7 +34,7 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
         MobileHtEffects => gate.Trigger.Id == "bear-first-damage" ? MobileHtSpirit(gate.OwnerSeat, MobileWulingAnimal.Bear) : MobileHtCourse(gate.OwnerSeat)is not null,
         _ => true
     };
-    SkillProgramStepOutcome global::CardGame.Core.IMobileHuaTuoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginMobileHt(frame, op);
+    SkillProgramStepOutcome IMobileHuaTuoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginMobileHt(frame, op);
     internal SkillProgramStepOutcome BeginMobileHt(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -162,7 +159,7 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MobileHuaTuo ?? throw new InvalidOperationException("Mobile Hua Tuo lost its owning choice.");
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MobileHtChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MobileHtChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Wuling requires the exact published order or public equipment entity.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == MobileHuaTuoStage.Recipient)

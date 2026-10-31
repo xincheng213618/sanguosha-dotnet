@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
 {
     internal const string ShenXuChuAction = "shen-xu-chu";
     internal static string ZhuangpoDiscardReason(ProgramSkillFrame f) => "skill-program." + f.SkillId + ".discard";
-    internal static CardConversionSource ShenXuChuSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IShenXuChuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenXuChu(f, op);
+    internal static CardConversionSource ShenXuChuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IShenXuChuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenXuChu(f, op);
     internal ProgramCardTriggerWindowFrame? ZhuangpoParent(ProgramSkillWindowContext? w) => w?.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized ? null : _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 38800, SkillProgramEffectOp.ResolveZhuangpoTarget)]
     internal bool CanResolveZhuangpo(ProgramTriggerLegalityContext g) => ZhuangpoParent(g.WindowContext)is { Action: { EffectiveKind: CardKind.Duel } a } && a.ActorSeat == g.OwnerSeat && a.ConversionChain.Contains(new(g.SkillId, ShenXuChuComposition.ViewAs, g.OwnerSeat, g.Candidate.SkillInstanceId)) && a.TargetSeats.Count > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhuangpoTargetIssuedEvent>().Any(e => e.ActionId == a.ActionId && e.Source.OwnerSeat == g.OwnerSeat && e.Source.SkillInstanceId == g.Candidate.SkillInstanceId);
@@ -100,7 +97,7 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
             };
             r = r with
             {
-                Draws = global::CardGame.Core.EngineOwners.CharacterXuChuHappyGodRuntime.ShenXuChuTargetDraws(f, r.TargetMarked)
+                Draws = CharacterXuChuHappyGodRuntime.ShenXuChuTargetDraws(f, r.TargetMarked)
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShenXuChu = r });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhuangpoTargetIssuedEvent(f.Id, r.Source, r.GameplayHash, use.Id, action.ActionId, r.TargetMarked ? action.TargetSeats.First(s => _coreMatchParticipantsPlayersAccess._players[s].Markers.GetValueOrDefault(PlayerMarkerKind.QingBanner) > 0) : r.TargetSeat, r.TargetMarked));
@@ -236,7 +233,7 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
     [ProgramAnswer(ShenXuChuAction)]
     internal void AnswerShenXuChu(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenXuChu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == ShenXuChuStage.MarkChoice ? f.OwnerSeat : r.TargetSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], ShenXuChuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenXuChu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == ShenXuChuStage.MarkChoice ? f.OwnerSeat : r.TargetSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], ShenXuChuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Zhuangpo requires the current participant's exact private answer.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == ShenXuChuStage.MarkChoice)
@@ -287,7 +284,7 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
     [ProgramAiChoice(SkillProgramEffectOp.ResolveZhuangpoTarget)]
     internal PromptChoice ChooseShenXuChu(PendingDecision p, ProgramSkillFrame f) => f.ShenXuChu!.Stage == ShenXuChuStage.MarkChoice ? p.Choices.First(c => c.Parameters["option"] == "0") : p.Choices[0];
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 38800)]
-    internal int ZhuangpoDuelBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int ZhuangpoDuelBonus(GameEngine.IDamageAttempt attack)
     {
         if (attack.EffectiveCardKind != CardKind.Duel || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action } use)
             return 0;

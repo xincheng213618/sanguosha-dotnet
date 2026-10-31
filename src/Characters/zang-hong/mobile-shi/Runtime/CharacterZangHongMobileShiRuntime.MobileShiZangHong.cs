@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZangHongMobileShiRuntime
 {
     internal const string ShiZhLiezhi = ShiZangHongComposition.LiezhiSkill, ShiZhJuegu = ShiZangHongComposition.JueguSkill;
-    SkillProgramStepOutcome global::CardGame.Core.IShiZangHongHost.ResolveLiezhi(ProgramSkillFrame frame) => BeginShiZhLiezhi(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiZangHongHost.ResolveJuegu(ProgramSkillFrame frame) => BeginShiZhJuegu(frame);
+    SkillProgramStepOutcome IShiZangHongHost.ResolveLiezhi(ProgramSkillFrame frame) => BeginShiZhLiezhi(frame);
+    SkillProgramStepOutcome IShiZangHongHost.ResolveJuegu(ProgramSkillFrame frame) => BeginShiZhJuegu(frame);
     // ---- 烈志: once per turn the owner pays one maximum HP to virtually use a
     // Peach or Wine. The shared zero-entity virtual-basic machinery issues the
     // use; this skill only narrows the offered options to Peach and Wine.
@@ -96,7 +93,7 @@ internal sealed partial class CharacterZangHongMobileShiRuntime
     [ProgramAnswer(ShiZangHongComposition.ProgramAction)]
     internal void AnswerShiZh(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZangHong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiZhDiscardChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZangHong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiZhDiscardChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Shi Zang Hong choice lost its current frame or legal card.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var cardId = selected.Cards.Single();

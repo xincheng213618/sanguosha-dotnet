@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
 {
     internal const string MouHxBojueDrawReason = "skill-program.mou-ol:bojue.draw";
     internal const string MouHxBojueDiscardReason = "skill-program.mou-ol:bojue.discard";
-    internal static CardConversionSource MouHxBojueSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMouHxBojueHost.Begin(ProgramSkillFrame f) => BeginMouHxBojue(f);
+    internal static CardConversionSource MouHxBojueSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMouHxBojueHost.Begin(ProgramSkillFrame f) => BeginMouHxBojue(f);
     internal SkillProgramStepOutcome BeginMouHxBojue(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -83,7 +80,7 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
     [ProgramAnswer("mou-hua-xiong-bojue")]
     internal void AnswerMouHxBojue(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouHxBojue: { } r } f || !ValidMouHxBojue(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MouHxBojueChooser(f) || !MouHxBojueChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouHxBojue: { } r } f || !ValidMouHxBojue(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MouHxBojueChooser(f) || !MouHxBojueChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Bojue accepts only its current participant's original private choice or native protected card slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

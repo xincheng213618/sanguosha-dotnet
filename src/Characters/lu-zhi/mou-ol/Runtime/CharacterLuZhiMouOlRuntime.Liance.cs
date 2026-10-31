@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuZhiMouOlRuntime
@@ -38,19 +34,19 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         ContinueMouLz(f.Id);
     }
 
-    internal int MouLzChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => a is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
-    internal void SetMouLzChainAmount(global::CardGame.Core.GameEngine.IDamageAttempt a, int amount)
+    internal int MouLzChainCursor(GameEngine.IDamageAttempt a) => a is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
+    internal void SetMouLzChainAmount(GameEngine.IDamageAttempt a, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(a, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !a.IsChainPropagation)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(a, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !a.IsChainPropagation)
             throw new InvalidOperationException("Liance chain return requires the exact current damage instance.");
-        if (a is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (a is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(a.ResolutionId, s => s with { DamageAmount = amount });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(a.ResolutionId, s => s!with { DamageAmount = amount });
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 32902)]
-    internal int MouLzLianceBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int MouLzLianceBonus(GameEngine.IDamageAttempt attack)
     {
         if (attack.IsSourceLess || !_coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn)
             return 0;
@@ -61,12 +57,12 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 32902)]
-    internal void BeforeMouLzChain(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void BeforeMouLzChain(GameEngine.IDamageAttempt attack)
     {
         if (!attack.IsChainPropagation || attack.IsSourceLess)
             return;
         var cursor = MouLzChainCursor(attack);
-        var remaining = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
+        var remaining = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
         if (!remaining.Skip(cursor).Any(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlChainIssuedEvent>().SingleOrDefault(e => e.AttackId == attack.ResolutionId && e.Cursor == cursor)is not { } issued || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlLianceConsumedEvent>().Any(e => e.AttackId == attack.ResolutionId && e.Chain && e.Cursor == cursor) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlChainRebasedEvent>().Any(e => e.AttackId == attack.ResolutionId && e.Cursor == cursor))
             return;
         SetMouLzChainAmount(attack, issued.Inherited);
@@ -74,7 +70,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 32902)]
-    internal void AfterMouLzChain(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void AfterMouLzChain(GameEngine.IDamageAttempt attack)
     {
         if (!attack.IsChainPropagation || attack.IsSourceLess || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlLianceArmedEvent>().Any(e => e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlLianceConsumedEvent>().Any(c => c.FrameId == e.FrameId)))
             return;

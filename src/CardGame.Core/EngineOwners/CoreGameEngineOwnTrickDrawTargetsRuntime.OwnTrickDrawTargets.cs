@@ -1,24 +1,20 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOwnTrickDrawTargetsRuntime
 {
     internal const string OwnTrickDrawReason = "program.own-multi-target-trick.draw";
-    internal static int ActualTrickTargetCount(CardUseFrame use) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OwnTrickDrawTargets.ActualTrickTargetCount(use);
+    internal static int ActualTrickTargetCount(CardUseFrame use) => RuntimeSkills.RuntimeRules_Core_OwnTrickDrawTargets.ActualTrickTargetCount(use);
     internal bool HasOwnMultiTargetTrickDraw => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawThenNullifyOwnMultiTargetTrick);
 
     internal bool OwnMultiTargetTrickCandidate(ProgramTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects.Any(e => e.Op == SkillProgramEffectOp.DrawThenNullifyOwnMultiTargetTrick);
-    internal bool HasOwnMultiTargetTrickSelfTarget(CardUseFrame use, int seat) => HasOwnMultiTargetTrickDraw && use.SourceSeat == seat && ActualTrickTargetCount(use) > 1 && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[seat]).Any(p => p.Triggers.Any(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.DrawThenNullifyOwnMultiTargetTrick)));
+    internal bool HasOwnMultiTargetTrickSelfTarget(CardUseFrame use, int seat) => HasOwnMultiTargetTrickDraw && use.SourceSeat == seat && ActualTrickTargetCount(use) > 1 && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[seat]).Any(p => p.Triggers.Any(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.DrawThenNullifyOwnMultiTargetTrick)));
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 800)]
     internal bool CanOfferOwnTrickOrHandCategory(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.DrawThenNullifyOwnMultiTargetTrick))
-            return context.ActualUseTarget is { } identity && identity.TargetSeat == c.OwnerSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(identity.CardUseFrameId)is { Action.Type: CardActionType.Use } use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) && ActualTrickTargetCount(use) > 1 && use.TargetSeats.Contains(c.OwnerSeat);
+            return context.ActualUseTarget is { } identity && identity.TargetSeat == c.OwnerSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(identity.CardUseFrameId)is { Action.Type: CardActionType.Use } use && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) && ActualTrickTargetCount(use) > 1 && use.TargetSeats.Contains(c.OwnerSeat);
         if (trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.RestrictDamageSourceHandCategory))
             return context.Window == SkillProgramTriggerWindow.AfterDamageApplied && context.TargetSeat == c.OwnerSeat && context.SourceSeat is { } source && _coreTableSeatQueriesOperations.IsValidPlayerSeat(source) && _coreMatchParticipantsPlayersAccess._players[source].IsAlive && _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && damage.Id == context.ParentFrameId && damage.ParentFrameId == context.DamageFrameId && _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage)is { IsSourceLess: false };
         return true;
@@ -26,7 +22,7 @@ internal sealed partial class CoreGameEngineOwnTrickDrawTargetsRuntime
 
     internal bool OwnTrickDrawMatches(ProgramSkillFrame root, ActualUseTargetWindowFrame parent)
     {
-        if (root.OwnTrickDraw is not { } r || root.InstructionIndex != 1 || r.InstructionIndex != 0 || root.WindowContext is not { Window: SkillProgramTriggerWindow.OtherActualUseTargeted, ActualUseTarget: { } identity } c || c.ParentFrameId != parent.Id || parent.ParentFrameId != r.Use.CardUseFrameId || identity != r.Use || identity.TargetSeat != root.OwnerSeat || !_coreActualUseTargetProgramsOperations.MatchesActualUseTarget(identity) || r.Source != new CardConversionSource(root.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId) || r.GameplayHash != root.GameplayHash || r.TargetCount < 2 || r.ActualDrawCount is < 0 or > 1 || r.SequenceBefore < 0 || r.SequenceAfter < r.SequenceBefore || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, parent.Candidates[parent.CandidateIndex]) || !OwnMultiTargetTrickCandidate(parent.Candidates[parent.CandidateIndex]) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(identity.EffectiveKind))
+        if (root.OwnTrickDraw is not { } r || root.InstructionIndex != 1 || r.InstructionIndex != 0 || root.WindowContext is not { Window: SkillProgramTriggerWindow.OtherActualUseTargeted, ActualUseTarget: { } identity } c || c.ParentFrameId != parent.Id || parent.ParentFrameId != r.Use.CardUseFrameId || identity != r.Use || identity.TargetSeat != root.OwnerSeat || !_coreActualUseTargetProgramsOperations.MatchesActualUseTarget(identity) || r.Source != new CardConversionSource(root.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId) || r.GameplayHash != root.GameplayHash || r.TargetCount < 2 || r.ActualDrawCount is < 0 or > 1 || r.SequenceBefore < 0 || r.SequenceAfter < r.SequenceBefore || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, parent.Candidates[parent.CandidateIndex]) || !OwnMultiTargetTrickCandidate(parent.Candidates[parent.CandidateIndex]) || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(identity.EffectiveKind))
             return false;
         var records = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter).ToArray();
         bool Draw(CardMovementRecord m) => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == OwnTrickDrawReason;
@@ -43,7 +39,7 @@ internal sealed partial class CoreGameEngineOwnTrickDrawTargetsRuntime
         var after = _coreLostHpOwnedGiftsOperations.PaidTargetMovementSequence;
         var actual = _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > before && m.Sequence <= after && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == OwnTrickDrawReason);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-        var r = new ProgramOwnTrickDrawReceipt(0, identity, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, ActualTrickTargetCount(_coreCardUseLifecycleOperations.LifecycleCardUse(identity.CardUseFrameId)!), before, after, actual);
+        var r = new ProgramOwnTrickDrawReceipt(0, identity, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, ActualTrickTargetCount(_coreCardUseLifecycleOperations.LifecycleCardUse(identity.CardUseFrameId)!), before, after, actual);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { OwnTrickDraw = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OwnTrickDrawIssuedEvent(f.Id, r));
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(f.Id, f.OwnerSeat) == SkillProgramStepOutcome.Continue)
@@ -67,7 +63,7 @@ internal sealed partial class CoreGameEngineOwnTrickDrawTargetsRuntime
             _coreProgramCardTargetEffectsOperations.MarkCardEffectIneffective(r.Use.CardUseFrameId, r.Use.TargetSeat);
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { OwnTrickDraw = r with { Applied = true } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OwnTrickTargetNullifiedEvent(id, r.Use.CardUseFrameId, r.Use.TargetSeat, r.Source));
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardEffectNullifiedEvent(id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, r.Use.ActorSeat, r.Use.CardUseFrameId, r.Use.EffectiveKind));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardEffectNullifiedEvent(id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, r.Use.ActorSeat, r.Use.CardUseFrameId, r.Use.EffectiveKind));
         }
 
         _coreSkillProgramsOperations.FinishProgramSkill(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), completed: true);
@@ -90,6 +86,6 @@ internal sealed partial class CoreGameEngineOwnTrickDrawTargetsRuntime
     internal bool OwnTrickDrawFirstChild(ProgramSkillFrame f, ResolutionFrame child) => f.OwnTrickDraw is { } r && f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } m && m.SubjectSeat == f.OwnerSeat && child is CardsMovedTriggerWindowFrame first && first.Batch.ParentFrameId == f.Id && (first.Batch.AwaitingProgramFrameId is null || first.Batch.AwaitingProgramFrameId == f.Id) && first.Batch.OriginSkillId == f.SkillId && first.Batch.OriginSkillInstanceId == f.SkillInstanceId && first.Batch.OriginOwnerSeat == f.OwnerSeat && first.Batch.Movements.Count > 0 && first.Batch.Movements.All(x => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(x) && x.Sequence > r.SequenceBefore && x.Sequence <= r.SequenceAfter && x.From == CardLocation.DrawPile && x.To == CardLocation.Hand(f.OwnerSeat) && x.Reason.Value == OwnTrickDrawReason);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 490)]
     internal bool IsOwnTrickDrawProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().Any(w => _corePaidOwnTargetObserversOperations.ActualUseTargetObserverRoot(w.ParentFrameId)is { OwnTrickDraw: not null } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id));
-    SkillProgramStepOutcome global::CardGame.Core.IOwnTrickAndHandCategoryProgramHost.DrawThenNullifyOwnMultiTargetTrick(ProgramSkillFrame f) => BeginOwnTrickDraw(f);
-    void global::CardGame.Core.IOwnTrickAndHandCategoryProgramHost.RestrictDamageSourceHandCategory(ProgramSkillFrame f, SkillProgramCardCategory category) => _coreTurnHandCategoryRestrictionsOperations.GrantDamageSourceHandCategory(f, category);
+    SkillProgramStepOutcome IOwnTrickAndHandCategoryProgramHost.DrawThenNullifyOwnMultiTargetTrick(ProgramSkillFrame f) => BeginOwnTrickDraw(f);
+    void IOwnTrickAndHandCategoryProgramHost.RestrictDamageSourceHandCategory(ProgramSkillFrame f, SkillProgramCardCategory category) => _coreTurnHandCategoryRestrictionsOperations.GrantDamageSourceHandCategory(f, category);
 }

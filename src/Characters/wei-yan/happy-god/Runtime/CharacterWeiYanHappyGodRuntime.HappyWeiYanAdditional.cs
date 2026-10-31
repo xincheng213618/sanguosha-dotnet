@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWeiYanHappyGodRuntime
@@ -245,7 +241,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         var action = receipt.OriginalAction!;
         if (receipt.Paid is not [var paid] || paid.CardId != bone.CardId || paid.From != CardLocation.Equipment(receipt.Target) || paid.Reason.Value != HappyEzhiDiscard || HappyBoneAt(bone.CardId, paid.From, receipt.Before)is not { } original || original.Sequence != bone.Sequence || original.PrintedKind != bone.PrintedKind)
             throw new InvalidOperationException("Ezhi must actually discard its frozen genuine bone before comparing the original categories.");
-        var cancel = global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(bone.PrintedKind) == global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind);
+        var cancel = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(bone.PrintedKind) == CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind);
         var fact = new HappyWeiYanEzhiPaidEvent(frame.Id, receipt.Source, receipt.GameplayHash, receipt.ActualTurn, receipt.ParentId, receipt.NativeParentId, action.ActionId, action.ActorSeat, action.EffectiveKind, bone.CardId, bone.PrintedKind, receipt.Before, receipt.After, cancel);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(fact);
         if (cancel)

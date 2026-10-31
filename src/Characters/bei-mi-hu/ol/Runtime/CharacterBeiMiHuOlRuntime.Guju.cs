@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBeiMiHuOlRuntime
@@ -14,7 +9,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     {
         var c = f.WindowContext;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (c is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, DamageFrameId: { } damage } || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame p || p.Id != c.ParentFrameId || p.ParentFrameId != damage || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex].ToProgramCandidate()) || !CanDrawAfterKuiDamage(f.OwnerSeat, _coreProgramLifecycleOperations.GetProgramTrigger(f), p.TargetSeat) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<BeiMiHuGujuDrawPaidEvent>().Any(e => e.DamageWindowId == p.Id && e.Source.OwnerSeat == f.OwnerSeat))
+        if (c is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, DamageFrameId: { } damage } || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame p || p.Id != c.ParentFrameId || p.ParentFrameId != damage || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex].ToProgramCandidate()) || !CanDrawAfterKuiDamage(f.OwnerSeat, _coreProgramLifecycleOperations.GetProgramTrigger(f), p.TargetSeat) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<BeiMiHuGujuDrawPaidEvent>().Any(e => e.DamageWindowId == p.Id && e.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Guju lost one actual applied damage on a public marked recipient.");
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var r = NewBeiMiHuReceipt(f, "draw-children")with

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreCommandInputAdaptersRuntime
@@ -92,7 +88,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
         }
 
         var legal = _coreNativeLegalActionsOperations.BuildLegalActions(actor, selectedPhysicalCardId: command.CardId).Where(action => action.CardId == command.CardId && action.Kind != LegalActionKind.EndPlay).ToArray();
-        var action = global::CardGame.Core.EngineOwners.CoreNativeOwnedCardQueriesRuntime.SelectPlayAction(legal, card, targets, command.PlayedCardKind, command.TargetCardId, command.ConversionSource, command.AdditionalConversionSources);
+        var action = CoreNativeOwnedCardQueriesRuntime.SelectPlayAction(legal, card, targets, command.PlayedCardKind, command.TargetCardId, command.ConversionSource, command.AdditionalConversionSources);
         if (action is null)
         {
             return _kernelCoreMainOperations.Reject(legal.Length == 0 ? CommandErrorCode.IllegalAction : CommandErrorCode.InvalidTarget, "The selected card and exact target list are not a legal choice for this prompt.");
@@ -140,7 +136,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
 
         if (command.EquipmentKind == CardKind.ZhangbaSerpentSpear && _coreNextActualUseTargetAdjustmentsOperations.ValidateNextActualUseZhangba(actor, cardIds, targets)is { } adjustedError)
             return _kernelCoreMainOperations.Reject(adjustedError.Code, adjustedError.Message);
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineZhangbaSelectionsRuntime.MatchesPublishedCardGroupTarget(action, cardIds, targets))
+        if (!CoreGameEngineZhangbaSelectionsRuntime.MatchesPublishedCardGroupTarget(action, cardIds, targets))
             return _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidTarget, "The selected materials cannot be used against this target.");
         if (command.EquipmentKind == CardKind.ZhangbaSerpentSpear && _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, cardIds))
             return _kernelCoreMainOperations.Reject(CommandErrorCode.IllegalAction, "The effective suit of this card use is forbidden this turn.");
@@ -264,7 +260,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
             });
         if (pending.Kind == DecisionKind.SelectFaction)
         {
-            if (!selected.Parameters.TryGetValue("faction-id", out var factionId) || !global::CardGame.Core.EngineOwners.CoreMainDefinitions.GodFactionChoices.Contains(factionId, StringComparer.Ordinal))
+            if (!selected.Parameters.TryGetValue("faction-id", out var factionId) || !CoreMainDefinitions.GodFactionChoices.Contains(factionId, StringComparer.Ordinal))
             {
                 return _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The god-faction choice is malformed.");
             }
@@ -375,7 +371,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
         return response switch
         {
             "faction-defense-request" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanRequestFactionDefenseCore(_coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
-            "dodge" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanRespondCore(useDodge: true, useBagua: false, requestedDodgeCardId: selected.Cards[0], requestedResponseCardKind: global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.ReadResponseCardKind(selected), advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
+            "dodge" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanRespondCore(useDodge: true, useBagua: false, requestedDodgeCardId: selected.Cards[0], requestedResponseCardKind: CoreNativeCardClassificationsRuntime.ReadResponseCardKind(selected), advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
             "bagua" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanRespondCore(useDodge: false, useBagua: true, requestedDodgeCardId: null, requestedResponseCardKind: null, advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
             "take-damage" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanRespondCore(useDodge: false, useBagua: false, requestedDodgeCardId: null, requestedResponseCardKind: null, advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
             _ => _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The prompt choice is malformed for this response window.")};
@@ -383,7 +379,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
 
     internal CommandResult SubmitFactionDefensePromptAnswer(PromptChoice selected, string response) => response switch
     {
-        "extended-view-as" when selected.Cards.Count == 2 && selected.Parameters.GetValueOrDefault("output-kind") == "Dodge" && global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var source) && _characterGuanHaiOlOperations.IsXieweiSource(source) => _kernelCoreMainOperations.Accept(() => _coreExtendedViewAsOperations.ResolveExtendedViewAsResponse2(selected)),
+        "extended-view-as" when selected.Cards.Count == 2 && selected.Parameters.GetValueOrDefault("output-kind") == "Dodge" && CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var source) && _characterGuanHaiOlOperations.IsXieweiSource(source) => _kernelCoreMainOperations.Accept(() => _coreExtendedViewAsOperations.ResolveExtendedViewAsResponse2(selected)),
         "faction-defense-dodge" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanFactionDefenseResponseCore(useDodge: true, useBagua: false, requestedCardId: selected.Cards[0], _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
         "faction-defense-bagua" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanFactionDefenseResponseCore(useDodge: false, useBagua: true, requestedCardId: null, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
         "faction-defense-decline" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanFactionDefenseResponseCore(useDodge: false, useBagua: false, requestedCardId: null, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
@@ -397,7 +393,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
 
         return response switch
         {
-            "nullification" when selected.Cards.Count == 1 && selected.Targets.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanNullificationCore(useNullification: true, requestedNullificationCardId: selected.Cards[0], advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands, selectedConversionSource: global::CardGame.Core.EngineOwners.CoreNativeNullificationRuntime.ReadPublishedNullificationSource(selected))),
+            "nullification" when selected.Cards.Count == 1 && selected.Targets.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanNullificationCore(useNullification: true, requestedNullificationCardId: selected.Cards[0], advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands, selectedConversionSource: CoreNativeNullificationRuntime.ReadPublishedNullificationSource(selected))),
             "pass" when selected.Cards.Count == 0 && selected.Targets.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanNullificationCore(useNullification: false, requestedNullificationCardId: null, advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
             _ => _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The Nullification choice is malformed.")};
     }
@@ -620,9 +616,9 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
             return response switch
             {
                 "faction-slash-request" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanBorrowedSwordFactionSlashCore(_coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
-                "borrowed-sword-slash" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanBorrowedSwordResponseCore(useSlash: true, requestedSlashCardId: selected.Cards[0], requestedEffectiveKind: global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.ReadResponseCardKind(selected), advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
+                "borrowed-sword-slash" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanBorrowedSwordResponseCore(useSlash: true, requestedSlashCardId: selected.Cards[0], requestedEffectiveKind: CoreNativeCardClassificationsRuntime.ReadResponseCardKind(selected), advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
                 "zhangba-slash" when selected.Cards.Count == 2 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanZhangbaSlashResponseCore(selected.Cards, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
-                "program-view-as-slash" when selected.Cards.Count >= 2 || selected.Cards.Count == 1 && _characterKongShuOlOperations.IsLeiluanSource(global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected)) => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanProgramViewAsSlashResponseCore(selected.Cards, global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected), _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
+                "program-view-as-slash" when selected.Cards.Count >= 2 || selected.Cards.Count == 1 && _characterKongShuOlOperations.IsLeiluanSource(CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected)) => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanProgramViewAsSlashResponseCore(selected.Cards, CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected), _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
                 "borrowed-sword-give-weapon" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanBorrowedSwordResponseCore(useSlash: false, requestedSlashCardId: null, requestedEffectiveKind: null, advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
                 _ => _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The choice is malformed for this Borrowed Sword response window.")};
         }
@@ -630,9 +626,9 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
         return response switch
         {
             "faction-slash-request" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanRequestFactionSlashCore(_coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
-            "slash" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanSlashResponseCore(useSlash: true, requestedSlashCardId: selected.Cards[0], requestedResponseCardKind: global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.ReadResponseCardKind(selected), advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
+            "slash" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanSlashResponseCore(useSlash: true, requestedSlashCardId: selected.Cards[0], requestedResponseCardKind: CoreNativeCardClassificationsRuntime.ReadResponseCardKind(selected), advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
             "zhangba-slash" when selected.Cards.Count == 2 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanZhangbaSlashResponseCore(selected.Cards, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
-            "program-view-as-slash" when selected.Cards.Count >= 2 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanProgramViewAsSlashResponseCore(selected.Cards, global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected), _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
+            "program-view-as-slash" when selected.Cards.Count >= 2 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanProgramViewAsSlashResponseCore(selected.Cards, CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected), _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
             "take-damage" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanSlashResponseCore(useSlash: false, requestedSlashCardId: null, requestedResponseCardKind: null, advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
             _ => _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The choice is malformed for this Slash response window.")};
     }
@@ -640,9 +636,9 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
     internal CommandResult SubmitFactionSlashPromptAnswer(PromptChoice selected, string response) => response switch
     {
         "faction-request-cost" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreFactionRequestPaymentsOperations.ResolveFactionRequestCostChoice(selected, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
-        "faction-slash-slash" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanFactionSlashResponseCore(useSlash: true, requestedCardId: selected.Cards[0], requestedEffectiveKind: global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.ReadResponseCardKind(selected), _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
+        "faction-slash-slash" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanFactionSlashResponseCore(useSlash: true, requestedCardId: selected.Cards[0], requestedEffectiveKind: CoreNativeCardClassificationsRuntime.ReadResponseCardKind(selected), _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
         "zhangba-slash" when selected.Cards.Count == 2 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanZhangbaSlashResponseCore(selected.Cards, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
-        "program-view-as-slash" when selected.Cards.Count >= 2 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanProgramViewAsSlashResponseCore(selected.Cards, global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected), _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
+        "program-view-as-slash" when selected.Cards.Count >= 2 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanProgramViewAsSlashResponseCore(selected.Cards, CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected), _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
         "faction-slash-decline" when selected.Cards.Count == 0 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanFactionSlashResponseCore(useSlash: false, requestedCardId: null, requestedEffectiveKind: null, _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands)),
         _ => _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The prompt choice is malformed for this FactionSlash response.")};
     internal CommandResult SubmitDyingPromptAnswer(PromptChoice selected)
@@ -652,7 +648,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
             return _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The dying prompt choice has no supported response effect.");
         }
 
-        _ = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var peachConversionSource);
+        _ = CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var peachConversionSource);
         return response switch
         {
             "peach" when selected.Cards.Count == 1 => _kernelCoreMainOperations.Accept(() => _coreHumanNativeCommandsOperations.HumanDyingResponseCore(usePeach: true, requestedPeachCardId: selected.Cards[0], useAlcohol: false, requestedAlcoholCardId: null, advanceToHumanBoundary: _coreMatchDefinitionOptionsPlayerCountAccess._options.AdvanceAfterHumanCommands, peachConversionSource: peachConversionSource)),

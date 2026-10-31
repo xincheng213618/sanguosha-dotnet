@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaXiongMouOlRuntime
@@ -51,19 +47,19 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
         return $"下次造成的伤害+{(outgoing)}；下次受到的伤害+{(incoming)}。分别生效，未用次数跨回合保留。";
     }
 
-    internal int MouHxYangweiChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => a is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
-    internal void SetMouHxYangweiChainAmount(global::CardGame.Core.GameEngine.IDamageAttempt a, int amount)
+    internal int MouHxYangweiChainCursor(GameEngine.IDamageAttempt a) => a is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
+    internal void SetMouHxYangweiChainAmount(GameEngine.IDamageAttempt a, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(a, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !a.IsChainPropagation)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(a, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !a.IsChainPropagation)
             throw new InvalidOperationException("Yangwei can rebase only its exact current native chain instance.");
-        if (a is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (a is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(a.ResolutionId, s => s with { DamageAmount = amount });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(a.ResolutionId, s => s!with { DamageAmount = amount });
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 33300)]
-    internal int ApplyMouHxYangwei(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int ApplyMouHxYangwei(GameEngine.IDamageAttempt attack)
     {
         if (attack.DamageAmount <= 0)
             return 0;
@@ -76,7 +72,7 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 33300)]
-    internal void BeforeMouHxYangweiChain(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void BeforeMouHxYangweiChain(GameEngine.IDamageAttempt attack)
     {
         if (!attack.IsChainPropagation)
             return;
@@ -90,7 +86,7 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 33300)]
-    internal void AfterMouHxYangweiChain(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void AfterMouHxYangweiChain(GameEngine.IDamageAttempt attack)
     {
         if (!attack.IsChainPropagation || (attack.IsSourceLess || ActiveMouHxYangweiTickets(attack.SourceSeat, true).Count == 0) && ActiveMouHxYangweiTickets(attack.TargetSeat, false).Count == 0)
             return;

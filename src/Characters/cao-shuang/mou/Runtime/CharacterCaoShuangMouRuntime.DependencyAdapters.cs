@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MouCaoShuangAnniversaryRuntime))]
-internal sealed class CharacterCaoShuangMouMouCaoShuangAnniversaryAdapter(global::System.Func<global::CardGame.Core.MouCaoShuangAnniversaryRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterCaoShuangMouMouCaoShuangAnniversaryOperations
+[Core.ProgramCapability(typeof(MouCaoShuangAnniversaryRuntime))]
+internal sealed class CharacterCaoShuangMouMouCaoShuangAnniversaryAdapter(Func<MouCaoShuangAnniversaryRuntime> targetFactory) : ICharacterCaoShuangMouMouCaoShuangAnniversaryOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MouCaoShuangAnniversaryRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MouCaoShuangAnniversaryRuntime Get() => this._targetFactory();
+    private readonly Func<MouCaoShuangAnniversaryRuntime> _targetFactory = targetFactory;
+    public MouCaoShuangAnniversaryRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime))]
-internal sealed class CharacterCaoShuangMouCorePlayerViewProjectionAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterCaoShuangMouCorePlayerViewProjectionOperations
+[Core.ProgramCapability(typeof(CorePlayerViewProjectionRuntime))]
+internal sealed class CharacterCaoShuangMouCorePlayerViewProjectionAdapter(Func<CorePlayerViewProjectionRuntime> targetFactory) : ICharacterCaoShuangMouCorePlayerViewProjectionOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
+    private readonly Func<CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
+    public GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
 }

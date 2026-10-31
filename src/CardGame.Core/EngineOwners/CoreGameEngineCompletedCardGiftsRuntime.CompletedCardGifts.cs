@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
@@ -33,7 +29,7 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
         var action = CompletedGiftAction(frame);
         if (frame.CompletedCardGiftDraft is not null)
             throw new InvalidOperationException("A completed gift was offered twice.");
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || CompletedGiftSources(frame).Count == 0 || !_coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && player.Seat != frame.OwnerSeat))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || CompletedGiftSources(frame).Count == 0 || !_coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && player.Seat != frame.OwnerSeat))
             return SkillProgramStepOutcome.Continue;
         frame = frame with
         {
@@ -73,14 +69,14 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
 
             foreach (var target in CompletedGiftSlashTargets(frame, actor.Seat))
                 foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor)).DistinctBy(card => card.Id))
-                    foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+                    foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
                         foreach (var conversion in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, forResponse: false))
                         {
                             if (_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], card, conversion, kind, ignoreDistance: true))
                                 continue;
                             var parameters = Parameters("slash");
                             parameters["effective-kind"] = kind.ToString();
-                            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, conversion);
+                            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, conversion);
                             choices.Add(new(new ChoiceId($"completed-gift.{(frame.Id)}.typed.{(kind)}.{(conversion.SkillId)}.{(conversion.BindingId)}.{(card.Id)}.{(target)}"), $"将牌当【{(CardCatalog.Get(kind).DisplayName)}】对 {(_coreMatchParticipantsPlayersAccess._players[target].Name)} 使用", [card.Id], [target], parameters));
                         }
 
@@ -99,7 +95,7 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
             foreach (var target in CompletedGiftSlashTargets(frame, actor.Seat))
                 foreach (var card in _coreActionQueriesOperations.GetSlashUseCards(actor))
                 {
-                    var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(actor, card).FirstOrDefault(item => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(item.Identity.OutputKind));
+                    var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(actor, card).FirstOrDefault(item => CoreNativeCardClassificationsRuntime.IsSlashCard(item.Identity.OutputKind));
                     var baseKind = identity?.Identity.OutputKind ?? _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(actor, card);
                     foreach (var kind in _coreNativeTargetLegalityOperations.GetSlashUseKinds(actor, baseKind))
                     {
@@ -112,14 +108,14 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
                 }
 
             foreach (var target in CompletedGiftSlashTargets(frame, actor.Seat))
-                foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+                foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
                     foreach (var selection in _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(actor, kind, false).Where(item => _corePlayCardHistoryOperations.ViewAsRule(item.Source)is { RoundDistinctBasicUse: null, LeiluanBasicUse: null } || item.OutputKind == kind))
                     {
                         if (!_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], selection.Cards[0], selection.Source, kind, ignoreDistance: true))
                             continue;
                         var parameters = Parameters("slash");
                         parameters["effective-kind"] = kind.ToString();
-                        global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
+                        CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
                         var ids = selection.Cards.Select(card => card.Id).ToArray();
                         choices.Add(new(new ChoiceId($"completed-gift.{(frame.Id)}.multi.{(selection.Source.SkillId)}.{(selection.Source.BindingId)}.{(string.Join('-', ids))}.{(target)}"), $"对 {(_coreMatchParticipantsPlayersAccess._players[target].Name)} 使用【{(CardCatalog.Get(kind).DisplayName)}】", ids, [target], parameters));
                     }
@@ -202,7 +198,7 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
         }
 
         var kind = Enum.Parse<CardKind>(selected.Parameters["effective-kind"]);
-        global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var conversion);
+        CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var conversion);
         IReadOnlyList<Card> paid = selected.Cards.Count == 1 && !_characterKongShuOlOperations.IsLeiluanSource(conversion) ? [_corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor)).Single(card => card.Id == selected.Cards[0])] : selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor).Single(pair => pair.Select(card => card.Id).SequenceEqual(selected.Cards)) : _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(actor, selected.Cards, kind, false, conversion!)?.Cards ?? throw new InvalidOperationException("Completed gift Slash lost its physical payment.");
         if (!CompletedGiftSlashTargets(frame, actor.Seat).Contains(target) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], paid[0], conversion, kind, ignoreDistance: true))
             throw new InvalidOperationException("Completed gift Slash target is no longer legal.");
@@ -215,5 +211,5 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ICompletedCardGiftProgramHost.OfferCompletedCardGift(ProgramSkillFrame frame) => OfferProgramCompletedCardGift(frame);
+    SkillProgramStepOutcome ICompletedCardGiftProgramHost.OfferCompletedCardGift(ProgramSkillFrame frame) => OfferProgramCompletedCardGift(frame);
 }

@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceNamanRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceNamanHost.Claim(ProgramSkillFrame frame) => ClaimShanheSourceNamanResponseCards(frame);
+    SkillProgramStepOutcome IShanheSourceNamanHost.Claim(ProgramSkillFrame frame) => ClaimShanheSourceNamanResponseCards(frame);
     internal ProgramCardTriggerWindowFrame? ShanheSourceNamanResponse(ProgramSkillWindowContext? context, int ownerSeat)
     {
-        if (context is not { Window: SkillProgramTriggerWindow.CardResponseCompleted, CardUse: { } identity } || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || window.ResponseCompletion is not { CostsDrained: true } completion || !_coreResponseCompletionOperations.ValidResponseCompletionWindow(window) || window.Action is not { Type: CardActionType.Response } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || completion.CompletionActorSeat == ownerSeat || identity.CardActionId != action.ActionId || identity.ParentCardUseFrameId != window.ParentFrameId)
+        if (context is not { Window: SkillProgramTriggerWindow.CardResponseCompleted, CardUse: { } identity } || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || window.ResponseCompletion is not { CostsDrained: true } completion || !_coreResponseCompletionOperations.ValidResponseCompletionWindow(window) || window.Action is not { Type: CardActionType.Response } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || completion.CompletionActorSeat == ownerSeat || identity.CardActionId != action.ActionId || identity.ParentCardUseFrameId != window.ParentFrameId)
             return null;
         return window;
     }

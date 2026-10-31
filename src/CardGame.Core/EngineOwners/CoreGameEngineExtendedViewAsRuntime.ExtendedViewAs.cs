@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineExtendedViewAsRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
     internal bool IsArmorIneffectiveForTurn(CharacterState target) => _characterLuBuMobileGodOperations.HasMobileWuqianArmorDisabled(target.Seat) || _coreShenwuExpandedPoliciesOperations.ShenwuZhaohuoDisablesArmor(target.Seat) || _turnCardUseEffectsOperations._turnCardUseEffects.TargetRestrictions.Any(restriction => restriction.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && restriction.Restriction == SkillProgramCardTargetRestriction.ArmorIneffectiveForTurn && restriction.TargetSeat == target.Seat);
     internal bool TryResolveExtendedAiResponse(CharacterState owner, Card card, CardKind kind)
     {
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, kind) || _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, true).Count > 0)
+        if (CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, kind) || _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, true).Count > 0)
             return false;
         var selection = _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(owner, kind, true).FirstOrDefault(item => item.Cards.Any(cost => cost.Id == card.Id));
         if (selection is null)
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
                 ["response"] = "extended-view-as",
                 ["output-kind"] = kind.ToString()
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
             return new PromptChoice(new ChoiceId("extended-view-as." + kind + "." + selection.Source.SkillId + "." + string.Join('-', selection.Cards.Select(card => card.Id))), _characterGuanHaiOlOperations.IsXieweiSelection(selection) ? $"发动【卸尾】，将两张手牌置为饵，视为使用【{(CardCatalog.Get(kind).DisplayName)}】。" : $"发动【{(_coreCardConversionsOperations.ProgramConversionName(selection.Source))}】，将 {(selection.Cards.Count)} 张牌当【{(CardCatalog.Get(kind).DisplayName)}】。", selection.Cards.Select(card => card.Id).ToArray(), [], parameters);
         }).ToArray();
     }
@@ -39,7 +35,7 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[_corePendingDecisionPolicyPipelineOperations._pendingDecision!.PlayerSeat];
         var kind = Enum.Parse<CardKind>(choice.Parameters["output-kind"]);
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
         var selection = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(owner, choice.Cards, kind, true, source) ?? throw new InvalidOperationException("The extended conversion lost its physical costs.");
         ResolveExtendedViewAsResponse(owner, selection);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
@@ -87,7 +83,7 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
             if (pending.NamedAmbushResponse is not null)
                 _coreNamedAmbushInvalidationOperations.BindNamedAmbushCounterspell(pending.Id, action);
             else
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, owner.Seat, selection.Cards[0].Id, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, owner.Seat, selection.Cards[0].Id, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
             if (pending.NamedAmbushResponse is null)
                 _characterCaoXiOlOperations.CaptureCaoXiNativeCounterspellOffset(pending, action, invalidated: false);
             if (_coreUnrespondableCounterspellsOperations.TryBeginPolicyCounterspellPayment(pending, action, unrespondableSource, selection.Cards.Select(card => card.Id).ToArray()))
@@ -112,7 +108,7 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
             _coreNativeDodgeOperations.ContinueAcceptedCardResponse(attack, responseAction, continuation);
     }
 
-    internal int ProgramConversionDamageBonus(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal int ProgramConversionDamageBonus(NativeOwners.CardAttackHandle attack)
     {
         var action = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(frame => frame.Id == attack.ResolutionId)?.Action;
         if (action is null || attack.IsChainPropagation)

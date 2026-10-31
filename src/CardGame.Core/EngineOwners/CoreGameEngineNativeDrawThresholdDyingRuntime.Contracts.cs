@@ -1,11 +1,7 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-internal interface ICoreNativeDrawThresholdDyingNativeDrawThresholdOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeDrawThresholdDyingNativeDrawThresholdOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.NativeDrawThresholdRuntime Get();
+    NativeDrawThresholdRuntime Get();
 }

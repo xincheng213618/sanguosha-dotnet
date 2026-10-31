@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class CardSnapshotFacts(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterWeiYanHappyGodEntries> getCharacterWeiYanHappyGodRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterDiaoChanLeEntries> getCharacterDiaoChanLeRuntime, global::System.Func<global::CardGame.Core.CardSkillMarkProjector> getCardSkillMarkProjector, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterDaQiaoLeEntries> getCharacterDaQiaoLeRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreActualTurnsEntries> getCoreActualTurnsRuntime, global::System.Func<global::CardGame.Core.ProgramPipelineHooks> getProgramPipelineHooks) : ICardSnapshotFacts, ICardSkillMarkSources
+internal sealed class CardSnapshotFacts(Func<RuntimeEntries.CharacterWeiYanHappyGodEntries> getCharacterWeiYanHappyGodRuntime, Func<RuntimeEntries.CharacterDiaoChanLeEntries> getCharacterDiaoChanLeRuntime, Func<CardSkillMarkProjector> getCardSkillMarkProjector, Func<RuntimeEntries.CharacterDaQiaoLeEntries> getCharacterDaQiaoLeRuntime, Func<RuntimeEntries.CoreActualTurnsEntries> getCoreActualTurnsRuntime, Func<ProgramPipelineHooks> getProgramPipelineHooks) : ICardSnapshotFacts, ICardSkillMarkSources
 {
     public EquipmentSlot? BoneSlot(Card card) => getCharacterWeiYanHappyGodRuntime().HappyBoneSlot(card);
     public int? BoneOwnerSeat(int cardId) => getCharacterWeiYanHappyGodRuntime().HappyBoneRecord(cardId)?.Source.OwnerSeat;

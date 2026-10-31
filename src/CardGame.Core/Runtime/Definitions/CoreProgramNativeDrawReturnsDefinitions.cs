@@ -1,5 +1,5 @@
 #nullable enable
-using global::CardGame.Core;
+
 using System.Collections.ObjectModel;
 
 using System.Reflection;
@@ -10,7 +10,7 @@ internal static class CoreProgramNativeDrawReturnsDefinitions
 internal static readonly Lazy<IReadOnlyDictionary<SkillProgramEffectOp, MethodInfo>> ProgramNativeDrawReturns = new(() =>
 {
     var returns = new Dictionary<SkillProgramEffectOp, MethodInfo>();
-    foreach (var method in global::CardGame.Core.GameEngine.RuntimeModuleMethods)
+    foreach (var method in GameEngine.RuntimeModuleMethods)
     {
         if (method.GetCustomAttribute<ProgramNativeDrawReturnAttribute>()is not { } registration)
             continue;

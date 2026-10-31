@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
@@ -10,8 +6,8 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
     internal const string BoundaryZhongyongReason = "skill-program.boundary-zhou-cang.zhongyong";
     internal bool HasBoundaryZhouCang => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBoundaryZhouCangZhongyong);
 
-    internal static CardConversionSource BoundaryZhongyongSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryZhouCangHost.Resolve(ProgramSkillFrame f) => BeginBoundaryZhongyong(f);
+    internal static CardConversionSource BoundaryZhongyongSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IBoundaryZhouCangHost.Resolve(ProgramSkillFrame f) => BeginBoundaryZhongyong(f);
     // Capture the actual declaration phase and paid entity lineage, before a later
     // observer can change the phase or claim and return an entity to the discard pile.
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 53300)]
@@ -19,7 +15,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
     {
         if (!HasBoundaryZhouCang)
             return;
-        if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { Action: { Type: CardActionType.Use } a } use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == a.ActorSeat)
+        if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { Action: { Type: CardActionType.Use } a } use && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == a.ActorSeat)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryZhongyongUseOriginEvent(use.Id, a.ActionId, a.ActorSeat, phase));
             RecordBoundaryZhongyongEntities(a);
@@ -51,7 +47,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
 
     internal CardUseFrame? BoundaryZhongyongUse(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (c.SkillId != BoundaryZhouCangComposition.Skill || c.BindingId != BoundaryZhouCangComposition.Binding || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } a } use || a.ActionId != identity.CardActionId || a.ActorSeat != c.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhongyongUseOriginEvent>().SingleOrDefault(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.Actor == c.OwnerSeat)is null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Continuation: ProgramCardContinuation.CompletedSlash or ProgramCardContinuation.CompletedCard } window || window.ParentFrameId != use.Id || window.Action.ActionId != a.ActionId || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(c, context, window))
+        if (c.SkillId != BoundaryZhouCangComposition.Skill || c.BindingId != BoundaryZhouCangComposition.Binding || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } a } use || a.ActionId != identity.CardActionId || a.ActorSeat != c.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhongyongUseOriginEvent>().SingleOrDefault(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.Actor == c.OwnerSeat)is null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Continuation: ProgramCardContinuation.CompletedSlash or ProgramCardContinuation.CompletedCard } window || window.ParentFrameId != use.Id || window.Action.ActionId != a.ActionId || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(c, context, window))
             return null;
         return use;
     }
@@ -74,7 +70,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
 
     internal CardUseFrame RequireBoundaryZhongyongUse(ProgramSkillFrame f)
     {
-        if (f.WindowContext is not { } c || BoundaryZhongyongUse(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), c)is not { } use || _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id)is var i && (i < 2 || _resolutionStackOperations._resolutionStack[i - 1].Id != c.ParentFrameId || _resolutionStackOperations._resolutionStack[i - 2].Id != use.Id))
+        if (f.WindowContext is not { } c || BoundaryZhongyongUse(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), c)is not { } use || _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id)is var i && (i < 2 || _resolutionStackOperations._resolutionStack[i - 1].Id != c.ParentFrameId || _resolutionStackOperations._resolutionStack[i - 2].Id != use.Id))
             throw new InvalidOperationException("Zhongyong requires the original completed native Slash and its immediate trigger mother.");
         return use;
     }
@@ -163,7 +159,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
     internal void ResolveBoundaryZhongyongChoice(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Zhongyong lost its original frame.");
-        if (!BoundaryZhongyongChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat)
+        if (!BoundaryZhongyongChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat)
             throw new InvalidOperationException("Zhongyong choice lost its current entities or exact recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         switch (selected.Parameters["branch"])

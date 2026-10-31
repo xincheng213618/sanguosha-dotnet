@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangChengYanOlRuntime
@@ -31,9 +27,9 @@ internal sealed partial class CharacterHuangChengYanOlRuntime
             }
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHuangChengYanProgramHost.JiezhenReplaceSkills(ProgramSkillFrame frame, SkillProgramEffect effect) => JiezhenProgramReplaceSkills(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IHuangChengYanProgramHost.JiezhenRestoreSkills(ProgramSkillFrame frame, SkillProgramEffect effect) => JiezhenProgramRestoreSkills(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IHuangChengYanProgramHost.ZecaiRoundSettlement(ProgramSkillFrame frame, SkillProgramEffect effect) => ZecaiProgramRoundSettlement(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IHuangChengYanProgramHost.YinshiPreventSourcelessDamage(ProgramSkillFrame frame, SkillProgramEffect effect) => YinshiProgramPreventSourcelessDamage(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IHuangChengYanProgramHost.YinshiClaimBaguaJudgmentCard(ProgramSkillFrame frame, SkillProgramEffect effect) => YinshiProgramClaimBaguaJudgmentCard(frame, effect);
+    SkillProgramStepOutcome IHuangChengYanProgramHost.JiezhenReplaceSkills(ProgramSkillFrame frame, SkillProgramEffect effect) => JiezhenProgramReplaceSkills(frame, effect);
+    SkillProgramStepOutcome IHuangChengYanProgramHost.JiezhenRestoreSkills(ProgramSkillFrame frame, SkillProgramEffect effect) => JiezhenProgramRestoreSkills(frame, effect);
+    SkillProgramStepOutcome IHuangChengYanProgramHost.ZecaiRoundSettlement(ProgramSkillFrame frame, SkillProgramEffect effect) => ZecaiProgramRoundSettlement(frame, effect);
+    SkillProgramStepOutcome IHuangChengYanProgramHost.YinshiPreventSourcelessDamage(ProgramSkillFrame frame, SkillProgramEffect effect) => YinshiProgramPreventSourcelessDamage(frame, effect);
+    SkillProgramStepOutcome IHuangChengYanProgramHost.YinshiClaimBaguaJudgmentCard(ProgramSkillFrame frame, SkillProgramEffect effect) => YinshiProgramClaimBaguaJudgmentCard(frame, effect);
 }

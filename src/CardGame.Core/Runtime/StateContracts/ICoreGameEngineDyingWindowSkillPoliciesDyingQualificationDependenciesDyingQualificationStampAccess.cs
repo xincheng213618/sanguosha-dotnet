@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineDyingWindowSkillPoliciesDyingQualificationDependenciesDyingQualificationStampAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineDyingWindowSkillPoliciesDyingQualificationDependenciesDyingQualificationStampAccess : IProgramRuntimeOperations
 {
     ref long _dyingQualificationStamp { get; }
 

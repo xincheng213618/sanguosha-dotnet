@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineLifetimeSlashUsesRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CoreGameEngineLifetimeSlashUsesRuntime
             throw new ArgumentOutOfRangeException("seat");
         var changes = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().GroupBy(fact => fact.CardUseFrameId).ToDictionary(group => group.Key, group => group.ToArray());
         var count = 0;
-        foreach (var group in _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Where(fact => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(fact.CardKind)).GroupBy(fact => fact.ResolutionId))
+        foreach (var group in _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Where(fact => CoreNativeCardClassificationsRuntime.IsSlashCard(fact.CardKind)).GroupBy(fact => fact.ResolutionId))
         {
             var declaration = group.First();
             if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(declaration.SourceSeat) || group.Any(fact => fact.SourceSeat != declaration.SourceSeat || fact.CardId != declaration.CardId || fact.CardKind != declaration.CardKind))

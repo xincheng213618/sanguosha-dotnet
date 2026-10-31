@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSchoolTrickRuntime
 {
-    internal static bool IsShanheSchoolDamageTrick(CardKind kind) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && (global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(kind) || kind == CardKind.UnexpectedAssault);
+    internal static bool IsShanheSchoolDamageTrick(CardKind kind) => CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && (CoreGameEngineMouLuMengRuntime.IsDamageCardKind(kind) || kind == CardKind.UnexpectedAssault);
     internal bool TryGetShanheSchoolTrickUse(int owner, ProgramSkillWindowContext? context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window)
     {
         use = null !;
@@ -22,13 +19,13 @@ internal sealed partial class CoreGameEngineShanheSchoolTrickRuntime
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 62024, SkillProgramEffectOp.RepeatCurrentDamageTrick)]
     internal bool CanOfferShanheSchoolTrick(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => candidate.SkillId == ShanheSchoolEffects.TrickRepeatSkillId && TryGetShanheSchoolTrickUse(candidate.OwnerSeat, context, out _, out _);
-    void global::CardGame.Core.IShanheSchoolTrickHost.RepeatCurrentDamageTrick(ProgramSkillFrame frame) => IssueShanheSchoolTrick(frame);
+    void IShanheSchoolTrickHost.RepeatCurrentDamageTrick(ProgramSkillFrame frame) => IssueShanheSchoolTrick(frame);
     internal void IssueShanheSchoolTrick(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (frame.SkillId != ShanheSchoolEffects.TrickRepeatSkillId || frame.InstructionIndex != 1 || !TryGetShanheSchoolTrickUse(frame.OwnerSeat, frame.WindowContext, out var use, out var window))
             throw new InvalidOperationException("A school trick repeat requires its exact accepted original damage-trick use.");
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+        var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
         var native = new ExtraCardEffectState
         {
             Source = source,

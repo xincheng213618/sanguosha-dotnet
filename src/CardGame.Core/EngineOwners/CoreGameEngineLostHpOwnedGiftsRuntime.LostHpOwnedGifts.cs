@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -35,8 +32,8 @@ internal sealed partial class CoreGameEngineLostHpOwnedGiftsRuntime
             var after = PaidTargetMovementSequence;
             var drawn = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > before && m.Sequence <= after && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(frame.OwnerSeat) && m.Reason.Value == LostHpGiftDrawReason);
             frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-            _coreRuntimeOperations.ReplaceRuntimeTop(frame with { ReexecuteParticipantInstruction = true, LostHpOwnedGift = new(0, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, x, drawn, before, after, LostHpOwnedGiftStage.Drawing, []) });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LostHpDrawGiftFrozenEvent(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, x, drawn));
+            _coreRuntimeOperations.ReplaceRuntimeTop(frame with { ReexecuteParticipantInstruction = true, LostHpOwnedGift = new(0, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, x, drawn, before, after, LostHpOwnedGiftStage.Drawing, []) });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LostHpDrawGiftFrozenEvent(frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, x, drawn));
             return AwaitLostHpOwnedGiftMovements(frame.Id);
         }
 
@@ -150,12 +147,12 @@ internal sealed partial class CoreGameEngineLostHpOwnedGiftsRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var view = _corePlayerViewProjectionOperations.CreateSnapshot(owner.Seat);
         var hint = new SkillProgramAiHint(0, 0, 0, 1, 0, 0, true, false);
-        return decision.Choices.Where(c => c.Parameters.GetValueOrDefault("program-action") == "limited-owned-gift").Select(c => (Choice: c, Value: _coreAiBrainsAiBrainsAccess._aiBrains[owner.Seat].ScoreProgramTarget(view, c.Targets.Single(), hint))).Where(c => c.Value > 0).OrderByDescending(c => c.Value).ThenBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(new(Enum.Parse<CardZoneKind>(c.Choice.Parameters["source-zone"]), owner.Seat)).Single(card => card.Id == c.Choice.Cards.Single()), owner)).ThenBy(c => view.Players.Single(p => p.Seat == c.Choice.Targets.Single()).HandCount).ThenBy(c => c.Choice.Targets.Single()).ThenBy(c => c.Choice.Cards.Single()).Select(c => c.Choice).FirstOrDefault() ?? stop;
+        return decision.Choices.Where(c => c.Parameters.GetValueOrDefault("program-action") == "limited-owned-gift").Select(c => (Choice: c, Value: _coreAiBrainsAiBrainsAccess._aiBrains[owner.Seat].ScoreProgramTarget(view, c.Targets.Single(), hint))).Where(c => c.Value > 0).OrderByDescending(c => c.Value).ThenBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(new(Enum.Parse<CardZoneKind>(c.Choice.Parameters["source-zone"]), owner.Seat)).Single(card => card.Id == c.Choice.Cards.Single()), owner)).ThenBy(c => view.Players.Single(p => p.Seat == c.Choice.Targets.Single()).HandCount).ThenBy(c => c.Choice.Targets.Single()).ThenBy(c => c.Choice.Cards.Single()).Select(c => c.Choice).FirstOrDefault() ?? stop;
     }
 
     internal bool IsValidLostHpOwnedGift(ProgramSkillFrame root)
     {
-        if (root.LostHpOwnedGift is not { } gift || !_coreEarnedActualEndingBenefitsOperations.MatchesLostHpOwnedGiftEnding(root) || gift.InstructionIndex != 0 || root.InstructionIndex != 1 || gift.Source != new CardConversionSource(root.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId) || gift.GameplayHash != root.GameplayHash || gift.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || gift.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || gift.MaximumGiftCount < 0 || gift.ActualDrawCount < 0 || gift.ActualDrawCount > gift.MaximumGiftCount || gift.DrawSequenceBefore < 0 || gift.DrawSequenceAfter < gift.DrawSequenceBefore || gift.PaidCardIds.Count > gift.MaximumGiftCount || gift.PaidCardIds.Distinct().Count() != gift.PaidCardIds.Count || gift.DeliveredCount < 0 || gift.DeliveredCount > gift.PaidCardIds.Count)
+        if (root.LostHpOwnedGift is not { } gift || !_coreEarnedActualEndingBenefitsOperations.MatchesLostHpOwnedGiftEnding(root) || gift.InstructionIndex != 0 || root.InstructionIndex != 1 || gift.Source != new CardConversionSource(root.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId) || gift.GameplayHash != root.GameplayHash || gift.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || gift.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || gift.MaximumGiftCount < 0 || gift.ActualDrawCount < 0 || gift.ActualDrawCount > gift.MaximumGiftCount || gift.DrawSequenceBefore < 0 || gift.DrawSequenceAfter < gift.DrawSequenceBefore || gift.PaidCardIds.Count > gift.MaximumGiftCount || gift.PaidCardIds.Distinct().Count() != gift.PaidCardIds.Count || gift.DeliveredCount < 0 || gift.DeliveredCount > gift.PaidCardIds.Count)
             return false;
         if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LostHpDrawGiftFrozenEvent>().Count(e => e.ProgramFrameId == root.Id && e.Source == gift.Source && e.GameplayHash == gift.GameplayHash && e.ActualTurnNumber == gift.ActualTurnNumber && e.ActualTurnOwnerSeat == gift.ActualTurnOwnerSeat && e.MaximumGiftCount == gift.MaximumGiftCount && e.ActualDrawCount == gift.ActualDrawCount) != 1)
             return false;

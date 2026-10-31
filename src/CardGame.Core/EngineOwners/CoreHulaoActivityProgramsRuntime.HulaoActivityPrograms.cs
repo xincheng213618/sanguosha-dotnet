@@ -1,16 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreHulaoActivityProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IHulaoActivityProgramHost.ExecuteHulaoActivity(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteHulaoActivity(f, e);
-    internal static CardConversionSource HulaoProgramSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IHulaoActivityProgramHost.ExecuteHulaoActivity(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteHulaoActivity(f, e);
+    internal static CardConversionSource HulaoProgramSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HulaoProgramSourceValid(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId && p.GameplayHash == f.GameplayHash);
     internal SkillProgramStepOutcome ExecuteHulaoActivity(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
@@ -146,7 +140,7 @@ internal sealed partial class CoreHulaoActivityProgramsRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         if (!HulaoProgramSourceValid(f) || !owner.HasHpValue || owner.Hp >= owner.MaxHp || _coreCardUseModulesOperations.IsCardUseForbidden(f.OwnerSeat, CardKind.Peach, CardActionType.Use) || _coreHandComparisonOperations.IsSelfTargetForbiddenAction(owner, CardKind.Peach, [f.OwnerSeat]) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(f.OwnerSeat, f.OwnerSeat, CardKind.Peach))
             return[];
-        return _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Where(c => c.Kind == CardKind.Peach && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, c) && !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(f.OwnerSeat, [c.Id]) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, CardKind.Peach, _coreNativeCardAppearanceOperations.EffectiveSuit(owner, c), global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, c)))).OrderBy(c => c.Id).ToArray();
+        return _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Where(c => c.Kind == CardKind.Peach && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, c) && !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(f.OwnerSeat, [c.Id]) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, CardKind.Peach, _coreNativeCardAppearanceOperations.EffectiveSuit(owner, c), CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, c)))).OrderBy(c => c.Id).ToArray();
     }
 
     internal IReadOnlyList<PromptChoice> HulaoPeachChoices(ProgramSkillFrame f) => HulaoPeaches(f).Select(card => new PromptChoice(new($"hulao-peach.{(f.Id)}.{(card.Id)}"), "使用一张【桃】。", [card.Id], [f.OwnerSeat], new Dictionary<string, string> { ["program-action"] = "hulao-peach" })).Append(new(new($"hulao-peach.{(f.Id)}.stop"), "不使用【桃】", [], [], new Dictionary<string, string> { ["program-action"] = "hulao-peach" })).ToArray();
@@ -326,5 +320,5 @@ internal sealed partial class CoreHulaoActivityProgramsRuntime
     internal PromptChoice SelectAiHulaoXiuluo(PendingDecision decision, ProgramSkillFrame f) => SelectHulaoActivityChoice(decision, f);
     [ProgramAiChoice(SkillProgramEffectOp.OfferHulaoDamagePeach)]
     internal PromptChoice SelectAiHulaoPeach(PendingDecision decision, ProgramSkillFrame f) => SelectHulaoActivityChoice(decision, f);
-    internal PromptChoice SelectHulaoActivityChoice(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderBy(c => c.Cards.Count == 0 ? 1 : 0).ThenBy(c => c.Cards.Count == 0 ? 0 : global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
+    internal PromptChoice SelectHulaoActivityChoice(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderBy(c => c.Cards.Count == 0 ? 1 : 0).ThenBy(c => c.Cards.Count == 0 ? 0 : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
 }

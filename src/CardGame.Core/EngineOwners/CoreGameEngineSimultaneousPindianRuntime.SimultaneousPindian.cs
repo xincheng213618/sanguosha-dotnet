@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
 {
     internal const string SimultaneousDiscardReason = "skill-program.simultaneous-pindian.discard", SimultaneousDrawReason = "skill-program.simultaneous-pindian.draw";
-    internal CardConversionSource SimultaneousSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource SimultaneousSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillProgramStepOutcome StartSimultaneousPindian(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -50,7 +47,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
         return SimultaneousNonwinners(pair)[r.ConsequenceIndex];
     }
 
-    internal static int[] SimultaneousNonwinners(PindianResult p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SimultaneousPindian.SimultaneousNonwinners(p);
+    internal static int[] SimultaneousNonwinners(PindianResult p) => RuntimeSkills.RuntimeRules_Core_SimultaneousPindian.SimultaneousNonwinners(p);
     internal PindianResult SimultaneousResult(ProgramSkillFrame f)
     {
         var r = f.SimultaneousPindian!;
@@ -128,7 +125,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A simultaneous answer lost its owning program.");
         var r = f.SimultaneousPindian!;
         var seat = SimultaneousChooser(f);
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !SimultaneousChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !SimultaneousChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
             throw new InvalidOperationException("A simultaneous answer is no longer its exact private published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == SimultaneousPindianStage.RandomPolicies)
@@ -242,7 +239,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, SimultaneousPindian = r = r with { Stage = SimultaneousPindianStage.DeathChildren, PaymentKind = null } });
             if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
             {
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillCauseDeathDeclaredEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.OwnerSeat));
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillCauseDeathDeclaredEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.OwnerSeat));
                 _coreNativePlayerDeathOperations.BeginPlayerDeath(f.Id, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], null, null, null, causingProgramSkillFrameId: f.Id);
                 return true;
             }
@@ -381,9 +378,9 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
             return p.Choices.Single(c => c.Parameters["branch"] == "random");
         if (f.SimultaneousPindian.Stage == SimultaneousPindianStage.Claiming)
             return p.Choices.Single(c => c.Parameters["branch"] == "claim");
-        return global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[seat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !p.Choices.Any(c => c.Parameters["branch"] == "discard") ? p.Choices.Single(c => c.Parameters["branch"] == "draw") : p.Choices.First(c => c.Parameters["branch"] == "discard");
+        return CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[seat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) || !p.Choices.Any(c => c.Parameters["branch"] == "discard") ? p.Choices.Single(c => c.Parameters["branch"] == "draw") : p.Choices.First(c => c.Parameters["branch"] == "discard");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISimultaneousPindianHost.StartSimultaneousPindian(ProgramSkillFrame f) => StartSimultaneousPindian(f);
-    void global::CardGame.Core.ISimultaneousPindianHost.AddRaoshePindianRankAndRestoreGushe(ProgramSkillFrame f, string skillId) => _corePindianRevealWindowsOperations.AddRaoshePindianRankAndRestoreGushe(f, skillId);
+    SkillProgramStepOutcome ISimultaneousPindianHost.StartSimultaneousPindian(ProgramSkillFrame f) => StartSimultaneousPindian(f);
+    void ISimultaneousPindianHost.AddRaoshePindianRankAndRestoreGushe(ProgramSkillFrame f, string skillId) => _corePindianRevealWindowsOperations.AddRaoshePindianRankAndRestoreGushe(f, skillId);
 }

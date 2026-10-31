@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -113,7 +110,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IWuGuanYuWuyouHost.Resolve(ProgramSkillFrame frame) => BeginWuyou(frame);
+    SkillProgramStepOutcome IWuGuanYuWuyouHost.Resolve(ProgramSkillFrame frame) => BeginWuyou(frame);
     internal SkillProgramStepOutcome BeginWuyou(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -223,7 +220,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     [ProgramAnswer("wuyou-return")]
     internal void AnswerWuyouReturn(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Wuyou: { Stage: WuyouStage.ReturnChoice } r } f || !ValidWuyouFrame(f, true) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuyouReturnChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Wuyou: { Stage: WuyouStage.ReturnChoice } r } f || !ValidWuyouFrame(f, true) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuyouReturnChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Wuyou's private return must match its exact five names, current Hand and original donor.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.Parameters.GetValueOrDefault("branch") == "decline")
@@ -293,5 +290,5 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28520)]
     internal bool ContinuePaidWuyou(ProgramSkillFrame f) => f.Wuyou is { ContributionPaid: true } && ValidWuyouFrame(f, true);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveWuyouContributionAndNamedReturn)]
-    internal PromptChoice ChooseWuyouReturn(PendingDecision prompt, ProgramSkillFrame f) => prompt.Choices.OrderBy(c => c.Cards.Count == 0 ? int.MaxValue : global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenByDescending(c => c.Parameters.TryGetValue("card-kind", out var kind) ? CardCatalog.Get(Enum.Parse<CardKind>(kind)).AiPlayValue : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    internal PromptChoice ChooseWuyouReturn(PendingDecision prompt, ProgramSkillFrame f) => prompt.Choices.OrderBy(c => c.Cards.Count == 0 ? int.MaxValue : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenByDescending(c => c.Parameters.TryGetValue("card-kind", out var kind) ? CardCatalog.Get(Enum.Parse<CardKind>(kind)).AiPlayValue : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 }

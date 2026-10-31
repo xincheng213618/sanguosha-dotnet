@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreProgramOwnCardDiscardsProgramPaidCardOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramOwnCardDiscardsProgramPaidCardOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramPaidCardRuntime Get();
+    ProgramPaidCardRuntime Get();
 }
 
-internal interface ICoreProgramOwnCardDiscardsCorePlayerViewProjectionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramOwnCardDiscardsCorePlayerViewProjectionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
+    GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
 }

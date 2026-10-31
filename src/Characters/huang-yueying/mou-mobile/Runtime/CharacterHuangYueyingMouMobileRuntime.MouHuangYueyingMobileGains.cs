@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangYueyingMouMobileRuntime
@@ -27,7 +23,7 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
                 var m = pair.Movement;
                 if (remaining == 0)
                     break;
-                if (m.Sequence <= grant.MovementSequence || m.To != CardLocation.Hand(grant.RecipientSeat) || _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(m, batch) == CardLocation.Hand(grant.RecipientSeat) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(m.CardKind) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().Any(e => e.GrantId == grant.GrantId && e.GainSequence == m.Sequence))
+                if (m.Sequence <= grant.MovementSequence || m.To != CardLocation.Hand(grant.RecipientSeat) || _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(m, batch) == CardLocation.Hand(grant.RecipientSeat) || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(m.CardKind) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().Any(e => e.GrantId == grant.GrantId && e.GainSequence == m.Sequence))
                     continue;
                 var source = grant.Source with
                 {
@@ -46,7 +42,7 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
         if (candidate.SkillId != MouHuangYueyingMobileComposition.Qicai || candidate.BindingId != "receive-three" || candidate.OccurrenceIndex < 0 || candidate.OccurrenceIndex >= batch.Movements.Count)
             return null;
         var claim = _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().SingleOrDefault(e => e.BatchId == batch.Id && e.MovementIndex == candidate.OccurrenceIndex && e.Source == new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId) && e.GameplayHash == candidate.GameplayHash);
-        if (claim is null || batch.Movements[claim.MovementIndex] is not { } m || m.CardId != claim.CardId || m.Sequence != claim.GainSequence || m.To != CardLocation.Hand(claim.GainingSeat) || _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(m, batch) != claim.OriginalFrom || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(m.CardKind))
+        if (claim is null || batch.Movements[claim.MovementIndex] is not { } m || m.CardId != claim.CardId || m.Sequence != claim.GainSequence || m.To != CardLocation.Hand(claim.GainingSeat) || _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(m, batch) != claim.OriginalFrom || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(m.CardKind))
             return null;
         var grant = _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGrantedEvent>().SingleOrDefault(g => g.GrantId == claim.GrantId);
         return grant is not null && grant.RecipientSeat == claim.GainingSeat && (grant.Source with
@@ -86,9 +82,9 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (f.WindowContext is not { } context || !IsIssuedMouHyQiCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), context))
+        if (f.WindowContext is not { } context || !IsIssuedMouHyQiCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), context))
             throw new InvalidOperationException("Qicai transfer requires its exact original accepted actual gain claim.");
-        var claim = MouHyQiClaim(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), context)!;
+        var claim = MouHyQiClaim(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), context)!;
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var from = CardLocation.Hand(claim.GainingSeat);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouHuangYueyingMobile = new(MouHySource(f), f.GameplayHash, SkillProgramEffectOp.TransferMouHuangYueyingQicaiGains, MouHuangYueyingMobileStage.MovementChildren, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, context.ParentFrameId, claim.GainingSeat, Paid: true, CardId: claim.CardId, From: from, Before: before, After: before, GrantId: claim.GrantId, ClaimSequence: claim.GainSequence), PendingMovementContinuation = new(f.OwnerSeat, 0, null) });

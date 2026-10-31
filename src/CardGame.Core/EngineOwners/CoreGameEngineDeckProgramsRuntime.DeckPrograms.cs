@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDeckProgramsRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CoreGameEngineDeckProgramsRuntime
         return !(features.HasOperation(SkillProgramEffectOp.UseDeckSlashesThenShuffle) && (context.TargetSeat is not { } deckTarget || _coreMatchParticipantsPlayersAccess._players[deckTarget].Gender != GeneralGender.Male || owner.Hp <= 0 || _cardZonesOperations._cardZones.Count(CardLocation.DrawPile) > owner.Hp * 10));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDeckProgramHost.ExecuteDeckProgram(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteDeckProgram(effect, frame);
+    SkillProgramStepOutcome IDeckProgramHost.ExecuteDeckProgram(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteDeckProgram(effect, frame);
     [ProgramActionSource(ProgramActionSourcePhase.ProgramTail, 10)]
     internal IEnumerable<LegalAction> BuildDeckEndExchangeActions(CharacterState provider)
     {
@@ -193,7 +189,7 @@ internal sealed partial class CoreGameEngineDeckProgramsRuntime
     {
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId);
         var held = _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(frame.DeckEndExchange!.CardId)).Single(card => card.Id == frame.DeckEndExchange.CardId);
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, frame.OwnerSeat, "选择将【" + held.DisplayName + " " + global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(held.Suit) + held.RankText + "】置于哪一端，再从另一端摸牌。", [], [], frame.OwnerSeat)
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, frame.OwnerSeat, "选择将【" + held.DisplayName + " " + CoreNativeCardClassificationsRuntime.GetSuitDisplayName(held.Suit) + held.RankText + "】置于哪一端，再从另一端摸牌。", [], [], frame.OwnerSeat)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             IsPrivate = true,
@@ -209,7 +205,7 @@ internal sealed partial class CoreGameEngineDeckProgramsRuntime
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Missing deck exchange frame.");
         var d = frame.DeckEndExchange ?? throw new InvalidOperationException("Missing deck exchange draft.");
-        if (d.Stage != "choice" || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DeckEndChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
+        if (d.Stage != "choice" || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DeckEndChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Deck exchange choice changed while suspended.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!DeckProgramSourceValid(frame) || !_coreMatchParticipantsPlayersAccess._players[d.ProviderSeat].IsAlive)
@@ -263,7 +259,7 @@ internal sealed partial class CoreGameEngineDeckProgramsRuntime
         // Query again after every real child; new deck cards participate, previously
         // declared physical entities never do, even if a child returned them.
         var declared = d.DeclaredIds.ToHashSet();
-        var next = target.IsAlive && owner.IsAlive && d.UsedCount < d.Limit && DeckProgramSourceValid(frame) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && !declared.Contains(card.Id) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(owner, target, card, effectiveKind: card.Kind, ignoreDistance: effect.TargetRestriction == SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget)) : null;
+        var next = target.IsAlive && owner.IsAlive && d.UsedCount < d.Limit && DeckProgramSourceValid(frame) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && !declared.Contains(card.Id) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(owner, target, card, effectiveKind: card.Kind, ignoreDistance: effect.TargetRestriction == SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget)) : null;
         if (next is null)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(frame with { DeckSlashSequence = d with { ActiveCardId = null, Shuffled = true } });

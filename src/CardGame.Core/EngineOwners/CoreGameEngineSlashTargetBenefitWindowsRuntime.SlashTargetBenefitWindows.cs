@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
 {
     internal bool HasSlashTargetBenefitCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferSlashTargetBenefit);
 
-    internal static bool IsSlashTargetBenefitWindow(SkillProgramTriggerWindow w) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SlashTargetBenefitWindows.IsSlashTargetBenefitWindow(w);
-    internal ActualUseTargetIdentity? FreezeSlashTargetBenefitUse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, int? designatedTarget = null)
+    internal static bool IsSlashTargetBenefitWindow(SkillProgramTriggerWindow w) => RuntimeSkills.RuntimeRules_Core_SlashTargetBenefitWindows.IsSlashTargetBenefitWindow(w);
+    internal ActualUseTargetIdentity? FreezeSlashTargetBenefitUse(NativeOwners.CardAttackHandle attack, int? designatedTarget = null)
     {
         var target = designatedTarget ?? attack.TargetSeat;
-        if (!HasSlashTargetBenefitCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !use.TargetSeats.Contains(target) || attack.IsSourceLess || attack.CardUserSeat != use.SourceSeat || attack.SourceSeat != use.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
+        if (!HasSlashTargetBenefitCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !use.TargetSeats.Contains(target) || attack.IsSourceLess || attack.CardUserSeat != use.SourceSeat || attack.SourceSeat != use.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
             return null;
         if (use.Action is { Type: CardActionType.Use } action && action.ActorSeat == use.SourceSeat && action.EffectiveKind == use.CardKind)
             return new(use.Id, action.ActionId, action.ActorSeat, action.ProviderSeat, action.EffectiveKind, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, null);
@@ -22,7 +18,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
 
     internal bool MatchesSlashTargetBenefitUse(ActualUseTargetIdentity identity)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(identity.CardUseFrameId)is not { } use || use.CardKind != identity.EffectiveKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || identity.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || identity.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(identity.CardUseFrameId)is not { } use || use.CardKind != identity.EffectiveKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || identity.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || identity.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
             return false;
         if (!use.TargetSeats.Contains(identity.TargetSeat) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SlashTargetBenefitOfferedEvent>().Any(e => e.CardUseFrameId == use.Id && e.ActorSeat == identity.ActorSeat && e.TargetSeat == identity.TargetSeat && (use.SlashTargetBenefits ?? []).Any(r => r.Use == identity && r.OfferWindowId == e.WindowId && r.OfferCandidateIndex == e.CandidateIndex)))
             return false;
@@ -64,7 +60,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
 
     internal SlashTargetBenefitReceipt? SlashTargetBenefitCurrent(SlashTargetBenefitReceipt identity) => _coreCardUseLifecycleOperations.LifecycleCardUse(identity.Use.CardUseFrameId)?.SlashTargetBenefits?.SingleOrDefault(r => r.OfferWindowId == identity.OfferWindowId && r.OfferCandidateIndex == identity.OfferCandidateIndex);
     internal void ReplaceSlashTargetBenefit(SlashTargetBenefitReceipt receipt) => _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(receipt.Use.CardUseFrameId, u => u with { SlashTargetBenefits = Array.AsReadOnly((u.SlashTargetBenefits ?? []).Select(r => r.OfferWindowId == receipt.OfferWindowId && r.OfferCandidateIndex == receipt.OfferCandidateIndex ? receipt : r).ToArray()) });
-    internal bool TryBeginSlashTargetBenefits(global::CardGame.Core.NativeOwners.CardAttackHandle attack, bool legacy = false, bool afterActualTargets = false)
+    internal bool TryBeginSlashTargetBenefits(NativeOwners.CardAttackHandle attack, bool legacy = false, bool afterActualTargets = false)
     {
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || FreezeSlashTargetBenefitUse(attack)is not { } identity || !_coreMatchParticipantsPlayersAccess._players[identity.ActorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[identity.TargetSeat].IsAlive)
             return false;
@@ -106,7 +102,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
         return true;
     }
 
-    internal bool TryBeginDodgeCancelledSlashBenefits(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryBeginDodgeCancelledSlashBenefits(NativeOwners.CardAttackHandle attack)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId);
         if (use is null || !HasSlashTargetBenefitCapability || attack.SuccessfulDodgeResponses < attack.RequiredDodgeResponses || _coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(attack))
@@ -192,7 +188,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
         }
     }
 
-    internal void ContinueSlashAfterTargetBenefitAdditions(global::CardGame.Core.NativeOwners.CardAttackHandle attack, bool legacy)
+    internal void ContinueSlashAfterTargetBenefitAdditions(NativeOwners.CardAttackHandle attack, bool legacy)
     {
         // New gains can themselves add another genuine target. Refill only this
         // capability's unvisited benefit keys before entering the original effect.
@@ -218,7 +214,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
 
     internal void CompleteSlashTargetBenefitBinding(ProgramSkillFrame f)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not SlashTargetBenefitWindowFrame w || w.Id != f.WindowContext?.ParentFrameId || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not SlashTargetBenefitWindowFrame w || w.Id != f.WindowContext?.ParentFrameId || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]))
             throw new InvalidOperationException("A Slash benefit child lost its exact candidate return.");
         var receipt = SlashTargetBenefitCurrent(w.Contexts[w.CandidateIndex].SlashTargetBenefit!);
         if (receipt?.Stage == SlashTargetBenefitStage.Offered)

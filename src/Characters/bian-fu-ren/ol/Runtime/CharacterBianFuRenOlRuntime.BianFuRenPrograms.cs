@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBianFuRenOlRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CharacterBianFuRenOlRuntime
         return batch.BianFuRenUsedDiscards?.SingleOrDefault(receipt => receipt.BatchId == batch.Id && receipt.NativeUseId > 0 && receipt.Action.Type == CardActionType.Use && receipt.Action.ActorSeat != owner && receipt.Action.EffectiveDesignatedTargetSeats.Contains(owner) && receipt.Materials.Any(material => material.CompletionMovementSequence == anchor.Sequence) && receipt.Materials.All(material => receipt.Action.PhysicalCards.Any(cost => cost.CardId == material.CardId && cost.CardKind == material.PrintedKind && cost.From == material.OriginalPayment?.OriginalFrom) && BianFuRenOriginalPaymentMatches(material, receipt.NativeUseId, receipt.Action.ActionId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(payment => payment.Sequence == material.PaymentMovementSequence && payment.CardId == material.CardId && BianFuRenNativeUsePayment(payment)) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(finish => finish.Sequence == material.CompletionMovementSequence && finish.CardId == material.CardId && (material.DelayedPlacementMovementSequence == 0 ? BianFuRenNativeUseFinish(finish) : BianFuRenDelayedFinish(material, finish)))));
     }
 
-    internal static bool IsBianFuRenOperation(SkillProgramEffectOp operation) => global::CardGame.Core.RuntimeSkills.RuntimeRules_bian_fu_ren_ol_BianFuRenPrograms.IsBianFuRenOperation(operation);
+    internal static bool IsBianFuRenOperation(SkillProgramEffectOp operation) => RuntimeSkills.RuntimeRules_bian_fu_ren_ol_BianFuRenPrograms.IsBianFuRenOperation(operation);
     internal void ValidateBianFuRenTrigger(SkillProgramTrigger trigger, SkillProgramEffectOp operation)
     {
         var wanwei = operation == SkillProgramEffectOp.WanweiObtainMatchingLostCard;
@@ -44,14 +40,14 @@ internal sealed partial class CharacterBianFuRenOlRuntime
     internal void ResolveBianFuRenMovement(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.InstructionIndex != 1 || frame.TriggerId is null || frame.WindowContext is not { } context || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not CardsMovedTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.Batch.Id != context.MovementBatch?.Id || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]) || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Any(fact => fact is WanweiAcquisitionIssuedEvent wanwei && wanwei.ProgramFrameId == frame.Id || fact is YuejianAcquisitionIssuedEvent yuejian && yuejian.ProgramFrameId == frame.Id))
+        if (frame.InstructionIndex != 1 || frame.TriggerId is null || frame.WindowContext is not { } context || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not CardsMovedTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.Batch.Id != context.MovementBatch?.Id || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]) || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Any(fact => fact is WanweiAcquisitionIssuedEvent wanwei && wanwei.ProgramFrameId == frame.Id || fact is YuejianAcquisitionIssuedEvent yuejian && yuejian.ProgramFrameId == frame.Id))
             throw new InvalidOperationException("Bian Fu Ren cannot borrow or repeat a different accepted movement instruction.");
         ValidateBianFuRenTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(frame), operation);
         if (operation == SkillProgramEffectOp.WanweiObtainMatchingLostCard)
         {
             var loss = BianFuRenLoss(context, frame.OwnerSeat) ?? throw new InvalidOperationException("Wanwei lost the actual other actor's frozen owned-loss payment.");
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-            var matching = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(card => global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(card.Kind) == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(loss.PrintedKind));
+            var matching = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(card => CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(card.Kind) == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(loss.PrintedKind));
             if (matching is not null)
                 _corePhysicalMovementFacadesOperations.MoveCard(matching, CardLocation.DrawPile, CardLocation.Hand(frame.OwnerSeat), new("skill-program.wanwei.named-acquisition"));
             else
@@ -83,5 +79,5 @@ internal sealed partial class CharacterBianFuRenOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YuejianAcquisitionIssuedEvent(frame.Id, receipt.BatchId, receipt.NativeUseId, receipt.Action.ActionId, frame.OwnerSeat, hand.Length, different, sequenceBefore, sequenceAfter, claimed));
     }
 
-    void global::CardGame.Core.IBianFuRenProgramHost.ResolveBianFuRenMovement(ProgramSkillFrame frame, SkillProgramEffectOp operation) => ResolveBianFuRenMovement(frame, operation);
+    void IBianFuRenProgramHost.ResolveBianFuRenMovement(ProgramSkillFrame frame, SkillProgramEffectOp operation) => ResolveBianFuRenMovement(frame, operation);
 }

@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMangYaChangAnniversaryRuntime
 {
-    internal bool JiedaoFinalRecipientMatches(AnniversaryJiedaoGrant grant, global::CardGame.Core.GameEngine.IDamageAttempt attack) => grant.Origin.Target == attack.TargetSeat || attack.DamageRedirected && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageTransferredEvent>().Count(e => e.ResolutionId == attack.ResolutionId && e.SourceSeat == grant.Origin.Source.OwnerSeat && e.TargetSeat == attack.TargetSeat) == 1;
-    internal void AppendAnniversaryJiedaoDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow timing, List<DamageTriggerCandidate> candidates)
+    internal bool JiedaoFinalRecipientMatches(AnniversaryJiedaoGrant grant, GameEngine.IDamageAttempt attack) => grant.Origin.Target == attack.TargetSeat || attack.DamageRedirected && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageTransferredEvent>().Count(e => e.ResolutionId == attack.ResolutionId && e.SourceSeat == grant.Origin.Source.OwnerSeat && e.TargetSeat == attack.TargetSeat) == 1;
+    internal void AppendAnniversaryJiedaoDamageCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow timing, List<DamageTriggerCandidate> candidates)
     {
         if (!HasAnniversaryJiedao || timing != SkillProgramTriggerWindow.AfterDamageApplied)
             return;

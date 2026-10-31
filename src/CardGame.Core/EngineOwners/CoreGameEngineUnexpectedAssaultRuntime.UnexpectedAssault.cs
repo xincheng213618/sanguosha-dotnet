@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineUnexpectedAssaultRuntime
@@ -18,8 +14,8 @@ internal sealed partial class CoreGameEngineUnexpectedAssaultRuntime
 
     internal void ResolveUnexpectedAssaultEffect(NullificationWindowFrame pending)
     {
-        var targetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Unexpected Assault lost its current target.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Id != pending.ParentFrameId || use.CardId != pending.EffectCardId || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.UnexpectedAssault || pending.EffectCardKind != global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || pending.ActionKind != LegalActionKind.UnexpectedAssault || use.SourceSeat != pending.SourceSeat || use.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != targetSeat || use.Action is not { Type: CardActionType.Use, EffectiveSuit: not null })
+        var targetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Unexpected Assault lost its current target.");
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Id != pending.ParentFrameId || use.CardId != pending.EffectCardId || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.UnexpectedAssault || pending.EffectCardKind != CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || pending.ActionKind != LegalActionKind.UnexpectedAssault || use.SourceSeat != pending.SourceSeat || use.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != targetSeat || use.Action is not { Type: CardActionType.Use, EffectiveSuit: not null })
             throw new InvalidOperationException("Unexpected Assault lost its exact owning native use and suit.");
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         if (!target.IsAlive || _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count == 0)
@@ -29,7 +25,7 @@ internal sealed partial class CoreGameEngineUnexpectedAssaultRuntime
         }
 
         if (!_coreExtraCardEffectRoundsOperations.IsExtraCardEffectRound(use.Id))
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(use.CardId, global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), use.SourceSeat, targetSeat));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(use.CardId, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), use.SourceSeat, targetSeat));
         _coreMatchLogOperations.AddLog("CardUsed", $"{(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].Name)} 对 {(target.Name)} 使用【出其不意】，选择展示其一张手牌。", use.SourceSeat, targetSeat);
         _coreNativeTrickEffectsOperations.BeginTargetCardSelection(pending, target, _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count);
     }
@@ -38,13 +34,13 @@ internal sealed partial class CoreGameEngineUnexpectedAssaultRuntime
     {
         if (effectiveCardKind != CardKind.UnexpectedAssault && actionKind != LegalActionKind.UnexpectedAssault)
             return false;
-        if (effectiveCardKind != CardKind.UnexpectedAssault || actionKind != LegalActionKind.UnexpectedAssault || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Id != resolutionId || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != effectiveCardKind || use.CardId != effectCard.Id || use.SourceSeat != sourceSeat || use.Step != ResolutionFrameStep.ResolvingEffect || use.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != targetSeat || targetCardFromZone != CardLocation.Hand(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Any(card => card.Id == targetCard.Id) || use.UnexpectedAssaultReveal?.TargetIndex == use.TargetIndex || use.Action is not { Type: CardActionType.Use, EffectiveSuit: { } useSuit } action || action.ActorSeat != sourceSeat)
+        if (effectiveCardKind != CardKind.UnexpectedAssault || actionKind != LegalActionKind.UnexpectedAssault || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Id != resolutionId || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != effectiveCardKind || use.CardId != effectCard.Id || use.SourceSeat != sourceSeat || use.Step != ResolutionFrameStep.ResolvingEffect || use.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != targetSeat || targetCardFromZone != CardLocation.Hand(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Any(card => card.Id == targetCard.Id) || use.UnexpectedAssaultReveal?.TargetIndex == use.TargetIndex || use.Action is not { Type: CardActionType.Use, EffectiveSuit: { } useSuit } action || action.ActorSeat != sourceSeat)
             throw new InvalidOperationException("Unexpected Assault reveal lost its exact current hand, action or target cursor.");
         var receipt = new UnexpectedAssaultRevealReceipt(use.Id, action.ActionId, use.TargetIndex, sourceSeat, targetSeat, targetCard.Id, targetCard.Kind, targetCard.Suit, targetCard.Rank, useSuit, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[targetSeat], targetCard), _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id));
         _coreRuntimeOperations.ReplaceRuntimeTop(use with { UnexpectedAssaultReveal = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(use.Id, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(targetCard) })));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new UnexpectedAssaultRevealedEvent(receipt));
-        _coreMatchLogOperations.AddLog("CardRevealed", $"{(_coreMatchParticipantsPlayersAccess._players[sourceSeat].Name)} 展示了 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 的【{(targetCard.DisplayName)}】（{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(receipt.EffectiveRevealedSuit))}）。", sourceSeat, targetSeat);
+        _coreMatchLogOperations.AddLog("CardRevealed", $"{(_coreMatchParticipantsPlayersAccess._players[sourceSeat].Name)} 展示了 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 的【{(targetCard.DisplayName)}】（{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(receipt.EffectiveRevealedSuit))}）。", sourceSeat, targetSeat);
         if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(use.Id, "unexpected-assault-hand"))
             return true;
         ContinueUnexpectedAssaultPublicReveal(_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)!);

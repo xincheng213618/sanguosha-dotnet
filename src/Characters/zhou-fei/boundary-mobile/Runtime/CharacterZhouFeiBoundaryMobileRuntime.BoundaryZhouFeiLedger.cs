@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouFeiBoundaryMobileRuntime
 {
     internal const string BoundaryZfLiangyin = "boundary:liangyin-mobile", BoundaryZfKongsheng = "boundary:kongsheng-mobile", BoundaryZfAction = "boundary-zhou-fei";
     internal const string BoundaryZfStoreReason = "skill.boundary-zhou-fei.store", BoundaryZfReturnReason = "skill.boundary-zhou-fei.return", BoundaryZfDiscardReason = "skill.boundary-zhou-fei.discard";
-    internal static CardConversionSource BoundaryZfSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    internal static CardConversionSource BoundaryZfSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     internal static bool BoundaryZfGeneralPile(CardLocation location) => location.OwnerSeat is not null && location.Zone is CardZoneKind.Authority or CardZoneKind.BuquWound or CardZoneKind.Chunlao or CardZoneKind.PublicPersistentPile or CardZoneKind.PrivatePersistentPile or CardZoneKind.PrivateReserve or CardZoneKind.PublicDeferredPile or CardZoneKind.PojunHold or CardZoneKind.PrivateTurnHold or CardZoneKind.RoundHold;
     internal static bool IsBoundaryZhouFeiMovement(ProgramTriggerCandidate candidate) => candidate.SkillId == BoundaryZfLiangyin && candidate.BindingId == "global-general-pile";
     internal IEnumerable<(int Encoded, int Index, int Direction)> BoundaryZfMovementGroups(CardMovementBatchContext batch)

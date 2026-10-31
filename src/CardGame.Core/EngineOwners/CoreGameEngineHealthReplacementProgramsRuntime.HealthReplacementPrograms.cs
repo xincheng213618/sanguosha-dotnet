@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineHealthReplacementProgramsRuntime
@@ -37,7 +33,7 @@ internal sealed partial class CoreGameEngineHealthReplacementProgramsRuntime
         _programPipelineHooksOperations._programPipelineHooks.CaptureHealthChange(change);
     }
 
-    internal bool ApplyAttackAsHpLoss(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool ApplyAttackAsHpLoss(GameEngine.IDamageAttempt attack)
     {
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
         var amount = _coreCardDamageMaximumHpReplacementOperations.CalculateCardDamageLayer(attack);

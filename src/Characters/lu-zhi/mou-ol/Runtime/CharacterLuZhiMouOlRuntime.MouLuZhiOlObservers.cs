@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuZhiMouOlRuntime
@@ -15,17 +11,17 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         if (n < 1 || _resolutionStackOperations._resolutionStack[n - 1].Id != r.WindowId)
             return false;
         if (r.Op == SkillProgramEffectOp.ResolveMouLuZhiLiance)
-            return f.SkillId == MouLuZhiOlComposition.Liance && r.BatchId > 0 && w.MovementBatch?.Id == r.BatchId && _resolutionStackOperations._resolutionStack[n - 1] is CardsMovedTriggerWindowFrame moved && moved.CandidateIndex >= 0 && moved.CandidateIndex < moved.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, moved.Candidates[moved.CandidateIndex]) && r.Stage is MouLuZhiOlStage.Drawing or MouLuZhiOlStage.DrawChildren;
+            return f.SkillId == MouLuZhiOlComposition.Liance && r.BatchId > 0 && w.MovementBatch?.Id == r.BatchId && _resolutionStackOperations._resolutionStack[n - 1] is CardsMovedTriggerWindowFrame moved && moved.CandidateIndex >= 0 && moved.CandidateIndex < moved.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, moved.Candidates[moved.CandidateIndex]) && r.Stage is MouLuZhiOlStage.Drawing or MouLuZhiOlStage.DrawChildren;
         if (f.SkillId != MouLuZhiOlComposition.Sibing)
             return false;
         if (_resolutionStackOperations._resolutionStack[n - 1] is MouLuZhiOlDirectWindowFrame dw)
         {
-            if (dw.Context != w || !ExactMouLzDirectWindow(dw) || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, dw.Candidate) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == dw.ParentFrameId)is not ProgramSkillFrame { MouLuZhiOlDirectDuel: { } d } || d.FrameId != r.OriginalId || d.Instruction != r.OriginalInstruction || r.OriginalActionId != 0 || r.ActorSeat != d.Actor || r.TargetSeat != d.Target)
+            if (dw.Context != w || !ExactMouLzDirectWindow(dw) || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, dw.Candidate) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == dw.ParentFrameId)is not ProgramSkillFrame { MouLuZhiOlDirectDuel: { } d } || d.FrameId != r.OriginalId || d.Instruction != r.OriginalInstruction || r.OriginalActionId != 0 || r.ActorSeat != d.Actor || r.TargetSeat != d.Target)
                 return false;
         }
         else if (_resolutionStackOperations._resolutionStack[n - 1] is ProgramCardTriggerWindowFrame window && MouLzContextUse(w)is { Action: { } a } use)
         {
-            if (window.ParentFrameId != use.Id || r.OriginalId != use.Id || r.OriginalActionId != a.ActionId || window.Action.ActionId != a.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])))
+            if (window.ParentFrameId != use.Id || r.OriginalId != use.Id || r.OriginalActionId != a.ActionId || window.Action.ActionId != a.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])))
                 return false;
         }
         else
@@ -53,16 +49,16 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         var r = f.MouLuZhiOl!;
         if (r.Stage == MouLuZhiOlStage.NativeUse && child is CardUseFrame u)
             return IsMouLzCounterUse(u);
-        if (r.Stage == MouLuZhiOlStage.Drawing && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
+        if (r.Stage == MouLuZhiOlStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
             return f.NativeDraw is not null;
         if (MouLzLionChild(f, child))
             return true;
         if (child is RecoveryReplacementFrame recovery)
             return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
         if (child is HpChangedTriggerWindowFrame hp)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
+            return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
         if (child is CardsMovedTriggerWindowFrame m)
-            return f.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, m) && m.Batch.Movements.All(x => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(x) && x.Sequence > r.Before && x.Sequence <= r.After);
+            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, m) && m.Batch.Movements.All(x => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(x) && x.Sequence > r.Before && x.Sequence <= r.After);
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
@@ -71,13 +67,13 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         if (_resolutionStackOperations._resolutionStack[n - 1] is CardUseFrame { MouLuZhiOlCounter: not null } u && IsMouLzCounterUse(u) && _resolutionStackOperations._resolutionStack[n] is ProgramCardTriggerWindowFrame w)
             return w.ParentFrameId == u.Id && w.Action.ActionId == u.Action!.ActionId;
         if (_resolutionStackOperations._resolutionStack[n - 1] is ProgramCardTriggerWindowFrame window && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { MouLuZhiOlCounter: not null } use && IsMouLzCounterUse(use) && _resolutionStackOperations._resolutionStack[n] is ProgramSkillFrame f && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) && f.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext2(window, window.Candidates[window.CandidateIndex]);
+            return CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) && f.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext2(window, window.Candidates[window.CandidateIndex]);
         if (_resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame { MouLuZhiOlDirectDuel: { } d } p && _resolutionStackOperations._resolutionStack[n] is MouLuZhiOlDirectWindowFrame direct)
             return direct.ParentFrameId == p.Id && ValidMouLzDirect(p, d) && ExactMouLzDirectWindow(direct);
-        return _resolutionStackOperations._resolutionStack[n - 1] is MouLuZhiOlDirectWindowFrame dw && _resolutionStackOperations._resolutionStack[n] is ProgramSkillFrame skill && ExactMouLzDirectWindow(dw) && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(skill, dw.Candidate) && skill.WindowContext == dw.Context;
+        return _resolutionStackOperations._resolutionStack[n - 1] is MouLuZhiOlDirectWindowFrame dw && _resolutionStackOperations._resolutionStack[n] is ProgramSkillFrame skill && ExactMouLzDirectWindow(dw) && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(skill, dw.Candidate) && skill.WindowContext == dw.Context;
     }
 
-    internal bool MouLzObserverEdge(int n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[n - 1], _resolutionStackOperations._resolutionStack[n]) || MouLzNativeEdge(n) || _resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame f && MouLzFirstChild(f, _resolutionStackOperations._resolutionStack[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]);
+    internal bool MouLzObserverEdge(int n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[n - 1], _resolutionStackOperations._resolutionStack[n]) || MouLzNativeEdge(n) || _resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame f && MouLzFirstChild(f, _resolutionStackOperations._resolutionStack[n]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]);
     internal bool MouLzSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => this.MouLzObserverEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? MouLzRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.MouLzFirstChild(f, c), (n) => this.MouLzSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 32900)]

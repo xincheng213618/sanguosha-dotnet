@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuRongMouMobileRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CharacterZhuRongMouMobileRuntime
             throw new InvalidOperationException("Juxiang requires its current Ending and one living recipient.");
         // The fixed mode recipe, not the depleted stock, supplies printed faces.
         // A mode without this kind uses the ordinary game's three printed faces.
-        var templates = global::CardGame.Core.EngineOwners.CoreMatchParticipantSetupRuntime.CreateDeckFromRegistry(_contentRegistryOperations._contentRegistry, global::CardGame.Core.EngineOwners.CoreMatchParticipantSetupRuntime.ResolveDeckDefinition(_contentRegistryOperations._contentRegistry, _coreMatchDefinitionModeDefinitionOptionsAccess._options.DeckId ?? _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.DeckId)).Where(c => c.Kind == CardKind.BarbarianAssault).Select(c => (c.Suit, c.Rank)).Distinct().ToArray();
+        var templates = CoreMatchParticipantSetupRuntime.CreateDeckFromRegistry(_contentRegistryOperations._contentRegistry, CoreMatchParticipantSetupRuntime.ResolveDeckDefinition(_contentRegistryOperations._contentRegistry, _coreMatchDefinitionModeDefinitionOptionsAccess._options.DeckId ?? _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.DeckId)).Where(c => c.Kind == CardKind.BarbarianAssault).Select(c => (c.Suit, c.Rank)).Distinct().ToArray();
         if (templates.Length == 0)
             templates = [(Suit.Spade, 7), (Suit.Spade, 13), (Suit.Club, 7)];
         var before = _randomOperations._random.State;

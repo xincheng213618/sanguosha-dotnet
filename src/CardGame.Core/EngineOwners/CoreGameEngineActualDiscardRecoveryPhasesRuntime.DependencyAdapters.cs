@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ActualDiscardRecoveryPhaseRuntime))]
-internal sealed class CoreActualDiscardRecoveryPhasesActualDiscardRecoveryPhaseAdapter(global::System.Func<global::CardGame.Core.ActualDiscardRecoveryPhaseRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreActualDiscardRecoveryPhasesActualDiscardRecoveryPhaseOperations
+[Core.ProgramCapability(typeof(ActualDiscardRecoveryPhaseRuntime))]
+internal sealed class CoreActualDiscardRecoveryPhasesActualDiscardRecoveryPhaseAdapter(Func<ActualDiscardRecoveryPhaseRuntime> targetFactory) : ICoreActualDiscardRecoveryPhasesActualDiscardRecoveryPhaseOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.ActualDiscardRecoveryPhaseRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ActualDiscardRecoveryPhaseRuntime Get() => this._targetFactory();
+    private readonly Func<ActualDiscardRecoveryPhaseRuntime> _targetFactory = targetFactory;
+    public ActualDiscardRecoveryPhaseRuntime Get() => this._targetFactory();
 }

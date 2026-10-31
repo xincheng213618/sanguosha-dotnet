@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCardUseModulesRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
         if (_turnCardUseEffectsOperations._turnCardUseEffects.HandColorRestrictions.Count == 0)
             return false;
         var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(player, card);
-        return _turnCardUseEffectsOperations._turnCardUseEffects.IsHandColorRestricted(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, player.Seat, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(suit), isColorless: suit == Suit.None);
+        return _turnCardUseEffectsOperations._turnCardUseEffects.IsHandColorRestricted(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, player.Seat, CoreNativeCardClassificationsRuntime.IsRedSuit(suit), isColorless: suit == Suit.None);
     }
 
     internal bool IsCardUseForbidden(int actorSeat, CardKind effectiveKind, CardActionType actionType, bool ignoreIssuedPlayBan = false, long? existingUseFrameId = null) => !_modeRulesOperations._modeRules.Cards.IsCardAllowed(effectiveKind) || _coreProgramCardLegalityOperations.CardLegality.IsUseForbidden(ProgramCardLegalityStage.BeforeIntrinsicUseBan, new(actorSeat, effectiveKind, actionType, existingUseFrameId)) || effectiveKind == CardKind.Poison || effectiveKind == CardKind.Peach && actionType == CardActionType.Use && !_characterSimaYiHappyGodOperations.AllowsHappySimaPeach(actorSeat) || _coreProgramCardLegalityOperations.CardLegality.IsUseForbidden(ProgramCardLegalityStage.BeforeTurnUseBan, new(actorSeat, effectiveKind, actionType, existingUseFrameId)) || !ignoreIssuedPlayBan && (actionType == CardActionType.Use || actionType == CardActionType.Response && (effectiveKind == CardKind.Nullification || _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[actorSeat], effectiveKind))) && _coreIssuedPlayUsePoliciesOperations.HasIssuedPlayPhaseUseBan(actorSeat) || _turnCardUseEffectsOperations._turnCardUseEffects.IsCardUseForbidden(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, actorSeat, effectiveKind, actionType) || _coreDyingWindowSkillPoliciesOperations.IsExclusiveTurnPeachUseForbidden(actorSeat, effectiveKind, actionType) || _coreNextActualUseTargetAdjustmentsOperations.IsNextActualUseCounterspellForbidden(actorSeat, effectiveKind, actionType) || _coreAlcoholIdentityPoliciesOperations.IsForeignTurnAlcoholUseForbidden(actorSeat, effectiveKind, actionType) || _corePhaseStartControlPoliciesOperations.IsOtherPlayRestrictionUseForbidden(actorSeat, effectiveKind, actionType) || _characterYuanTanYuanShangOlOperations.IsNeifaUseForbidden(actorSeat, effectiveKind, actionType) || _characterZhangLingOlOperations.IsCategoryTalismanUseForbidden(actorSeat, effectiveKind, actionType);
@@ -128,7 +124,7 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
         if (binding.CardIds.Count != 1 || binding.SourceLocations.Count != 1 || (!useFrozenSuit && _cardZonesOperations._cardZones.GetLocation(binding.CardIds[0]) != binding.SourceLocations[0]))
             throw new InvalidOperationException("A hand-color restriction requires one stable bound card.");
         var effectiveSuit = useFrozenSuit ? binding.FrozenRevealedSuit ?? throw new InvalidOperationException("A frozen hand-color restriction requires its captured suit.") : _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _cardZonesOperations._cardZones.CardsAt(binding.SourceLocations[0]).Single(item => item.Id == binding.CardIds[0]));
-        var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandColorRestriction(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, CreateProgramTurnEffectSource(frame), targetSeat, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(effectiveSuit));
+        var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandColorRestriction(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, CreateProgramTurnEffectSource(frame), targetSeat, CoreNativeCardClassificationsRuntime.IsRedSuit(effectiveSuit));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HandCardColorRestrictionGrantedEvent(granted));
     }
 
@@ -190,7 +186,7 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
         if (binding.CardIds.Count != 1 || binding.SourceLocations.Count != 1 || _cardZonesOperations._cardZones.GetLocation(binding.CardIds[0]) != binding.SourceLocations[0])
             throw new InvalidOperationException("A turn card conversion requires one stable bound card.");
         var card = _cardZonesOperations._cardZones.CardsAt(binding.SourceLocations[0]).Single(item => item.Id == binding.CardIds[0]);
-        var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantConversion(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, CreateProgramTurnEffectSource(frame), sourceBind, colorRelation, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card)), outputKind);
+        var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantConversion(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, CreateProgramTurnEffectSource(frame), sourceBind, colorRelation, CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card)), outputKind);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardConversionGrantedEvent(granted));
     }
 
@@ -200,7 +196,7 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
             throw new InvalidOperationException("A turn effect requires an active program frame in an ongoing turn.");
     }
 
-    internal static CardUseEffectSource CreateProgramTurnEffectSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CardUseModules.CreateProgramTurnEffectSource(frame);
+    internal static CardUseEffectSource CreateProgramTurnEffectSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_Core_CardUseModules.CreateProgramTurnEffectSource(frame);
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 130)]
     internal bool DistanceCardUseExemption130HasUnlimitedTurnRuleModifier(ProgramCardDistanceQuery q) => HasUnlimitedTurnRuleModifier(q.Actor.Seat, SkillRuleQuery.CardUseDistanceLimit, q.Kind);
 }

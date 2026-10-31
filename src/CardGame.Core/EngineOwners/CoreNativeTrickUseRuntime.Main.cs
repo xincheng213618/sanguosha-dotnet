@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeTrickUseRuntime
@@ -61,7 +57,7 @@ internal sealed partial class CoreNativeTrickUseRuntime
             throw new InvalidOperationException($"{(groupCard.Kind)} became illegal before resolution.");
         }
 
-        var targets = Enumerable.Range(1, _coreMatchDefinitionPlayerCountAccess._playerCount - 1).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(source.Seat, offset)]).Where(player => player.IsAlive && !_coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ExcludeGlobalTarget, groupCard.Kind) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(source.Seat, player.Seat, groupCard.Kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(player, groupCard.Kind, groupCard.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, groupCard))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(source.Seat, player.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(source, groupCard))).Select(player => player.Seat).ToArray();
+        var targets = Enumerable.Range(1, _coreMatchDefinitionPlayerCountAccess._playerCount - 1).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(source.Seat, offset)]).Where(player => player.IsAlive && !_coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ExcludeGlobalTarget, groupCard.Kind) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(source.Seat, player.Seat, groupCard.Kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(player, groupCard.Kind, groupCard.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, groupCard))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(source.Seat, player.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(source, groupCard))).Select(player => player.Seat).ToArray();
         var resolutionId = _coreNativeCardUseOperations.BeginCardUse(groupCard, source.Seat, targets);
         _corePhysicalMovementFacadesOperations.MoveCard(groupCard, _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(source, groupCard), CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(resolutionId, groupCard, source.Seat, targets, actionKind, requiredCardKind: requiredCardKind);
@@ -82,7 +78,7 @@ internal sealed partial class CoreNativeTrickUseRuntime
             throw new InvalidOperationException("PeachGarden became illegal before resolution.");
         }
 
-        var targets = _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(source, Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(source.Seat, offset)]).Where(player => player.IsAlive && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(source.Seat, player.Seat, CardKind.PeachGarden)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(player, CardKind.PeachGarden, peachGarden.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, peachGarden))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(source.Seat, player.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(source, peachGarden))).Select(player => player.Seat).ToArray());
+        var targets = _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(source, Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(source.Seat, offset)]).Where(player => player.IsAlive && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(source.Seat, player.Seat, CardKind.PeachGarden)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(player, CardKind.PeachGarden, peachGarden.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, peachGarden))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(source.Seat, player.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(source, peachGarden))).Select(player => player.Seat).ToArray());
         var resolutionId = _coreNativeCardUseOperations.BeginCardUse(peachGarden, source.Seat, targets);
         _corePhysicalMovementFacadesOperations.MoveCard(peachGarden, _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(source, peachGarden), CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(resolutionId, peachGarden, source.Seat, targets, LegalActionKind.PeachGarden);
@@ -96,7 +92,7 @@ internal sealed partial class CoreNativeTrickUseRuntime
             throw new InvalidOperationException("FiveGrains became illegal before resolution.");
         }
 
-        var aliveSeats = _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(source, Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(source.Seat, offset)]).Where(player => player.IsAlive && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(source.Seat, player.Seat, CardKind.FiveGrains)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(player, CardKind.FiveGrains, fiveGrains.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, fiveGrains))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(source.Seat, player.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(source, fiveGrains))).Select(player => player.Seat).ToArray());
+        var aliveSeats = _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(source, Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(source.Seat, offset)]).Where(player => player.IsAlive && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(source.Seat, player.Seat, CardKind.FiveGrains)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(player, CardKind.FiveGrains, fiveGrains.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, fiveGrains))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(source.Seat, player.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(source, fiveGrains))).Select(player => player.Seat).ToArray());
         var availableCards = _cardZonesOperations._cardZones.Count(CardLocation.DrawPile) + _cardZonesOperations._cardZones.Count(CardLocation.DiscardPile);
         var targets = aliveSeats.Take(availableCards).ToArray();
         var resolutionId = _coreNativeCardUseOperations.BeginCardUse(fiveGrains, source.Seat, targets);
@@ -151,7 +147,7 @@ internal sealed partial class CoreNativeTrickUseRuntime
         }
 
         var source = _coreMatchParticipantsPlayersAccess._players[pending.SourceSeat];
-        var targetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("A delayed card must retain one target.");
+        var targetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("A delayed card must retain one target.");
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         var expectedActionKind = pending.EffectCardKind switch
         {
@@ -195,9 +191,9 @@ internal sealed partial class CoreNativeTrickUseRuntime
         _coreNativeCardUseCompletionOperations.FinishCardUse(pending.ParentFrameId, _coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending), pending.EffectCardKind);
     }
 
-    internal void ResolveDismantlement(CharacterState source, CharacterState target, Card dismantlement, int? targetCardId, CardKind? playedCardKind = null, TargetHandCardPreselection? preselection = null) => BeginTargetCardEffect(source, target, dismantlement, LegalActionKind.Dismantlement, global::CardGame.Core.GameEngine.TargetCardEffect.Discard, targetCardId, playedCardKind, preselection);
-    internal void ResolveSnatch(CharacterState source, CharacterState target, Card snatch, int? targetCardId, CardKind? playedCardKind = null, TargetHandCardPreselection? preselection = null) => BeginTargetCardEffect(source, target, snatch, LegalActionKind.Snatch, global::CardGame.Core.GameEngine.TargetCardEffect.Take, targetCardId, playedCardKind, preselection);
-    internal void BeginTargetCardEffect(CharacterState source, CharacterState target, Card effectCard, LegalActionKind actionKind, global::CardGame.Core.GameEngine.TargetCardEffect effect, int? targetCardId, CardKind? playedCardKind = null, TargetHandCardPreselection? preselection = null)
+    internal void ResolveDismantlement(CharacterState source, CharacterState target, Card dismantlement, int? targetCardId, CardKind? playedCardKind = null, TargetHandCardPreselection? preselection = null) => BeginTargetCardEffect(source, target, dismantlement, LegalActionKind.Dismantlement, GameEngine.TargetCardEffect.Discard, targetCardId, playedCardKind, preselection);
+    internal void ResolveSnatch(CharacterState source, CharacterState target, Card snatch, int? targetCardId, CardKind? playedCardKind = null, TargetHandCardPreselection? preselection = null) => BeginTargetCardEffect(source, target, snatch, LegalActionKind.Snatch, GameEngine.TargetCardEffect.Take, targetCardId, playedCardKind, preselection);
+    internal void BeginTargetCardEffect(CharacterState source, CharacterState target, Card effectCard, LegalActionKind actionKind, GameEngine.TargetCardEffect effect, int? targetCardId, CardKind? playedCardKind = null, TargetHandCardPreselection? preselection = null)
     {
         var effectiveCardKind = playedCardKind ?? effectCard.Kind;
         var stillLegal = _coreNativeLegalActionsOperations.BuildLegalActions(source, selectedPhysicalCardId: effectCard.Id).Any(action => action.Kind == actionKind && action.CardId == effectCard.Id && action.TargetSeat == target.Seat && action.TargetCardId == targetCardId && (action.PlayedCardKind ?? effectCard.Kind) == effectiveCardKind);

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
@@ -27,7 +23,7 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
         return selection.CardKinds.Count == 0 || ProgramCardKindMatch.Contains(selection.CardKinds, card.Kind) || from == CardLocation.Hand(f.OwnerSeat) && card.Kind == CardKind.Alcohol && selection.CardKinds.Contains(CardKind.Slash) && _coreAlcoholIdentityPoliciesOperations.HasAlcoholKingIdentityPolicy(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]);
     }
 
-    internal CardConversionSource SharedSlashSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource SharedSlashSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillProgramStepOutcome BeginSharedSlashGift(long frameId, int actorSeat, string bind)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
@@ -210,7 +206,7 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 90)]
-    internal bool ReturnRegisteredCompleteSharedSlashBenefit(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnRegisteredCompleteSharedSlashBenefit(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.SharedSlashBenefit is null)
             return false;
@@ -218,7 +214,7 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
         return true;
     }
 
-    internal void CompleteSharedSlashBenefit(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal void CompleteSharedSlashBenefit(GameEngine.AttackCompletionReceipt completion)
     {
         var returned = completion.SharedSlashBenefit ?? throw new InvalidOperationException("A shared Slash lost its typed return.");
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(returned.ProgramFrameId);
@@ -258,5 +254,5 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
         return decision.Choices.First(c => c.Parameters.GetValueOrDefault("offer-option") == (canDamage ? "slash" : "draw"));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISharedSlashOfferProgramHost.GiveBoundCardThenOffer(ProgramSkillFrame frame, int actorSeat, string sourceBind) => BeginSharedSlashGift(frame.Id, actorSeat, sourceBind);
+    SkillProgramStepOutcome ISharedSlashOfferProgramHost.GiveBoundCardThenOffer(ProgramSkillFrame frame, int actorSeat, string sourceBind) => BeginSharedSlashGift(frame.Id, actorSeat, sourceBind);
 }

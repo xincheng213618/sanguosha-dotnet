@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoJiaMobileGodRuntime
@@ -63,7 +59,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
         if (child is DeathFrame death)
             return receipt.Stage == ShenGuoJiaStage.CostChildren && receipt.MaximumAfter == 0 && death.ParentFrameId == frame.Id && death.VictimSeat == frame.OwnerSeat && death.ReturnKind == DeathReturnKind.ProgramSkill;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return frame.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(movement => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(movement) && movement.Sequence > receipt.Before && movement.Sequence <= receipt.After && (movement.Reason.Value is "skill-program.mobile:huishi.give" or "skill-program.mobile:huishi.cleanup" or "skill-program.mobile:huishi-gift.draw" or "skill-program.judgment.result" || movement.Reason == CardMoveReasons.Reshuffle));
+            return frame.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(movement => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(movement) && movement.Sequence > receipt.Before && movement.Sequence <= receipt.After && (movement.Reason.Value is "skill-program.mobile:huishi.give" or "skill-program.mobile:huishi.cleanup" or "skill-program.mobile:huishi-gift.draw" or "skill-program.judgment.result" || movement.Reason == CardMoveReasons.Reshuffle));
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == frame.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 

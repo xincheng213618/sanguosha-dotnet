@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTangJiOlRuntime
@@ -72,7 +68,7 @@ internal sealed partial class CharacterTangJiOlRuntime
 
         var gifted = _coreMatchParticipantsPlayersAccess._players[state.MarkedSeat].IsAlive ? GiftJielieSuitCards(active, state, frame.WindowContext.Amount) : 0;
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 的【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】：防止 {(frame.WindowContext.Amount)} 点伤害，失去 {(state.PaidHpLost)} 点体力，令 {(_coreMatchParticipantsPlayersAccess._players[state.MarkedSeat].Name)} 从弃牌堆随机获得 {(gifted)} 张{(SuitName(state.Suit))}牌。", active.OwnerSeat, state.MarkedSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJieliePreventedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, source, frame.WindowContext.Amount, state.Suit, state.PaidHpLost, gifted, state.MarkedSeat));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJieliePreventedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, source, frame.WindowContext.Amount, state.Suit, state.PaidHpLost, gifted, state.MarkedSeat));
         // Keep the paid receipt while native gift children still ride on this
         // before-damage program. Its completed cursor returns without reissue.
         return SkillProgramStepOutcome.Continue;

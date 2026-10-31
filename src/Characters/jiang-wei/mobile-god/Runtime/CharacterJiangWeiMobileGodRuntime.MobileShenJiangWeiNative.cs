@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiMobileGodRuntime
@@ -32,7 +28,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileJiangWei = r with { Index = r.Index + 1 } });
         r = f.MobileJiangWei!;
         var card = _coreCardAttackStateOperations.GetAttackCard(shown.Id);
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(shown.Kind) || card.Kind != shown.Kind || _cardZonesOperations._cardZones.GetLocation(card.Id) != from || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[r.Target], card, effectiveKind: card.Kind, physicalCardIds: [card.Id]))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(shown.Kind) || card.Kind != shown.Kind || _cardZonesOperations._cardZones.GetLocation(card.Id) != from || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[r.Target], card, effectiveKind: card.Kind, physicalCardIds: [card.Id]))
         {
             NextMobileJwSlash(f);
             return;
@@ -44,7 +40,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
 
     internal bool IsMobileJwXinghunSlashSource(long? parentId, int actor, int target, Card card, CardKind kind, int physicalOwner, CardLocation from, IReadOnlyList<Card>? materials, bool countsTowardLimit)
     {
-        if (parentId is not { } id || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { Stage: MobileJiangWeiStage.SlashIssued, Use: null } r } f || f.Id != id || r.Operation != SkillProgramEffectOp.ResolveMobileJiangWeiXinghun || actor != f.OwnerSeat || physicalOwner != actor || target != r.Target || countsTowardLimit || materials is not null || kind != card.Kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || r.Index < 1 || r.Index > r.Shown.Count || r.Shown[r.Index - 1] is not { } shown || shown.Id != card.Id || shown.Kind != kind || from != (shown.From == CardLocation.DrawPile ? CardLocation.Processing : shown.From) || _cardZonesOperations._cardZones.GetLocation(card.Id) != from)
+        if (parentId is not { } id || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { Stage: MobileJiangWeiStage.SlashIssued, Use: null } r } f || f.Id != id || r.Operation != SkillProgramEffectOp.ResolveMobileJiangWeiXinghun || actor != f.OwnerSeat || physicalOwner != actor || target != r.Target || countsTowardLimit || materials is not null || kind != card.Kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || r.Index < 1 || r.Index > r.Shown.Count || r.Shown[r.Index - 1] is not { } shown || shown.Id != card.Id || shown.Kind != kind || from != (shown.From == CardLocation.DrawPile ? CardLocation.Processing : shown.From) || _cardZonesOperations._cardZones.GetLocation(card.Id) != from)
             return false;
         return _coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[target], card, effectiveKind: kind, physicalCardIds: [card.Id]);
     }
@@ -88,7 +84,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 40600)]
-    internal bool ReturnMobileJwAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnMobileJwAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { Stage: MobileJiangWeiStage.SlashReturned, Use: { } ret } } f || ret.UseId != completion.ResolutionId)
             return false;

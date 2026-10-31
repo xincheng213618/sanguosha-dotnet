@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGuanduExtraEffectsRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreGameEngineGuanduExtraEffectsRuntime
     {
         if (use.Action is not { } action || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive || use.TargetSeats.Count == 0)
             return false;
-        bool IsTrickTargetAllowed(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(use.SourceSeat, seat, use.CardKind, use.Id) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], use.CardKind, action.EffectiveSuit ?? Suit.None, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(use.SourceSeat, seat, action.EffectiveSuit) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(use.SourceSeat, seat, use.CardKind);
+        bool IsTrickTargetAllowed(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(use.SourceSeat, seat, use.CardKind, use.Id) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], use.CardKind, action.EffectiveSuit ?? Suit.None, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(use.SourceSeat, seat, action.EffectiveSuit) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(use.SourceSeat, seat, use.CardKind);
         // Borrowed Sword designates weapon owners. Each following seat is that
         // owner's Slash victim, not another target of the original trick.
         if (use.CardKind == CardKind.BorrowedSword)

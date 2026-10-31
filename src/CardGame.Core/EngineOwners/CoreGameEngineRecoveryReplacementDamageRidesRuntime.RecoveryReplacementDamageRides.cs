@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRecoveryReplacementDamageRidesRuntime
@@ -22,12 +18,12 @@ internal sealed partial class CoreGameEngineRecoveryReplacementDamageRidesRuntim
         PostEventContinuation.RecoveryReplacement => beneath is RecoveryReplacementFrame,
         _ => false
     };
-    internal static bool PaidCardUseHpFrameRidesOn(ResolutionFrame ride, ResolutionFrame beneath) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecoveryReplacementDamageRides.PaidCardUseHpFrameRidesOn(ride, beneath);
+    internal static bool PaidCardUseHpFrameRidesOn(ResolutionFrame ride, ResolutionFrame beneath) => RuntimeSkills.RuntimeRules_Core_RecoveryReplacementDamageRides.PaidCardUseHpFrameRidesOn(ride, beneath);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 110)]
     internal bool IsPaidCardUseProgramDying() => _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.RecoveryPaidContinuation?.Kind is RecoveryPaidCardUseKind.DodgeCompletion or RecoveryPaidCardUseKind.CommittedSlash && IsRecoveryReplacementProgramDying(attack.ResolutionId);
     internal bool RecoveryReplacementDamageObserverRidesOn(int index)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]))
+        if (!CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]))
             return false;
         // Only a contiguous chain of exact observer returns may borrow the recovery
         // producer's damage cursor. An unrelated HP or movement observer still stops it.
@@ -37,7 +33,7 @@ internal sealed partial class CoreGameEngineRecoveryReplacementDamageRidesRuntim
             var parent = _resolutionStackOperations._resolutionStack[parentIndex - 1];
             if (RecoveryReplacementFrameRidesOn(frame, parent) || PaidCardUseHpFrameRidesOn(frame, parent))
                 return true;
-            if (!_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) && !_corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(frame, parent) && !_coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(frame, parent))
+            if (!_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) && !CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) && !_corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(frame, parent) && !_coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(frame, parent))
                 return false;
         }
 
@@ -78,7 +74,7 @@ internal sealed partial class CoreGameEngineRecoveryReplacementDamageRidesRuntim
                 continue;
             }
 
-            if (!_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) && !_corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(frame, parent) && !_coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(frame, parent))
+            if (!_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) && !CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) && !_corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(frame, parent) && !_coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(frame, parent))
                 return false;
         }
 

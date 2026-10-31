@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var context = active.WindowContext;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == active.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame damage || context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } || context.ParentFrameId != damage.Id || damage.TriggerWindow != context.Window || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId) || active.OwnedDamagePointJudgment is not null || effect.Target != SkillProgramEffectTarget.Owner || effect.Visibility != SkillProgramCardSetVisibility.Public || effect.Op != SkillProgramEffectOp.StartOwnedDamagePointJudgment)
+        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame damage || context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } || context.ParentFrameId != damage.Id || damage.TriggerWindow != context.Window || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId) || active.OwnedDamagePointJudgment is not null || effect.Target != SkillProgramEffectTarget.Owner || effect.Visibility != SkillProgramCardSetVisibility.Public || effect.Op != SkillProgramEffectOp.StartOwnedDamagePointJudgment)
             throw new InvalidOperationException("An owned damage-point judgment requires its exact live source and current damage candidate.");
         var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
         if (attack.IsSourceLess || context.SourceSeat != attack.SourceSeat || context.TargetSeat != attack.TargetSeat)
@@ -38,7 +34,7 @@ internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
     internal ProgramSkillFrame? OwnedDamagePointJudgmentRoot(long damageWindowId)
     {
         var damageIndex = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == damageWindowId);
-        if (damageIndex < 0 || damageIndex + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[damageIndex] is not DamageTriggerWindowFrame damage || damage.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || _resolutionStackOperations._resolutionStack[damageIndex + 1] is not ProgramSkillFrame root || root.OwnedDamagePointJudgment is not { } receipt || receipt.DamageWindowId != damage.Id || receipt.DamageOwnerFrameId != damage.ParentFrameId || receipt.OccurrenceIndex != damage.Candidates[damage.CandidateIndex].OccurrenceIndex || receipt.DamageSourceSeat != damage.SourceSeat || receipt.DamageTargetSeat != damage.TargetSeat || root.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || context.ParentFrameId != damage.Id || context.SourceSeat != damage.SourceSeat || context.TargetSeat != damage.TargetSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()))
+        if (damageIndex < 0 || damageIndex + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[damageIndex] is not DamageTriggerWindowFrame damage || damage.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || _resolutionStackOperations._resolutionStack[damageIndex + 1] is not ProgramSkillFrame root || root.OwnedDamagePointJudgment is not { } receipt || receipt.DamageWindowId != damage.Id || receipt.DamageOwnerFrameId != damage.ParentFrameId || receipt.OccurrenceIndex != damage.Candidates[damage.CandidateIndex].OccurrenceIndex || receipt.DamageSourceSeat != damage.SourceSeat || receipt.DamageTargetSeat != damage.TargetSeat || root.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || context.ParentFrameId != damage.Id || context.SourceSeat != damage.SourceSeat || context.TargetSeat != damage.TargetSeat || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()))
             return null;
         var plan = ProgramInstructionResolver.Default.Resolve(root, _contentRegistryOperations._contentRegistry.GetSkill(root.SkillId).Program!);
         if (receipt.InstructionIndex < 1 || receipt.InstructionIndex > plan.Instructions.Count || root.InstructionIndex < receipt.InstructionIndex || root.InstructionIndex > receipt.InstructionIndex + 1 || plan.Instructions[receipt.InstructionIndex - 1] is not { Op: SkillProgramEffectOp.StartOwnedDamagePointJudgment } start || start.JudgmentReason != receipt.Reason || start.ResultBind != receipt.ResultBind)
@@ -93,11 +89,11 @@ internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
                 return _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(index - 1, dying);
             if (child is ProgramSkillFrame && _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(index - 1, dying))
                 return true;
-            if (global::CardGame.Core.EngineOwners.CoreParticipantHandDamageRidesRuntime.ParticipantHandDyingEntryRide(child, parent, dying))
+            if (CoreParticipantHandDamageRidesRuntime.ParticipantHandDyingEntryRide(child, parent, dying))
                 return true;
         }
 
-        if (child is ProgramSkillFrame entryProgram && parent is ProgramLifecycleTriggerWindowFrame entry && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().LastOrDefault(f => f.Id == entry.ResumeDyingFrameId)is { } entryDying && global::CardGame.Core.EngineOwners.CoreParticipantHandDamageRidesRuntime.ParticipantHandDyingEntryRide(entryProgram, entry, entryDying))
+        if (child is ProgramSkillFrame entryProgram && parent is ProgramLifecycleTriggerWindowFrame entry && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().LastOrDefault(f => f.Id == entry.ResumeDyingFrameId)is { } entryDying && CoreParticipantHandDamageRidesRuntime.ParticipantHandDyingEntryRide(entryProgram, entry, entryDying))
             return true;
         if (child is HpChangedTriggerWindowFrame hp && parent is CardUseFrame rescue && index >= 2 && _resolutionStackOperations._resolutionStack[index - 2] is DyingFrame rescued && _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(index - 2, rescued))
             return _coreParticipantHandDamageRidesOperations.ParticipantHandRescueObserverRide(hp, rescue, rescue);

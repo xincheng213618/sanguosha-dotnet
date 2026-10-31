@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunJianMouOlRuntime
 {
     internal bool ValidMouSunJianOlYipo(ProgramSkillFrame f)
     {
-        if (f.MouSunJianOlYipo is not { } r || r.Source != MouSunJianOlSource(f) || r.GameplayHash != f.GameplayHash || f.SkillId != MouSunJianOlComposition.Yipo || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.WindowContext is not { } w || w.ParentFrameId != r.ChangeId || !Enum.IsDefined(r.Stage) || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || !QualifiedMouSunJianOlYipo(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouSunJianOlYipoStartedEvent>().Count(e => e == new MouSunJianOlYipoStartedEvent(f.Id, r.Source, r.GameplayHash, r.ChangeId)) != 1)
+        if (f.MouSunJianOlYipo is not { } r || r.Source != MouSunJianOlSource(f) || r.GameplayHash != f.GameplayHash || f.SkillId != MouSunJianOlComposition.Yipo || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.WindowContext is not { } w || w.ParentFrameId != r.ChangeId || !Enum.IsDefined(r.Stage) || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || !QualifiedMouSunJianOlYipo(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouSunJianOlYipoStartedEvent>().Count(e => e == new MouSunJianOlYipoStartedEvent(f.Id, r.Source, r.GameplayHash, r.ChangeId)) != 1)
             return false;
         var n = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (n < 1 || _resolutionStackOperations._resolutionStack[n - 1] is not HpChangedTriggerWindowFrame parent || parent.Id != r.ChangeId || parent.Change != w.HpChange || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
+        if (n < 1 || _resolutionStackOperations._resolutionStack[n - 1] is not HpChangedTriggerWindowFrame parent || parent.Id != r.ChangeId || parent.Change != w.HpChange || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
             return false;
         if (r.Branch is null)
             return r.Stage is MouSunJianOlYipoStage.Target or MouSunJianOlYipoStage.Option && r.X == 0 && r.Draw is null && r.Selected.Count == 0;
@@ -32,7 +28,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
         if (f.MouSunJianOlHulie is not { } r || f.SkillId != MouSunJianOlComposition.Hulie || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.WindowContext is not { } w || r.Entry.Source.OwnerSeat != f.OwnerSeat || r.Entry.Source.SkillId != f.SkillId || r.Entry.Source.SkillInstanceId != f.SkillInstanceId || r.Entry.GameplayHash != f.GameplayHash || !Enum.IsDefined(r.Stage) || w.CardUse?.ParentCardUseFrameId != r.Entry.UseId || w.CardUse.CardActionId != r.Entry.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(r.Entry.UseId)is not { } use || use.MouSunJianOlHulieEntries?.Any(e => e with { Boosted = false } == r.Entry with { Boosted = false } && ValidMouSunJianOlHulieEntry(use, e)) != true)
             return false;
         var n = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (n < 1 || _resolutionStackOperations._resolutionStack[n - 1] is not ProgramCardTriggerWindowFrame parent || parent.Id != w.ParentFrameId || parent.ParentFrameId != use.Id || parent.Action.ActionId != r.Entry.ActionId || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])))
+        if (n < 1 || _resolutionStackOperations._resolutionStack[n - 1] is not ProgramCardTriggerWindowFrame parent || parent.Id != w.ParentFrameId || parent.ParentFrameId != use.Id || parent.Action.ActionId != r.Entry.ActionId || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])))
             return false;
         if (r.Stage == MouSunJianOlHulieStage.DamageChoice)
             return f.TriggerId == "single-target-damage" && w.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && !r.Accepted && r.UseId == 0;
@@ -51,14 +47,14 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     {
         if (f.MouSunJianOlYipo is { } r && ValidMouSunJianOlYipo(f))
         {
-            if (global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
+            if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
                 return r.Stage == MouSunJianOlYipoStage.Drawing && f.NativeDraw is not null;
             if (child is RecoveryReplacementFrame recovery)
                 return IsMouSunJianOlRecoveryParent(f, recovery);
             if (child is HpChangedTriggerWindowFrame hp)
                 return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == hp.Change.TargetSeat && MouSunJianOlLionPayment(f, hp.Change.TargetSeat, new(MouSunJianOlYipoDiscardReason));
             if (child is CardsMovedTriggerWindowFrame moved && f.PendingMovementContinuation is { } pending && IsMouSunJianOlMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
-                return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && (r.Draw is { } d && r.Stage == MouSunJianOlYipoStage.DrawChildren ? m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter : m.Sequence > r.Before && m.Sequence <= r.After));
+                return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && (r.Draw is { } d && r.Stage == MouSunJianOlYipoStage.DrawChildren ? m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter : m.Sequence > r.Before && m.Sequence <= r.After));
         }
         else if (f.MouSunJianOlHulie is { Stage: MouSunJianOlHulieStage.NativeUse } && ValidMouSunJianOlHulie(f) && child is CardUseFrame native)
             return IsMouSunJianOlCounterUse(native);
@@ -74,13 +70,13 @@ internal sealed partial class CharacterSunJianMouOlRuntime
         if (_resolutionStackOperations._resolutionStack[n - 1] is ProgramCardTriggerWindowFrame parent && _coreCardUseLifecycleOperations.LifecycleCardUse(parent.ParentFrameId)is { MouSunJianOlCounter: not null } u && IsMouSunJianOlCounterUse(u) && _resolutionStackOperations._resolutionStack[n] is ProgramSkillFrame f && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count)
         {
             var c = parent.Candidates[parent.CandidateIndex];
-            return global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(c)) && f.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext2(parent, c);
+            return CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(c)) && f.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext2(parent, c);
         }
 
         return false;
     }
 
-    internal bool MouSunJianOlObserverEdge(int n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[n - 1], _resolutionStackOperations._resolutionStack[n]) || MouSunJianOlNativeEdge(n) || _resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame f && MouSunJianOlFirstChild(f, _resolutionStackOperations._resolutionStack[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]);
+    internal bool MouSunJianOlObserverEdge(int n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[n - 1], _resolutionStackOperations._resolutionStack[n]) || MouSunJianOlNativeEdge(n) || _resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame f && MouSunJianOlFirstChild(f, _resolutionStackOperations._resolutionStack[n]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]);
     internal bool MouSunJianOlObserverSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => this.MouSunJianOlObserverEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? MouSunJianOlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.MouSunJianOlFirstChild(f, c), (n) => this.MouSunJianOlObserverSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 32500)]
@@ -89,5 +85,5 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     internal bool AdvanceMouSunJianOlChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouSunJianOlObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 32500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 32500)]
-    internal bool ContinuePaidMouSunJianOl(ProgramSkillFrame f) => f.MouSunJianOlYipo is { Branch: not null } && ValidMouSunJianOlYipo(f) || f.MouSunJianOlHulie is { Accepted: true } && ValidMouSunJianOlHulie(f) || f.MouSunJianOlHulie is null && f.TriggerId == "undamaged-counter" && f.InstructionIndex is 0 or 1 && f.WindowContext is { } w && CanRunIssuedMouSunJianOlHulie(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w);
+    internal bool ContinuePaidMouSunJianOl(ProgramSkillFrame f) => f.MouSunJianOlYipo is { Branch: not null } && ValidMouSunJianOlYipo(f) || f.MouSunJianOlHulie is { Accepted: true } && ValidMouSunJianOlHulie(f) || f.MouSunJianOlHulie is null && f.TriggerId == "undamaged-counter" && f.InstructionIndex is 0 or 1 && f.WindowContext is { } w && CanRunIssuedMouSunJianOlHulie(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w);
 }

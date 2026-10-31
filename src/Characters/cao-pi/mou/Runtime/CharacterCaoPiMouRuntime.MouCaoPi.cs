@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoPiMouRuntime
 {
     internal const string MouCaoPiDrawReason = "skill-program.mou-cao-pi.xingshang.draw";
-    internal static CardConversionSource MouCaoPiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cao_pi_mou_MouCaoPi.MouCaoPiSource(f);
+    internal static CardConversionSource MouCaoPiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cao_pi_mou_MouCaoPi.MouCaoPiSource(f);
     internal int Song(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Markers.GetValueOrDefault(PlayerMarkerKind.CaoPiSong);
-    SkillProgramStepOutcome global::CardGame.Core.IMouCaoPiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouCaoPi(f, op);
+    SkillProgramStepOutcome IMouCaoPiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouCaoPi(f, op);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 28000, SkillProgramEffectOp.MouCaoPiXingshang, SkillProgramEffectOp.MouCaoPiFangzhu, SkillProgramEffectOp.MouCaoPiRemoveWeiSkills)]
     internal bool CanActivateMouCaoPi(ProgramActivationLegalityContext c) => c.Owner.IsAlive && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == c.OwnerSeat && (c.SkillId == "mou:songwei" ? c.Owner.Role == Role.Lord && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != c.OwnerSeat && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(p) == "wei" && MouCaoPiGeneralGrants(p).Any()) : HasMouXingshang(c.Owner) && Song(c.OwnerSeat) >= 2 && (c.SkillId != "mou:fangzhu" || _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != c.OwnerSeat)));
     internal SkillProgramStepOutcome BeginMouCaoPi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -88,7 +85,7 @@ internal sealed partial class CharacterCaoPiMouRuntime
     [ProgramAnswer("mou-cao-pi")]
     internal void AnswerMouCaoPi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouCaoPi: { Stage: MouCaoPiStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouCaoPiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouCaoPi: { Stage: MouCaoPiStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouCaoPiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Mou Cao Pi lost the exact live menu and original private chooser.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var option = choice.Parameters["option"];

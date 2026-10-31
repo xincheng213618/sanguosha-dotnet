@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,12 +7,12 @@ internal sealed partial class CharacterTianFengMobileShiRuntime
 {
     internal const string ShiTfGanggeng = "mobile:shi-ganggeng", ShiTfSijian = "mobile:shi-sijian";
     internal const string ShiTfDiscard = "skill.mobile-shi-tian-feng.discard", ShiTfDraw = "skill.mobile-shi-tian-feng.draw";
-    internal static CardConversionSource ShiTfSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    internal static CardConversionSource ShiTfSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     internal bool ShiTfNobodyDying() => !_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.HasHpValue && p.Hp <= 0);
     internal int ShiTfBackwaters(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiTianFengBackwaterEvent>().Count(e => e.Source.OwnerSeat == owner);
     internal IEnumerable<MobileShiTianFengGiftEvent> ShiTfOutstandingGifts(int owner, string instance, string hash) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiTianFengGiftEvent>().Where(gift => gift.Source.OwnerSeat == owner && gift.Source.SkillInstanceId == instance && gift.GameplayHash == hash && gift.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiTianFengGiftSettledEvent>().Any(done => done.GiftFrameId == gift.FrameId));
     internal IEnumerable<MobileShiTianFengDebtIssuedEvent> ShiTfUseDebts(int owner, string instance, string hash, long action, int actor) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiTianFengDebtIssuedEvent>().Where(debt => debt.Source.OwnerSeat == owner && debt.Source.SkillInstanceId == instance && debt.GameplayHash == hash && debt.TargetSeat == actor && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiTianFengDebtClaimedEvent>().Any(done => done.IssuingFrameId == debt.FrameId) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Select(e => e.Action).Where(a => a.ActionId > debt.AfterActionId && a.ActorSeat == actor && _characterLiuZanMobileOperations.IsAlternateColorActualUse(a)).OrderBy(a => a.ActionId).FirstOrDefault()?.ActionId == action);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiTianFengHost.Resolve(ProgramSkillFrame frame) => BeginMobileShiTianFeng(frame);
+    SkillProgramStepOutcome IMobileShiTianFengHost.Resolve(ProgramSkillFrame frame) => BeginMobileShiTianFeng(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 47500)]
     internal bool CanOfferMobileShiTianFeng(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -100,7 +97,7 @@ internal sealed partial class CharacterTianFengMobileShiRuntime
     [ProgramAnswer("mobile-shi-tian-feng")]
     internal void AnswerMobileShiTianFeng(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiTianFeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Operation == "debt" ? r.TargetSeat : f.OwnerSeat) || !ShiTfChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiTianFeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Operation == "debt" ? r.TargetSeat : f.OwnerSeat) || !ShiTfChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Shi Tian Feng choice lost its current original frame, chooser or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = selected.Parameters["branch"];

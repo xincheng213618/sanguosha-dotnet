@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRoundEndingRuntime
@@ -101,7 +97,7 @@ internal sealed partial class CoreGameEngineRoundEndingRuntime
     [ProgramWindowReturn(SkillProgramTriggerWindow.RoundEnding)]
     internal void ReturnRoundEndingProgram(ProgramSkillFrame frame, bool completed)
     {
-        if (frame.WindowContext is not { } context || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramLifecycleTriggerWindowFrame child || child.CandidateIndex >= child.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, child.Candidates[child.CandidateIndex]) || !IsExactRoundEndingCandidate(child.Candidates[child.CandidateIndex], context))
+        if (frame.WindowContext is not { } context || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramLifecycleTriggerWindowFrame child || child.CandidateIndex >= child.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, child.Candidates[child.CandidateIndex]) || !IsExactRoundEndingCandidate(child.Candidates[child.CandidateIndex], context))
             throw new InvalidOperationException("A round-end program lost its exact current binding.");
         _coreProgramLifecycleOperations.AdvanceProgramLifecycleCursor(child);
         _coreRuntimeOperations.AdvanceRuntimeFrame(child.Id);

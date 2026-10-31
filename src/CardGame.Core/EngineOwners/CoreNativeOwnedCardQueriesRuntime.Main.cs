@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeOwnedCardQueriesRuntime
@@ -62,12 +58,12 @@ internal sealed partial class CoreNativeOwnedCardQueriesRuntime
         throw new InvalidOperationException($"The chosen card is no longer in the actor's playable zones. " + $"Actor={(actor.Seat)}; card={(card.Id)}; location={(_cardZonesOperations._cardZones.GetLocation(card.Id))}.");
     }
 
-    internal static CardMoveReason GetTargetCardMoveReason(LegalActionKind actionKind, CardZoneKind sourceZone) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.GetTargetCardMoveReason(actionKind, sourceZone);
-    internal static CardMoveReason GetTargetCardFinishedMoveReason(LegalActionKind actionKind, CardZoneKind sourceZone) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.GetTargetCardFinishedMoveReason(actionKind, sourceZone);
-    internal static LegalAction? SelectPlayAction(IReadOnlyList<LegalAction> legalActions, Card card, IReadOnlyList<int> targets, CardKind? playedCardKind, int? targetCardId, CardConversionSource? conversionSource, IReadOnlyList<CardConversionSource>? additionalConversionSources) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.SelectPlayAction(legalActions, card, targets, playedCardKind, targetCardId, conversionSource, additionalConversionSources);
+    internal static CardMoveReason GetTargetCardMoveReason(LegalActionKind actionKind, CardZoneKind sourceZone) => RuntimeSkills.RuntimeRules_Core_CommonRules.GetTargetCardMoveReason(actionKind, sourceZone);
+    internal static CardMoveReason GetTargetCardFinishedMoveReason(LegalActionKind actionKind, CardZoneKind sourceZone) => RuntimeSkills.RuntimeRules_Core_CommonRules.GetTargetCardFinishedMoveReason(actionKind, sourceZone);
+    internal static LegalAction? SelectPlayAction(IReadOnlyList<LegalAction> legalActions, Card card, IReadOnlyList<int> targets, CardKind? playedCardKind, int? targetCardId, CardConversionSource? conversionSource, IReadOnlyList<CardConversionSource>? additionalConversionSources) => RuntimeSkills.RuntimeRules_Core_CommonRules.SelectPlayAction(legalActions, card, targets, playedCardKind, targetCardId, conversionSource, additionalConversionSources);
     internal void MarkSlashUsedOrPlayedDuringCurrentPlayPhase(int actorSeat, CardKind effectiveCardKind)
     {
-        if (_coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && actorSeat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveCardKind))
+        if (_coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && actorSeat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveCardKind))
         {
             _coreCurrentTurnStatisticsUsedOrPlayedSlashDuringPlayPhaseAccess._usedOrPlayedSlashDuringPlayPhase = true;
         }

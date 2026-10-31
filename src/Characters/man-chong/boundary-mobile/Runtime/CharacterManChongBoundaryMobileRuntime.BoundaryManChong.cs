@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterManChongBoundaryMobileRuntime
 {
     internal const string BoundaryManChongAction = "boundary-man-chong-junxing";
     internal const string BoundaryManChongDiscard = "skill-program.boundary-junxing-mobile.target-discard";
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryManChongHost.Choose(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginBoundaryManChongJunxing(frame, effect);
+    SkillProgramStepOutcome IBoundaryManChongHost.Choose(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginBoundaryManChongJunxing(frame, effect);
     internal SkillProgramStepOutcome BeginBoundaryManChongJunxing(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -58,7 +54,7 @@ internal sealed partial class CharacterManChongBoundaryMobileRuntime
     [ProgramAnswer(BoundaryManChongAction)]
     internal void AnswerBoundaryManChongJunxing(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryManChongJunxing: { Paid: false } draft } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.TargetSeat || !_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices.Any(current => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([current], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryManChongJunxing: { Paid: false } draft } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.TargetSeat || !_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices.Any(current => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([current], [choice])))
             throw new InvalidOperationException("Junxing lost its original recipient's current private choice.");
         var branch = choice.Parameters.GetValueOrDefault("branch");
         if (branch is "card" or "unpick")

@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CharacterZhaoZhongOlRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CharacterZhaoZhongOlRuntime))]
 internal sealed partial class CharacterZhaoZhongOlEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterZhaoZhongOlRuntime> _resolve;
-    private CharacterZhaoZhongOlEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterZhaoZhongOlRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterZhaoZhongOlRuntime> _resolve;
+    private CharacterZhaoZhongOlEntries(Func<EngineOwners.CharacterZhaoZhongOlRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterZhaoZhongOlEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterZhaoZhongOlRuntime> resolve) => new(resolve);
+    internal static CharacterZhaoZhongOlEntries Create(Func<EngineOwners.CharacterZhaoZhongOlRuntime> resolve) => new(resolve);
 }

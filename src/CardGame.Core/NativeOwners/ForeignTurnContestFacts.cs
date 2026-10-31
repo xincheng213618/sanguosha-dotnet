@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ForeignTurnContestFacts(global::CardGame.Core.EngineStates.CoreMatchOutcomeState matchOutcomeState,global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState,global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineTreatedWoundedEntries> getCoreGameEngineTreatedWoundedRuntime,global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries> getCoreGameEngineNationalSkillsRuntime) : IForeignTurnContestFacts
+internal sealed class ForeignTurnContestFacts(EngineStates.CoreMatchOutcomeState matchOutcomeState,EngineStates.CoreMatchParticipantsState matchParticipantsState,Func<RuntimeEntries.CoreGameEngineTreatedWoundedEntries> getCoreGameEngineTreatedWoundedRuntime,Func<RuntimeEntries.CoreGameEngineNationalSkillsEntries> getCoreGameEngineNationalSkillsRuntime) : IForeignTurnContestFacts
 {
     public Winner Winner => matchOutcomeState.ReferenceToWinner;
 

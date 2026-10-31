@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouYuOlMouRuntime
@@ -96,7 +92,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         {
             if (response.EffectiveKind == CardKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } counterspell && _coreResponseUseCompletionOperations.IsCompletedResponseUse(response, ProgramCardContinuation.NullificationResponse))
                 CaptureMouGuquResponseUse(counterspell, response, ProgramCardContinuation.NullificationResponse);
-            else if (response.EffectiveKind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.EffectiveCardKind is { } incoming && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == response.ActorSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } parent && _coreResponseUseCompletionOperations.IsCompletedResponseUse(response, ProgramCardContinuation.Dodge))
+            else if (response.EffectiveKind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.EffectiveCardKind is { } incoming && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == response.ActorSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } parent && _coreResponseUseCompletionOperations.IsCompletedResponseUse(response, ProgramCardContinuation.Dodge))
                 CaptureMouGuquResponseUse(parent, response, ProgramCardContinuation.Dodge);
         }
 
@@ -106,14 +102,14 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
 
     internal GuquUseClaim? MouGuquCompletedClaim(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
-        if (candidate.SkillId != MouGuquSkill || candidate.BindingId != MouGuquBinding || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } used || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCompleted || window.Action.ActionId != used.CardActionId || window.Action.Type == CardActionType.Response && window.CompletedResponseReturn is null || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == window.ParentFrameId)is not { GuquClaims: { } claims })
+        if (candidate.SkillId != MouGuquSkill || candidate.BindingId != MouGuquBinding || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } used || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCompleted || window.Action.ActionId != used.CardActionId || window.Action.Type == CardActionType.Response && window.CompletedResponseReturn is null || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == window.ParentFrameId)is not { GuquClaims: { } claims })
             return null;
         return claims.SingleOrDefault(q => q.ParentFrameId == window.ParentFrameId && q.ActionId == used.CardActionId && q.Source.OwnerSeat == candidate.OwnerSeat && q.Source.SkillId == candidate.SkillId && q.Source.BindingId == candidate.BindingId && q.Source.SkillInstanceId == candidate.SkillInstanceId && q.GameplayHash == candidate.GameplayHash && ValidMouGuquClaim(q, window.Action));
     }
 
     internal bool ValidMouGuquClaim(GuquUseClaim q, CardActionContext action)
     {
-        if (q.ActionId != action.ActionId || q.QueMaterialCount < 1 || q.ProviderSeat != action.ProviderSeat || !MouGuquActorLineageMatches(q.ParentFrameId, q.ActionId, q.ActorSeat, action.ActorSeat, q.ProviderSeat, action.Type) || q.EffectiveKind != action.EffectiveKind && !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.EffectiveKind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind)) || q.Source.SkillId != MouGuquSkill || q.Source.BindingId != MouGuquBinding || q.Source.OwnerSeat != q.TurnOwner || q.ActualTurn < 1 || q.MovementSequence < 0 || q.MovementSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash != q.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<GuquUseClaimedEvent>().Count(e => e.Claim == q) != 1)
+        if (q.ActionId != action.ActionId || q.QueMaterialCount < 1 || q.ProviderSeat != action.ProviderSeat || !MouGuquActorLineageMatches(q.ParentFrameId, q.ActionId, q.ActorSeat, action.ActorSeat, q.ProviderSeat, action.Type) || q.EffectiveKind != action.EffectiveKind && !(CoreNativeCardClassificationsRuntime.IsSlashCard(q.EffectiveKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind)) || q.Source.SkillId != MouGuquSkill || q.Source.BindingId != MouGuquBinding || q.Source.OwnerSeat != q.TurnOwner || q.ActualTurn < 1 || q.MovementSequence < 0 || q.MovementSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash != q.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<GuquUseClaimedEvent>().Count(e => e.Claim == q) != 1)
             return false;
         var materials = _coreProgramEventHistoryOperations.ProgramEventHistory<GuquUseMaterialClaimedEvent>().Where(e => e.ParentFrameId == q.ParentFrameId && e.ActionId == q.ActionId && e.Source == q.Source).OrderBy(e => e.Index).ToArray();
         return materials.Length == q.QueMaterialCount && materials.Select(m => m.CardId).Distinct().Count() == materials.Length && materials.Select((m, i) => m.Index == i && action.PhysicalCards.Any(c => c.CardId == m.CardId && c.CardKind == m.PrintedKind && c.From == m.From) && _coreProgramEventHistoryOperations.ProgramEventHistory<GuquQueMarkedEvent>().Any(e => e.ActualTurn == q.ActualTurn && e.TurnOwner == q.TurnOwner && e.Source == q.Source && e.GameplayHash == q.GameplayHash && e.CardId == m.CardId && e.MovementSequence <= q.MovementSequence)).All(b => b);

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangCanMobileRuntime
@@ -28,11 +24,11 @@ internal sealed partial class CharacterWangCanMobileRuntime
         if (child is DyingFrame dying)
             return r.Stage == MobileWangCanXiStage.HealthChildren && dying.ParentFrameId == f.Id && dying.VictimSeat == r.Subject && dying.ResumesProgramSkill && dying.KillerSeat is null;
         if (child is HpChangedTriggerWindowFrame hp)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && (r.Stage == MobileWangCanXiStage.HealthChildren && hp.Change.TargetSeat == r.Subject || r.Stage == MobileWangCanXiStage.GiftChildren && hp.Change.Kind == HpChangeKind.Recovery);
+            return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && (r.Stage == MobileWangCanXiStage.HealthChildren && hp.Change.TargetSeat == r.Subject || r.Stage == MobileWangCanXiStage.GiftChildren && hp.Change.Kind == HpChangeKind.Recovery);
         if (child is RecoveryReplacementFrame recovery)
             return r.Stage == MobileWangCanXiStage.GiftChildren && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == MobileWangCanXiGift;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return r.Stage == MobileWangCanXiStage.GiftChildren && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After);
+            return r.Stage == MobileWangCanXiStage.GiftChildren && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After);
         return child is ProgramLifecycleTriggerWindowFrame lifecycle && lifecycle.ResumeProgramFrameId == f.Id && (lifecycle.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange || lifecycle is { Window: SkillProgramTriggerWindow.SkillsChanged, Continuation: ProgramLifecycleContinuation.ResumeParentProgram });
     }
 

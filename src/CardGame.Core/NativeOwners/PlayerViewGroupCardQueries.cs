@@ -2,7 +2,7 @@
 
 namespace CardGame.Core.NativeOwners;
 
-internal readonly struct PlayerViewGroupCardQueries(global::CardGame.Core.NativeOwners.GroupCardHandle group) : IPlayerViewGroupCardQueries
+internal readonly struct PlayerViewGroupCardQueries(GroupCardHandle group) : IPlayerViewGroupCardQueries
     {
         public GroupCardEffect Effect => group.Effect;
         public int TargetIndex => group.TargetIndex;

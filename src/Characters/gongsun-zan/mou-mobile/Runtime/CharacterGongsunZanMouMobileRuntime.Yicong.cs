@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
 {
     internal bool HasMouGszMobile => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouGongsunZanYicong);
 
-    internal static CardConversionSource MouGszMobileSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MouGszMobileSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int MouGszMobileCharge(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(PlayerMarkerKind.MouGongsunZanCharge);
     internal void ChangeMouGszMobileCharge(long frame, int owner, int delta)
     {
@@ -40,7 +37,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
     internal bool IsLiveMouGszHuPile(PublicPersistentPileSource p) => IsIssuedMouGszHuPile(p) && _coreMatchParticipantsPlayersAccess._players[p.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[p.OwnerSeat], p.SkillId, p.SkillInstanceId);
     internal IReadOnlyList<Card> MouGszHuCards(CharacterState owner) => HasMouGszMobile ? MouGszHuPiles(owner.Seat).Where(IsLiveMouGszHuPile).SelectMany(_corePublicPileSourcesOperations.PublicPileCards).ToArray() : [];
     internal bool IsMouGszHuCard(CharacterState owner, int id) => id > 0 && MouGszHuCards(owner).Any(c => c.Id == id);
-    SkillProgramStepOutcome global::CardGame.Core.IMouGongsunZanMobileHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouGszMobile(f, op);
+    SkillProgramStepOutcome IMouGongsunZanMobileHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouGszMobile(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 33600, SkillProgramEffectOp.ResolveMouGongsunZanYicong, SkillProgramEffectOp.ResolveMouGongsunZanQiaomeng)]
     internal bool OfferMouGszMobile(ProgramTriggerLegalityContext c)
     {
@@ -134,7 +131,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
     [ProgramAnswer("mou-gongsun-zan-mobile")]
     internal void AnswerMouGszMobile(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouGongsunZanMobile: { } r } f || !ValidMouGszMobile(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouGszMobileChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouGongsunZanMobile: { } r } f || !ValidMouGszMobile(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouGszMobileChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Mobile Gongsun Zan choice changed its native owner or actual material.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -148,7 +145,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
             ChangeMouGszMobileCharge(f.Id, f.OwnerSeat, -n);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGongsunZanMobileDistanceEvent(f.Id, r.Source, r.GameplayHash, r.Round, branch == "offense", n));
             var room = Math.Max(0, 4 - MouGszHuPiles(f.OwnerSeat).Sum(p => _corePublicPileSourcesOperations.PublicPileCards(p).Count));
-            var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().Where(card => branch == "offense" ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) : card.Kind == CardKind.Dodge).Take(Math.Min(n, room)).ToArray();
+            var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().Where(card => branch == "offense" ? CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) : card.Kind == CardKind.Dodge).Take(Math.Min(n, room)).ToArray();
             if (cards.Length > 0)
             {
                 var pile = _corePublicPileSourcesOperations.EnsurePublicPileSource(f, 4);

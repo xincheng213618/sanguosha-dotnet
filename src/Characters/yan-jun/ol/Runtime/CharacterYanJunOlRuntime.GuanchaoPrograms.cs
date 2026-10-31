@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanJunOlRuntime
@@ -49,7 +45,7 @@ internal sealed partial class CharacterYanJunOlRuntime
         return ranks;
     }
 
-    internal static bool MatchesGuanchaoPattern(IReadOnlyList<int?> ranks, bool ascending) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yan_jun_ol_Guanchao_Programs.MatchesGuanchaoPattern(ranks, ascending);
+    internal static bool MatchesGuanchaoPattern(IReadOnlyList<int?> ranks, bool ascending) => RuntimeSkills.RuntimeRules_yan_jun_ol_Guanchao_Programs.MatchesGuanchaoPattern(ranks, ascending);
     internal SkillProgramStepOutcome GuanchaoProgramChoosePattern(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -86,7 +82,7 @@ internal sealed partial class CharacterYanJunOlRuntime
             throw new InvalidOperationException("The Guanchao pattern chooser changed while suspended.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var ascending = selected.Parameters.GetValueOrDefault("ascending") == "true";
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramGuanchaoPatternChosenEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, CurrentPlayPhaseEventIndex(active.OwnerSeat), ascending));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramGuanchaoPatternChosenEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, CurrentPlayPhaseEventIndex(active.OwnerSeat), ascending));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 观潮：本阶段使用牌的点数按{((ascending ? "严格递增" : "严格递减"))}结算。", active.OwnerSeat);
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
@@ -113,7 +109,7 @@ internal sealed partial class CharacterYanJunOlRuntime
         if (drew)
             _corePhysicalDrawFacadesOperations.DrawCards(owner, 1, true, new($"skill-program.{(active.SkillId)}.guanchao-draw"));
         _coreMatchLogOperations.AddLog("SkillEffect", drew ? $"{(owner.Name)} 观潮：本阶段使用过的牌点数均符合所选规律，摸一张牌。" : $"{(owner.Name)} 观潮：本阶段使用过的牌点数不再符合所选规律。", owner.Seat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramGuanchaoRankDrawEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, currentRank ?? 0, drew) { CardActionId = action.ActionId });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramGuanchaoRankDrawEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, currentRank ?? 0, drew) { CardActionId = action.ActionId });
         if (drew && !_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return drew ? SkillProgramStepOutcome.AwaitChild : SkillProgramStepOutcome.Continue;

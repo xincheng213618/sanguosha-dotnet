@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePublicPileCollectionRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IPublicPileCollectionProgramHost.ExecutePublicPileCollection(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecutePublicPileCollection(effect, frame);
+    SkillProgramStepOutcome IPublicPileCollectionProgramHost.ExecutePublicPileCollection(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecutePublicPileCollection(effect, frame);
     internal IReadOnlyList<PromptChoice> PublicPileCollectionChoices(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         var slots = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).SelectMany(player => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(frame.Id, frame.OwnerSeat, player.Seat, effect.Zones, OwnedCardMoveIntent.Transfer)).ToArray();

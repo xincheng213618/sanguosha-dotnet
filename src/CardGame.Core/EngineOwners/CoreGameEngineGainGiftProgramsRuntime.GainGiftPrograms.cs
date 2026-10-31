@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
 {
     internal bool TracksRedOwnedLoss => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RevealRedLossAndDraw) || _characterZhugeJinMobileOperations.HasMobileMingzheRegistration;
 
-    internal static bool OwnedLossZone(CardZoneKind zone) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GainGiftPrograms.OwnedLossZone(zone);
+    internal static bool OwnedLossZone(CardZoneKind zone) => RuntimeSkills.RuntimeRules_Core_GainGiftPrograms.OwnedLossZone(zone);
     internal RedOwnedLossMaterial? CaptureRedOwnedLoss(Card card, CardLocation from, CardLocation to, long sequence)
     {
         // Freeze the original owner's effective suit at issuance, before equipment
@@ -53,7 +48,7 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
     }
 
     internal Card[] TransferableGainGiftCards(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner])).Where(c => !c.IsGeneralWeapon).OrderBy(c => c.Id).ToArray();
-    internal static CardConversionSource GainGiftSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GainGiftPrograms.GainGiftSource(f);
+    internal static CardConversionSource GainGiftSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_GainGiftPrograms.GainGiftSource(f);
     internal SkillProgramStepOutcome ExecuteGainGift(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -67,7 +62,7 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
         // Preserve occurrence identity from the actual parent, including PerBatch's cursor.
         var parent = _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(w => w.Id == context.ParentFrameId);
         var candidate = parent.Candidates[parent.CandidateIndex];
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || !CanRunGainGiftTrigger(candidate, _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
+        if (!CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || !CanRunGainGiftTrigger(candidate, _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Gain/loss lost its exact movement parent and current qualification.");
         var losses = effect.Op == SkillProgramEffectOp.RevealRedLossAndDraw ? _coreCardMovementProgramsOperations.MatchingOwnerBatchMovementIndexes(parent.Batch, candidate, _coreProgramLifecycleOperations.GetProgramTrigger(f)).Select(i => parent.Batch.Movements[i].RedOwnedLoss!).ToArray() : Array.Empty<RedOwnedLossMaterial>();
         var r = new GainGiftProgramReceipt(f.InstructionIndex, effect.Op, GainGiftStage.Choosing, parent.Id, parent.Batch.Id, parent.Batch.DiscardRecoveryPhase, [], [], 0, 0, losses);
@@ -117,7 +112,7 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
         return Array.AsReadOnly(choices.ToArray());
     }
 
-    internal static Dictionary<string, string> GainGiftParameters(ProgramSkillFrame f, string branch) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GainGiftPrograms.GainGiftParameters(f, branch);
+    internal static Dictionary<string, string> GainGiftParameters(ProgramSkillFrame f, string branch) => RuntimeSkills.RuntimeRules_Core_GainGiftPrograms.GainGiftParameters(f, branch);
     internal void PublishGainGiftChoice(ProgramSkillFrame f)
     {
         var choices = GainGiftChoices(f);
@@ -138,7 +133,7 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Gift has no owning program.");
         var r = f.GainGiftReceipt!;
-        if (r.Operation != SkillProgramEffectOp.GiveAfterBatchGain || r.Stage != GainGiftStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true, Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], GainGiftChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (r.Operation != SkillProgramEffectOp.GiveAfterBatchGain || r.Stage != GainGiftStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true, Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], GainGiftChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Gift choice lost its current private owner and exact choices.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["branch"] == "finish" || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
@@ -282,7 +277,7 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
         return gifts.OrderBy(c => CardCatalog.Get(cards[c.Cards[0]].Kind).HandKeepValue).ThenBy(c => c.Targets[0]).ThenBy(c => c.Cards[0]).FirstOrDefault() ?? decision.Choices.Single(c => c.Cards.Count == 0);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDelegatedJudgmentAndGainGiftHost.ExecuteGainGift(ProgramSkillFrame frame, SkillProgramEffect effect) => ExecuteGainGift(frame, effect);
+    SkillProgramStepOutcome IDelegatedJudgmentAndGainGiftHost.ExecuteGainGift(ProgramSkillFrame frame, SkillProgramEffect effect) => ExecuteGainGift(frame, effect);
     [ProgramPipelineHook(ProgramPipelinePhase.SelectLegacyMovementIndexes, 300)]
     internal int[]? SelectWindowIndexes_MatchingActualGainGiftIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, CardLocation location)
     {

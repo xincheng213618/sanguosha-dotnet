@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuCheErMouRuntime
@@ -14,44 +10,44 @@ internal sealed partial class CharacterHuCheErMouRuntime
     internal void ContinueMouHuCheEr(long id) => MouHuCheErRuntime.Continue(id);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 35800, SkillProgramEffectOp.ResolveMouHuCheErKongwu)]
     internal bool CanStartMouHuCheEr(CharacterState owner) => MouHuCheErRuntime.CanStart(owner.Seat);
-    int global::CardGame.Core.IMouHuCheErFacts.Turn => _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber;
+    int IMouHuCheErFacts.Turn => _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber;
 
-    long global::CardGame.Core.IMouHuCheErFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+    long IMouHuCheErFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
-    bool global::CardGame.Core.IMouHuCheErFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouHuCheErFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    bool global::CardGame.Core.IMouHuCheErFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
-    bool global::CardGame.Core.IMouHuCheErFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
-    bool global::CardGame.Core.IMouHuCheErFacts.Friendly(int owner, int other) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), other, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
-    bool global::CardGame.Core.IMouHuCheErFacts.HasHp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].HasHpValue;
-    int global::CardGame.Core.IMouHuCheErFacts.Hp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Hp;
-    int global::CardGame.Core.IMouHuCheErFacts.MaxHp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].MaxHp;
-    int global::CardGame.Core.IMouHuCheErFacts.HandCount(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count;
-    string global::CardGame.Core.IMouHuCheErFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
-    string global::CardGame.Core.IMouHuCheErFacts.SkillName(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Name;
-    string global::CardGame.Core.IMouHuCheErFacts.SkillDescription(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Description;
-    SkillProgram global::CardGame.Core.IMouHuCheErFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    bool global::CardGame.Core.IMouHuCheErFacts.Owns(ProgramSkillFrame f) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
-    ActualDiscardRecoveryPhaseKey? global::CardGame.Core.IMouHuCheErFacts.Phase() => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
-    bool global::CardGame.Core.IMouHuCheErFacts.Recorded(ActualDiscardRecoveryPhaseKey p) => _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p);
-    IReadOnlyList<int> global::CardGame.Core.IMouHuCheErFacts.Targets(int owner) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(t => t.IsAlive && t.Seat != owner && _corePhysicalOwnedCardQueriesOperations.GetHand(t).Count > 0).Select(t => t.Seat).ToArray());
-    IReadOnlyList<MouHuCheErHand> global::CardGame.Core.IMouHuCheErFacts.Hand(int target) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Select((c, i) => new MouHuCheErHand(c.Id, i, c.Kind, _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[target], c))).ToArray());
-    bool global::CardGame.Core.IMouHuCheErFacts.InHand(int target, int id) => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(target);
-    SkillProgramCardCategory global::CardGame.Core.IMouHuCheErFacts.Category(CardKind kind) => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind);
-    IReadOnlyList<int> global::CardGame.Core.IMouHuCheErFacts.SameSuitDiscards(int target, Suit suit) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Where(c => _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[target], c) == suit && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(target, c, CardLocation.Hand(target), OwnedCardMoveIntent.Discard)).Select(c => c.Id).ToArray());
-    int global::CardGame.Core.IMouHuCheErFacts.CategoryCount(int target, SkillProgramCardCategory category) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(target)).Count(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == category);
-    IEnumerable<T> global::CardGame.Core.IMouHuCheErFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    MouHuCheErDamageEvent? global::CardGame.Core.IMouHuCheErFacts.Damage(IGameEvent payload)
+    bool IMouHuCheErFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
+    bool IMouHuCheErFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
+    bool IMouHuCheErFacts.Friendly(int owner, int other) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), other, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
+    bool IMouHuCheErFacts.HasHp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].HasHpValue;
+    int IMouHuCheErFacts.Hp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Hp;
+    int IMouHuCheErFacts.MaxHp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].MaxHp;
+    int IMouHuCheErFacts.HandCount(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count;
+    string IMouHuCheErFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
+    string IMouHuCheErFacts.SkillName(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Name;
+    string IMouHuCheErFacts.SkillDescription(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Description;
+    SkillProgram IMouHuCheErFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
+    bool IMouHuCheErFacts.Owns(ProgramSkillFrame f) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
+    ActualDiscardRecoveryPhaseKey? IMouHuCheErFacts.Phase() => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
+    bool IMouHuCheErFacts.Recorded(ActualDiscardRecoveryPhaseKey p) => _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p);
+    IReadOnlyList<int> IMouHuCheErFacts.Targets(int owner) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(t => t.IsAlive && t.Seat != owner && _corePhysicalOwnedCardQueriesOperations.GetHand(t).Count > 0).Select(t => t.Seat).ToArray());
+    IReadOnlyList<MouHuCheErHand> IMouHuCheErFacts.Hand(int target) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Select((c, i) => new MouHuCheErHand(c.Id, i, c.Kind, _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[target], c))).ToArray());
+    bool IMouHuCheErFacts.InHand(int target, int id) => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(target);
+    SkillProgramCardCategory IMouHuCheErFacts.Category(CardKind kind) => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind);
+    IReadOnlyList<int> IMouHuCheErFacts.SameSuitDiscards(int target, Suit suit) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Where(c => _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[target], c) == suit && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(target, c, CardLocation.Hand(target), OwnedCardMoveIntent.Discard)).Select(c => c.Id).ToArray());
+    int IMouHuCheErFacts.CategoryCount(int target, SkillProgramCardCategory category) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(target)).Count(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == category);
+    IEnumerable<T> IMouHuCheErFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    MouHuCheErDamageEvent? IMouHuCheErFacts.Damage(IGameEvent payload)
     {
-        if (payload is not DamageAppliedEvent { Amount: > 0 } applied || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not global::CardGame.Core.NativeOwners.CardAttackHandle a || a.IsChainPropagation || _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { MouHuCheErSlash: { } o } use || !IsIssuedMouHuCheErUse(use) || applied.TargetSeat != o.Target || a.TargetSeat != o.Target || !a.DamageWasApplied)
+        if (payload is not DamageAppliedEvent { Amount: > 0 } applied || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not NativeOwners.CardAttackHandle a || a.IsChainPropagation || _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { MouHuCheErSlash: { } o } use || !IsIssuedMouHuCheErUse(use) || applied.TargetSeat != o.Target || a.TargetSeat != o.Target || !a.DamageWasApplied)
             return null;
         return new(o.FrameId, use.Id, applied.TargetSeat, applied.Amount);
     }
 
-    void global::CardGame.Core.IMouHuCheErNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
-    void global::CardGame.Core.IMouHuCheErNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
-    bool global::CardGame.Core.IMouHuCheErNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    void global::CardGame.Core.IMouHuCheErNative.Reveal(ProgramSkillFrame f)
+    void IMouHuCheErNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    void IMouHuCheErNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+    bool IMouHuCheErNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
+    void IMouHuCheErNative.Reveal(ProgramSkillFrame f)
     {
         if (!ValidMouHuCheEr(f) || f.MouHuCheEr is not { Stage: MouHuCheErStage.DiscardChildren } r || _cardZonesOperations._cardZones.GetLocation(r.Shown) != CardLocation.Hand(r.Target))
             throw new InvalidOperationException("Kongwu reveal requires its actual selected Hand entity.");
@@ -59,7 +55,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHuCheErShownEvent(f.Id, r.Target, r.Shown, r.Suit, r.Category));
     }
 
-    void global::CardGame.Core.IMouHuCheErNative.Discard(ProgramSkillFrame f)
+    void IMouHuCheErNative.Discard(ProgramSkillFrame f)
     {
         if (!ValidMouHuCheEr(f) || f.MouHuCheEr is not { Stage: MouHuCheErStage.DiscardChildren } r || !r.Discards.SequenceEqual(_characterHuCheErMouOperations.CreateMouHuCheErFacts().SameSuitDiscards(r.Target, r.Suit)))
             throw new InvalidOperationException("Kongwu discards require its actual payable whole same-suit Hand group.");
@@ -75,6 +71,6 @@ internal sealed partial class CharacterHuCheErMouRuntime
         });
     }
 
-    bool global::CardGame.Core.IMouHuCheErNative.CanSlash(ProgramSkillFrame f) => CanMouHuCheErSlash(f);
-    void global::CardGame.Core.IMouHuCheErNative.Slash(ProgramSkillFrame f) => IssueMouHuCheErSlash(f);
+    bool IMouHuCheErNative.CanSlash(ProgramSkillFrame f) => CanMouHuCheErSlash(f);
+    void IMouHuCheErNative.Slash(ProgramSkillFrame f) => IssueMouHuCheErSlash(f);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangWenAnniversaryRuntime
@@ -12,9 +8,9 @@ internal sealed partial class CharacterZhangWenAnniversaryRuntime
     internal static CardMoveReason ZhangWenGift => new("skill-program.anniversary:sibian.gift");
     internal static CardMoveReason ZhangWenCleanup => new("skill-program.anniversary:sibian.cleanup");
 
-    internal static CardConversionSource ZhangWenSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    void global::CardGame.Core.IAnniversaryZhangWenHost.Refund(ProgramSkillFrame frame) => RefundZhangWenSongshu(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryZhangWenHost.Sibian(ProgramSkillFrame frame) => BeginZhangWenSibian(frame);
+    internal static CardConversionSource ZhangWenSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    void IAnniversaryZhangWenHost.Refund(ProgramSkillFrame frame) => RefundZhangWenSongshu(frame);
+    SkillProgramStepOutcome IAnniversaryZhangWenHost.Sibian(ProgramSkillFrame frame) => BeginZhangWenSibian(frame);
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 45100)]
     internal void CaptureZhangWenSongshu(ProgramSkillStartedEvent started)
     {
@@ -99,7 +95,7 @@ internal sealed partial class CharacterZhangWenAnniversaryRuntime
     [ProgramAnswer(ZhangWenChoice)]
     internal void AnswerZhangWenSibian(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangWenSibian: { Stage: ZhangWenSibianStage.Recipient } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], ZhangWenSibianChoices(f).Where(c => c.Id == answer.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangWenSibian: { Stage: ZhangWenSibianStage.Recipient } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], ZhangWenSibianChoices(f).Where(c => c.Id == answer.Id).ToArray()))
             throw new InvalidOperationException("Sibian requires the original owner's current whole-remainder choice.");
         RequireZhangWenSibian(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

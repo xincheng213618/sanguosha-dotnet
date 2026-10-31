@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMengDaOlRuntime
@@ -24,7 +20,7 @@ internal sealed partial class CharacterMengDaOlRuntime
 
     internal bool IsGoudeSlashUse(long useId)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { GoudeSlash: { } o, CardId: 0, PhysicalCardIds.Count: 0, Action: { Type: CardActionType.Use } action } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.EffectiveKind != use.CardKind || action.ActionId != o.ActionId || action.ProviderSeat != o.ProviderSeat || action.PhysicalCards.Count != 0 || !action.ConversionChain.Contains(o.Source) || o.UseId != useId || o.Source.OwnerSeat != o.OriginalActor || o.OriginalActor != o.ProviderSeat || o.ActualTurn != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || o.TurnOwner != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<GoudeSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { GoudeSlash: { } o, CardId: 0, PhysicalCardIds.Count: 0, Action: { Type: CardActionType.Use } action } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.EffectiveKind != use.CardKind || action.ActionId != o.ActionId || action.ProviderSeat != o.ProviderSeat || action.PhysicalCards.Count != 0 || !action.ConversionChain.Contains(o.Source) || o.UseId != useId || o.Source.OwnerSeat != o.OriginalActor || o.OriginalActor != o.ProviderSeat || o.ActualTurn != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || o.TurnOwner != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<GoudeSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         var useIndex = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == useId);
         if (useIndex < 1 || _resolutionStackOperations._resolutionStack[useIndex - 1] is not ProgramSkillFrame { Goude: { Stage: GoudeStage.NativeSlash, NativeCompleted: false } r } f || f.Id != o.ProgramFrameId || r.NativeOrigin != o || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.Option != GoudeOption.Slash || r.TargetSeat != o.OriginalTarget || f.InstructionIndex != 1)
@@ -59,7 +55,7 @@ internal sealed partial class CharacterMengDaOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 27240)]
-    internal bool ReturnGoudeAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnGoudeAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Goude: { Stage: GoudeStage.NativeSlash, NativeCompleted: true, NativeOrigin: { } o } r } f || completion.ResolutionId != o.UseId)
             return false;

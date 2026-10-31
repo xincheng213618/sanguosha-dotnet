@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSourceDingxiRuntime
@@ -39,7 +34,7 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
         return batch.Movements.Where(m => m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && SourceDingxiDamageCard(m.CardKind) && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile && _coreProgramEventHistoryOperations.ProgramEventHistory<SourceDingxiDiscardQualifiedEvent>().Count(e => e.BatchId == batch.Id && e.OriginalUseId == parent && e.OwnerSeat == owner && e.CardId == m.CardId && e.DiscardSequence == m.Sequence) == 1).Select(m => m.CardId).Distinct().ToArray();
     }
 
-    internal global::CardGame.Core.GameEngine.SourceDingxiUsePlan? SourceDingxiPlan(int owner, int id, int target)
+    internal GameEngine.SourceDingxiUsePlan? SourceDingxiPlan(int owner, int id, int target)
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || (_cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DiscardPile && _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Processing))
             return null;
@@ -47,13 +42,13 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
         var kind = card.Kind;
         var actor = _coreMatchParticipantsPlayersAccess._players[owner];
         var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, card);
-        var color = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
+        var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
         if (!SourceDingxiDamageCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(owner, kind, CardActionType.Use) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner, [id]) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(owner, kind, [id], null)) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(owner, [id], suit))
             return null;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], card, effectiveKind: kind, physicalCardIds: [id]) ? new(id, kind, LegalActionKind.Slash, null) : null;
         // Lightning retains its normal self-only target domain; "left" does not override it.
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+        if (!CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
             return null;
         var options = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: color, hasActualColor: true, physicalCardIds: [id]);
         var group = kind is CardKind.BarbarianAssault or CardKind.ArrowBarrage;

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,7 +10,7 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
     internal bool ShiWyMissionOver(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanMissionEvent>().Any(e => e.OwnerSeat == seat);
     internal int ShiWyPhaseUses(int seat, int turn, int phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanUseEvent>().Count(e => e.OwnerSeat == seat && e.TurnNumber == turn && e.PhaseInstanceId == phase);
     internal MobileShiWeiYanPhaseGrantEvent? ShiWyPhaseGrant(int seat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat ? _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanPhaseGrantEvent>().LastOrDefault(e => e.OwnerSeat == seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) : null;
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiWeiYanHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginMobileShiWeiYan(frame, operation);
+    SkillProgramStepOutcome IMobileShiWeiYanHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginMobileShiWeiYan(frame, operation);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 47100)]
     internal bool CanOfferMobileShiWeiYan(ProgramTriggerLegalityContext gate)
     {
@@ -154,7 +151,7 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
     [ProgramAnswer("mobile-shi-wei-yan")]
     internal void AnswerMobileShiWeiYan(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiWeiYan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MobileShiWeiYanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiWeiYan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MobileShiWeiYanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Shi Wei Yan lost its exact current private payment or choice.");
         var branch = selected.Parameters["branch"];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -251,7 +248,7 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
                 return;
             }
 
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiWeiYanPhaseGrantEvent(f.Id, f.OwnerSeat, r.TurnNumber, r.PhaseInstanceId, r.Cards.Count, r.HpLoss) { Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiWeiYanPhaseGrantEvent(f.Id, f.OwnerSeat, r.TurnNumber, r.PhaseInstanceId, r.Cards.Count, r.HpLoss) { Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) });
             _coreSkillProgramsOperations.FinishProgramSkill(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), true);
             return;
         }

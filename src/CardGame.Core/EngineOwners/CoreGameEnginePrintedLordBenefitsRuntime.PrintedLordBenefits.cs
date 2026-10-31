@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CoreGameEnginePrintedLordBenefitsRuntime
     internal bool PrintedLordUnissuedSource(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None;
     internal bool ExactPrintedLordStart(ProgramSkillFrame f)
     {
-        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || context.OwnerSeat != f.OwnerSeat || context.SourceSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, Continuation: ProgramLifecycleContinuation.NormalTurnStart } parent || parent.OwnerSeat != f.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
+        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || context.OwnerSeat != f.OwnerSeat || context.SourceSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, Continuation: ProgramLifecycleContinuation.NormalTurnStart } parent || parent.OwnerSeat != f.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
         if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1].Id != parent.Id)
@@ -26,7 +23,7 @@ internal sealed partial class CoreGameEnginePrintedLordBenefitsRuntime
             throw new InvalidOperationException("Printed lord qualification requires the exact own actual-start candidate.");
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
             _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PrintedLordBenefit = new(1, global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime.RecipientConsequencesSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, f.WindowContext!.ParentFrameId, PrintedLordBenefitStage.ChoosingBeneficiary) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PrintedLordBenefit = new(1, CoreGameEngineBlackGiftContestsRuntime.RecipientConsequencesSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, f.WindowContext!.ParentFrameId, PrintedLordBenefitStage.ChoosingBeneficiary) });
         PublishPrintedLordChoice(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -62,7 +59,7 @@ internal sealed partial class CoreGameEnginePrintedLordBenefitsRuntime
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         var r = f.PrintedLordBenefit!;
-        if (r.Stage != PrintedLordBenefitStage.ChoosingBeneficiary || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [PrintedLordChoices(f).Single(c => c.Id == choice.Id)]))
+        if (r.Stage != PrintedLordBenefitStage.ChoosingBeneficiary || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [PrintedLordChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Printed lord benefit lost its exact published beneficiary.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!PrintedLordUnissuedSource(f))
@@ -147,7 +144,7 @@ internal sealed partial class CoreGameEnginePrintedLordBenefitsRuntime
     internal PromptChoice SelectAiRecipientConsequences(PendingDecision p, ProgramSkillFrame f)
     {
         if (f.BlackGiftContest is { Stage: BlackGiftContestStage.ChoosingDiscard })
-            return p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).ThenBy(c => c.Cards.Single()).First();
+            return p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).ThenBy(c => c.Cards.Single()).First();
         var hint = f.PrintedLordBenefit is not null ? new SkillProgramAiHint(0, 0, 0, 0, 1, 0, false, false) : new SkillProgramAiHint(0, 0, 0, 0, 0, 1, false, false);
         // Shared public team/HP/hand-count target scoring; no foreign Hand ids.
         return p.Choices.OrderByDescending(c => _coreAiBrainsAiBrainsAccess._aiBrains[f.OwnerSeat].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(f.OwnerSeat), c.Targets.Single(), hint)).ThenBy(c => c.Targets.Single()).First();

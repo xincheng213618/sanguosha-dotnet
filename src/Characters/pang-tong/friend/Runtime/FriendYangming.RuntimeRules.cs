@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_pang_tong_friend_FriendYangming
 {
     internal static CardLocation FriendYangmingLocation(ProgramSkillFrame frame) => new(CardZoneKind.PublicPersistentPile,

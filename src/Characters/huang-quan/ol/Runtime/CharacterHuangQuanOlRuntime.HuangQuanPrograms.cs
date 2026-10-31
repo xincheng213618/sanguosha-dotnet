@@ -1,15 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangQuanOlRuntime
 {
-    internal CardConversionSource HuangQuanSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource HuangQuanSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillProgramStepOutcome IssueHuangQuanDraw(ProgramSkillFrame f, int target, string kind, DianhuOccurrence? occurrence)
     {
         if (f.HuangQuan is not null)
@@ -84,7 +78,7 @@ internal sealed partial class CharacterHuangQuanOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHuangQuanProgramHost.ArmDianhuRelation(ProgramSkillFrame f, int target) => ArmDianhuRelation(f, target);
-    SkillProgramStepOutcome global::CardGame.Core.IHuangQuanProgramHost.DrawForDianhuActualOccurrence(ProgramSkillFrame f) => DrawForDianhuActualOccurrence(f);
-    SkillProgramStepOutcome global::CardGame.Core.IHuangQuanProgramHost.DrawAndOfferJianjiExactCard(ProgramSkillFrame f, int target) => DrawAndOfferJianjiExactCard(f, target);
+    SkillProgramStepOutcome IHuangQuanProgramHost.ArmDianhuRelation(ProgramSkillFrame f, int target) => ArmDianhuRelation(f, target);
+    SkillProgramStepOutcome IHuangQuanProgramHost.DrawForDianhuActualOccurrence(ProgramSkillFrame f) => DrawForDianhuActualOccurrence(f);
+    SkillProgramStepOutcome IHuangQuanProgramHost.DrawAndOfferJianjiExactCard(ProgramSkillFrame f, int target) => DrawAndOfferJianjiExactCard(f, target);
 }

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,9 +8,9 @@ internal sealed partial class CharacterChengPuMobileShiRuntime
     internal const string ShiCpDuzuoSkill = "mobile:shi-duzuo", ShiCpBihanSkill = "mobile:shi-bihan";
     internal const string ShiCpDuzuoGrantMoveReason = "skill-program.mobile:shi-duzuo.fire-slash-grant";
     internal const string ShiCpBihanDiscardMoveReason = "skill-program.mobile:shi-bihan.discard";
-    internal static CardConversionSource ShiCpSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiChengPuProgramHost.ResolveDuzuoGrant(ProgramSkillFrame frame) => BeginMobileShiDuzuoGrantProgram(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiChengPuProgramHost.ResolveBihanGuard(ProgramSkillFrame frame) => BeginMobileShiBihanGuardProgram(frame);
+    internal static CardConversionSource ShiCpSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    SkillProgramStepOutcome IMobileShiChengPuProgramHost.ResolveDuzuoGrant(ProgramSkillFrame frame) => BeginMobileShiDuzuoGrantProgram(frame);
+    SkillProgramStepOutcome IMobileShiChengPuProgramHost.ResolveBihanGuard(ProgramSkillFrame frame) => BeginMobileShiBihanGuardProgram(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 67300)]
     internal bool CanOfferMobileShiChengPu(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -104,7 +101,7 @@ internal sealed partial class CharacterChengPuMobileShiRuntime
     [ProgramAnswer("mobile-shi-duzuo")]
     internal void AnswerMobileShiDuzuo(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiChengPu: { Operation: "duzuo", TargetSeat: -1 } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], ShiCpDuzuoChoices(f).Where(current => current.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiChengPu: { Operation: "duzuo", TargetSeat: -1 } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], ShiCpDuzuoChoices(f).Where(current => current.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Duzuo choice lost its original frame, chooser or legal recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var seat = int.Parse(selected.Parameters["seat"], CultureInfo.InvariantCulture);
@@ -188,7 +185,7 @@ internal sealed partial class CharacterChengPuMobileShiRuntime
     [ProgramAnswer("mobile-shi-bihan")]
     internal void AnswerMobileShiBihan(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiChengPu: { Operation: "bihan" } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == 0 ? f.OwnerSeat : r.TargetSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], (r.Stage == 0 ? ShiCpBihanDiscarderChoices(f) : ShiCpBihanDiscardChoices(f)).Where(current => current.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiChengPu: { Operation: "bihan" } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == 0 ? f.OwnerSeat : r.TargetSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], (r.Stage == 0 ? ShiCpBihanDiscarderChoices(f) : ShiCpBihanDiscardChoices(f)).Where(current => current.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Bihan choice lost its original frame, chooser or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.Parameters["branch"] == "discarder")

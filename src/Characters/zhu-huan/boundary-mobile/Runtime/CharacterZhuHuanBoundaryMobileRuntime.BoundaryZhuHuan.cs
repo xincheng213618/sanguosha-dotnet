@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuHuanBoundaryMobileRuntime
@@ -10,15 +6,15 @@ internal sealed partial class CharacterZhuHuanBoundaryMobileRuntime
     internal const string BoundaryPingkouAction = "boundary-zhu-huan-pingkou", BoundaryPingkouGain = "skill.boundary-zhu-huan.pingkou.equipment";
     internal bool TracksBoundaryZhuHuanPhaseSkips => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBoundaryZhuHuanPingkou) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileZhuHuanPingkou);
 
-    internal static CardConversionSource BoundaryZhuHuanSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryZhuHuanHost.Resolve(ProgramSkillFrame frame) => BeginBoundaryPingkou(frame);
-    void global::CardGame.Core.IBoundaryZhuHuanHost.SkipDraw(ProgramSkillFrame frame) => SkipBoundaryZhuHuanDraw(frame);
+    internal static CardConversionSource BoundaryZhuHuanSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    SkillProgramStepOutcome IBoundaryZhuHuanHost.Resolve(ProgramSkillFrame frame) => BeginBoundaryPingkou(frame);
+    void IBoundaryZhuHuanHost.SkipDraw(ProgramSkillFrame frame) => SkipBoundaryZhuHuanDraw(frame);
     internal void SkipBoundaryZhuHuanDraw(ProgramSkillFrame frame)
     {
         if (frame.SkillId != BoundaryZhuHuanComposition.Fenli || frame.TriggerId != "skip-draw-most-hand" || frame.InstructionIndex != 1 || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || frame.WindowContext is not { Window: SkillProgramTriggerWindow.DrawPhaseStarting } context || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^1].Id != frame.Id || _resolutionStackOperations._resolutionStack[^2] is not ProgramLifecycleTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != frame.OwnerSeat)
             throw new InvalidOperationException("Fenli Draw substitution requires its exact original owner starting window.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { ActualPhaseSubstitution = new(parent.Id, frame.Id, frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, SkillProgramTurnPhase.Draw) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, context.Window, SkillProgramTurnPhase.Draw));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, context.Window, SkillProgramTurnPhase.Draw));
     }
 
     internal void RecordBoundaryZhuHuanSkippedPhase(int owner, SkillProgramTurnPhase phase, long extraDrawFrameId = 0)
@@ -115,7 +111,7 @@ internal sealed partial class CharacterZhuHuanBoundaryMobileRuntime
     [ProgramAnswer(BoundaryPingkouAction)]
     internal void AnswerBoundaryPingkou(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryZhuHuan: { Stage: BoundaryZhuHuanStage.Targets } receipt } frame || !ValidBoundaryPingkou(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], BoundaryPingkouChoices(frame).Where(c => c.Id == answer.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryZhuHuan: { Stage: BoundaryZhuHuanStage.Targets } receipt } frame || !ValidBoundaryPingkou(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], BoundaryPingkouChoices(frame).Where(c => c.Id == answer.Id).ToArray()))
             throw new InvalidOperationException("Pingkou requires the same owner and fresh distinct living targets.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -235,5 +231,5 @@ internal sealed partial class CharacterZhuHuanBoundaryMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 53800)]
     internal bool KeepIssuedBoundaryPingkou(ProgramSkillFrame frame) => frame.BoundaryZhuHuan is { Sealed: true } && ValidBoundaryPingkou(frame);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryZhuHuanPingkou)]
-    internal PromptChoice BoundaryPingkouAi(PendingDecision pending, ProgramSkillFrame frame) => pending.Choices.FirstOrDefault(c => c.Targets is [var target] && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? pending.Choices.Single(c => c.Parameters["branch"] == "finish");
+    internal PromptChoice BoundaryPingkouAi(PendingDecision pending, ProgramSkillFrame frame) => pending.Choices.FirstOrDefault(c => c.Targets is [var target] && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? pending.Choices.Single(c => c.Parameters["branch"] == "finish");
 }

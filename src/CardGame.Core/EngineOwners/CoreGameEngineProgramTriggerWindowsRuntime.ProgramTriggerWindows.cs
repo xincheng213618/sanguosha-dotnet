@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramTriggerWindowsRuntime
 {
-    internal global::CardGame.Core.NativeOwners.ProgramTriggerWindowHost? CurrentDrivenProgramTriggerWindow() => _resolutionStackOperations._resolutionStack.LastOrDefault() switch
+    internal NativeOwners.ProgramTriggerWindowHost? CurrentDrivenProgramTriggerWindow() => _resolutionStackOperations._resolutionStack.LastOrDefault() switch
     {
         CardsMovedTriggerWindowFrame => _kernelCoreGameEngineProgramTriggerWindowsOperations.CreateCardsMovedTriggerWindowHost(),
         HpChangedTriggerWindowFrame => _kernelCoreGameEngineProgramTriggerWindowsOperations.CreateHpChangedTriggerWindowHost(),

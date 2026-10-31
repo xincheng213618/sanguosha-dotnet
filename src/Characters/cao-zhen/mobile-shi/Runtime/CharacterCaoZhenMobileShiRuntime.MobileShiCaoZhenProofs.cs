@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoZhenMobileShiRuntime
@@ -30,7 +26,7 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
         if (!ValidShiCaoZ(f) || f.ShiCaoZhen is not { Paid: true } r)
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } p && ShiCaoZMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => ShiCaoZOwnMovement(f, m));
+            return f.PendingMovementContinuation is { } p && ShiCaoZMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => ShiCaoZOwnMovement(f, m));
         if (child is DamageFrame damage)
             return r.Stage == ShiCaoZStage.DamageChildren && damage.ParentFrameId == f.Id && damage.SourceSeat == f.OwnerSeat && f.AttackAttempt is { } a && damage.TargetSeat == a.TargetSeat && damage.Amount == a.DamageAmount;
         if (child is BeforeDamageProgramWindowFrame before)
@@ -42,7 +38,7 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && state.CharacterStateContinuation == CharacterStateContinuation.Program);
     }
 
-    internal bool ShiCaoZChildEdge(int i) => _characterHuaTuoAnniversaryGodOperations.SkillInvocationStructuralEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && ShiCaoZFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
+    internal bool ShiCaoZChildEdge(int i) => _characterHuaTuoAnniversaryGodOperations.SkillInvocationStructuralEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && ShiCaoZFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal bool ShiCaoZChildSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => this.ShiCaoZChildEdge(n), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, dying) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, dying) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, dying));
     internal ProgramSkillFrame? ShiCaoZObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.ShiCaoZFirstChild(f, child), (i) => this.ShiCaoZChildSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49900)]
@@ -60,7 +56,7 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 49900)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 49900)]
-    internal bool KeepShiCaoZIssued(ProgramSkillFrame f) => f.ShiCaoZhen is { Paid: true } && ValidShiCaoZ(f) || f.SkillId == ShiCaoZSifeng && f.ShiCaoZhen is null && f.InstructionIndex is 0 or 1 && f.WindowContext is { } context && IsIssuedShiCaoZCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
+    internal bool KeepShiCaoZIssued(ProgramSkillFrame f) => f.ShiCaoZhen is { Paid: true } && ValidShiCaoZ(f) || f.SkillId == ShiCaoZSifeng && f.ShiCaoZhen is null && f.InstructionIndex is 0 or 1 && f.WindowContext is { } context && IsIssuedShiCaoZCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 49900)]
     internal bool AdvanceShiCaoZChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ShiCaoZObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

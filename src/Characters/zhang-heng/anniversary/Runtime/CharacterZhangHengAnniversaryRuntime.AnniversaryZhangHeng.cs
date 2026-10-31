@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangHengAnniversaryRuntime
 {
-    internal static CardConversionSource ZhangHengSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ZhangHengSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardMoveReason ZhangHengMoveReason => new("skill-program.anniversary:dangzai.move");
 
     internal Card[] ZhangHengMovable(int owner, int donor, IReadOnlyList<int>? selected = null)
@@ -20,7 +16,7 @@ internal sealed partial class CharacterZhangHengAnniversaryRuntime
     }
 
     internal IEnumerable<int> ZhangHengDonors(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && ZhangHengMovable(owner, p.Seat).Length > 0).Select(p => p.Seat);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryZhangHengHost.Begin(ProgramSkillFrame f) => BeginZhangHengDangzai(f);
+    SkillProgramStepOutcome IAnniversaryZhangHengHost.Begin(ProgramSkillFrame f) => BeginZhangHengDangzai(f);
     internal SkillProgramStepOutcome BeginZhangHengDangzai(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -72,7 +68,7 @@ internal sealed partial class CharacterZhangHengAnniversaryRuntime
     [ProgramAnswer("anniversary-zhang-heng")]
     internal void AnswerZhangHeng(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryZhangHeng: { } r } f || !ValidZhangHeng(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ZhangHengChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryZhangHeng: { } r } f || !ValidZhangHeng(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ZhangHengChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Dangzai rejects a changed original Play boundary, donor or physical judgment entity.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuanShuJunOlRuntime
@@ -43,7 +39,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         return a;
     }
 
-    internal void ClearHuanpeiDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void ClearHuanpeiDodgeResponse(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { HuanpeiResponse: { } r } use)
             return;
@@ -68,6 +64,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         return true;
     }
 
-    internal bool HasHuanpeiForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.ActiveAttack is null && pending.WeaponOwnerSeat == actor.Seat && pending.SlashTargetSeat == target.Seat && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && HasHuanpeiForcedSlash(actor, target, false);
-    internal bool HasHuanpeiForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.Attack.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && HasHuanpeiForcedSlash(actor, target, true);
+    internal bool HasHuanpeiForcedSlash(CharacterState actor, CharacterState target, NativeOwners.BorrowedSwordHandle pending) => CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.ActiveAttack is null && pending.WeaponOwnerSeat == actor.Seat && pending.SlashTargetSeat == target.Seat && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && HasHuanpeiForcedSlash(actor, target, false);
+    internal bool HasHuanpeiForcedSlash(CharacterState actor, CharacterState target, NativeOwners.QinglongCrescentBladeHandle pending) => CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.Attack.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && HasHuanpeiForcedSlash(actor, target, true);
 }

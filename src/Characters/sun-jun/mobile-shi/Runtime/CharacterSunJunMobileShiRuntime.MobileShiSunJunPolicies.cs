@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunJunMobileShiRuntime
@@ -71,7 +67,7 @@ internal sealed partial class CharacterSunJunMobileShiRuntime
 
         // A Dodge against an actual Slash is a Use; an Arrow Barrage Dodge and
         // a Duel/Barbarian Slash retain their ordinary played-response meaning.
-        if (_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, ProgramCompletedResponseKind.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.Action?.ActionId == a.ParentActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(f.CardKind) && f.CardAttack?.TargetSeat == a.ActorSeat)is { } parent)
+        if (_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, ProgramCompletedResponseKind.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.Action?.ActionId == a.ParentActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(f.CardKind) && f.CardAttack?.TargetSeat == a.ActorSeat)is { } parent)
             RecordShiSjHandAction(parent.Id, a, suit);
     }
 

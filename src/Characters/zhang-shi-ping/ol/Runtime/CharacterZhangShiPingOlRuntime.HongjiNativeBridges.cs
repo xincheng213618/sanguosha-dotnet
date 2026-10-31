@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangShiPingOlRuntime
@@ -40,7 +36,7 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
                 _characterDuFuRenOlOperations.ConsumeDuFuRenPhase(ActualDiscardRecoveryPhaseKind.Draw, recipientSeat);
                 _characterChengGongYingOlOperations.ConsumeChengGongYingDraw(recipientSeat);
                 _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[recipientSeat], _characterCaoXiOlOperations.FreezeAndCaptureCaoXiNativeDrawBase(_coreMatchParticipantsPlayersAccess._players[recipientSeat]), true);
-                _coreActualTurnsOperations.CompleteTurnStartAfterDraw(_coreMatchParticipantsPlayersAccess._players[recipientSeat], global::CardGame.Core.GameEngine.DelayedTurnEffects.None);
+                _coreActualTurnsOperations.CompleteTurnStartAfterDraw(_coreMatchParticipantsPlayersAccess._players[recipientSeat], GameEngine.DelayedTurnEffects.None);
             }
         }
 

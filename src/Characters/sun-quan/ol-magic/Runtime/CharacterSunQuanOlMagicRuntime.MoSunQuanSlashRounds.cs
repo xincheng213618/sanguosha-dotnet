@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunQuanOlMagicRuntime
 {
     internal bool HasUnstartedMoQuanyuExtraRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MoQuanyuExtraRound: { Started: false }, Action: { Type: CardActionType.Use } } use && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && !_coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(use);
     internal bool IsMoQuanyuExtraRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.MoQuanyuExtraRound is { Started: true };
-    internal void CaptureMoQuanyuExtraAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CaptureMoQuanyuExtraAttack(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MoQuanyuExtraRound: { Started: false } r, CardAttack: { } original } use || _characterDaQiaoLeOperations.IsZixiExtraEffectRound(use.Id) || _characterFeiYiOlOperations.IsFeiYiExtraEffectRound(use.Id) || use.ExtraCardEffect is { WholeGroupRepeated: true } || r.Native.OriginalAttacks.Any(s => s.TargetIndex == use.TargetIndex))
             return;
@@ -61,14 +57,14 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
             _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd = _kernelCoreMainOperations.CreateFangtianHalberdHandle(id);
         }
 
-        _coreCardAttackStateOperations.UpdateCardAttackState(id, _ => global::CardGame.Core.EngineOwners.CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(first.Attack));
+        _coreCardAttackStateOperations.UpdateCardAttackState(id, _ => CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(first.Attack));
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreNativeSlashUseOperations.ContinueSlashDefense(attack);
         return true;
     }
 
-    internal bool ContinueMoQuanyuFangtian(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool ContinueMoQuanyuFangtian(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MoQuanyuExtraRound: { Active: true } r } use)
             return false;
@@ -79,7 +75,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
             return true;
         }
 
-        _coreCardAttackStateOperations.UpdateCardAttackState(use.Id, _ => global::CardGame.Core.EngineOwners.CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(seed.Attack));
+        _coreCardAttackStateOperations.UpdateCardAttackState(use.Id, _ => CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(seed.Attack));
         _coreNativeSlashUseOperations.ContinueSlashDefense(attack);
         return true;
     }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesRuntime
@@ -135,9 +131,9 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesRuntime
         BeginDrawFundedDistinctBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
     }
 
-    internal void BeginDrawFundedDistinctBasicSlash(CharacterState actor, IReadOnlyList<int> targets, DrawFundedDistinctBasicPayment p, global::CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit, long? programParent)
+    internal void BeginDrawFundedDistinctBasicSlash(CharacterState actor, IReadOnlyList<int> targets, DrawFundedDistinctBasicPayment p, NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit, long? programParent)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectiveKind) || targets.Count == 0)
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectiveKind) || targets.Count == 0)
             throw new InvalidOperationException("A paid zero-material Slash requires its accepted ordered targets.");
         var kind = p.EffectiveKind;
         var card = new Card(0, kind, Suit.None, 0);
@@ -188,7 +184,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesRuntime
         if (use.CurrentSlashFirePolicy is not null)
             _coreCurrentSlashFireOffersOperations.AssertCurrentSlashFirePolicy(use);
         var p = receipt.Payment;
-        return action.ActionId == receipt.CardActionId && action.EffectiveKind == p.EffectiveKind && (use.CardKind == p.EffectiveKind || use.CurrentSlashFirePolicy is not null && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectiveKind)) && action.ProviderSeat == p.Source.OwnerSeat && action.RequesterSeat is null && action.ResponderSeat is null && action.PhysicalCards.Count == 0 && action.ConversionChain is [var source] && source == p.Source && action.EffectiveSuit == Suit.None && action.EffectiveRank == 0 && action.EffectiveIsRed == false && (action.ActorSeat == p.Source.OwnerSeat && use.SourceSeat == p.Source.OwnerSeat || _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, action.ActorSeat, p.Source.OwnerSeat));
+        return action.ActionId == receipt.CardActionId && action.EffectiveKind == p.EffectiveKind && (use.CardKind == p.EffectiveKind || use.CurrentSlashFirePolicy is not null && CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectiveKind)) && action.ProviderSeat == p.Source.OwnerSeat && action.RequesterSeat is null && action.ResponderSeat is null && action.PhysicalCards.Count == 0 && action.ConversionChain is [var source] && source == p.Source && action.EffectiveSuit == Suit.None && action.EffectiveRank == 0 && action.EffectiveIsRed == false && (action.ActorSeat == p.Source.OwnerSeat && use.SourceSeat == p.Source.OwnerSeat || _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, action.ActorSeat, p.Source.OwnerSeat));
     }
 
     internal bool IsDrawFundedDistinctBasicUse(long frameId) => _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)is { } use && IsIssuedDrawFundedDistinctBasicUse(use);
@@ -217,10 +213,10 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 150)]
-    internal bool FinishDrawFundedDistinctBasicAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishDrawFundedDistinctBasicAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (attack.Card is not null || !IsDrawFundedDistinctBasicUse(attack.ResolutionId) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
+        if (attack.Card is not null || !IsDrawFundedDistinctBasicUse(attack.ResolutionId) || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);

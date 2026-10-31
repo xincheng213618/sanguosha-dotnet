@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramAllHandTrickPaymentsRuntime
@@ -38,7 +34,7 @@ internal sealed partial class CoreGameEngineProgramAllHandTrickPaymentsRuntime
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MatchBatch, 90)]
-    internal bool IsProgramAllHandTrickPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch) && ProgramAllHandTrickMaterialsMatch(use, batch);
+    internal bool IsProgramAllHandTrickPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch) && ProgramAllHandTrickMaterialsMatch(use, batch);
     // BeginJizhiOrNullificationWindow already calls TryPauseRecoveryPaidCardUse.
     // Opt only an issued all-hand Duel activation into its original payment
     // tail, so last-hand children finish before the same Duel's first response.

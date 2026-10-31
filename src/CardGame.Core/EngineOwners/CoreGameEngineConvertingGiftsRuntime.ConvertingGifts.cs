@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineConvertingGiftsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IConvertingGiftProgramHost.GiveSelectedOwnedCardAndDamage(ProgramSkillFrame f, int limit) => BeginConvertingGiftDamage(f, limit);
-    SkillProgramStepOutcome global::CardGame.Core.IConvertingGiftProgramHost.ObserveDamageSourceHandAndGive(ProgramSkillFrame f, int limit) => BeginDamageSourceObservationGift(f, limit);
-    SkillProgramStepOutcome global::CardGame.Core.IConvertingGiftProgramHost.DrawToHandCount(ProgramSkillFrame f, int seat, int limit, SkillProgramNumberExpression? expression, bool capAtTargetMaxHp) => DrawProgramToHandCount(f, seat, expression == SkillProgramNumberExpression.LivingPlayerCount ? _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive) : limit, capAtTargetMaxHp);
+    SkillProgramStepOutcome IConvertingGiftProgramHost.GiveSelectedOwnedCardAndDamage(ProgramSkillFrame f, int limit) => BeginConvertingGiftDamage(f, limit);
+    SkillProgramStepOutcome IConvertingGiftProgramHost.ObserveDamageSourceHandAndGive(ProgramSkillFrame f, int limit) => BeginDamageSourceObservationGift(f, limit);
+    SkillProgramStepOutcome IConvertingGiftProgramHost.DrawToHandCount(ProgramSkillFrame f, int seat, int limit, SkillProgramNumberExpression? expression, bool capAtTargetMaxHp) => DrawProgramToHandCount(f, seat, expression == SkillProgramNumberExpression.LivingPlayerCount ? _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive) : limit, capAtTargetMaxHp);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 110)]
     internal bool CanActivateConvertingGift(CharacterState owner, string skillId, ProgramInstructionFeatures features) => !features.HasOperation(SkillProgramEffectOp.GiveSelectedOwnedCardAndDamage) || _coreProgramConversionPolarityOperations.GetProgramConversionPolarity(owner.Seat, skillId) == SkillPolarity.Yang;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeAdvancedPrerequisites, 20)]
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEngineConvertingGiftsRuntime
         }
 
         var count = Math.Max(0, limit - _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count);
-        return count == 0 ? SkillProgramStepOutcome.Continue : _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, seat, count, global::CardGame.Core.EngineOwners.CoreGameEngineConvertingGiftsDefinitions.HandCountDrawReason);
+        return count == 0 ? SkillProgramStepOutcome.Continue : _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, seat, count, CoreGameEngineConvertingGiftsDefinitions.HandCountDrawReason);
     }
 
     [ProgramNativeDrawReturn(SkillProgramEffectOp.DrawToHandCount)]
@@ -39,9 +35,9 @@ internal sealed partial class CoreGameEngineConvertingGiftsRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var instruction = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Instructions[frame.InstructionIndex - 1];
         var recipient = instruction.Target == SkillProgramEffectTarget.Owner ? frame.OwnerSeat : frame.SelectedTargetSeats.Count == 1 ? frame.SelectedTargetSeats[0] : -1;
-        if (frame.NativeDraw is not null || instruction.Op != SkillProgramEffectOp.DrawToHandCount || recipient != outcome.RecipientSeat || outcome.RequestedCount is < 1 or > 16 || outcome.SequenceBefore > outcome.SequenceAfter || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.ActualDrawIds.Count > outcome.RequestedCount || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > outcome.SequenceBefore && move.Sequence <= outcome.SequenceAfter && move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(recipient) && move.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineConvertingGiftsDefinitions.HandCountDrawReason).OrderBy(move => move.Sequence).Select(move => move.CardId).SequenceEqual(outcome.ActualDrawIds))
+        if (frame.NativeDraw is not null || instruction.Op != SkillProgramEffectOp.DrawToHandCount || recipient != outcome.RecipientSeat || outcome.RequestedCount is < 1 or > 16 || outcome.SequenceBefore > outcome.SequenceAfter || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.ActualDrawIds.Count > outcome.RequestedCount || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > outcome.SequenceBefore && move.Sequence <= outcome.SequenceAfter && move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(recipient) && move.Reason == CoreGameEngineConvertingGiftsDefinitions.HandCountDrawReason).OrderBy(move => move.Sequence).Select(move => move.CardId).SequenceEqual(outcome.ActualDrawIds))
             throw new InvalidOperationException("A hand-count refill lost its original recipient or native draw-material return.");
-        _coreProgramLifecycleOperations.CompleteProgramDrawCards(frame.Id, recipient, null, SkillProgramCardSetVisibility.Private, global::CardGame.Core.EngineOwners.CoreGameEngineConvertingGiftsDefinitions.HandCountDrawReason, 0, outcome.ActualDrawIds);
+        _coreProgramLifecycleOperations.CompleteProgramDrawCards(frame.Id, recipient, null, SkillProgramCardSetVisibility.Private, CoreGameEngineConvertingGiftsDefinitions.HandCountDrawReason, 0, outcome.ActualDrawIds);
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
@@ -81,7 +77,7 @@ internal sealed partial class CoreGameEngineConvertingGiftsRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ConvertingGift = f.ConvertingGift!with { GiftCardId = cardId, GiftOrdinal = ordinal } });
         if (draft.Observe && ordinal is { } moved)
         {
-            var obligation = new GiftHandRetentionObligation(++_coreGameEngineConvertingGiftsGiftHandRetentionObligationsGiftHandRetentionSequenceAccess._giftHandRetentionSequence, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, draft.RecipientSeat, cardId, moved, draft.HandLimit);
+            var obligation = new GiftHandRetentionObligation(++_coreGameEngineConvertingGiftsGiftHandRetentionObligationsGiftHandRetentionSequenceAccess._giftHandRetentionSequence, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, draft.RecipientSeat, cardId, moved, draft.HandLimit);
             _coreGameEngineConvertingGiftsGiftHandRetentionObligationsGiftHandRetentionSequenceAccess._giftHandRetentionObligations.Add(obligation);
             AppendGiftRetentionToActiveEnding(obligation);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GiftHandRetentionScheduledEvent(obligation));
@@ -301,7 +297,7 @@ internal sealed partial class CoreGameEngineConvertingGiftsRuntime
         _coreRuntimeOperations.ReplaceRuntimeFrame(program.Id, program with { ConvertingGift = d with { ExactDamageDeath = true } });
     }
 
-    internal static TurnEndingBoundaryItem CreateGiftRetentionEndingItem(GiftHandRetentionObligation due) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ConvertingGifts.CreateGiftRetentionEndingItem(due);
+    internal static TurnEndingBoundaryItem CreateGiftRetentionEndingItem(GiftHandRetentionObligation due) => RuntimeSkills.RuntimeRules_Core_ConvertingGifts.CreateGiftRetentionEndingItem(due);
     internal void AppendGiftRetentionEndingItems(List<TurnEndingBoundaryItem> items)
     {
         foreach (var due in _coreGameEngineConvertingGiftsGiftHandRetentionObligationsGiftHandRetentionSequenceAccess._giftHandRetentionObligations.Where(d => d.CreatedTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber).OrderBy(d => d.Id))

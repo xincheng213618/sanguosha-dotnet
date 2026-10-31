@@ -1,15 +1,7 @@
 #nullable enable
-using AcquisitionNode = CardGame.Core.ProgramStageNode<CardGame.Core.ProgramSeatAcquisitionCall, CardGame.Core.ProgramSeatAcquisitionReceipt, CardGame.Core.ProgramSeatAcquisitionStage>;
-using AttackReceipt = CardGame.Core.GameEngine.AttackCompletionReceipt;
+
 using CardGame.Core.Campaigns;
-using System.Collections.Frozen;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.ExceptionServices;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 [ProgramPassiveFactRequirements("mou-ol:yangwei", ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.ActualDiscardRecoveryPhase)]
@@ -17,13 +9,13 @@ public sealed partial class GameEngine
 {
 
     /// <summary>Trusted rule diagnostics, not a player projection. Returned nested collections are frozen.</summary>
-    public IReadOnlyList<ProgramEndingHandCountHistory> GetProgramEndingHandCountHistoryDiagnostics() => GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreEndingHandCountProgramsRuntime>().GetProgramEndingHandCountHistoryDiagnostics();
+    public IReadOnlyList<ProgramEndingHandCountHistory> GetProgramEndingHandCountHistoryDiagnostics() => GetRuntimeModule<EngineOwners.CoreEndingHandCountProgramsRuntime>().GetProgramEndingHandCountHistoryDiagnostics();
     private IModeBattleRulesHost CreateActivityBattleRulesHost() => this.ComposeNativeActivityBattleRulesHost();
     private IWenheRuleFlowHost CreateWenheRuleFlowHost() => this.ComposeNativeWenheRuleFlowHost();
     private IGuanduEventFlowHost CreateGuanduEventFlowHost() => this.ComposeNativeGuanduEventFlowHost();
 
     /// <summary>Returns immutable rule metadata for a published conversion source in this match's mode.</summary>
-    public SkillProgramViewAs? GetCardConversionDefinition(CardConversionSource source) => GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreGameEngineActivityOrdinaryTricksRuntime>().GetCardConversionDefinition(source);
+    public SkillProgramViewAs? GetCardConversionDefinition(CardConversionSource source) => GetRuntimeModule<EngineOwners.CoreGameEngineActivityOrdinaryTricksRuntime>().GetCardConversionDefinition(source);
 
     // Interim native alias to CardMovementBatchStore's original suppression stack.
     private readonly Stack<long> _suppressedCardMovedEventBatchIds;
@@ -38,24 +30,24 @@ public sealed partial class GameEngine
     /// An internal rules failure may have changed mutable state before it threw.
     /// A faulted session must be reconstructed from a trusted command prefix.
     /// </summary>
-    public bool IsFaulted =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreCommandSessionQueriesRuntime>().IsFaulted;
+    public bool IsFaulted =>GetRuntimeModule<EngineOwners.CoreCommandSessionQueriesRuntime>().IsFaulted;
 
     /// <summary>
     /// The last complete command prefix captured before a failing operation,
     /// when this session was driven entirely through Submit.
     /// </summary>
-    public GameCheckpoint? LastTrustedCheckpoint =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreCommandSessionQueriesRuntime>().LastTrustedCheckpoint;
+    public GameCheckpoint? LastTrustedCheckpoint =>GetRuntimeModule<EngineOwners.CoreCommandSessionQueriesRuntime>().LastTrustedCheckpoint;
 
     private void EnsureSessionHealthy() => _commandSession.EnsureHealthy();
     /// <summary>Builds both UI queries together without enumerating legal actions twice.</summary>
     public HumanActionView GetHumanActionView()
-=>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreGameEngineHandGuidanceRuntime>().GetHumanActionView();
+=>GetRuntimeModule<EngineOwners.CoreGameEngineHandGuidanceRuntime>().GetHumanActionView();
 
     /// <summary>
     /// Explains the current human hand. Legal actions remain authoritative;
     /// this query does not advance a frame, consume randomness or publish events.
     /// </summary>
-    public IReadOnlyList<HandCardGuidance> GetHumanHandGuidance() =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreHandCardGuidanceProjectionRuntime>().GetHumanHandGuidance();
+    public IReadOnlyList<HandCardGuidance> GetHumanHandGuidance() =>GetRuntimeModule<EngineOwners.CoreHandCardGuidanceProjectionRuntime>().GetHumanHandGuidance();
     private IHellEncounterHost CreateHellEncounterHost() => this.ComposeNativeHellEncounterHost();
     // A match-local immutable service cache, never a second allegiance or pending-state store.
     private IMatchModeAllegiancePolicy? _allegiancePolicy;
@@ -92,10 +84,10 @@ public sealed partial class GameEngine
 
     /// <summary>Only the acting seat receives its legal actions; this query never advances the match.</summary>
     public IReadOnlyList<LegalAction> GetLegalActions(int actorSeat)
-=>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreNativeLegalActionsRuntime>().GetLegalActions(actorSeat);
+=>GetRuntimeModule<EngineOwners.CoreNativeLegalActionsRuntime>().GetLegalActions(actorSeat);
     private INianChallengeHost CreateNianChallengeHost() => this.ComposeNativeNianChallengeHost();
-    public bool IsNianClockRunning =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreNianModeProjectionRuntime>().IsNianClockRunning;
-    public int? NianRemainingMilliseconds =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreNianModeProjectionRuntime>().NianRemainingMilliseconds;
+    public bool IsNianClockRunning =>GetRuntimeModule<EngineOwners.CoreNianModeProjectionRuntime>().IsNianClockRunning;
+    public int? NianRemainingMilliseconds =>GetRuntimeModule<EngineOwners.CoreNianModeProjectionRuntime>().NianRemainingMilliseconds;
     private ObserverDispatcher? _observers;
     private ObserverDispatcher Observers =>
         _observers ??= new(_pendingNotifications, _observerFailures, this.ComposeNativeObserverSource());
@@ -121,7 +113,7 @@ public sealed partial class GameEngine
             _movementTail = entries.Where(item => item.Kind == ProgramContinuationKind.MovementTail).ToArray();
         }
 
-        internal static global::CardGame.Core.GameEngine.ProgramContinuationCatalog Discover(IEnumerable<MethodInfo> methods)
+        internal static ProgramContinuationCatalog Discover(IEnumerable<MethodInfo> methods)
         {
             var entries = new List<Registration>();
             foreach (var method in methods)
@@ -184,14 +176,14 @@ public sealed partial class GameEngine
     private ProgramInteractionRouter ProgramInteractions => _programInteractions ??= new(ProgramInteractionCatalog.Default, BindRuntimeHandler, this.ProgramLifecycleEntries.ResolveProgramActivationChoice, _modeRuntime.PromptAnswers);
     private ProgramSelectionValidationRegistry? _programSelectionValidators;
     private ProgramSelectionValidationRegistry ProgramSelectionValidators =>
-        _programSelectionValidators ??= new(global::CardGame.Core.EngineOwners.CoreGameEngineProgramSelectionValidationDefinitions.ProgramSelectionValidationMetadata.Value, ProgramSelectionQueries);
+        _programSelectionValidators ??= new(EngineOwners.CoreGameEngineProgramSelectionValidationDefinitions.ProgramSelectionValidationMetadata.Value, ProgramSelectionQueries);
     private ProgramTargetResolverRegistry? _programTargetResolvers;
     private ProgramTargetResolverRegistry ProgramTargetResolvers =>
-        _programTargetResolvers ??= new(global::CardGame.Core.EngineOwners.CoreGameEngineProgramTargetResolversDefinitions.ProgramTargetResolverMetadata.Value, ProgramSelectionQueries);
+        _programTargetResolvers ??= new(EngineOwners.CoreGameEngineProgramTargetResolversDefinitions.ProgramTargetResolverMetadata.Value, ProgramSelectionQueries);
 
     /// <summary>Pure estimate of the viewer's proposed card and visible table; never issues an attempt or consumes usage.</summary>
     public PublicDamagePrediction PredictPublicActionDamage(int viewerSeat, LegalAction action, int targetSeat)
-=>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreGameEnginePublicDamagePredictionRuntime>().PredictPublicActionDamage(viewerSeat, action, targetSeat);
+=>GetRuntimeModule<EngineOwners.CoreGameEnginePublicDamagePredictionRuntime>().PredictPublicActionDamage(viewerSeat, action, targetSeat);
     private readonly ProgramRuleObservers _programRuleObservers;
     private RuleProgressionRuntime RuleProgression => _ruleProgression ??= new(_programRuleObservers, this.ComposeNativeRuleProgressionOperations());
 
@@ -201,59 +193,59 @@ public sealed partial class GameEngine
     private void AdvanceToHumanBoundary() => _matchExecutionLoop.AdvanceToHumanBoundary();
     private ShanheCampaignSession? _shanheMarket;
     public bool HasPendingShanheMarketPurchase
-{        get =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreShanheMarketProjectionRuntime>().HasPendingShanheMarketPurchase;}
+{        get =>GetRuntimeModule<EngineOwners.CoreShanheMarketProjectionRuntime>().HasPendingShanheMarketPurchase;}
 
     /// <summary>The expedition trader belongs to its human owner; it contains no enemy private state.</summary>
     public ShanheCampaignSnapshot? CreateShanheMarketSnapshot(int viewerSeat)
-=>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreShanheMarketProjectionRuntime>().CreateShanheMarketSnapshot(viewerSeat);
+=>GetRuntimeModule<EngineOwners.CoreShanheMarketProjectionRuntime>().CreateShanheMarketSnapshot(viewerSeat);
 
     /// <summary>Trusted-host result, imported by the campaign only after its battle journal was verified.</summary>
     public ShanheBattleMarketTransfer? CreateShanheMarketTransfer()
-=>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreShanheMarketProjectionRuntime>().CreateShanheMarketTransfer();
+=>GetRuntimeModule<EngineOwners.CoreShanheMarketProjectionRuntime>().CreateShanheMarketTransfer();
     private ProgramLegalityRouter? _programLegality;
-    private ProgramLegalityRouter ProgramLegality => _programLegality ??= new(global::CardGame.Core.EngineOwners.CoreGameEngineSkillProgramsDefinitions.ProgramLegalityMetadata.Value, this, ResolveRuntimeHandlerTarget);
+    private ProgramLegalityRouter ProgramLegality => _programLegality ??= new(EngineOwners.CoreGameEngineSkillProgramsDefinitions.ProgramLegalityMetadata.Value, this, ResolveRuntimeHandlerTarget);
     private IStandardBattleHost CreateStandardBattleHost()
     {
         if (_options.ShanheBattle is not null && _contentRegistry.Skills.TryGetValue(ShanheSourceDongdangRules.SkillId, out var definition))
             ShanheSourceDongdangRules.ValidateDefinition(definition);
         return this.ComposeNativeStandardBattleHost();
     }
-    public bool IsWushuangMode =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreWushuangModeProjectionRuntime>().IsWushuangMode;
-    public bool IsWushuangClockRunning =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreWushuangModeProjectionRuntime>().IsWushuangClockRunning;
-    public int? WushuangRemainingMilliseconds =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreWushuangModeProjectionRuntime>().WushuangRemainingMilliseconds;
-    public WushuangSnapshot? CreateWushuangSnapshot(int viewerSeat) =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreWushuangModeProjectionRuntime>().CreateWushuangSnapshot(viewerSeat);
+    public bool IsWushuangMode =>GetRuntimeModule<EngineOwners.CoreWushuangModeProjectionRuntime>().IsWushuangMode;
+    public bool IsWushuangClockRunning =>GetRuntimeModule<EngineOwners.CoreWushuangModeProjectionRuntime>().IsWushuangClockRunning;
+    public int? WushuangRemainingMilliseconds =>GetRuntimeModule<EngineOwners.CoreWushuangModeProjectionRuntime>().WushuangRemainingMilliseconds;
+    public WushuangSnapshot? CreateWushuangSnapshot(int viewerSeat) =>GetRuntimeModule<EngineOwners.CoreWushuangModeProjectionRuntime>().CreateWushuangSnapshot(viewerSeat);
     private ProgramActionRouter? _programActions;
-    private ProgramActionRouter ProgramActions => _programActions ??= new(global::CardGame.Core.EngineOwners.CoreProgramActionModulesDefinitions.ProgramActionMetadata.Value,
+    private ProgramActionRouter ProgramActions => _programActions ??= new(EngineOwners.CoreProgramActionModulesDefinitions.ProgramActionMetadata.Value,
         BindRuntimeHandler);
     // Legacy nested adapters and explicit independent modules share one contract
     // directory; independent hook/capability entry points share one match instance.
     private ProgramCapabilityRegistry? _programCapabilities;
     private ProgramCapabilityRegistry ProgramCapabilities =>_programCapabilities ??= MatchRuntime.Capabilities;
     private ProgramCardLegality? _cardLegality;
-    private ProgramCardLegality CardLegality => _cardLegality ??= new(global::CardGame.Core.EngineOwners.CoreProgramCardLegalityDefinitions.CardLegalityMetadata.Value,
+    private ProgramCardLegality CardLegality => _cardLegality ??= new(EngineOwners.CoreProgramCardLegalityDefinitions.CardLegalityMetadata.Value,
         BindRuntimeHandler);
     private ProgramCardUsePayments? _cardUsePayments;
-    private ProgramCardUsePayments CardUsePayments => _cardUsePayments ??= new(global::CardGame.Core.EngineOwners.CoreProgramCardUsePaymentsDefinitions.CardUsePaymentMetadata.Value,
+    private ProgramCardUsePayments CardUsePayments => _cardUsePayments ??= new(EngineOwners.CoreProgramCardUsePaymentsDefinitions.CardUsePaymentMetadata.Value,
         row => BindRuntimeHandler(row.Method, row.DelegateType));
     private ProgramDamageHooks? _damageHooks;
-    private ProgramDamageHooks DamageHooks => _damageHooks ??= new(global::CardGame.Core.EngineOwners.CoreProgramDamageHooksDefinitions.DamageHookMetadata.Value, row => BindRuntimeHandler(row.Method, row.DelegateType), _modeRuntime.DamageRules, attack => this.ProgramDamageHooksEntries.CaptureModeDamageFacts((global::CardGame.Core.GameEngine.IDamageAttempt)attack));
+    private ProgramDamageHooks DamageHooks => _damageHooks ??= new(EngineOwners.CoreProgramDamageHooksDefinitions.DamageHookMetadata.Value, row => BindRuntimeHandler(row.Method, row.DelegateType), _modeRuntime.DamageRules, attack => this.ProgramDamageHooksEntries.CaptureModeDamageFacts((IDamageAttempt)attack));
     private ProgramDistanceRules? _distanceRules;
-    private ProgramDistanceRules DistanceRules => _distanceRules ??= new(global::CardGame.Core.EngineOwners.CoreProgramDistanceRulesDefinitions.DistanceRuleMetadata.Value,
+    private ProgramDistanceRules DistanceRules => _distanceRules ??= new(EngineOwners.CoreProgramDistanceRulesDefinitions.DistanceRuleMetadata.Value,
         BindRuntimeHandler);
     private ProgramNativeReturns? _nativeReturns;
-    private ProgramNativeReturns NativeReturns => _nativeReturns ??= new(global::CardGame.Core.EngineOwners.CoreProgramNativeReturnsDefinitions.NativeReturnMetadata.Value,
+    private ProgramNativeReturns NativeReturns => _nativeReturns ??= new(EngineOwners.CoreProgramNativeReturnsDefinitions.NativeReturnMetadata.Value,
         BindRuntimeHandler);
     private ProgramPhaseUsedProjections? _phaseUsedProjections;
-    private ProgramPhaseUsedProjections PhaseUsedProjections => _phaseUsedProjections ??= new(global::CardGame.Core.EngineOwners.CoreProgramPhaseUsedProjectionsDefinitions.PhaseUsedProjectionMetadata.Value,
+    private ProgramPhaseUsedProjections PhaseUsedProjections => _phaseUsedProjections ??= new(EngineOwners.CoreProgramPhaseUsedProjectionsDefinitions.PhaseUsedProjectionMetadata.Value,
         method => (Func<int, string, int, int>)BindRuntimeHandler(method, typeof(Func<int, string, int, int>)));
     private ProgramRuntimeHooks? _runtimeHooks;
-    private ProgramRuntimeHooks RuntimeHooks => _runtimeHooks ??= new(global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksDefinitions.RuntimeHookMetadata.Value,
+    private ProgramRuntimeHooks RuntimeHooks => _runtimeHooks ??= new(EngineOwners.CoreProgramRuntimeHooksDefinitions.RuntimeHookMetadata.Value,
         BindRuntimeHandler, _modeRuntime.RuntimeHooks);
 internal static IReadOnlyList<MethodInfo> RuntimeModuleMethods => ProgramRuntimeModuleCatalog.Default.Methods;
     private MatchRuntime? _matchRuntime;
     private MatchRuntime MatchRuntime => _matchRuntime ??= new(ProgramRuntimeModuleCatalog.Default,
-        ProgramCapabilityCatalog.Default, new global::CardGame.Core.GameEngine.MatchRuntimeAdapterFactory(this),
-        global::System.Linq.Enumerable.ToArray(global::System.Linq.Enumerable.Concat(new MatchCoreCapabilityProvider(_cardZones, ProgramHistory, _cardMovementBatches, _contentRegistry,
+        ProgramCapabilityCatalog.Default, new MatchRuntimeAdapterFactory(this),
+        Enumerable.ToArray(Enumerable.Concat(new MatchCoreCapabilityProvider(_cardZones, ProgramHistory, _cardMovementBatches, _contentRegistry,
             _players, _cardMovements, _cardSnapshotCache, turnEffects: _turnCardUseEffects, random: _random,
             skillObservations: _skillGrantRevisions).Bindings, __GeneratedActualStateOwnerBindings())),
         resolutionScheduler: _resolutionScheduler);
@@ -268,19 +260,19 @@ internal sealed class MatchRuntimeAdapterFactory(GameEngine engine) : IMatchRunt
         public object CoreHandlerTarget(MethodInfo method) => engine;
     }
     private ProgramSelectionRegistry? _programSelections;
-    private ProgramSelectionRegistry ProgramSelections => _programSelections ??= new(global::CardGame.Core.EngineOwners.CoreProgramSelectionModulesDefinitions.ProgramSelectionMetadata.Value, ProgramSelectionQueries);
+    private ProgramSelectionRegistry ProgramSelections => _programSelections ??= new(EngineOwners.CoreProgramSelectionModulesDefinitions.ProgramSelectionMetadata.Value, ProgramSelectionQueries);
     private IProgramSelectionQueries? _programSelectionQueries;
     private IProgramSelectionQueries ProgramSelectionQueries => _programSelectionQueries ??= this.ComposeNativeSelectionQueries();
     private ProgramTargetRules? _targetRules;
-    private ProgramTargetRules TargetRules => _targetRules ??= new(global::CardGame.Core.EngineOwners.CoreProgramTargetRulesDefinitions.TargetRuleMetadata.Value,
+    private ProgramTargetRules TargetRules => _targetRules ??= new(EngineOwners.CoreProgramTargetRulesDefinitions.TargetRuleMetadata.Value,
         BindRuntimeHandler);
     private ProgramTargetWindowProtocols? _targetWindowProtocols;
-    private ProgramTargetWindowProtocols TargetWindowProtocols => _targetWindowProtocols ??= new(global::CardGame.Core.EngineOwners.CoreProgramTargetWindowProtocolsDefinitions.TargetWindowMetadata.Value,
+    private ProgramTargetWindowProtocols TargetWindowProtocols => _targetWindowProtocols ??= new(EngineOwners.CoreProgramTargetWindowProtocolsDefinitions.TargetWindowMetadata.Value,
         BindRuntimeHandler);
     private ProgramViewContributors? _viewContributors;
-    private ProgramViewContributors ViewContributors => _viewContributors ??= new(global::CardGame.Core.EngineOwners.CoreProgramViewContributorsDefinitions.ViewContributionMetadata.Value,
+    private ProgramViewContributors ViewContributors => _viewContributors ??= new(EngineOwners.CoreProgramViewContributorsDefinitions.ViewContributionMetadata.Value,
         row => BindRuntimeHandler(row.Method, row.DelegateType));
     private IPendingGameEventOutput? _pendingGameEventOutput;
     private IPendingGameEventOutput PendingEventOutput => _pendingGameEventOutput ??= new PendingGameEventOutput(() => _started, payload => this.PublicPlayedCardsEntries.CapturePublicPlayedCard(payload), payload => this.ProgramEventHistoryEntries.AppendPendingProgramEvent(payload), () => _pendingEvents[^1], () => checked(_eventSequence + _pendingEvents.Count), (payload, sequence) => this.SimaYiMouEntries.CaptureMouSmSecretFact(payload, sequence));
-    public bool IsMoLuBuOpeningPhase =>GetRuntimeModule<global::CardGame.Core.EngineOwners.CharacterLuBuOlMagicRuntime>().IsMoLuBuOpeningPhase;
+    public bool IsMoLuBuOpeningPhase =>GetRuntimeModule<EngineOwners.CharacterLuBuOlMagicRuntime>().IsMoLuBuOpeningPhase;
 }

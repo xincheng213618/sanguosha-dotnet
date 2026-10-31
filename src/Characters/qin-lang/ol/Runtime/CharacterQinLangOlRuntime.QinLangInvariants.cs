@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQinLangOlRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CharacterQinLangOlRuntime
         var ending = r.Grants.Count > 0;
         if (ending)
         {
-            if (f.TriggerId is not ("turn-end-own" or "turn-end-foreign") || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded } context || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } parent || !_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent) || parent.AfterTurnEnded?.CurrentChild?.FrameId != f.Id || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(parent)) || context.SourceSeat != parent.OwnerSeat || context.TargetSeat != parent.OwnerSeat || context.Facts != parent.AfterTurnEnded.Items[parent.AfterTurnEnded.ItemIndex].Facts || r.Grants.Select(g => g.FrameId).Distinct().Count() != r.Grants.Count || r.Grants.Any(g => !SameQinLangSource(g.Source, r.Source) || g.ActualTurn != r.ActualTurn || g.TurnOwner != r.TurnOwner || g.GameplayHash != r.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<QinLangXianyingGrantedEvent>().Count(e => e == g) != 1) || r.Stage is not (QinLangXianyingStage.EndChoice or QinLangXianyingStage.NativeUse or QinLangXianyingStage.NativeChildren))
+            if (f.TriggerId is not ("turn-end-own" or "turn-end-foreign") || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded } context || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } parent || !_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent) || parent.AfterTurnEnded?.CurrentChild?.FrameId != f.Id || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(parent)) || context.SourceSeat != parent.OwnerSeat || context.TargetSeat != parent.OwnerSeat || context.Facts != parent.AfterTurnEnded.Items[parent.AfterTurnEnded.ItemIndex].Facts || r.Grants.Select(g => g.FrameId).Distinct().Count() != r.Grants.Count || r.Grants.Any(g => !SameQinLangSource(g.Source, r.Source) || g.ActualTurn != r.ActualTurn || g.TurnOwner != r.TurnOwner || g.GameplayHash != r.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<QinLangXianyingGrantedEvent>().Count(e => e == g) != 1) || r.Stage is not (QinLangXianyingStage.EndChoice or QinLangXianyingStage.NativeUse or QinLangXianyingStage.NativeChildren))
                 return false;
         }
         else

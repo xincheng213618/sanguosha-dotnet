@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoJiaHappyGodRuntime
 {
     internal const string HappyGjHuishi = "happy:huishi", HappyGjTianyi = "happy:tianyi", HappyGjGift = "happy:huishi-gift", HappyGjZuoxing = "happy:zuoxing";
-    SkillProgramStepOutcome global::CardGame.Core.IHappyGuoJiaHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyGuoJia(f, op);
-    internal CardConversionSource HappyGjSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IHappyGuoJiaHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyGuoJia(f, op);
+    internal CardConversionSource HappyGjSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 40900, SkillProgramEffectOp.ResolveHappyGuoJiaHuishi)]
     internal bool CanHappyGjHuishi(CharacterState owner) => owner.HasHpValue && owner.MaxHp < 10;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 40901, SkillProgramEffectOp.ResolveHappyGuoJiaHuishiGrant)]
@@ -121,7 +118,7 @@ internal sealed partial class CharacterGuoJiaHappyGodRuntime
     [ProgramAnswer("happy-guo-jia")]
     internal void AnswerHappyGuoJia(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyGuoJia: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ValidHappyGj(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], HappyGjChoices(f).Where(x => x.Id == c.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyGuoJia: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ValidHappyGj(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], HappyGjChoices(f).Where(x => x.Id == c.Id).ToArray()))
             throw new InvalidOperationException("Happy Guo Jia requires its exact current owner menu.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = c.Parameters["branch"];

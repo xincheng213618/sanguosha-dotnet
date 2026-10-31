@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouShiMouMobileRuntime
 {
     internal const string MouXiahouShiDiscardReason = "skill-program.mou-mobile:yanyu.discard", MouXiahouShiDrawReason = "skill-program.mou-mobile:yanyu.Draw", MouXiahouShiSupportDrawReason = "skill-program.mou-mobile:yanyu.support.Draw", MouXiahouShiQiaoshiDrawReason = "skill-program.mou-mobile:qiaoshi.Draw";
-    internal static CardConversionSource MouXiahouShiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xiahou_shi_mou_mobile_MouXiahouShiYanyu.MouXiahouShiSource(f);
-    internal static bool MouXiahouShiSlash(CardKind k) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xiahou_shi_mou_mobile_MouXiahouShiYanyu.MouXiahouShiSlash(k);
+    internal static CardConversionSource MouXiahouShiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_xiahou_shi_mou_mobile_MouXiahouShiYanyu.MouXiahouShiSource(f);
+    internal static bool MouXiahouShiSlash(CardKind k) => RuntimeSkills.RuntimeRules_xiahou_shi_mou_mobile_MouXiahouShiYanyu.MouXiahouShiSlash(k);
     internal int MouXiahouShiPhaseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouShiYanyuStartedEvent>().Count(e => !e.Support && e.Source.OwnerSeat == owner && e.Source.SkillId == MouXiahouShiComposition.Yanyu && e.Phase == phase);
     internal int MouXiahouShiTurnDiscards(int owner, MouXiahouShiTurnKey turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouShiYanyuDiscardPaidEvent>().Count(e => e.Source.OwnerSeat == owner && e.Source.SkillId == MouXiahouShiComposition.Yanyu && e.Turn == turn && ValidMouXiahouShiPaidHistory(e));
     [ProgramPhaseUsedProjection(40)]
@@ -75,7 +72,7 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouXiahouShiYanyu!;
-        if (!ValidMouXiahouShiYanyu(f) || !r.Support || r.Stage != MouXiahouShiYanyuStage.TargetChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXiahouShiSupportChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidMouXiahouShiYanyu(f) || !r.Support || r.Stage != MouXiahouShiYanyuStage.TargetChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXiahouShiSupportChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Yanyu support accepts only its exact living other target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var seat = selected.Targets.Single();
@@ -126,7 +123,7 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouXiahouShiYanyuSupport)]
     internal PromptChoice AiMouXiahouShiSupport(PendingDecision pending, ProgramSkillFrame f) => pending.Choices.OrderByDescending(c => _coreAiBrainsAiBrainsAccess._aiBrains[pending.PlayerSeat].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(pending.PlayerSeat), c.Targets.Single(), new(OwnerDraw: 0, OwnerRecovery: 0, OwnerHpLoss: 0, TargetDraw: checked(f.MouXiahouShiYanyu!.FrozenDiscardCount * 3), TargetRecovery: 0, TargetHpLoss: 0, GivesSelected: false, DiscardsSelected: false))).ThenBy(c => c.Targets.Single()).First();
-    SkillProgramStepOutcome global::CardGame.Core.IMouXiahouShiHost.Discard(ProgramSkillFrame f) => BeginMouXiahouShiDiscard(f);
-    SkillProgramStepOutcome global::CardGame.Core.IMouXiahouShiHost.Support(ProgramSkillFrame f) => BeginMouXiahouShiSupport(f);
-    SkillProgramStepOutcome global::CardGame.Core.IMouXiahouShiHost.Qiaoshi(ProgramSkillFrame f) => BeginMouXiahouShiQiaoshi(f);
+    SkillProgramStepOutcome IMouXiahouShiHost.Discard(ProgramSkillFrame f) => BeginMouXiahouShiDiscard(f);
+    SkillProgramStepOutcome IMouXiahouShiHost.Support(ProgramSkillFrame f) => BeginMouXiahouShiSupport(f);
+    SkillProgramStepOutcome IMouXiahouShiHost.Qiaoshi(ProgramSkillFrame f) => BeginMouXiahouShiQiaoshi(f);
 }

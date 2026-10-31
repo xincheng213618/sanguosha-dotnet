@@ -1,24 +1,20 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuLiAnniversaryRuntime
 {
     internal const string LiuLiDiscardReason = "skill-program.anniversary:fuli.discard", LiuLiDrawReason = "skill-program.anniversary:fuli.draw";
-    internal CardConversionSource LiuLiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryLiuLiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginLiuLi(f, op);
-    internal static int LiuLiNameLength(Card c) => (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) ? "杀" : c.DisplayName).EnumerateRunes().Count();
+    internal CardConversionSource LiuLiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryLiuLiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginLiuLi(f, op);
+    internal static int LiuLiNameLength(Card c) => (CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) ? "杀" : c.DisplayName).EnumerateRunes().Count();
     internal Card[][] LiuLiCategories(int seat) => new[]
     {
         SkillProgramCardCategory.Basic,
         SkillProgramCardCategory.Trick,
         SkillProgramCardCategory.Equipment
-    }.Select(category => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == category).ToArray()).ToArray();
+    }.Select(category => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Where(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == category).ToArray()).ToArray();
     internal bool LiuLiCanDiscard(int seat, IReadOnlyList<Card> cards) => cards.Count > 0 && cards.All(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, CardLocation.Hand(seat), OwnedCardMoveIntent.Discard));
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 43300, SkillProgramEffectOp.ResolveAnniversaryLiuLiFuli)]
     internal bool CanStartLiuLiFuli(CharacterState owner) => LiuLiCategories(owner.Seat).Any(cards => LiuLiCanDiscard(owner.Seat, cards));
@@ -100,7 +96,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     [ProgramAnswer("anniversary-liu-li")]
     internal void AnswerLiuLi(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryLiuLi: { } r } f || !ValidLiuLi(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !LiuLiChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryLiuLi: { } r } f || !ValidLiuLi(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !LiuLiChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
             throw new InvalidOperationException("Liu Li rejects a stale category, native use plan or range recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -112,7 +108,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
             if (!LiuLiCanDiscard(f.OwnerSeat, cards) || !cards.Select(card => card.Id).SequenceEqual(c.Cards))
                 throw new InvalidOperationException("Fuli must pay the complete live category of discardable Hand cards.");
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryLiuLi = r with { Stage = AnniversaryLiuLiStage.CostChildren, Category = category, Cards = cards.Select(card => card.Id).ToArray(), NameSum = cards.Sum(LiuLiNameLength), DamageDiscarded = cards.Any(card => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(card.Kind)), Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryLiuLi = r with { Stage = AnniversaryLiuLiStage.CostChildren, Category = category, Cards = cards.Select(card => card.Id).ToArray(), NameSum = cards.Sum(LiuLiNameLength), DamageDiscarded = cards.Any(card => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(card.Kind)), Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiDiscardPaidEvent(f.Id, category, f.AnniversaryLiuLi.Cards.Count, f.AnniversaryLiuLi.NameSum, f.AnniversaryLiuLi.DamageDiscarded, before, before));
             _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, f.AnniversaryLiuLi.Cards, new(LiuLiDiscardReason), (_, _) =>
             {
@@ -152,7 +148,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
             return true;
         }
 
-        if (r.Stage == AnniversaryLiuLiStage.NativeUse && f.VirtualBasicDraft is null && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Plan!.Kind))
+        if (r.Stage == AnniversaryLiuLiStage.NativeUse && f.VirtualBasicDraft is null && CoreNativeCardClassificationsRuntime.IsSlashCard(r.Plan!.Kind))
         {
             CompleteLiuLiNative(_coreProgramLifecycleOperations.GetActiveProgramFrame(id));
             return true;

@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZouShiLeRuntime
 {
     internal bool HasLeZouShiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeYunzhengInitialEntities) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveHuoxinNonEquipmentUse);
 
-    internal static CardConversionSource YunzhengSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zou_shi_le_LeZouShiYunzheng.YunzhengSource(frame);
+    internal static CardConversionSource YunzhengSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_zou_shi_le_LeZouShiYunzheng.YunzhengSource(frame);
     // The physical mark outlives its original holder, zone and granting instance.
     // Registration only; the query still belongs to legacy GameEngine.LeZouShiYunzheng.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 130)]
@@ -46,11 +42,11 @@ internal sealed partial class CharacterZouShiLeRuntime
         var inputs = (inner, (long)_coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, initial, shown);
         var changed = inputs != _characterZouShiLeYunzhengQualificationInputsYunzhengQualificationSeatsYunzhengQualificationStampAccess._yunzhengQualificationInputs || _characterZouShiLeYunzhengQualificationInputsYunzhengQualificationSeatsYunzhengQualificationStampAccess._yunzhengQualificationSeats.Length != _coreMatchParticipantsPlayersAccess._players.Count;
         if (_characterZouShiLeYunzhengQualificationInputsYunzhengQualificationSeatsYunzhengQualificationStampAccess._yunzhengQualificationSeats.Length != _coreMatchParticipantsPlayersAccess._players.Count)
-            _characterZouShiLeYunzhengQualificationInputsYunzhengQualificationSeatsYunzhengQualificationStampAccess._yunzhengQualificationSeats = new global::CardGame.Core.GameEngine.YunzhengQualificationSeat[_coreMatchParticipantsPlayersAccess._players.Count];
+            _characterZouShiLeYunzhengQualificationInputsYunzhengQualificationSeatsYunzhengQualificationStampAccess._yunzhengQualificationSeats = new GameEngine.YunzhengQualificationSeat[_coreMatchParticipantsPlayersAccess._players.Count];
         for (var i = 0; i < _coreMatchParticipantsPlayersAccess._players.Count; i++)
         {
             var p = _coreMatchParticipantsPlayersAccess._players[i];
-            var next = new global::CardGame.Core.GameEngine.YunzhengQualificationSeat(p.SkillGrants.Revision, p.Hp, p.IsAlive, p.IdentityConcealed, p.GeneralSelected, p.GeneralRevealed, p.SecondaryGeneralSelected, p.SecondaryGeneralRevealed, p.Role);
+            var next = new GameEngine.YunzhengQualificationSeat(p.SkillGrants.Revision, p.Hp, p.IsAlive, p.IdentityConcealed, p.GeneralSelected, p.GeneralRevealed, p.SecondaryGeneralSelected, p.SecondaryGeneralRevealed, p.Role);
             if (_characterZouShiLeYunzhengQualificationInputsYunzhengQualificationSeatsYunzhengQualificationStampAccess._yunzhengQualificationSeats[i] == next)
                 continue;
             _characterZouShiLeYunzhengQualificationInputsYunzhengQualificationSeatsYunzhengQualificationStampAccess._yunzhengQualificationSeats[i] = next;
@@ -102,8 +98,8 @@ internal sealed partial class CharacterZouShiLeRuntime
         return frame.InstructionIndex == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<YunzhengInitializedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var initialized] && initialized.Source == YunzhengSource(frame) && initialized.GameplayHash == frame.GameplayHash;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeZouShiHost.InitializeYunzheng(ProgramSkillFrame frame) => InitializeYunzheng(frame);
-    SkillProgramStepOutcome global::CardGame.Core.ILeZouShiHost.ResolveHuoxin(ProgramSkillFrame frame) => BeginHuoxin(frame);
+    SkillProgramStepOutcome ILeZouShiHost.InitializeYunzheng(ProgramSkillFrame frame) => InitializeYunzheng(frame);
+    SkillProgramStepOutcome ILeZouShiHost.ResolveHuoxin(ProgramSkillFrame frame) => BeginHuoxin(frame);
     internal SkillProgramStepOutcome InitializeYunzheng(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

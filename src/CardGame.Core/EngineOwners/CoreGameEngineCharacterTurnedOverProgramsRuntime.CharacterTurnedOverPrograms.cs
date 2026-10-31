@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCharacterTurnedOverProgramsRuntime
@@ -16,10 +12,10 @@ internal sealed partial class CoreGameEngineCharacterTurnedOverProgramsRuntime
         _coreCharacterStateProgramsOperations.RecordCharacterStateChange(targetSeat, SkillProgramTriggerWindow.CharacterTurnedOver, turnedOver: new(wasFaceDown, isFaceDown));
     }
 
-    internal static bool CharacterTurnedOverFrameRidesOn(ResolutionFrame ride, ResolutionFrame beneath) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CharacterTurnedOverPrograms.CharacterTurnedOverFrameRidesOn(ride, beneath);
+    internal static bool CharacterTurnedOverFrameRidesOn(ResolutionFrame ride, ResolutionFrame beneath) => RuntimeSkills.RuntimeRules_Core_CharacterTurnedOverPrograms.CharacterTurnedOverFrameRidesOn(ride, beneath);
     internal bool CharacterTurnedOverDamageObserverRidesOn(int index)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]))
+        if (!CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]))
             return false;
         for (var parentIndex = index - 1; parentIndex >= 1; parentIndex--)
         {
@@ -27,7 +23,7 @@ internal sealed partial class CoreGameEngineCharacterTurnedOverProgramsRuntime
             var parent = _resolutionStackOperations._resolutionStack[parentIndex - 1];
             if (CharacterTurnedOverFrameRidesOn(frame, parent))
                 return true;
-            if (!_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) && !_coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(frame, parent) && !_corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(frame, parent) && !_coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(frame, parent))
+            if (!_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) && !CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) && !_coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(frame, parent) && !_corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(frame, parent) && !_coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(frame, parent))
                 return false;
         }
 

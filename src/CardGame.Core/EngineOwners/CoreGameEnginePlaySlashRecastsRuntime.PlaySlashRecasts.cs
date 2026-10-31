@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePlaySlashRecastsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IEndingPairSlashLossHost.DrawEndingPair(ProgramSkillFrame f, string state) => _coreEndingPairDrawsOperations.BeginEndingPairDraw(f, state);
-    SkillProgramStepOutcome global::CardGame.Core.IEndingPairSlashLossHost.RecastSelectedPhysicalSlash(ProgramSkillFrame f) => BeginActualPlaySlashRecast(f);
+    SkillProgramStepOutcome IEndingPairSlashLossHost.DrawEndingPair(ProgramSkillFrame f, string state) => _coreEndingPairDrawsOperations.BeginEndingPairDraw(f, state);
+    SkillProgramStepOutcome IEndingPairSlashLossHost.RecastSelectedPhysicalSlash(ProgramSkillFrame f) => BeginActualPlaySlashRecast(f);
     internal SkillProgramStepOutcome BeginActualPlaySlashRecast(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -22,7 +18,7 @@ internal sealed partial class CoreGameEnginePlaySlashRecastsRuntime
         }
 
         var card = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Single(c => c.Id == id);
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))
             throw new InvalidOperationException("The active recast requires a printed physical Slash, Fire Slash or Thunder Slash.");
         var before = _coreEndingPairDrawsOperations.EndingPairSequence;
         f = _coreNativeRecastInvocationsOperations.BeginFrameNativeRecastInvocation(f, f.OwnerSeat, [id]);
@@ -100,7 +96,7 @@ internal sealed partial class CoreGameEnginePlaySlashRecastsRuntime
 
     internal bool ValidPlaySlashRecast(ProgramSkillFrame f)
     {
-        if (f.PlaySlashRecast is not { } r || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 || f.TriggerId is not null || r.Source != _coreEndingPairDrawsOperations.EndingPairSource(f) || r.GameplayHash != f.GameplayHash || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.PhaseActorSeat != f.OwnerSeat || r.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != f.OwnerSeat || !f.SelectedCardIds.SequenceEqual([r.CardId]) || f.SelectedTargetSeats.Count != 0 || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.CardKind) || r.SequenceBefore < 0 || r.SequenceAfter <= r.SequenceBefore || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is not [{ Op: SkillProgramEffectOp.RecastSelectedPhysicalSlash }] || _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.CardId == r.CardId && m.CardKind == r.CardKind && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.RecastDiscard) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlaySlashRecastPaidEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurnNumber == r.ActualTurnNumber && e.ActualTurnOwnerSeat == r.ActualTurnOwnerSeat && e.PhaseActorSeat == r.PhaseActorSeat && e.PhaseInstanceId == r.PhaseInstanceId && e.CardId == r.CardId && e.CardKind == r.CardKind && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter) != 1)
+        if (f.PlaySlashRecast is not { } r || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 || f.TriggerId is not null || r.Source != _coreEndingPairDrawsOperations.EndingPairSource(f) || r.GameplayHash != f.GameplayHash || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.PhaseActorSeat != f.OwnerSeat || r.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != f.OwnerSeat || !f.SelectedCardIds.SequenceEqual([r.CardId]) || f.SelectedTargetSeats.Count != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(r.CardKind) || r.SequenceBefore < 0 || r.SequenceAfter <= r.SequenceBefore || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is not [{ Op: SkillProgramEffectOp.RecastSelectedPhysicalSlash }] || _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.CardId == r.CardId && m.CardKind == r.CardKind && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.RecastDiscard) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlaySlashRecastPaidEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurnNumber == r.ActualTurnNumber && e.ActualTurnOwnerSeat == r.ActualTurnOwnerSeat && e.PhaseActorSeat == r.PhaseActorSeat && e.PhaseInstanceId == r.PhaseInstanceId && e.CardId == r.CardId && e.CardKind == r.CardKind && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter) != 1)
             return false;
         if (r.AwaitingMovement && (f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat))
             return false;

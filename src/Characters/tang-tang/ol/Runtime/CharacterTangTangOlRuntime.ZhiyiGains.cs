@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTangTangOlRuntime
 {
     internal bool HasTangTangZhiyi => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZhiyiGainColorBenefit) == true;
 
-    internal static bool IsTangTangZhiyiTrigger(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_tang_tang_ol_Zhiyi_Gains.IsTangTangZhiyiTrigger(t);
+    internal static bool IsTangTangZhiyiTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_tang_tang_ol_Zhiyi_Gains.IsTangTangZhiyiTrigger(t);
     internal bool ZhiyiAvailable(int owner) => !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhiyiOpportunityPaidEvent>().Any(e => e.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
     internal IEnumerable<ProgramTriggerCandidate> CollectTangTangZhiyiCandidates(CardMovementBatchContext batch) => batch.TangTangGains is not { Count: > 0 } gains ? [] : gains.GroupBy(g => g.OwnerSeat).Where(g => _coreMatchParticipantsPlayersAccess._players[g.Key].IsAlive && ZhiyiAvailable(g.Key)).SelectMany(g => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[g.Key], SkillProgramTriggerWindow.CardsMoved).Where(c => IsTangTangZhiyiTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c))).Select(c => c with { OccurrenceIndex = TangTangGainOccurrence(batch, g) })).ToArray();
     internal ProgramSkillWindowContext CreateTangTangZhiyiContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate c) => new(SkillProgramTriggerWindow.CardsMoved, frame.Id, c.OwnerSeat, SourceSeat: c.OwnerSeat, TargetSeat: c.OwnerSeat, OccurrenceIndex: c.OccurrenceIndex, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat])with { MovedCardCount = frame.Batch.TangTangGains!.Count(g => g.OwnerSeat == c.OwnerSeat) }, MovementBatch: frame.Batch, MovementIndex: c.OccurrenceIndex);

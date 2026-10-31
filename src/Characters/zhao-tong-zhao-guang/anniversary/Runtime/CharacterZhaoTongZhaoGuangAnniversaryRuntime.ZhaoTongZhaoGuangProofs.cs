@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
             return false;
         if (f.SkillId == AnniversaryZhaoTongZhaoGuangComposition.Longyuan)
             return f.TriggerId == "three-yizan-awakening" && c.Window == SkillProgramTriggerWindow.AfterTurnEnded && _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is { } parent && _coreAfterTurnEndedProgramsOperations.MatchesAfterTurnEndedChild(parent, f, c);
-        return f.TriggerId == "own-ending-yizan-count" && c.Window == SkillProgramTriggerWindow.TurnEnding && c.SourceSeat == f.OwnerSeat && c.TargetSeat == f.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is { } ending && ending.OwnerSeat == f.OwnerSeat && ending.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && candidate.OccurrenceIndex == c.OccurrenceIndex;
+        return f.TriggerId == "own-ending-yizan-count" && c.Window == SkillProgramTriggerWindow.TurnEnding && c.SourceSeat == f.OwnerSeat && c.TargetSeat == f.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is { } ending && ending.OwnerSeat == f.OwnerSeat && ending.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && candidate.OccurrenceIndex == c.OccurrenceIndex;
     }
 
     internal bool ValidAnniversaryQingren(ProgramSkillFrame f)
@@ -32,13 +28,13 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
         if (f.AnniversaryQingren is not { } r || !ValidAnniversaryQingren(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryQingrenStage.Drawing && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f) && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == r.Count;
+            return r.Stage == AnniversaryQingrenStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f) && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == r.Count;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return r.Stage == AnniversaryQingrenStage.DrawChildren && r.Draw is { } outcome && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter);
+            return r.Stage == AnniversaryQingrenStage.DrawChildren && r.Draw is { } outcome && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter);
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
-    internal bool AnniversaryQingrenObserverSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
+    internal bool AnniversaryQingrenObserverSuffix(int root) => _coreObserverSubtreesOperations.HasObserverSuffix(root, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? AnniversaryQingrenObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.AnniversaryQingrenFirstChild(f, child), (i) => this.AnniversaryQingrenObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 44600)]
     internal bool AnniversaryQingrenDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryQingrenObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);

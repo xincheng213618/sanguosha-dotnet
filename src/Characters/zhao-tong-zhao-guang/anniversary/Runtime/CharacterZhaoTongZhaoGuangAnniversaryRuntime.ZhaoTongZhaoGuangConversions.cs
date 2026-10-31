@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
         if (source.SkillId != AnniversaryZhaoTongZhaoGuangComposition.Yizan || source.OwnerSeat != owner.Seat || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, source.SkillId, source.SkillInstanceId) || _corePlayCardHistoryOperations.ViewAsRule(source)is not { } r || ids.Count != r.InputCount || ids.Distinct().Count() != ids.Count || (r.InputCount == 1) != AnniversaryYizanModified(owner.Seat))
             return false;
         var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Where(c => ids.Contains(c.Id)).ToArray();
-        return cards.Length == ids.Count && cards.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreWenhePoisonOperations.EffectiveConversionInputKind(owner, c)) == SkillProgramCardCategory.Basic) && (r.InputCount != 1 || cards.All(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreWenhePoisonOperations.EffectiveConversionInputKind(owner, c)) == SkillProgramCardCategory.Basic));
+        return cards.Length == ids.Count && cards.Any(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreWenhePoisonOperations.EffectiveConversionInputKind(owner, c)) == SkillProgramCardCategory.Basic) && (r.InputCount != 1 || cards.All(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreWenhePoisonOperations.EffectiveConversionInputKind(owner, c)) == SkillProgramCardCategory.Basic));
     }
 
     [ProgramCardLegality(ProgramCardLegalityStage.ConfiguredConversionBan, 44600)]

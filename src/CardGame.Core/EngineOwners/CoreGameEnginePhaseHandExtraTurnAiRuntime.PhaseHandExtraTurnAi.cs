@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePhaseHandExtraTurnAiRuntime
 {
-    internal static ProgramAiPublicContext WithPhaseHandExtraTurnTargetPricing(ProgramAiPublicContext context, SkillProgram program, SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PhaseHandExtraTurnAi.WithPhaseHandExtraTurnTargetPricing(context, program, trigger);
+    internal static ProgramAiPublicContext WithPhaseHandExtraTurnTargetPricing(ProgramAiPublicContext context, SkillProgram program, SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_PhaseHandExtraTurnAi.WithPhaseHandExtraTurnTargetPricing(context, program, trigger);
     internal ProgramAiEstimate IncludePhaseHandExtraTurnDeclarationForAi(ProgramAiEstimate baseline, CharacterState owner, string skillId, string skillInstanceId, SkillProgram program, SkillProgramTrigger declaration, ProgramAiPublicContext context, ProgramSkillWindowContext windowContext)
     {
         if (windowContext.Window != SkillProgramTriggerWindow.AfterNormalDraw || windowContext.OwnerSeat != owner.Seat || owner.Seat != _coreActualTurnProgressCurrentSeatAccess._currentSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().LastOrDefault(parent => parent.Id == windowContext.ParentFrameId)is not { Window: SkillProgramTriggerWindow.AfterNormalDraw, Continuation: ProgramLifecycleContinuation.CompleteAfterNormalDraw } boundary || boundary.OwnerSeat != owner.Seat || !owner.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, skillId, skillInstanceId) || !ProgramPhaseHandExtraTurnAi.TryGetPaymentAfterDeclaration(program, declaration, out var payment))

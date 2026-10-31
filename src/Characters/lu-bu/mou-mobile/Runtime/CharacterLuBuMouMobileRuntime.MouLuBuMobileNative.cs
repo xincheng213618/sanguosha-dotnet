@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuBuMouMobileRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
             throw new InvalidOperationException("Mobile Liyu Duel lost its actual gain categories and victim's legal choice.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouLuBuLiyu = r = r with { Stage = MouLuBuLiyuStage.DuelIssued, DuelTarget = target } });
         _coreCardAttackStateOperations.UpdateCardAttackState(r.OuterUseId, s => s!with { Active = false });
-        var origin = new ProgramDamageTargetDuelOrigin(f.Id, f.InstructionIndex, MouLbOriginAnchor(f), r.OuterUseId, r.WindowId, r.DamageFrameId, r.OuterActionId, f.OwnerSeat, r.VictimSeat, target, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, r.ActualTurn);
+        var origin = new ProgramDamageTargetDuelOrigin(f.Id, f.InstructionIndex, MouLbOriginAnchor(f), r.OuterUseId, r.WindowId, r.DamageFrameId, r.OuterActionId, f.OwnerSeat, r.VictimSeat, target, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, r.ActualTurn);
         var card = new Card(0, CardKind.Duel, Suit.None, 0);
         var use = _coreNativeCardUseOperations.BeginCardUse(card, f.OwnerSeat, [target], CardKind.Duel, physicalCardIds: [], damageTargetDuelOrigin: origin);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuBuLiyuDuelIssuedEvent(f.Id, use, f.OwnerSeat, target));
@@ -28,8 +24,8 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
     }
 
     internal long MouLbOriginAnchor(ProgramSkillFrame f) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuBuLiyuObtainedEvent>().First(e => e.FrameId == f.Id).Sequence;
-    internal static bool IsMouLbDuelOrigin(ProgramDamageTargetDuelOrigin o) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_bu_mou_mobile_MouLuBuMobileNative.IsMouLbDuelOrigin(o);
-    internal bool MatchesMouLbDuelParent(ProgramSkillFrame f, ProgramDamageTargetDuelOrigin o) => IsMouLbDuelOrigin(o) && ValidMouLb(f) && f.MouLuBuLiyu is { Stage: MouLuBuLiyuStage.DuelIssued, Paid: true, CategoryMask: 7, DuelTarget: { } target } r && o.ParentProgramFrameId == f.Id && o.InstructionIndex == f.InstructionIndex && o.ReceiptSequence == MouLbOriginAnchor(f) && o.OuterCardUseFrameId == r.OuterUseId && o.DamageWindowId == r.WindowId && o.DamageFrameId == r.DamageFrameId && o.OuterActionId == r.OuterActionId && o.InitialActorSeat == f.OwnerSeat && o.VictimChooserSeat == r.VictimSeat && o.InitialTargetSeat == target && o.SkillId == f.SkillId && o.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && o.SkillInstanceId == f.SkillInstanceId && o.GameplayHash == f.GameplayHash && o.TurnNumber == r.ActualTurn && o.BaseDamage is null && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuBuLiyuBranchEvent>().Count(e => e.FrameId == f.Id && e.ChooserSeat == r.VictimSeat && e.Branch == "duel" && e.TargetSeat == target && e.CategoryMask == 7) == 1;
+    internal static bool IsMouLbDuelOrigin(ProgramDamageTargetDuelOrigin o) => RuntimeSkills.RuntimeRules_lu_bu_mou_mobile_MouLuBuMobileNative.IsMouLbDuelOrigin(o);
+    internal bool MatchesMouLbDuelParent(ProgramSkillFrame f, ProgramDamageTargetDuelOrigin o) => IsMouLbDuelOrigin(o) && ValidMouLb(f) && f.MouLuBuLiyu is { Stage: MouLuBuLiyuStage.DuelIssued, Paid: true, CategoryMask: 7, DuelTarget: { } target } r && o.ParentProgramFrameId == f.Id && o.InstructionIndex == f.InstructionIndex && o.ReceiptSequence == MouLbOriginAnchor(f) && o.OuterCardUseFrameId == r.OuterUseId && o.DamageWindowId == r.WindowId && o.DamageFrameId == r.DamageFrameId && o.OuterActionId == r.OuterActionId && o.InitialActorSeat == f.OwnerSeat && o.VictimChooserSeat == r.VictimSeat && o.InitialTargetSeat == target && o.SkillId == f.SkillId && o.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) && o.SkillInstanceId == f.SkillInstanceId && o.GameplayHash == f.GameplayHash && o.TurnNumber == r.ActualTurn && o.BaseDamage is null && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuBuLiyuBranchEvent>().Count(e => e.FrameId == f.Id && e.ChooserSeat == r.VictimSeat && e.Branch == "duel" && e.TargetSeat == target && e.CategoryMask == 7) == 1;
 
     [NativeUseReturn(229)]
     internal void ReturnMouLbNullifiedDuel(CardUseFrame use)
@@ -42,7 +38,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 99)]
-    internal bool ReturnMouLbDuelAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt c)
+    internal bool ReturnMouLbDuelAttack(GameEngine.AttackCompletionReceipt c)
     {
         if (c.DamageTargetDuelReturn is not { AttackStarted: true } o || !IsMouLbDuelOrigin(o))
             return false;

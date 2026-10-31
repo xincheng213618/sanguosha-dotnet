@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCappedConversionBenefitsRuntime
 {
-    internal static CardConversionSource CappedConversionSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CappedConversionBenefits.CappedConversionSource(f);
+    internal static CardConversionSource CappedConversionSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_CappedConversionBenefits.CappedConversionSource(f);
     internal bool ExactCappedConversionParent(ProgramSkillFrame f, out DamageTriggerWindowFrame window)
     {
         window = null !;
-        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } current || current.TriggerWindow != context.Window || current.TargetSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || context.OwnerSeat != f.OwnerSeat || context.DamageFrameId != current.ParentFrameId || current.CandidateIndex < 0 || current.CandidateIndex >= current.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, current.Candidates[current.CandidateIndex].ToProgramCandidate()))
+        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } current || current.TriggerWindow != context.Window || current.TargetSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || context.OwnerSeat != f.OwnerSeat || context.DamageFrameId != current.ParentFrameId || current.CandidateIndex < 0 || current.CandidateIndex >= current.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, current.Candidates[current.CandidateIndex].ToProgramCandidate()))
             return false;
         window = current;
         return true;
@@ -97,5 +93,5 @@ internal sealed partial class CoreGameEngineCappedConversionBenefitsRuntime
         return _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == $"skill-program.{(f.SkillId)}.capped-conversion-draw") == r.ActualDrawCount;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ICappedConversionBenefitHost.DrawBeforeCappedConversionTierUpgrade(ProgramSkillFrame f, string state) => BeginCappedConversionBenefit(f, state);
+    SkillProgramStepOutcome ICappedConversionBenefitHost.DrawBeforeCappedConversionTierUpgrade(ProgramSkillFrame f, string state) => BeginCappedConversionBenefit(f, state);
 }

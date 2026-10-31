@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXunXuAnniversaryRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     internal bool XunXuAllowance(int owner, CardKind kind)
     {
         var uses = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuUseEvent>().Where(e => e.Source.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber).ToArray();
-        if (uses.Any(e => e.Name == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind)))
+        if (uses.Any(e => e.Name == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind)))
             return false;
         return uses.Length == 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuRearmedEvent>().Any(e => e.ActionId == uses[^1].ActionId && e.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
     }
@@ -38,8 +34,8 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
         if (!XunXuAllowance(source.OwnerSeat, action.EffectiveKind))
             throw new InvalidOperationException("Boqia cannot reuse this actual-turn allowance or card name.");
         var cards = action.PhysicalCards.Select(c => _coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId)).ToArray();
-        var reward = cards.Select(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], c)).Distinct().Count() == 3 || cards.Select(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreWenhePoisonOperations.EffectiveConversionInputKind(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], c))).Distinct().Count() == 3;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXunXuUseEvent(source, action.ActionId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind), reward));
+        var reward = cards.Select(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], c)).Distinct().Count() == 3 || cards.Select(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreWenhePoisonOperations.EffectiveConversionInputKind(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], c))).Distinct().Count() == 3;
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXunXuUseEvent(source, action.ActionId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind), reward));
     }
 
     [ProgramActionSource(ProgramActionSourcePhase.Cardless, 46100)]
@@ -62,25 +58,25 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
                         SelectableCardIds = Array.AsReadOnly(ids),
                         SelectableTargetSeats = Array.AsReadOnly(plan.Targets.ToArray()),
                         TargetCardId = plan.Card,
-                        ProgramAiHint = new(0, kind == CardKind.Peach ? 1 : 0, 0, 0, 0, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0, false, false)
+                        ProgramAiHint = new(0, kind == CardKind.Peach ? 1 : 0, 0, 0, 0, CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0, false, false)
                     };
                 }
             }
     }
 
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.XunXuUsePlan> XunXuPlayPlans(CharacterState owner, ProgramMultiCardViewAsSelection s)
+    internal IReadOnlyList<GameEngine.XunXuUsePlan> XunXuPlayPlans(CharacterState owner, ProgramMultiCardViewAsSelection s)
     {
         var kind = s.OutputKind;
         var ids = s.Cards.Select(c => c.Id).ToArray();
         var suit = _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(owner, s);
         var color = _coreGuanHaiBridgesOperations.ProgramMultiCardColor(owner, s);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
-            return _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, p, kind, physicalSuit: suit, effectiveColor: color, physicalCardIds: ids, conversionSource: s.Source) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner.Seat, p.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, p.Seat, suit)).Select(p => new global::CardGame.Core.GameEngine.XunXuUsePlan(LegalActionKind.Slash, [p.Seat])).ToArray();
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            return _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, p, kind, physicalSuit: suit, effectiveColor: color, physicalCardIds: ids, conversionSource: s.Source) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner.Seat, p.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, p.Seat, suit)).Select(p => new GameEngine.XunXuUsePlan(LegalActionKind.Slash, [p.Seat])).ToArray();
         if (kind == CardKind.Peach)
             return _coreTreatedWoundedOperations.IsRuleWounded(owner) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit) ? [new(LegalActionKind.Peach, [owner.Seat])] : [];
         if (kind == CardKind.Alcohol)
             return !owner.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && _characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(owner, null) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit) ? [new(LegalActionKind.Alcohol, [])] : [];
-        return _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(owner, kind, suit, enforceUsePermission: true, actualEffectiveColor: color, hasActualColor: true, physicalCardIds: ids, conversionSource: s.Source).Select(p => new global::CardGame.Core.GameEngine.XunXuUsePlan(p.ActionKind, p.TargetSeats, p.TargetCardId, p.RequiredCardKind)).ToArray();
+        return _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(owner, kind, suit, enforceUsePermission: true, actualEffectiveColor: color, hasActualColor: true, physicalCardIds: ids, conversionSource: s.Source).Select(p => new GameEngine.XunXuUsePlan(p.ActionKind, p.TargetSeats, p.TargetCardId, p.RequiredCardKind)).ToArray();
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.FilterPlayPhaseActions, 46100)]
@@ -142,7 +138,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
         var kind = action.PlayedCardKind!.Value;
         var s = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(owner, ids, kind, false, source)!;
         var plan = XunXuPlayPlans(owner, s).Single(p => p.Card == action.TargetCardId && p.Targets.SequenceEqual(targets));
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             _coreNativeSlashUseOperations.ResolveSlashCore(owner, _coreMatchParticipantsPlayersAccess._players[targets[0]], s.Cards[0], kind, owner.Seat, physicalCards: s.Cards, conversionSource: source);
         else if (kind == CardKind.Peach)
             _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(owner, owner, s.Cards[0], "桃", kind, conversionSource: source, physicalCards: s.Cards);

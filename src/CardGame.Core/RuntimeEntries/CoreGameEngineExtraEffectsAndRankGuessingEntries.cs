@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime))]
 internal sealed partial class CoreGameEngineExtraEffectsAndRankGuessingEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime> _resolve;
-    private CoreGameEngineExtraEffectsAndRankGuessingEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime> _resolve;
+    private CoreGameEngineExtraEffectsAndRankGuessingEntries(Func<EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineExtraEffectsAndRankGuessingEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineExtraEffectsAndRankGuessingEntries Create(Func<EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime> resolve) => new(resolve);
 }

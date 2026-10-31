@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangLiaoMobileGodRuntime
 {
     internal bool HasMobileShenZhangLiao => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RestoreMobileZhitiEquipmentSlot);
 
-    internal static CardConversionSource MobileZhangLiaoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MobileZhangLiaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool MobileDuoruiActive(MobileDuoruiIssuedEvent e) => !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileDuoruiExpiredEvent>().Any(x => x.FrameId == e.FrameId);
     internal IEnumerable<MobileDuoruiIssuedEvent> MobileDuoruiLeases => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileDuoruiIssuedEvent>().Where(MobileDuoruiActive);
 
@@ -68,7 +64,7 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
         return MobileZhitiContestCandidateMatches(g.Candidate, context);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShenZhangLiaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileShenZhangLiao(f, op);
+    SkillProgramStepOutcome IMobileShenZhangLiaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileShenZhangLiao(f, op);
     internal SkillProgramStepOutcome BeginMobileShenZhangLiao(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

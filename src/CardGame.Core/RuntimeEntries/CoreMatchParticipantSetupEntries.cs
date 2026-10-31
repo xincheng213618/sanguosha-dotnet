@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreMatchParticipantSetupRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreMatchParticipantSetupRuntime))]
 internal sealed partial class CoreMatchParticipantSetupEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreMatchParticipantSetupRuntime> _resolve;
-    private CoreMatchParticipantSetupEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreMatchParticipantSetupRuntime> resolve)
+    private readonly Func<EngineOwners.CoreMatchParticipantSetupRuntime> _resolve;
+    private CoreMatchParticipantSetupEntries(Func<EngineOwners.CoreMatchParticipantSetupRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreMatchParticipantSetupEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreMatchParticipantSetupRuntime> resolve) => new(resolve);
+    internal static CoreMatchParticipantSetupEntries Create(Func<EngineOwners.CoreMatchParticipantSetupRuntime> resolve) => new(resolve);
 }

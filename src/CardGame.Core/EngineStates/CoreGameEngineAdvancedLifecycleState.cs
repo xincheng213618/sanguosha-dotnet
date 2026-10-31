@@ -1,21 +1,21 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreGameEngineAdvancedLifecycleState : global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedLifecycleInheritedWeaponAbilitiesAccess
+internal sealed class CoreGameEngineAdvancedLifecycleState : Contracts.ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess, Contracts.ICoreGameEngineAdvancedLifecycleInheritedWeaponAbilitiesAccess
 {
-    private global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind>> _copiedWeaponAbilities = [];
-    internal ref readonly global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind>> ReferenceToCopiedWeaponAbilities => ref _copiedWeaponAbilities;
+    private Dictionary<int, IReadOnlyList<CardKind>> _copiedWeaponAbilities = [];
+    internal ref readonly Dictionary<int, IReadOnlyList<CardKind>> ReferenceToCopiedWeaponAbilities => ref _copiedWeaponAbilities;
 
-    private global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind>> _inheritedWeaponAbilities = [];
-    internal ref readonly global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind>> ReferenceToInheritedWeaponAbilities => ref _inheritedWeaponAbilities;
+    private Dictionary<int, IReadOnlyList<CardKind>> _inheritedWeaponAbilities = [];
+    internal ref readonly Dictionary<int, IReadOnlyList<CardKind>> ReferenceToInheritedWeaponAbilities => ref _inheritedWeaponAbilities;
 
-    private global::System.Collections.Generic.HashSet<int> _weaponCopyConsumed = [];
-    internal ref readonly global::System.Collections.Generic.HashSet<int> ReferenceToWeaponCopyConsumed => ref _weaponCopyConsumed;
+    private HashSet<int> _weaponCopyConsumed = [];
+    internal ref readonly HashSet<int> ReferenceToWeaponCopyConsumed => ref _weaponCopyConsumed;
 
-    ref readonly global::System.Collections.Generic.HashSet<int> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess._weaponCopyConsumed => ref _weaponCopyConsumed;
+    ref readonly HashSet<int> Contracts.ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess._weaponCopyConsumed => ref _weaponCopyConsumed;
 
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind>> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess._copiedWeaponAbilities => ref _copiedWeaponAbilities;
+    ref readonly Dictionary<int, IReadOnlyList<CardKind>> Contracts.ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess._copiedWeaponAbilities => ref _copiedWeaponAbilities;
 
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind>> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess._inheritedWeaponAbilities => ref _inheritedWeaponAbilities;
+    ref readonly Dictionary<int, IReadOnlyList<CardKind>> Contracts.ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess._inheritedWeaponAbilities => ref _inheritedWeaponAbilities;
 
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind>> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAdvancedLifecycleInheritedWeaponAbilitiesAccess._inheritedWeaponAbilities => ref _inheritedWeaponAbilities;
+    ref readonly Dictionary<int, IReadOnlyList<CardKind>> Contracts.ICoreGameEngineAdvancedLifecycleInheritedWeaponAbilitiesAccess._inheritedWeaponAbilities => ref _inheritedWeaponAbilities;
 }

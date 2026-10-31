@@ -1,14 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreWushuangCombatProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IWushuangCombatHost.Execute(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteWushuangCombat(f, e);
+    SkillProgramStepOutcome IWushuangCombatHost.Execute(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteWushuangCombat(f, e);
     internal SkillProgramStepOutcome ExecuteWushuangCombat(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -58,7 +53,7 @@ internal sealed partial class CoreWushuangCombatProgramsRuntime
         {
             var context = f.WindowContext!;
             var parent = _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Single(w => w.Id == context.ParentFrameId);
-            global::CardGame.Core.GameEngine.IDamageAttempt attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(parent);
+            GameEngine.IDamageAttempt attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(parent);
             target = attack.SourceSeat;
             amount = attack.DamageAmount;
             nature = _coreNativeCardClassificationsOperations.GetDamageNature(attack);
@@ -170,7 +165,7 @@ internal sealed partial class CoreWushuangCombatProgramsRuntime
         if (producer.UniqueHpPeer is not { Stage: UniqueHpPeerStage.DrawChildren } paid || paid.ChooserSeat != recipient || !_coreRecipientContestReceiptsOperations.ValidUniqueHpPeer(producer))
             return false;
         var invoice = recipient == producer.OwnerSeat ? paid.OwnerInvoice : paid.PeerInvoice;
-        return invoice is { DrawIssued: true, ActualDrawCount: > 0 and <= 2 } && invoice.ActorSeat == recipient && invoice.DrawBefore >= invoice.CostAfter && invoice.DrawAfter > invoice.DrawBefore && actualDraw.Requested == 2 && actualDraw.ActualCount == invoice.ActualDrawCount && actualDraw.TurnNumber == paid.TurnNumber && actualDraw.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEngineUniqueHpPeerProgramsRuntime.UniqueHpPeerDrawReason(producer, recipient) && actualDraw.SequenceBefore == invoice.DrawBefore && actualDraw.SequenceAfter == invoice.DrawAfter && _coreProgramEventHistoryOperations.ProgramEventHistory<UniqueHpPeerDrawIssuedEvent>().Where(issued => issued.FrameId == producer.Id && issued.ActorSeat == recipient).ToArray()is [var issued] && issued.Before == invoice.DrawBefore && issued.After == invoice.DrawAfter && issued.ActualCount == invoice.ActualDrawCount;
+        return invoice is { DrawIssued: true, ActualDrawCount: > 0 and <= 2 } && invoice.ActorSeat == recipient && invoice.DrawBefore >= invoice.CostAfter && invoice.DrawAfter > invoice.DrawBefore && actualDraw.Requested == 2 && actualDraw.ActualCount == invoice.ActualDrawCount && actualDraw.TurnNumber == paid.TurnNumber && actualDraw.Reason.Value == CoreGameEngineUniqueHpPeerProgramsRuntime.UniqueHpPeerDrawReason(producer, recipient) && actualDraw.SequenceBefore == invoice.DrawBefore && actualDraw.SequenceAfter == invoice.DrawAfter && _coreProgramEventHistoryOperations.ProgramEventHistory<UniqueHpPeerDrawIssuedEvent>().Where(issued => issued.FrameId == producer.Id && issued.ActorSeat == recipient).ToArray()is [var issued] && issued.Before == invoice.DrawBefore && issued.After == invoice.DrawAfter && issued.ActualCount == invoice.ActualDrawCount;
     }
 
     internal bool IsWushuangNativeDrawDamageParent(ProgramSkillFrame producer)

@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceTiepaoRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceTiepaoHost.Begin(ProgramSkillFrame f) => BeginShanheSourceTiepao(f);
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? SourceTiepaoOriginalAttack(DamageTriggerWindowFrame window, long damageId, int amount)
+    SkillProgramStepOutcome IShanheSourceTiepaoHost.Begin(ProgramSkillFrame f) => BeginShanheSourceTiepao(f);
+    internal GameEngine.IDamageAttempt? SourceTiepaoOriginalAttack(DamageTriggerWindowFrame window, long damageId, int amount)
     {
         if (window.ParentFrameId != damageId || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damageId)is not { } damage || damage.SourceSeat != window.SourceSeat || damage.TargetSeat != window.TargetSeat || damage.Amount != amount || amount <= 0)
             return null;
@@ -20,7 +17,7 @@ internal sealed partial class CoreGameEngineShanheSourceTiepaoRuntime
     }
 
     internal bool SourceTiepaoDamage(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => c.SkillId == ShanheSourceTiepaoComposition.SkillId && w.Window == SkillProgramTriggerWindow.AfterDamageApplied && w.TargetSeat == c.OwnerSeat && w.Amount > 0 && w.SourceSeat is { } source && source != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[source].IsAlive && w.DamageFrameId is { } damageId && _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } parent && parent.Id == w.ParentFrameId && parent.ParentFrameId == damageId && SourceTiepaoOriginalAttack(parent, damageId, w.Amount)is { } attack && attack.SourceSeat == source && attack.TargetSeat == c.OwnerSeat;
-    internal CardConversionSource SourceTiepaoConversion(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource SourceTiepaoConversion(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool SourceTiepaoMaterialLegal(int owner, int target, Card card, CardConversionSource source)
     {
         var from = _cardZonesOperations._cardZones.GetLocation(card.Id);
@@ -35,7 +32,7 @@ internal sealed partial class CoreGameEngineShanheSourceTiepaoRuntime
     internal SkillProgramStepOutcome BeginShanheSourceTiepao(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.ShanheSourceTiepao is not null || f.WindowContext is not { } w || !SourceTiepaoDamage(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w))
+        if (f.ShanheSourceTiepao is not null || f.WindowContext is not { } w || !SourceTiepaoDamage(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w))
             throw new InvalidOperationException("Source14075 lost its actual foreign damage parent.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheSourceTiepao = new(w.ParentFrameId, w.DamageFrameId!.Value, w.SourceSeat!.Value) });
         var choices = SourceTiepaoChoices(f);
@@ -68,7 +65,7 @@ internal sealed partial class CoreGameEngineShanheSourceTiepaoRuntime
     [ProgramAnswer("source-tiepao")]
     internal void AnswerSourceTiepao(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceTiepao: { UseId: null, Issuing: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !SourceTiepaoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceTiepao: { UseId: null, Issuing: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !SourceTiepaoChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Source14075 lost its original private physical material choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.Parameters["branch"] == "decline" || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))

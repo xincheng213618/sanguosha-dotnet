@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLvQianOlRuntime
 {
     internal bool HasLvQianCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RecordWeiluActualDamageSource);
 
-    internal static CardConversionSource LvQianSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lv_qian_ol_LvQianObservers.LvQianSource(f);
+    internal static CardConversionSource LvQianSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lv_qian_ol_LvQianObservers.LvQianSource(f);
     internal bool LvQianSourceCurrent(CardConversionSource source, string hash) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(source.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[source.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], source.SkillId, source.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash == hash;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 520)]
     internal void ObserveLvQianTurnBoundary(IGameEvent payload)

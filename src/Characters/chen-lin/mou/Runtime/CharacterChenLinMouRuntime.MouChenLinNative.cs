@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenLinMouRuntime
@@ -15,10 +11,10 @@ internal sealed partial class CharacterChenLinMouRuntime
         var kind = card.Kind;
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, card);
-        var color = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
+        var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
         if (!MouChenLinRuntime.DamageCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, [id]) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(actor.Seat, kind, [id], r.Source)) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(actor.Seat, [id], suit))
             return null;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], card, effectiveKind: kind, physicalCardIds: [id], conversionSource: r.Source) ? new(id, kind, LegalActionKind.Slash, null)
             {
                 EligibleTargets = [target]
@@ -36,7 +32,7 @@ internal sealed partial class CharacterChenLinMouRuntime
             : null;
         }
 
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+        if (!CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
             return null;
         var options = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: color, hasActualColor: true, physicalCardIds: [id], conversionSource: r.Source);
         var group = kind is CardKind.BarbarianAssault or CardKind.ArrowBarrage;
@@ -56,7 +52,7 @@ internal sealed partial class CharacterChenLinMouRuntime
         var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [r.Target], plan.Kind, physicalCardIds: [card.Id], conversionSource: r.Source);
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)?.MouChenLinWrittenUse is null)
             throw new InvalidOperationException("Zhuanwen must bind its real Processing entity before native declaration.");
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(plan.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(plan.Kind))
         {
             var target = _coreMatchParticipantsPlayersAccess._players[r.Target];
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, target.Seat, card, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: plan.Kind, physicalCards: [card], ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, plan.Kind), programSkillCardUseFrameId: f.Id);

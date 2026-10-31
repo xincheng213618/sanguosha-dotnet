@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuKangWumiaoRuntime
@@ -33,7 +29,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         if ((_characterGuanYuWumiaoOperations.CaptureJuewuActionRank(provider.Seat, ids) ?? _coreAlcoholIdentityPoliciesOperations.CaptureAlcoholActionRank(provider.Seat, kind, ids))is { } nativeRank)
             return nativeRank;
         if (ids.Count != 1)
-            return isTrueZhangba && source is null && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && ids.Count == 2 && _coreNativeDamageHandlesOperations.UsesFormalZhangbaSerpentSpear && _coreAdvancedWeaponsOperations.HasWeaponAbility(provider, CardKind.ZhangbaSerpentSpear) ? Math.Min(13, cards.Sum(c => _characterGuanYuWumiaoOperations.JuewuForeignHandRank(provider, c) ?? c.Rank)) : null;
+            return isTrueZhangba && source is null && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && ids.Count == 2 && _coreNativeDamageHandlesOperations.UsesFormalZhangbaSerpentSpear && _coreAdvancedWeaponsOperations.HasWeaponAbility(provider, CardKind.ZhangbaSerpentSpear) ? Math.Min(13, cards.Sum(c => _characterGuanYuWumiaoOperations.JuewuForeignHandRank(provider, c) ?? c.Rank)) : null;
         // Use the same native appearance transformations as the accepted action.
         // A zero-point conversion stays zero; no printed-rank fallback is used.
         var appearance = _corePlayCardHistoryOperations.ApplyProgramUseAppearance(provider, card, source);
@@ -45,7 +41,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     internal bool ValidWuLuKangDixianDeclaration(WuLuKangDixianDeclarationReceipt r) => r.DeclarationId > 0 && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.ActorSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.ProviderSeat) && r.CardId > 0 && r.EffectiveRank is >= 0 and <= 13 && (r.Grant is null || r.Grant.Source.OwnerSeat == r.ActorSeat && ValidWuLuKangDixianGrant(r.Grant)) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangDixianDeclarationAdmittedEvent>().Count(e => e.Receipt == r) == 1;
     internal DeclaredCardPayment CaptureWuLuKangDixianDeclaration(DeclaredCardPayment payment, CardDeclarationParentReturn parent)
     {
-        if (!HasWuLuKangDixianCapability || !global::CardGame.Core.EngineOwners.CharacterCaiWenJiLeRuntime.BeifenDeclarationIsTrueUse(parent) || payment.ActorSeat != parent.ActorSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(parent.ActorSeat) || payment.Claimed || payment.WuLuKangDixian is not null || _cardZonesOperations._cardZones.GetLocation(payment.Cost.CardId) != payment.Cost.From)
+        if (!HasWuLuKangDixianCapability || !CharacterCaiWenJiLeRuntime.BeifenDeclarationIsTrueUse(parent) || payment.ActorSeat != parent.ActorSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(parent.ActorSeat) || payment.Claimed || payment.WuLuKangDixian is not null || _cardZonesOperations._cardZones.GetLocation(payment.Cost.CardId) != payment.Cost.From)
             return payment;
         var provider = _coreMatchParticipantsPlayersAccess._players[payment.ProviderSeat];
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(payment.Cost.CardId);
@@ -80,7 +76,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuLuKangDixianUseAdmittedEvent(r));
     }
 
-    internal bool HasIssuedWuLuKangDixianUse(long useId, int actorSeat) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { Type: CardActionType.Use } a, WuLuKangDixianUse: { Applies: true, Grant: { } g } r } use && r.UseId == use.Id && r.ActionId == a.ActionId && r.ActorSeat == a.ActorSeat && r.ActorSeat == actorSeat && r.ProviderSeat == a.ProviderSeat && r.EffectiveRank is> 0 && r.EffectiveRank <= g.Rank && r.EffectiveRank == a.EffectiveRank && ValidWuLuKangDixianGrant(g) && g.Source.OwnerSeat == actorSeat && (r.Kind == a.EffectiveKind || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use)) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangDixianUseAdmittedEvent>().Count(e => e.Receipt == r) == 1;
+    internal bool HasIssuedWuLuKangDixianUse(long useId, int actorSeat) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { Type: CardActionType.Use } a, WuLuKangDixianUse: { Applies: true, Grant: { } g } r } use && r.UseId == use.Id && r.ActionId == a.ActionId && r.ActorSeat == a.ActorSeat && r.ActorSeat == actorSeat && r.ProviderSeat == a.ProviderSeat && r.EffectiveRank is> 0 && r.EffectiveRank <= g.Rank && r.EffectiveRank == a.EffectiveRank && ValidWuLuKangDixianGrant(g) && g.Source.OwnerSeat == actorSeat && (r.Kind == a.EffectiveKind || CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind) && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use)) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangDixianUseAdmittedEvent>().Count(e => e.Receipt == r) == 1;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 29701)]
     internal void ObserveWuLuKangDixianUse(IGameEvent fact)
     {
@@ -98,7 +94,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(f => f.WuLuKangDixianUse is not null))
         {
             var r = use.WuLuKangDixianUse!;
-            if (use.Action is not { Type: CardActionType.Use } a || r.UseId != use.Id || r.ActionId != a.ActionId || r.ActorSeat != a.ActorSeat || r.ProviderSeat != a.ProviderSeat || r.EffectiveRank != a.EffectiveRank || r.Kind != a.EffectiveKind && !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use)) || r.Grant is { } g && (g.Source.OwnerSeat != r.ActorSeat || !ValidWuLuKangDixianGrant(g)) || r.Applies != (r.Grant is { } grant && r.EffectiveRank is> 0 && r.EffectiveRank <= grant.Rank) || _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangDixianUseAdmittedEvent>().Count(e => e.Receipt == r) != 1)
+            if (use.Action is not { Type: CardActionType.Use } a || r.UseId != use.Id || r.ActionId != a.ActionId || r.ActorSeat != a.ActorSeat || r.ProviderSeat != a.ProviderSeat || r.EffectiveRank != a.EffectiveRank || r.Kind != a.EffectiveKind && !(CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind) && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use)) || r.Grant is { } g && (g.Source.OwnerSeat != r.ActorSeat || !ValidWuLuKangDixianGrant(g)) || r.Applies != (r.Grant is { } grant && r.EffectiveRank is> 0 && r.EffectiveRank <= grant.Rank) || _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangDixianUseAdmittedEvent>().Count(e => e.Receipt == r) != 1)
                 throw new InvalidOperationException("Dixian changed its frozen actual Use actor, effective rank or issued permanent admission.");
         }
     }

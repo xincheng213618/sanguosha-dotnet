@@ -4,6 +4,6 @@ internal sealed partial class CoreGameEngineUnequalHandHpObserversEntries
 {
     internal bool IsUnequalHandHpDying() => _resolve().IsUnequalHandHpDying();
     internal bool TryAdvanceUnequalHandHpSubtree() => _resolve().TryAdvanceUnequalHandHpSubtree();
-    internal bool UnequalHandHpFirstChild(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ResolutionFrame child) => _resolve().UnequalHandHpFirstChild(root, child);
-    internal global::CardGame.Core.ProgramSkillFrame? UnequalHandHpObserverRoot() => _resolve().UnequalHandHpObserverRoot();
+    internal bool UnequalHandHpFirstChild(ProgramSkillFrame root, ResolutionFrame child) => _resolve().UnequalHandHpFirstChild(root, child);
+    internal ProgramSkillFrame? UnequalHandHpObserverRoot() => _resolve().UnequalHandHpObserverRoot();
 }

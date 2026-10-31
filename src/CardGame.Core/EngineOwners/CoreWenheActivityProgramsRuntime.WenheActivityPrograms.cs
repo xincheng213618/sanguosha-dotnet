@@ -1,14 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreWenheActivityProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IWenheActivityProgramHost.ExecuteWenheActivity(ProgramSkillFrame frame, SkillProgramEffectOp op) => ExecuteWenheActivity(frame, op);
+    SkillProgramStepOutcome IWenheActivityProgramHost.ExecuteWenheActivity(ProgramSkillFrame frame, SkillProgramEffectOp op) => ExecuteWenheActivity(frame, op);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 41000)]
     internal bool AllowsWenheActivation(ProgramActivationLegalityContext gate) => _coreActivityBattleRulesOperations.WenheRules?.AllowsActivation(gate.SkillId, gate.OwnerSeat) ?? gate.SkillId is not ("wenhe:chaos-resolution" or "wenhe:champion-mark");
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 41000)]

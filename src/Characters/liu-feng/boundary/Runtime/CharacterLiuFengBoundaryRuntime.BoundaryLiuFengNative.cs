@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuFengBoundaryRuntime
@@ -72,7 +68,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
 
     internal bool IsBoundaryLiuFengUse(CardUseFrame use)
     {
-        if (use.BoundaryLiuFeng is not { } o || o.UseId != use.Id || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || current.ActionId != o.ActionId || current.ProviderSeat != o.Actor || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || current.EffectiveKind != use.CardKind)
+        if (use.BoundaryLiuFeng is not { } o || o.UseId != use.Id || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || current.ActionId != o.ActionId || current.ProviderSeat != o.Actor || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || current.EffectiveKind != use.CardKind)
             return false;
         var a = current;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -86,7 +82,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 50201)]
-    internal bool CompleteBoundaryLiuFengAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool CompleteBoundaryLiuFengAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { BoundaryLiuFeng: { } o } use || !IsBoundaryLiuFengUse(use))

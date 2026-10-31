@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaYiMouRuntime
@@ -47,7 +43,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
             {
                 var kind = _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(actor, card, required);
                 var identity = _coreCardConversionsOperations.HasProgramCardIdentity(actor, card);
-                if (!identity && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, required) && (!_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(actor, card) || _coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(actor, card, kind, true)))
+                if (!identity && CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, required) && (!_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(actor, card) || _coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(actor, card, kind, true)))
                     plans.Add(new(kind, null, false) { Cards = [card.Id] });
                 foreach (var source in identity ? _coreCardConversionsOperations.GetProgramCardIdentitySources(actor, card, kind, true) : _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, true))
                     plans.Add(new(kind, source, false) { Cards = [card.Id] });

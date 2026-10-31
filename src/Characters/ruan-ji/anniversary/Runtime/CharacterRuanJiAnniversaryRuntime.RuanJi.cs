@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterRuanJiAnniversaryRuntime
 {
     internal const string RuanJiDiscardAction = "anniversary-ruan-ji-discard", RuanJiRevealReturn = "anniversary-ruan-ji-shown";
-    internal static CardConversionSource RuanJiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource RuanJiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool KeepsAnniversaryRuanJiAlcohol(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[seat], AnniversaryRuanJiComposition.Jiudun);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryRuanJiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginRuanJi(f, op);
+    SkillProgramStepOutcome IAnniversaryRuanJiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginRuanJi(f, op);
     internal CardActionContext? RuanJiWindowAction(ProgramSkillWindowContext context) => context.CardUse is { } c ? _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId && w.Action.ActionId == c.CardActionId)?.Action ?? _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)?.Action ?? _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().LastOrDefault(e => e.Action.ActionId == c.CardActionId)?.Action : null;
     internal bool RuanJiIncoming(int owner, ProgramSkillWindowContext context) => context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && context.CardUse is { ActorSeat: var actor, IsPublicRed: false } c && actor != owner && _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } action } use && action.ActionId == c.CardActionId && action.ActorSeat == actor && action.EffectiveDesignatedTargetSeats.Contains(owner) && use.TargetSeats.Contains(owner);
     internal Card[] RuanJiDiscardable(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Where(card => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, card, CardLocation.Hand(owner), OwnedCardMoveIntent.Discard)).ToArray();
@@ -37,7 +34,7 @@ internal sealed partial class CharacterRuanJiAnniversaryRuntime
         if (op == SkillProgramEffectOp.ResolveAnniversaryRuanJiZhaowen)
             r = r with
             {
-                Hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(c => new RuanJiShownEntity(c.Id, c.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c), global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c)))).ToArray()
+                Hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(c => new RuanJiShownEntity(c.Id, c.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c), CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c)))).ToArray()
             };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { RuanJi = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RuanJiStartedEvent(f.Id, r.Source, r.GameplayHash, op, r.ParentId, r.ActualTurn, r.UseId, r.ActionId, r.WasDrunk));
@@ -108,7 +105,7 @@ internal sealed partial class CharacterRuanJiAnniversaryRuntime
     [ProgramAnswer(RuanJiDiscardAction)]
     internal void AnswerRuanJiDiscard(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanJi.Stage: RuanJiStage.DiscardChoice } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !RuanJiDiscardChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanJi.Stage: RuanJiStage.DiscardChoice } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !RuanJiDiscardChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Jiudun requires its owner's exact private current hand payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.RuanJi!;
@@ -149,7 +146,7 @@ internal sealed partial class CharacterRuanJiAnniversaryRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
             _coreProgramCardTargetEffectsOperations.MarkCardEffectIneffective(r.UseId, f.OwnerSeat);
             var use = _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)!;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardEffectNullifiedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, use.SourceSeat, use.Id, use.CardKind));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardEffectNullifiedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, use.SourceSeat, use.Id, use.CardKind));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardEffectSkippedEvent(use.Id, use.SourceSeat, f.OwnerSeat, use.CardKind, CardEffectSkipReason.SkillNullified));
             FinishRuanJi(f);
             return;

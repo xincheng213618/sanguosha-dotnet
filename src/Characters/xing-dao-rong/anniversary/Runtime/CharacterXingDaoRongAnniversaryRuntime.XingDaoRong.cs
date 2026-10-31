@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,7 +10,7 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
     internal static CardMoveReason XingDaoRongDrawReason => new("skill-program.anniversary:xuhe.nearby-draw");
 
     internal static CardConversionSource XingDaoRongSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryXingDaoRongHost.Begin(ProgramSkillFrame f) => BeginXingDaoRong(f);
+    SkillProgramStepOutcome IAnniversaryXingDaoRongHost.Begin(ProgramSkillFrame f) => BeginXingDaoRong(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 45700)]
     internal bool QualifyXingDaoRong(ProgramTriggerLegalityContext g) => g.SkillId != XingDaoRongComposition.Skill || g.Trigger.Id != XingDaoRongComposition.Ending || g.WindowContext is { Window: SkillProgramTriggerWindow.PlayEnding, SourceSeat: { } actor } && actor == g.OwnerSeat && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.MaxHp > g.Owner.MaxHp);
     internal SkillProgramStepOutcome BeginXingDaoRong(ProgramSkillFrame supplied)
@@ -53,7 +50,7 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
     [ProgramAnswer(XingDaoRongAction)]
     internal void AnswerXingDaoRong(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XingDaoRongXuHe: { } r } f || !ValidXingDaoRong(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], XingDaoRongChoices(f).Where(c => c.Id == answer.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XingDaoRongXuHe: { } r } f || !ValidXingDaoRong(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], XingDaoRongChoices(f).Where(c => c.Id == answer.Id).ToArray()))
             throw new InvalidOperationException("Xuhe lost its current original group choice or opaque discard slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

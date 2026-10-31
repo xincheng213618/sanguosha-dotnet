@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineTurnDrawDebtPaymentObserversRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreGameEngineTurnDrawDebtPaymentObserversRuntime
     {
         for (var index = 1; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
         {
-            if (_resolutionStackOperations._resolutionStack[index - 1] is not TurnEndingBoundaryFrame ending || ending.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || _resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.TurnDrawDebtPayment is not { InstructionIndex: 0 } paid || root.OwnerSeat != ending.OwnerSeat || root.InstructionIndex is < 2 or > 3 || root.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || context.ParentFrameId != ending.Id || ending.ItemIndex < 0 || ending.ItemIndex >= ending.Items.Count || ending.Items[ending.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, candidate) || root.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != root.OwnerSeat)
+            if (_resolutionStackOperations._resolutionStack[index - 1] is not TurnEndingBoundaryFrame ending || ending.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || _resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.TurnDrawDebtPayment is not { InstructionIndex: 0 } paid || root.OwnerSeat != ending.OwnerSeat || root.InstructionIndex is < 2 or > 3 || root.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || context.ParentFrameId != ending.Id || ending.ItemIndex < 0 || ending.ItemIndex >= ending.Items.Count || ending.Items[ending.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, candidate) || root.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != root.OwnerSeat)
                 continue;
             var program = _contentRegistryOperations._contentRegistry.GetSkill(root.SkillId).Program;
             if (program is null || program.GameplayHash != root.GameplayHash)

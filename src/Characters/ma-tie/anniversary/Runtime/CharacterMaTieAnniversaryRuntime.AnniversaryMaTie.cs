@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaTieAnniversaryRuntime
 {
     internal const string MaTieAction = "anniversary-ma-tie", MaTieObtainReason = "skill-program.anniversary:quxian.obtain";
-    internal static CardConversionSource MaTieSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryMaTieHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    internal static CardConversionSource MaTieSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryMaTieHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.ResolveAnniversaryMaTieQuxian => BeginMaTie(f),
         SkillProgramEffectOp.ResolveAnniversaryMaTieQuxianReward => BeginMaTieReward(f),
@@ -43,7 +40,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryMaTie = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryMaTieStartedEvent(f.Id, r.Source, r.Hash, r.ParentId, r.Turn, r.TurnOwner));
-        var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) && !c.IsGeneralWeapon);
+        var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) && !c.IsGeneralWeapon);
         if (card is not null)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryMaTie = r with { ObtainedCard = card.Id } });
@@ -110,7 +107,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
     [ProgramAnswer(MaTieAction)]
     internal void AnswerMaTie(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryMaTie: { } r } f || !ValidMaTie(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == AnniversaryMaTieStage.Target ? f.OwnerSeat : r.Actors[r.Cursor]) || !MaTieChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryMaTie: { } r } f || !ValidMaTie(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == AnniversaryMaTieStage.Target ? f.OwnerSeat : r.Actors[r.Cursor]) || !MaTieChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
             throw new InvalidOperationException("Quxian changed its private original actor, target or native plan.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -262,8 +259,8 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
     {
         var r = f.AnniversaryMaTie!;
         if (r.Stage == AnniversaryMaTieStage.Target)
-            return p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]) ? 1 : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[r.Actors[r.Cursor]], _coreMatchParticipantsPlayersAccess._players[r.Target]))
+            return p.Choices.OrderBy(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]) ? 1 : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+        if (!CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[r.Actors[r.Cursor]], _coreMatchParticipantsPlayersAccess._players[r.Target]))
             return p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "slash") ?? p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "faction") ?? p.Choices.Last();
         return p.Choices.Last();
     }

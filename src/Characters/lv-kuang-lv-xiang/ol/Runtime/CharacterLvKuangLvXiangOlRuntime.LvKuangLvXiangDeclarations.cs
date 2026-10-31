@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLvKuangLvXiangOlRuntime
 {
     internal void BeginQigongDeclaration(ProgramSkillFrame f, PromptChoice choice)
     {
-        if (!IsQigongRequest(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source) || source is null || _corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is null || choice.Cards is not [var id] || source.OwnerSeat != f.LvKuangLvXiang!.Actor || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(source.OwnerSeat))
+        if (!IsQigongRequest(f) || !CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source) || source is null || _corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is null || choice.Cards is not [var id] || source.OwnerSeat != f.LvKuangLvXiang!.Actor || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(source.OwnerSeat))
             throw new InvalidOperationException("Qigong declaration needs its actual selected actor's one original hand cost.");
         var r = f.LvKuangLvXiang;
         var kind = Enum.Parse<CardKind>(choice.Parameters["effective-kind"]);

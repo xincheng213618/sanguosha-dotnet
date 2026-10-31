@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -19,7 +16,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
 
     internal bool HasFengweiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveFengweiRoundStartDraw);
 
-    internal static CardConversionSource FengweiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_zhang_ol_Fengwei.FengweiSource(f);
+    internal static CardConversionSource FengweiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_liu_zhang_ol_Fengwei.FengweiSource(f);
     internal bool FengweiLive(CharacterState p) => p.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(p).ProgramInstances.Any(i => i.SkillId == "ol:fengwei" && i.Program.Triggers.Any(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveFengweiRoundStartDraw)));
     internal int? FengweiMarkedHand(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<FengweiAcquiredEvent>().Where(e => e.Source.OwnerSeat == seat && e.Round == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber && _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.Hand(seat)).Select(e => (int? )e.CardId).FirstOrDefault();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 27510, SkillProgramEffectOp.ResolveFengweiRoundStartDraw, SkillProgramEffectOp.ResolveFengweiActualDrawSkip)]
@@ -44,7 +41,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
                 throw new InvalidOperationException("Fengwei skip requires a currently held original acquisition.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FengweiDrawSkippedEvent(f.Id, source, _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber, w.Id, id));
             _coreRuntimeOperations.ReplaceRuntimeFrame(w.Id, w with { ActualPhaseSubstitution = new(w.Id, f.Id, f.OwnerSeat, f.SkillId, f.SkillInstanceId, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, SkillProgramTurnPhase.Draw) });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, c.Window, SkillProgramTurnPhase.Draw));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, c.Window, SkillProgramTurnPhase.Draw));
             return _coreProgramTurnPhaseOperations.SkipProgramTurnPhases(f, [SkillProgramTurnPhase.Draw]);
         }
 
@@ -85,7 +82,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     [ProgramAnswer("liu-zhang-fengwei")]
     internal void AnswerFengwei(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Fengwei: { Stage: FengweiStage.Choice } r } f || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(FengweiChoices(f).Where(c => c.Id == choice.Id).ToArray(), [choice]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Fengwei: { Stage: FengweiStage.Choice } r } f || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(FengweiChoices(f).Where(c => c.Id == choice.Id).ToArray(), [choice]))
             throw new InvalidOperationException("Fengwei requires its actual positive round draw selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var count = int.Parse(choice.Parameters["count"], CultureInfo.InvariantCulture);
@@ -163,7 +160,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         if (f.Fengwei is not { Stage: FengweiStage.DrawChildren })
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsFengweiMovement(f, m));
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsFengweiMovement(f, m));
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)

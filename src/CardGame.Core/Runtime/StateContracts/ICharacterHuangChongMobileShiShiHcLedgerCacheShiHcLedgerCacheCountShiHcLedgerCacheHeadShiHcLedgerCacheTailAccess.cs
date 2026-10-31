@@ -1,12 +1,12 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess : IProgramRuntimeOperations
 {
-    ref global::CardGame.Core.NativeOwners.ShiHcLedgerView? _shiHcLedgerCache { get; }
+    ref NativeOwners.ShiHcLedgerView? _shiHcLedgerCache { get; }
 
     ref int _shiHcLedgerCacheCount { get; }
 
-    ref global::CardGame.Core.IGameEvent? _shiHcLedgerCacheHead { get; }
+    ref IGameEvent? _shiHcLedgerCacheHead { get; }
 
-    ref global::CardGame.Core.IGameEvent? _shiHcLedgerCacheTail { get; }
+    ref IGameEvent? _shiHcLedgerCacheTail { get; }
 }

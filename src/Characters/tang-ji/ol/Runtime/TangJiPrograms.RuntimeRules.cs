@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_tang_ji_ol_TangJiPrograms
 {
     internal static string SuitName(Suit suit) => suit switch

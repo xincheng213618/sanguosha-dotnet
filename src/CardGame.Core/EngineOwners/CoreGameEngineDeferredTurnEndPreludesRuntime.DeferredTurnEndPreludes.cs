@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDeferredTurnEndPreludesRuntime
@@ -36,7 +32,7 @@ internal sealed partial class CoreGameEngineDeferredTurnEndPreludesRuntime
         return false;
     }
 
-    internal static bool SameDeferredTurnEndBatch(CardMovementBatchContext left, CardMovementBatchContext right) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DeferredTurnEndPreludes.SameDeferredTurnEndBatch(left, right);
+    internal static bool SameDeferredTurnEndBatch(CardMovementBatchContext left, CardMovementBatchContext right) => RuntimeSkills.RuntimeRules_Core_DeferredTurnEndPreludes.SameDeferredTurnEndBatch(left, right);
     internal bool MatchesDeferredTurnEndPreludeChild(DeferredTurnEndFrame parent, CardsMovedTriggerWindowFrame child) => IsActualDeferredTurnEndPrelude(parent) && parent.Prelude!.CurrentChild is { } current && current.FrameId == child.Id && child.ResumeProgramFrameId is null && child.DeferredTurnEndReturn is { } receipt && receipt.ParentFrameId == parent.Id && receipt.OwnerSeat == parent.OwnerSeat && receipt.TurnNumber == parent.TurnNumber && receipt.BatchId == current.Batch.Id && child.Id == child.Batch.Id && child.Batch.TurnNumber == parent.TurnNumber && child.Batch.AwaitingProgramFrameId is null && SameDeferredTurnEndBatch(current.Batch, child.Batch);
     internal void ReturnDeferredTurnEndPrelude(CardsMovedTriggerWindowFrame child)
     {

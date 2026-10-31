@@ -1,17 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuZhangOlRuntime
 {
-    internal const string ZonghuOpen = global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuNeeds.ZonghuOpen, ZonghuChoice = "zonghu-choice", ZonghuGiftReason = "skill-program.liu-zhang.zonghu.give";
+    internal const string ZonghuOpen = RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuNeeds.ZonghuOpen, ZonghuChoice = "zonghu-choice", ZonghuGiftReason = "skill-program.liu-zhang.zonghu.give";
     internal bool HasZonghuCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveZonghuRequiredUseRequest);
 
-    internal static CardConversionSource ZonghuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuNeeds.ZonghuSource(f);
+    internal static CardConversionSource ZonghuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuNeeds.ZonghuSource(f);
     internal bool ZonghuTurnOpen(int seat) => _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.TurnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
     internal bool ZonghuSpent(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuCostPaidEvent>().Any(e => e.Source.OwnerSeat == seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.ActualTurnOwner == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
     internal IEnumerable<(CardConversionSource Source, string Hash)> ZonghuSources(CharacterState actor)
@@ -45,11 +40,11 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             return N(ZonghuIntent.Dying, provider, [d.VictimSeat], d.ResponderIndex, ownerId: d.Id);
         if (kind == DecisionKind.RespondDodge)
         {
-            if (_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } fd && fd.CurrentCandidateSeat == provider && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(fd.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack))
+            if (_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } fd && fd.CurrentCandidateSeat == provider && CoreNativeDamageHandlesRuntime.SameAttackOwner(fd.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack))
                 return N(ZonghuIntent.FactionDodge, fd.OwnerSeat, [], fd.CandidateIndex, fd.OwnerSeat, fd.Attack.SourceSeat, ownerId: fd.Attack.ResolutionId);
             if (_coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack, CurrentAttack: { } ga } g && ga.TargetSeat == provider && g.RequiredCardKind == CardKind.Dodge)
                 return N(ZonghuIntent.Group, provider, [], ga.SuccessfulDodgeResponses, opponent: g.SourceSeat, index: g.TargetIndex, ownerId: g.ResolutionId);
-            if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } a && a.TargetSeat == provider && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveCardKind ?? CardKind.Dodge))
+            if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } a && a.TargetSeat == provider && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveCardKind ?? CardKind.Dodge))
                 return N(ZonghuIntent.Dodge, provider, [], a.SuccessfulDodgeResponses, opponent: a.SourceSeat, ownerId: a.ResolutionId);
         }
 
@@ -57,7 +52,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         {
             if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { AwaitingProviders: true } f && f.CurrentCandidateSeat == provider)
             {
-                var played = !global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(f);
+                var played = !CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(f);
                 var opponent = f.Purpose == FactionCardRequestPurpose.DuelResponse ? _coreNativeCardContinuationCursorsOperations.ActiveDuel?.OpponentSeat : f.ResponseAttack?.SourceSeat;
                 var program = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == f.ProgramSkillFrameId);
                 return N(played ? ZonghuIntent.FactionSlashPlayed : ZonghuIntent.FactionSlashUse, f.OwnerSeat, f.TargetSeat is { } t ? [t] : [], f.CandidateIndex, f.OwnerSeat, opponent, op: program is null ? null : _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(program)?.Op, instruction: program?.InstructionIndex ?? 0, ownerId: f.OwnerFrameId);
@@ -71,7 +66,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
                 return N(ZonghuIntent.Group, provider, [], opponent: g.SourceSeat, index: g.TargetIndex, ownerId: g.ResolutionId);
         }
 
-        if (kind == DecisionKind.QinglongCrescentBlade && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.SourceSeat == provider && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack))
+        if (kind == DecisionKind.QinglongCrescentBlade && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.SourceSeat == provider && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack))
             return N(ZonghuIntent.Qinglong, provider, [q.Attack.TargetSeat], opponent: q.Attack.TargetSeat, ownerId: q.Attack.ResolutionId);
         if (kind != DecisionKind.ProgramTrigger || top is not ProgramSkillFrame p || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(p)is not { } effect)
             return null;
@@ -100,8 +95,8 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         }, provider, targets, op: effect.Op, instruction: p.InstructionIndex);
     }
 
-    internal static bool ZonghuIsDying(ZonghuNeed n) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuNeeds.ZonghuIsDying(n);
-    internal static bool ZonghuIsPlayed(ZonghuNeed n) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuNeeds.ZonghuIsPlayed(n);
+    internal static bool ZonghuIsDying(ZonghuNeed n) => RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuNeeds.ZonghuIsDying(n);
+    internal static bool ZonghuIsPlayed(ZonghuNeed n) => RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuNeeds.ZonghuIsPlayed(n);
     internal IEnumerable<(CardKind Kind, int Target)> ZonghuOutputs(ZonghuNeed n)
     {
         if (n.ProviderSeat != n.ActorSeat || n.RequesterSeat is not null || n.Intent is ZonghuIntent.Dying or ZonghuIntent.Group or ZonghuIntent.Duel or ZonghuIntent.FactionDodge or ZonghuIntent.FactionSlashPlayed or ZonghuIntent.FactionSlashUse)
@@ -127,7 +122,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[n.ActorSeat];
         var provider = _coreMatchParticipantsPlayersAccess._players[n.ProviderSeat];
         var action = ZonghuIsPlayed(n) || n.Intent == ZonghuIntent.Dodge ? CardActionType.Response : CardActionType.Use;
-        if (_coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, kind, action) || n.ProviderSeat != n.ActorSeat && _coreCardUseModulesOperations.IsCardUseForbidden(n.ProviderSeat, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? CardKind.Slash : kind, action) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action == CardActionType.Response && _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, CardKind.Slash, action))
+        if (_coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, kind, action) || n.ProviderSeat != n.ActorSeat && _coreCardUseModulesOperations.IsCardUseForbidden(n.ProviderSeat, CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? CardKind.Slash : kind, action) || CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action == CardActionType.Response && _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, CardKind.Slash, action))
             return false;
         if (n.Intent == ZonghuIntent.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) && _coreIssuedPlayUsePoliciesOperations.HasIssuedPlayPhaseUseBan(actor.Seat))
             return false;
@@ -140,7 +135,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
                 return false;
             if (kind == CardKind.Dodge && (_coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(attack)is not null || !_coreRecordedSuitSlashOperations.IsRecordedSuitResponseAllowed(provider, [], kind)))
                 return false;
-            return n.Intent == ZonghuIntent.Dodge ? kind == CardKind.Dodge && attack.TargetSeat == n.ActorSeat && attack.SuccessfulDodgeResponses == n.Cursor : n.Intent == ZonghuIntent.Duel ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreNativeCardContinuationCursorsOperations.ActiveDuel?.ResponderSeat == n.ActorSeat && _coreNativeCardContinuationCursorsOperations.ActiveDuel.SuccessfulSlashResponses == n.Cursor : n.Intent == ZonghuIntent.Group ? _coreNativeCardContinuationCursorsOperations.ActiveGroupCard?.TargetIndex == n.TargetIndex && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(kind, _coreNativeCardContinuationCursorsOperations.ActiveGroupCard.RequiredCardKind!.Value) : n.Intent == ZonghuIntent.FactionDodge ? kind == CardKind.Dodge && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.CurrentCandidateSeat == n.ProviderSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense.CandidateIndex == n.Cursor : _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest?.CurrentCandidateSeat == n.ProviderSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.CandidateIndex == n.Cursor && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
+            return n.Intent == ZonghuIntent.Dodge ? kind == CardKind.Dodge && attack.TargetSeat == n.ActorSeat && attack.SuccessfulDodgeResponses == n.Cursor : n.Intent == ZonghuIntent.Duel ? CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreNativeCardContinuationCursorsOperations.ActiveDuel?.ResponderSeat == n.ActorSeat && _coreNativeCardContinuationCursorsOperations.ActiveDuel.SuccessfulSlashResponses == n.Cursor : n.Intent == ZonghuIntent.Group ? _coreNativeCardContinuationCursorsOperations.ActiveGroupCard?.TargetIndex == n.TargetIndex && CoreNativeCardClassificationsRuntime.MatchesRequiredCard(kind, _coreNativeCardContinuationCursorsOperations.ActiveGroupCard.RequiredCardKind!.Value) : n.Intent == ZonghuIntent.FactionDodge ? kind == CardKind.Dodge && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.CurrentCandidateSeat == n.ProviderSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense.CandidateIndex == n.Cursor : _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest?.CurrentCandidateSeat == n.ProviderSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.CandidateIndex == n.Cursor && CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
         }
 
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(n.ActorSeat, target, Suit.None) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(n.ActorSeat, target, kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None))
@@ -149,7 +144,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             return n.Intent == ZonghuIntent.GenericBasic && target == n.ActorSeat && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(n.ActorSeat);
         if (kind == CardKind.Alcohol)
             return n.Intent == ZonghuIntent.GenericBasic && target == n.ActorSeat && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(n.ActorSeat) && _characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null);
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || target == n.ActorSeat || !n.Targets.Contains(target))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || target == n.ActorSeat || !n.Targets.Contains(target))
             return false;
         if (n.Intent == ZonghuIntent.BorrowedSword)
             return _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true, ActiveAttack: null } b && b.ResolutionId == n.OwnerFrameId && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None, false, null, 0, []);
@@ -168,19 +163,19 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             return false;
         var kind = _coreDyingCursorRuntimeOperations.ActiveDying?.ResponderSeat == actor.Seat ? DecisionKind.RescueDying : required == CardKind.Dodge ? DecisionKind.RespondDodge : DecisionKind.RespondSlash;
         var n = ZonghuCurrentNeed(actor.Seat, kind, _resolutionStackOperations._resolutionStack.LastOrDefault());
-        return n is not null && ZonghuOutputs(n).Any(o => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(o.Kind, required) || ZonghuIsDying(n) && required == CardKind.Peach);
+        return n is not null && ZonghuOutputs(n).Any(o => CoreNativeCardClassificationsRuntime.MatchesRequiredCard(o.Kind, required) || ZonghuIsDying(n) && required == CardKind.Peach);
     }
 
     internal bool HasZonghuForcedSlash(CharacterState actor, CharacterState target, bool qinglong) => ZonghuSources(actor).Any() && ZonghuVictims(actor.Seat).Any() && ZonghuCurrentNeed(actor.Seat, qinglong ? DecisionKind.QinglongCrescentBlade : DecisionKind.RespondSlash, _resolutionStackOperations._resolutionStack.LastOrDefault())is { } n && n.Targets.Contains(target.Seat) && ZonghuOutputs(n).Any();
-    internal bool HasZonghuForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => HasZonghuCapability && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.ActiveAttack is null && pending.WeaponOwnerSeat == actor.Seat && pending.SlashTargetSeat == target.Seat && actor.IsAlive && target.IsAlive && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && ZonghuSources(actor).Any() && ZonghuVictims(actor.Seat).Any() && new[]
+    internal bool HasZonghuForcedSlash(CharacterState actor, CharacterState target, NativeOwners.BorrowedSwordHandle pending) => HasZonghuCapability && CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.ActiveAttack is null && pending.WeaponOwnerSeat == actor.Seat && pending.SlashTargetSeat == target.Seat && actor.IsAlive && target.IsAlive && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && ZonghuSources(actor).Any() && ZonghuVictims(actor.Seat).Any() && new[]
     {
         CardKind.Slash
     }.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, Suit.None) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) && _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, kind, Suit.None, false, null, 0, []));
-    internal bool HasZonghuForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => HasZonghuCapability && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.Attack.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && actor.IsAlive && target.IsAlive && ZonghuSources(actor).Any() && ZonghuVictims(actor.Seat).Any() && new[]
+    internal bool HasZonghuForcedSlash(CharacterState actor, CharacterState target, NativeOwners.QinglongCrescentBladeHandle pending) => HasZonghuCapability && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.Attack.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && actor.IsAlive && target.IsAlive && ZonghuSources(actor).Any() && ZonghuVictims(actor.Seat).Any() && new[]
     {
         CardKind.Slash
     }.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, Suit.None) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, kind, null, false, Suit.None, 0, []));
-    internal bool HasZonghuProgramSlash(CharacterState actor, IEnumerable<int> targets) => ZonghuSources(actor).Any() && ZonghuVictims(actor.Seat).Any() && ZonghuCurrentNeed(actor.Seat, DecisionKind.ProgramTrigger, _resolutionStackOperations._resolutionStack.LastOrDefault())is { } n && ZonghuOutputs(n).Any(o => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(o.Kind) && targets.Contains(o.Target));
+    internal bool HasZonghuProgramSlash(CharacterState actor, IEnumerable<int> targets) => ZonghuSources(actor).Any() && ZonghuVictims(actor.Seat).Any() && ZonghuCurrentNeed(actor.Seat, DecisionKind.ProgramTrigger, _resolutionStackOperations._resolutionStack.LastOrDefault())is { } n && ZonghuOutputs(n).Any(o => CoreNativeCardClassificationsRuntime.IsSlashCard(o.Kind) && targets.Contains(o.Target));
     internal bool HasZonghuGenericBasic(ProgramSkillFrame f) => f.KeBiNengPingduan is { } r && ZonghuSources(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat]).Any() && ZonghuVictims(r.ActorSeat).Any() && ZonghuCurrentNeed(r.ActorSeat, DecisionKind.ProgramTrigger, f)is { } n && ZonghuOutputs(n).Any();
     internal PendingDecision? AddZonghuRequestChoices(PendingDecision? p)
     {
@@ -201,7 +196,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
                     "open"
                 }
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
             choices.Add(new(new($"zonghu.{(n.RequestFrameId)}.{(source.SkillInstanceId)}"), "发动【宗护】：交给他人牌，视为本人使用杀或闪", [], [], args));
         }
 
@@ -211,5 +206,5 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         };
     }
 
-    internal static PendingDecision ZonghuNativeDecision(PendingDecision p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuNeeds.ZonghuNativeDecision(p);
+    internal static PendingDecision ZonghuNativeDecision(PendingDecision p) => RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuNeeds.ZonghuNativeDecision(p);
 }

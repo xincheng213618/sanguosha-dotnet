@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNationalSkillsRuntime
 {
-    internal static int DualGeneralMaxHp(GeneralDefinition primary, GeneralDefinition secondary) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NationalSkills.DualGeneralMaxHp(primary, secondary);
+    internal static int DualGeneralMaxHp(GeneralDefinition primary, GeneralDefinition secondary) => RuntimeSkills.RuntimeRules_Core_NationalSkills.DualGeneralMaxHp(primary, secondary);
     internal void InitializeDualGeneralHealth()
     {
         if (!_coreNativeDamageHandlesOperations.IsDualGeneralMode)
@@ -37,7 +33,7 @@ internal sealed partial class CoreGameEngineNationalSkillsRuntime
         return ToRuntimeSkillDefinition(skill);
     }
 
-    internal static GeneralSkillDefinition ToRuntimeSkillDefinition(ContentSkillDefinition skill) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NationalSkills.ToRuntimeSkillDefinition(skill);
+    internal static GeneralSkillDefinition ToRuntimeSkillDefinition(ContentSkillDefinition skill) => RuntimeSkills.RuntimeRules_Core_NationalSkills.ToRuntimeSkillDefinition(skill);
     internal IEnumerable<GeneralSkillDefinition> OwnedRuntimeSkills(CharacterState player, GeneralDefinition general, bool includeAcquired)
     {
         var emitted = new HashSet<string>(StringComparer.Ordinal);

@@ -1,11 +1,7 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-internal interface ICoreResponseCompletionHealthResponseCompletionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreResponseCompletionHealthResponseCompletionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ResponseCompletionRuntime Get();
+    ResponseCompletionRuntime Get();
 }

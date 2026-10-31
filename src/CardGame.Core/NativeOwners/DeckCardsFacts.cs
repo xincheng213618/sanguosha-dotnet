@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class DeckCardsFacts(global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState, global::CardGame.Core.EngineStates.CoreCardMovementJournalState cardMovementJournalState, global::System.Func<global::CardGame.Core.CardZoneStore> getCardZoneStore, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreHappyWeiYanGainDestinationsEntries> getCoreHappyWeiYanGainDestinationsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZuoCiHappyGodEntries> getCharacterZuoCiHappyGodRuntime) : IProgramDeckCardsFacts
+internal sealed class DeckCardsFacts(EngineStates.CoreMatchParticipantsState matchParticipantsState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, Func<CardZoneStore> getCardZoneStore, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CoreHappyWeiYanGainDestinationsEntries> getCoreHappyWeiYanGainDestinationsRuntime, Func<RuntimeEntries.CharacterZuoCiHappyGodEntries> getCharacterZuoCiHappyGodRuntime) : IProgramDeckCardsFacts
 {
     public bool Alive(int seat) => matchParticipantsState.ReferenceToPlayers[seat].IsAlive;
     public long MovementSequence => cardMovementJournalState.ReferenceToMovementSequence;

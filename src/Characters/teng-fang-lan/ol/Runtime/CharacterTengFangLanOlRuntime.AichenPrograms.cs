@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTengFangLanOlRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterTengFangLanOlRuntime
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, active.SkillId, active.SkillInstanceId))
             return SkillProgramStepOutcome.Continue;
         var removed = AichenRemovedOptions(active.OwnerSeat);
-        var remaining = global::CardGame.Core.EngineOwners.CharacterTengFangLanOlDefinitions.LuochongOptionIds.Where(optionId => !removed.Contains(optionId)).ToArray();
+        var remaining = CharacterTengFangLanOlDefinitions.LuochongOptionIds.Where(optionId => !removed.Contains(optionId)).ToArray();
         if (remaining.Length <= 1)
             return SkillProgramStepOutcome.Continue;
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
@@ -43,9 +39,9 @@ internal sealed partial class CharacterTengFangLanOlRuntime
         if (selected.Parameters.GetValueOrDefault("option")is not { } option || !IsLuochongOptionId(option) || AichenRemovedOptions(active.OwnerSeat).Contains(option))
             throw new InvalidOperationException("The Aichen removal option is no longer available.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        var remainingCount = global::CardGame.Core.EngineOwners.CharacterTengFangLanOlDefinitions.LuochongOptionIds.Length - AichenRemovedOptions(active.OwnerSeat).Count - 1;
+        var remainingCount = CharacterTengFangLanOlDefinitions.LuochongOptionIds.Length - AichenRemovedOptions(active.OwnerSeat).Count - 1;
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】，移除“落宠”的选项：{(LuochongOptionDisplayName(option))}。", active.OwnerSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAichenRemovedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, option, remainingCount));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAichenRemovedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, option, remainingCount));
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
 }

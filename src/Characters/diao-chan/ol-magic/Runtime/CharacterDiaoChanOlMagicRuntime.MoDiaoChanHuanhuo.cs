@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanOlMagicRuntime
 {
     internal bool HasMoDiaoChan => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMoDiaoChanHuanhuoRound) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMoDiaoChanQingshiPrep);
 
-    internal static CardConversionSource MoDcSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_diao_chan_ol_magic_MoDiaoChanHuanhuo.MoDcSource(f);
+    internal static CardConversionSource MoDcSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_diao_chan_ol_magic_MoDiaoChanHuanhuo.MoDcSource(f);
     internal int? MoDcDueTurn(MoDiaoChanPromiseEvent p) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Skip(p.AfterTurnStartOrdinal).FirstOrDefault(t => t.ActorSeat == p.TargetSeat)?.TurnNumber;
     internal MoDiaoChanPromiseEvent[] ActiveMoDcPromises(int actor) => !HasMoDiaoChan || !_coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn || actor != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != actor ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanPromiseEvent>().Where(p => p.TargetSeat == actor && MoDcDueTurn(p) == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim.PromiseId == p.PromiseId) < 2).ToArray();
     internal int MoDcRemaining(int actor) => ActiveMoDcPromises(actor).Select(p => 2 - _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim.PromiseId == p.PromiseId)).DefaultIfEmpty(0).Max();

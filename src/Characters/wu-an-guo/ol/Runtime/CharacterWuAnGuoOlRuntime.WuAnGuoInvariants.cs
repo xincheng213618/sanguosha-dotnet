@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuAnGuoOlRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
         var movements = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).ToArray();
         if (r.ObtainedCardId is { } card)
         {
-            if (movements is not [var m] || m.CardId != card || m.From != CardLocation.DrawPile || m.To != CardLocation.Hand(f.OwnerSeat) || m.Reason.Value != LiyongGainReason || (global::CardGame.Core.EngineOwners.CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(_coreCardAttackStateOperations.GetAttackCard(card).Suit) & r.UsedSuitMask) == 0)
+            if (movements is not [var m] || m.CardId != card || m.From != CardLocation.DrawPile || m.To != CardLocation.Hand(f.OwnerSeat) || m.Reason.Value != LiyongGainReason || (CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(_coreCardAttackStateOperations.GetAttackCard(card).Suit) & r.UsedSuitMask) == 0)
                 return false;
         }
         else if (r.Before != r.After || movements.Length != 0)

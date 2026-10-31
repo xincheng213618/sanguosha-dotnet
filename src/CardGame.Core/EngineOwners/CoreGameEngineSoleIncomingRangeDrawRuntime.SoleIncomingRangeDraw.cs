@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSoleIncomingRangeDrawRuntime
 {
-    internal static CardMoveReason SoleIncomingRangeDrawReason(SoleIncomingEffectGrant grant) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SoleIncomingRangeDraw.SoleIncomingRangeDrawReason(grant);
-    internal bool TryBeginSoleIncomingAttackRangeDraw(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal static CardMoveReason SoleIncomingRangeDrawReason(SoleIncomingEffectGrant grant) => RuntimeSkills.RuntimeRules_Core_SoleIncomingRangeDraw.SoleIncomingRangeDrawReason(grant);
+    internal bool TryBeginSoleIncomingAttackRangeDraw(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { SoleIncomingEffects: { } rounds } use || rounds.DrawIndex >= rounds.Grants.Count)
             return false;
@@ -52,7 +48,7 @@ internal sealed partial class CoreGameEngineSoleIncomingRangeDrawRuntime
             var count = Math.Min(grant.MaximumDrawCount, Math.Max(0, range));
             var receipt = new SoleIncomingRangeDrawReceipt(grant, rounds.DrawIndex, range, count, SoleIncomingRangeDrawStage.Requesting)
             {
-                AwaitingProgramFrameId = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()is { } parent && global::CardGame.Core.EngineOwners.CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(parent) ? parent.Id : null
+                AwaitingProgramFrameId = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()is { } parent && CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(parent) ? parent.Id : null
             };
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, current => current with { SoleIncomingRangeDraw = receipt, NativeDraw = new NativeDrawProducerReceipt(0, count, null, SkillProgramCardSetVisibility.Private, SoleIncomingRangeDrawReason(grant)) { Recipients = [owner.Seat], ReturnKind = NativeDrawAttemptReturnKind.SoleIncomingRange } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SoleIncomingRangeDrawRequestedEvent(id, grant.ProgramFrameId, owner.Seat, range, count));
@@ -109,14 +105,14 @@ internal sealed partial class CoreGameEngineSoleIncomingRangeDrawRuntime
     }
 
     internal bool IsSoleIncomingRangeDrawMovement(CardUseFrame use, CardMovementBatchContext batch) => use.SoleIncomingRangeDraw is { Stage: SoleIncomingRangeDrawStage.Children, Outcome: { } result } receipt && batch.ParentFrameId == use.Id && batch.AwaitingProgramFrameId == receipt.AwaitingProgramFrameId && batch.Movements.Count > 0 && batch.Movements.All(m => m.Sequence > result.SequenceBefore && m.Sequence <= result.SequenceAfter && (result.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(result.RecipientSeat) && m.Reason == SoleIncomingRangeDrawReason(receipt.Grant) || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle));
-    internal bool IsSoleIncomingRangeDrawMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame window) => window.ResumeSoleIncomingRangeDrawFrameId == use.Id && window.Id == window.Batch.Id && window.ResumeProgramFrameId is null && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(window with { ResumeSoleIncomingRangeDrawFrameId = null }) && IsSoleIncomingRangeDrawMovement(use, window.Batch);
+    internal bool IsSoleIncomingRangeDrawMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame window) => window.ResumeSoleIncomingRangeDrawFrameId == use.Id && window.Id == window.Batch.Id && window.ResumeProgramFrameId is null && !CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(window with { ResumeSoleIncomingRangeDrawFrameId = null }) && IsSoleIncomingRangeDrawMovement(use, window.Batch);
 
     internal void AssertSoleIncomingEffectRounds(CardUseFrame use)
     {
         if (use.SoleIncomingEffects is not { } r)
             return;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        if (use.Action is not { Type: CardActionType.Use } action || r.ActionId != action.ActionId || r.Grants.Count == 0 || r.Grants.Select(g => g.ProgramFrameId).Distinct().Count() != r.Grants.Count || r.Started < 0 || r.Started > r.Grants.Count || r.DrawIndex < 0 || r.DrawIndex > r.Grants.Count || r.Active && r.Started == 0 || r.Native.ActionId != action.ActionId || r.Native.WholeGroupRepeated != (r.Started > 0) || !global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(use.CardKind) || r.Native.OriginalAttacks.GroupBy(s => s.TargetIndex).Any(g => g.Count() != 1) || r.Native.OriginalAttacks.Any(s => s.TargetIndex < 0 || s.TargetIndex >= use.TargetSeats.Count) || r.Grants.Any(g => g.UseFrameId != use.Id || g.ActionId != action.ActionId || g.TargetSeat != g.Source.OwnerSeat || g.OriginalActorSeat == g.TargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(g.TargetSeat) || g.MaximumDrawCount is < 1 or > 20 || g.WindowFrameId <= use.Id || g.ProgramFrameId <= g.WindowFrameId || !global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(g.CardKind) || history.OfType<SoleIncomingEffectIssuedEvent>().Count(e => e.Grant == g) != 1 || history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == g.ProgramFrameId && e.SkillId == g.Source.SkillId && e.SkillInstanceId == g.Source.SkillInstanceId && e.OwnerSeat == g.Source.OwnerSeat && e.BindingId == g.Source.BindingId && e.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized) != 1 || _contentRegistryOperations._contentRegistry.GetSkill(g.Source.SkillId).Program is not { } p || p.GameplayHash != g.GameplayHash || ProgramInstructionResolver.Default.FindTrigger(p, g.Source.BindingId)?.Effects is not [{ Op: SkillProgramEffectOp.RepeatIncomingSoleCardEffectAndDrawByRange, Amount: var cap }] || cap != g.MaximumDrawCount) || !Enumerable.Range(1, r.Started).SequenceEqual(history.OfType<SoleIncomingEffectRoundStartedEvent>().Where(e => e.UseFrameId == use.Id).Select(e => e.Round)))
+        if (use.Action is not { Type: CardActionType.Use } action || r.ActionId != action.ActionId || r.Grants.Count == 0 || r.Grants.Select(g => g.ProgramFrameId).Distinct().Count() != r.Grants.Count || r.Started < 0 || r.Started > r.Grants.Count || r.DrawIndex < 0 || r.DrawIndex > r.Grants.Count || r.Active && r.Started == 0 || r.Native.ActionId != action.ActionId || r.Native.WholeGroupRepeated != (r.Started > 0) || !CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(use.CardKind) || r.Native.OriginalAttacks.GroupBy(s => s.TargetIndex).Any(g => g.Count() != 1) || r.Native.OriginalAttacks.Any(s => s.TargetIndex < 0 || s.TargetIndex >= use.TargetSeats.Count) || r.Grants.Any(g => g.UseFrameId != use.Id || g.ActionId != action.ActionId || g.TargetSeat != g.Source.OwnerSeat || g.OriginalActorSeat == g.TargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(g.TargetSeat) || g.MaximumDrawCount is < 1 or > 20 || g.WindowFrameId <= use.Id || g.ProgramFrameId <= g.WindowFrameId || !CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(g.CardKind) || history.OfType<SoleIncomingEffectIssuedEvent>().Count(e => e.Grant == g) != 1 || history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == g.ProgramFrameId && e.SkillId == g.Source.SkillId && e.SkillInstanceId == g.Source.SkillInstanceId && e.OwnerSeat == g.Source.OwnerSeat && e.BindingId == g.Source.BindingId && e.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized) != 1 || _contentRegistryOperations._contentRegistry.GetSkill(g.Source.SkillId).Program is not { } p || p.GameplayHash != g.GameplayHash || ProgramInstructionResolver.Default.FindTrigger(p, g.Source.BindingId)?.Effects is not [{ Op: SkillProgramEffectOp.RepeatIncomingSoleCardEffectAndDrawByRange, Amount: var cap }] || cap != g.MaximumDrawCount) || !Enumerable.Range(1, r.Started).SequenceEqual(history.OfType<SoleIncomingEffectRoundStartedEvent>().Where(e => e.UseFrameId == use.Id).Select(e => e.Round)))
             throw new InvalidOperationException("An incoming extra effect lost its accepted native use, source or ordered issued grants.");
         for (var index = 0; index < r.Grants.Count; index++)
         {
@@ -148,7 +144,7 @@ internal sealed partial class CoreGameEngineSoleIncomingRangeDrawRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AttackCompletionPrelude, 30)]
-    internal bool FinishSoleIncomingAttackRangeDraw(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishSoleIncomingAttackRangeDraw(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = TryBeginSoleIncomingAttackRangeDraw(attack);
         return paused;

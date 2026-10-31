@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterKanZeOlRuntime
 {
     internal const string XiashuGiftBind = "xiashu.gift", XiashuShownBind = "xiashu.shown", XiashuClaimBind = "xiashu.claim", XiashuGiftReason = "program.xiashu.gift", XiashuClaimReason = "program.xiashu.claim";
-    internal CardConversionSource KanZeSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource KanZeSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillProgramStepOutcome BeginXiashu(ProgramSkillFrame supplied, int recipient)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -75,7 +70,7 @@ internal sealed partial class CharacterKanZeOlRuntime
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         var r = f.XiashuPaid!;
         var seat = r.Stage == XiashuStage.OwnerClaim ? f.OwnerSeat : r.Invoice.RecipientSeat;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], XiashuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], XiashuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xiashu decision lost its actual chooser.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == XiashuStage.RecipientReveal)
@@ -145,6 +140,6 @@ internal sealed partial class CharacterKanZeOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IKanZeProgramHost.BeginXiashu(ProgramSkillFrame f, int target) => BeginXiashu(f, target);
-    SkillProgramStepOutcome global::CardGame.Core.IKanZeProgramHost.ArmKuanshi(ProgramSkillFrame f, int target) => ArmKuanshi(f, target);
+    SkillProgramStepOutcome IKanZeProgramHost.BeginXiashu(ProgramSkillFrame f, int target) => BeginXiashu(f, target);
+    SkillProgramStepOutcome IKanZeProgramHost.ArmKuanshi(ProgramSkillFrame f, int target) => ArmKuanshi(f, target);
 }

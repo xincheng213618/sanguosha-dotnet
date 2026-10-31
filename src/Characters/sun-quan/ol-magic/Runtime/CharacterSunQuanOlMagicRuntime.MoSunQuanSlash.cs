@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -39,19 +36,19 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMoSunQuanSlashHost.Resolve(ProgramSkillFrame frame) => BeginMoQuanyuSlash(frame);
+    SkillProgramStepOutcome IMoSunQuanSlashHost.Resolve(ProgramSkillFrame frame) => BeginMoQuanyuSlash(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28912)]
     internal bool CanOfferMoQuanyuSlash(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMoSunQuanQuanyuSlashEffects))
             return true;
-        return candidate.SkillId == "ol:mo-quanyu" && candidate.BindingId == "singleton-slash-effects" && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && TryGetMoQuanyuSingletonUse(candidate.OwnerSeat, context, out var use, out var window, out var target) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window) && MoQuanyuSlashMask(candidate.OwnerSeat, target) != 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuSlashStartedEvent>().Any(e => e.Original.UseId == use.Id && e.Source.OwnerSeat == candidate.OwnerSeat);
+        return candidate.SkillId == "ol:mo-quanyu" && candidate.BindingId == "singleton-slash-effects" && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && TryGetMoQuanyuSingletonUse(candidate.OwnerSeat, context, out var use, out var window, out var target) && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window) && MoQuanyuSlashMask(candidate.OwnerSeat, target) != 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuSlashStartedEvent>().Any(e => e.Original.UseId == use.Id && e.Source.OwnerSeat == candidate.OwnerSeat);
     }
 
     internal SkillProgramStepOutcome BeginMoQuanyuSlash(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.MoQuanyuSlash is not null || f.WindowContext is not { } context || f.SkillId != "ol:mo-quanyu" || f.TriggerId != "singleton-slash-effects" || f.InstructionIndex != 1 || !TryGetMoQuanyuSingletonUse(f.OwnerSeat, context, out var use, out _, out var target) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (f.MoQuanyuSlash is not null || f.WindowContext is not { } context || f.SkillId != "ol:mo-quanyu" || f.TriggerId != "singleton-slash-effects" || f.InstructionIndex != 1 || !TryGetMoQuanyuSingletonUse(f.OwnerSeat, context, out var use, out _, out var target) || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             throw new InvalidOperationException("Quanyu requires its original sole-target native Slash and exact finalized-window producer.");
         var mask = MoQuanyuSlashMask(f.OwnerSeat, target);
         if (mask == 0 || use.MoQuanyuSlashPolicy is not null)
@@ -98,7 +95,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     [ProgramAnswer("mo-quanyu-extra-target")]
     internal void AnswerMoQuanyuAdditionalTarget(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoQuanyuSlash: { Stage: MoQuanyuSlashStage.AdditionalTarget } r } f || r.Choices.SingleOrDefault(c => c.Id == selected.Id)is not { } choice || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.Original.UseId)is not { Action: { } a } use)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoQuanyuSlash: { Stage: MoQuanyuSlashStage.AdditionalTarget } r } f || r.Choices.SingleOrDefault(c => c.Id == selected.Id)is not { } choice || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.Original.UseId)is not { Action: { } a } use)
             throw new InvalidOperationException("Quanyu extra target answer lost its frozen original Slash choice.");
         if (choice.Targets is [var added])
         {
@@ -149,7 +146,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    internal void ApplyMoQuanyuAttackPolicy(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void ApplyMoQuanyuAttackPolicy(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MoQuanyuSlashPolicy is not { Stage: MoQuanyuSlashStage.Applied } r)
             return;
@@ -160,7 +157,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 60)]
-    internal int MoQuanyuDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MoQuanyuSlashPolicy is { Stage: MoQuanyuSlashStage.Applied } r && (r.Mask & MoQuanyuBit(MoQuanyuEffect.Baihong)) != 0 ? 1 : 0;
+    internal int MoQuanyuDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MoQuanyuSlashPolicy is { Stage: MoQuanyuSlashStage.Applied } r && (r.Mask & MoQuanyuBit(MoQuanyuEffect.Baihong)) != 0 ? 1 : 0;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMoSunQuanQuanyuSlashEffects)]
-    internal PromptChoice ChooseMoQuanyuExtraTargetAi(PendingDecision prompt, ProgramSkillFrame f) => prompt.Choices.FirstOrDefault(c => c.Targets is [var target] && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? prompt.Choices.Single(c => c.Targets.Count == 0);
+    internal PromptChoice ChooseMoQuanyuExtraTargetAi(PendingDecision prompt, ProgramSkillFrame f) => prompt.Choices.FirstOrDefault(c => c.Targets is [var target] && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? prompt.Choices.Single(c => c.Targets.Count == 0);
 }

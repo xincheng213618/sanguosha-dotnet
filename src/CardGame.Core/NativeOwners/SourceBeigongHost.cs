@@ -1,8 +1,7 @@
 #nullable enable
-using System.Globalization;
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class SourceBeigongHost(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineSourceDingxiEntries> getCoreGameEngineSourceDingxiRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineSourceBeigongEntries> getCoreGameEngineSourceBeigongRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineSourceHuojieEntries> getCoreGameEngineSourceHuojieRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineSourceXingxiaEntries> getCoreGameEngineSourceXingxiaRuntime) : ISourceBeigongHost
+internal sealed class SourceBeigongHost(Func<RuntimeEntries.CoreGameEngineSourceDingxiEntries> getCoreGameEngineSourceDingxiRuntime, Func<RuntimeEntries.CoreGameEngineSourceBeigongEntries> getCoreGameEngineSourceBeigongRuntime, Func<RuntimeEntries.CoreGameEngineSourceHuojieEntries> getCoreGameEngineSourceHuojieRuntime, Func<RuntimeEntries.CoreGameEngineSourceXingxiaEntries> getCoreGameEngineSourceXingxiaRuntime) : ISourceBeigongHost
 {
     public SkillProgramStepOutcome Run(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {

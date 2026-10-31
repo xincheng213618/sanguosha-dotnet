@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBuZhiOlRuntime
 {
-    internal global::CardGame.Core.GameEngine.NativeBuZhiDiscardInvocationDraft? CaptureNativeBuZhiDiscardInvocation(ProgramSkillFrame frame, IReadOnlyList<CardZoneKind> zones, CardMoveReason reason)
+    internal GameEngine.NativeBuZhiDiscardInvocationDraft? CaptureNativeBuZhiDiscardInvocation(ProgramSkillFrame frame, IReadOnlyList<CardZoneKind> zones, CardMoveReason reason)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferNativeBatchHandGainOrCardLossBenefit) || !_coreMatchSetupSetupCompleteAccess._setupComplete || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber < 1)
             return null;
@@ -19,16 +15,16 @@ internal sealed partial class CharacterBuZhiOlRuntime
             return null;
         if (!effect.Zones.SequenceEqual(zones) || zones.Count == 0 || zones.Distinct().Count() != zones.Count || zones.Any(z => z is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment)))
             throw new InvalidOperationException("Native discard aggregation cannot capture invented zones.");
-        var eligible = zones.SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, active.OwnerSeat)).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(active.OwnerSeat, c, new(z, active.OwnerSeat), OwnedCardMoveIntent.Discard)).Select(c => new NativeBuZhiDiscardMaterial(c.Id, c.Kind, new(z, active.OwnerSeat), _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(c, new(z, active.OwnerSeat), (c.IsGeneralWeapon && z == CardZoneKind.Equipment || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(c, new(z, active.OwnerSeat), CardLocation.DiscardPile)) ? CardLocation.OutsideGame : CardLocation.DiscardPile), 0))).ToArray();
-        return new(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, active.Id, new(active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId), active.GameplayHash, active.InstructionIndex, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, reason, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Array.AsReadOnly(zones.ToArray()), Array.AsReadOnly(eligible));
+        var eligible = zones.SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, active.OwnerSeat)).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(active.OwnerSeat, c, new(z, active.OwnerSeat), OwnedCardMoveIntent.Discard)).Select(c => new NativeBuZhiDiscardMaterial(c.Id, c.Kind, new(z, active.OwnerSeat), _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(c, new(z, active.OwnerSeat), (c.IsGeneralWeapon && z == CardZoneKind.Equipment || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(c, new(z, active.OwnerSeat), CardLocation.DiscardPile)) ? CardLocation.OutsideGame : CardLocation.DiscardPile), 0))).ToArray();
+        return new(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, active.Id, new(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId), active.GameplayHash, active.InstructionIndex, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, reason, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Array.AsReadOnly(zones.ToArray()), Array.AsReadOnly(eligible));
     }
 
-    internal void CompleteNativeBuZhiDiscardInvocation(global::CardGame.Core.GameEngine.NativeBuZhiDiscardInvocationDraft? draft, IReadOnlyList<int> actualIds)
+    internal void CompleteNativeBuZhiDiscardInvocation(GameEngine.NativeBuZhiDiscardInvocationDraft? draft, IReadOnlyList<int> actualIds)
     {
         if (draft is null || actualIds.Count == 0)
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(draft.FrameId);
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) != draft.Source || f.GameplayHash != draft.GameplayHash || f.InstructionIndex != draft.InstructionIndex || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber != draft.Turn || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat != draft.TurnOwner || actualIds.Distinct().Count() != actualIds.Count)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) != draft.Source || f.GameplayHash != draft.GameplayHash || f.InstructionIndex != draft.InstructionIndex || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber != draft.Turn || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat != draft.TurnOwner || actualIds.Distinct().Count() != actualIds.Count)
             throw new InvalidOperationException("One synchronous native discard invocation lost its owning source or repeated an entity.");
         var after = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var materials = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > draft.Before && m.Sequence <= after && m.From.OwnerSeat == draft.Source.OwnerSeat && draft.Zones.Contains(m.From.Zone) && m.Reason == draft.Reason).OrderBy(m => m.Sequence).Select(m => new NativeBuZhiDiscardMaterial(m.CardId, m.CardKind, m.From, m.To, m.Sequence)).ToArray();

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouYuOlMouRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         var target = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
         var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card);
-        return !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, [id]) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, CardKind.Alcohol, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, CardKind.Alcohol) && !(_coreCardUseModulesOperations.HasTurnCardTargetRestriction(actor.Seat, SkillProgramCardTargetRestriction.SelfOnly) && actor.Seat != target.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.Alcohol, suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, suit) && IsMouGuquUseAllowed(actor.Seat, CardKind.Alcohol, [id], r.Source);
+        return !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, [id]) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, CardKind.Alcohol, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, CardKind.Alcohol) && !(_coreCardUseModulesOperations.HasTurnCardTargetRestriction(actor.Seat, SkillProgramCardTargetRestriction.SelfOnly) && actor.Seat != target.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.Alcohol, suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(suit)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, suit) && IsMouGuquUseAllowed(actor.Seat, CardKind.Alcohol, [id], r.Source);
     }
 
     internal bool IsExactMouZuifengAlcoholConversion(int actorSeat, int cardId, CardConversionSource? source)

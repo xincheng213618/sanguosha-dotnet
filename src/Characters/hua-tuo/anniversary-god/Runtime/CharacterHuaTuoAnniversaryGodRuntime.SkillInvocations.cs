@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.InstructionIndex != 0 || f.TriggerId is not null && !_coreProgramLifecycleOperations.GetProgramTrigger(f).IsSkillInvocation)
             return false;
-        return TryBeginSkillInvocation(id, f.ActivatingSeat ?? f.OwnerSeat, f.SkillId, "program:" + global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId);
+        return TryBeginSkillInvocation(id, f.ActivatingSeat ?? f.OwnerSeat, f.SkillId, "program:" + CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId);
     }
 
     internal bool HasConvertedSkillInvocations(CardActionContext action, SkillProgramTriggerWindow window) => HasSkillInvocationObservers && window is SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardResponseAccepted && (action.ConversionChain.Any(IsAcceptedViewAsInvocation) || SkillInvocationEquipmentSources(action).Count > 0 || _characterCaoPiAnniversaryGodOperations.HasKemingCompletedCardEffect(action, window));
@@ -37,7 +33,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
 
     internal bool TryBeginConvertedSkillInvocations(ProgramCardTriggerWindowFrame f)
     {
-        if (!HasConvertedSkillInvocations(f.Action, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(f)))
+        if (!HasConvertedSkillInvocations(f.Action, CoreGameEngineCardActionsRuntime.GetCardActionWindow(f)))
             return false;
         for (var i = 0; i < f.Action.ConversionChain.Count; i++)
         {
@@ -226,7 +222,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
             _coreNativeDyingOperations.ExposeHumanDyingPrompt();
     }
 
-    internal void ReturnSkillInvocationDying(global::CardGame.Core.GameEngine.DyingCompletionReceipt dying)
+    internal void ReturnSkillInvocationDying(GameEngine.DyingCompletionReceipt dying)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not SkillInvocationFrame f || f.Id != dying.ParentFrameId || f.DyingFrameId != dying.FrameId || f.ActorSeat != dying.VictimSeat || dying.Continuation != DyingContinuationKind.SkillInvocation || f.Stage != SkillInvocationStage.Children)
             throw new InvalidOperationException("Luxin requires its exact once-paid invocation dying return.");

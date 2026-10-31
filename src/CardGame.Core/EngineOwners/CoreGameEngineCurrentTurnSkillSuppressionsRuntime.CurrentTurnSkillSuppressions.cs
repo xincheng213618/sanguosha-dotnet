@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCurrentTurnSkillSuppressionsRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CoreGameEngineCurrentTurnSkillSuppressionsRuntime
         var issued = _programPipelineHooksOperations._programPipelineHooks.AdmitTurnSuppression(frame, targetSeat);
         if (!ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || targetSeat == frame.OwnerSeat && !issued || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !issued && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
             throw new InvalidOperationException("Suppression requires its actual owned program frame and living other target.");
-        var fact = new CurrentTurnNonLockedSkillSuppression(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), targetSeat);
+        var fact = new CurrentTurnNonLockedSkillSuppression(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), targetSeat);
         var existing = _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnQualificationDependenciesCurrentTurnQualificationStampCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressions.SingleOrDefault(s => s.ParentFrameId == fact.ParentFrameId && s.EffectIndex == fact.EffectIndex && s.TargetSeat == targetSeat);
         if (existing is not null)
         {

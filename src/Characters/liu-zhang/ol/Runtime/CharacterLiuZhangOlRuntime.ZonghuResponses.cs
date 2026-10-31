@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuZhangOlRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             _ => throw new InvalidOperationException("Zonghu response lost its typed incoming native owner.")});
     }
 
-    internal static ZonghuPaidOrigin? ZonghuResponseOrigin(ResolutionFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuResponses.ZonghuResponseOrigin(f);
+    internal static ZonghuPaidOrigin? ZonghuResponseOrigin(ResolutionFrame f) => RuntimeSkills.RuntimeRules_liu_zhang_ol_ZonghuResponses.ZonghuResponseOrigin(f);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27512)]
     internal void ObserveZonghuResponse(CardActionAcceptedEvent accepted)
     {
@@ -54,7 +50,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         var attack = n.Intent == ZonghuIntent.Duel ? _coreNativeCardContinuationCursorsOperations.ActiveDuel!.Attack : n.Intent == ZonghuIntent.Group ? _coreNativeCardContinuationCursorsOperations.ActiveGroupCard!.CurrentAttack! : n.Intent == ZonghuIntent.FactionSlashPlayed ? _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.ResponseAttack! : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack!;
         var continuation = ZonghuResponseContinuation(p);
         var faction = _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest;
-        global::CardGame.Core.GameEngine.FactionProviderRewardReceipt? reward = null;
+        GameEngine.FactionProviderRewardReceipt? reward = null;
         if (n.Intent == ZonghuIntent.FactionSlashPlayed)
         {
             reward = _coreFactionRequestPaymentsOperations.CaptureFactionProviderReward(faction!);
@@ -74,7 +70,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GroupResponseEvent(g.ResolutionId, g.Card.Kind, g.RequiredCardKind!.Value, n.ActorSeat, true, 0, p.OutputKind));
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind))
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(n.ActorSeat, p.OutputKind);
         if (reward is not null)
             _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(reward, n.ProviderSeat);
@@ -137,7 +133,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(reward, n.ProviderSeat);
     }
 
-    internal bool IsZonghuZeroSupply(CardUseFrame use, global::CardGame.Core.NativeOwners.FactionCardRequestHandle request) => use.ZonghuOrigin is { } p && p.Need.Intent == ZonghuIntent.FactionSlashUse && IsIssuedZonghuUse(use) && p.Need.OwnerFrameId == request.OwnerFrameId && p.Need.ActorSeat == request.OwnerSeat && p.Need.ProviderSeat == request.CurrentCandidateSeat && p.Need.RequesterSeat == request.OwnerSeat && p.Need.Cursor == request.CandidateIndex && request.TargetSeat == p.TargetSeat && request.ActiveAttack?.ResolutionId == use.Id;
+    internal bool IsZonghuZeroSupply(CardUseFrame use, NativeOwners.FactionCardRequestHandle request) => use.ZonghuOrigin is { } p && p.Need.Intent == ZonghuIntent.FactionSlashUse && IsIssuedZonghuUse(use) && p.Need.OwnerFrameId == request.OwnerFrameId && p.Need.ActorSeat == request.OwnerSeat && p.Need.ProviderSeat == request.CurrentCandidateSeat && p.Need.RequesterSeat == request.OwnerSeat && p.Need.Cursor == request.CandidateIndex && request.TargetSeat == p.TargetSeat && request.ActiveAttack?.ResolutionId == use.Id;
     internal void RepublishZonghuNative(ZonghuReceipt r)
     {
         var n = r.Need;
@@ -184,7 +180,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         {
             if (!actor.IsAlive)
             {
-                if (r.Paid is not { } paid || !ValidZonghuPayment(paid) || !ZonghuNativeNeedCurrent(r) || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != n.OwnerFrameId || blade.Attack.SourceSeat != n.ActorSeat || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack))
+                if (r.Paid is not { } paid || !ValidZonghuPayment(paid) || !ZonghuNativeNeedCurrent(r) || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != n.OwnerFrameId || blade.Attack.SourceSeat != n.ActorSeat || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack))
                     throw new InvalidOperationException("A dead Zonghu payer lost its exact still-unconsumed Qinglong parent.");
                 // This is the native no-follow-up return: no card or dead-player menu is issued.
                 var attack = blade.Attack;

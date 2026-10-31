@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangYueyingOlMouRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         if (!ValidMouBingcaiStarted(f) || f.MouBingcai is not { Paid: true, MaterialId: { } id, PrintedKind: { } printed, EffectiveKind: { } effective, From: { } from } r || from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || r.RecastInvocationId <= 0 || r.BatchId <= 0 || r.MovementSequence <= r.Before || r.MovementSequence > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.MatchesDamage != (IsMouHuangYueyingDamageCardKind(r.BasicKind) == IsMouHuangYueyingDamageCardKind(effective)) || r.IsTrick != (CardUseCategoryCatalog.Get(effective)is CardUseCategories.InstantTrick or CardUseCategories.DelayedTrick) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouBingcaiRecastPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid != new MouBingcaiRecastPaidEvent(f.Id, r.RecastInvocationId, r.BatchId, f.OwnerSeat, id, printed, effective, from, r.MovementSequence, r.Before, r.After, r.MatchesDamage, r.IsTrick))
             return false;
         var payment = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence == r.MovementSequence && m.CardId == id && m.CardKind == printed && m.From == from && m.Reason == CardMoveReasons.RecastDiscard).ToArray();
-        if (payment is not [var m] || m.To != CardLocation.DiscardPile && !(m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(id).IsGeneralWeapon && from.Zone == CardZoneKind.Equipment || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), from, m.To))))
+        if (payment is not [var m] || m.To != CardLocation.DiscardPile && !(m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(id).IsGeneralWeapon && from.Zone == CardZoneKind.Equipment || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), from, m.To))))
             return false;
         var invoices = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeRecastInvocationRecordedEvent>().Where(e => e.InvocationId == r.RecastInvocationId).ToArray();
         if (f.NativeRecastInvocation is { } draft)

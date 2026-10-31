@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime))]
-internal sealed class CharacterSimaShiMouCorePlayerViewProjectionAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterSimaShiMouCorePlayerViewProjectionOperations
+[Core.ProgramCapability(typeof(CorePlayerViewProjectionRuntime))]
+internal sealed class CharacterSimaShiMouCorePlayerViewProjectionAdapter(Func<CorePlayerViewProjectionRuntime> targetFactory) : ICharacterSimaShiMouCorePlayerViewProjectionOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
+    private readonly Func<CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
+    public GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MouSimaShiRuntime))]
-internal sealed class CharacterSimaShiMouMouSimaShiAdapter(global::System.Func<global::CardGame.Core.MouSimaShiRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterSimaShiMouMouSimaShiOperations
+[Core.ProgramCapability(typeof(MouSimaShiRuntime))]
+internal sealed class CharacterSimaShiMouMouSimaShiAdapter(Func<MouSimaShiRuntime> targetFactory) : ICharacterSimaShiMouMouSimaShiOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MouSimaShiRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MouSimaShiRuntime Get() => this._targetFactory();
+    private readonly Func<MouSimaShiRuntime> _targetFactory = targetFactory;
+    public MouSimaShiRuntime Get() => this._targetFactory();
 }

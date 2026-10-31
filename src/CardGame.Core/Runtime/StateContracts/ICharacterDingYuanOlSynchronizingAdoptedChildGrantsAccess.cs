@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterDingYuanOlSynchronizingAdoptedChildGrantsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterDingYuanOlSynchronizingAdoptedChildGrantsAccess : IProgramRuntimeOperations
 {
     ref bool _synchronizingAdoptedChildGrants { get; }
 }

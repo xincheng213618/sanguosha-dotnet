@@ -1,9 +1,7 @@
-using System.Collections.ObjectModel;
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_OwnedHandRankSumPrograms
 {
     internal static int OwnedHandSelectedRankSum(ProgramOwnedHandRankSumSelection draft) =>

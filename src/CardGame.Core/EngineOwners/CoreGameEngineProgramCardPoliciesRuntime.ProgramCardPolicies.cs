@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
     }
 
     internal bool HasCardPolicy(CharacterState owner, SkillProgramCardPolicyKind kind, CardKind? effectiveKind = null) => kind == SkillProgramCardPolicyKind.UnlimitedAlcoholUse && _coreProgramAlcoholQuotaOperations.HasAdditionalAlcoholUse(owner) || (kind is SkillProgramCardPolicyKind.IgnoreUseDistance or SkillProgramCardPolicyKind.UnlimitedAlcoholUse) && _characterHanSongAnniversaryOperations.HasAnniversaryHanSongUniqueHand(owner) || (kind is SkillProgramCardPolicyKind.IgnoreUseDistance or SkillProgramCardPolicyKind.UnlimitedAlcoholUse) && _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(owner) || kind == SkillProgramCardPolicyKind.UnlimitedAlcoholUse && _characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(owner) || _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetCardPolicies(kind).Count != 0 && CardPolicies(owner, kind, effectiveKind).Any();
-    internal bool HasOutsideAttackRangeSlashQuota(CharacterState owner, CharacterState target, CardKind kind, EquipmentSlot? excludedEquipmentSlot = null) => owner.IsAlive && target.IsAlive && owner.Seat != target.Seat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && !_characterSunYuanOlOperations.HasSayingRoundRange(owner.Seat, target.Seat) && HasCardPolicy(owner, SkillProgramCardPolicyKind.BypassSlashLimitAgainstOutsideAttackRange, kind) && (excludedEquipmentSlot is null ? _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, target.Seat) > _coreNativeRuleQueriesOperations.GetAttackRange(owner.Seat) : global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(owner, target, excludedEquipmentSlot: excludedEquipmentSlot)) > global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(owner, excludedEquipmentSlot: excludedEquipmentSlot)));
+    internal bool HasOutsideAttackRangeSlashQuota(CharacterState owner, CharacterState target, CardKind kind, EquipmentSlot? excludedEquipmentSlot = null) => owner.IsAlive && target.IsAlive && owner.Seat != target.Seat && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && !_characterSunYuanOlOperations.HasSayingRoundRange(owner.Seat, target.Seat) && HasCardPolicy(owner, SkillProgramCardPolicyKind.BypassSlashLimitAgainstOutsideAttackRange, kind) && (excludedEquipmentSlot is null ? _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, target.Seat) > _coreNativeRuleQueriesOperations.GetAttackRange(owner.Seat) : CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(owner, target, excludedEquipmentSlot: excludedEquipmentSlot)) > CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(owner, excludedEquipmentSlot: excludedEquipmentSlot)));
     internal bool IsNearbyTargetResponseProhibited(int sourceSeat, int responderSeat, CardKind incomingKind, IReadOnlyList<int> targetSeats)
     {
         if (_coreShanheTrickResponseOperations.IsShanheTrickResponseProhibited(sourceSeat, responderSeat, incomingKind, targetSeats))
@@ -47,14 +43,14 @@ internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
             return true;
         if (_characterLvYiMobileShiOperations.ShiLyShishiCannotRespond(sourceSeat, responderSeat))
             return true;
-        if ((!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(incomingKind)) || sourceSeat == responderSeat || !_coreMatchParticipantsPlayersAccess._players[sourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[responderSeat].IsAlive)
+        if ((!CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) && !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(incomingKind)) || sourceSeat == responderSeat || !_coreMatchParticipantsPlayersAccess._players[sourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[responderSeat].IsAlive)
             return false;
         return CardPolicies(_coreMatchParticipantsPlayersAccess._players[sourceSeat], SkillProgramCardPolicyKind.ProhibitNearbyTargetResponse, incomingKind).Any(item => (item.Policy.IncludeNonTargetResponders == true || targetSeats.Contains(responderSeat)) && (item.Policy.UseIncomingResponseDistance == true ? _coreNativeRuleQueriesOperations.GetCombatDistance(responderSeat, sourceSeat) : _coreNativeRuleQueriesOperations.GetCombatDistance(sourceSeat, responderSeat)) <= item.Policy.Value);
     }
 
-    internal bool IsSuitSlashResponseProhibited(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool IsSuitSlashResponseProhibited(NativeOwners.CardAttackHandle attack)
     {
-        if (attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || attack.CardUserSeat == attack.TargetSeat || attack.PhysicalCards.Count == 0)
+        if (attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || attack.CardUserSeat == attack.TargetSeat || attack.PhysicalCards.Count == 0)
             return false;
         var source = _coreMatchParticipantsPlayersAccess._players[attack.CardUserSeat];
         return CardPolicies(source, SkillProgramCardPolicyKind.ProhibitTargetSlashResponseBySuit, kind).Any(item => attack.PhysicalCards.Any(card => _coreNativeCardAppearanceOperations.EffectiveSuit(source, card) == item.Policy.InputSuit));
@@ -68,7 +64,7 @@ internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
         // The max (never a product) matches the Wushuang aggregation precedent.
         var attackerSide = sourceSeat == owner.Seat ? CardPolicies(owner, SkillProgramCardPolicyKind.MinimumResponseCount, incomingKind, requiredKind, eventTargetIsFemale: _coreMatchParticipantsPlayersAccess._players[responderSeat].Gender == GeneralGender.Female, eventSourceIsFemale: _coreMatchParticipantsPlayersAccess._players[sourceSeat].Gender == GeneralGender.Female).Select(item => item.Policy.Value).DefaultIfEmpty(1).Max() : 1;
         var targetSide = CardPolicies(_coreMatchParticipantsPlayersAccess._players[responderSeat], SkillProgramCardPolicyKind.MinimumResponseCountAsTarget, incomingKind, requiredKind, eventTargetIsFemale: _coreMatchParticipantsPlayersAccess._players[responderSeat].Gender == GeneralGender.Female, eventSourceIsFemale: _coreMatchParticipantsPlayersAccess._players[sourceSeat].Gender == GeneralGender.Female).Select(item => item.Policy.Value).DefaultIfEmpty(0).Max();
-        var shortRange = sourceSeat == owner.Seat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) && requiredKind == CardKind.Dodge && _coreNativeRuleQueriesOperations.GetCombatDistance(sourceSeat, responderSeat) == 1 ? CardPolicies(owner, SkillProgramCardPolicyKind.MinimumSlashResponseAtDistanceOne, incomingKind, requiredKind).Select(item => item.Policy.Value).DefaultIfEmpty(1).Max() : 1;
+        var shortRange = sourceSeat == owner.Seat && CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) && requiredKind == CardKind.Dodge && _coreNativeRuleQueriesOperations.GetCombatDistance(sourceSeat, responderSeat) == 1 ? CardPolicies(owner, SkillProgramCardPolicyKind.MinimumSlashResponseAtDistanceOne, incomingKind, requiredKind).Select(item => item.Policy.Value).DefaultIfEmpty(1).Max() : 1;
         return Math.Max(_coreShanheBossProgramsOperations.GetBattleSlashCountResponseRequirement(owner, sourceSeat, incomingKind, requiredKind), Math.Max(shortRange, Math.Max(attackerSide, targetSide)));
     }
 

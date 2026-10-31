@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaoCaoHappyGodEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterCaoCaoHappyGodRuntime> _resolve;
-    private CharacterCaoCaoHappyGodEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterCaoCaoHappyGodRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterCaoCaoHappyGodRuntime> _resolve;
+    private CharacterCaoCaoHappyGodEntries(Func<EngineOwners.CharacterCaoCaoHappyGodRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterCaoCaoHappyGodEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterCaoCaoHappyGodRuntime> resolve) => new(resolve);
+    internal static CharacterCaoCaoHappyGodEntries Create(Func<EngineOwners.CharacterCaoCaoHappyGodRuntime> resolve) => new(resolve);
 }

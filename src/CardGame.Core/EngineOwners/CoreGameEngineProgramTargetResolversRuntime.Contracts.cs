@@ -1,11 +1,7 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-internal interface ICoreProgramTargetResolversCoreProgramSelectionModulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramTargetResolversCoreProgramSelectionModulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.IProgramSelectionQueries ProgramSelectionQueries { get; }
+    IProgramSelectionQueries ProgramSelectionQueries { get; }
 }

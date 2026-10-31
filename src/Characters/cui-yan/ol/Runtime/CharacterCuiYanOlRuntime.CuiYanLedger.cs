@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCuiYanOlRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
     internal bool HasCuiYanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShutongFinalizedUse) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZhijieActualTurnEnd);
     internal bool CuiYanActualTurnOpen => _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
 
-    internal static Suit CuiYanTrueUseSuit(IReadOnlyList<int> ids, Suit? nativeSuit) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cui_yan_ol_CuiYanLedger.CuiYanTrueUseSuit(ids, nativeSuit);
+    internal static Suit CuiYanTrueUseSuit(IReadOnlyList<int> ids, Suit? nativeSuit) => RuntimeSkills.RuntimeRules_cui_yan_ol_CuiYanLedger.CuiYanTrueUseSuit(ids, nativeSuit);
     internal void CaptureCuiYanUseTargets(CardUseFrame use)
     {
         if (!HasCuiYanCapability || !CuiYanActualTurnOpen || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) || use.Action is { Type: not CardActionType.Use })
@@ -22,7 +18,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
         if (old != next)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(next);
         var targets = (use.Action?.EffectiveDesignatedTargetSeats ?? use.TargetSeats).Distinct().ToArray();
-        if (targets.Length == 0 && !use.TargetsAdjusted && (global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Equipment || use.CardKind is CardKind.DrawTwo or CardKind.Peach or CardKind.Alcohol))
+        if (targets.Length == 0 && !use.TargetsAdjusted && (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Equipment || use.CardKind is CardKind.DrawTwo or CardKind.Peach or CardKind.Alcohol))
             targets = [use.SourceSeat];
         foreach (var target in targets.Where(_coreTableSeatQueriesOperations.IsValidPlayerSeat))
             if (!_coreProgramEventHistoryOperations.ProgramEventHistory<CuiYanEverTargetedEvent>().Any(e => e.UseId == use.Id && e.TargetSeat == target))
@@ -40,7 +36,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
             return true;
         }
 
-        if (a.EffectiveKind == CardKind.Dodge && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(u => u.Action?.ActionId == a.ParentActionId)is { CardAttack: { } attack } use && attack.TargetSeat == a.ActorSeat && a.OpponentSeat == attack.SourceSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? use.CardKind))
+        if (a.EffectiveKind == CardKind.Dodge && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(u => u.Action?.ActionId == a.ParentActionId)is { CardAttack: { } attack } use && attack.TargetSeat == a.ActorSeat && a.OpponentSeat == attack.SourceSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? use.CardKind))
         {
             parentId = use.Id;
             return true;

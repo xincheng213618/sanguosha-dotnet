@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeJudgmentRuntime
 {
-    internal bool? ResolveBaguaJudgment(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CharacterState defender)
+    internal bool? ResolveBaguaJudgment(NativeOwners.CardAttackHandle attack, CharacterState defender)
     {
         if (attack.IgnoresArmor)
         {
@@ -24,7 +20,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
         return BeginJudgment(attack, defender.Seat, JudgmentReasons.BaguaDefense, attack.ResolutionId, attack.EffectiveCardKind, JudgmentContinuationKind.Bagua);
     }
 
-    internal void CompleteBaguaResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, bool succeeded)
+    internal void CompleteBaguaResponse(NativeOwners.CardAttackHandle attack, bool succeeded)
     {
         succeeded &= _characterHuangZuMobileShiOperations.ShiHzResponseColorAllowed(attack.TargetSeat, effectiveIsRed: null);
         if (!succeeded)
@@ -33,13 +29,13 @@ internal sealed partial class CoreNativeJudgmentRuntime
             return;
         }
 
-        if (_coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack } group && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(group.CurrentAttack, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack } group && CoreNativeDamageHandlesRuntime.SameAttackOwner(group.CurrentAttack, attack))
         {
             var requiredCardKind = group.RequiredCardKind ?? throw new InvalidOperationException("A group response attack must declare a required card kind.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GroupResponseEvent(group.ResolutionId, group.Card.Kind, requiredCardKind, attack.TargetSeat, UsedResponse: true, ResponseCardId: null, ResponseCardKind: CardKind.Dodge));
         }
 
-        var continuation = _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack } responseGroup && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(responseGroup.CurrentAttack, attack) ? ProgramCardContinuation.GroupResponse : ProgramCardContinuation.Dodge;
+        var continuation = _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack } responseGroup && CoreNativeDamageHandlesRuntime.SameAttackOwner(responseGroup.CurrentAttack, attack) ? ProgramCardContinuation.GroupResponse : ProgramCardContinuation.Dodge;
         if (_coreCardActionsOperations.TryBeginCardResponsePrograms(attack, _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat], _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat], requesterSeat: null, attack.SourceSeat, CardKind.Dodge, [], continuation))
         {
             return;
@@ -48,7 +44,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
         _coreNativeDodgeOperations.CompleteSuccessfulDodgeResponse(attack);
     }
 
-    internal bool? BeginJudgment(global::CardGame.Core.NativeOwners.CardAttackHandle? attack, int targetSeat, string reason, long parentFrameId, CardKind? sourceCard, JudgmentContinuationKind continuation, Card? delayedCard = null, int? sourceSeat = null, string? programResultBind = null, SkillProgramCardSetVisibility? programResultVisibility = null, OriginalUseLightningAttachment? originalUseLightning = null, int? originalUseLightningExcludedCardId = null)
+    internal bool? BeginJudgment(NativeOwners.CardAttackHandle? attack, int targetSeat, string reason, long parentFrameId, CardKind? sourceCard, JudgmentContinuationKind continuation, Card? delayedCard = null, int? sourceSeat = null, string? programResultBind = null, SkillProgramCardSetVisibility? programResultVisibility = null, OriginalUseLightningAttachment? originalUseLightning = null, int? originalUseLightningExcludedCardId = null)
     {
         if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment is { } originalJudgment && !_coreFinalizedJudgmentDamageChildrenOperations.CanBeginFinalizedDamageChildJudgment(originalJudgment, parentFrameId, targetSeat, reason, continuation, programResultBind, programResultVisibility))
         {
@@ -83,9 +79,9 @@ internal sealed partial class CoreNativeJudgmentRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JudgmentResolvedEvent(frameId, parentFrameId, targetSeat, reason, CardId: null, CardKind: null, Suit: null, Rank: null, Succeeded: false));
             _coreMatchLogOperations.AddLog("Judgment", $"{(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 的判定因牌堆耗尽而失败。", targetSeat, frame.SourceSeat);
             _coreRuntimeOperations.PopResolutionFrame(frameId, ResolutionFrameKind.Judgment);
-            if (global::CardGame.Core.EngineOwners.CoreActualTurnsRuntime.IsDelayedJudgmentContinuation(continuation) || continuation == JudgmentContinuationKind.ProgramSkill)
+            if (CoreActualTurnsRuntime.IsDelayedJudgmentContinuation(continuation) || continuation == JudgmentContinuationKind.ProgramSkill)
             {
-                ResumeCompletedJudgment(new global::CardGame.Core.GameEngine.JudgmentCompletionReceipt(frame, Succeeded: false));
+                ResumeCompletedJudgment(new GameEngine.JudgmentCompletionReceipt(frame, Succeeded: false));
             }
 
             return false;
@@ -114,9 +110,9 @@ internal sealed partial class CoreNativeJudgmentRuntime
         if (orderedCandidates.Length == 0)
         {
             var succeeded = FinalizeJudgment(pending);
-            if (succeeded is { } completed && (global::CardGame.Core.EngineOwners.CoreActualTurnsRuntime.IsDelayedJudgmentContinuation(continuation) || continuation == JudgmentContinuationKind.ProgramSkill))
+            if (succeeded is { } completed && (CoreActualTurnsRuntime.IsDelayedJudgmentContinuation(continuation) || continuation == JudgmentContinuationKind.ProgramSkill))
             {
-                ResumeCompletedJudgment(new global::CardGame.Core.GameEngine.JudgmentCompletionReceipt(pending, completed));
+                ResumeCompletedJudgment(new GameEngine.JudgmentCompletionReceipt(pending, completed));
             }
 
             return succeeded;
@@ -135,7 +131,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
             {
                 var program = binding.Program;
                 var trigger = binding.Trigger;
-                if (!_coreJudgmentReplacementProgramsOperations.MatchesProgramJudgmentReplacement(owner, trigger, targetSeat, reason) || (global::CardGame.Core.EngineOwners.CharacterWangYiMobileRuntime.IsDeckTopJudgmentReplacement(trigger) ? !_characterWangYiMobileOperations.HasDeckTopJudgmentReplacementMaterial() : _coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacementCards(owner, trigger, targetSeat, reason, ignoreCurrentColor: true).Count == 0))
+                if (!_coreJudgmentReplacementProgramsOperations.MatchesProgramJudgmentReplacement(owner, trigger, targetSeat, reason) || (CharacterWangYiMobileRuntime.IsDeckTopJudgmentReplacement(trigger) ? !_characterWangYiMobileOperations.HasDeckTopJudgmentReplacementMaterial() : _coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacementCards(owner, trigger, targetSeat, reason, ignoreCurrentColor: true).Count == 0))
                 {
                     continue;
                 }
@@ -162,7 +158,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
             var succeeded = FinalizeJudgment(pending);
             if (succeeded is { } completed)
             {
-                ResumeCompletedJudgment(new global::CardGame.Core.GameEngine.JudgmentCompletionReceipt(pending, completed));
+                ResumeCompletedJudgment(new GameEngine.JudgmentCompletionReceipt(pending, completed));
             }
 
             return;
@@ -191,7 +187,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
             var succeeded = FinalizeJudgment(pending);
             if (succeeded is { } completed)
             {
-                ResumeCompletedJudgment(new global::CardGame.Core.GameEngine.JudgmentCompletionReceipt(pending, completed));
+                ResumeCompletedJudgment(new GameEngine.JudgmentCompletionReceipt(pending, completed));
             }
 
             return;
@@ -222,7 +218,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
             JudgmentContinuationKind.Lightning => judgmentSuit == Suit.Spade && judgmentRank is >= 2 and <= 9,
             JudgmentContinuationKind.Indulgence => judgmentSuit == Suit.Heart,
             JudgmentContinuationKind.SupplyShortage => judgmentSuit == Suit.Club,
-            _ => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(judgmentSuit)};
+            _ => CoreNativeCardClassificationsRuntime.IsRedSuit(judgmentSuit)};
         succeeded = _corePassiveRulePoliciesOperations.ApplyDelayedJudgmentOutcomePolicies(pending, succeeded);
         ReplaceJudgmentFrame(frame with { CardId = judgmentCard.Id, CardKind = judgmentCard.Kind, Suit = judgmentSuit, Succeeded = succeeded, Step = ResolutionFrameStep.Completed });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JudgmentResolvedEvent(pending.Id, frame.ParentFrameId, pending.TargetSeat, pending.Reason, judgmentCard.Id, judgmentCard.Kind, judgmentSuit, judgmentRank, succeeded));
@@ -294,12 +290,12 @@ internal sealed partial class CoreNativeJudgmentRuntime
 
         var effectiveCardKind = _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(delayedCard);
         var delayedEffectSucceeded = !succeeded;
-        var delayedEffects = delayedEffectSucceeded ? global::CardGame.Core.EngineOwners.CoreActualTurnsRuntime.GetDelayedTurnEffects(effectiveCardKind) : global::CardGame.Core.GameEngine.DelayedTurnEffects.None;
+        var delayedEffects = delayedEffectSucceeded ? CoreActualTurnsRuntime.GetDelayedTurnEffects(effectiveCardKind) : GameEngine.DelayedTurnEffects.None;
         _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= delayedEffects;
         _corePhysicalMovementFacadesOperations.MoveCard(delayedCard, CardLocation.Judgment(target.Seat), CardLocation.DiscardPile, CardMoveReasons.DelayedCardFinish);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DelayedCardResolvedEvent(pending.Id, delayedCard.Id, effectiveCardKind, target.Seat, _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id, succeeded, SkippedPlayPhase: delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase)) { SkippedDrawPhase = delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase) });
-        var phaseDescription = delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase) && delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase) ? "跳过摸牌和出牌阶段" : delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase) ? "跳过摸牌阶段" : delayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase) ? "跳过出牌阶段" : "正常进入后续阶段";
-        _coreMatchLogOperations.AddLog("DelayedCardResolved", $"{(target.Name)} 的【{(CardCatalog.Get(effectiveCardKind).DisplayName)}】判定为{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(_coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Suit))}，{(phaseDescription)}。", target.Seat);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DelayedCardResolvedEvent(pending.Id, delayedCard.Id, effectiveCardKind, target.Seat, _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id, succeeded, SkippedPlayPhase: delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase)) { SkippedDrawPhase = delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) });
+        var phaseDescription = delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) && delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase) ? "跳过摸牌和出牌阶段" : delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) ? "跳过摸牌阶段" : delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase) ? "跳过出牌阶段" : "正常进入后续阶段";
+        _coreMatchLogOperations.AddLog("DelayedCardResolved", $"{(target.Name)} 的【{(CardCatalog.Get(effectiveCardKind).DisplayName)}】判定为{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(_coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Suit))}，{(phaseDescription)}。", target.Seat);
         _coreActualTurnsOperations.BeginDelayedJudgmentOrTurnStart(target);
     }
 
@@ -307,7 +303,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
     {
         var nextTargetSeat = Enumerable.Range(1, _coreMatchDefinitionPlayerCountAccess._playerCount - 1).Select(offset => _coreTableOrderOperations.TableStepSeat(target.Seat, offset)).FirstOrDefault(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && !_coreMatchParticipantsPlayersAccess._players[seat].JudgmentAreaAbolished && !_coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[seat], SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget) && // A transfer carries the held delayed card's actual color,
  // evaluated for its current holder, never the judgment card.
-        !_coreDyingWindowSkillPoliciesOperations.IsBlackTrickTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Lightning, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(target, lightning))) && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Lightning), target.Seat);
+        !_coreDyingWindowSkillPoliciesOperations.IsBlackTrickTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Lightning, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(target, lightning))) && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Lightning), target.Seat);
         if (nextTargetSeat != target.Seat)
         {
             _corePhysicalMovementFacadesOperations.MoveCard(lightning, CardLocation.Judgment(target.Seat), CardLocation.Judgment(nextTargetSeat), CardMoveReasons.DelayedCardTransfer);
@@ -363,7 +359,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
         _coreActualTurnsOperations.BeginDelayedJudgmentOrTurnStart(current, excludedCardId);
     }
 
-    internal void ResumeCompletedJudgment(global::CardGame.Core.GameEngine.JudgmentCompletionReceipt receipt)
+    internal void ResumeCompletedJudgment(GameEngine.JudgmentCompletionReceipt receipt)
     {
         var pending = receipt.Frame;
         var succeeded = receipt.Succeeded;
@@ -441,7 +437,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
             return;
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreActualTurnsRuntime.IsDelayedJudgmentContinuation(pending.Continuation))
+        if (CoreActualTurnsRuntime.IsDelayedJudgmentContinuation(pending.Continuation))
         {
             CompleteDelayedJudgment(pending, succeeded);
             return;

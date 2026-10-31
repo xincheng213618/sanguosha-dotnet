@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangXiMobileShiRuntime
 {
     internal const string ShiPxXuye = ShiPangXiComposition.XuyeSkill, ShiPxKuangxiang = ShiPangXiComposition.KuangxiangSkill;
-    SkillProgramStepOutcome global::CardGame.Core.IShiPangXiHost.ResolveXuye(ProgramSkillFrame frame) => BeginShiPxXuye(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiPangXiHost.ResolveKuangxiang(ProgramSkillFrame frame) => BeginShiPxKuangxiang(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiPangXiHost.ResolveRider(ProgramSkillFrame frame) => BeginShiPxRider(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiPangXiHost.ResolveSweep(ProgramSkillFrame frame) => BeginShiPxSweep(frame);
+    SkillProgramStepOutcome IShiPangXiHost.ResolveXuye(ProgramSkillFrame frame) => BeginShiPxXuye(frame);
+    SkillProgramStepOutcome IShiPangXiHost.ResolveKuangxiang(ProgramSkillFrame frame) => BeginShiPxKuangxiang(frame);
+    SkillProgramStepOutcome IShiPangXiHost.ResolveRider(ProgramSkillFrame frame) => BeginShiPxRider(frame);
+    SkillProgramStepOutcome IShiPangXiHost.ResolveSweep(ProgramSkillFrame frame) => BeginShiPxSweep(frame);
     internal bool ShiPxIsGlobalMinimumHand(int seat)
     {
         var counts = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).Select(player => _corePhysicalOwnedCardQueriesOperations.GetHand(player).Count).ToArray();
@@ -88,7 +85,7 @@ internal sealed partial class CharacterPangXiMobileShiRuntime
         FinishShiPxOperation(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }
 
-    internal IReadOnlyList<int> ShiPxAreaCardIds(int seat) => global::CardGame.Core.EngineOwners.CharacterPangXiMobileShiDefinitions.ShiPxHolderZones.SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new CardLocation(zone, seat))).Select(card => card.Id).Distinct().ToArray();
+    internal IReadOnlyList<int> ShiPxAreaCardIds(int seat) => CharacterPangXiMobileShiDefinitions.ShiPxHolderZones.SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new CardLocation(zone, seat))).Select(card => card.Id).Distinct().ToArray();
     internal SkillProgramStepOutcome BeginShiPxKuangxiang(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -212,7 +209,7 @@ internal sealed partial class CharacterPangXiMobileShiRuntime
     [ProgramAnswer(ShiPangXiComposition.ProgramAction)]
     internal void AnswerShiPx(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { PangXi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiPxChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { PangXi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiPxChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Shi Pang Xi choice lost its current frame or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

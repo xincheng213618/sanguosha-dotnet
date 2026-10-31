@@ -1,11 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoXiangOlRuntime
@@ -16,10 +11,10 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
     internal bool ZhaoXiangPreparationParentMatches(ProgramSkillFrame f)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        return f.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } c && f.TriggerId is not null && f.ActivationId == f.TriggerId && f.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && c.OwnerSeat == f.OwnerSeat && c.SourceSeat == f.OwnerSeat && index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame parent && parent.Id == c.ParentFrameId && parent.OwnerSeat == f.OwnerSeat && parent.Window == c.Window && parent.Continuation == ProgramLifecycleContinuation.NormalTurnStart && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]);
+        return f.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } c && f.TriggerId is not null && f.ActivationId == f.TriggerId && f.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && c.OwnerSeat == f.OwnerSeat && c.SourceSeat == f.OwnerSeat && index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame parent && parent.Id == c.ParentFrameId && parent.OwnerSeat == f.OwnerSeat && parent.Window == c.Window && parent.Continuation == ProgramLifecycleContinuation.NormalTurnStart && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]);
     }
 
-    internal static string ZhaoXiangPoolFingerprint(IReadOnlyList<string> ids) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhao_xiang_ol_Fuhan_Programs.ZhaoXiangPoolFingerprint(ids);
+    internal static string ZhaoXiangPoolFingerprint(IReadOnlyList<string> ids) => RuntimeSkills.RuntimeRules_zhao_xiang_ol_Fuhan_Programs.ZhaoXiangPoolFingerprint(ids);
     internal SkillProgramStepOutcome ExchangeFiveShuBySpentMeiYing(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -83,7 +78,7 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
     [ProgramAnswer("zhao-xiang-exchange")]
     internal void ResolveZhaoXiangExchangeChoice(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhaoXiang: { Stage: "selection" } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhaoXiangExchangeChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhaoXiang: { Stage: "selection" } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhaoXiangExchangeChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Five-Shu choice lost its original private sampled templates.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.ZhaoXiang!;

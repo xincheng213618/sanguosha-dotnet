@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
         if (f.AnniversaryBly is not { } r || f.InstructionIndex != 1 || f.SkillId != AnniversaryBaiLingYunComposition.Linghui || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } w || r.Source != AnniversaryBlySource(f) || r.Hash != f.GameplayHash || r.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ParentId != w.ParentFrameId || !Enum.IsDefined(r.Stage) || r.Viewed.Count > 3 || r.Viewed.Distinct().Count() != r.Viewed.Count || r.ViewBefore < 0 || r.ViewAfter < r.ViewBefore || r.ViewAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryBlyStartedEvent>().Count(e => e == new AnniversaryBlyStartedEvent(f.Id, r.Source, r.Hash, r.ParentId, r.Turn, r.Viewed.Count)) != 1)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not TurnEndingBoundaryFrame p || p.Id != r.ParentId || p.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || p.ItemIndex < 0 || p.ItemIndex >= p.Items.Count || p.Items[p.ItemIndex].Candidate is not { } c || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c))
+        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not TurnEndingBoundaryFrame p || p.Id != r.ParentId || p.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || p.ItemIndex < 0 || p.ItemIndex >= p.Items.Count || p.Items[p.ItemIndex].Candidate is not { } c || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c))
             return false;
         var viewed = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.ViewBefore && m.Sequence <= r.ViewAfter && m.Reason == AnniversaryBlyReason("view")).ToArray();
         return viewed.Select(m => m.CardId).SequenceEqual(r.Viewed) && viewed.All(m => m.From == CardLocation.DrawPile && m.To == AnniversaryBlyLease(f));
@@ -46,7 +42,7 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
         if (child is CardUseFrame use)
             return r.Stage == AnniversaryBlyStage.NativeUse && IsAnniversaryBlyNative(use);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } p && AnniversaryBlyMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+            return f.PendingMovementContinuation is { } p && AnniversaryBlyMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is RecoveryReplacementFrame recovery)

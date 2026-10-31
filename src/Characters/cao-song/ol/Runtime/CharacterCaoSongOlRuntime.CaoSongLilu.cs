@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,9 +7,9 @@ internal sealed partial class CharacterCaoSongOlRuntime
 {
     internal const string LiluDrawReason = "skill-program.caosong.lilu.draw";
     internal const string LiluGiftReason = "skill-program.caosong.lilu.gift";
-    internal CardConversionSource CaoSongSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.ICaoSongProgramHost.ReplaceDrawWithLiluGift(ProgramSkillFrame frame) => BeginCaoSongLilu(frame);
-    void global::CardGame.Core.ICaoSongProgramHost.GrantYizhengSupport(ProgramSkillFrame frame) => IssueCaoSongYizheng(frame);
+    internal CardConversionSource CaoSongSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    SkillProgramStepOutcome ICaoSongProgramHost.ReplaceDrawWithLiluGift(ProgramSkillFrame frame) => BeginCaoSongLilu(frame);
+    void ICaoSongProgramHost.GrantYizhengSupport(ProgramSkillFrame frame) => IssueCaoSongYizheng(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26030)]
     internal bool CanOfferCaoSongLilu(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ReplaceDrawWithLiluGift) || context.Window == SkillProgramTriggerWindow.DrawPhaseStarting && context.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat] is { IsAlive: true, HasHpValue: true } && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != candidate.OwnerSeat);
     internal SkillProgramStepOutcome BeginCaoSongLilu(ProgramSkillFrame supplied)
@@ -100,7 +97,7 @@ internal sealed partial class CharacterCaoSongOlRuntime
             return Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != frame.OwnerSeat).Select(p => Choice("recipient", $"交给 {(p.Name)} 手牌", targets: [p.Seat])).ToArray());
         if (receipt.Stage != CaoSongLiluStage.Cards || receipt.RecipientSeat is not { } recipient || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive)
             return[];
-        var choices = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Select(card => Choice("card", $"{((receipt.SelectedCardIds.Contains(card.Id) ? "取消选择" : "选择"))}【{(card.DisplayName)}】 {(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}", [card.Id])).ToList();
+        var choices = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Select(card => Choice("card", $"{((receipt.SelectedCardIds.Contains(card.Id) ? "取消选择" : "选择"))}【{(card.DisplayName)}】 {(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}", [card.Id])).ToList();
         if (receipt.SelectedCardIds.Count > 0)
             choices.Add(Choice("give", $"交出已选 {(receipt.SelectedCardIds.Count)} 张手牌", receipt.SelectedCardIds, [recipient]));
         return Array.AsReadOnly(choices.ToArray());
@@ -130,7 +127,7 @@ internal sealed partial class CharacterCaoSongOlRuntime
     [ProgramAnswer("caosong-lilu")]
     internal void AnswerCaoSongLilu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoSongLilu: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoSongLiluChoices(frame).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoSongLilu: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoSongLiluChoices(frame).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Lilu lost its actual private chooser or current hand selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["option"] == "recipient")
@@ -176,7 +173,7 @@ internal sealed partial class CharacterCaoSongOlRuntime
         var desired = previous < hand.Count ? previous + 1 : 1;
         if (receipt.SelectedCardIds.Count >= desired)
             return decision.Choices.Single(c => c.Parameters["option"] == "give");
-        return decision.Choices.Where(c => c.Parameters["option"] == "card" && !receipt.SelectedCardIds.Contains(c.Cards.Single())).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat])).ThenBy(c => c.Cards.Single()).First();
+        return decision.Choices.Where(c => c.Parameters["option"] == "card" && !receipt.SelectedCardIds.Contains(c.Cards.Single())).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat])).ThenBy(c => c.Cards.Single()).First();
     }
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 26030)]

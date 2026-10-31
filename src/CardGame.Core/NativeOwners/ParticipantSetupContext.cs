@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal readonly struct ParticipantSetupContext(global::CardGame.Core.EngineStates.CoreMatchDefinitionState matchDefinitionState, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineMultiplayerEntries> getCoreGameEngineMultiplayerRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineGuanduActivitiesEntries> getCoreGameEngineGuanduActivitiesRuntime, global::CardGame.Core.EngineStates.CoreGameEngineShenwuActivitiesState gameEngineShenwuActivitiesState, global::CardGame.Core.EngineStates.CoreMatchSetupState matchSetupState, global::CardGame.Core.EngineStates.CoreGameEngineGuanduActivitiesState gameEngineGuanduActivitiesState) : IMatchParticipantSetupQueries, IMatchParticipantSetupState
+internal readonly struct ParticipantSetupContext(EngineStates.CoreMatchDefinitionState matchDefinitionState, Func<RuntimeEntries.CoreGameEngineMultiplayerEntries> getCoreGameEngineMultiplayerRuntime, Func<RuntimeEntries.CoreGameEngineGuanduActivitiesEntries> getCoreGameEngineGuanduActivitiesRuntime, EngineStates.CoreGameEngineShenwuActivitiesState gameEngineShenwuActivitiesState, EngineStates.CoreMatchSetupState matchSetupState, EngineStates.CoreGameEngineGuanduActivitiesState gameEngineGuanduActivitiesState) : IMatchParticipantSetupQueries, IMatchParticipantSetupState
 {
     public int SeatCount => matchDefinitionState.ReferenceToPlayerCount;
 

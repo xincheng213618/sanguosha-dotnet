@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreAwaitedBlindHandTakeProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IAwaitedBlindHandTakeProgramHost.TakeRandomHandCardsAndAwait(ProgramSkillFrame frame, int amountPerTarget, CardMoveReason reason) => BeginAwaitedBlindHandTake(frame, amountPerTarget, reason);
+    SkillProgramStepOutcome IAwaitedBlindHandTakeProgramHost.TakeRandomHandCardsAndAwait(ProgramSkillFrame frame, int amountPerTarget, CardMoveReason reason) => BeginAwaitedBlindHandTake(frame, amountPerTarget, reason);
     internal SkillProgramStepOutcome BeginAwaitedBlindHandTake(ProgramSkillFrame frame, int amountPerTarget, CardMoveReason reason)
     {
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -31,7 +27,7 @@ internal sealed partial class CoreAwaitedBlindHandTakeProgramsRuntime
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards.Select(c => c.Card.Id).ToArray(), destination, reason);
         }
 
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramRandomHandCardsTakenEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, Array.AsReadOnly(seats.ToArray()), cards.Count));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramRandomHandCardsTakenEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, Array.AsReadOnly(seats.ToArray()), cards.Count));
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }

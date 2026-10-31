@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengYuMouOlRuntime
@@ -103,10 +99,10 @@ internal sealed partial class CharacterChengYuMouOlRuntime
 
     internal bool IsMouDanchiSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => f.MouDanchi is { Stage: MouDanchiStage.Children, Returned: true } r && MouDanchi.Valid(f) && r.Batches.Contains(batch.Id) && batch.ParentFrameId == r.UseId && batch.AwaitingProgramFrameId is null && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.OriginOwnerSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDanchiNativeBatchEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.BatchId == batch.Id) == 1 && batch.Movements.Count > 0 && batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m));
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 34101)]
-    internal bool FinishMouDanchiSlash(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishMouDanchiSlash(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (attack.Card is not null || !IsMouDanchiUse(attack.ResolutionId) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!.CardKind))
+        if (attack.Card is not null || !IsMouDanchiUse(attack.ResolutionId) || !CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!.CardKind))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
@@ -145,7 +141,7 @@ internal sealed partial class CharacterChengYuMouOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 34101)]
-    internal bool ReturnMouDanchiAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnMouDanchiAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDanchi: { Stage: MouDanchiStage.Children, Returned: true } r } f || r.UseId != completion.ResolutionId)
             return false;

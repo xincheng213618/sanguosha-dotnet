@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBaOlRuntime
@@ -34,6 +30,6 @@ internal sealed partial class CharacterLiuBaOlRuntime
     {
         if (!HasLiuBaCapability || c.SkillId != "ol:zhubi" || c.BindingId != "issued-holder-ending" || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || c.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || context.Window != SkillProgramTriggerWindow.TurnEnding || context.OwnerSeat != c.OwnerSeat || context.SourceSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || context.TargetSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || context.OccurrenceIndex != c.OccurrenceIndex || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || parent.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate != c)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<LiuBaCoinMintedEvent>().Any(e => ValidLiuBaCoin(e) && e.Source.SkillInstanceId == c.SkillInstanceId && e.GameplayHash == c.GameplayHash && parent.Items[parent.ItemIndex].StableIdentity == $"liu-ba.coin:{(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber)}:{(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)}:{(e.CardId)}") && (LiuBaCoins(c.OwnerSeat).Length > 0 || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.LiuBa is { Op: SkillProgramEffectOp.ExchangeZhubiCoinsAtEnding, Paid: true } && f.WindowContext == context && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c)));
+        return _coreProgramEventHistoryOperations.ProgramEventHistory<LiuBaCoinMintedEvent>().Any(e => ValidLiuBaCoin(e) && e.Source.SkillInstanceId == c.SkillInstanceId && e.GameplayHash == c.GameplayHash && parent.Items[parent.ItemIndex].StableIdentity == $"liu-ba.coin:{(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber)}:{(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)}:{(e.CardId)}") && (LiuBaCoins(c.OwnerSeat).Length > 0 || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.LiuBa is { Op: SkillProgramEffectOp.ExchangeZhubiCoinsAtEnding, Paid: true } && f.WindowContext == context && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c)));
     }
 }

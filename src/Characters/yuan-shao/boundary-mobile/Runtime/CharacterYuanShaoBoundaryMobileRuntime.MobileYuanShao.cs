@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuanShaoBoundaryMobileRuntime
@@ -29,8 +25,8 @@ internal sealed partial class CharacterYuanShaoBoundaryMobileRuntime
         }
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMobileYuanShaoProgramHost.Draw(ProgramSkillFrame frame, bool responder) => DrawMobileYuanShao(frame, responder);
-    bool global::CardGame.Core.IMobileYuanShaoSelectionQueries.SuitAvailable(int owner, Suit suit) => MobileYuanShaoSuitAvailable(owner, suit);
+    SkillProgramStepOutcome IMobileYuanShaoProgramHost.Draw(ProgramSkillFrame frame, bool responder) => DrawMobileYuanShao(frame, responder);
+    bool IMobileYuanShaoSelectionQueries.SuitAvailable(int owner, Suit suit) => MobileYuanShaoSuitAvailable(owner, suit);
     internal int? MobileYuanShaoResponder(ProgramSkillWindowContext context, int owner)
     {
         if (context.Window != SkillProgramTriggerWindow.CardResponseCompleted || context.CardUse is not { } action || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ResponseCompletion is not { CostsDrained: true, OriginalContinuation: ProgramCardContinuation.GroupResponse or ProgramCardContinuation.FactionDefenseDodge } || window.Action.ActionId != action.CardActionId || window.Action.EffectiveKind != CardKind.Dodge || window.Action.ProviderSeat == owner || window.Action.ParentActionId is not { } parentAction || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { Type: CardActionType.Use } parent } use || parent.ActionId != parentAction || parent.EffectiveKind != CardKind.ArrowBarrage || parent.ActorSeat != owner || use.SourceSeat != owner)

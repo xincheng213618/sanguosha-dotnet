@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangLiaoOlSpRuntime
 {
     internal const string MubingReveal = "mubing-public-reveal";
-    internal CardConversionSource SpZhangLiaoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.ISpZhangLiaoProgramHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginSpZhangLiao(f, op);
+    internal CardConversionSource SpZhangLiaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome ISpZhangLiaoProgramHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginSpZhangLiao(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26070)]
     internal bool CanOfferSpZhangLiao(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)
     {
@@ -169,7 +165,7 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
     [ProgramAnswer("sp-zhang-liao")]
     internal void AnswerSpZhangLiao(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SpZhangLiao: { } r } f || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], SpZhangLiaoChoices(f).Where(c => c.Id == choice.Id).ToArray()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SpZhangLiaoStage.HighestCard ? r.VictimSeat : f.OwnerSeat))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SpZhangLiao: { } r } f || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], SpZhangLiaoChoices(f).Where(c => c.Id == choice.Id).ToArray()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SpZhangLiaoStage.HighestCard ? r.VictimSeat : f.OwnerSeat))
             throw new InvalidOperationException("The rank exchange lost its actual chooser, physical source or budget.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -268,7 +264,7 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
         {
             var target = MubingAvailableReveal(f).Sum(id => _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Rank);
             var current = r.Selected.Sum(id => _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Rank);
-            return d.Choices.Where(c => c.Parameters["option"] == "card" && !r.Selected.Contains(c.Cards.Single())).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault()is { } add && current < target ? add : d.Choices.Single(c => c.Parameters["option"] == "confirm");
+            return d.Choices.Where(c => c.Parameters["option"] == "card" && !r.Selected.Contains(c.Cards.Single())).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault()is { } add && current < target ? add : d.Choices.Single(c => c.Parameters["option"] == "confirm");
         }
 
         if (r.Stage == SpZhangLiaoStage.Obtain)

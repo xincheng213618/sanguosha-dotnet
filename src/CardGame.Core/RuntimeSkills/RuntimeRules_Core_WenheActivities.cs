@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_WenheActivities
 {
     internal static string WenheRuleName(WenheRuleKind rule) => rule switch { WenheRuleKind.Chaos => "乱武", WenheRuleKind.Bounty => "重赏",

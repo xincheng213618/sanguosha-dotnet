@@ -1,14 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDamageArmorPaymentsRuntime
 {
-    internal DamageArmorPaymentReceipt? PrepareDamageArmorPayment(long frameId, global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal DamageArmorPaymentReceipt? PrepareDamageArmorPayment(long frameId, GameEngine.IDamageAttempt attack)
     {
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
         if (target.Armor == 0 || _coreNativeDamageArmorPoliciesOperations.BypassesNativeDamageArmor(attack))
@@ -27,7 +22,7 @@ internal sealed partial class CoreGameEngineDamageArmorPaymentsRuntime
         return receipt;
     }
 
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? DamageArmorPaymentOwner(DamageFrame damage) => _resolutionStackOperations._resolutionStack.FirstOrDefault(frame => frame.Id == damage.ParentFrameId) switch
+    internal GameEngine.IDamageAttempt? DamageArmorPaymentOwner(DamageFrame damage) => _resolutionStackOperations._resolutionStack.FirstOrDefault(frame => frame.Id == damage.ParentFrameId) switch
     {
         ProgramSkillFrame { AttackAttempt: not null } program => _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(program.Id),
         CardUseFrame { CardAttack: not null } use => _kernelCoreMainOperations.CreateCardAttackHandle(use.Id),
@@ -35,7 +30,7 @@ internal sealed partial class CoreGameEngineDamageArmorPaymentsRuntime
         JudgmentFrame { CardAttack: not null } judgment => _kernelCoreMainOperations.CreateCardAttackHandle(judgment.Id),
         _ => null
     };
-    internal bool IsExactArmorDamageRequest(DamageFrame damage, global::CardGame.Core.GameEngine.IDamageAttempt attack, bool requireUnpaid = false)
+    internal bool IsExactArmorDamageRequest(DamageFrame damage, GameEngine.IDamageAttempt attack, bool requireUnpaid = false)
     {
         if (_coreProgramEventHistoryOperations.ProgramEventHistory<DamageRequestedEvent>().Where(request => request.ResolutionId == damage.Id).ToArray()is not [var request] || request.SourceSeat != damage.SourceSeat || request.TargetSeat != damage.TargetSeat || request.Amount != damage.Amount || request.SourceCard != attack.EffectiveCardKind || request.Nature != damage.Nature || request.SourceLess != attack.IsSourceLess)
             return false;
@@ -52,7 +47,7 @@ internal sealed partial class CoreGameEngineDamageArmorPaymentsRuntime
         return IsExactArmorDamageRequest(damage, attack);
     }
 
-    internal static bool DamageAppliedMatchesArmorPayment(DamageAppliedEvent applied, DamageArmorPaymentReceipt payment) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DamageArmorPayments.DamageAppliedMatchesArmorPayment(applied, payment);
+    internal static bool DamageAppliedMatchesArmorPayment(DamageAppliedEvent applied, DamageArmorPaymentReceipt payment) => RuntimeSkills.RuntimeRules_Core_DamageArmorPayments.DamageAppliedMatchesArmorPayment(applied, payment);
     internal bool IsIssuedDamageArmorPayment(DamageFrame damage) => IsValidDamageArmorPayment(damage, requireApplied: true) && _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Where(applied => applied.ArmorPayment == damage.ArmorPayment).ToArray()is [var applied] && DamageAppliedMatchesArmorPayment(applied, damage.ArmorPayment!);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 101)]
     internal void RequireExactDamageArmorPayment(IGameEvent payload)

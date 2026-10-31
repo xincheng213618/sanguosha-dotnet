@@ -1,21 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoYuOlRuntime
 {
     internal const string GongjieGiftReason = "skill-program.cao-yu.gongjie.obtain", GongjieDrawReason = "skill-program.cao-yu.gongjie.draw", XiangxuDrawReason = "skill-program.cao-yu.xiangxu.draw", XiangxuDiscardReason = "skill-program.cao-yu.xiangxu.discard", XiangzuGiftReason = "skill-program.cao-yu.xiangzu.give";
-    SkillProgramStepOutcome global::CardGame.Core.ICaoYuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCaoYu(f, op);
+    SkillProgramStepOutcome ICaoYuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCaoYu(f, op);
     internal IReadOnlyList<Card> CaoYuGiftCards(int owner, int chooser) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(owner)).Where(c => !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Transfer)).OrderBy(c => _cardZonesOperations._cardZones.GetLocation(c.Id).Zone).ThenBy(c => c.Id).ToArray());
     internal IReadOnlyList<Card> CaoYuDiscardCards(int owner) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, c, CardLocation.Hand(owner), OwnedCardMoveIntent.Discard) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, CardLocation.Hand(owner), OwnedCardMoveIntent.Discard)).OrderBy(c => c.Id).ToArray());
     internal SkillProgramStepOutcome BeginCaoYu(ProgramSkillFrame input, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
+        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
         if (f.CaoYu is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || !QualifyCaoYu(c, _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("CaoYu requires its exact original round, causal minimum, issued ending or dying candidate.");
         if (op == SkillProgramEffectOp.ResolveXiangxuMinimumTransition)
@@ -160,7 +157,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
     [ProgramAnswer("cao-yu")]
     internal void AnswerCaoYu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == CaoYuStage.GongjieTake ? r.Targets[r.Index] : f.OwnerSeat) || !CaoYuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == CaoYuStage.GongjieTake ? r.Targets[r.Index] : f.OwnerSeat) || !CaoYuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("CaoYu requires its actual chooser and exact current opaque slot or private material set.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -406,13 +403,13 @@ internal sealed partial class CharacterCaoYuOlRuntime
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27441)]
-    internal bool ContinueIssuedCaoYu(ProgramSkillFrame f) => f.CaoYu is null && f.InstructionIndex is 0 or 1 && f.WindowContext is { } c && (IsXiangxuMinimumCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex), c) || IsIssuedXiangxuEndingCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex), c));
+    internal bool ContinueIssuedCaoYu(ProgramSkillFrame f) => f.CaoYu is null && f.InstructionIndex is 0 or 1 && f.WindowContext is { } c && (IsXiangxuMinimumCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex), c) || IsIssuedXiangxuEndingCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex), c));
     [ProgramAiChoice(SkillProgramEffectOp.ResolveGongjieRoundFirstGifts, SkillProgramEffectOp.ResolveXiangxuIssuedTurnEndAdjustment, SkillProgramEffectOp.ResolveXiangzuDyingGiftAndRecovery)]
     internal PromptChoice AiCaoYu(PendingDecision p, ProgramSkillFrame f)
     {
         var r = f.CaoYu!;
         if (r.Stage == CaoYuStage.GongjieTargets)
-            return p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "target" && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "targets-done") ?? p.Choices.Last();
+            return p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "target" && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "targets-done") ?? p.Choices.Last();
         if (r.Stage == CaoYuStage.XiangzuRecipient)
             return p.Choices.FirstOrDefault(c => c.Targets.Count > 0 && CaoYuHistory(f.OwnerSeat, "ol:gongjie", c.Targets[0]) && CaoYuHistory(f.OwnerSeat, "ol:xiangxu", c.Targets[0])) ?? p.Choices.First();
         if (r.Stage == CaoYuStage.XiangzuCards)

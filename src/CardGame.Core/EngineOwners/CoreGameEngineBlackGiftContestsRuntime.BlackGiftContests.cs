@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
@@ -17,9 +12,9 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
         return !(features.HasOperation(SkillProgramEffectOp.GiveBlackHandAndResolveRecipientContest) && _coreRecipientConsequencesReceiptsOperations.BlackGiftGameIssued(owner.Seat, program.Id));
     }
 
-    internal static CardConversionSource RecipientConsequencesSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_BlackGiftContests.RecipientConsequencesSource(f);
-    internal static string BlackGiftReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftReason(f);
-    internal static string BlackGiftDiscardReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftDiscardReason(f);
+    internal static CardConversionSource RecipientConsequencesSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_BlackGiftContests.RecipientConsequencesSource(f);
+    internal static string BlackGiftReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftReason(f);
+    internal static string BlackGiftDiscardReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftDiscardReason(f);
     internal bool BlackGiftMaterialLegal(int owner, Card card) => _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Hand(owner) && _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card)is Suit.Spade or Suit.Club;
     internal SkillProgramStepOutcome BeginBlackGiftContest(ProgramSkillFrame supplied, int recipient)
     {
@@ -65,15 +60,15 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
         return _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, winner, winner, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard, canSelect: (_, c) => !f.BlackGiftContest.SelectedDiscardIds.Contains(c.Id));
     }
 
-    internal static int? BlackGiftWinner(PindianResult p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftWinner(p);
-    internal static int[] BlackGiftLosers(PindianResult p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftLosers(p);
+    internal static int? BlackGiftWinner(PindianResult p) => RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftWinner(p);
+    internal static int[] BlackGiftLosers(PindianResult p) => RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftLosers(p);
     internal IReadOnlyList<PromptChoice> BlackGiftChoices(ProgramSkillFrame f)
     {
         var r = f.BlackGiftContest!;
         return Array.AsReadOnly((r.Stage == BlackGiftContestStage.ChoosingSecond ? BlackGiftSecondSeats(f).Select(seat => new PromptChoice(new($"black-gift.{(f.Id)}.second-{(seat)}"), $"令 {(_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].Name)} 与 {(_coreMatchParticipantsPlayersAccess._players[seat].Name)} 拼点", [], [seat], BlackGiftParameters(f, "second"))) : BlackGiftDiscardOptions(f).Select(c => new PromptChoice(new($"black-gift.{(f.Id)}.discard-{(c.Cards.Single())}"), c.Label, c.Cards, [], BlackGiftParameters(f, "discard")))).ToArray());
     }
 
-    internal static Dictionary<string, string> BlackGiftParameters(ProgramSkillFrame f, string stage) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftParameters(f, stage);
+    internal static Dictionary<string, string> BlackGiftParameters(ProgramSkillFrame f, string stage) => RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftParameters(f, stage);
     internal void PublishBlackGiftChoice(ProgramSkillFrame f)
     {
         if (_coreRecipientConsequencesReceiptsOperations.RecipientConsequencesGameEnded())
@@ -106,7 +101,7 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         var r = f.BlackGiftContest!;
         var seat = r.Stage == BlackGiftContestStage.ChoosingSecond ? f.OwnerSeat : BlackGiftWinner(r.Result!)!.Value;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != seat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [BlackGiftChoices(f).Single(c => c.Id == choice.Id)]))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != seat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [BlackGiftChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("A black gift answer lost its exact private owning choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == BlackGiftContestStage.ChoosingSecond)
@@ -154,7 +149,7 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    internal static string BlackGiftResultBind(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftResultBind(f);
+    internal static string BlackGiftResultBind(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_BlackGiftContests.BlackGiftResultBind(f);
     internal bool BlackGiftResultMatches(ProgramSkillFrame f, out PindianResult result)
     {
         result = null !;
@@ -242,6 +237,6 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IRecipientContestConsequencesHost.BlackGiftContest(ProgramSkillFrame f, int recipient) => BeginBlackGiftContest(f, recipient);
-    SkillProgramStepOutcome global::CardGame.Core.IRecipientContestConsequencesHost.PrintedLordBenefit(ProgramSkillFrame f) => _corePrintedLordBenefitsOperations.BeginPrintedLordBenefit(f);
+    SkillProgramStepOutcome IRecipientContestConsequencesHost.BlackGiftContest(ProgramSkillFrame f, int recipient) => BeginBlackGiftContest(f, recipient);
+    SkillProgramStepOutcome IRecipientContestConsequencesHost.PrintedLordBenefit(ProgramSkillFrame f) => _corePrintedLordBenefitsOperations.BeginPrintedLordBenefit(f);
 }

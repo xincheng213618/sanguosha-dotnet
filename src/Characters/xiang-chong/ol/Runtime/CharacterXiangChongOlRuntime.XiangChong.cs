@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiangChongOlRuntime
 {
     internal const string XiangGift = "skill-program.xiang-chong.guying.gift", XiangDebt = "skill-program.xiang-chong.guying.debt", XiangReturn = "skill-program.xiang-chong.guying.return", MuzhenGift = "skill-program.xiang-chong.muzhen.gift", MuzhenClaim = "skill-program.xiang-chong.muzhen.claim";
-    internal static CardConversionSource XiangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xiang_chong_ol_XiangChong.XiangSource(f);
+    internal static CardConversionSource XiangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_xiang_chong_ol_XiangChong.XiangSource(f);
     internal int XiangDebtCount(int owner)
     {
         var through = _coreProgramEventHistoryOperations.ProgramEventHistory<XiangChongDebtConsumedEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.ThroughFrameId).DefaultIfEmpty(0).Max();
@@ -26,7 +23,7 @@ internal sealed partial class CharacterXiangChongOlRuntime
 
     internal IReadOnlyList<XiangChongCard> XiangOwned(int owner, ProgramSkillFrame? f = null, bool discard = false) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(owner)).Where(c => !c.IsGeneralWeapon && (f is null || !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, f.SkillId, f.SkillInstanceId, c)) && (!discard || !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard))).Select(c => new XiangChongCard(c.Id, c.Kind, _cardZonesOperations._cardZones.GetLocation(c.Id))).ToArray());
     internal long XiangPlayToken(int owner) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play, ActorSeat: var actor } p && actor == owner ? p.Token : 0;
-    SkillProgramStepOutcome global::CardGame.Core.IXiangChongHost.Resolve(ProgramSkillFrame f, SkillProgramEffect effect) => BeginXiangChong(f, effect);
+    SkillProgramStepOutcome IXiangChongHost.Resolve(ProgramSkillFrame f, SkillProgramEffect effect) => BeginXiangChong(f, effect);
     internal SkillProgramStepOutcome BeginXiangChong(ProgramSkillFrame input, SkillProgramEffect e)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -98,7 +95,7 @@ internal sealed partial class CharacterXiangChongOlRuntime
     }
 
     internal bool XiangLostStillAvailable(ProgramSkillFrame f) => f.XiangChong is { Lost: { } lost, LossDestination: { } to } r && _cardZonesOperations._cardZones.GetLocation(lost.CardId) == to && to != CardLocation.OutsideGame && to != CardLocation.Hand(f.OwnerSeat) && to != CardLocation.Equipment(f.OwnerSeat) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == lost.CardId).Sequence == r.LossSequence;
-    internal static Dictionary<string, string> XiangArgs(string branch) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xiang_chong_ol_XiangChong.XiangArgs(branch);
+    internal static Dictionary<string, string> XiangArgs(string branch) => RuntimeSkills.RuntimeRules_xiang_chong_ol_XiangChong.XiangArgs(branch);
     internal IReadOnlyList<PromptChoice> XiangChoices(ProgramSkillFrame f)
     {
         var r = f.XiangChong!;
@@ -175,7 +172,7 @@ internal sealed partial class CharacterXiangChongOlRuntime
     [ProgramAnswer("xiang-chong")]
     internal void AnswerXiang(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XiangChong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == XiangChongStage.Choice ? r.TurnOwner : f.OwnerSeat) || !XiangChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XiangChong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == XiangChongStage.Choice ? r.TurnOwner : f.OwnerSeat) || !XiangChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("XiangChong requires its exact current chooser and frozen private card frontier.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -362,7 +359,7 @@ internal sealed partial class CharacterXiangChongOlRuntime
         if (r.Stage == XiangChongStage.Choice)
             return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "give") ?? p.Choices[0];
         if (r.Stage == XiangChongStage.Cards)
-            return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "pay") ?? p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
+            return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "pay") ?? p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
         return p.Choices[0];
     }
 }

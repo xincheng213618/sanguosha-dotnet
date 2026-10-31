@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreCardMovementJournalCardMovementsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreCardMovementJournalCardMovementsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.CardMovementRecord> _cardMovements { get; }
+    ref readonly List<CardMovementRecord> _cardMovements { get; }
 }

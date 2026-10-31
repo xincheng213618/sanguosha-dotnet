@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSlashTargetBenefitObserversRuntime
@@ -120,7 +116,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitObserversRuntime
     internal bool SlashBenefitWindowMatches(SlashTargetBenefitWindowFrame w)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == w.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not CardUseFrame owner || owner.Id != w.ParentFrameId || !Enum.IsDefined(w.ReturnKind) || w.Id <= 0 || w.Candidates.Count == 0 || w.Candidates.Count != w.Contexts.Count || w.CandidateIndex < 0 || w.CandidateIndex > w.Candidates.Count || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not CardUseFrame owner || owner.Id != w.ParentFrameId || !Enum.IsDefined(w.ReturnKind) || w.Id <= 0 || w.Candidates.Count == 0 || w.Candidates.Count != w.Contexts.Count || w.CandidateIndex < 0 || w.CandidateIndex > w.Candidates.Count || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             return false;
         for (var i = 0; i < w.Candidates.Count; i++)
         {

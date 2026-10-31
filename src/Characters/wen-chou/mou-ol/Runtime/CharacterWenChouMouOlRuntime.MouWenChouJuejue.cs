@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWenChouMouOlRuntime
@@ -69,7 +65,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     internal SkillProgramStepOutcome BeginMouWenChouTrigger(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
+        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
         if (f.MouWenChouOl is not null || f.InstructionIndex != 1 || f.ActivationId != f.TriggerId || f.WindowContext is not { } w || !CanRunIssuedMouWenChou(c, w))
             throw new InvalidOperationException("Mou Wen Chou requires its original paid native action and exact qualifying card window.");
         var use = MouWenChouContextUse(c, w)!;
@@ -107,7 +103,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 33100)]
-    internal bool CaptureMouWenChouDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageId)
+    internal bool CaptureMouWenChouDamage(GameEngine.IDamageAttempt attack, long damageId)
     {
         if (HasMouWenChouOl && attack.DamageWasApplied && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { MouWenChouLunzhan: not null } use && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == damageId)is DamageFrame { Amount: > 0 } damage && damage.ParentFrameId == use.Id && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouUseDamageEvent>().Any(e => e.DamageId == damageId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouWenChouUseDamageEvent(use.Id, damageId, damage.SourceSeat, damage.TargetSeat, damage.Amount));

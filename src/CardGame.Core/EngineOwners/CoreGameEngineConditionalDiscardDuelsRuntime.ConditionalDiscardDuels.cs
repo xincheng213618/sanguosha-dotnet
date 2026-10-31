@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,7 +9,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime
     internal const string ConditionalDuelTargetReason = "skill-program.conditional-discard-duel.target-cost";
     internal bool ConditionalDuelSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 60, SkillProgramEffectOp.DiscardSlashThenOtherCardAndUseDuel)]
-    internal bool CanStartConditionalDiscardDuel(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Any(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) && !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner.Seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard));
+    internal bool CanStartConditionalDiscardDuel(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Any(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) && !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner.Seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard));
     internal bool ConditionalDuelParentMatches(ProgramSkillFrame f)
     {
         if (f.ConditionalDiscardDuel is not { } d || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != d.InstructionIndex || d.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var target] || target != d.TargetSeat || target == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || d.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || d.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || d.TurnOwnerSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || d.Source != new CardConversionSource(f.SkillId, f.ActivationId!, f.OwnerSeat, f.SkillInstanceId) || d.GameplayHash != f.GameplayHash || string.IsNullOrWhiteSpace(f.SkillInstanceId) || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash)
@@ -40,7 +37,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime
         var d = f.ConditionalDiscardDuel!;
         var ownerCost = d.Stage == ConditionalDiscardDuelStage.OwnerChoice;
         var payer = ownerCost ? f.OwnerSeat : d.TargetSeat;
-        var choices = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, payer, payer, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard, canSelect: (_, c) => !ownerCost || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) && !c.IsGeneralWeapon).Select(c =>
+        var choices = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, payer, payer, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard, canSelect: (_, c) => !ownerCost || CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) && !c.IsGeneralWeapon).Select(c =>
         {
             var args = c.Parameters.ToDictionary(e => e.Key, e => e.Value, StringComparer.Ordinal);
             args["program-action"] = "conditional-discard-duel";
@@ -106,7 +103,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime
             throw new InvalidOperationException("Conditional Duel lost its own payment zone and slot.");
         var from = new CardLocation(zone, payer);
         var cards = _cardZonesOperations._cardZones.CardsAt(from);
-        if (slot < 0 || slot >= cards.Count || selected.Cards is not [var id] || cards[slot].Id != id || ownerCost && (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(cards[slot].Kind) || cards[slot].IsGeneralWeapon) || _coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(payer, cards[slot], from, OwnedCardMoveIntent.Discard))
+        if (slot < 0 || slot >= cards.Count || selected.Cards is not [var id] || cards[slot].Id != id || ownerCost && (!CoreNativeCardClassificationsRuntime.IsSlashCard(cards[slot].Kind) || cards[slot].IsGeneralWeapon) || _coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(payer, cards[slot], from, OwnedCardMoveIntent.Discard))
             throw new InvalidOperationException("Conditional Duel cannot pay an invalid or substituted entity.");
         var card = cards[slot];
         var before = _coreCardMovementJournalMovementSequenceAccess._movementSequence;
@@ -179,7 +176,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime
         }
 
         // This comparison happens only after every real child of the target's actual discard has returned.
-        if (d.TargetPayment is not { } paid || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(paid.PrintedKind) || _coreMatchParticipantsPlayersAccess._players[d.TargetSeat].Hp < _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp || !_coreDamageColorDuelProgramsOperations.CanIssueSelectedActorDuel(d.TargetSeat, f.OwnerSeat))
+        if (d.TargetPayment is not { } paid || CoreNativeCardClassificationsRuntime.IsSlashCard(paid.PrintedKind) || _coreMatchParticipantsPlayersAccess._players[d.TargetSeat].Hp < _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp || !_coreDamageColorDuelProgramsOperations.CanIssueSelectedActorDuel(d.TargetSeat, f.OwnerSeat))
         {
             FinishConditionalDiscardDuel(f, false);
             return true;
@@ -217,8 +214,8 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime
             return decision.Choices[0];
         // Every named card belongs to this exact chooser. No opponent's hidden identity is inspected.
         var d = f.ConditionalDiscardDuel!;
-        return choices.OrderBy(c => d.Stage == ConditionalDiscardDuelStage.TargetChoice && _coreMatchParticipantsPlayersAccess._players[d.TargetSeat].Hp >= _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp && c.Cards is [var id] && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardAttackStateOperations.GetAttackCard(id).Kind) ? -100 : 0).ThenBy(c => c.Parameters.GetValueOrDefault("source-zone") == "Equipment" ? 1 : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+        return choices.OrderBy(c => d.Stage == ConditionalDiscardDuelStage.TargetChoice && _coreMatchParticipantsPlayersAccess._players[d.TargetSeat].Hp >= _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp && c.Cards is [var id] && CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardAttackStateOperations.GetAttackCard(id).Kind) ? -100 : 0).ThenBy(c => c.Parameters.GetValueOrDefault("source-zone") == "Equipment" ? 1 : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IConditionalDiscardDuelProgramHost.DiscardSlashThenOtherCardAndUseDuel(ProgramSkillFrame frame) => BeginConditionalDiscardDuel(frame);
+    SkillProgramStepOutcome IConditionalDiscardDuelProgramHost.DiscardSlashThenOtherCardAndUseDuel(ProgramSkillFrame frame) => BeginConditionalDiscardDuel(frame);
 }

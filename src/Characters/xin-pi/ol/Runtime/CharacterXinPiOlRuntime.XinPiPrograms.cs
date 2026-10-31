@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXinPiOlRuntime
@@ -145,5 +141,5 @@ internal sealed partial class CharacterXinPiOlRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IXinPiProgramHost.BeginXinPi(ProgramSkillFrame f, SkillProgramEffect e) => BeginXinPi(f, e);
+    SkillProgramStepOutcome IXinPiProgramHost.BeginXinPi(ProgramSkillFrame f, SkillProgramEffect e) => BeginXinPi(f, e);
 }

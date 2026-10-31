@@ -1,20 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoZhenMobileShiRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShiCaoZHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginShiCaoZ(f, operation);
+    SkillProgramStepOutcome IShiCaoZHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginShiCaoZ(f, operation);
     internal SkillProgramStepOutcome BeginShiCaoZ(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.SkillId != ShiCaoZSifeng || f.ShiCaoZhen is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
             throw new InvalidOperationException("Sifeng requires its original issued native trigger.");
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
+        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
         if (operation == SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengPlace && (f.TriggerId != "place-forecast" || context.Window != SkillProgramTriggerWindow.TurnEnding || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive) || operation == SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengUse && !IsIssuedShiCaoZUseCandidate(candidate, context) || operation == SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengEnd && !IsIssuedShiCaoZEndCandidate(candidate, context))
             throw new InvalidOperationException("Sifeng lost its own ending, completed native Use or source-independent issued end.");
         var stage = operation == SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengPlace ? ShiCaoZStage.TopChildren : operation == SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengUse ? ShiCaoZStage.UseRemovalChildren : ShiCaoZStage.EndChoice;
@@ -70,7 +67,7 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
         {
             foreach (var id in r.Pool.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing))
                 foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat))
-                    Add("assign", $"{(id)}.{(target.Seat)}", $"将【{(global::CardGame.Core.EngineOwners.CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(_coreAdvancedLifecycleOperations.GetAdvancedCard(id)))}】放在{(target.Name)}的伺锋队尾", [id], [target.Seat]);
+                    Add("assign", $"{(id)}.{(target.Seat)}", $"将【{(CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(_coreAdvancedLifecycleOperations.GetAdvancedCard(id)))}】放在{(target.Name)}的伺锋队尾", [id], [target.Seat]);
             return _coreCardDistributionPresentationOperations.PresentCardDistribution(f, choices, "shi-cao-zhen-forecast", r.Pool.Count, label: c => "扣置于 " + _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()].Name);
         }
 
@@ -116,7 +113,7 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
     [ProgramAnswer("mobile-shi-cao-zhen")]
     internal void AnswerShiCaoZ(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiCaoZhen: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ShiCaoZChooser(f) || !ShiCaoZChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiCaoZhen: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ShiCaoZChooser(f) || !ShiCaoZChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Sifeng lost its exact private order, recipient, hand-only payment or end choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -298,5 +295,5 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengPlace, SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengUse, SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengEnd)]
-    internal PromptChoice ShiCaoZAi(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "damage" && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.ShiCaoZhen!.Holder])) ?? decision.Choices[0];
+    internal PromptChoice ShiCaoZAi(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "damage" && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.ShiCaoZhen!.Holder])) ?? decision.Choices[0];
 }

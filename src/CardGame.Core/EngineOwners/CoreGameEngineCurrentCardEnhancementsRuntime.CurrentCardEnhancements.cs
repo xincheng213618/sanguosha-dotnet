@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCurrentCardEnhancementsRuntime
 {
-    internal void CaptureProgramAdjustedSlashBaseDamage(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CaptureProgramAdjustedSlashBaseDamage(NativeOwners.CardAttackHandle attack)
     {
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash))
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(attack.ResolutionId, frame => frame with { ProgramAdjustedSlashBaseDamage = frame.ProgramAdjustedSlashBaseDamage ?? attack.DamageAmount });
     }
 
-    internal bool TryContinueEnhancedSlashTargets(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryContinueEnhancedSlashTargets(NativeOwners.CardAttackHandle attack)
     {
         if (!HasRemainingEnhancedSlashTargets(attack.ResolutionId) || _coreForeignPublicPileSlashesOperations.IsForeignPublicPileSlashUse(attack.ResolutionId) || _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd?.ResolutionId == attack.ResolutionId)
             return false;
@@ -37,9 +33,9 @@ internal sealed partial class CoreGameEngineCurrentCardEnhancementsRuntime
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = continued;
         _coreNativeCardContinuationCursorsOperations.ActiveDuel = null;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { ActiveAttack: { } factionAttack } faction && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(factionAttack, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { ActiveAttack: { } factionAttack } faction && CoreNativeDamageHandlesRuntime.SameAttackOwner(factionAttack, attack))
             faction.ActiveAttack = continued;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { ActiveAttack: { } borrowedAttack } borrowed && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(borrowedAttack, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { ActiveAttack: { } borrowedAttack } borrowed && CoreNativeDamageHandlesRuntime.SameAttackOwner(borrowedAttack, attack))
             borrowed.ActiveAttack = continued;
         _coreNativeSlashUseOperations.BeginSlashTargetResolution(continued);
         return true;
@@ -74,7 +70,7 @@ internal sealed partial class CoreGameEngineCurrentCardEnhancementsRuntime
             _coreTieredRoundActualTargetWindowsOperations.SyncIssuedTieredRoundZeroTrickTargetWindows(use.Id, action);
         }
 
-        if (_coreActualTurnProgressCurrentSeatAccess._currentSeat != frame.OwnerSeat || use.Action!.EffectiveDesignatedTargetSeats.Count != 1 || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && CardUseCategoryCatalog.Get(use.CardKind) != CardUseCategories.InstantTrick || _coreMatchParticipantsPlayersAccess._players.Any(other => other.IsAlive && other.Seat != frame.OwnerSeat && _coreNativeRuleQueriesOperations.GetCombatDistance(frame.OwnerSeat, other.Seat) != 1))
+        if (_coreActualTurnProgressCurrentSeatAccess._currentSeat != frame.OwnerSeat || use.Action!.EffectiveDesignatedTargetSeats.Count != 1 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && CardUseCategoryCatalog.Get(use.CardKind) != CardUseCategories.InstantTrick || _coreMatchParticipantsPlayersAccess._players.Any(other => other.IsAlive && other.Seat != frame.OwnerSeat && _coreNativeRuleQueriesOperations.GetCombatDistance(frame.OwnerSeat, other.Seat) != 1))
             return SkillProgramStepOutcome.Continue;
         if (frame.CardEnhancementDraft is not null)
             throw new InvalidOperationException("A current-card enhancement was offered twice.");
@@ -88,7 +84,7 @@ internal sealed partial class CoreGameEngineCurrentCardEnhancementsRuntime
         var use = EnhancementCardUse(frame);
         var actor = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var card = use.Action!.PhysicalCards.Select(cost => _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(cost.CardId)).Single(item => item.Id == cost.CardId)).FirstOrDefault();
-        return _coreMatchParticipantsPlayersAccess._players.Where(target => target.IsAlive && !use.Action!.EffectiveDesignatedTargetSeats.Contains(target.Seat) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, use.CardKind, use.Id) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, card?.Suit ?? Suit.Spade, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(use.Action!)) && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) ? target.Seat != actor.Seat && (card is null ? !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target) : _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, target, card, effectiveKind: use.CardKind, ignoreDistance: true)) : use.CardKind switch
+        return _coreMatchParticipantsPlayersAccess._players.Where(target => target.IsAlive && !use.Action!.EffectiveDesignatedTargetSeats.Contains(target.Seat) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, use.CardKind, use.Id) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, card?.Suit ?? Suit.Spade, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(use.Action!)) && (CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) ? target.Seat != actor.Seat && (card is null ? !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target) : _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, target, card, effectiveKind: use.CardKind, ignoreDistance: true)) : use.CardKind switch
         {
             CardKind.DrawTwo or CardKind.IronChain => true,
             CardKind.StarShift or CardKind.HandRedistribution => _coreWenheCardsOperations.CanBeWenheAdditionalTarget(use, target),
@@ -256,7 +252,7 @@ internal sealed partial class CoreGameEngineCurrentCardEnhancementsRuntime
     }
 
     internal bool HasCurrentCardEnhancement(long frameId, CurrentCardEnhancement flag) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { } use && (use.Enhancements & flag) != 0;
-    internal bool HasRemainingEnhancedSlashTargets(long frameId) => !_characterDaQiaoLeOperations.IsTargetScopedZixiEffectRound(frameId) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { } use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Count > 1 && use.TargetSeats.Skip(use.TargetIndex + 1).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive);
+    internal bool HasRemainingEnhancedSlashTargets(long frameId) => !_characterDaQiaoLeOperations.IsTargetScopedZixiEffectRound(frameId) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { } use && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Count > 1 && use.TargetSeats.Skip(use.TargetIndex + 1).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive);
 
-    SkillProgramStepOutcome global::CardGame.Core.ICurrentCardEnhancementProgramHost.ApplyCurrentCardEnhancements(ProgramSkillFrame frame, int maximum) => ApplyProgramCurrentCardEnhancements(frame, maximum);
+    SkillProgramStepOutcome ICurrentCardEnhancementProgramHost.ApplyCurrentCardEnhancements(ProgramSkillFrame frame, int maximum) => ApplyProgramCurrentCardEnhancements(frame, maximum);
 }

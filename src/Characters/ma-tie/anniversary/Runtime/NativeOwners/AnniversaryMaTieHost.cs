@@ -1,8 +1,7 @@
 #nullable enable
-using System.Globalization;
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class AnniversaryMaTieHost(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterMaTieAnniversaryEntries> getCharacterMaTieAnniversaryRuntime) : IAnniversaryMaTieHost
+internal sealed class AnniversaryMaTieHost(Func<RuntimeEntries.CharacterMaTieAnniversaryEntries> getCharacterMaTieAnniversaryRuntime) : IAnniversaryMaTieHost
 {
     public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {

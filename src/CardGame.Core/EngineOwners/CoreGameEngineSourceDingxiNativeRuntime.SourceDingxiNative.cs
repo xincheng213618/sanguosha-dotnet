@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSourceDingxiNativeRuntime
 {
     internal bool SourceDingxiEntry(ProgramSkillFrame f, SourceDingxiReceipt r) => f.SkillId == SourceBeigongIds.Dingxi && r.CardId > 0 && r.OriginalCardIds.Contains(r.CardId) && r.DiscardSequence > 0 && r.EntrySequence > r.DiscardSequence && r.EntrySequence <= _coreCardMovementJournalCardMovementsAccess._cardMovements.Count && _coreCardMovementJournalCardMovementsAccess._cardMovements[r.EntrySequence - 1] is { } entry && entry.CardId == r.CardId && entry.From == CardLocation.DiscardPile && entry.To == CardLocation.Processing && entry.Reason.Value == "skill-program.source-dingxi.enter" && f.WindowContext?.MovementBatch is { } batch && batch.Id == r.BatchId && batch.ParentFrameId == r.OriginalUseId && batch.Movements.Any(m => m.Sequence == r.DiscardSequence && m.CardId == r.CardId && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile) && _coreProgramEventHistoryOperations.ProgramEventHistory<SourceDingxiDiscardQualifiedEvent>().Count(e => e.BatchId == r.BatchId && e.OriginalUseId == r.OriginalUseId && e.OriginalActionId == r.OriginalActionId && e.OwnerSeat == f.OwnerSeat && e.CardId == r.CardId && e.DiscardSequence == r.DiscardSequence) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<SourceDingxiEnteredEvent>().Count(e => e.ProgramFrameId == f.Id && e.CardId == r.CardId && e.OwnerSeat == f.OwnerSeat && e.OriginalDiscardSequence == r.DiscardSequence && e.EntrySequence == r.EntrySequence) == 1;
-    internal void IssueSourceDingxiUse(ProgramSkillFrame f, global::CardGame.Core.GameEngine.SourceDingxiUsePlan plan)
+    internal void IssueSourceDingxiUse(ProgramSkillFrame f, GameEngine.SourceDingxiUsePlan plan)
     {
         var r = f.SourceDingxi!;
         if (r.Stage != SourceDingxiStage.Issuing || !SourceDingxiEntry(f, r))
@@ -18,7 +14,7 @@ internal sealed partial class CoreGameEngineSourceDingxiNativeRuntime
         var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [r.LeftSeat], plan.Kind, physicalCardIds: [card.Id]);
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)?.SourceDingxiUse is null)
             throw new InvalidOperationException("Dingxi must bind its raw original material before declaration.");
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(plan.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(plan.Kind))
         {
             var target = _coreMatchParticipantsPlayersAccess._players[r.LeftSeat];
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, target.Seat, card, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: plan.Kind, physicalCards: [card], ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, plan.Kind), programSkillCardUseFrameId: f.Id);

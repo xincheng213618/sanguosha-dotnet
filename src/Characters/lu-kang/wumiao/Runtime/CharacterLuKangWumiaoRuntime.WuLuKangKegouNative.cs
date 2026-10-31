@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuKangWumiaoRuntime
@@ -62,7 +58,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
 
     internal bool IsIssuedWuLuKangKegouUse(CardUseFrame use)
     {
-        if (use.WuLuKangKegouSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || o.UseId != use.Id || o.ActionId != current.ActionId || current.ProviderSeat != o.ActorSeat || current.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangKegouSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { WuLuKangKegou: { Stage: WuLuKangKegouStage.NativeSlash, NativeReturned: false } r } parent || r.NativeUseId != use.Id || r.ActionId != o.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.Iteration != o.Iteration || r.PindianId != o.PindianId || r.OpponentSeat != o.ActorSeat || parent.OwnerSeat != o.TargetSeat)
+        if (use.WuLuKangKegouSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || o.UseId != use.Id || o.ActionId != current.ActionId || current.ProviderSeat != o.ActorSeat || current.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangKegouSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { WuLuKangKegou: { Stage: WuLuKangKegouStage.NativeSlash, NativeReturned: false } r } parent || r.NativeUseId != use.Id || r.ActionId != o.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.Iteration != o.Iteration || r.PindianId != o.PindianId || r.OpponentSeat != o.ActorSeat || parent.OwnerSeat != o.TargetSeat)
             return false;
         var original = current;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -80,7 +76,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     internal bool IsWuLuKangKegouUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedWuLuKangKegouUse(use);
     internal Card WuLuKangKegouRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedWuLuKangKegouUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Kegou requires its issued native zero-entity representation.");
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 60)]
-    internal bool FinishWuLuKangKegouAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishWuLuKangKegouAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || !IsWuLuKangKegouUse(attack.ResolutionId))
@@ -121,7 +117,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 29700)]
-    internal bool ReturnWuLuKangKegouAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt c)
+    internal bool ReturnWuLuKangKegouAttack(GameEngine.AttackCompletionReceipt c)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuLuKangKegou: { NativeReturned: true, Stage: WuLuKangKegouStage.NativeSlash } r } f || c.ResolutionId != r.NativeUseId)
             return false;

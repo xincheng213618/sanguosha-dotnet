@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
@@ -24,7 +19,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         if (parent is ProgramCardTriggerWindowFrame cardWindow && cardWindow.Action.Type == CardActionType.Use && cardWindow.Action.ActorSeat == actorSeat)
             capture = capture with
             {
-                Names = [new(global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(cardWindow.Action.EffectiveKind), false, cardWindow.Action.ActionId, 0)]
+                Names = [new(CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(cardWindow.Action.EffectiveKind), false, cardWindow.Action.ActionId, 0)]
             };
         _coreRuntimeOperations.ReplaceRuntimeTop(parent with { KemingCapture = capture });
         foreach (var issue in issues)
@@ -40,7 +35,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
             var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == draw.ParentFrameId);
             if (index >= 0 && _resolutionStackOperations._resolutionStack[index] is { KemingCapture: { Closed: false } capture } parent && capture.ActorSeat == draw.OwnerSeat)
             {
-                var names = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && m.To == CardLocation.Hand(draw.OwnerSeat) && m.From == CardLocation.DrawPile && m.Reason == draw.Reason).OrderBy(m => m.Sequence).Select(m => new KemingProducedName(global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(m.CardKind), true, draw.InvocationId, m.Sequence));
+                var names = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && m.To == CardLocation.Hand(draw.OwnerSeat) && m.From == CardLocation.DrawPile && m.Reason == draw.Reason).OrderBy(m => m.Sequence).Select(m => new KemingProducedName(CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(m.CardKind), true, draw.InvocationId, m.Sequence));
                 _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { KemingCapture = capture with { Names = capture.Names.Concat(names).Distinct().Take(5).ToArray() } });
             }
         }
@@ -73,7 +68,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
             }
             else
                 continue;
-            _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { KemingCapture = capture with { Names = capture.Names.Append(new(global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind), false, action.ActionId, 0)).Take(5).ToArray() } });
+            _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { KemingCapture = capture with { Names = capture.Names.Append(new(CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind), false, action.ActionId, 0)).Take(5).ToArray() } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KemingSourceCardUsedEvent(capture.InvocationId, parent.Id, action.ActionId));
         }
     }
@@ -91,7 +86,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         return source?.KemingCapture is { } native && source is not ProgramSkillFrame && BeginKemingEcho(f, native, new(KemingEchoReturnKind.CardWindow));
     }
 
-    internal bool TryCompleteKemingCixiong(global::CardGame.Core.NativeOwners.CixiongDoubleSwordsHandle pending, bool activated, bool targetDiscarded, int? discardedCardId, int sourceDrawCount)
+    internal bool TryCompleteKemingCixiong(NativeOwners.CixiongDoubleSwordsHandle pending, bool activated, bool targetDiscarded, int? discardedCardId, int sourceDrawCount)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(pending.Attack.ResolutionId)is not { KemingCapture: { Closed: false } capture } source || capture.SkillKey != CardCatalog.Get(CardKind.CixiongDoubleSwords).DisplayName)
             return false;
@@ -188,7 +183,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
                     {
                         if (!_corePhysicalDrawFacadesOperations.EnsureDrawPile())
                             break;
-                        var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(c => global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(c.Kind) == name.Name);
+                        var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(c => CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(c.Kind) == name.Name);
                         if (card is null)
                             continue;
                         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Hand(owner), paid.Reason);
@@ -236,7 +231,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
                 _coreRuntimeOperations.AdvanceRuntimeFrame(parent.Id);
             else
             {
-                global::CardGame.Core.NativeOwners.CixiongDoubleSwordsHandle pending = _coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords ?? throw new InvalidOperationException("Keming lost its completed Cixiong source.");
+                NativeOwners.CixiongDoubleSwordsHandle pending = _coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords ?? throw new InvalidOperationException("Keming lost its completed Cixiong source.");
                 _coreNativeWeaponResponsesOperations.CompleteCixiongDoubleSwords(pending, f.Return.Activated, f.Return.TargetDiscarded, f.Return.DiscardedCardId, f.Return.SourceDrawCount);
             }
 
@@ -288,10 +283,10 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
             if (name.IsDraw)
             {
                 var draws = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(e => e.InvocationId == name.ProducerId && e.ParentFrameId == c.ParentFrameId && e.OwnerSeat == c.ActorSeat && name.Sequence > e.SequenceBefore && name.Sequence <= e.SequenceAfter).ToArray();
-                if (draws.Length != 1 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == name.Sequence && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(c.ActorSeat) && m.Reason == draws[0].Reason && global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(m.CardKind) == name.Name))
+                if (draws.Length != 1 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == name.Sequence && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(c.ActorSeat) && m.Reason == draws[0].Reason && CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(m.CardKind) == name.Name))
                     throw new InvalidOperationException("Keming's private drawn name must match its original native draw invoice and exact entity movement.");
             }
-            else if (name.Sequence != 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<KemingSourceCardUsedEvent>().Count(e => e.InvocationId == c.InvocationId && e.SourceFrameId == c.ParentFrameId && e.ActionId == name.ProducerId) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == name.ProducerId && e.Action.ActorSeat == c.ActorSeat && global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(e.Action.EffectiveKind) == name.Name && (e.Action.Type == CardActionType.Use || _coreResponseUseCompletionOperations.IsCompletedResponseUse(e.Action, e.Action.EffectiveKind == CardKind.Dodge ? ProgramCardContinuation.Dodge : ProgramCardContinuation.NullificationResponse))))
+            else if (name.Sequence != 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<KemingSourceCardUsedEvent>().Count(e => e.InvocationId == c.InvocationId && e.SourceFrameId == c.ParentFrameId && e.ActionId == name.ProducerId) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == name.ProducerId && e.Action.ActorSeat == c.ActorSeat && CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(e.Action.EffectiveKind) == name.Name && (e.Action.Type == CardActionType.Use || _coreResponseUseCompletionOperations.IsCompletedResponseUse(e.Action, e.Action.EffectiveKind == CardKind.Dodge ? ProgramCardContinuation.Dodge : ProgramCardContinuation.NullificationResponse))))
                 throw new InvalidOperationException("Keming's public used name must match the exact accepted native action observed by this source invocation.");
         }
     }
@@ -304,10 +299,10 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         HpChangedTriggerWindowFrame hp when parent is KemingSkillEchoFrame f => hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.KemingEcho && hp.Change.ParentFrameId == f.Id,
         ProgramLifecycleTriggerWindowFrame state when parent is KemingSkillEchoFrame f => state.ResumeProgramFrameId == f.Id && state.CharacterStateContinuation == CharacterStateContinuation.KemingEcho,
         RecoveryReplacementFrame recovery when parent is KemingSkillEchoFrame f => f.Stage == KemingSkillEchoStage.Children && recovery.ParentFrameId == f.Id && recovery.Return.Continuation == PostEventContinuation.KemingEcho && recovery.Return.ResumeFrameId == f.Id,
-        _ => global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent)};
+        _ => CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent)};
     internal bool KemingEchoTypedParentMatches(KemingSkillEchoFrame f, ResolutionFrame parent) => f.Return.Kind switch
     {
-        KemingEchoReturnKind.ProgramCompletion => parent is ProgramSkillFrame p && f.Capture.ParentFrameId == p.Id && f.Capture.SkillKey == p.SkillId && f.Capture.SkillInstanceId == p.SkillInstanceId && f.Capture.OccurrenceKey == "program:" + global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(p) && !f.Return.Activated && !f.Return.TargetDiscarded && f.Return.DiscardedCardId is null && f.Return.SourceDrawCount == 0,
+        KemingEchoReturnKind.ProgramCompletion => parent is ProgramSkillFrame p && f.Capture.ParentFrameId == p.Id && f.Capture.SkillKey == p.SkillId && f.Capture.SkillInstanceId == p.SkillInstanceId && f.Capture.OccurrenceKey == "program:" + CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(p) && !f.Return.Activated && !f.Return.TargetDiscarded && f.Return.DiscardedCardId is null && f.Return.SourceDrawCount == 0,
         KemingEchoReturnKind.CardWindow => parent is ProgramCardTriggerWindowFrame w && f.Capture.ActorSeat == w.Action.ActorSeat && f.Capture.Names.Any(n => !n.IsDraw && n.ProducerId == w.Action.ActionId) && !f.Return.Activated && !f.Return.TargetDiscarded && f.Return.DiscardedCardId is null && f.Return.SourceDrawCount == 0,
         KemingEchoReturnKind.CixiongCompletion => parent is CardUseFrame use && f.Capture.ParentFrameId == use.Id && f.Capture.SkillKey == CardCatalog.Get(CardKind.CixiongDoubleSwords).DisplayName && f.Return.Activated && !f.Return.TargetDiscarded && f.Return.DiscardedCardId is null && f.Return.SourceDrawCount == 1 && _coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords is { Stage: CixiongDoubleSwordsStage.TargetChoice } pending && pending.Attack.ResolutionId == use.Id && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeEquipmentInvocationIssuedEvent>().Any(e => e.ParentFrameId == use.Id && e.Kind == NativeEquipmentInvocationKind.Cixiong && e.OccurrenceKey == f.Capture.OccurrenceKey),
         _ => false

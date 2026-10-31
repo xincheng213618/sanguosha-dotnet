@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheChilianRuntime
 {
     internal const string ChilianLiangyin = "shanhe:chilian-liangyin";
     internal static bool IsChilianLiangyinMovement(ProgramTriggerCandidate candidate) => candidate.SkillId == ChilianLiangyin && candidate.BindingId is "game-out-draw" or "game-in-discard";
-    internal static int[] ChilianLiangyinMovementIndexes(CardMovementBatchContext batch, string bindingId) => batch.Movements.Select((movement, index) => (movement, index)).Where(item => bindingId == "game-out-draw" ? !global::CardGame.Core.EngineOwners.CoreGameEngineGameDomainsRuntime.IsRuleOutsideGame(item.movement.From) && global::CardGame.Core.EngineOwners.CoreGameEngineGameDomainsRuntime.IsRuleOutsideGame(item.movement.To) : global::CardGame.Core.EngineOwners.CoreGameEngineGameDomainsRuntime.IsRuleOutsideGame(item.movement.From) && item.movement.To.Zone == CardZoneKind.Hand).Select(item => item.index).ToArray();
+    internal static int[] ChilianLiangyinMovementIndexes(CardMovementBatchContext batch, string bindingId) => batch.Movements.Select((movement, index) => (movement, index)).Where(item => bindingId == "game-out-draw" ? !CoreGameEngineGameDomainsRuntime.IsRuleOutsideGame(item.movement.From) && CoreGameEngineGameDomainsRuntime.IsRuleOutsideGame(item.movement.To) : CoreGameEngineGameDomainsRuntime.IsRuleOutsideGame(item.movement.From) && item.movement.To.Zone == CardZoneKind.Hand).Select(item => item.index).ToArray();
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 78200)]
     internal void CollectChilianLiangyinCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> candidates)
     {

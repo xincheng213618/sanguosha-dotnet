@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
 {
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedAfterCategory, 110)]
-    internal bool ResponseEntityExchangeFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ExchangeRespondedCardEntities) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind);
+    internal bool ResponseEntityExchangeFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ExchangeRespondedCardEntities) && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind);
     internal IEnumerable<IGameEvent> ResponseExchangeHistory() => _coreCommandJournalStorageEventsPendingEventsAccess._events.Select(e => e.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents);
     internal bool HasResponseEntityExchangeObservers() => _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && (_coreNationalSkillsOperations.GetSkillBindingShard(p)?.GetInstanceTriggers(SkillProgramTriggerWindow.CardResponseAccepted) ?? []).Any(b => b.Trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ExchangeRespondedCardEntities)));
     internal IReadOnlyList<ProgramResponseExchangeStateSnapshot>? GetResponseExchangeStateSnapshots()
@@ -135,7 +131,7 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
             Suit.Heart,
             Suit.Club,
             Suit.Diamond
-        }.Select(s => new PromptChoice(new ChoiceId($"public-suit-choice.{(frame.Id)}.{(s)}"), global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(s), [], [], new Dictionary<string, string> { ["program-action"] = "public-suit-choice", ["suit"] = s.ToString() })).ToArray();
+        }.Select(s => new PromptChoice(new ChoiceId($"public-suit-choice.{(frame.Id)}.{(s)}"), CoreNativeCardClassificationsRuntime.GetSuitDisplayName(s), [], [], new Dictionary<string, string> { ["program-action"] = "public-suit-choice", ["suit"] = s.ToString() })).ToArray();
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, frame.OwnerSeat, $"{(skill.Name)}：选择场上牌的花色。", [], [], frame.PublicSuitDiscard!.TargetSeat)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
@@ -240,7 +236,7 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         var draft = frame.PublicSuitDiscard!;
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId);
         var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat])).Where(c => !draft.SelectedIds!.Contains(c.Id)).ToArray();
-        var choices = cards.Select(c => new PromptChoice(new ChoiceId($"public-suit-discard.{(frame.Id)}.{(c.Id)}"), $"弃置【{(c.DisplayName)}】{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(c.Suit))}{(c.RankText)}", [c.Id], [], new Dictionary<string, string> { ["program-action"] = "public-suit-discard" })).ToArray();
+        var choices = cards.Select(c => new PromptChoice(new ChoiceId($"public-suit-discard.{(frame.Id)}.{(c.Id)}"), $"弃置【{(c.DisplayName)}】{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(c.Suit))}{(c.RankText)}", [c.Id], [], new Dictionary<string, string> { ["program-action"] = "public-suit-discard" })).ToArray();
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, draft.TargetSeat, $"{(skill.Name)}：选择弃置 {(draft.Required)} 张手牌或装备牌。", cards.Select(c => c.Id).ToArray(), [], draft.TargetSeat)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
@@ -281,6 +277,6 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IResponseExchangeProgramHost.ExchangeRespondedCardEntities(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginResponseEntityExchange(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IResponseExchangeProgramHost.DrawPublicSuitThenEscalatingDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginPublicSuitEscalatingDiscard(frame, effect);
+    SkillProgramStepOutcome IResponseExchangeProgramHost.ExchangeRespondedCardEntities(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginResponseEntityExchange(frame, effect);
+    SkillProgramStepOutcome IResponseExchangeProgramHost.DrawPublicSuitThenEscalatingDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginPublicSuitEscalatingDiscard(frame, effect);
 }

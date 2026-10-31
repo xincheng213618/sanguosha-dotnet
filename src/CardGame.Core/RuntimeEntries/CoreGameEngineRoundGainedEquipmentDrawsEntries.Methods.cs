@@ -2,10 +2,10 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRoundGainedEquipmentDrawsEntries
 {
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginRoundGainedEquipmentDraw(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginRoundGainedEquipmentDraw(supplied);
-    internal bool CanOfferRoundGainedEquipmentDraw(global::CardGame.Core.ProgramTriggerCandidate candidate, global::CardGame.Core.SkillProgramTrigger trigger, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().CanOfferRoundGainedEquipmentDraw(candidate, trigger, context);
-    internal global::CardGame.Core.RoundGainedUseQualification? ExactRoundGainedEquipmentDrawParent(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ExactRoundGainedEquipmentDrawParent(frame);
+    internal SkillProgramStepOutcome BeginRoundGainedEquipmentDraw(ProgramSkillFrame supplied) => _resolve().BeginRoundGainedEquipmentDraw(supplied);
+    internal bool CanOfferRoundGainedEquipmentDraw(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().CanOfferRoundGainedEquipmentDraw(candidate, trigger, context);
+    internal RoundGainedUseQualification? ExactRoundGainedEquipmentDrawParent(ProgramSkillFrame frame) => _resolve().ExactRoundGainedEquipmentDrawParent(frame);
     internal bool ResumeRoundGainedEquipmentDraw(long id) => _resolve().ResumeRoundGainedEquipmentDraw(id);
-    internal bool ReturnRoundGainedEquipmentDrawMovement(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ReturnRoundGainedEquipmentDrawMovement(frame);
-    internal bool ValidRoundGainedEquipmentDraw(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ValidRoundGainedEquipmentDraw(frame);
+    internal bool ReturnRoundGainedEquipmentDrawMovement(ProgramSkillFrame frame) => _resolve().ReturnRoundGainedEquipmentDrawMovement(frame);
+    internal bool ValidRoundGainedEquipmentDraw(ProgramSkillFrame frame) => _resolve().ValidRoundGainedEquipmentDraw(frame);
 }

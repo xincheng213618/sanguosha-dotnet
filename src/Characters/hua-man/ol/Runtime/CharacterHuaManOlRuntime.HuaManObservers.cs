@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaManOlRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterHuaManOlRuntime
     internal bool HuaManFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => HasHuaManCapability;
     internal bool HasHuaManCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.PaySouyingDirectionalSoleTarget);
 
-    internal static CardConversionSource HuaManSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hua_man_ol_HuaManObservers.HuaManSource(f);
+    internal static CardConversionSource HuaManSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_hua_man_ol_HuaManObservers.HuaManSource(f);
     internal bool HuaManCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 550)]
     internal void ObserveAcceptedHuaManUse(CardActionAcceptedEvent accepted) => ObserveHuaManAcceptedUse(accepted.Action);
@@ -35,7 +31,7 @@ internal sealed partial class CharacterHuaManOlRuntime
     {
         if (!HasActualSouyingObserver() || _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].HuaManUses is not { } list || !list.Any(s => s.ActionId == action.ActionId))
             return;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { } actual } use || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, actual))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { } actual } use || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, actual))
             throw new InvalidOperationException("Souying requires an exact accepted native target designation.");
         var primary = action.EffectiveDesignatedTargetSeats.Distinct().ToArray();
         var updated = list.Select(s => s.ActionId == action.ActionId ? s with { NativeUseId = id, Finalized = true, Targets = primary } : s).ToArray();
@@ -53,7 +49,7 @@ internal sealed partial class CharacterHuaManOlRuntime
         if (!HasHuaManCapability || _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].HuaManUses is not { } list)
             return;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id);
-        if (use?.Action is not { } actual || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action))
+        if (use?.Action is not { } actual || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action))
             return;
         _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].HuaManUses = list.Select(s => s.ActionId == action.ActionId ? s with { Targets = action.EffectiveDesignatedTargetSeats.Distinct().ToArray() } : s).ToArray();
     }

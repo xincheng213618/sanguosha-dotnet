@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreHandGuidanceCoreNativeLegalActionsOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreHandGuidanceCoreNativeLegalActionsOperations : IProgramRuntimeOperations
 {
-    global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.LegalAction> GetHumanLegalActions();
+    IReadOnlyList<LegalAction> GetHumanLegalActions();
 }
 
-internal interface ICoreHandGuidanceCoreCommandSessionQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreHandGuidanceCoreCommandSessionQueriesOperations : IProgramRuntimeOperations
 {
     long Revision { get; }
 }

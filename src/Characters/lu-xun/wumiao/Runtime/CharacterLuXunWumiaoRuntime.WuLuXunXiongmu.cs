@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -14,8 +11,8 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
     internal const string XiongmuObtainReason = "skill-program.wu-lu-xun.xiongmu.obtain";
     internal bool HasWuXiongmuCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveWuLuXunXiongmu);
 
-    internal static CardConversionSource WuXiongmuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_xun_wumiao_WuLuXunXiongmu.WuXiongmuSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IWuLuXunXiongmuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveWuLuXunXiongmu ? BeginWuXiongmu(f) : ResolveWuXiongmuFirstDamage(f);
+    internal static CardConversionSource WuXiongmuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lu_xun_wumiao_WuLuXunXiongmu.WuXiongmuSource(f);
+    SkillProgramStepOutcome IWuLuXunXiongmuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveWuLuXunXiongmu ? BeginWuXiongmu(f) : ResolveWuXiongmuFirstDamage(f);
     internal bool WuXiongmuNativeCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
         if (context.OwnerSeat != candidate.OwnerSeat || context.OccurrenceIndex != candidate.OccurrenceIndex || candidate.SkillId != WuXiongmuSkill || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not { } parent)
@@ -100,7 +97,7 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
     [ProgramAnswer("wu-lu-xun-xiongmu")]
     internal void AnswerWuXiongmu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Xiongmu: { Stage: XiongmuStage.Selection } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuXiongmuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Xiongmu: { Stage: XiongmuStage.Selection } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuXiongmuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xiongmu cannot substitute a foreign, moved or replayed private material choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];

@@ -1,11 +1,7 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-internal interface ICoreNativeDrawOrdinalsNativeDrawOrdinalTriggerOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeDrawOrdinalsNativeDrawOrdinalTriggerOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.NativeDrawOrdinalTriggerRuntime Get();
+    NativeDrawOrdinalTriggerRuntime Get();
 }

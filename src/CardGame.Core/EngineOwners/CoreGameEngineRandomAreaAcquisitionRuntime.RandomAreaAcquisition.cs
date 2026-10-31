@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRandomAreaAcquisitionRuntime
 {
-    internal static CardConversionSource RandomAreaSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RandomAreaAcquisition.RandomAreaSource(frame);
-    internal static CardMoveReason RandomAreaReason(ProgramSkillFrame frame, int index) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RandomAreaAcquisition.RandomAreaReason(frame, index);
+    internal static CardConversionSource RandomAreaSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_Core_RandomAreaAcquisition.RandomAreaSource(frame);
+    internal static CardMoveReason RandomAreaReason(ProgramSkillFrame frame, int index) => RuntimeSkills.RuntimeRules_Core_RandomAreaAcquisition.RandomAreaReason(frame, index);
     internal bool ExactRandomAreaParent(ProgramSkillFrame frame, out DamageTriggerWindowFrame window, out DamageFrame damage)
     {
         window = null !;
@@ -134,5 +130,5 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 1245)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1245)]
     internal bool CanContinueRandomAreaAcquisition(ProgramSkillFrame frame) => frame.RandomAreaAcquisition is { } r && (r.Steps.Count > 0 || r.TurnoverIssued) && _coreRandomAreaAcquisitionProofsOperations.ValidRandomAreaAcquisition(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IRandomAreaAcquisitionHost.ObtainRandomAreaFromEachOtherThenTurnOver(ProgramSkillFrame frame) => ObtainRandomAreaFromEachOtherThenTurnOver(frame);
+    SkillProgramStepOutcome IRandomAreaAcquisitionHost.ObtainRandomAreaFromEachOtherThenTurnOver(ProgramSkillFrame frame) => ObtainRandomAreaFromEachOtherThenTurnOver(frame);
 }

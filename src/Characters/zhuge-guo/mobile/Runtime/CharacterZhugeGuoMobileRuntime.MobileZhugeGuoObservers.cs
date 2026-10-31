@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeGuoMobileRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterZhugeGuoMobileRuntime
     internal void AssertMobileQirangGain(ProgramSkillFrame f)
     {
         var r = f.MobileQirangGain ?? throw new InvalidOperationException("Mobile Qirang lost its paid receipt.");
-        if (f.SkillId != MobileQirang || f.TriggerId != "equipment-entry" || f.InstructionIndex != 1 || r.Source != MobileZhugeGuoSource(f) || r.Hash != f.GameplayHash || f.WindowContext?.MovementBatch is not { } batch || batch.Id != r.EquipmentBatchId || !batch.Movements.Any(m => m.Sequence == r.EquipmentSequence && m.CardId == r.EquipmentCardId && m.To == CardLocation.Equipment(f.OwnerSeat) && m.From != m.To) || r.Before < r.EquipmentSequence || r.Before >= r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.GainSequence <= r.Before || r.GainSequence > r.After || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(r.Kind) != SkillProgramCardCategory.Trick || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileQirangGainPaidEvent>().Count(e => e.FrameId == f.Id && e.Receipt == r) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == r.GainSequence && m.CardId == r.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MobileQirangGainReason) != 1)
+        if (f.SkillId != MobileQirang || f.TriggerId != "equipment-entry" || f.InstructionIndex != 1 || r.Source != MobileZhugeGuoSource(f) || r.Hash != f.GameplayHash || f.WindowContext?.MovementBatch is not { } batch || batch.Id != r.EquipmentBatchId || !batch.Movements.Any(m => m.Sequence == r.EquipmentSequence && m.CardId == r.EquipmentCardId && m.To == CardLocation.Equipment(f.OwnerSeat) && m.From != m.To) || r.Before < r.EquipmentSequence || r.Before >= r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.GainSequence <= r.Before || r.GainSequence > r.After || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(r.Kind) != SkillProgramCardCategory.Trick || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileQirangGainPaidEvent>().Count(e => e.FrameId == f.Id && e.Receipt == r) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == r.GainSequence && m.CardId == r.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MobileQirangGainReason) != 1)
             throw new InvalidOperationException("Mobile Qirang lost its actual entering equipment, exact source or once-paid deck trick movement.");
     }
 
@@ -32,9 +28,9 @@ internal sealed partial class CharacterZhugeGuoMobileRuntime
             return false;
         AssertMobileQirangGain(f);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == r.CardId && m.Reason.Value == MobileQirangGainReason);
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == r.CardId && m.Reason.Value == MobileQirangGainReason);
         if (child is HpChangedTriggerWindowFrame hp)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
+            return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
         if (child is RecoveryReplacementFrame recovery)
             return _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f);
         return child is ProgramLifecycleTriggerWindowFrame lifecycle && lifecycle.ResumeProgramFrameId == f.Id && (lifecycle.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange || lifecycle is { Window: SkillProgramTriggerWindow.SkillsChanged, Continuation: ProgramLifecycleContinuation.ResumeParentProgram });

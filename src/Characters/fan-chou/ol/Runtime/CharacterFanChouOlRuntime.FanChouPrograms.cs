@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFanChouOlRuntime
@@ -11,23 +7,23 @@ internal sealed partial class CharacterFanChouOlRuntime
     internal bool FanChouFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => HasFanChouCapability;
     [ProgramTargetWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, 90)]
     internal bool FanChouNormalizeImplicitDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => HasFanChouCapability;
-    internal const string FanChouDiscardReason = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FanChouDiscardReason;
+    internal const string FanChouDiscardReason = RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FanChouDiscardReason;
     internal const string FanChouDrawReason = "skill-program.xingluan.fallback-draw", FanChouFieldReason = "skill-program.xingluan.field-gain", FanChouDeckReason = "skill-program.xingluan.deck-gain", FanChouGiftReason = "skill-program.xingluan.recipient-gift";
     internal bool HasFanChouCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseXingluanRankSixBenefit);
 
-    internal static CardConversionSource FanChouSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_fan_chou_ol_FanChouPrograms.FanChouSource(f);
+    internal static CardConversionSource FanChouSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_fan_chou_ol_FanChouPrograms.FanChouSource(f);
     internal bool FanChouSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     internal bool TryFanChouUse(int owner, ProgramSkillWindowContext context, out FanChouUseProof proof)
     {
         proof = null !;
-        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1 || owner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCompleted || window.Action is not { } a || a.ActionId != identity.CardActionId || a.ActorSeat != owner)
+        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1 || owner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCompleted || window.Action is not { } a || a.ActionId != identity.CardActionId || a.ActorSeat != owner)
             return false;
         if (a.Type == CardActionType.Use)
         {
-            if (window.CompletedResponseReturn is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Step: ResolutionFrameStep.Completed, Action: { } native } use || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(native, a) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, a) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Any(e => e.ResolutionId == use.Id && e.CardId == use.CardId && e.CardKind == use.CardKind))
+            if (window.CompletedResponseReturn is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Step: ResolutionFrameStep.Completed, Action: { } native } use || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(native, a) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, a) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Any(e => e.ResolutionId == use.Id && e.CardId == use.CardId && e.CardKind == use.CardKind))
                 return false;
         }
-        else if (window.CompletedResponseReturn is not { IsCommitted: false } ret || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, ret.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, a)))
+        else if (window.CompletedResponseReturn is not { IsCommitted: false } ret || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, ret.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, a)))
             return false;
         proof = new(window.Id, window.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, a, window.CompletedResponseReturn?.Kind);
         return true;
@@ -108,7 +104,7 @@ internal sealed partial class CharacterFanChouOlRuntime
         RequireFanChou(f);
         var r = f.FanChou!;
         var seat = r.Stage == FanChouStage.OtherPayment ? r.Recipient!.Value : f.OwnerSeat;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FanChouChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FanChouChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xingluan choice changed its actual payer, private candidate or entity.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!FanChouSourceCurrent(f))
@@ -252,7 +248,7 @@ internal sealed partial class CharacterFanChouOlRuntime
     }
     internal void RequireFanChou(ProgramSkillFrame f)
     {
-        if (f.FanChou is not { } r || r.Source != FanChouSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.Use.WindowId != f.WindowContext?.ParentFrameId || r.Use.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Use.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Use.Action.ActorSeat != f.OwnerSeat || r.DeckCandidates.Count > 2 || r.DeckCandidates.Distinct().Count() != r.DeckCandidates.Count || !Enum.IsDefined(r.Stage) || f.WindowContext is not { } originalContext || !TryFanChouUse(f.OwnerSeat, originalContext, out var originalUse) || originalUse.WindowId != r.Use.WindowId || originalUse.NativeParentId != r.Use.NativeParentId || originalUse.ActualTurn != r.Use.ActualTurn || originalUse.PhaseInstance != r.Use.PhaseInstance || originalUse.ResponseKind != r.Use.ResponseKind || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(originalUse.Action, r.Use.Action))
+        if (f.FanChou is not { } r || r.Source != FanChouSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.Use.WindowId != f.WindowContext?.ParentFrameId || r.Use.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Use.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Use.Action.ActorSeat != f.OwnerSeat || r.DeckCandidates.Count > 2 || r.DeckCandidates.Distinct().Count() != r.DeckCandidates.Count || !Enum.IsDefined(r.Stage) || f.WindowContext is not { } originalContext || !TryFanChouUse(f.OwnerSeat, originalContext, out var originalUse) || originalUse.WindowId != r.Use.WindowId || originalUse.NativeParentId != r.Use.NativeParentId || originalUse.ActualTurn != r.Use.ActualTurn || originalUse.PhaseInstance != r.Use.PhaseInstance || originalUse.ResponseKind != r.Use.ResponseKind || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(originalUse.Action, r.Use.Action))
             throw new InvalidOperationException("Xingluan lost its exact source, phase, native action or private candidates.");
         if (r.Stage is not (FanChouStage.MovementChildren or FanChouStage.DrawChildren))
         {
@@ -283,5 +279,5 @@ internal sealed partial class CharacterFanChouOlRuntime
     }
 
     internal IReadOnlyList<CardSnapshot> FanChouPrivateDeckCards(int viewer) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { OwnerSeat: var owner, FanChou: { Stage: FanChouStage.Deck } r } && owner == viewer ? Array.AsReadOnly(r.DeckCandidates.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DrawPile).Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray()) : [];
-    SkillProgramStepOutcome global::CardGame.Core.IFanChouProgramHost.BeginFanChou(ProgramSkillFrame f, SkillProgramEffect e) => BeginFanChou(f, e);
+    SkillProgramStepOutcome IFanChouProgramHost.BeginFanChou(ProgramSkillFrame f, SkillProgramEffect e) => BeginFanChou(f, e);
 }

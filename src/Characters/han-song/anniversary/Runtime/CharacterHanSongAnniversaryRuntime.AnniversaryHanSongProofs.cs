@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHanSongAnniversaryRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterHanSongAnniversaryRuntime
     internal bool ExactHanSongParent(ProgramSkillFrame f)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
-        return f.SkillId == AnniversaryHanSongComposition.Shuaiyan && f.WindowContext is { } c && c.OwnerSeat == f.OwnerSeat && index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame p && p.Id == c.ParentFrameId && p.Window == c.Window && p.OwnerSeat == c.SourceSeat && c.TargetSeat == p.OwnerSeat && p.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && (p.Window == SkillProgramTriggerWindow.DrawPhaseEnded && p.Continuation == ProgramLifecycleContinuation.CompleteDrawPhaseEnded && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Draw || p.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && p.Continuation == ProgramLifecycleContinuation.EndTurnAfterDiscardPhase && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Discard) && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]);
+        return f.SkillId == AnniversaryHanSongComposition.Shuaiyan && f.WindowContext is { } c && c.OwnerSeat == f.OwnerSeat && index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame p && p.Id == c.ParentFrameId && p.Window == c.Window && p.OwnerSeat == c.SourceSeat && c.TargetSeat == p.OwnerSeat && p.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && (p.Window == SkillProgramTriggerWindow.DrawPhaseEnded && p.Continuation == ProgramLifecycleContinuation.CompleteDrawPhaseEnded && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Draw || p.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && p.Continuation == ProgramLifecycleContinuation.EndTurnAfterDiscardPhase && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Discard) && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]);
     }
 
     internal bool ValidHanSong(ProgramSkillFrame f)

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRevealedFireAttackPaymentRuntime
@@ -19,7 +15,7 @@ internal sealed partial class CoreGameEngineRevealedFireAttackPaymentRuntime
     internal void CompleteNativeFireAttackPayment(CardUseFrame pending, Card revealed, Card payment, bool revealInstead)
     {
         var source = _coreMatchParticipantsPlayersAccess._players[pending.SourceSeat];
-        var target = _coreMatchParticipantsPlayersAccess._players[global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending)];
+        var target = _coreMatchParticipantsPlayersAccess._players[CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending)];
         var canDamage = _coreMatchOutcomeWinnerAccess._winner == Winner.None && source.IsAlive && target.IsAlive;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FireAttackResolvedEvent(pending.Id, source.Seat, target.Seat, revealed.Id, revealed.Suit, payment.Id, CausedDamage: canDamage));
         var attackCard = _coreNativeFireAttackOperations.GetFireAttackEffectCard(pending);

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangQuanMouRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
     {
         use = null !;
         window = null !;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } info } || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != info.ParentCardUseFrameId || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != context.Window || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } u || a.ActionId != info.CardActionId || a.ActionId != w.Action.ActionId || a.ActorSeat != u.SourceSeat || a.EffectiveKind != u.CardKind || !w.Action.TargetSeats.SequenceEqual(u.TargetSeats) || !(a.ActorSeat == owner ? a.EffectiveDesignatedTargetSeats.Any(t => t != owner) : a.EffectiveDesignatedTargetSeats.Contains(owner)) || w.CompletedResponseReturn is not null)
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } info } || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != info.ParentCardUseFrameId || CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != context.Window || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } u || a.ActionId != info.CardActionId || a.ActionId != w.Action.ActionId || a.ActorSeat != u.SourceSeat || a.EffectiveKind != u.CardKind || !w.Action.TargetSeats.SequenceEqual(u.TargetSeats) || !(a.ActorSeat == owner ? a.EffectiveDesignatedTargetSeats.Any(t => t != owner) : a.EffectiveDesignatedTargetSeats.Contains(owner)) || w.CompletedResponseReturn is not null)
             return false;
         var at = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == w.Id);
         if (at < 1 || _resolutionStackOperations._resolutionStack[at - 1].Id != u.Id)
@@ -40,6 +36,6 @@ internal sealed partial class CharacterHuangQuanMouRuntime
             return c.OwnerSeat == f.OwnerSeat && c.SkillId == f.SkillId && c.TriggerId == f.TriggerId && c.SkillInstanceId == f.SkillInstanceId && c.GameplayHash == f.GameplayHash;
         }
 
-        return f.SkillId == MouHqTuicheng && _resolutionStackOperations._resolutionStack[at - 1] is CardsMovedTriggerWindowFrame moved && moved.CandidateIndex >= 0 && moved.CandidateIndex < moved.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, moved.Candidates[moved.CandidateIndex]) && context.MouHqGift is { } g && MouHqGiftsForBatch(moved.Batch, f.OwnerSeat).Any(x => x.Id == g.Id);
+        return f.SkillId == MouHqTuicheng && _resolutionStackOperations._resolutionStack[at - 1] is CardsMovedTriggerWindowFrame moved && moved.CandidateIndex >= 0 && moved.CandidateIndex < moved.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, moved.Candidates[moved.CandidateIndex]) && context.MouHqGift is { } g && MouHqGiftsForBatch(moved.Batch, f.OwnerSeat).Any(x => x.Id == g.Id);
     }
 }

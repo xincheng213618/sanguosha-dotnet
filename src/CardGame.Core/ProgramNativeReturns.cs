@@ -97,7 +97,7 @@ internal sealed class ProgramNativeReturnCatalog
                 RequireInstance(method);
                 if (!Enum.IsDefined(attackReturn.Phase) || attackReturn.Order <= 0 ||
                     (method.ReturnType != typeof(bool) && method.ReturnType != typeof(void)) ||
-                    (!Parameters(method, typeof(global::CardGame.Core.GameEngine.AttackCompletionReceipt)) && !Parameters(method)) ||
+                    (!Parameters(method, typeof(AttackReceipt)) && !Parameters(method)) ||
                     !attackReturns.TryAdd((attackReturn.Phase, attackReturn.Order),
                         new(attackReturn.Phase, attackReturn.Order, method))) throw Invalid(method);
             }
@@ -145,7 +145,7 @@ internal sealed class ProgramNativeReturns
     private readonly NativeUseValidation[] _validations;
     private readonly Func<CardUseFrame, bool>[] _preparations;
     private readonly Func<NativeUseReturnContext, bool>[] _useReturns;
-    private readonly IReadOnlyDictionary<NativeAttackReturnPhase, Func<global::CardGame.Core.GameEngine.AttackCompletionReceipt, bool>[]> _attackReturns;
+    private readonly IReadOnlyDictionary<NativeAttackReturnPhase, Func<AttackReceipt, bool>[]> _attackReturns;
 
     internal ProgramNativeReturns(ProgramNativeReturnCatalog catalog, Func<MethodInfo, Type, Delegate> bind)
     {
@@ -200,7 +200,7 @@ internal sealed class ProgramNativeReturns
         return context => { useHandler(context.Use); return false; };
     }
 
-    private static Func<global::CardGame.Core.GameEngine.AttackCompletionReceipt, bool> BindAttackReturn(MethodInfo method, Func<MethodInfo, Type, Delegate> bind)
+    private static Func<AttackReceipt, bool> BindAttackReturn(MethodInfo method, Func<MethodInfo, Type, Delegate> bind)
     {
         if (method.GetParameters().Length == 0)
         {
@@ -213,8 +213,8 @@ internal sealed class ProgramNativeReturns
             return _ => { action(); return false; };
         }
         if (method.ReturnType == typeof(bool))
-            return (Func<global::CardGame.Core.GameEngine.AttackCompletionReceipt, bool>)bind(method, typeof(Func<global::CardGame.Core.GameEngine.AttackCompletionReceipt, bool>));
-        var receiptAction = (Action<global::CardGame.Core.GameEngine.AttackCompletionReceipt>)bind(method, typeof(Action<global::CardGame.Core.GameEngine.AttackCompletionReceipt>));
+            return (Func<AttackReceipt, bool>)bind(method, typeof(Func<AttackReceipt, bool>));
+        var receiptAction = (Action<AttackReceipt>)bind(method, typeof(Action<AttackReceipt>));
         return receipt => { receiptAction(receipt); return false; };
     }
 
@@ -234,7 +234,7 @@ internal sealed class ProgramNativeReturns
         foreach (var handler in _useReturns) if (handler(context)) return true;
         return false;
     }
-    internal bool ReturnAttack(NativeAttackReturnPhase phase, global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnAttack(NativeAttackReturnPhase phase, AttackReceipt completion)
     {
         foreach (var handler in _attackReturns[phase]) if (handler(completion)) return true;
         return false;

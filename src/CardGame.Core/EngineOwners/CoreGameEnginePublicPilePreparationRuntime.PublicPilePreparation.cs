@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
 {
-    internal static string PreparationReason(ProgramSkillFrame f, string step) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PublicPilePreparation.PreparationReason(f, step);
+    internal static string PreparationReason(ProgramSkillFrame f, string step) => RuntimeSkills.RuntimeRules_Core_PublicPilePreparation.PreparationReason(f, step);
     internal long PreparationSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
     internal bool PreparationGameEnded() => _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._status == EngineStatus.Completed && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Finished && _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winner != Winner.None && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GameEndedEvent>().Count(e => e.Winner == _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winner && e.TeamId == (_coreNativeDamageHandlesOperations.IsTeamMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winnerTeamId : null) && e.FactionId == (_coreNativeDamageHandlesOperations.IsNationalWarMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winnerFactionId : null)) == 1;
@@ -28,7 +25,7 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
             return false;
         if (op == SkillProgramEffectOp.RemovePublicPileAfterAttackDamage)
         {
-            if (_resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame w || w.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || w.TargetSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat || c.Window != w.TriggerWindow || c.Amount <= 0 || w.SourceCard is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Duel) || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()))
+            if (_resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame w || w.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || w.TargetSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat || c.Window != w.TriggerWindow || c.Amount <= 0 || w.SourceCard is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash or CardKind.Duel) || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()))
                 return false;
             if (_resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == w.ParentFrameId)is not { } applied || c.DamageFrameId != applied.Id || applied.SourceSeat != w.SourceSeat || applied.TargetSeat != f.OwnerSeat || applied.Amount != c.Amount)
                 return false;
@@ -47,8 +44,8 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
         if (f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || c.SourceSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat)
             return false;
         if (op == SkillProgramEffectOp.StoreNonBasicOwnedPublicPile)
-            return c.Window == SkillProgramTriggerWindow.TurnEnding && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame ending && ending.OwnerSeat == f.OwnerSeat && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
-        return c.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame start && start.Window == c.Window && start.Continuation == ProgramLifecycleContinuation.NormalTurnStart && start.OwnerSeat == f.OwnerSeat && start.CandidateIndex >= 0 && start.CandidateIndex < start.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, start.Candidates[start.CandidateIndex]);
+            return c.Window == SkillProgramTriggerWindow.TurnEnding && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame ending && ending.OwnerSeat == f.OwnerSeat && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
+        return c.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame start && start.Window == c.Window && start.Continuation == ProgramLifecycleContinuation.NormalTurnStart && start.OwnerSeat == f.OwnerSeat && start.CandidateIndex >= 0 && start.CandidateIndex < start.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, start.Candidates[start.CandidateIndex]);
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 190)]
@@ -72,14 +69,14 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
             return SkillProgramStepOutcome.Continue;
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
             _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
-        var issuer = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var issuer = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PublicPilePreparation = new() { InstructionIndex = 1, Operation = effect.Op, Issuer = issuer, GameplayHash = f.GameplayHash, ActualTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, ParentId = f.WindowContext!.ParentFrameId, Stage = PublicPilePreparationStage.Choosing, Pile = pile } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PublicPilePreparationStartedEvent(f.Id, effect.Op, issuer, f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, f.WindowContext.ParentFrameId, pile));
         PublishPublicPilePreparation(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal IEnumerable<Card> PreparationStoreCards(ProgramSkillFrame f) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Where(c => !global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, SkillProgramCardCategory.Basic) && !c.IsGeneralWeapon && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(f.OwnerSeat, f.SkillId, f.SkillInstanceId, c));
+    internal IEnumerable<Card> PreparationStoreCards(ProgramSkillFrame f) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Where(c => !CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, SkillProgramCardCategory.Basic) && !c.IsGeneralWeapon && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(f.OwnerSeat, f.SkillId, f.SkillInstanceId, c));
     internal bool PreparationPileCurrent(PublicPersistentPileSource p) => _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.GetValueOrDefault((p.OwnerSeat, p.SkillId, p.SkillInstanceId)) == p;
     internal IReadOnlyList<PromptChoice> PublicPilePreparationChoices(ProgramSkillFrame f)
     {
@@ -89,14 +86,14 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
         if (r.Operation == SkillProgramEffectOp.StoreNonBasicOwnedPublicPile)
         {
             foreach (var c in PreparationStoreCards(f).Where(c => !r.SelectedIds.Contains(c.Id)))
-                Add("store-" + c.Id, "存入【" + global::CardGame.Core.EngineOwners.CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(c) + "】", [c.Id], []);
+                Add("store-" + c.Id, "存入【" + CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(c) + "】", [c.Id], []);
             Add("finish", "完成存牌", [], []);
         }
         else if (r.Operation == SkillProgramEffectOp.RemovePublicPileAfterAttackDamage)
         {
             if (r.Pile is { } p && PreparationPileCurrent(p))
                 foreach (var c in _corePublicPileSourcesOperations.PublicPileCards(p))
-                    Add("remove-" + c.Id, "移去【" + global::CardGame.Core.EngineOwners.CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(c) + "】", [c.Id], []);
+                    Add("remove-" + c.Id, "移去【" + CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(c) + "】", [c.Id], []);
         }
         else
         {
@@ -138,7 +135,7 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A preparation choice lost its owning frame.");
         var r = f.PublicPilePreparation!;
-        if (r.Stage != PublicPilePreparationStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [PublicPilePreparationChoices(f).Single(c => c.Id == choice.Id)]))
+        if (r.Stage != PublicPilePreparationStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [PublicPilePreparationChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("A preparation choice must name its exact current entity or beneficiary.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!PreparationSourceAlive(f))
@@ -271,9 +268,9 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
     {
         var r = f.PublicPilePreparation!;
         if (r.Operation == SkillProgramEffectOp.StoreNonBasicOwnedPublicPile)
-            return p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? p.Choices.Single();
+            return p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? p.Choices.Single();
         if (r.Operation == SkillProgramEffectOp.RemovePublicPileAfterAttackDamage)
-            return p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
+            return p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
         var fill = p.Choices.Single(c => c.Targets.Count == 0);
         var gifts = p.Choices.Where(c => c.Targets.Count == 1).ToArray();
         var count = r.Pile is { } pile ? _corePublicPileSourcesOperations.PublicPileCards(pile).Count : 0;
@@ -284,5 +281,5 @@ internal sealed partial class CoreGameEnginePublicPilePreparationRuntime
         return bestGift.Choice is not null && bestGift.Value > fillValue ? bestGift.Choice : fill;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IPublicPilePreparationHost.ExecutePublicPilePreparation(SkillProgramEffect e, ProgramSkillFrame f) => BeginPublicPilePreparation(e, f);
+    SkillProgramStepOutcome IPublicPilePreparationHost.ExecutePublicPilePreparation(SkillProgramEffect e, ProgramSkillFrame f) => BeginPublicPilePreparation(e, f);
 }

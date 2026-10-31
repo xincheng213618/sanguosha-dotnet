@@ -2,7 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramDiscardTopPlacementEntries
 {
-    internal void PublishProgramDiscardTopPlacement(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishProgramDiscardTopPlacement(frame);
-    internal global::CardGame.Core.SkillProgramStepOutcome PutProgramDiscardedCardsOnDrawPileTop(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PutProgramDiscardedCardsOnDrawPileTop(frame);
-    internal void ResolveProgramDiscardTopPlacementChoice(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveProgramDiscardTopPlacementChoice(choice);
+    internal void PublishProgramDiscardTopPlacement(ProgramSkillFrame frame) => _resolve().PublishProgramDiscardTopPlacement(frame);
+    internal SkillProgramStepOutcome PutProgramDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame) => _resolve().PutProgramDiscardedCardsOnDrawPileTop(frame);
+    internal void ResolveProgramDiscardTopPlacementChoice(PromptChoice choice) => _resolve().ResolveProgramDiscardTopPlacementChoice(choice);
 }

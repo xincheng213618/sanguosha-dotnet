@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
 {
     internal const string ShiXqHeyun = "mobile:shi-heyun", ShiXqYinhui = "mobile:shi-yinhui", ShiXqDrawReason = "skill.mobile-shi-xiao-qiao.heyun.draw";
-    internal static CardConversionSource ShiXqSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiXqSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static string ShiXqGrantSource(int owner, long frame) => $"acquired:mobile:shi-yinhui:{(owner)}:{(frame)}";
     internal string[] ShiXqVisibleOwnedSkills(int viewer, int seat)
     {
@@ -46,7 +43,7 @@ internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
     internal bool CanActivateShiXqHeyun(CharacterState owner) => ShiXqHeyunTargets(owner.Seat).Length != 0;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 50400)]
     internal bool CanOfferShiXqYinhui(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => c.SkillId != ShiXqYinhui || context.Window == SkillProgramTriggerWindow.RoundStarting && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && ShiXqCopyOptions(c.OwnerSeat).Length != 0;
-    SkillProgramStepOutcome global::CardGame.Core.IShiXqHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginShiXq(f, operation);
+    SkillProgramStepOutcome IShiXqHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginShiXq(f, operation);
     internal SkillProgramStepOutcome BeginShiXq(ProgramSkillFrame input, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -147,7 +144,7 @@ internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
     [ProgramAnswer("mobile-shi-xiao-qiao")]
     internal void AnswerShiXq(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiXiaoQiao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiXqChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiXiaoQiao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiXqChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Shi Xiao Qiao lost its exact current common-skill target, lost skill or public current donor skill.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

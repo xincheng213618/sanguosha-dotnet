@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouYuOlMouRuntime
 {
     internal const string MouGuquDrawReason = "skill-program.mou-zhou-yu.guqu.draw";
-    SkillProgramStepOutcome global::CardGame.Core.IMouZhouYuGuquHost.Resolve(ProgramSkillFrame frame) => BeginMouGuqu(frame);
-    internal static CardConversionSource MouGuquFrameSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_yu_ol_mou_MouZhouYuGuqu.MouGuquFrameSource(f);
+    SkillProgramStepOutcome IMouZhouYuGuquHost.Resolve(ProgramSkillFrame frame) => BeginMouGuqu(frame);
+    internal static CardConversionSource MouGuquFrameSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhou_yu_ol_mou_MouZhouYuGuqu.MouGuquFrameSource(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29021, SkillProgramEffectOp.ResolveMouZhouYuGuqu)]
     internal bool CanOfferMouGuqu(ProgramTriggerLegalityContext gate) => IsIssuedMouGuquCandidate(gate.Candidate, gate.Context);
     [ProgramIssuedTrigger(70)]

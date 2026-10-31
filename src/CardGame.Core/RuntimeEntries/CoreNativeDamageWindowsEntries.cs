@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreNativeDamageWindowsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreNativeDamageWindowsRuntime))]
 internal sealed partial class CoreNativeDamageWindowsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeDamageWindowsRuntime> _resolve;
-    private CoreNativeDamageWindowsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeDamageWindowsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreNativeDamageWindowsRuntime> _resolve;
+    private CoreNativeDamageWindowsEntries(Func<EngineOwners.CoreNativeDamageWindowsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreNativeDamageWindowsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeDamageWindowsRuntime> resolve) => new(resolve);
+    internal static CoreNativeDamageWindowsEntries Create(Func<EngineOwners.CoreNativeDamageWindowsRuntime> resolve) => new(resolve);
 }

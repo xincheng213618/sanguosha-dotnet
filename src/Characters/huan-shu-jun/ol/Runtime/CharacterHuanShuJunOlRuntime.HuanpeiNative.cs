@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuanShuJunOlRuntime
 {
     internal bool ValidHuanpeiPayment(HuanpeiPaidOrigin p)
     {
-        if (p.Source.SkillId != "ol:huanpei" || p.Source.BindingId != "adjust-and-use-basic" || p.Source.OwnerSeat != p.Request.ActorSeat || p.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash || !global::CardGame.Core.EngineOwners.CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Contains(p.Kind) || p.SequenceBefore < 0 || p.SequenceAfter < p.SequenceBefore || p.Targets is not System.Collections.IList { IsReadOnly: true })
+        if (p.Source.SkillId != "ol:huanpei" || p.Source.BindingId != "adjust-and-use-basic" || p.Source.OwnerSeat != p.Request.ActorSeat || p.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash || !CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Contains(p.Kind) || p.SequenceBefore < 0 || p.SequenceAfter < p.SequenceBefore || p.Targets is not System.Collections.IList { IsReadOnly: true })
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<HuanShuJunStartedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Source == p.Source && e.GameplayHash == p.GameplayHash && e.Op == SkillProgramEffectOp.ResolveHuanpeiHandAdjustmentAndBasicUse) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiAdjustmentAcceptedEvent>().Where(e => e.FrameId == p.ProgramFrameId).ToArray()is [var paid] && paid.OwnerSeat == p.Source.OwnerSeat && paid.Round == p.Round && paid.HandCount == p.FrozenHandCount && paid.Hp == p.FrozenHp && paid.RequestedCount == p.AdjustmentCount && paid.Before == p.SequenceBefore && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiAdjustmentCompletedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Before == p.SequenceBefore && e.After == p.SequenceAfter) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiOutputChosenEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Kind == p.Kind && e.TargetCount == p.Targets.Count) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiTargetChosenEvent>().Where(e => e.FrameId == p.ProgramFrameId).OrderBy(e => e.Index).Select(e => e.TargetSeat).SequenceEqual(p.Targets);
     }
 
-    internal static bool SameHuanpeiPayment(HuanpeiPaidOrigin a, HuanpeiPaidOrigin b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanpeiNative.SameHuanpeiPayment(a, b);
+    internal static bool SameHuanpeiPayment(HuanpeiPaidOrigin a, HuanpeiPaidOrigin b) => RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanpeiNative.SameHuanpeiPayment(a, b);
     internal CardActionContext PrepareHuanpeiAction(CardActionContext a, HuanpeiPaidOrigin? p) => p is null ? a : _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(a.ActionId, a.ParentActionId, a.Type, a.ActorSeat, a.ProviderSeat, a.RequesterSeat, a.ResponderSeat, a.OpponentSeat, a.EffectiveKind, a.TargetSeats, a.PhysicalCards, a.ConversionChain, a.DesignatedTargetSeats, effectiveSuit: Suit.None, effectiveRank: 0, effectiveIsRed: null));
     internal void IssueHuanpeiUse(CardUseFrame use, HuanpeiPaidOrigin? p)
     {
@@ -71,10 +67,10 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 40)]
-    internal bool FinishHuanpeiAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishHuanpeiAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (attack.Card is not null || !IsHuanpeiUse(attack.ResolutionId) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
+        if (attack.Card is not null || !IsHuanpeiUse(attack.ResolutionId) || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
@@ -229,7 +225,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         BeginHuanpeiSlash(p, false, null);
     }
 
-    internal void BeginHuanpeiSlash(HuanpeiPaidOrigin p, bool counts, global::CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowed)
+    internal void BeginHuanpeiSlash(HuanpeiPaidOrigin p, bool counts, NativeOwners.BorrowedSwordHandle? borrowed)
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat];
         var card = new Card(0, p.Kind, Suit.None, 0);

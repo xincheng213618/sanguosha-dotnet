@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiFengOlRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterLiFengOlRuntime
         foreach (var source in sources)
             foreach (var pile in _corePublicPileSourcesOperations.ReferencedPublicPileSources(request.ProviderSeat, "ol:jiyun", source.SkillInstanceId).Where(IsLiveJiyunPile))
                 foreach (var card in _corePublicPileSourcesOperations.PublicPileCards(pile))
-                    if (request.RequiredKind is null || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(card.Kind, request.RequiredKind.Value))
+                    if (request.RequiredKind is null || CoreNativeCardClassificationsRuntime.MatchesRequiredCard(card.Kind, request.RequiredKind.Value))
                         result.Add(new(pile, new("ol:shuliang", "original-grain", request.ProviderSeat, source.SkillInstanceId), card, request));
         return Array.AsReadOnly(result.DistinctBy(c => (c.Card.Id, c.AccessSource)).ToArray());
     }

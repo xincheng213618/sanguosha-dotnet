@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,11 +7,11 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
 {
     internal bool TracksTurnDefaultStats => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AllocateCurrentTurnDefaultStats);
 
-    internal static IReadOnlyList<int> NewTurnDefaultSlots() => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_TurnDefaultStats.NewTurnDefaultSlots();
-    internal static IReadOnlyDictionary<TurnDefaultStatKind, global::CardGame.Core.GameEngine.TurnDefaultStatAssignment> EmptyTurnDefaultAssignments() => new System.Collections.ObjectModel.ReadOnlyDictionary<TurnDefaultStatKind, global::CardGame.Core.GameEngine.TurnDefaultStatAssignment>(new Dictionary<TurnDefaultStatKind, global::CardGame.Core.GameEngine.TurnDefaultStatAssignment>());
-    internal static TurnDefaultStatKind FirstTurnDefaultStat(SkillProgramTriggerWindow window) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_TurnDefaultStats.FirstTurnDefaultStat(window);
-    internal static string TurnDefaultStatName(TurnDefaultStatKind stat) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_TurnDefaultStats.TurnDefaultStatName(stat);
-    internal static global::CardGame.Core.GameEngine.TurnDefaultStatState EmptyTurnDefaultState(CardConversionSource source, string hash) => new(source, hash, 0, false, NewTurnDefaultSlots(), 0, EmptyTurnDefaultAssignments(), NewTurnDefaultSlots());
+    internal static IReadOnlyList<int> NewTurnDefaultSlots() => RuntimeSkills.RuntimeRules_Core_TurnDefaultStats.NewTurnDefaultSlots();
+    internal static IReadOnlyDictionary<TurnDefaultStatKind, GameEngine.TurnDefaultStatAssignment> EmptyTurnDefaultAssignments() => new System.Collections.ObjectModel.ReadOnlyDictionary<TurnDefaultStatKind, GameEngine.TurnDefaultStatAssignment>(new Dictionary<TurnDefaultStatKind, GameEngine.TurnDefaultStatAssignment>());
+    internal static TurnDefaultStatKind FirstTurnDefaultStat(SkillProgramTriggerWindow window) => RuntimeSkills.RuntimeRules_Core_TurnDefaultStats.FirstTurnDefaultStat(window);
+    internal static string TurnDefaultStatName(TurnDefaultStatKind stat) => RuntimeSkills.RuntimeRules_Core_TurnDefaultStats.TurnDefaultStatName(stat);
+    internal static GameEngine.TurnDefaultStatState EmptyTurnDefaultState(CardConversionSource source, string hash) => new(source, hash, 0, false, NewTurnDefaultSlots(), 0, EmptyTurnDefaultAssignments(), NewTurnDefaultSlots());
     internal void RecordTurnDefaultStatFact(IGameEvent fact)
     {
         _coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess._turnDefaultStatLedgerStarted = true;
@@ -27,7 +24,7 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
         if (!TracksTurnDefaultStats || payload is not TurnStartedEvent started || started.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || started.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(started.ActorSeat))
             return;
         var owner = _coreMatchParticipantsPlayersAccess._players[started.ActorSeat];
-        var sources = _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.SelectMany(instance => instance.Program.Triggers.Where(t => t.Window == SkillProgramTriggerWindow.DrawPhaseStarting && t.Effects is [{ Op: SkillProgramEffectOp.AllocateCurrentTurnDefaultStats }]).Select(t => (Key: new global::CardGame.Core.GameEngine.TurnDefaultStatKey(owner.Seat, instance.SkillId, t.Effects[0].StateId!), Source: new CardConversionSource(instance.SkillId, t.Id, owner.Seat, instance.SkillInstanceId), Hash: instance.Program.GameplayHash))).GroupBy(x => x.Key).ToDictionary(g => g.Key, g => g.OrderBy(x => x.Source.SkillInstanceId, StringComparer.Ordinal).First());
+        var sources = _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.SelectMany(instance => instance.Program.Triggers.Where(t => t.Window == SkillProgramTriggerWindow.DrawPhaseStarting && t.Effects is [{ Op: SkillProgramEffectOp.AllocateCurrentTurnDefaultStats }]).Select(t => (Key: new GameEngine.TurnDefaultStatKey(owner.Seat, instance.SkillId, t.Effects[0].StateId!), Source: new CardConversionSource(instance.SkillId, t.Id, owner.Seat, instance.SkillInstanceId), Hash: instance.Program.GameplayHash))).GroupBy(x => x.Key).ToDictionary(g => g.Key, g => g.OrderBy(x => x.Source.SkillInstanceId, StringComparer.Ordinal).First());
         foreach (var key in _coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess._turnDefaultStatStates.Keys.Where(k => k.OwnerSeat == owner.Seat).Union(sources.Keys).OrderBy(k => k.SkillId, StringComparer.Ordinal).ThenBy(k => k.StateId, StringComparer.Ordinal).ToArray())
         {
             var hasBinding = sources.TryGetValue(key, out var binding);
@@ -61,7 +58,7 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
             return null;
         // Concurrent generic sources use the last actual assignment, rather than
         // dictionary iteration or the current lifetime of a grant instance.
-        return _coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess._turnDefaultStatStates.Where(p => p.Key.OwnerSeat == seat && p.Value.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && p.Value.HasPool).Select(p => p.Value.Assigned.GetValueOrDefault(stat.Value)).OfType<global::CardGame.Core.GameEngine.TurnDefaultStatAssignment>().MaxBy(a => a.FrameId)?.Value;
+        return _coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess._turnDefaultStatStates.Where(p => p.Key.OwnerSeat == seat && p.Value.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && p.Value.HasPool).Select(p => p.Value.Assigned.GetValueOrDefault(stat.Value)).OfType<GameEngine.TurnDefaultStatAssignment>().MaxBy(a => a.FrameId)?.Value;
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 960)]
@@ -75,7 +72,7 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
             return _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber > 0 && context.Window == SkillProgramTriggerWindow.AfterDamageApplied && context.TargetSeat == ownerSeat && ownerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && context.Amount > 0 && context.DamageFrameId is { } damageId && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnDefaultStatMinimumIncreasedEvent>().Any(e => e.Source.OwnerSeat == ownerSeat && e.Source.SkillId == skillId && e.StateId == effect.StateId && e.DamageFrameId == damageId);
         if (ownerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || context.SourceSeat != ownerSeat || context.TargetSeat != ownerSeat || context.Window is not (SkillProgramTriggerWindow.DrawPhaseStarting or SkillProgramTriggerWindow.PlayPhaseStarting or SkillProgramTriggerWindow.DiscardPhaseStarting))
             return false;
-        var key = new global::CardGame.Core.GameEngine.TurnDefaultStatKey(ownerSeat, skillId, effect.StateId!);
+        var key = new GameEngine.TurnDefaultStatKey(ownerSeat, skillId, effect.StateId!);
         return !_coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess._turnDefaultStatStates.TryGetValue(key, out var state) || state.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || !state.HasPool || !state.Assigned.ContainsKey(FirstTurnDefaultStat(context.Window));
     }
 
@@ -92,8 +89,8 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
     {
         if (!_coreTurnDefaultStatsValidationOperations.ExactTurnDefaultStatPhaseParent(f))
             throw new InvalidOperationException("Default-stat allocation lost its actual owner phase parent.");
-        var key = new global::CardGame.Core.GameEngine.TurnDefaultStatKey(f.OwnerSeat, f.SkillId, stateId);
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var key = new GameEngine.TurnDefaultStatKey(f.OwnerSeat, f.SkillId, stateId);
+        var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var state = _coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess._turnDefaultStatStates.GetValueOrDefault(key);
         if (state is null || state.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || !state.HasPool)
         {
@@ -115,8 +112,8 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
     {
         if (!_coreTurnDefaultStatsValidationOperations.ExactTurnDefaultStatDamageParent(f, out var damage, out var window, out var attack))
             throw new InvalidOperationException("A next-turn minimum increment requires one real positive applied-damage event outside the owner's turn.");
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-        var key = new global::CardGame.Core.GameEngine.TurnDefaultStatKey(f.OwnerSeat, f.SkillId, stateId);
+        var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var key = new GameEngine.TurnDefaultStatKey(f.OwnerSeat, f.SkillId, stateId);
         var state = _coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess._turnDefaultStatStates.GetValueOrDefault(key) ?? EmptyTurnDefaultState(source, f.GameplayHash);
         var values = state.NextSlots.ToArray();
         var minimum = values.Min();
@@ -159,10 +156,10 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Default-stat choice lost its owner.");
         var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
-        if (f.TurnDefaultStatAllocation is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } decision || !_coreTurnDefaultStatsValidationOperations.IsTurnDefaultStatChoice(f, decision) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], TurnDefaultStatChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (f.TurnDefaultStatAllocation is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } decision || !_coreTurnDefaultStatsValidationOperations.IsTurnDefaultStatChoice(f, decision) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], TurnDefaultStatChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("A default-stat choice changed its frozen slot or phase.");
         var slot = int.Parse(choice.Parameters["slot-index"], CultureInfo.InvariantCulture);
-        var key = new global::CardGame.Core.GameEngine.TurnDefaultStatKey(f.OwnerSeat, f.SkillId, r.Origin.StateId);
+        var key = new GameEngine.TurnDefaultStatKey(f.OwnerSeat, f.SkillId, r.Origin.StateId);
         var state = _coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess._turnDefaultStatStates[key];
         var assignments = state.Assigned.ToDictionary(p => p.Key, p => p.Value);
         assignments.Add(r.CurrentStat, new(r.Slots[slot], f.Id, slot));
@@ -170,7 +167,7 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
         _coreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess._turnDefaultStatStates[key] = state with
         {
             UsedSlotMask = mask,
-            Assigned = new System.Collections.ObjectModel.ReadOnlyDictionary<TurnDefaultStatKind, global::CardGame.Core.GameEngine.TurnDefaultStatAssignment>(assignments)
+            Assigned = new System.Collections.ObjectModel.ReadOnlyDictionary<TurnDefaultStatKind, GameEngine.TurnDefaultStatAssignment>(assignments)
         };
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         RecordTurnDefaultStatFact(new TurnDefaultStatAssignedEvent(f.Id, r.Origin.Source, r.Origin.StateId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, r.CurrentStat, slot, r.Slots[slot], mask));
@@ -187,5 +184,5 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ITurnDefaultStatsProgramHost.ExecuteTurnDefaultStatOperation(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteTurnDefaultStatOperation(f, e);
+    SkillProgramStepOutcome ITurnDefaultStatsProgramHost.ExecuteTurnDefaultStatOperation(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteTurnDefaultStatOperation(f, e);
 }

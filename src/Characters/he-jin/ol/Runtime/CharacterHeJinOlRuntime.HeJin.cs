@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHeJinOlRuntime
 {
-    internal const string HeJinGiftReason = "skill-program.he-jin.mouzhu.give", HeJinDiscardReason = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.HeJinDiscardReason;
-    internal static CardConversionSource HeJinSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_he_jin_ol_HeJin.HeJinSource(f);
+    internal const string HeJinGiftReason = "skill-program.he-jin.mouzhu.give", HeJinDiscardReason = RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.HeJinDiscardReason;
+    internal static CardConversionSource HeJinSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_he_jin_ol_HeJin.HeJinSource(f);
     internal SkillProgramStepOutcome BeginHeJinMouzhu(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -66,7 +63,7 @@ internal sealed partial class CharacterHeJinOlRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Mouzhu lost its owning frame.");
         var r = f.HeJinMouzhu!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != r.ActorSeat || !HeJinMouzhuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != r.ActorSeat || !HeJinMouzhuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Mouzhu needs the actual donor's exact private answer.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == HeJinMouzhuStage.ChoosingGift)
@@ -156,5 +153,5 @@ internal sealed partial class CharacterHeJinOlRuntime
         return p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "card" && c.Cards.Count > 0) ?? p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "card") ?? p.Choices.First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHeJinProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouzhuHandDemandAndAssault ? BeginHeJinMouzhu(f) : BeginHeJinYanhuo(f);
+    SkillProgramStepOutcome IHeJinProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouzhuHandDemandAndAssault ? BeginHeJinMouzhu(f) : BeginHeJinYanhuo(f);
 }

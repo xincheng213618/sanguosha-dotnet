@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class HandComparisonProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineHandComparisonEntries> getCoreGameEngineHandComparisonRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseModulesEntries> getCoreGameEngineCardUseModulesRuntime, global::CardGame.Core.NativeOwners.KernelAdvanceEventRulesAndQueueFactCall advanceEventRulesAndQueueFact, global::CardGame.Core.EngineStates.CoreActualTurnProgressState actualTurnProgressState) : IHandComparisonProgramHost
+internal sealed class HandComparisonProgramCapability(Func<RuntimeEntries.CoreGameEngineHandComparisonEntries> getCoreGameEngineHandComparisonRuntime, Func<RuntimeEntries.CoreGameEngineCardUseModulesEntries> getCoreGameEngineCardUseModulesRuntime, KernelAdvanceEventRulesAndQueueFactCall advanceEventRulesAndQueueFact, EngineStates.CoreActualTurnProgressState actualTurnProgressState) : IHandComparisonProgramHost
 {
     public SkillProgramStepOutcome CompareSelectedHandWithHpHand(ProgramSkillFrame f, SkillProgramEffect e) => getCoreGameEngineHandComparisonRuntime().CompareSelectedHandWithHpHand(f, e);
     public void AdjustPersistentHandLimit(ProgramSkillFrame f, int targetSeat, int amount, string stateId) => getCoreGameEngineHandComparisonRuntime().AdjustPersistentHandLimit(f, targetSeat, amount, stateId);

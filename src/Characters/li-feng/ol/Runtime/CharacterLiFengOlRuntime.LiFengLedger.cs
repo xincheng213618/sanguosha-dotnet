@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiFengOlRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterLiFengOlRuntime
     internal const string JiyunInitialReason = "skill-program.li-feng.jiyun.initial", JiyunDrawReason = "skill-program.li-feng.jiyun.draw", JiyunCollectReason = "skill-program.li-feng.jiyun.collect", ShuliangGiftReason = "skill-program.li-feng.shuliang.gift";
     internal bool HasLiFengCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeJiyunCategoryGrain) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJiyunPreparationDrawLeases) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.CollectJiyunCompletedUseEntities) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DistributeShuliangEndingGrain);
 
-    internal static CardConversionSource LiFengSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_li_feng_ol_LiFengLedger.LiFengSource(f);
+    internal static CardConversionSource LiFengSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_li_feng_ol_LiFengLedger.LiFengSource(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27591)]
     internal bool CanOfferLiFeng(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {

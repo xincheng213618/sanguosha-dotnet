@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeHarvestRuntime
 {
-    internal void BeginHarvestSelection(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal void BeginHarvestSelection(NativeOwners.GroupCardHandle group)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.PublicDraft)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.PublicDraft)
         {
             throw new InvalidOperationException("The FiveGrains draft is not the current card resolution.");
         }
@@ -46,9 +42,9 @@ internal sealed partial class CoreNativeHarvestRuntime
         _coreMatchOutcomeStatusWinnerAccess._status = picker.IsHuman ? EngineStatus.AwaitingHumanCardSelection : EngineStatus.Running;
     }
 
-    internal void ResolveHarvestSelection(global::CardGame.Core.NativeOwners.GroupCardHandle group, CharacterState picker, int cardId)
+    internal void ResolveHarvestSelection(NativeOwners.GroupCardHandle group, CharacterState picker, int cardId)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.PublicDraft)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.PublicDraft)
         {
             throw new InvalidOperationException("The FiveGrains draft is not the current card resolution.");
         }
@@ -80,9 +76,9 @@ internal sealed partial class CoreNativeHarvestRuntime
         }
     }
 
-    internal void FinishFiveGrains(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal void FinishFiveGrains(NativeOwners.GroupCardHandle group)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.PublicDraft)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.PublicDraft)
         {
             throw new InvalidOperationException("The FiveGrains draft is not the current card resolution.");
         }

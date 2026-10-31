@@ -2,15 +2,15 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaoCaoMobileGodEntries
 {
-    internal global::CardGame.Core.PromptChoice AiMobileGuixin(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().AiMobileGuixin(p, f);
-    internal void AnswerMobileGuixin(global::CardGame.Core.PromptChoice chosen) => _resolve().AnswerMobileGuixin(chosen);
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileGuixin(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMobileGuixin(supplied);
-    internal bool DrainMobileGuixinChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainMobileGuixinChildren(f);
-    internal void FinishMobileGuixin(global::CardGame.Core.ProgramSkillFrame f, bool cancelled) => _resolve().FinishMobileGuixin(f, cancelled);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> MobileGuixinChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().MobileGuixinChoices(f);
-    internal bool MobileGuixinPaymentTail(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.MobileGuixinPayment payment, global::CardGame.Core.CardMovementRecord gain) => _resolve().MobileGuixinPaymentTail(frame, payment, gain);
+    internal PromptChoice AiMobileGuixin(PendingDecision p, ProgramSkillFrame f) => _resolve().AiMobileGuixin(p, f);
+    internal void AnswerMobileGuixin(PromptChoice chosen) => _resolve().AnswerMobileGuixin(chosen);
+    internal SkillProgramStepOutcome BeginMobileGuixin(ProgramSkillFrame supplied) => _resolve().BeginMobileGuixin(supplied);
+    internal bool DrainMobileGuixinChildren(ProgramSkillFrame f) => _resolve().DrainMobileGuixinChildren(f);
+    internal void FinishMobileGuixin(ProgramSkillFrame f, bool cancelled) => _resolve().FinishMobileGuixin(f, cancelled);
+    internal IReadOnlyList<PromptChoice> MobileGuixinChoices(ProgramSkillFrame f) => _resolve().MobileGuixinChoices(f);
+    internal bool MobileGuixinPaymentTail(ProgramSkillFrame frame, MobileGuixinPayment payment, CardMovementRecord gain) => _resolve().MobileGuixinPaymentTail(frame, payment, gain);
     internal bool ResumeMobileGuixin(long id) => _resolve().ResumeMobileGuixin(id);
-    internal bool RetainMobileGuixinPaid(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainMobileGuixinPaid(f);
-    internal bool ReturnMobileGuixinMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnMobileGuixinMovement(f);
-    internal bool ValidMobileGuixin(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidMobileGuixin(f);
+    internal bool RetainMobileGuixinPaid(ProgramSkillFrame f) => _resolve().RetainMobileGuixinPaid(f);
+    internal bool ReturnMobileGuixinMovement(ProgramSkillFrame f) => _resolve().ReturnMobileGuixinMovement(f);
+    internal bool ValidMobileGuixin(ProgramSkillFrame f) => _resolve().ValidMobileGuixin(f);
 }

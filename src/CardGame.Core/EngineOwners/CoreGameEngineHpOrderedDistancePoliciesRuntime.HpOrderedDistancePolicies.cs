@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineHpOrderedDistancePoliciesRuntime
@@ -17,6 +13,6 @@ internal sealed partial class CoreGameEngineHpOrderedDistancePoliciesRuntime
             return original;
         // A final, directed Set deliberately follows both horses and additive
         // distance contributions: the printed current rule says 'treated as 1'.
-        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new RuleQueryBounds(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-hp-ordered-policy", global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], policies.Select(p => (RuleQueryContribution)new FiniteRuleQueryContribution($"skill:{(p.Source.SkillId)}:{(p.Source.SkillInstanceId)}:policy:{(p.Policy.Id)}", SkillRuleOperation.Set, 1)).ToArray());
+        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new RuleQueryBounds(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-hp-ordered-policy", CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], policies.Select(p => (RuleQueryContribution)new FiniteRuleQueryContribution($"skill:{(p.Source.SkillId)}:{(p.Source.SkillInstanceId)}:policy:{(p.Policy.Id)}", SkillRuleOperation.Set, 1)).ToArray());
     }
 }

@@ -437,21 +437,21 @@ internal sealed partial class ProgramPaidCardRuntime
     }
 
     internal static bool IsProgramAttackRangeCoverageDecreased(ProgramSkillFrame frame, string bind) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.IsProgramAttackRangeCoverageDecreased(frame,bind);
+        RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.IsProgramAttackRangeCoverageDecreased(frame,bind);
 
     internal static bool MatchesProgramCardCategory(
         CardKind kind,
         IReadOnlyList<SkillProgramCardCategory> categories) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardCategory(kind,categories);
+        RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardCategory(kind,categories);
 
     internal static bool MatchesSkillProgramCardCategory(CardKind kind, SkillProgramCardCategory category) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesSkillProgramCardCategory(kind,category);
+        RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesSkillProgramCardCategory(kind,category);
 
     internal static bool MatchesProgramCardFilter(
         CardKind kind,
         IReadOnlyList<SkillProgramCardCategory> categories,
         IReadOnlyList<CardKind> kinds) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardFilter(kind,categories,kinds);
+        RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.MatchesProgramCardFilter(kind,categories,kinds);
 
     internal bool CanEnterEquipmentSlot(int recipientSeat, Card card) =>
         EquipmentCatalog.IsEquipment(card.Kind) &&
@@ -460,7 +460,7 @@ internal sealed partial class ProgramPaidCardRuntime
         _facts.EquipmentSlotCapacity(recipientSeat, EquipmentCatalog.Get(card.Kind).Slot);
 
     internal static SkillProgramCardCategory GetProgramCardCategory(CardKind kind) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.GetProgramCardCategory(kind);
+        RuntimeSkills.RuntimeRules_Core_ProgramCardPayments.GetProgramCardCategory(kind);
 
     private bool TryCompleteRetainedSelectedCard(ProgramSkillFrame frame, SkillProgramEffect effect,
         Card card, CardLocation source, CardLocation destination, CardMoveReason reason,

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangGaiMouRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CharacterHuangGaiMouRuntime
         if (f.MouHuangGai is not { Reveals.Count: > 0 } r || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
             return[];
         var shown = r.Reveals[^1];
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(shown.Kind) || _cardZonesOperations._cardZones.GetLocation(shown.CardId) != CardLocation.Processing)
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(shown.Kind) || _cardZonesOperations._cardZones.GetLocation(shown.CardId) != CardLocation.Processing)
             return[];
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(shown.CardId);
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
@@ -54,7 +50,7 @@ internal sealed partial class CharacterHuangGaiMouRuntime
             _coreNativeSlashUseOperations.BeginSlashTargetResolution(attack);
     }
 
-    internal bool MouHgUseRidesOn(ProgramSkillFrame f, CardUseFrame u) => ValidMouHg(f) && f.MouHuangGai is { Stage: MouHgStage.NativeUse, Native: { } r, NativeReturned: false } && u.MouHgQuzhou == r && r.FrameId == f.Id && r.UseId == u.Id && u.CardId == r.CardId && u.Action is { Type: CardActionType.Use } a && a.ActionId == r.ActionId && a.ProviderSeat == r.Actor && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == r.CardId && from == CardLocation.Processing && u.PhysicalCardIds is [var physical] && physical == id && f.MouHuangGai.Reveals.Any(e => e.CardId == id && e.Kind == r.Kind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, r.Actor, r.Actor) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHgNativeIssuedEvent>().Count(e => e.Origin == r) == 1;
+    internal bool MouHgUseRidesOn(ProgramSkillFrame f, CardUseFrame u) => ValidMouHg(f) && f.MouHuangGai is { Stage: MouHgStage.NativeUse, Native: { } r, NativeReturned: false } && u.MouHgQuzhou == r && r.FrameId == f.Id && r.UseId == u.Id && u.CardId == r.CardId && u.Action is { Type: CardActionType.Use } a && a.ActionId == r.ActionId && a.ProviderSeat == r.Actor && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == r.CardId && from == CardLocation.Processing && u.PhysicalCardIds is [var physical] && physical == id && f.MouHuangGai.Reveals.Any(e => e.CardId == id && e.Kind == r.Kind) && CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, r.Actor, r.Actor) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHgNativeIssuedEvent>().Count(e => e.Origin == r) == 1;
     [NativeUseValidation(35400)]
     internal void ValidateMouHgUse(CardUseFrame use)
     {
@@ -75,7 +71,7 @@ internal sealed partial class CharacterHuangGaiMouRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 35400)]
-    internal bool ReturnMouHgAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnMouHgAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouHuangGai: { Stage: MouHgStage.NativeUse, NativeReturned: true, Native: { } o } } f || completion.ResolutionId != o.UseId)
             return false;

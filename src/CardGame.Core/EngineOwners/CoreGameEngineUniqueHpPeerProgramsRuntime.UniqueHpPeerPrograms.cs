@@ -1,19 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineUniqueHpPeerProgramsRuntime
 {
-    internal CardConversionSource RecipientContestSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource RecipientContestSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal long RecipientContestSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
     internal bool RecipientContestUnissuedSource(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
-    internal static string UniqueHpPeerCostReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_UniqueHpPeerPrograms.UniqueHpPeerCostReason(f);
-    internal static string UniqueHpPeerDrawReason(ProgramSkillFrame f, int seat) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_UniqueHpPeerPrograms.UniqueHpPeerDrawReason(f, seat);
+    internal static string UniqueHpPeerCostReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_UniqueHpPeerPrograms.UniqueHpPeerCostReason(f);
+    internal static string UniqueHpPeerDrawReason(ProgramSkillFrame f, int seat) => RuntimeSkills.RuntimeRules_Core_UniqueHpPeerPrograms.UniqueHpPeerDrawReason(f, seat);
     internal IEnumerable<(Card Card, CardLocation From)> UniqueHpPeerLegalCards(ProgramSkillFrame f, int actor) => new[]
     {
         CardLocation.Hand(actor),
@@ -23,13 +20,13 @@ internal sealed partial class CoreGameEngineUniqueHpPeerProgramsRuntime
     internal bool UniqueHpPeerPayable(ProgramSkillFrame f, int seat) => UniqueHpPeerLegalCards(f, seat).Count() >= UniqueHpPeerRequired(seat);
     internal bool ExactUniqueHpPeerParent(ProgramSkillFrame f)
     {
-        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.OtherActualUseTargeted, ActualUseTarget: { } identity } context || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(identity.EffectiveKind) || context.OwnerSeat != f.OwnerSeat || identity.TargetSeat != f.OwnerSeat || context.TargetSeat != identity.TargetSeat || context.SourceSeat != identity.ActorSeat || _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.ParentFrameId != identity.CardUseFrameId || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates.Count != parent.Contexts.Count || !_coreActualUseTargetProgramsOperations.MatchesActualUseTarget(identity))
+        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.OtherActualUseTargeted, ActualUseTarget: { } identity } context || !CoreNativeCardClassificationsRuntime.IsSlashCard(identity.EffectiveKind) || context.OwnerSeat != f.OwnerSeat || identity.TargetSeat != f.OwnerSeat || context.TargetSeat != identity.TargetSeat || context.SourceSeat != identity.ActorSeat || _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.ParentFrameId != identity.CardUseFrameId || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates.Count != parent.Contexts.Count || !_coreActualUseTargetProgramsOperations.MatchesActualUseTarget(identity))
             return false;
-        return global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) && parent.Contexts[parent.CandidateIndex].ActualUseTarget == identity && parent.Contexts[parent.CandidateIndex] == context;
+        return CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) && parent.Contexts[parent.CandidateIndex].ActualUseTarget == identity && parent.Contexts[parent.CandidateIndex] == context;
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 730)]
-    internal bool CanRunUniqueHpPeer(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.DiscardDrawAndOfferUniqueHpPeer) || context.ActualUseTarget is { } identity && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(identity.EffectiveKind) && identity.TargetSeat == c.OwnerSeat && _coreActualUseTargetProgramsOperations.CanRunActualUseTarget(c, context) && UniqueHpPeerRequired(c.OwnerSeat) <= new[]
+    internal bool CanRunUniqueHpPeer(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.DiscardDrawAndOfferUniqueHpPeer) || context.ActualUseTarget is { } identity && CoreNativeCardClassificationsRuntime.IsSlashCard(identity.EffectiveKind) && identity.TargetSeat == c.OwnerSeat && _coreActualUseTargetProgramsOperations.CanRunActualUseTarget(c, context) && UniqueHpPeerRequired(c.OwnerSeat) <= new[]
     {
         CardLocation.Hand(c.OwnerSeat),
         CardLocation.Equipment(c.OwnerSeat)
@@ -268,11 +265,11 @@ internal sealed partial class CoreGameEngineUniqueHpPeerProgramsRuntime
         {
             if (r.Stage == UniqueHpPeerStage.PeerOffer)
             {
-                var cost = UniqueHpPeerLegalCards(f, r.ChooserSeat).Select(x => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(x.Card, _coreMatchParticipantsPlayersAccess._players[r.ChooserSeat])).Order().Take(UniqueHpPeerRequired(r.ChooserSeat)).Sum();
+                var cost = UniqueHpPeerLegalCards(f, r.ChooserSeat).Select(x => CoreNativeAiDecisionsRuntime.GetKeepValue(x.Card, _coreMatchParticipantsPlayersAccess._players[r.ChooserSeat])).Order().Take(UniqueHpPeerRequired(r.ChooserSeat)).Sum();
                 return decision.Choices.First(c => c.Parameters.GetValueOrDefault("branch") == (cost < 24d && decision.Choices.Any(x => x.Parameters.GetValueOrDefault("branch") == "accept") ? "accept" : "decline"));
             }
 
-            return decision.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[r.ChooserSeat])).ThenBy(c => c.Cards.Single()).First();
+            return decision.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[r.ChooserSeat])).ThenBy(c => c.Cards.Single()).First();
         }
 
         // A one-point damage to the selected target is what this effect promises;

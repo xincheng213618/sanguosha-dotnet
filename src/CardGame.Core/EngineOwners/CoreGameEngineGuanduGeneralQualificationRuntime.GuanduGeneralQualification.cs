@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGuanduGeneralQualificationRuntime
@@ -73,11 +69,11 @@ internal sealed partial class CoreGameEngineGuanduGeneralQualificationRuntime
     {
         if (!_coreGuanduActivitiesOperations.IsGuanduActivity || f.GuanduGeneral?.Operation != SkillProgramEffectOp.ResolveGuanduXiying || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduAllCardBanIssuedEvent>().Any(e => e.ProgramFrameId == f.Id && e.TargetSeat == target))
             throw new InvalidOperationException("Xiying requires its exact once-paid other-character decision.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduAllCardBanIssuedEvent(f.Id, f.OwnerSeat, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduAllCardBanIssuedEvent(f.Id, f.OwnerSeat, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f)));
     }
 
     internal bool IsGuanduCardActionForbidden(int actorSeat, CardKind kind, CardActionType type) => _coreGuanduActivitiesOperations.IsGuanduActivity && _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduAllCardBanIssuedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TargetSeat == actorSeat);
-    internal bool TryGetGuanduIncomingHpReplacement(global::CardGame.Core.GameEngine.IDamageAttempt attack, out CardUseEffectSource source)
+    internal bool TryGetGuanduIncomingHpReplacement(GameEngine.IDamageAttempt attack, out CardUseEffectSource source)
     {
         source = null !;
         if (!_coreGuanduActivitiesOperations.IsGuanduActivity || attack.IsSourceLess || attack.SourceSeat == attack.TargetSeat || attack.DamageAmount <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat) || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive || !_coreGuanduGeneralsOperations.GuanduSkillEnabled(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat], "guandu:gangzhi"))

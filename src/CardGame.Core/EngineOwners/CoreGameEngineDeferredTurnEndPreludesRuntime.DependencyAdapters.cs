@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.CardsMovedWindowRuntime))]
-internal sealed class CoreDeferredTurnEndPreludesCardsMovedWindowAdapter(global::System.Func<global::CardGame.Core.CardsMovedWindowRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreDeferredTurnEndPreludesCardsMovedWindowOperations
+[Core.ProgramCapability(typeof(CardsMovedWindowRuntime))]
+internal sealed class CoreDeferredTurnEndPreludesCardsMovedWindowAdapter(Func<CardsMovedWindowRuntime> targetFactory) : ICoreDeferredTurnEndPreludesCardsMovedWindowOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.CardsMovedWindowRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.CardsMovedWindowRuntime Get() => this._targetFactory();
+    private readonly Func<CardsMovedWindowRuntime> _targetFactory = targetFactory;
+    public CardsMovedWindowRuntime Get() => this._targetFactory();
 }

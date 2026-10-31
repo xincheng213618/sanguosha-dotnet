@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangTongMouMobileRuntime
 {
     internal bool HasMouPangTongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouPangTongLianhuanTargets);
 
-    internal static CardConversionSource MouPtSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_pang_tong_mou_mobile_MouPangTong.MouPtSource(f);
+    internal static CardConversionSource MouPtSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_pang_tong_mou_mobile_MouPangTong.MouPtSource(f);
     internal bool MouPtUpgraded(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongUpgradedEvent>().Any(e => e.Source.OwnerSeat == owner);
     internal bool HasMouPangTongExpandedTargets(CharacterState owner) => _coreNationalSkillsOperations.HasRuntimeSkill(owner, MouPangTongComposition.Lianhuan) && MouPtUpgraded(owner.Seat);
     internal CardUseFrame? MouPtUse(ProgramSkillWindowContext c) => c.CardUse is { } card ? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == card.CardActionId) : null;
@@ -43,7 +39,7 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
         return (MouPtUpgraded(gate.OwnerSeat) || MouPtPaidBySource(use, source, gate.Candidate.GameplayHash)) && (gate.Context.MouPangTongLateTargetSeat is not null ? MouPtLateNotification(gate.Context, use, source, gate.Candidate.GameplayHash) : !_coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongTargetsStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == gate.OwnerSeat));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouPangTongHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveMouPt(f, op);
+    SkillProgramStepOutcome IMouPangTongHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveMouPt(f, op);
     internal SkillProgramStepOutcome ResolveMouPt(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

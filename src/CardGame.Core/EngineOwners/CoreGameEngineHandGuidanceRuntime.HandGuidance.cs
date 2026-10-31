@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineHandGuidanceRuntime
@@ -38,7 +34,7 @@ internal sealed partial class CoreGameEngineHandGuidanceRuntime
             {
                 if (cardActions.Any(action => action.Kind == LegalActionKind.Recast))
                     return Hint(HandGuidanceReason.Playable, "可选择一到两名存活角色切换连环，或不选目标，点击重铸换一张牌。", true);
-                if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && cardActions.All(action => action.PlayedCardKind == CardKind.Slash))
+                if (!CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && cardActions.All(action => action.PlayedCardKind == CardKind.Slash))
                     return Hint(HandGuidanceReason.ConversionOnly, $"当前可通过【{(skillNames)}】当作杀使用；选择目标后确认转化。", true);
                 return Hint(HandGuidanceReason.Playable, cardActions.All(action => action.TargetSeats.All(seat => seat == actor.Seat)) ? "当前可以使用；点击选中，再确认出牌。" : "当前可以使用；选中后，合法目标或目标组合会亮起。", true);
             }
@@ -47,7 +43,7 @@ internal sealed partial class CoreGameEngineHandGuidanceRuntime
                 return Hint(HandGuidanceReason.NoLegalTarget, "本轮这张实体桃视为毒，不能当桃使用或救援；正面朝上离开手牌区时失去1点体力。");
             if (identity is null && card.Kind == CardKind.Peach && !_coreTreatedWoundedOperations.IsRuleWounded(actor))
                 return Hint(HandGuidanceReason.HealthFull, "你的体力已满，当前不能用桃回复；保留后可在濒死时救援。");
-            if ((global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || identity is not null && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(identity.Identity.OutputKind)) && _coreCurrentTurnStatisticsSlashCountThisTurnAccess._slashCountThisTurn >= _coreRuleQueriesOperations.GetSlashUseLimit(actor) && !_coreDirectedCardPolicyQueriesOperations.HasSlashAllowanceForAnyTarget(actor, _coreProgramCardUseRulesOperations.GetSlashUseVariants2(actor, identity?.Identity.OutputKind ?? card.Kind).Select(variant => variant.EffectiveKind)))
+            if ((CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || identity is not null && CoreNativeCardClassificationsRuntime.IsSlashCard(identity.Identity.OutputKind)) && _coreCurrentTurnStatisticsSlashCountThisTurnAccess._slashCountThisTurn >= _coreRuleQueriesOperations.GetSlashUseLimit(actor) && !_coreDirectedCardPolicyQueriesOperations.HasSlashAllowanceForAnyTarget(actor, _coreProgramCardUseRulesOperations.GetSlashUseVariants2(actor, identity?.Identity.OutputKind ?? card.Kind).Select(variant => variant.EffectiveKind)))
                 return Hint(HandGuidanceReason.SlashLimitReached, "本回合可使用杀的次数已用完；可以保留它用于响应或下个回合。");
             if (identity is null && card.Kind == CardKind.Alcohol && actor.HasAlcoholEffect)
                 return Hint(HandGuidanceReason.AlcoholAlreadyActive, "你已有酒的效果，等待下一张杀消耗加伤；当前不能叠加饮酒。");

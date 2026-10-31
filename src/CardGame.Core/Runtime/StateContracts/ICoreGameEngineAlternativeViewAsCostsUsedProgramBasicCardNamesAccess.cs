@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineAlternativeViewAsCostsUsedProgramBasicCardNamesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineAlternativeViewAsCostsUsedProgramBasicCardNamesAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.Dictionary<int, (int Turn, global::System.Collections.Generic.HashSet<global::CardGame.Core.CardKind> Kinds)> _usedProgramBasicCardNames { get; }
+    ref readonly Dictionary<int, (int Turn, HashSet<CardKind> Kinds)> _usedProgramBasicCardNames { get; }
 }

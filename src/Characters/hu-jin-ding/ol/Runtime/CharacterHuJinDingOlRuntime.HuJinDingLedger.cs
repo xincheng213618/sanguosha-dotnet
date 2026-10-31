@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuJinDingOlRuntime
 {
     internal bool HasQingyuanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.SelectQingyuanOpeningPartner);
 
-    internal static CardConversionSource HuJinDingSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hu_jin_ding_ol_HuJinDingLedger.HuJinDingSource(f);
+    internal static CardConversionSource HuJinDingSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_hu_jin_ding_ol_HuJinDingLedger.HuJinDingSource(f);
     internal IEnumerable<QingyuanPartnerSelectedEvent> QingyuanPartners(int owner, string skill, string instance) => _coreProgramEventHistoryOperations.ProgramEventHistory<QingyuanPartnerSelectedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.Source.SkillInstanceId == instance);
     internal bool IsLiveQingyuanPartner(QingyuanPartnerSelectedEvent p) => _coreMatchParticipantsPlayersAccess._players[p.PartnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat], p.Source.SkillId, p.Source.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash == p.GameplayHash;
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 26820)]
@@ -53,7 +49,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
         }
     }
 
-    internal static bool IsQingyuanGainTrigger(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hu_jin_ding_ol_HuJinDingLedger.IsQingyuanGainTrigger(t);
+    internal static bool IsQingyuanGainTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_hu_jin_ding_ol_HuJinDingLedger.IsQingyuanGainTrigger(t);
     internal void CaptureQingyuanGainBatch(CardMovementBatchContext batch)
     {
         if (!HasQingyuanCapability || batch.TurnNumber < 1)

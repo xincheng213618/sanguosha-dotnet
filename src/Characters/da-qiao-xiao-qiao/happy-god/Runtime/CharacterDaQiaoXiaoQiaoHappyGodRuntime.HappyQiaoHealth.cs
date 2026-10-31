@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
@@ -66,7 +62,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         return true;
     }
 
-    internal bool TryBeginHappyQiaoDamageChoice(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool TryBeginHappyQiaoDamageChoice(GameEngine.IDamageAttempt attack)
     {
         if (!HasHappyQiaoHealth(attack.TargetSeat) || attack.DamageWasApplied || attack.DamageAmount <= 0)
             return false;
@@ -178,7 +174,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
     [ProgramAnswer(HappyQiaoHealthAction)]
     internal void AnswerHappyQiaoHealth(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not HappyQiaoHealthChoiceFrame f || !HappyQiaoHealthChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not HappyQiaoHealthChoiceFrame f || !HappyQiaoHealthChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Qiao health rejects a stale or substituted pool choice.");
         RequireHappyQiaoHealthChoice(f);
         var parent = _resolutionStackOperations._resolutionStack[^2];

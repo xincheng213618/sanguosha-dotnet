@@ -1,22 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreTeamActivityProgramsRuntime
 {
-    internal bool PublicTeamEnemy(int owner, CharacterState target) => _coreModeAllegianceOperations.ModeAllegiancePolicy.PublicTeamEnemy(global::CardGame.Core.EngineOwners.CoreGameEngineModeAllegianceRuntime.CaptureAllegianceSeat(_coreMatchParticipantsPlayersAccess._players[owner]), global::CardGame.Core.EngineOwners.CoreGameEngineModeAllegianceRuntime.CaptureAllegianceSeat(target));
+    internal bool PublicTeamEnemy(int owner, CharacterState target) => _coreModeAllegianceOperations.ModeAllegiancePolicy.PublicTeamEnemy(CoreGameEngineModeAllegianceRuntime.CaptureAllegianceSeat(_coreMatchParticipantsPlayersAccess._players[owner]), CoreGameEngineModeAllegianceRuntime.CaptureAllegianceSeat(target));
     internal bool OtherRevealedPublicTeamAlly(CharacterState owner, CharacterState target) => owner.IsAlive && owner.Seat != target.Seat && owner.TeamRevealed && target.TeamRevealed && _coreTeamActivitiesOperations.SamePublicTeam(owner, target);
-    SkillProgramStepOutcome global::CardGame.Core.ITeamActivityProgramHost.ExecuteTeamActivity(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteTeamActivity(f, e);
+    SkillProgramStepOutcome ITeamActivityProgramHost.ExecuteTeamActivity(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteTeamActivity(f, e);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27400)]
     internal bool CanOfferTeamActivity(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (trigger.Effects.FirstOrDefault(e => e.Op is SkillProgramEffectOp.SelectAllPublicTeamTargets or SkillProgramEffectOp.SelectRandomPublicTeamTarget)is { TargetKind: { } kind } selection && _coreProgramLifecycleOperations.GetProgramTargetSeats(c.OwnerSeat, kind, context).Count < selection.MinimumTargets)
             return false;
         if (trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.RepeatCurrentRedTrick))
-            return _coreExtraEffectsAndRankGuessingOperations.TryGetExtraEffectUse(c.OwnerSeat, context, out var use) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) && context.Facts?.CardActionCardIsRed == true;
+            return _coreExtraEffectsAndRankGuessingOperations.TryGetExtraEffectUse(c.OwnerSeat, context, out var use) && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) && context.Facts?.CardActionCardIsRed == true;
         return true;
     }
 
@@ -36,10 +32,10 @@ internal sealed partial class CoreTeamActivityProgramsRuntime
             return SkillProgramStepOutcome.Continue;
         }
 
-        if (effect.Op != SkillProgramEffectOp.RepeatCurrentRedTrick || !_coreExtraEffectsAndRankGuessingOperations.TryGetExtraEffectUse(frame.OwnerSeat, frame.WindowContext, out var use) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || frame.WindowContext?.Facts?.CardActionCardIsRed != true)
+        if (effect.Op != SkillProgramEffectOp.RepeatCurrentRedTrick || !_coreExtraEffectsAndRankGuessingOperations.TryGetExtraEffectUse(frame.OwnerSeat, frame.WindowContext, out var use) || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || frame.WindowContext?.Facts?.CardActionCardIsRed != true)
             throw new InvalidOperationException("A red-trick repeat requires its original accepted ordinary-trick use.");
         var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w => w.Id == frame.WindowContext.ParentFrameId);
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+        var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { ExtraCardEffect = new() { Source = source, ProgramFrameId = frame.Id, ActionId = use.Action!.ActionId, AutomaticGameplayHash = frame.GameplayHash, Simple = window.SimpleContinuation, Trick = window.TrickContinuation } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AutomaticExtraCardEffectIssuedEvent(frame.Id, source, use.Id, use.Action!.ActionId, frame.GameplayHash));
         return SkillProgramStepOutcome.Continue;

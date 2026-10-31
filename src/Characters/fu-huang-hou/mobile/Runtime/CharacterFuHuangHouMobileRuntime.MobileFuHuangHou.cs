@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFuHuangHouMobileRuntime
@@ -15,6 +11,6 @@ internal sealed partial class CharacterFuHuangHouMobileRuntime
         var grants = _coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess._directedTurnCardPolicies.Where(p => p.Source.SkillId == "mobile:zhuikong" && p.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && p.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && p.ActorSeat == source.Seat && p.TargetSeat == target.Seat && p.Effects == DirectedTurnCardPolicyEffect.IgnoreDistance).ToArray();
         if (grants.Length == 0)
             return original;
-        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-mobile-zhuikong", global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"mobile-zhuikong:{(g.ParentFrameId)}:{(g.EffectIndex)}", SkillRuleOperation.Set, 1)).ToArray());
+        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-mobile-zhuikong", CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"mobile-zhuikong:{(g.ParentFrameId)}:{(g.EffectIndex)}", SkillRuleOperation.Set, 1)).ToArray());
     }
 }

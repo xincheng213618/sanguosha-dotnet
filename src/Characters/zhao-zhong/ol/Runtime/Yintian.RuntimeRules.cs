@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_zhao_zhong_ol_Yintian
 {
     internal static bool IsYintianRecoveryTrigger(SkillProgramTrigger trigger) =>

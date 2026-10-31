@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreActualTurnsCoreProgramRuntimeHooksOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreActualTurnsCoreProgramRuntimeHooksOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramRuntimeHooks RuntimeHooks { get; }
+    ProgramRuntimeHooks RuntimeHooks { get; }
 }

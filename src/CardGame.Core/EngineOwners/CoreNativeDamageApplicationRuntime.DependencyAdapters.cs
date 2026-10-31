@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime))]
-internal sealed class CoreNativeDamageApplicationCoreNativeRuleQueriesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreNativeDamageApplicationCoreNativeRuleQueriesOperations
+[Core.ProgramCapability(typeof(CoreNativeRuleQueriesRuntime))]
+internal sealed class CoreNativeDamageApplicationCoreNativeRuleQueriesAdapter(Func<CoreNativeRuleQueriesRuntime> targetFactory) : ICoreNativeDamageApplicationCoreNativeRuleQueriesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> _targetFactory = targetFactory;
+    private readonly Func<CoreNativeRuleQueriesRuntime> _targetFactory = targetFactory;
     public int GetCombatDistance(int sourceSeat, int targetSeat) => this._targetFactory().GetCombatDistance(sourceSeat, targetSeat);
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramDamageHooksRuntime))]
-internal sealed class CoreNativeDamageApplicationCoreProgramDamageHooksAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramDamageHooksRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreNativeDamageApplicationCoreProgramDamageHooksOperations
+[Core.ProgramCapability(typeof(CoreProgramDamageHooksRuntime))]
+internal sealed class CoreNativeDamageApplicationCoreProgramDamageHooksAdapter(Func<CoreProgramDamageHooksRuntime> targetFactory) : ICoreNativeDamageApplicationCoreProgramDamageHooksOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramDamageHooksRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramDamageHooks DamageHooks { get => this._targetFactory().DamageHooks; }
+    private readonly Func<CoreProgramDamageHooksRuntime> _targetFactory = targetFactory;
+    public ProgramDamageHooks DamageHooks { get => this._targetFactory().DamageHooks; }
 }

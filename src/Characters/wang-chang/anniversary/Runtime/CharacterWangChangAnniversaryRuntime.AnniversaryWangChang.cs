@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangChangAnniversaryRuntime
 {
     internal const string WangChangAction = "anniversary-wang-chang", WangChangDiscardReason = "skill-program.anniversary:wang-chang.discard", WangChangDrawReason = "skill-program.anniversary:kaiji.draw";
-    internal static CardConversionSource WangChangSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryWangChangHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWangChang(f, op);
+    internal static CardConversionSource WangChangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryWangChangHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWangChang(f, op);
     internal Card[] WangChangOwnCosts(int seat, string instance) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat])).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(seat, AnniversaryWangChangComposition.Kaiji, instance, c)).OrderBy(c => c.Id).ToArray();
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 46500, SkillProgramEffectOp.ResolveAnniversaryWangChangKaiji)]
     internal bool CanActivateWangChang(ProgramActivationLegalityContext c) => c.Owner.IsAlive && c.Owner.MaxHp > 0 && c.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && (_coreProgramConversionPolarityOperations.GetProgramConversionPolarity(c.OwnerSeat, AnniversaryWangChangComposition.Kaiji) == SkillPolarity.Yang || _coreNationalSkillsOperations.GetSkillBindingShard(c.Owner).ProgramInstances.Where(i => i.SkillId == AnniversaryWangChangComposition.Kaiji).Any(i => WangChangOwnCosts(c.OwnerSeat, i.SkillInstanceId).Length > 0));
@@ -91,7 +88,7 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
             choices.Add(WangChangChoice(f, "seal", "done", r.Targets.Count == 0 ? "不选择角色" : $"确认{(r.Targets.Count)}名角色"));
         }
         else if (r.Stage == AnniversaryWangChangStage.ForeignCard)
-            choices.AddRange(WangChangForeignCards(f).Select(m => WangChangChoice(f, "foreign", $"{(m.From.Zone)}.{(m.Slot)}", m.Hidden ? $"第{(m.Slot + 1)}张手牌" : global::CardGame.Core.EngineOwners.CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(m.Card), m.Hidden ? [] : [m.Card.Id], extra: new Dictionary<string, string> { ["source-zone"] = m.From.Zone.ToString(), ["slot-index"] = m.Slot.ToString(CultureInfo.InvariantCulture), ["card-owner-seat"] = r.Targets[r.Cursor].ToString(CultureInfo.InvariantCulture) })));
+            choices.AddRange(WangChangForeignCards(f).Select(m => WangChangChoice(f, "foreign", $"{(m.From.Zone)}.{(m.Slot)}", m.Hidden ? $"第{(m.Slot + 1)}张手牌" : CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(m.Card), m.Hidden ? [] : [m.Card.Id], extra: new Dictionary<string, string> { ["source-zone"] = m.From.Zone.ToString(), ["slot-index"] = m.Slot.ToString(CultureInfo.InvariantCulture), ["card-owner-seat"] = r.Targets[r.Cursor].ToString(CultureInfo.InvariantCulture) })));
         return Array.AsReadOnly(choices.ToArray());
     }
 
@@ -127,14 +124,14 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
         if (r.Stage == AnniversaryWangChangStage.OwnCards)
             return p.Choices.FirstOrDefault(c => c.Parameters["verb"] == "pay") ?? p.Choices[0];
         if (r.Stage == AnniversaryWangChangStage.Targets)
-            return p.Choices.FirstOrDefault(c => c.Targets is [var seat] && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[seat])) ?? p.Choices.Last();
+            return p.Choices.FirstOrDefault(c => c.Targets is [var seat] && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[seat])) ?? p.Choices.Last();
         return p.Choices[0];
     }
 
     [ProgramAnswer(WangChangAction)]
     internal void AnswerWangChang(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryWangChang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ValidWangChang(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WangChangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryWangChang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ValidWangChang(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WangChangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Wang Chang rejects another owner, native cursor, cost card or target menu.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
@@ -81,7 +77,7 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
     internal bool LishiProjectedHandForbidden(ProgramLegalActionQuery q) => q.Action.CardId is { } id && q.EffectiveKind is { } kind && LishiHandTypeSpent(q.Actor.Seat, kind, [id]);
     [ProgramCardLegality(ProgramCardLegalityStage.MaterialUseBan, 39300)]
     internal bool LishiMaterialForbidden(ProgramCardMaterialQuery q) => !q.IsResponse && LishiHandTypeSpent(q.ActorSeat, q.Kind, q.CardIds.ToArray());
-    internal bool IsLishiResponseUse(int actor, CardKind kind) => kind == CardKind.Nullification || kind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.TargetSeat == actor && attack.EffectiveCardKind is { } incoming && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming);
+    internal bool IsLishiResponseUse(int actor, CardKind kind) => kind == CardKind.Nullification || kind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.TargetSeat == actor && attack.EffectiveCardKind is { } incoming && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming);
     [ProgramCardLegality(ProgramCardLegalityStage.NativeResponseBan, 39300)]
     internal bool LishiResponseHandForbidden(ProgramNativeResponseQuery q) => IsLishiResponseUse(q.Provider.Seat, q.Kind) && LishiHandTypeSpent(q.Provider.Seat, q.Kind, q.CardIds);
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.AcceptedConversionCost, 39301)]
@@ -94,12 +90,12 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
 
     internal CardLocation? LishiDiscardOrigin(int cardId, CardLocation from, CardMoveReason reason, long before)
     {
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(from))
-            return global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(reason) ? from : null;
+        if (CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(from))
+            return CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(reason) ? from : null;
         if (from != CardLocation.Processing)
             return null;
         var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == cardId && m.Sequence <= before);
-        return entry is not null && entry.To == CardLocation.Processing && global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(entry.From) && global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(entry.Reason) && (reason == entry.Reason || reason.Value == entry.Reason.Value + "-finished" || reason.Value == entry.Reason.Value + "-discard") ? entry.From : null;
+        return entry is not null && entry.To == CardLocation.Processing && CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(entry.From) && CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(entry.Reason) && (reason == entry.Reason || reason.Value == entry.Reason.Value + "-finished" || reason.Value == entry.Reason.Value + "-discard") ? entry.From : null;
     }
 
     internal LishiPunishmentIssuedEvent? LishiDiscardClaim(int actor) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase && phase.ActorSeat == actor ? LishiActiveEffects(phase).Where(e => e.Option == 5 && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive).OrderBy(e => _coreTableOrderOperations.RelativeTableOrder(_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, e.Source.OwnerSeat)).ThenBy(e => e.FrameId).FirstOrDefault() : null;
@@ -125,7 +121,7 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
         var invoices = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(e => e.OwnerSeat == f.OwnerSeat && e.Phase == phase).ToArray();
         var drawn = invoices.SelectMany(d => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason == d.Reason)).Select(m => m.CardId).Distinct().Select(_coreAdvancedLifecycleOperations.GetAdvancedCard).ToArray();
         var allowed = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand], OwnedCardMoveIntent.Discard).SelectMany(c => c.Cards).ToHashSet();
-        var discard = drawn.Length > 0 && drawn.Select(c => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c))).Distinct().Count() == 1 ? drawn.Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.Hand(f.OwnerSeat) && allowed.Contains(c.Id) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, c, CardLocation.Hand(f.OwnerSeat), OwnedCardMoveIntent.Discard)).ToArray() : [];
+        var discard = drawn.Length > 0 && drawn.Select(c => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c))).Distinct().Count() == 1 ? drawn.Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.Hand(f.OwnerSeat) && allowed.Contains(c.Id) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, c, CardLocation.Hand(f.OwnerSeat), OwnedCardMoveIntent.Discard)).ToArray() : [];
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShenZhongHui = r with { Before = before, After = before, Stage = ShenZhongHuiStage.Complete }, PendingMovementContinuation = discard.Length > 0 ? new(f.OwnerSeat, 0, null) : null });
         if (discard.Length > 0)
@@ -186,9 +182,9 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
             if (r.ResultId is not null)
             {
                 if (kind == CardKind.Indulgence && r.ResultSuit != Suit.Heart)
-                    _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase;
+                    _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= GameEngine.DelayedTurnEffects.SkipPlayPhase;
                 if (kind == CardKind.SupplyShortage && r.ResultSuit != Suit.Club)
-                    _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase;
+                    _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= GameEngine.DelayedTurnEffects.SkipDrawPhase;
                 if (kind == CardKind.Lightning && r.ResultSuit == Suit.Spade && r.ResultRank is >= 2 and <= 9)
                 {
                     _coreSkillProgramsOperations.BeginProgramSkillDamage(f, f.OwnerSeat, 3, nature: DamageNature.Thunder, sourceLess: true);

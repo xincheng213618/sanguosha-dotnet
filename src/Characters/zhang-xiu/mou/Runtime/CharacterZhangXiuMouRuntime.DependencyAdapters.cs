@@ -1,28 +1,24 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime))]
-internal sealed class CharacterZhangXiuMouCoreProgramTargetRulesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterZhangXiuMouCoreProgramTargetRulesOperations
+[Core.ProgramCapability(typeof(CoreProgramTargetRulesRuntime))]
+internal sealed class CharacterZhangXiuMouCoreProgramTargetRulesAdapter(Func<CoreProgramTargetRulesRuntime> targetFactory) : ICharacterZhangXiuMouCoreProgramTargetRulesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
+    private readonly Func<CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
+    public ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime))]
-internal sealed class CharacterZhangXiuMouCorePlayerViewProjectionAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterZhangXiuMouCorePlayerViewProjectionOperations
+[Core.ProgramCapability(typeof(CorePlayerViewProjectionRuntime))]
+internal sealed class CharacterZhangXiuMouCorePlayerViewProjectionAdapter(Func<CorePlayerViewProjectionRuntime> targetFactory) : ICharacterZhangXiuMouCorePlayerViewProjectionOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
+    private readonly Func<CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
+    public GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MouZhangXiuAnniversaryRuntime))]
-internal sealed class CharacterZhangXiuMouMouZhangXiuAnniversaryAdapter(global::System.Func<global::CardGame.Core.MouZhangXiuAnniversaryRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterZhangXiuMouMouZhangXiuAnniversaryOperations
+[Core.ProgramCapability(typeof(MouZhangXiuAnniversaryRuntime))]
+internal sealed class CharacterZhangXiuMouMouZhangXiuAnniversaryAdapter(Func<MouZhangXiuAnniversaryRuntime> targetFactory) : ICharacterZhangXiuMouMouZhangXiuAnniversaryOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MouZhangXiuAnniversaryRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MouZhangXiuAnniversaryRuntime Get() => this._targetFactory();
+    private readonly Func<MouZhangXiuAnniversaryRuntime> _targetFactory = targetFactory;
+    public MouZhangXiuAnniversaryRuntime Get() => this._targetFactory();
 }

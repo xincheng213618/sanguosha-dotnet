@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class YingboGiftHandle(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, global::CardGame.Core.NativeOwners.CardAttackHandleFactory createCardAttackHandle, global::CardGame.Core.NativeOwners.GroupCardHandleFactory createGroupCardHandle, long ownerId) : global::CardGame.Core.GameEngine.ICardContinuationHandle
+internal sealed class YingboGiftHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, CardAttackHandleFactory createCardAttackHandle, GroupCardHandleFactory createGroupCardHandle, long ownerId) : GameEngine.ICardContinuationHandle
 {
     public long OwnerFrameId => ownerId;
     public long ResolutionId => ownerId;
@@ -9,6 +9,6 @@ internal sealed class YingboGiftHandle(global::System.Func<global::CardGame.Core
     public Card Card => getCoreGameEngineCardAttackStateRuntime().ReadCardAppearance(State.Card);
     public CardKind CardKind => State.CardKind;
     public YingboGiftContinuation Continuation => State.Continuation;
-    public global::CardGame.Core.NativeOwners.CardAttackHandle? Attack => State.AttackOwnerId is { } id ? createCardAttackHandle(id) : null;
-    public global::CardGame.Core.NativeOwners.GroupCardHandle? Group => State.GroupOwnerId is { } id ? createGroupCardHandle(id) : null;
+    public CardAttackHandle? Attack => State.AttackOwnerId is { } id ? createCardAttackHandle(id) : null;
+    public GroupCardHandle? Group => State.GroupOwnerId is { } id ? createGroupCardHandle(id) : null;
 }

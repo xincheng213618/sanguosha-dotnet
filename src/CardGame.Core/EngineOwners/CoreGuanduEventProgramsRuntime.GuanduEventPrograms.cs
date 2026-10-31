@@ -1,14 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGuanduEventProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IGuanduEventHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteGuanduEvent(f, op);
+    SkillProgramStepOutcome IGuanduEventHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteGuanduEvent(f, op);
     internal GuanduBattleEvent? CurrentGuanduEvent => _coreActivityBattleRulesOperations.GuanduRules?.CurrentEvent;
 
     internal void RecordGuanduCardAction(CardActionContext action, SkillProgramTriggerWindow window) => _coreActivityBattleRulesOperations.GuanduRules?.RecordCardAction(new(action.ActionId, action.Type, action.ActorSeat, action.EffectiveKind), window);
@@ -24,7 +19,7 @@ internal sealed partial class CoreGuanduEventProgramsRuntime
     internal CardUseFrame? GuanduDamageRewardUse(int owner, ProgramSkillWindowContext context) => context.SourceSeat == owner && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsSourceLess: false } damage && damage.SourceSeat == owner && _coreCardUseLifecycleOperations.LifecycleCardUse(damage.ResolutionId)is { Action.Type: CardActionType.Use } use && _coreActivityBattleRulesOperations.GuanduRules?.DamageRewardAvailable(use.Id) == true ? use : null;
     internal CardUseFrame? GuanduTenthUse(int owner, ProgramSkillWindowContext context)
     {
-        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } c || _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is not { Action: { } action, ExtraCardEffect: null } use || action.ActionId != c.CardActionId || action.ActorSeat != owner || action.Type != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(use.CardKind) || use.CardKind is CardKind.Dodge or CardKind.Nullification)
+        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } c || _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is not { Action: { } action, ExtraCardEffect: null } use || action.ActionId != c.CardActionId || action.ActorSeat != owner || action.Type != CardActionType.Use || !CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(use.CardKind) || use.CardKind is CardKind.Dodge or CardKind.Nullification)
             return null;
         return _coreActivityBattleRulesOperations.GuanduRules?.IsTenthAction(action.ActionId) == true ? use : null;
     }

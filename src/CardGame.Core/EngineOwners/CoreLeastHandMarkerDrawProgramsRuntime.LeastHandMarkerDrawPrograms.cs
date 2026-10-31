@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreLeastHandMarkerDrawProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.ILeastHandMarkerDrawProgramHost.GrantLeastHandMarkerOrDraw(ProgramSkillFrame frame, int targetSeat, PlayerMarkerKind marker) => BeginLeastHandMarkerOrDraw(frame, targetSeat, marker);
+    SkillProgramStepOutcome ILeastHandMarkerDrawProgramHost.GrantLeastHandMarkerOrDraw(ProgramSkillFrame frame, int targetSeat, PlayerMarkerKind marker) => BeginLeastHandMarkerOrDraw(frame, targetSeat, marker);
     internal SkillProgramStepOutcome BeginLeastHandMarkerOrDraw(ProgramSkillFrame frame, int targetSeat, PlayerMarkerKind marker)
     {
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -22,7 +18,7 @@ internal sealed partial class CoreLeastHandMarkerDrawProgramsRuntime
         if (markerBranch)
         {
             _coreAttributedMarkerEventsOperations.MutateParticipantMarker(frame, targetSeat, marker, 1);
-            _coreLeastHandMarkerDrawProgramsMarkerExtraDrawPoliciesAccess._markerExtraDrawPolicies[(targetSeat, marker)] = new(targetSeat, marker, frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame));
+            _coreLeastHandMarkerDrawProgramsMarkerExtraDrawPoliciesAccess._markerExtraDrawPolicies[(targetSeat, marker)] = new(targetSeat, marker, frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame));
         }
         else
         {

@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineColdDamageRuntime
 {
-    internal bool TryBeginColdDamageReplacement(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, DamageNature nature)
+    internal bool TryBeginColdDamageReplacement(GameEngine.IDamageAttempt attack, int amount, DamageNature nature)
     {
         if (nature != DamageNature.Cold || attack.IsChainPropagation || attack.DamageRedirected || attack.IsSourceLess || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive || _coreNativeIceSwordOperations.GetIceSwordTargetCardCount(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat], attack.SourceSeat) == 0)
             return false;
-        if (attack is global::CardGame.Core.NativeOwners.CardAttackHandle)
+        if (attack is NativeOwners.CardAttackHandle)
         {
             if (_coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ColdDamageReplacementAttempted)
                 return false;
@@ -28,14 +24,14 @@ internal sealed partial class CoreGameEngineColdDamageRuntime
 
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != attack.ResolutionId)
             throw new InvalidOperationException("Cold damage must be offered on its original direct attack frame.");
-        var frame = new ColdDamageReplacementFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, attack.ResolutionId, attack is global::CardGame.Core.NativeOwners.CardAttackHandle, attack.SourceSeat, attack.TargetSeat, amount);
+        var frame = new ColdDamageReplacementFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, attack.ResolutionId, attack is NativeOwners.CardAttackHandle, attack.SourceSeat, attack.TargetSeat, amount);
         _coreRuntimeOperations.PushRuntimeFrame(frame);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ColdDamageOfferedEvent(frame.Id, frame.ParentFrameId, frame.SourceSeat, frame.TargetSeat, frame.Amount));
         ContinueColdDamageReplacement(frame.Id);
         return true;
     }
 
-    internal global::CardGame.Core.GameEngine.IDamageAttempt ColdDamageAttack(ColdDamageReplacementFrame frame) => frame.CardAttack ? _kernelCoreMainOperations.CreateCardAttackHandle(frame.ParentFrameId) : _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(frame.ParentFrameId);
+    internal GameEngine.IDamageAttempt ColdDamageAttack(ColdDamageReplacementFrame frame) => frame.CardAttack ? _kernelCoreMainOperations.CreateCardAttackHandle(frame.ParentFrameId) : _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(frame.ParentFrameId);
     internal bool HasColdDamagePrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ColdDamageReplacementFrame f && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } p && p.PlayerSeat == f.SourceSeat && p.Choices.Count > 0 && p.Choices.All(c => c.Parameters.GetValueOrDefault("program-action") == "native-cold-damage" && c.Parameters.GetValueOrDefault("frame-id") == f.Id.ToString(CultureInfo.InvariantCulture));
     [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.BeforeOpening, 5770)]
     [NativeFrameRoute(typeof(ColdDamageReplacementFrame), 5770)]
@@ -123,7 +119,7 @@ internal sealed partial class CoreGameEngineColdDamageRuntime
     [ProgramAnswer("native-cold-damage")]
     internal void ResolveColdDamageChoice(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ColdDamageReplacementFrame frame || !HasColdDamagePrompt() || !ColdDamageChoices(frame).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, choice)))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ColdDamageReplacementFrame frame || !HasColdDamagePrompt() || !ColdDamageChoices(frame).Any(c => CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, choice)))
             throw new InvalidOperationException("Cold damage lost its exact private source choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -153,14 +149,14 @@ internal sealed partial class CoreGameEngineColdDamageRuntime
             throw new InvalidOperationException("Cold damage cannot discard protected equipment.");
         var draft = frame.LogicalDiscard;
         if (_coreNativeLogicalDiscardsOperations.TracksNativeLogicalDiscards)
-            draft = draft is null ? _coreNativeLogicalDiscardsOperations.CaptureNativeLogicalDiscardInvocation(frame.SourceSeat, frame.SourceSeat, [material.Id], global::CardGame.Core.EngineOwners.CoreGameEngineColdDamageDefinitions.ColdDamageDiscardReason, frame.Id) : draft with
+            draft = draft is null ? _coreNativeLogicalDiscardsOperations.CaptureNativeLogicalDiscardInvocation(frame.SourceSeat, frame.SourceSeat, [material.Id], CoreGameEngineColdDamageDefinitions.ColdDamageDiscardReason, frame.Id) : draft with
             {
                 Materials = draft.Materials.Append(new(material.Id, from)).ToArray()
             };
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { LogicalDiscard = draft });
         var sequence = _coreCardMovementJournalCardMovementsAccess._cardMovements.Count;
-        _corePhysicalMovementFacadesOperations.MoveCard(material, from, CardLocation.DiscardPile, global::CardGame.Core.EngineOwners.CoreGameEngineColdDamageDefinitions.ColdDamageDiscardReason);
-        var movement = _coreCardMovementJournalCardMovementsAccess._cardMovements.Skip(sequence).Single(m => m.CardId == material.Id && m.From == from && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineColdDamageDefinitions.ColdDamageDiscardReason);
+        _corePhysicalMovementFacadesOperations.MoveCard(material, from, CardLocation.DiscardPile, CoreGameEngineColdDamageDefinitions.ColdDamageDiscardReason);
+        var movement = _coreCardMovementJournalCardMovementsAccess._cardMovements.Skip(sequence).Single(m => m.CardId == material.Id && m.From == from && m.Reason == CoreGameEngineColdDamageDefinitions.ColdDamageDiscardReason);
         var receipt = new ColdDamageDiscardedEvent(frame.Id, frame.Discards.Count + 1, material.Id, from, movement.Sequence);
         // Keep any recovery attempts enqueued by removing Silver Lion on this frame.
         var current = (ColdDamageReplacementFrame)_resolutionStackOperations._resolutionStack.Last();

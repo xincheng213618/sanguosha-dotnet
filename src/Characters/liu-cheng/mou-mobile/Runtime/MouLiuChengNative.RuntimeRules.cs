@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_liu_cheng_mou_mobile_MouLiuChengNative
 {
     internal static bool SameMouLiuChengPlan(MouLiuChengUsePlan a, MouLiuChengUsePlan b) => a.Kind == b.Kind && a.ActionKind == b.ActionKind &&

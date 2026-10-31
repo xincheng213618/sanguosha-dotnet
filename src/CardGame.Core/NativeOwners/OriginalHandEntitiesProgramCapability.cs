@@ -1,8 +1,7 @@
 #nullable enable
-using System.Globalization;
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class OriginalHandEntitiesProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineOriginalHandEntitiesEntries> getCoreGameEngineOriginalHandEntitiesRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineOriginalHandAwakeningEntries> getCoreGameEngineOriginalHandAwakeningRuntime) : IOriginalHandEntitiesProgramHost
+internal sealed class OriginalHandEntitiesProgramCapability(Func<RuntimeEntries.CoreGameEngineOriginalHandEntitiesEntries> getCoreGameEngineOriginalHandEntitiesRuntime, Func<RuntimeEntries.CoreGameEngineOriginalHandAwakeningEntries> getCoreGameEngineOriginalHandAwakeningRuntime) : IOriginalHandEntitiesProgramHost
 {
     public SkillProgramStepOutcome ExecuteOriginalHandEntityOperation(ProgramSkillFrame f, SkillProgramEffect e) => e.Op switch
     {

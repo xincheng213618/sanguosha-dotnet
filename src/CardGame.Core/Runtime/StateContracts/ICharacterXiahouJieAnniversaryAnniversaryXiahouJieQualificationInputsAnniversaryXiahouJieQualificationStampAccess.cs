@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess : IProgramRuntimeOperations
 {
     ref long _anniversaryXiahouJieQualificationStamp { get; }
 

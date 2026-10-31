@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
 {
     internal bool HasShenCaoPiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ApplyShenCaoPiYinzhi);
 
-    internal static CardConversionSource ShenCaoPiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShenCaoPiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int YinzhiOwnTurns(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == seat);
     internal bool YinzhiAwaitingOwnTurn(YinzhiIssuedEvent e) => YinzhiOwnTurns(e.TargetSeat) == e.TargetOwnTurns && !(_resolutionStackOperations._resolutionStack.FirstOrDefault()is BeiMiHuTurnPreludeFrame prelude && prelude.Proof.UpcomingOwnerSeat == e.TargetSeat && prelude.Proof.UpcomingTurnNumber > e.ActualTurn);
     internal bool IsYinzhiSkillSuppressed(int seat) => HasShenCaoPiCapability && _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.TargetSeat == seat && YinzhiAwaitingOwnTurn(e));
@@ -48,7 +44,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     internal bool YinzhiResponseBan(ProgramNativeResponseQuery q) => YinzhiNewCardsForbidden(q.Provider.Seat, q.CardIds);
     [ProgramCardLegality(ProgramCardLegalityStage.AfterLegalActionKind, 39700)]
     internal bool YinzhiActionBan(ProgramLegalActionQuery q) => q.EffectiveKind is not null && YinzhiNewCardsForbidden(q.Actor.Seat, q.Action.CardId is> 0 and var id ? [id] : []);
-    SkillProgramStepOutcome global::CardGame.Core.IShenCaoPiHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginShenCaoPi(frame, op);
+    SkillProgramStepOutcome IShenCaoPiHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginShenCaoPi(frame, op);
     internal CardActionContext? YinzhiAction(ProgramSkillWindowContext? c) => c is null ? null : _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)?.Action;
     internal YinzhiIssuedEvent? YinzhiRewardIssue(int owner, CardActionContext? a) => a is null || !a.PhysicalCards.Any(c => c.From == CardLocation.Hand(a.ActorSeat)) ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiIssuedEvent>().Where(e => e.Source.OwnerSeat == owner && e.TargetSeat == a.ActorSeat && YinzhiAwaitingOwnTurn(e) && !_coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiHandRewardRequestedEvent>().Any(r => r.IssueFrameId == e.FrameId && r.ActionId == a.ActionId)).OrderBy(e => e.FrameId).FirstOrDefault();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 39700, SkillProgramEffectOp.DrawYinzhiHandAction, SkillProgramEffectOp.ResolveKemingDamagedSkill, SkillProgramEffectOp.ArmKemingSkillEcho)]

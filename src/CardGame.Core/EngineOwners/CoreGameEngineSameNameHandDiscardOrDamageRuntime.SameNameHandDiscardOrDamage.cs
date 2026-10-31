@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,11 +7,11 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageRuntime
 {
     internal string SameNameHandDiscardReason(ProgramSkillFrame f) => $"skill-program.{(f.SkillId)}.same-name-hand.discard";
     internal int[] SameNameHandTargets(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0).Select(p => p.Seat).ToArray();
-    internal SameNameHandMaterial[] SameNameHandMaterials(int seat, CardKind name) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(c.Kind) == name && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, CardLocation.Hand(seat), OwnedCardMoveIntent.Discard)).Select(c => new SameNameHandMaterial(c.Id, c.Kind, CardLocation.Hand(seat))).ToArray();
+    internal SameNameHandMaterial[] SameNameHandMaterials(int seat, CardKind name) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Where(c => CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(c.Kind) == name && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, CardLocation.Hand(seat), OwnedCardMoveIntent.Discard)).Select(c => new SameNameHandMaterial(c.Id, c.Kind, CardLocation.Hand(seat))).ToArray();
     internal bool SameNameHandActionParent(int owner, ProgramSkillWindowContext context, out ProgramCardTriggerWindowFrame window)
     {
         window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)!;
-        if (window is null || context.OwnerSeat != owner || context.CardUse is not { } use || use.ActorSeat != owner || (window.CardSupplyCompletion?.ProviderSeat ?? window.ResponseCompletion?.CompletionActorSeat ?? window.Action.ActorSeat) != owner || use.CardActionId != window.Action.ActionId || use.EffectiveKind != window.Action.EffectiveKind || use.ParentCardUseFrameId != window.ParentFrameId || context.Window != global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window))
+        if (window is null || context.OwnerSeat != owner || context.CardUse is not { } use || use.ActorSeat != owner || (window.CardSupplyCompletion?.ProviderSeat ?? window.ResponseCompletion?.CompletionActorSeat ?? window.Action.ActorSeat) != owner || use.CardActionId != window.Action.ActionId || use.EffectiveKind != window.Action.EffectiveKind || use.ParentCardUseFrameId != window.ParentFrameId || context.Window != CoreGameEngineCardActionsRuntime.GetCardActionWindow(window))
             return false;
         if (context.Window == SkillProgramTriggerWindow.CardResponseCompleted)
             return window.ResponseCompletion is { CostsDrained: true } && _coreResponseCompletionOperations.ValidResponseCompletionWindow(window);
@@ -35,20 +32,20 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
-        if (f.InstructionIndex != 1 || f.SameNameHandDiscardOrDamage is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || plan.Trigger is not { } trigger || trigger.Effects is not [{ Op: SkillProgramEffectOp.OfferSameNameHandDiscardOrDamage }] || f.WindowContext is not { } context || !SameNameHandActionParent(f.OwnerSeat, context, out var window) || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2].Id != window.Id || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])))
+        if (f.InstructionIndex != 1 || f.SameNameHandDiscardOrDamage is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || plan.Trigger is not { } trigger || trigger.Effects is not [{ Op: SkillProgramEffectOp.OfferSameNameHandDiscardOrDamage }] || f.WindowContext is not { } context || !SameNameHandActionParent(f.OwnerSeat, context, out var window) || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2].Id != window.Id || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])))
             throw new InvalidOperationException("A same-name hand demand requires its exact completed actor candidate.");
-        if (!CanOfferSameNameHandDiscardOrDamage(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]), trigger, context))
+        if (!CanOfferSameNameHandDiscardOrDamage(CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]), trigger, context))
             return SkillProgramStepOutcome.Continue;
         var a = window.Action;
         var r = new ProgramSameNameHandReceipt
         {
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             ActionId = a.ActionId,
             CardWindowId = window.Id,
             OriginalParentFrameId = window.ParentFrameId,
             EffectiveKind = a.EffectiveKind,
-            NormalizedName = global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(a.EffectiveKind),
+            NormalizedName = CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(a.EffectiveKind),
             ActualTurnNumber = _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber,
             ActualTurnOwnerSeat = _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat,
             Stage = SameNameHandStage.ChoosingTarget,
@@ -145,7 +142,7 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    internal static bool SameNameHandChoicesEqual(PromptChoice a, PromptChoice b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SameNameHandDiscardOrDamage.SameNameHandChoicesEqual(a, b);
+    internal static bool SameNameHandChoicesEqual(PromptChoice a, PromptChoice b) => RuntimeSkills.RuntimeRules_Core_SameNameHandDiscardOrDamage.SameNameHandChoicesEqual(a, b);
     [ProgramContinuation(ProgramContinuationKind.Resume, 170)]
     internal bool ResumeSameNameHandDiscardOrDamage(long id)
     {
@@ -200,9 +197,9 @@ internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageRuntime
             return decision.Choices.OrderByDescending(c => _coreAiBrainsAiBrainsAccess._aiBrains[decision.PlayerSeat].ScoreProgramTarget(snapshot, c.Targets.Single(), harm)).ThenBy(c => c.Targets.Single()).First();
         }
 
-        var discard = decision.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat])).ThenBy(c => c.Cards[0]).FirstOrDefault();
+        var discard = decision.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat])).ThenBy(c => c.Cards[0]).FirstOrDefault();
         return discard ?? decision.Choices.Single(c => c.Parameters["step"] == "damage");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISameNameHandDiscardOrDamageProgramHost.OfferSameNameHandDiscardOrDamage(ProgramSkillFrame f) => BeginSameNameHandDiscardOrDamage(f);
+    SkillProgramStepOutcome ISameNameHandDiscardOrDamageProgramHost.OfferSameNameHandDiscardOrDamage(ProgramSkillFrame f) => BeginSameNameHandDiscardOrDamage(f);
 }

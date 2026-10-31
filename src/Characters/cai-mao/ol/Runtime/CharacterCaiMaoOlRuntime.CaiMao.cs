@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiMaoOlRuntime
@@ -11,8 +7,8 @@ internal sealed partial class CharacterCaiMaoOlRuntime
     internal const string CaiMaoRevealPrefix = "cai-mao.reveal.";
     internal bool HasCaiMaoCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveZuolianWholeRevealExchange) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJingzhouBeforeDamageToggles);
 
-    internal static CardConversionSource CaiMaoSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cai_mao_ol_CaiMao.CaiMaoSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.ICaiMaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCaiMao(f, op);
+    internal static CardConversionSource CaiMaoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cai_mao_ol_CaiMao.CaiMaoSource(f);
+    SkillProgramStepOutcome ICaiMaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCaiMao(f, op);
     internal SkillProgramStepOutcome BeginCaiMao(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -94,7 +90,7 @@ internal sealed partial class CharacterCaiMaoOlRuntime
     [ProgramAnswer("cai-mao")]
     internal void AnswerCaiMao(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaiMao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CaiMaoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaiMao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CaiMaoChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Cai Mao requires the exact current private whole-operation choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

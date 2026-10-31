@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
@@ -37,7 +34,7 @@ internal sealed partial class CoreGameEngineShanheMarketRuntime
         return _kernelCoreMainOperations.Accept(() =>
         {
             _shanheMarketOperations._shanheMarket.SynchronizeBattleMarketHealth(_coreMatchParticipantsPlayersAccess._players[0].Hp, _coreMatchParticipantsPlayersAccess._players[0].MaxHp);
-            var decision = _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } pending ? global::CardGame.Core.EngineOwners.CoreGameEngineCardAttackStateRuntime.CaptureSuspendedDecision(pending) : null;
+            var decision = _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } pending ? CoreGameEngineCardAttackStateRuntime.CaptureSuspendedDecision(pending) : null;
             var status = _coreMatchOutcomeStatusWinnerAccess._status;
             var depth = _resolutionStackOperations._resolutionStack.Count;
             var parent = _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id;
@@ -103,7 +100,7 @@ internal sealed partial class CoreGameEngineShanheMarketRuntime
         if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[0].IsAlive)
         {
             _coreMatchOutcomeStatusWinnerAccess._status = market.Status;
-            _corePendingDecisionPolicyPipelineOperations._pendingDecision = market.Decision is { } decision ? global::CardGame.Core.EngineOwners.CoreGameEngineCardAttackStateRuntime.RestoreSuspendedDecision(decision) : null;
+            _corePendingDecisionPolicyPipelineOperations._pendingDecision = market.Decision is { } decision ? CoreGameEngineCardAttackStateRuntime.RestoreSuspendedDecision(decision) : null;
             RefreshShanheMarketSuspendedPrompt(market.DiscardQuote);
         }
     }

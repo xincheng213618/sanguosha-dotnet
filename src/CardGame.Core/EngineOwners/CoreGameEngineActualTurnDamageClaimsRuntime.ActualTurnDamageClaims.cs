@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineActualTurnDamageClaimsRuntime
@@ -88,7 +84,7 @@ internal sealed partial class CoreGameEngineActualTurnDamageClaimsRuntime
     internal bool MatchesActualTurnDamageEnding(ProgramSkillFrame root)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame end && end.OwnerSeat == root.OwnerSeat && end.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && end.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && root.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } c && c.ParentFrameId == end.Id && c.OwnerSeat == root.OwnerSeat && c.SourceSeat == root.OwnerSeat && c.TargetSeat == root.OwnerSeat && end.ItemIndex >= 0 && end.ItemIndex < end.Items.Count && end.Items[end.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, candidate) && c.OccurrenceIndex == candidate.OccurrenceIndex;
+        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame end && end.OwnerSeat == root.OwnerSeat && end.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && end.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && root.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } c && c.ParentFrameId == end.Id && c.OwnerSeat == root.OwnerSeat && c.SourceSeat == root.OwnerSeat && c.TargetSeat == root.OwnerSeat && end.ItemIndex >= 0 && end.ItemIndex < end.Items.Count && end.Items[end.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, candidate) && c.OccurrenceIndex == candidate.OccurrenceIndex;
     }
 
     internal SkillProgramStepOutcome BeginActualTurnDamageClaim(ProgramSkillFrame frame)
@@ -115,7 +111,7 @@ internal sealed partial class CoreGameEngineActualTurnDamageClaimsRuntime
             var fact = facts[index];
             if (movement.CardId != fact.CardId)
                 throw new InvalidOperationException("The claimed damage entities changed their frozen movement order.");
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ActualTurnDamageEntityClaimedEvent(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, movement.CardId, index, fact.DamageFrameId, movement.Sequence));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ActualTurnDamageEntityClaimedEvent(frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, movement.CardId, index, fact.DamageFrameId, movement.Sequence));
         }, emitCardMovedEvents: false);
         // Preserve any native queue added to the real owning frame by movement.
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);

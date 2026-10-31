@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuJinMouMobileRuntime
@@ -11,14 +7,14 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
     internal const string MouXiayuanCostReason = "skill-program.mou-mobile:xiayuan.MoveBoundCards";
     internal bool HasMouYuJinCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouYuJinXiayuan) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouYuJinJieyue);
 
-    internal static CardConversionSource MouYuJinSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yu_jin_mou_mobile_MouYuJinXiayuan.MouYuJinSource(f);
+    internal static CardConversionSource MouYuJinSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_yu_jin_mou_mobile_MouYuJinXiayuan.MouYuJinSource(f);
     internal Card[] MouXiayuanLegalCosts(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, CardLocation.Hand(owner), OwnedCardMoveIntent.Discard)).ToArray();
     internal DamageFrame? MouXiayuanDamage(ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.DamageFrameId is { } id && _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(f => f.Id == id)is { ArmorPayment: { } p } damage && _coreDamageArmorPaymentsOperations.IsIssuedDamageArmorPayment(damage) && c.TargetSeat == p.TargetSeat && c.Amount == p.DamageAmount && c.OccurrenceIndex == 0 && c.SourceSeat == (p.SourceLess ? null : (int? )p.SourceSeat) && p.ArmorBefore > 0 && p.ArmorAbsorbed > 0 && p.ArmorAfter == 0 ? damage : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29300, SkillProgramEffectOp.ResolveMouYuJinXiayuan)]
     internal bool CanOfferMouXiayuan(ProgramTriggerLegalityContext c) => c.SkillId == MouXiayuan && MouYuJinComposition.IsXiayuan(c.Program) && c.Owner.IsAlive && MouXiayuanDamage(c.Context)is { } d && d.TargetSeat != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[d.TargetSeat].IsAlive && MouXiayuanLegalCosts(c.OwnerSeat).Length >= 2;
     internal DamageFrame? MouXiayuanRoot(ProgramSkillFrame f)
     {
-        if (f.SkillId != MouXiayuan || f.TriggerId != "restore-after-armor-loss" || f.ActivationId != f.TriggerId || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.OwnerSeat != f.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } program || program.GameplayHash != f.GameplayHash || !MouYuJinComposition.IsXiayuan(program) || MouXiayuanDamage(c)is not { } damage || damage.TargetSeat == f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.ParentFrameId != damage.Id || window.TriggerWindow != c.Window || window.TargetSeat != damage.TargetSeat || window.SourceSeat != damage.SourceSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex].ToProgramCandidate()is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
+        if (f.SkillId != MouXiayuan || f.TriggerId != "restore-after-armor-loss" || f.ActivationId != f.TriggerId || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.OwnerSeat != f.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } program || program.GameplayHash != f.GameplayHash || !MouYuJinComposition.IsXiayuan(program) || MouXiayuanDamage(c)is not { } damage || damage.TargetSeat == f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.ParentFrameId != damage.Id || window.TriggerWindow != c.Window || window.TargetSeat != damage.TargetSeat || window.SourceSeat != damage.SourceSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex].ToProgramCandidate()is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
             return null;
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         return i > 1 && _resolutionStackOperations._resolutionStack[i - 1].Id == window.Id && _resolutionStackOperations._resolutionStack[i - 2].Id == damage.Id ? damage : null;
@@ -66,7 +62,7 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
             var before = target.Armor;
             var after = checked(before + amount);
             target.Armor = after;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ArmorGrantedEvent(f.Id, 3, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), target.Seat, amount, before, after));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ArmorGrantedEvent(f.Id, 3, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), target.Seat, amount, before, after));
             _coreMatchLogOperations.AddLog("ArmorGranted", $"{(target.Name)} 获得 {(amount)} 点护甲，现有 {(after)} 点。", f.OwnerSeat, target.Seat);
         }
 
@@ -90,7 +86,7 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
 
     internal (ProgramAiEstimate Estimate, int? TargetSeat) EstimateMouXiayuanForAi(CharacterState owner, ProgramAiPublicContext context, ProgramSkillWindowContext? window)
     {
-        var costs = MouXiayuanLegalCosts(owner.Seat).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(c, owner)).ThenBy(c => c.Id).Take(2).ToArray();
+        var costs = MouXiayuanLegalCosts(owner.Seat).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(c, owner)).ThenBy(c => c.Id).Take(2).ToArray();
         if (costs.Length != 2 || window is null || MouXiayuanDamage(window)is not { ArmorPayment: { } payment })
             return (new(new(0, 0, 0, 0, 0, 0, false, false), 0, false, "狭援无原始耗尽护甲回执或没有足额两张合法手牌。"), null);
         var condition = new SkillProgramCondition(SkillProgramConditionKind.Always, 0, []);
@@ -104,11 +100,11 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
         };
         var estimate = ProgramCompositionAi.Estimate([new SkillProgramEffect(SkillProgramEffectOp.GrantArmor, SkillProgramEffectTarget.SelectedTarget, payment.ArmorAbsorbed, condition)], _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner), publicContext: context with { SelectedTarget = recipient });
         var value = _coreAiBrainsAiBrainsAccess._aiBrains[owner.Seat].ScoreProgramTarget(snapshot, payment.TargetSeat, estimate.Hint);
-        var cost = costs.Sum(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(c, owner)) * 0.35d;
+        var cost = costs.Sum(c => CoreNativeAiDecisionsRuntime.GetKeepValue(c, owner)) * 0.35d;
         return (estimate with { Score = estimate.Score + value - cost, Approximation = "按公开原始失甲量估算盟友护甲收益，并扣除自己实际两张最低保留价值手牌。" }, payment.TargetSeat);
     }
 
-    internal PromptChoice SelectAiMouXiayuanCost(PendingDecision p, ProgramSkillFrame f) => p.Choices.Where(c => c.Parameters.GetValueOrDefault("program-action") == "select-owned-cards").OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Cards[0]).First();
-    SkillProgramStepOutcome global::CardGame.Core.IMouYuJinHost.Xiayuan(ProgramSkillFrame f) => ResolveMouXiayuan(f);
-    SkillProgramStepOutcome global::CardGame.Core.IMouYuJinHost.Jieyue(ProgramSkillFrame f) => ResolveMouJieyue(f);
+    internal PromptChoice SelectAiMouXiayuanCost(PendingDecision p, ProgramSkillFrame f) => p.Choices.Where(c => c.Parameters.GetValueOrDefault("program-action") == "select-owned-cards").OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Cards[0]).First();
+    SkillProgramStepOutcome IMouYuJinHost.Xiayuan(ProgramSkillFrame f) => ResolveMouXiayuan(f);
+    SkillProgramStepOutcome IMouYuJinHost.Jieyue(ProgramSkillFrame f) => ResolveMouJieyue(f);
 }

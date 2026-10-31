@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOtherParticipantHealthReplacementRuntime
 {
-    internal bool TryGetOtherParticipantHpReplacement(global::CardGame.Core.GameEngine.IDamageAttempt attack, out CardUseEffectSource source)
+    internal bool TryGetOtherParticipantHpReplacement(GameEngine.IDamageAttempt attack, out CardUseEffectSource source)
     {
         if (_coreGuanduGeneralQualificationOperations.TryGetGuanduIncomingHpReplacement(attack, out source))
             return true;

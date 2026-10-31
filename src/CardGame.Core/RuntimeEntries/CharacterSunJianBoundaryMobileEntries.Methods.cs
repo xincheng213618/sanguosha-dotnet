@@ -2,13 +2,13 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterSunJianBoundaryMobileEntries
 {
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileSunJianPolu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginMobileSunJianPolu(supplied);
+    internal SkillProgramStepOutcome BeginMobileSunJianPolu(ProgramSkillFrame supplied) => _resolve().BeginMobileSunJianPolu(supplied);
     internal void ContinueMobileSunJianPolu(long id) => _resolve().ContinueMobileSunJianPolu(id);
-    internal bool KeepMobileSunJianPolu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().KeepMobileSunJianPolu(frame);
-    internal int MobileSunJianInvocationCount(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().MobileSunJianInvocationCount(frame);
-    internal bool ProveMobileSunJianPoluRecovery(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().ProveMobileSunJianPoluRecovery(frame, recovery);
+    internal bool KeepMobileSunJianPolu(ProgramSkillFrame frame) => _resolve().KeepMobileSunJianPolu(frame);
+    internal int MobileSunJianInvocationCount(ProgramSkillFrame frame) => _resolve().MobileSunJianInvocationCount(frame);
+    internal bool ProveMobileSunJianPoluRecovery(ProgramSkillFrame frame, RecoveryReplacementFrame recovery) => _resolve().ProveMobileSunJianPoluRecovery(frame, recovery);
     internal bool ResumeMobileSunJianPolu(long id) => _resolve().ResumeMobileSunJianPolu(id);
-    internal void ReturnMobileSunJianPoluDraw(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnMobileSunJianPoluDraw(frame, outcome);
-    internal bool ReturnMobileSunJianPoluMovement(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ReturnMobileSunJianPoluMovement(frame);
-    internal bool ValidMobileSunJianPolu(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ValidMobileSunJianPolu(frame);
+    internal void ReturnMobileSunJianPoluDraw(ProgramSkillFrame frame, NativeDrawOutcome outcome) => _resolve().ReturnMobileSunJianPoluDraw(frame, outcome);
+    internal bool ReturnMobileSunJianPoluMovement(ProgramSkillFrame frame) => _resolve().ReturnMobileSunJianPoluMovement(frame);
+    internal bool ValidMobileSunJianPolu(ProgramSkillFrame frame) => _resolve().ValidMobileSunJianPolu(frame);
 }

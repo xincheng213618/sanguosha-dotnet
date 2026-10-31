@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
 {
     internal const string GuoZhaoObtainReason = "skill-program.anniversary:pianchong.obtain", GuoZhaoColorDrawReason = "skill-program.anniversary:pianchong.draw", GuoZhaoZunweiDrawReason = "skill-program.anniversary:zunwei.draw";
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryGuoZhaoHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginGuoZhao(f, op);
-    internal CardConversionSource GuoZhaoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryGuoZhaoHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginGuoZhao(f, op);
+    internal CardConversionSource GuoZhaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int GuoZhaoOwnerStart(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().LastOrDefault(e => e.ActorSeat == owner)?.TurnNumber ?? 0;
     internal IEnumerable<AnniversaryGuoZhaoLeaseEvent> GuoZhaoLeases(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Where(e => e.Source.OwnerSeat == owner && e.OwnerStartTurn == GuoZhaoOwnerStart(owner) && e.Turn <= _coreActualTurnProgressTurnNumberAccess._turnNumber);
     internal AnniversaryGuoZhaoLoss? CaptureAnniversaryGuoZhaoLoss(Card card, CardLocation from, CardLocation to, int sequence)
@@ -18,7 +13,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawAnniversaryGuoZhaoLostColor) || from.OwnerSeat is not { } owner || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || from == to)
             return null;
         var leases = GuoZhaoLeases(owner).ToArray();
-        if (leases.Length == 0 || global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card))is not { } red)
+        if (leases.Length == 0 || CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card))is not { } red)
             return null;
         return new(owner, red, GuoZhaoOwnerStart(owner), leases.Max(l => l.FrameId), sequence);
     }
@@ -75,7 +70,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
 
             )
             {
-                var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(c => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c)) == red);
+                var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(c => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c)) == red);
                 if (card is null)
                     continue;
                 _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Hand(f.OwnerSeat), new(GuoZhaoObtainReason));
@@ -142,7 +137,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
     [ProgramAnswer("anniversary-guo-zhao")]
     internal void AnswerGuoZhao(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryGuoZhao: { } r } f || !ValidGuoZhao(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], GuoZhaoChoices(f).Where(x => x.Id == c.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryGuoZhao: { } r } f || !ValidGuoZhao(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], GuoZhaoChoices(f).Where(x => x.Id == c.Id).ToArray()))
             throw new InvalidOperationException("Guo Zhao lost her exact original color or permanent-option menu.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var option = c.Parameters["option"];
@@ -270,7 +265,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
             return false;
         if (!ValidGuoZhao(f) || f.OwnerSeat != player.Seat || paid.Recipients is not [var recipient] || recipient != player.Seat || paid.RequestedCount != r.Amount || paid.Reason != reason)
             throw new InvalidOperationException("Pianchong colored draw lost its exact paid native request.");
-        var candidates = drawPile.Where(c => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(player, c)) == red);
+        var candidates = drawPile.Where(c => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(player, c)) == red);
         material = _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.DrawFromBottom) ? candidates.FirstOrDefault() : candidates.LastOrDefault();
         return true;
     }

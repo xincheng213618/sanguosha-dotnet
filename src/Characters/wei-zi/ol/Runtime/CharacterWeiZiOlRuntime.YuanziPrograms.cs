@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWeiZiOlRuntime
@@ -19,7 +15,7 @@ internal sealed partial class CharacterWeiZiOlRuntime
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
         _corePhysicalMovementFacadesOperations.MoveCards(hand, CardLocation.Hand(active.OwnerSeat), CardLocation.Hand(boundarySeat), new($"skill-program.{(active.SkillId)}.yuanzi-give"), _characterHuangQuanMouOperations.NativeGiveCompletion(active.Id, active.OwnerSeat, boundarySeat, hand.Select(c => c.Id).ToArray(), _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(presentation.Name)}】，将所有手牌（{(hand.Length)}张）交给 {(_coreMatchParticipantsPlayersAccess._players[boundarySeat].Name)}。", active.OwnerSeat, boundarySeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYuanziInvokedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, boundarySeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYuanziInvokedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, boundarySeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return SkillProgramStepOutcome.AwaitChild;
@@ -74,7 +70,7 @@ internal sealed partial class CharacterWeiZiOlRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
         var drawn = _corePhysicalDrawFacadesOperations.DrawCards(owner, 2, true, new($"skill-program.{(active.SkillId)}.yuanzi-draw"));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 的【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】生效：摸两张牌。", active.OwnerSeat, pending.RecipientSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYuanziDamageDrawEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, pending.RecipientSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, Array.AsReadOnly(drawn.ToArray())));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYuanziDamageDrawEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, pending.RecipientSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, Array.AsReadOnly(drawn.ToArray())));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }

@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineAllHandChallengesRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineAllHandChallengesRuntime))]
 internal sealed partial class CoreGameEngineAllHandChallengesEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineAllHandChallengesRuntime> _resolve;
-    private CoreGameEngineAllHandChallengesEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineAllHandChallengesRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineAllHandChallengesRuntime> _resolve;
+    private CoreGameEngineAllHandChallengesEntries(Func<EngineOwners.CoreGameEngineAllHandChallengesRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineAllHandChallengesEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineAllHandChallengesRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineAllHandChallengesEntries Create(Func<EngineOwners.CoreGameEngineAllHandChallengesRuntime> resolve) => new(resolve);
 }

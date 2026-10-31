@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineNativeReturnBridgesRuntime
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineQinglongInsertionEntries _coreQinglongInsertionOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeDyingEntries _coreNativeDyingOperations;
-    internal CoreGameEngineNativeReturnBridgesRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineQinglongInsertionEntries coreQinglongInsertionOperations, global::CardGame.Core.RuntimeEntries.CoreNativeDyingEntries coreNativeDyingOperations)
+    private readonly RuntimeEntries.CoreGameEngineQinglongInsertionEntries _coreQinglongInsertionOperations;
+    private readonly RuntimeEntries.CoreNativeDyingEntries _coreNativeDyingOperations;
+    internal CoreGameEngineNativeReturnBridgesRuntime(RuntimeEntries.CoreGameEngineQinglongInsertionEntries coreQinglongInsertionOperations, RuntimeEntries.CoreNativeDyingEntries coreNativeDyingOperations)
     {
         this._coreQinglongInsertionOperations = coreQinglongInsertionOperations;
         this._coreNativeDyingOperations = coreNativeDyingOperations;

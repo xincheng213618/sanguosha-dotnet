@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterKongShuOlRuntime
@@ -24,7 +20,7 @@ internal sealed partial class CharacterKongShuOlRuntime
         {
             var kind = selection.OutputKind;
             var targets = LeiluanPlayTargets(owner, selection);
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && targets.Count == 0 || kind == CardKind.Peach && targets.Count == 0 || kind == CardKind.Alcohol && !LeiluanAlcoholAllowed(owner, selection.Cards))
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && targets.Count == 0 || kind == CardKind.Peach && targets.Count == 0 || kind == CardKind.Alcohol && !LeiluanAlcoholAllowed(owner, selection.Cards))
                 continue;
             var ids = Array.AsReadOnly(selection.Cards.Select(c => c.Id).Order().ToArray());
             var targetCount = kind == CardKind.Alcohol ? 0 : 1;
@@ -35,7 +31,7 @@ internal sealed partial class CharacterKongShuOlRuntime
                 ConversionSource = selection.Source,
                 SelectableCardIds = ids,
                 SelectableTargetSeats = Array.AsReadOnly(targets.ToArray()),
-                ProgramAiHint = new(0, kind == CardKind.Peach ? 1 : 0, 0, 0, 0, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0, false, false)
+                ProgramAiHint = new(0, kind == CardKind.Peach ? 1 : 0, 0, 0, 0, CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0, false, false)
                 {
                     ValueAdjustment = kind == CardKind.Alcohol ? 10 : 0
                 }
@@ -48,7 +44,7 @@ internal sealed partial class CharacterKongShuOlRuntime
         var kind = selection.OutputKind;
         var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, selection.Cards);
         var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, selection.Cards);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, p, kind, suit, effectiveColor: color, physicalCardIds: selection.Cards.Select(c => c.Id).ToArray())).Select(p => p.Seat).ToArray();
         return kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(owner) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit) ? [owner.Seat] : [];
     }
@@ -60,7 +56,7 @@ internal sealed partial class CharacterKongShuOlRuntime
             return error;
         if (action.ConversionSource is not { } source || action.PlayedCardKind is not { } kind || !IsLeiluanSource(source) || LeiluanSelections(owner, kind, false).SingleOrDefault(s => s.Source == source && s.Cards.Select(c => c.Id).Order().SequenceEqual(ids.Order()))is not { } selection)
             return new(CommandErrorCode.InvalidCard, "累卵的真实连环人数、材料、轮牌名或技能资格已变化。");
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind == CardKind.Peach)
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind == CardKind.Peach)
         {
             if (targets.Count != 1 || !LeiluanPlayTargets(owner, selection).Contains(targets[0]))
                 return new(CommandErrorCode.InvalidTarget, "累卵目标或原生杀次数不合法。");
@@ -117,7 +113,7 @@ internal sealed partial class CharacterKongShuOlRuntime
             throw new InvalidOperationException(invalid.Message);
         var kind = selected.PlayedCardKind!.Value;
         var selection = LeiluanSelections(actor, kind, false).Single(s => s.Source == source && s.Cards.Select(c => c.Id).Order().SequenceEqual(ids.Order()));
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], selection.Cards[0], kind, actor.Seat, physicalCards: selection.Cards, conversionSource: source);
         else if (kind == CardKind.Peach)
             _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(actor, actor, selection.Cards[0], "桃", kind, conversionSource: source, physicalCards: selection.Cards);

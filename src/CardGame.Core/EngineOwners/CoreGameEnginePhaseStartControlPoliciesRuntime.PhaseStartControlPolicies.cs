@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePhaseStartControlPoliciesRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CoreGameEnginePhaseStartControlPoliciesRuntime
         var existing = _coreNationalSkillsOperations.GetSkillBindingShard(recipient).ActiveGrants.Where(g => g.SkillId == skillId).OrderBy(g => g.SourceId.StartsWith("turn:", StringComparison.Ordinal) ? 1 : 0).ThenBy(g => g.SkillInstanceId, StringComparer.Ordinal).FirstOrDefault();
         var instance = existing?.SkillInstanceId ?? $"turn-shared:{(recipient.Seat)}:{(skillId)}";
         recipient.SkillGrants.Grant(new SkillGrant($"{(sourceId)}:{(skillId)}", skillId, instance, sourceId, TurnExpiry: new SkillGrantTurnExpiry(r.ActualTurnNumber, r.ActualTurnOwnerSeat)));
-        var distance = !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(payment.Kind) && !(CardCatalog.Get(payment.Kind).CategoryName == "锦囊牌" && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(payment.EffectiveSuit) && payment.EffectiveSuit != Suit.None);
+        var distance = !CoreNativeCardClassificationsRuntime.IsSlashCard(payment.Kind) && !(CardCatalog.Get(payment.Kind).CategoryName == "锦囊牌" && !CoreNativeCardClassificationsRuntime.IsRedSuit(payment.EffectiveSuit) && payment.EffectiveSuit != Suit.None);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OtherPlayRestrictionGrantedEvent(f.Id, r.PhaseParentFrameId, r.Source, r.GameplayHash, r.ActualTurnNumber, r.ActualTurnOwnerSeat, r.PhaseInstanceId, recipient.Seat, skillId, sourceId, distance, payment.CardId, payment.SequenceBefore, payment.SequenceAfter));
     }
 
@@ -29,7 +25,7 @@ internal sealed partial class CoreGameEnginePhaseStartControlPoliciesRuntime
     {
         if (!_corePhaseStartCardControlOperations.HasExactPhaseStartCardControl(f) || f.PhaseStartCardControl is not { Kind: PhaseStartCardControlKind.StartingEquipment, Stage: PhaseStartCardControlStage.GrantChildren, ArmorAcquired: true, Payment: { } p } r || p.To != CardLocation.Hand(f.OwnerSeat) || p.From.Zone != CardZoneKind.Equipment || _coreEquipmentContentOperations.EquipmentRules.Get(p.Kind).Slot != EquipmentSlot.Armor || f.PendingMovementContinuation is not null)
             throw new InvalidOperationException("Starting equipment control requires its actual paid armor acquisition.");
-        var ban = _turnCardUseEffectsOperations._turnCardUseEffects.GrantActionProhibition(r.ActualTurnNumber, r.ActualTurnOwnerSeat, f.Id, f.InstructionIndex - 1, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash], [CardActionType.Use, CardActionType.Response]);
+        var ban = _turnCardUseEffectsOperations._turnCardUseEffects.GrantActionProhibition(r.ActualTurnNumber, r.ActualTurnOwnerSeat, f.Id, f.InstructionIndex - 1, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash], [CardActionType.Use, CardActionType.Response]);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionProhibitionGrantedEvent(ban));
     }
 
@@ -40,8 +36,8 @@ internal sealed partial class CoreGameEnginePhaseStartControlPoliciesRuntime
         var paid = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PhaseStartCardControlPaidEvent>().Where(e => e.Receipt.ProgramFrameId == grant.ProgramFrameId).ToArray();
         if (paid is not [{ Receipt: var r }] || r.Source != grant.Source || r.GameplayHash != grant.GameplayHash || r.PhaseParentFrameId != grant.PhaseParentFrameId || r.ActualTurnNumber != grant.ActualTurnNumber || r.ActualTurnOwnerSeat != grant.ActualTurnOwnerSeat || r.PhaseInstanceId != grant.PhaseInstanceId || r.GrantedSkillId != grant.SkillId || r.Payment is not { } p || p.CardId != grant.CostCardId || p.SequenceBefore != grant.CostSequenceBefore || p.SequenceAfter != grant.CostSequenceAfter || p.From.OwnerSeat != grant.Source.OwnerSeat)
             return false;
-        var distance = !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) && !(CardCatalog.Get(p.Kind).CategoryName == "锦囊牌" && p.EffectiveSuit != Suit.None && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(p.EffectiveSuit));
-        return distance == grant.DirectedDistanceOne && p.SequenceAfter > p.SequenceBefore && grant.GrantSourceId == $"turn:{(r.ActualTurnNumber)}:{(r.ActualTurnOwnerSeat)}:phase-control:{(r.ProgramFrameId)}:{(r.Source.SkillId)}:{(r.Source.SkillInstanceId)}" && _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.CardId == p.CardId && m.From == p.From && m.To == p.To && m.CardKind == p.Kind && m.Sequence > p.SequenceBefore && m.Sequence <= p.SequenceAfter && m.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePhaseStartCardControlRuntime.PhaseStartControlReason(r.Kind)) == 1;
+        var distance = !CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) && !(CardCatalog.Get(p.Kind).CategoryName == "锦囊牌" && p.EffectiveSuit != Suit.None && !CoreNativeCardClassificationsRuntime.IsRedSuit(p.EffectiveSuit));
+        return distance == grant.DirectedDistanceOne && p.SequenceAfter > p.SequenceBefore && grant.GrantSourceId == $"turn:{(r.ActualTurnNumber)}:{(r.ActualTurnOwnerSeat)}:phase-control:{(r.ProgramFrameId)}:{(r.Source.SkillId)}:{(r.Source.SkillInstanceId)}" && _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.CardId == p.CardId && m.From == p.From && m.To == p.To && m.CardKind == p.Kind && m.Sequence > p.SequenceBefore && m.Sequence <= p.SequenceAfter && m.Reason.Value == CoreGameEnginePhaseStartCardControlRuntime.PhaseStartControlReason(r.Kind)) == 1;
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.DistanceProjection, 50)]
@@ -55,6 +51,6 @@ internal sealed partial class CoreGameEnginePhaseStartControlPoliciesRuntime
         var grants = history.OfType<OtherPlayRestrictionGrantedEvent>().Where(g => g.DirectedDistanceOne && g.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.ActualTurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && g.RecipientSeat == source.Seat && g.Source.OwnerSeat == target.Seat && IsExactOtherPlayRestrictionGrant(g)).ToArray();
         if (grants.Length == 0)
             return original;
-        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-other-play-one", global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"other-play-distance:{(g.ProgramFrameId)}", SkillRuleOperation.Set, 1)).ToArray());
+        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-other-play-one", CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"other-play-distance:{(g.ProgramFrameId)}", SkillRuleOperation.Set, 1)).ToArray());
     }
 }

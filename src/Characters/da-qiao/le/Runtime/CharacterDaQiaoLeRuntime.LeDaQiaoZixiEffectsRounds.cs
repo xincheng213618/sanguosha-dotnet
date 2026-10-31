@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoLeRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     {
         var r = f.ZixiEffects!;
         var old = use.ZixiEffectRounds;
-        if (r.JudgmentCount != 1 || window.Continuation == ProgramCardContinuation.Slash && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || window.Continuation == ProgramCardContinuation.FinalizedTrick && window.TrickContinuation is null || window.Continuation == ProgramCardContinuation.FinalizedSimpleCard && window.SimpleContinuation is null || old is not null && (old.ActionId != r.ActionId || old.Started > 0 || old.Grants.Any(g => g.Source.OwnerSeat == f.OwnerSeat)))
+        if (r.JudgmentCount != 1 || window.Continuation == ProgramCardContinuation.Slash && !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || window.Continuation == ProgramCardContinuation.FinalizedTrick && window.TrickContinuation is null || window.Continuation == ProgramCardContinuation.FinalizedSimpleCard && window.SimpleContinuation is null || old is not null && (old.ActionId != r.ActionId || old.Started > 0 || old.Grants.Any(g => g.Source.OwnerSeat == f.OwnerSeat)))
             throw new InvalidOperationException("Zixi cannot issue another effect without the original accepted native continuation.");
         var simple = window.SimpleContinuation is { } s ? s with
         {
@@ -56,7 +52,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
             return;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, current => current with { ZixiEffectRounds = rounds with { Grants = rounds.Grants.Select(g => g.CurrentTargetSeat == previous ? g with { CurrentTargetSeat = target } : g).ToArray() } });
         foreach (var grant in affected)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZixiExtraEffectRedirectedEvent(useId, a.ActionId, grant.FrameId, f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, use.TargetIndex, previous, target));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZixiExtraEffectRedirectedEvent(useId, a.ActionId, grant.FrameId, f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, use.TargetIndex, previous, target));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 28720)]
@@ -66,9 +62,9 @@ internal sealed partial class CharacterDaQiaoLeRuntime
             return;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { ZixiEffectRounds = r with { Grants = r.Grants.Select(g => g.CurrentTargetSeat == e.PreviousTargetSeat ? g with { CurrentTargetSeat = e.NewTargetSeat } : g).ToArray() } });
     }
-    internal void CaptureZixiExtraEffectAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CaptureZixiExtraEffectAttack(NativeOwners.CardAttackHandle attack)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ZixiEffectRounds: { Started: 0 } rounds, CardAttack: { } original } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || rounds.Native.OriginalAttacks.Any(s => s.TargetIndex == use.TargetIndex))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ZixiEffectRounds: { Started: 0 } rounds, CardAttack: { } original } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || rounds.Native.OriginalAttacks.Any(s => s.TargetIndex == use.TargetIndex))
             return;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { ZixiEffectRounds = rounds with { Native = rounds.Native with { OriginalAttacks = rounds.Native.OriginalAttacks.Append(new(use.TargetIndex, original)).ToArray(), Fangtian = current.Continuations.FangtianHalberd ?? rounds.Native.Fangtian } } });
     }
@@ -106,7 +102,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
         {
             var first = native.OriginalAttacks.SingleOrDefault(s => s.TargetIndex == targetIndex && s.Attack.TargetSeat == grant.CurrentTargetSeat && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(id, s.Attack.TargetSeat));
             // A redirected native target stays redirected; the original issuer,
@@ -122,7 +118,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
             // This one target's extra effect must not restart a Fangtian/full
             // target walker belonging to the card's ordinary resolution.
             _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd = null;
-            _coreCardAttackStateOperations.UpdateCardAttackState(id, _ => global::CardGame.Core.EngineOwners.CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(first.Attack));
+            _coreCardAttackStateOperations.UpdateCardAttackState(id, _ => CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(first.Attack));
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id);
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             _coreNativeSlashUseOperations.ContinueSlashDefense(attack);

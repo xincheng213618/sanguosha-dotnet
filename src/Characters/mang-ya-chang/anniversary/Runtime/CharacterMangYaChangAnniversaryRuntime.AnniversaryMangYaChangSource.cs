@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMangYaChangAnniversaryRuntime
 {
     internal bool HasAnniversaryJiedao => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseAnniversaryMangYaChangJiedao);
 
-    internal int JiedaoChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex : 0;
+    internal int JiedaoChainCursor(GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex : 0;
     internal bool FirstActualJiedaoSourceDamage(int seat) => !_corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent).OfType<DamageAppliedEvent>().Any(e => e.Amount > 0 && !e.SourceLess && e.SourceSeat == seat);
-    internal bool TryBeginAnniversaryJiedaoSourceWindow(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool TryBeginAnniversaryJiedaoSourceWindow(GameEngine.IDamageAttempt attack)
     {
         if (!HasAnniversaryJiedao || attack.IsSourceLess || attack.DamageAmountFinalized || attack.DamageWasApplied || attack.DamageAmount <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], AnniversaryJiedaoComposition.Skill) || !FirstActualJiedaoSourceDamage(attack.SourceSeat))
             return false;
@@ -38,7 +34,7 @@ internal sealed partial class CharacterMangYaChangAnniversaryRuntime
         return true;
     }
 
-    internal bool ResumeAnniversaryJiedaoSourceWindow(BeforeDamageProgramWindowFrame window, global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool ResumeAnniversaryJiedaoSourceWindow(BeforeDamageProgramWindowFrame window, GameEngine.IDamageAttempt attack)
     {
         if (window.AnniversaryJiedaoSource is not { } r)
             return false;
@@ -53,7 +49,7 @@ internal sealed partial class CharacterMangYaChangAnniversaryRuntime
     internal bool ValidJiedaoOrigin(AnniversaryJiedaoSourceReceipt r) => r.Source.SkillId == AnniversaryJiedaoComposition.Skill && r.Source.BindingId == AnniversaryJiedaoComposition.Choose && _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash == r.Hash && r.MaximumBonus > 0 && r.OriginalAmount > 0 && r.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryJiedaoWindowIssuedEvent>().Count(e => e.Receipt == r) == 1;
     internal bool ValidJiedaoGrant(AnniversaryJiedaoGrant g) => ValidJiedaoOrigin(g.Origin) && g.Bonus >= 0 && g.Bonus <= g.Origin.MaximumBonus && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryJiedaoChosenEvent>().Count(e => e.Grant == g) == 1;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 44400)]
-    internal int JiedaoSourceDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int JiedaoSourceDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (!HasAnniversaryJiedao || attack.IsSourceLess)
             return 0;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBaoXinOlRuntime
@@ -62,7 +58,7 @@ internal sealed partial class CharacterBaoXinOlRuntime
     [ProgramAnswer("bao-xin")]
     internal void AnswerBaoXin(PromptChoice chosen)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BaoXin: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == BaoXinStage.Mode ? f.OwnerSeat : r.Holder) || !BaoXinChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BaoXin: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == BaoXinStage.Mode ? f.OwnerSeat : r.Holder) || !BaoXinChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
             throw new InvalidOperationException("Yimou requires its exact current private chooser and original choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -83,7 +79,7 @@ internal sealed partial class CharacterBaoXinOlRuntime
                 return;
             }
 
-            var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)).OrderBy(c => c.Id).ToArray();
+            var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)).OrderBy(c => c.Id).ToArray();
             if (pool.Length == 0 || !_coreMatchParticipantsPlayersAccess._players[r.Holder].IsAlive)
             {
                 FinishBaoXin(f);

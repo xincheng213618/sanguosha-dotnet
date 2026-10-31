@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFaZhengMouMobileRuntime
 {
     internal bool HasMouFaZhengCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.TakeMouFaZhengXuanhuoGain);
 
-    internal static CardConversionSource MouFaZhengSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_fa_zheng_mou_mobile_MouFaZhengLedger.MouFaZhengSource(f);
+    internal static CardConversionSource MouFaZhengSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_fa_zheng_mou_mobile_MouFaZhengLedger.MouFaZhengSource(f);
     internal IEnumerable<MouFaZhengMarkEvent> MouFaZhengMarks() => _coreProgramEventHistoryOperations.ProgramEventHistory<MouFaZhengMarkEvent>().Where(m => !_coreProgramEventHistoryOperations.ProgramEventHistory<MouFaZhengRemovedEvent>().Any(e => e.MarkId == m.MarkId));
     internal int MouFaZhengExtracted(long mark) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouFaZhengObtainedEvent>().Where(e => e.MarkId == mark).Sum(e => e.Actual);
     internal int MouFaZhengReceived(long mark) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouFaZhengActualGainEvent>().Count(e => e.MarkId == mark);
     internal bool IsLiveMouFaZhengSource(MouFaZhengMarkEvent mark) => _coreMatchParticipantsPlayersAccess._players[mark.Source.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[mark.TargetSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[mark.Source.OwnerSeat], MouFaZhengComposition.Xuanhuo) && _contentRegistryOperations._contentRegistry.GetSkill(mark.Source.SkillId).Program?.GameplayHash == mark.GameplayHash;
-    internal static bool IsMouFaZhengGainTrigger(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_fa_zheng_mou_mobile_MouFaZhengLedger.IsMouFaZhengGainTrigger(t);
+    internal static bool IsMouFaZhengGainTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_fa_zheng_mou_mobile_MouFaZhengLedger.IsMouFaZhengGainTrigger(t);
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 31800)]
     internal void SynchronizeMouFaZhengMarks()
     {

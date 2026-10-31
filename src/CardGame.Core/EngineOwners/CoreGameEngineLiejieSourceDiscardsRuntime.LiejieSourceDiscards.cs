@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
 {
     internal long LiejieMoveSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static string LiejieDiscardReason(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_LiejieSourceDiscards.LiejieDiscardReason(frame);
+    internal static string LiejieDiscardReason(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_Core_LiejieSourceDiscards.LiejieDiscardReason(frame);
     internal bool IsLiejieDiscardDestination(CardMovementRecord movement) => movement.To == CardLocation.DiscardPile || movement.From.Zone == CardZoneKind.Equipment && movement.To == CardLocation.OutsideGame && (_coreCardAttackStateOperations.GetAttackCard(movement.CardId).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(movement));
     internal bool IsAtomicLiejieCostMove(ProgramSkillFrame frame, string sourceBind)
     {
@@ -36,7 +32,7 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
         {
             if (_cardZonesOperations._cardZones.GetLocation(id) != selectedLocations[i])
                 throw new InvalidOperationException("Liejie cost left its original HE source.");
-            return global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _cardZonesOperations._cardZones.CardsAt(selectedLocations[i]).Single(c => c.Id == id)));
+            return CoreNativeCardClassificationsRuntime.IsRedSuit(_coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _cardZonesOperations._cardZones.CardsAt(selectedLocations[i]).Single(c => c.Id == id)));
         }).Count(value => value);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramLiejieCostColorFrozenEvent(frame.Id, sourceBind, frame.SkillInstanceId, frame.GameplayHash, selectedIds.Count, red, LiejieMoveSequence));
     }
@@ -46,7 +42,7 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
         if (frame.TriggerId is null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0 } context || context.OwnerSeat != frame.OwnerSeat || context.TargetSeat != frame.OwnerSeat || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || frame.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.GameplayHash)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.TriggerWindow != context.Window || parent.TargetSeat != frame.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(f => f.Id == parent.ParentFrameId)is not { } damage || damage.Id != context.DamageFrameId || damage.SourceSeat != parent.SourceSeat || damage.TargetSeat != frame.OwnerSeat || damage.Amount != context.Amount)
+        if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.TriggerWindow != context.Window || parent.TargetSeat != frame.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(f => f.Id == parent.ParentFrameId)is not { } damage || damage.Id != context.DamageFrameId || damage.SourceSeat != parent.SourceSeat || damage.TargetSeat != frame.OwnerSeat || damage.Amount != context.Amount)
             return false;
         // Native children may own the current attack. The original applied damage
         // stays tied to its immutable requested fact and live outer damage frame.
@@ -173,7 +169,7 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
                 _characterBianFuRenOlOperations.RecordBianFuRenForeignDiscardProducer(movement, frame.OwnerSeat, frame.Id);
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(active with { LiejieDiscardPending = active.LiejieDiscardPending!with { BatchId = batch, After = LiejieMoveSequence } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramLiejieSourceDiscardEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, draft.SourceSeat, records.Count, Array.AsReadOnly(ids)));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramLiejieSourceDiscardEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, draft.SourceSeat, records.Count, Array.AsReadOnly(ids)));
         });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
@@ -230,7 +226,7 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
         }
 
         var moves = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > draft.Before && m.Sequence <= draft.After && m.Reason.Value == LiejieDiscardReason(frame)).ToArray();
-        if (draft.SelectedIds.Count == 0 || draft.BatchId is null || draft.After <= draft.Before || draft.After > LiejieMoveSequence || frame.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != draft.SourceSeat || moves.Length != draft.SelectedIds.Count || !moves.Select(m => m.CardId).Order().SequenceEqual(draft.SelectedIds.Order()) || moves.Any(m => m.From != draft.CandidateLocations[draft.CandidateIds.ToList().IndexOf(m.CardId)] || !IsLiejieDiscardDestination(m)) || history.OfType<ProgramLiejieSourceDiscardEvent>().Where(e => e.FrameId == frame.Id).ToArray()is not [var paid] || paid.SourceSeat != draft.SourceSeat || paid.OwnerSeat != frame.OwnerSeat || paid.SkillId != frame.SkillId || paid.BindingId != global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || paid.DiscardCount != moves.Length || !paid.DiscardedCardIds.SequenceEqual(draft.SelectedIds))
+        if (draft.SelectedIds.Count == 0 || draft.BatchId is null || draft.After <= draft.Before || draft.After > LiejieMoveSequence || frame.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != draft.SourceSeat || moves.Length != draft.SelectedIds.Count || !moves.Select(m => m.CardId).Order().SequenceEqual(draft.SelectedIds.Order()) || moves.Any(m => m.From != draft.CandidateLocations[draft.CandidateIds.ToList().IndexOf(m.CardId)] || !IsLiejieDiscardDestination(m)) || history.OfType<ProgramLiejieSourceDiscardEvent>().Where(e => e.FrameId == frame.Id).ToArray()is not [var paid] || paid.SourceSeat != draft.SourceSeat || paid.OwnerSeat != frame.OwnerSeat || paid.SkillId != frame.SkillId || paid.BindingId != CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || paid.DiscardCount != moves.Length || !paid.DiscardedCardIds.SequenceEqual(draft.SelectedIds))
             throw new InvalidOperationException("Paid Liejie continuation lost its original physical HE invoice.");
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
         if (index + 1 < _resolutionStackOperations._resolutionStack.Count && !LiejieSourceDiscardFirstChild(frame, _resolutionStackOperations._resolutionStack[index + 1]))

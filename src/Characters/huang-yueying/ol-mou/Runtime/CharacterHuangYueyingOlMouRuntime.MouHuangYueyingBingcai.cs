@@ -1,19 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangYueyingOlMouRuntime
 {
     internal const string MouLixianSkill = "mou-ol:lixian", MouBingcaiSkill = "mou-ol:bingcai";
-    internal static CardConversionSource MouHuangYueyingSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huang_yueying_ol_mou_MouHuangYueyingBingcai.MouHuangYueyingSource(f);
-    internal static bool IsMouHuangYueyingDamageCardKind(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huang_yueying_ol_mou_MouHuangYueyingBingcai.IsMouHuangYueyingDamageCardKind(kind);
+    internal static CardConversionSource MouHuangYueyingSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_huang_yueying_ol_mou_MouHuangYueyingBingcai.MouHuangYueyingSource(f);
+    internal static bool IsMouHuangYueyingDamageCardKind(CardKind kind) => RuntimeSkills.RuntimeRules_huang_yueying_ol_mou_MouHuangYueyingBingcai.IsMouHuangYueyingDamageCardKind(kind);
     internal CardKind MouHuangYueyingOwnedKind(CharacterState owner, Card card) => _coreActionQueriesOperations.GetProgramCardIdentityMatches(owner, card).FirstOrDefault()?.Identity.OutputKind ?? card.Kind;
-    SkillProgramStepOutcome global::CardGame.Core.IMouHuangYueyingHost.ResolveMouHuangYueyingLixian(ProgramSkillFrame frame) => BeginMouLixian(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IMouHuangYueyingHost.ResolveMouHuangYueyingBingcai(ProgramSkillFrame frame) => BeginMouBingcai(frame);
+    SkillProgramStepOutcome IMouHuangYueyingHost.ResolveMouHuangYueyingLixian(ProgramSkillFrame frame) => BeginMouLixian(frame);
+    SkillProgramStepOutcome IMouHuangYueyingHost.ResolveMouHuangYueyingBingcai(ProgramSkillFrame frame) => BeginMouBingcai(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28961)]
     internal bool CanOfferMouBingcai(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouHuangYueyingBingcai) || candidate.SkillId == MouBingcaiSkill && candidate.BindingId == "first-basic-recast" && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && TryGetMouBingcaiFirstBasic(context, out var use, out _) && _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]).ProgramInstances.Where(i => i.SkillId == MouBingcaiSkill).OrderBy(i => i.SkillInstanceId, StringComparer.Ordinal).FirstOrDefault()?.SkillInstanceId == candidate.SkillInstanceId && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouBingcaiStartedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.UseId == use.Id) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat])).Any();
     internal SkillProgramStepOutcome BeginMouBingcai(ProgramSkillFrame supplied)
@@ -52,7 +49,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
             choices.Add(C("cancel", "取消并才"));
         }
         else if (r.Stage == MouBingcaiStage.AddNameChoice && IsPaidMouBingcai(f))
-            choices.AddRange(global::CardGame.Core.EngineOwners.CharacterHuangYueyingOlMouDefinitions.MouLixianAdditionalNames.Except(MouLixianAddedNames(f.OwnerSeat)).Select(kind => C("add-name", $"为理贤添加【{(CardCatalog.Get(kind).DisplayName)}】", kind: kind)));
+            choices.AddRange(CharacterHuangYueyingOlMouDefinitions.MouLixianAdditionalNames.Except(MouLixianAddedNames(f.OwnerSeat)).Select(kind => C("add-name", $"为理贤添加【{(CardCatalog.Get(kind).DisplayName)}】", kind: kind)));
         return Array.AsReadOnly(choices.ToArray());
     }
 
@@ -72,7 +69,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
     [ProgramAnswer("mou-bingcai")]
     internal void AnswerMouBingcai(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouBingcai: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouBingcaiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouBingcai: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouBingcaiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Bingcai cannot answer a foreign, stale or unpublished material/name choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["branch"] == "cancel")
@@ -140,7 +137,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
                 IssueMouBingcaiExtraEffect(f);
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
             r = f.MouBingcai!;
-            if (r.IsTrick && global::CardGame.Core.EngineOwners.CharacterHuangYueyingOlMouDefinitions.MouLixianAdditionalNames.Except(MouLixianAddedNames(f.OwnerSeat)).Any() && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeWinnerAccess._winner == Winner.None)
+            if (r.IsTrick && CharacterHuangYueyingOlMouDefinitions.MouLixianAdditionalNames.Except(MouLixianAddedNames(f.OwnerSeat)).Any() && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeWinnerAccess._winner == Winner.None)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouBingcai = r with { Stage = MouBingcaiStage.AddNameChoice } });
                 PublishMouBingcai(f);

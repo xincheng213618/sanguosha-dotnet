@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeLiangMouRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
             throw new InvalidOperationException("Zhitian lost its once-paid deck replacement and owning FireAttack.");
         if (_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id))
             return;
-        var target = global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use);
+        var target = CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use);
         var allowed = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FireAttackResolvedEvent(id, use.SourceSeat, target, revealedId, receipt.RevealedSuit, receipt.CardId, allowed));
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, current => current with { MouZhitianPayment = null, FireAttackSelection = null });

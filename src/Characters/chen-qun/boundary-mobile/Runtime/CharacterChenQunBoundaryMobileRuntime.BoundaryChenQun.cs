@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenQunBoundaryMobileRuntime
 {
-    internal static CardConversionSource BoundaryDingpinSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource BoundaryDingpinSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool BoundaryDingpinActiveTurn(int turn, int owner) => turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && owner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
     internal bool BoundaryDingpinCanTarget(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryDingpinTargetBannedEvent>().Any(e => e.Owner == owner && e.Target == target && BoundaryDingpinActiveTurn(e.Turn, e.TurnOwner));
     internal bool BoundaryDingpinCanDiscard(int owner, Card card)
     {
-        var category = global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind);
+        var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind);
         var mask = 1 << (int)category;
         if (_coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.ActorSeat == owner && BoundaryDingpinActiveTurn(e.TurnNumber, e.TurnOwnerSeat) && (e.CardCategoryMask & mask) != 0))
             return false;
@@ -21,7 +17,7 @@ internal sealed partial class CharacterChenQunBoundaryMobileRuntime
             {
                 if (_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryDingpinHeartExceptionEvent>().Any(e => e.Owner == owner && e.InvocationId == discard.InvocationId && e.CardId == material.CardId && e.CostSequence == material.CompletionSequence && BoundaryDingpinActiveTurn(e.Turn, e.TurnOwner)))
                     continue;
-                if (global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId).Kind) == category)
+                if (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId).Kind) == category)
                     return false;
             }
 
@@ -30,15 +26,15 @@ internal sealed partial class CharacterChenQunBoundaryMobileRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 53600, SkillProgramEffectOp.PrepareBoundaryChenQunDingpin)]
     internal bool CanActivateBoundaryDingpin(ProgramActivationLegalityContext c) => c.Owner.IsAlive && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == c.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == c.OwnerSeat;
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryChenQunHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.PrepareBoundaryChenQunDingpin ? PrepareBoundaryDingpin(f) : ResolveBoundaryDingpin(f);
-    bool global::CardGame.Core.IBoundaryChenQunSelection.CanDiscard(int owner, Card card) => BoundaryDingpinCanDiscard(owner, card);
-    bool global::CardGame.Core.IBoundaryChenQunSelection.CanTarget(int owner, int target) => BoundaryDingpinCanTarget(owner, target);
+    SkillProgramStepOutcome IBoundaryChenQunHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.PrepareBoundaryChenQunDingpin ? PrepareBoundaryDingpin(f) : ResolveBoundaryDingpin(f);
+    bool IBoundaryChenQunSelection.CanDiscard(int owner, Card card) => BoundaryDingpinCanDiscard(owner, card);
+    bool IBoundaryChenQunSelection.CanTarget(int owner, int target) => BoundaryDingpinCanTarget(owner, target);
     internal SkillProgramStepOutcome PrepareBoundaryDingpin(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.BoundaryChenQunDingpin is not null || f.TriggerId is not null || f.ActivationId != BoundaryChenQunComposition.Activation || f.InstructionIndex != 1 || f.SelectedCardIds is not [var id] || f.SelectedTargetSeats is not [var target] || !BoundaryDingpinCanTarget(f.OwnerSeat, target) || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != f.OwnerSeat || _cardZonesOperations._cardZones.GetLocation(id)is not { Zone: CardZoneKind.Hand or CardZoneKind.Equipment, OwnerSeat: { } owner } from || owner != f.OwnerSeat || !BoundaryDingpinCanDiscard(f.OwnerSeat, _coreAdvancedLifecycleOperations.GetAdvancedCard(id)))
             throw new InvalidOperationException("Dingpin requires one presently unused/undiscarded category, its own physical HE cost and a legal actual-Play target.");
-        var r = new BoundaryDingpinReceipt(BoundaryDingpinSource(f), f.GameplayHash, phase, target, id, from, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
+        var r = new BoundaryDingpinReceipt(BoundaryDingpinSource(f), f.GameplayHash, phase, target, id, from, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { BoundaryChenQunDingpin = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryDingpinPreparedEvent(f.Id, r.Source, r.Hash, phase, target, id, from, r.Category, r.Before));
         return SkillProgramStepOutcome.Continue;
@@ -70,7 +66,7 @@ internal sealed partial class CharacterChenQunBoundaryMobileRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryDingpinHeartExceptionEvent(f.Id, f.OwnerSeat, r.Phase.TurnNumber, r.Phase.ActualTurnOwnerSeat, paid.Invocation.InvocationId, r.CostId, paid.Material.CompletionSequence));
         if (!black)
             return SkillProgramStepOutcome.Continue;
-        return _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, r.Target, count, global::CardGame.Core.EngineOwners.CharacterChenQunBoundaryMobileDefinitions.BoundaryDingpinDrawReason);
+        return _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, r.Target, count, CharacterChenQunBoundaryMobileDefinitions.BoundaryDingpinDrawReason);
     }
 
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveBoundaryChenQunDingpin)]
@@ -78,7 +74,7 @@ internal sealed partial class CharacterChenQunBoundaryMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.BoundaryChenQunDingpin;
-        if (r is not { Stage: BoundaryDingpinStage.Drawing, Draw: null, Judgment.Suit: Suit.Spade or Suit.Club } || f.InstructionIndex != 5 || f.NativeDraw is not null || outcome.RecipientSeat != r.Target || outcome.RequestedCount != r.Requested || outcome.SequenceBefore > outcome.SequenceAfter || outcome.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.ActualDrawIds.Count > r.Requested || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.Target) && m.Reason == global::CardGame.Core.EngineOwners.CharacterChenQunBoundaryMobileDefinitions.BoundaryDingpinDrawReason).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
+        if (r is not { Stage: BoundaryDingpinStage.Drawing, Draw: null, Judgment.Suit: Suit.Spade or Suit.Club } || f.InstructionIndex != 5 || f.NativeDraw is not null || outcome.RecipientSeat != r.Target || outcome.RequestedCount != r.Requested || outcome.SequenceBefore > outcome.SequenceAfter || outcome.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.ActualDrawIds.Count > r.Requested || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.Target) && m.Reason == CharacterChenQunBoundaryMobileDefinitions.BoundaryDingpinDrawReason).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
             throw new InvalidOperationException("Dingpin received a different or repeated native bounded-HP draw request.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryChenQunDingpin = r with { Stage = BoundaryDingpinStage.DrawChildren, Draw = outcome }, PendingMovementContinuation = new(r.Target, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryDingpinDrawReturnedEvent(f.Id, r.Target, r.Requested, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));

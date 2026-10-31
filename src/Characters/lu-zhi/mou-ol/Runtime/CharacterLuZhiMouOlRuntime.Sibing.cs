@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuZhiMouOlRuntime
 {
     internal const string MouLzDiscard = "skill-program.mou-ol:sibing.discard", MouLzDraw = "skill-program.mou-ol:liance.draw";
-    SkillProgramStepOutcome global::CardGame.Core.IMouLuZhiOlHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouLz(f, op);
-    internal CardConversionSource MouLzSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal static bool IsMouLzDamageCard(CardKind k) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(k) || k is CardKind.Duel or CardKind.FireAttack or CardKind.BarbarianAssault or CardKind.ArrowBarrage or CardKind.UnexpectedAssault or CardKind.AgainstCurrent or CardKind.WumiaoFlood or CardKind.Lightning;
+    SkillProgramStepOutcome IMouLuZhiOlHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouLz(f, op);
+    internal CardConversionSource MouLzSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static bool IsMouLzDamageCard(CardKind k) => CoreNativeCardClassificationsRuntime.IsSlashCard(k) || k is CardKind.Duel or CardKind.FireAttack or CardKind.BarbarianAssault or CardKind.ArrowBarrage or CardKind.UnexpectedAssault or CardKind.AgainstCurrent or CardKind.WumiaoFlood or CardKind.Lightning;
     internal bool MouLzPressAvailable(int owner) => !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlPressUsedEvent>().Any(e => e.Owner == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
     internal CardUseFrame? MouLzContextUse(ProgramSkillWindowContext? context) => context?.CardUse is { } c && _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } a } use && a.ActionId == c.CardActionId ? use : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 32900, SkillProgramEffectOp.ResolveMouLuZhiSibingPress, SkillProgramEffectOp.ResolveMouLuZhiSibingRetaliation)]
@@ -131,7 +128,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     [ProgramAnswer("mou-lu-zhi-ol")]
     internal void AnswerMouLz(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLuZhiOl: { } r } f || !ValidMouLz(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouLuZhiOlStage.TargetRed ? r.TargetSeat : f.OwnerSeat) || !MouLzChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLuZhiOl: { } r } f || !ValidMouLz(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouLuZhiOlStage.TargetRed ? r.TargetSeat : f.OwnerSeat) || !MouLzChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Lu Zhi requires the exact current private chooser, cost and native target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -284,10 +281,10 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         }
 
         var need = r.Stage == MouLuZhiOlStage.Red ? 1 : r.Stage == MouLuZhiOlStage.Black ? 1 : r.Required;
-        if (r.Stage == MouLuZhiOlStage.TargetRed && MouLzCards(actor, true, true).Count < need || r.Stage == MouLuZhiOlStage.Red && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[r.TargetSeat]))
+        if (r.Stage == MouLuZhiOlStage.TargetRed && MouLzCards(actor, true, true).Count < need || r.Stage == MouLuZhiOlStage.Red && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[r.TargetSeat]))
             return p.Choices.Single(c => c.Parameters["branch"] == "decline");
         if (r.Selected.Count >= need)
             return p.Choices.First(c => c.Parameters["branch"] == "confirm");
-        return p.Choices.Where(c => c.Parameters["branch"] == "card" && !r.Selected.Contains(c.Cards.Single())).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[actor])).FirstOrDefault() ?? p.Choices.Single(c => c.Parameters["branch"] == "decline");
+        return p.Choices.Where(c => c.Parameters["branch"] == "card" && !r.Selected.Contains(c.Cards.Single())).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[actor])).FirstOrDefault() ?? p.Choices.Single(c => c.Parameters["branch"] == "decline");
     }
 }

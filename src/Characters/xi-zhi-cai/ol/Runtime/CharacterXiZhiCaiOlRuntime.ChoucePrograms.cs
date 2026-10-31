@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiZhiCaiOlRuntime
@@ -12,7 +7,7 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
-        if (f.Chouce is not null || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.ParentFrameId != window.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
+        if (f.Chouce is not null || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.ParentFrameId != window.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("Chouce needs its exact actual after-damage point candidate.");
         var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
         if (!attack.DamageWasApplied || attack.TargetSeat != f.OwnerSeat || c.OccurrenceIndex < 0 || c.OccurrenceIndex >= attack.DamageAmount)
@@ -100,7 +95,7 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         var p = f.Chouce!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ChouceChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ChouceChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Chouce lost its actual chooser authority.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)

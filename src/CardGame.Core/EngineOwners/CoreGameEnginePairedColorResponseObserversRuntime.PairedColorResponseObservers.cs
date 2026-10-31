@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePairedColorResponseObserversRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CoreGameEnginePairedColorResponseObserversRuntime
     internal string PairedColorPaidReason(ProgramPairedColorDispositionReceipt r) => r.Obtain ? "skill-program.paired-color-response.obtain" : "skill-program.paired-color-response.discard";
     internal bool ValidPairedColorDispositionReceipt(ProgramSkillFrame f)
     {
-        if (f.PairedColorDisposition is not { } r || !_corePairedColorResponsesOperations.ExactPairedColorDispositionParent(f, out _, out var pair, out var counterpart) || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.Pair != pair || r.CounterpartSeat != counterpart || !Enum.IsDefined(r.Stage) || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects[0].StateId != r.StateId)
+        if (f.PairedColorDisposition is not { } r || !_corePairedColorResponsesOperations.ExactPairedColorDispositionParent(f, out _, out var pair, out var counterpart) || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.Pair != pair || r.CounterpartSeat != counterpart || !Enum.IsDefined(r.Stage) || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects[0].StateId != r.StateId)
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         if (history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == SkillProgramTriggerWindow.CardResponseCompleted) != 1 || history.OfType<PairedColorDispositionStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var started] || started != new PairedColorDispositionStartedEvent(f.Id, r.Source, r.GameplayHash, r.StateId, pair.ResponseActionId, pair.PairedActionId, counterpart, r.Obtain) || history.OfType<PairedColorDispositionCompletedEvent>().Any(e => e.FrameId == f.Id))
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEnginePairedColorResponseObserversRuntime
         return moves is [var moved] && moved.CardId == id && moved.CardKind == kind && moved.From == from && moved.To == paid.To && moved.Reason.Value == PairedColorPaidReason(r);
     }
 
-    internal bool IsPairedColorDispositionChoice(ProgramSkillFrame f, PendingDecision decision) => f.PairedColorDisposition is { Stage: PairedColorDispositionStage.ChoosingCard } r && ValidPairedColorDispositionReceipt(f) && decision.Kind == DecisionKind.ProgramTrigger && decision.PlayerSeat == f.OwnerSeat && decision.IsPrivate && decision.SkillPrompt?.SkillId == f.SkillId && decision.Choices.Count > 0 && decision.Choices.Count == _corePairedColorResponsesOperations.PairedColorDispositionChoices(f).Count && decision.Choices.Zip(_corePairedColorResponsesOperations.PairedColorDispositionChoices(f)).All(p => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(p.First, p.Second)) && decision.ValidCardIds.SequenceEqual(decision.Choices.SelectMany(c => c.Cards).Distinct()) && decision.ValidTargetSeats.Count == 0 && decision.TargetSeat == r.CounterpartSeat && decision.SourceSeat == f.OwnerSeat && decision.ValidContentIds.Count == 0 && decision.RequiredCardCount == 0 && decision.IncomingCard is null && decision.RequiredCardKind is null;
+    internal bool IsPairedColorDispositionChoice(ProgramSkillFrame f, PendingDecision decision) => f.PairedColorDisposition is { Stage: PairedColorDispositionStage.ChoosingCard } r && ValidPairedColorDispositionReceipt(f) && decision.Kind == DecisionKind.ProgramTrigger && decision.PlayerSeat == f.OwnerSeat && decision.IsPrivate && decision.SkillPrompt?.SkillId == f.SkillId && decision.Choices.Count > 0 && decision.Choices.Count == _corePairedColorResponsesOperations.PairedColorDispositionChoices(f).Count && decision.Choices.Zip(_corePairedColorResponsesOperations.PairedColorDispositionChoices(f)).All(p => CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(p.First, p.Second)) && decision.ValidCardIds.SequenceEqual(decision.Choices.SelectMany(c => c.Cards).Distinct()) && decision.ValidTargetSeats.Count == 0 && decision.TargetSeat == r.CounterpartSeat && decision.SourceSeat == f.OwnerSeat && decision.ValidContentIds.Count == 0 && decision.RequiredCardCount == 0 && decision.IncomingCard is null && decision.RequiredCardKind is null;
 
     internal bool PairedColorDispositionFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {

@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CorePhysicalDrawFacadesRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CorePhysicalDrawFacadesRuntime))]
 internal sealed partial class CorePhysicalDrawFacadesEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CorePhysicalDrawFacadesRuntime> _resolve;
-    private CorePhysicalDrawFacadesEntries(global::System.Func<global::CardGame.Core.EngineOwners.CorePhysicalDrawFacadesRuntime> resolve)
+    private readonly Func<EngineOwners.CorePhysicalDrawFacadesRuntime> _resolve;
+    private CorePhysicalDrawFacadesEntries(Func<EngineOwners.CorePhysicalDrawFacadesRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CorePhysicalDrawFacadesEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CorePhysicalDrawFacadesRuntime> resolve) => new(resolve);
+    internal static CorePhysicalDrawFacadesEntries Create(Func<EngineOwners.CorePhysicalDrawFacadesRuntime> resolve) => new(resolve);
 }

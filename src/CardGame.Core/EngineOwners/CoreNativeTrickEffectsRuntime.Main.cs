@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeTrickEffectsRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
     {
         if (_coreNativeCardEffectDrawsOperations.TryBeginNativeDrawTwo(pending))
             return;
-        var source = _coreMatchParticipantsPlayersAccess._players[global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? pending.SourceSeat];
+        var source = _coreMatchParticipantsPlayersAccess._players[CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? pending.SourceSeat];
         _coreNativeCardUseFramesOperations.SetCardUseStep(pending.ParentFrameId, ResolutionFrameStep.ResolvingEffect);
         var canDraw = source.IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None;
         if (canDraw)
@@ -103,7 +99,7 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
 
     internal void ResolveTargetCardEffect(NullificationWindowFrame pending)
     {
-        var targetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("A target-card effect must retain one target.");
+        var targetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("A target-card effect must retain one target.");
         _coreWushuangTargetCardsOperations.BindWushuangTargetCards(pending, targetSeat);
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         Card targetCard;
@@ -203,7 +199,7 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
             return;
         var source = _coreMatchParticipantsPlayersAccess._players[sourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
-        var targetMoveReason = global::CardGame.Core.EngineOwners.CoreNativeOwnedCardQueriesRuntime.GetTargetCardMoveReason(actionKind, targetCardFromZone.Zone);
+        var targetMoveReason = CoreNativeOwnedCardQueriesRuntime.GetTargetCardMoveReason(actionKind, targetCardFromZone.Zone);
         if (actionKind == LegalActionKind.Dismantlement && _coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(sourceSeat, targetCard, targetCardFromZone, OwnedCardMoveIntent.Discard))
         {
             _coreSequentialTrickTargetsOperations.MoveFinishedTrickCard(resolutionId, effectCard);
@@ -216,14 +212,14 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
         _corePhysicalMovementFacadesOperations.MoveCard(targetCard, targetCardFromZone, CardLocation.Processing, targetMoveReason, disclosure: actionKind == LegalActionKind.Dismantlement ? CardMovementDisclosure.FaceUp : CardMovementDisclosure.FaceDown);
         if (actionKind == LegalActionKind.Dismantlement)
         {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TargetCardDiscardedEvent(resolutionId, source.Seat, target.Seat, targetCardFromZone.Zone, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsPublicTargetZone(targetCardFromZone.Zone) ? targetCard.Id : null, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsPublicTargetZone(targetCardFromZone.Zone) ? publicTargetKind : null));
-            _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(targetCard, CardLocation.DiscardPile, global::CardGame.Core.EngineOwners.CoreNativeOwnedCardQueriesRuntime.GetTargetCardFinishedMoveReason(actionKind, targetCardFromZone.Zone));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TargetCardDiscardedEvent(resolutionId, source.Seat, target.Seat, targetCardFromZone.Zone, CoreNativeCardClassificationsRuntime.IsPublicTargetZone(targetCardFromZone.Zone) ? targetCard.Id : null, CoreNativeCardClassificationsRuntime.IsPublicTargetZone(targetCardFromZone.Zone) ? publicTargetKind : null));
+            _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(targetCard, CardLocation.DiscardPile, CoreNativeOwnedCardQueriesRuntime.GetTargetCardFinishedMoveReason(actionKind, targetCardFromZone.Zone));
             _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(logicalDiscard);
         }
         else
         {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TargetCardTakenEvent(resolutionId, source.Seat, target.Seat, targetCardFromZone.Zone, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsPublicTargetZone(targetCardFromZone.Zone) ? targetCard.Id : null, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsPublicTargetZone(targetCardFromZone.Zone) ? publicTargetKind : null));
-            _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(targetCard, CardLocation.Hand(source.Seat), global::CardGame.Core.EngineOwners.CoreNativeOwnedCardQueriesRuntime.GetTargetCardFinishedMoveReason(actionKind, targetCardFromZone.Zone));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TargetCardTakenEvent(resolutionId, source.Seat, target.Seat, targetCardFromZone.Zone, CoreNativeCardClassificationsRuntime.IsPublicTargetZone(targetCardFromZone.Zone) ? targetCard.Id : null, CoreNativeCardClassificationsRuntime.IsPublicTargetZone(targetCardFromZone.Zone) ? publicTargetKind : null));
+            _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(targetCard, CardLocation.Hand(source.Seat), CoreNativeOwnedCardQueriesRuntime.GetTargetCardFinishedMoveReason(actionKind, targetCardFromZone.Zone));
         }
 
         if (_coreWushuangTargetCardsOperations.TryContinueWushuangTargetCards(resolutionId, effectCard, effectiveCardKind, sourceSeat, targetSeat, actionKind))
@@ -238,20 +234,20 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
             _ => "一张手牌"
         };
         var outcome = actionKind == LegalActionKind.Dismantlement ? $"弃置 {(target.Name)} 的{(targetDescription)}" : $"获得 {(target.Name)} 的{(targetDescription)}";
-        _coreMatchLogOperations.AddLog("CardEffect", global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsPublicTargetZone(targetCardFromZone.Zone) ? $"{(source.Name)} 使用【{(displayName)}】，{(outcome)}。" : $"{(source.Name)} 使用【{(displayName)}】，{(outcome)}（牌面不公开）。", source.Seat, target.Seat);
+        _coreMatchLogOperations.AddLog("CardEffect", CoreNativeCardClassificationsRuntime.IsPublicTargetZone(targetCardFromZone.Zone) ? $"{(source.Name)} 使用【{(displayName)}】，{(outcome)}。" : $"{(source.Name)} 使用【{(displayName)}】，{(outcome)}（牌面不公开）。", source.Seat, target.Seat);
     }
 
     internal void ResolveFireAttackEffect(NullificationWindowFrame pending)
     {
         var source = _coreMatchParticipantsPlayersAccess._players[pending.SourceSeat];
-        var targetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("FireAttack must retain one target.");
+        var targetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("FireAttack must retain one target.");
         if (_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Count == 0)
         {
             SkipUnavailableTargetCardEffect(pending, _coreMatchParticipantsPlayersAccess._players[targetSeat], CardEffectSkipReason.TargetHandEmpty);
             return;
         }
 
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame cardUse || cardUse.Id != pending.ParentFrameId || cardUse.CardId != pending.EffectCardId || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(cardUse) != pending.EffectCardKind || cardUse.SourceSeat != source.Seat || cardUse.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(cardUse).Count || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(cardUse)[cardUse.TargetIndex] != targetSeat)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame cardUse || cardUse.Id != pending.ParentFrameId || cardUse.CardId != pending.EffectCardId || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(cardUse) != pending.EffectCardKind || cardUse.SourceSeat != source.Seat || cardUse.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(cardUse).Count || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(cardUse)[cardUse.TargetIndex] != targetSeat)
         {
             throw new InvalidOperationException("FireAttack lost its current CardUse target.");
         }
@@ -300,7 +296,7 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
         if (_coreNativeSlashTargetDuelOperations.TryResolveNativeSlashTargetDuel(pending))
             return;
         var source = _coreMatchParticipantsPlayersAccess._players[pending.SourceSeat];
-        var targetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Duel must retain one target.");
+        var targetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Duel must retain one target.");
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         var virtualOrigin = _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ParentFrameId)?.SelectedActorDuelOrigin;
         if (virtualOrigin is not null)

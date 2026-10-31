@@ -1,10 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanYuWumiaoRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     internal void AddWumiaoFloodNaturalActions(List<LegalAction> actions, CharacterState actor, IReadOnlyList<Card> playable, int? selectedPhysicalCardId = null)
     {
         foreach (var card in playable.Where(card => card.Kind == CardKind.WumiaoFlood && (selectedPhysicalCardId is null || card.Id == selectedPhysicalCardId) && !_coreCardConversionsOperations.HasProgramCardIdentity(actor, card)))
-            foreach (global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, CardKind.WumiaoFlood, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), enforceUsePermission: true, physicalCardIds: [card.Id]))
+            foreach (GameEngine.ProgramOrdinaryTrickUseOption option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, CardKind.WumiaoFlood, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), enforceUsePermission: true, physicalCardIds: [card.Id]))
                 actions.Add(new LegalAction(option.ActionKind, card.Id, option.TargetSeats.Count == 1 ? option.TargetSeats[0] : null, option.Description, TargetSeats: option.TargetSeats));
     }
 
@@ -31,34 +27,34 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     internal void ResolveWumiaoFloodEffect(NullificationWindowFrame pending)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Id != pending.ParentFrameId || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.WumiaoFlood || pending.ActionKind != LegalActionKind.WumiaoFlood || pending.EffectCardKind != global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || use.WumiaoFlood is not null || global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending)is not { } target || use.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != target || use.Action is not { Type: CardActionType.Use } action)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Id != pending.ParentFrameId || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.WumiaoFlood || pending.ActionKind != LegalActionKind.WumiaoFlood || pending.EffectCardKind != CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || use.WumiaoFlood is not null || CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending)is not { } target || use.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != target || use.Action is not { Type: CardActionType.Use } action)
             throw new InvalidOperationException("Wumiao Flood lost its exact resolved target and owning use.");
         if (!_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
         {
-            _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, _coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending), global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
+            _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, _coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending), CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
             return;
         }
 
         var receipt = new WumiaoFloodReceipt(action.ActionId, pending.Id, target, use.TargetIndex, _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id), WumiaoFloodStage.AwaitingDamage)
         {
-            AwaitingProgramFrameId = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()is { } parent && global::CardGame.Core.EngineOwners.CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(parent) ? parent.Id : null
+            AwaitingProgramFrameId = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()is { } parent && CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(parent) ? parent.Id : null
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(use with { WumiaoFlood = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WumiaoFloodEffectStartedEvent(use.Id, action.ActionId, pending.Id, target, use.TargetIndex, receipt.ExtraEffectOrdinal));
         if (!_coreExtraCardEffectRoundsOperations.IsExtraCardEffectRound(use.Id))
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(use.CardId, global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), use.SourceSeat, target));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(use.CardId, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), use.SourceSeat, target));
         var card = _coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending);
-        global::CardGame.Core.NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle(use.Id, use.SourceSeat, target, card, playedCardKind: CardKind.WumiaoFlood, damageNatureOverride: DamageNature.Thunder, physicalCards: _coreNativeTrickUseOperations.GetCardUsePhysicalCards(use.Id));
+        NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle(use.Id, use.SourceSeat, target, card, playedCardKind: CardKind.WumiaoFlood, damageNatureOverride: DamageNature.Thunder, physicalCards: _coreNativeTrickUseOperations.GetCardUsePhysicalCards(use.Id));
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
 
-    internal bool TryCompleteWumiaoFloodAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryCompleteWumiaoFloodAttack(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { WumiaoFlood: { } receipt } use)
             return false;
-        if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.WumiaoFlood || attack.EffectiveCardKind != global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || use.Action?.ActionId != receipt.ActionId || attack.CardUserSeat != use.SourceSeat || use.TargetIndex != receipt.TargetIndex || _coreDyingCursorRuntimeOperations.ActiveDying is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != use.Id)
+        if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.WumiaoFlood || attack.EffectiveCardKind != CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || use.Action?.ActionId != receipt.ActionId || attack.CardUserSeat != use.SourceSeat || use.TargetIndex != receipt.TargetIndex || _coreDyingCursorRuntimeOperations.ActiveDying is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != use.Id)
             throw new InvalidOperationException("Wumiao Flood lost its completed damage subtree.");
         if (receipt.Stage == WumiaoFloodStage.FinishingAttack)
         {
@@ -104,8 +100,8 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var grains = _coreNativeDamageHandlesOperations.UsesFormalWoodenOx && card.Kind == CardKind.WoodenOx && from == CardLocation.Equipment(r.TargetSeat) ? _cardZonesOperations._cardZones.CardsAt(CardLocation.WoodenOxGrain(r.TargetSeat)).Select(c => new WumiaoFloodGrainMaterial(c.Id, c.Kind, CardLocation.WoodenOxGrain(r.TargetSeat))).ToArray() : [];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        _coreRuntimeOperations.ReplaceRuntimeTop(use with { WumiaoFlood = r with { Stage = WumiaoFloodStage.DiscardChildren, DiscardCardId = cardId, DiscardFrom = from, DiscardPrintedKind = card.Kind, DiscardSequenceBefore = before, DiscardSequenceAfter = before, GrainMaterials = grains, DiscardNativeDestruction = from.Zone == CardZoneKind.Equipment && (card.IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, from, CardLocation.DiscardPile) || _characterDiaoChanLeOperations.IsDiouCarrier(card.Id)) } });
-        _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(r.TargetSeat, r.TargetSeat, card, from, global::CardGame.Core.EngineOwners.CharacterGuanYuWumiaoDefinitions.WumiaoFloodDiscardReason, movement =>
+        _coreRuntimeOperations.ReplaceRuntimeTop(use with { WumiaoFlood = r with { Stage = WumiaoFloodStage.DiscardChildren, DiscardCardId = cardId, DiscardFrom = from, DiscardPrintedKind = card.Kind, DiscardSequenceBefore = before, DiscardSequenceAfter = before, GrainMaterials = grains, DiscardNativeDestruction = from.Zone == CardZoneKind.Equipment && (card.IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, from, CardLocation.DiscardPile) || _characterDiaoChanLeOperations.IsDiouCarrier(card.Id)) } });
+        _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(r.TargetSeat, r.TargetSeat, card, from, CharacterGuanYuWumiaoDefinitions.WumiaoFloodDiscardReason, movement =>
         {
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { WumiaoFlood = current.WumiaoFlood!with { DiscardSequence = movement.Sequence, DiscardTo = movement.To } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WumiaoFloodDiscardPaidEvent(use.Id, r.NullificationFrameId, r.TargetSeat, cardId, from, movement.Sequence));
@@ -142,8 +138,8 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WumiaoFloodDiscardBatchIssuedEvent(use.Id, r.NullificationFrameId, b.BatchId, b.ParentBatchId, b.MovementCount));
     }
 
-    internal static bool WumiaoFloodDiscardEntryMatches(WumiaoFloodDiscardMovement entry, CardMovementRecord movement) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guan_yu_wumiao_WumiaoFlood.WumiaoFloodDiscardEntryMatches(entry, movement);
-    internal bool IsWumiaoFloodPrimaryDiscardMovement(WumiaoFloodReceipt r, CardMovementRecord movement) => movement.Sequence == r.DiscardSequence && movement.CardId == r.DiscardCardId && movement.CardKind == r.DiscardPrintedKind && movement.From == r.DiscardFrom && movement.To == r.DiscardTo && movement.Reason == global::CardGame.Core.EngineOwners.CharacterGuanYuWumiaoDefinitions.WumiaoFloodDiscardReason && (r.DiscardNativeDestruction ? movement.From.Zone == CardZoneKind.Equipment && movement.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(movement.CardId).IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(movement.CardId), movement.From, CardLocation.DiscardPile) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(movement)) : movement.To == CardLocation.DiscardPile || _coreHellMengpoProgramsOperations.IsHellShiyouPaidDiscardMovement(movement, movement.From, global::CardGame.Core.EngineOwners.CharacterGuanYuWumiaoDefinitions.WumiaoFloodDiscardReason));
+    internal static bool WumiaoFloodDiscardEntryMatches(WumiaoFloodDiscardMovement entry, CardMovementRecord movement) => RuntimeSkills.RuntimeRules_guan_yu_wumiao_WumiaoFlood.WumiaoFloodDiscardEntryMatches(entry, movement);
+    internal bool IsWumiaoFloodPrimaryDiscardMovement(WumiaoFloodReceipt r, CardMovementRecord movement) => movement.Sequence == r.DiscardSequence && movement.CardId == r.DiscardCardId && movement.CardKind == r.DiscardPrintedKind && movement.From == r.DiscardFrom && movement.To == r.DiscardTo && movement.Reason == CharacterGuanYuWumiaoDefinitions.WumiaoFloodDiscardReason && (r.DiscardNativeDestruction ? movement.From.Zone == CardZoneKind.Equipment && movement.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(movement.CardId).IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(movement.CardId), movement.From, CardLocation.DiscardPile) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(movement)) : movement.To == CardLocation.DiscardPile || _coreHellMengpoProgramsOperations.IsHellShiyouPaidDiscardMovement(movement, movement.From, CharacterGuanYuWumiaoDefinitions.WumiaoFloodDiscardReason));
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 28510)]
     internal bool AdvanceWumiaoFloodDiscardAi()
     {
@@ -204,7 +200,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             }
             else
                 throw new InvalidOperationException("Wumiao Flood lost its exact effect stage.");
-            global::CardGame.Core.NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(id);
+            NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(id);
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);
             return;
@@ -212,16 +208,16 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     }
 
     internal bool IsWumiaoFloodMovement(CardUseFrame use, CardMovementBatchContext batch) => use.WumiaoFlood is { } r && batch.ParentFrameId == use.Id && batch.AwaitingProgramFrameId == r.AwaitingProgramFrameId && batch.Movements.Count > 0 && (r.Stage == WumiaoFloodStage.DrawingChildren && r.DrawOutcome is { } draw && batch.Movements.All(m => m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter && (draw.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason == CardMoveReasons.Draw || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle)) || r.Stage == WumiaoFloodStage.DiscardChildren && r.DiscardInvoiceSealed && r.DiscardBatches.Any(b => b.BatchId == batch.Id && b.ParentBatchId == batch.ParentBatchId && b.MovementCount == batch.Movements.Count) && batch.Movements.All(m => r.DiscardMovements.Any(e => WumiaoFloodDiscardEntryMatches(e, m))));
-    internal bool IsWumiaoFloodMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame frame) => frame.ResumeWumiaoFloodFrameId == use.Id && frame.Id == frame.Batch.Id && frame.ResumeProgramFrameId is null && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(frame with { ResumeWumiaoFloodFrameId = null }) && IsWumiaoFloodMovement(use, frame.Batch);
+    internal bool IsWumiaoFloodMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame frame) => frame.ResumeWumiaoFloodFrameId == use.Id && frame.Id == frame.Batch.Id && frame.ResumeProgramFrameId is null && !CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(frame with { ResumeWumiaoFloodFrameId = null }) && IsWumiaoFloodMovement(use, frame.Batch);
     internal bool IsWumiaoFloodHpReturn(CardUseFrame use, HpChangedTriggerWindowFrame frame) => use.WumiaoFlood is { Stage: WumiaoFloodStage.DiscardChildren or WumiaoFloodStage.DrawingChildren } && frame.Continuation == PostEventContinuation.WumiaoFlood && frame.ResumeFrameId == use.Id && frame.Change.ParentFrameId == use.Id && frame.CardId is null && frame.CardKind is null;
     internal bool IsWumiaoFloodRecoveryReturn(CardUseFrame use, RecoveryReplacementFrame frame) => frame.ParentFrameId == use.Id && frame.Return == new RecoveryReplacementReturn(PostEventContinuation.WumiaoFlood, use.Id) && IsWumiaoFloodRecoveryAttempt(use, frame.Attempt);
-    internal bool IsWumiaoFloodRecoveryAttempt(CardUseFrame use, RecoveryAttempt attempt) => use.WumiaoFlood is { Stage: WumiaoFloodStage.DiscardChildren, DiscardCardId: { } card, DiscardFrom: { Zone: CardZoneKind.Equipment } from, DiscardSequence: > 0 } r && from.OwnerSeat == r.TargetSeat && r.DiscardInvoiceSealed && attempt.SourceSeat == r.TargetSeat && attempt.TargetSeat == r.TargetSeat && attempt.Amount == 1 && attempt.Completion == new RecoveryAttemptCompletion(RecoveryAttemptProducer.SilverLion, MoveReason: global::CardGame.Core.EngineOwners.CharacterGuanYuWumiaoDefinitions.WumiaoFloodDiscardReason) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == r.DiscardSequence && m.CardId == card && m.CardKind == CardKind.SilverLion && m.From == from && IsWumiaoFloodPrimaryDiscardMovement(r, m));
+    internal bool IsWumiaoFloodRecoveryAttempt(CardUseFrame use, RecoveryAttempt attempt) => use.WumiaoFlood is { Stage: WumiaoFloodStage.DiscardChildren, DiscardCardId: { } card, DiscardFrom: { Zone: CardZoneKind.Equipment } from, DiscardSequence: > 0 } r && from.OwnerSeat == r.TargetSeat && r.DiscardInvoiceSealed && attempt.SourceSeat == r.TargetSeat && attempt.TargetSeat == r.TargetSeat && attempt.Amount == 1 && attempt.Completion == new RecoveryAttemptCompletion(RecoveryAttemptProducer.SilverLion, MoveReason: CharacterGuanYuWumiaoDefinitions.WumiaoFloodDiscardReason) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == r.DiscardSequence && m.CardId == card && m.CardKind == CardKind.SilverLion && m.From == from && IsWumiaoFloodPrimaryDiscardMovement(r, m));
 
     internal void AssertWumiaoFlood(CardUseFrame use)
     {
         if (use.WumiaoFlood is not { } r)
             return;
-        if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.WumiaoFlood || use.Action is not { Type: CardActionType.Use } action || action.ActionId != r.ActionId || action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind || r.TargetIndex != use.TargetIndex || r.TargetIndex < 0 || r.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[r.TargetIndex] != r.TargetSeat || !Enum.IsDefined(r.Stage) || r.ExtraEffectOrdinal < 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<WumiaoFloodEffectStartedEvent>().Count(e => e.UseId == use.Id && e.ActionId == r.ActionId && e.NullificationId == r.NullificationFrameId && e.TargetSeat == r.TargetSeat && e.TargetIndex == r.TargetIndex && e.ExtraEffectOrdinal == r.ExtraEffectOrdinal) != 1)
+        if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.WumiaoFlood || use.Action is not { Type: CardActionType.Use } action || action.ActionId != r.ActionId || action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind || r.TargetIndex != use.TargetIndex || r.TargetIndex < 0 || r.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[r.TargetIndex] != r.TargetSeat || !Enum.IsDefined(r.Stage) || r.ExtraEffectOrdinal < 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<WumiaoFloodEffectStartedEvent>().Count(e => e.UseId == use.Id && e.ActionId == r.ActionId && e.NullificationId == r.NullificationFrameId && e.TargetSeat == r.TargetSeat && e.TargetIndex == r.TargetIndex && e.ExtraEffectOrdinal == r.ExtraEffectOrdinal) != 1)
             throw new InvalidOperationException("Wumiao Flood lost its exact action, target cursor or once-only effect.");
         if (r.Stage != WumiaoFloodStage.AwaitingDamage && _coreProgramEventHistoryOperations.ProgramEventHistory<WumiaoFloodDamageReturnedEvent>().Count(e => e.UseId == use.Id && e.NullificationId == r.NullificationFrameId && e.TargetSeat == r.TargetSeat && e.TargetIndex == r.TargetIndex) != 1)
             throw new InvalidOperationException("Wumiao Flood lost its completed native damage receipt.");

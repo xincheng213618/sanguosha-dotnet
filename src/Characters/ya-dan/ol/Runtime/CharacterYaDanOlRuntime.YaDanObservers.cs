@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYaDanOlRuntime
@@ -22,7 +18,7 @@ internal sealed partial class CharacterYaDanOlRuntime
     {
         if (f.YaDan is not null || f.InstructionIndex is not (0 or 1) || f.TriggerId != "use-next-actual-phase" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.ActualPhaseEnded } context || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is not [{ Op: SkillProgramEffectOp.ResolveQingyaNextActualPhaseUse }])
             return false;
-        return IsIssuedQingyaCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
+        return IsIssuedQingyaCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
     }
 
     internal bool YaDanFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -32,7 +28,7 @@ internal sealed partial class CharacterYaDanOlRuntime
         if (child is CardUseFrame use)
             return r.Stage == QingyaStage.NativeUse && use.QingyaOrigin == r.NativeOrigin && IsIssuedQingyaUse(use.Id);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return r.Stage == QingyaStage.DiscardChildren && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == QingyaDiscardReason && m.From.Zone == CardZoneKind.Hand && m.To == CardLocation.DiscardPile);
+            return r.Stage == QingyaStage.DiscardChildren && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == QingyaDiscardReason && m.From.Zone == CardZoneKind.Hand && m.To == CardLocation.DiscardPile);
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 

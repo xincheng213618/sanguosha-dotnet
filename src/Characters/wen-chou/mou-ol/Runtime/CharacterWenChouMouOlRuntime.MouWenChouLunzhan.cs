@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,11 +8,11 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     internal const string MouWenChouDrawReason = "skill-program.mou-ol:lunzhan.draw", MouWenChouDiscardReason = "skill-program.mou-ol:juejue.discard";
     internal bool HasMouWenChouOl => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouWenChouJuejue) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.UseMouWenChouLunzhan);
 
-    internal static CardConversionSource MouWenChouSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MouWenChouSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool MouWenChouCountUsed(int owner, int count) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouLunzhanIssuedEvent>().Any(e => e.Origin.Source.OwnerSeat == owner && e.Origin.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Origin.MaterialCount == count);
     internal bool MouWenChouTargetBanned(int owner, int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouRewardAcceptedEvent>().Any(e => e.OwnerSeat == owner && e.TargetSeat == target && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
-    SkillProgramStepOutcome global::CardGame.Core.IMouWenChouOlHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.UseMouWenChouLunzhan ? BeginMouWenChouLunzhan(f) : BeginMouWenChouTrigger(f, op);
-    bool global::CardGame.Core.IMouWenChouOlSelection.Target(int owner, int target) => !MouWenChouTargetBanned(owner, target);
+    SkillProgramStepOutcome IMouWenChouOlHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.UseMouWenChouLunzhan ? BeginMouWenChouLunzhan(f) : BeginMouWenChouTrigger(f, op);
+    bool IMouWenChouOlSelection.Target(int owner, int target) => !MouWenChouTargetBanned(owner, target);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 33100, SkillProgramEffectOp.UseMouWenChouLunzhan)]
     internal bool CanActivateMouWenChouLunzhan(ProgramActivationLegalityContext c) => _coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn && c.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && !MouWenChouCountUsed(c.OwnerSeat, c.Activation.MinCards) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != c.OwnerSeat && !MouWenChouTargetBanned(c.OwnerSeat, p.Seat));
     internal bool ValidMouWenChouOl(ProgramSkillFrame f) => f.MouWenChouOl is { } r && r.Source == MouWenChouSource(f) && r.GameplayHash == f.GameplayHash && f.InstructionIndex == 1 && Enum.IsDefined(r.Stage) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f).Op == r.Operation && _coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == f.GameplayHash && e.Operation == r.Operation && e.UseId == (r.Operation == SkillProgramEffectOp.UseMouWenChouLunzhan ? 0 : r.UseId)) == 1 && (r.Operation == SkillProgramEffectOp.UseMouWenChouLunzhan ? f.TriggerId is null && f.ActivationId == r.Source.BindingId && f.WindowContext is null && f.SelectedCardIds.Count is >= 0 and <= 5 && f.SelectedTargetSeats.Count == 1 : f.ActivationId == f.TriggerId && f.WindowContext?.CardUse?.ParentCardUseFrameId == r.UseId);
@@ -29,7 +26,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
             throw new InvalidOperationException("Lunzhan cannot bypass a native material restriction.");
         return card;
     }).ToArray();
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> MouWenChouOptions(ProgramSkillFrame f)
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> MouWenChouOptions(ProgramSkillFrame f)
     {
         var cards = MouWenChouMaterials(f);
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
@@ -74,7 +71,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     internal IReadOnlyList<PromptChoice> MouWenChouChoices(ProgramSkillFrame f)
     {
         var r = f.MouWenChouOl!;
-        PromptChoice Choice(string branch, string label, int? card = null, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption? option = null) => new(new($"mou-wen-chou.{(f.Id)}.{(r.Stage)}.{(branch)}.{(card)}.{(option?.Id.Value)}"), label, card is { } id ? [id] : [], option?.TargetSeats ?? [], new Dictionary<string, string> { ["program-action"] = "mou-wen-chou-ol", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = branch, ["option-id"] = option?.Id.Value ?? "" });
+        PromptChoice Choice(string branch, string label, int? card = null, GameEngine.ProgramOrdinaryTrickUseOption? option = null) => new(new($"mou-wen-chou.{(f.Id)}.{(r.Stage)}.{(branch)}.{(card)}.{(option?.Id.Value)}"), label, card is { } id ? [id] : [], option?.TargetSeats ?? [], new Dictionary<string, string> { ["program-action"] = "mou-wen-chou-ol", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = branch, ["option-id"] = option?.Id.Value ?? "" });
         if (r.Stage == MouWenChouOlStage.Targets)
             return Array.AsReadOnly(MouWenChouOptions(f).Select(o => Choice("duel", o.Description, option: o)).ToArray());
         if (r.Stage == MouWenChouOlStage.Reward)
@@ -110,7 +107,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     [ProgramAnswer("mou-wen-chou-ol")]
     internal void AnswerMouWenChouOl(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouWenChouOl: { } r } f || !ValidMouWenChouOl(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouWenChouOlStage.Discard ? r.TargetSeat : f.OwnerSeat) || !MouWenChouChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouWenChouOl: { } r } f || !ValidMouWenChouOl(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouWenChouOlStage.Discard ? r.TargetSeat : f.OwnerSeat) || !MouWenChouChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Mou Wen Chou requires its current chooser and exact live native option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -154,7 +151,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
         var options = pending.Choices!;
         if (options.Any(c => c.Parameters.GetValueOrDefault("branch") == "draw"))
             return options.First(c => c.Parameters["branch"] == "draw");
-        return options.OrderBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreResponseEntityExchangeOperations.EntityAtCurrentLocation(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[pending.PlayerSeat]) : 0).First();
+        return options.OrderBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreResponseEntityExchangeOperations.EntityAtCurrentLocation(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[pending.PlayerSeat]) : 0).First();
     }
 
     internal bool DrainMouWenChouOl(long id) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);

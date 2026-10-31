@@ -2,5 +2,5 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterDuanWeiOlEntries
 {
-    internal bool AllowsDuanWeiTaohuai(global::CardGame.Core.ProgramTriggerLegalityContext gate) => _resolve().AllowsDuanWeiTaohuai(gate);
+    internal bool AllowsDuanWeiTaohuai(ProgramTriggerLegalityContext gate) => _resolve().AllowsDuanWeiTaohuai(gate);
 }

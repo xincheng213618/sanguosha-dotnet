@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoLeRuntime
@@ -15,8 +11,8 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     internal const string ZixiEffectsObtainReason = "skill-program.le-da-qiao.zixi.obtain";
     internal bool HasZixiEffectsCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZixiUniqueTargetJudgmentEffects);
 
-    internal static CardConversionSource ZixiEffectsSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_da_qiao_le_LeDaQiaoZixiEffects.ZixiEffectsSource(f);
-    internal static bool ZixiEffectsKind(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_da_qiao_le_LeDaQiaoZixiEffects.ZixiEffectsKind(kind);
+    internal static CardConversionSource ZixiEffectsSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_da_qiao_le_LeDaQiaoZixiEffects.ZixiEffectsSource(f);
+    internal static bool ZixiEffectsKind(CardKind kind) => RuntimeSkills.RuntimeRules_da_qiao_le_LeDaQiaoZixiEffects.ZixiEffectsKind(kind);
     internal IReadOnlyList<Card> ZixiJudgmentAreaCards(int target)
     {
         // Native judgment results temporarily share the physical Judgment zone,
@@ -25,7 +21,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
         return Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetJudgment(_coreMatchParticipantsPlayersAccess._players[target]).Where(c => !results.Contains(c.Id)).ToArray());
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IZixiEffectsHost.ResolveZixiUniqueTargetJudgmentEffects(ProgramSkillFrame f) => BeginZixiEffects(f);
+    SkillProgramStepOutcome IZixiEffectsHost.ResolveZixiUniqueTargetJudgmentEffects(ProgramSkillFrame f) => BeginZixiEffects(f);
     internal bool TryGetZixiEffectsUse(int actor, ProgramSkillWindowContext context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window, out int target)
     {
         use = null !;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBaoXinOlRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterBaoXinOlRuntime
             return false;
         if (r.Op == SkillProgramEffectOp.ResolveBaoXinMutao)
         {
-            if (f.SkillId != "ol:mutao" || f.TriggerId is not null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "public-slash-ring" || f.SelectedTargetSeats is not [var holder] || holder != r.Holder || !r.Paid || r.Qualification is not null || r.Pile is not { } pile || pile != new PublicPersistentPileSource(r.Holder, "ol:mutao", "bao-xin:" + f.Id, 0, "bao-xin.mutao." + f.Id) || !IsIssuedBaoXinMutaoPile(pile) || r.Original.Any(c => c.From != CardLocation.Hand(r.Holder) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.EffectiveKind)))
+            if (f.SkillId != "ol:mutao" || f.TriggerId is not null || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "public-slash-ring" || f.SelectedTargetSeats is not [var holder] || holder != r.Holder || !r.Paid || r.Qualification is not null || r.Pile is not { } pile || pile != new PublicPersistentPileSource(r.Holder, "ol:mutao", "bao-xin:" + f.Id, 0, "bao-xin.mutao." + f.Id) || !IsIssuedBaoXinMutaoPile(pile) || r.Original.Any(c => c.From != CardLocation.Hand(r.Holder) || !CoreNativeCardClassificationsRuntime.IsSlashCard(c.EffectiveKind)))
                 return false;
             foreach (var(id, index)in r.Original.Select((c, index) => (c, index)))
                 if (_coreProgramEventHistoryOperations.ProgramEventHistory<BaoXinOriginalEntityEvent>().Count(e => e.FrameId == f.Id && e.Index == index && e.CardId == id.CardId && e.Kind == id.Kind && e.EffectiveKind == id.EffectiveKind && e.From == id.From) != 1)
@@ -34,7 +30,7 @@ internal sealed partial class CharacterBaoXinOlRuntime
         }
         else
         {
-            if (f.SkillId != "ol:yimou" || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "near-damage" || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || r.Qualification is not { } q || r.Holder != q.VictimSeat || BaoXinQualification(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context) != q || r.Pile is not null || r.Original.Count != 0)
+            if (f.SkillId != "ol:yimou" || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "near-damage" || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || r.Qualification is not { } q || r.Holder != q.VictimSeat || BaoXinQualification(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context) != q || r.Pile is not null || r.Original.Count != 0)
                 return false;
             var branch = _coreProgramEventHistoryOperations.ProgramEventHistory<BaoXinYimouBranchEvent>().Where(e => e.FrameId == f.Id).ToArray();
             if (r.Paid ? branch is not [var selected] || selected.Branch != r.Branch || selected.VictimSeat != r.Holder : r.Stage != BaoXinStage.Mode || branch.Length != 0)
@@ -90,7 +86,7 @@ internal sealed partial class CharacterBaoXinOlRuntime
         if (f.BaoXin is not { Paid: true } r || !ValidBaoXin(f))
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => BaoXinMovementMatches(f, m));
+            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => BaoXinMovementMatches(f, m));
         if (child is DamageFrame damage)
             return r.Stage == BaoXinStage.DamageChildren && damage.ParentFrameId == f.Id && f.AttackAttempt is { } attempt && damage.SourceSeat == attempt.SourceSeat && damage.TargetSeat == attempt.TargetSeat && damage.Amount == attempt.DamageAmount;
         if (child is BeforeDamageProgramWindowFrame before)

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiMouMobileRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         var actor = r.Targets[r.Cursor];
         var source = _coreMatchParticipantsPlayersAccess._players[actor];
         var target = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        return source.IsAlive && target.IsAlive && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(source, CardKind.Slash)is not null && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(actor, SkillProgramCardTargetRestriction.SelfOnly) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target) && global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor, target.Seat, kind) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor, kind, CardActionType.Use) && _coreProgramTargetRulesOperations.TargetRules.AllowsSlash(new(source, target, kind, null, null)) && _coreRuleQueriesOperations.CanSpendSlashUse(source, target, ignoresCount: true, kind));
+        return source.IsAlive && target.IsAlive && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(source, CardKind.Slash)is not null && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(actor, SkillProgramCardTargetRestriction.SelfOnly) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target) && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor, target.Seat, kind) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor, kind, CardActionType.Use) && _coreProgramTargetRulesOperations.TargetRules.AllowsSlash(new(source, target, kind, null, null)) && _coreRuleQueriesOperations.CanSpendSlashUse(source, target, ignoresCount: true, kind));
     }
 
     internal void BeginMouJwFaction(ProgramSkillFrame f)
@@ -35,7 +31,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateMouJwFactionParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
+    internal bool ValidateMouJwFactionParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
     {
         if (f.MouJiangWei is not { FactionPolicy: { } policy } r)
             return false;
@@ -44,7 +40,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         return true;
     }
 
-    internal bool MouJwFactionSupplyLegal(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CardKind kind)
+    internal bool MouJwFactionSupplyLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind)
     {
         if (pending.ProgramSkillFrameId is not { } id || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == id)is not { MouJiangWei.FactionPolicy: not null } f)
             return true;
@@ -52,13 +48,13 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     }
 
     internal bool HasMouJwFactionDistance(int actor, int target) => _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsAssistedProgramUse: true, ProgramSkillFrameId: { } id } p && p.OwnerSeat == actor && p.TargetSeat == target && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == id)is { MouJiangWei.FactionPolicy: not null } f && f.OwnerSeat == target && ValidateMouJwFactionParent(p, f);
-    internal bool PrepareMouJwFactionNative(ProgramSkillFrame f, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind, CardConversionSource? conversion)
+    internal bool PrepareMouJwFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind, CardConversionSource? conversion)
     {
         if (!ValidateMouJwFactionParent(pending, f))
             return false;
         var r = f.MouJiangWei!;
         var actor = r.Targets[r.Cursor];
-        if (r.Stage != MouJiangWeiStage.FactionRequest || cards.Count == 0 || cards.Select(c => c.Id).Distinct().Count() != cards.Count || provider.Seat == actor || !pending.CandidateSeats.Contains(provider.Seat) || cards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.Id).OwnerSeat != provider.Seat) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor, kind, CardActionType.Use) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor, f.OwnerSeat, kind))
+        if (r.Stage != MouJiangWeiStage.FactionRequest || cards.Count == 0 || cards.Select(c => c.Id).Distinct().Count() != cards.Count || provider.Seat == actor || !pending.CandidateSeats.Contains(provider.Seat) || cards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.Id).OwnerSeat != provider.Seat) || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor, kind, CardActionType.Use) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor, f.OwnerSeat, kind))
             throw new InvalidOperationException("Tiaoxin's real faction provider lost its paid material or the actual actor's target legality.");
         var action = new LegalAction(LegalActionKind.Slash, cards[0].Id, f.OwnerSeat, "通过实际势力响应使用杀", kind)
         {
@@ -69,7 +65,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         return true;
     }
 
-    internal bool FinishMouJwFactionDeclined(long id, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending)
+    internal bool FinishMouJwFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouJiangWei.FactionPolicy: not null } f || f.Id != id)
             return false;

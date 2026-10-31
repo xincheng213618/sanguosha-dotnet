@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineIssuedPlayUsePoliciesRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CoreGameEngineIssuedPlayUsePoliciesRuntime
     internal void CleanupIssuedPlayPhaseUseBans() => _coreGameEngineIssuedPlayUsePoliciesIssuedPlayPhaseUseProhibitionsAccess._issuedPlayPhaseUseProhibitions.RemoveAll(policy => _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || policy.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || policy.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || policy.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
     internal bool HasIssuedPolicyForAction(long actionId) => _coreGameEngineIssuedPlayUsePoliciesIssuedPlayPhaseUseProhibitionsAccess._issuedPlayPhaseUseProhibitions.Any(policy => policy.CardActionId == actionId);
     internal bool IsIssuedCardUnrespondable(long frameId) => _characterZhangFeiBoundaryMobileOperations.IsBoundaryZhangFeiLiyongUnrespondable(frameId) || _characterHuangZhongBoundaryMobileOperations.IsBoundaryHuangZhongUnrespondable(frameId) || _characterMaChaoBoundaryMobileOperations.IsBoundaryMaChaoUnrespondable(frameId) || _characterPangDeBoundaryMobileOperations.IsBoundaryPangDeUnrespondable(frameId) || _characterPanZhangMaZhongBoundaryMobileOperations.IsBoundaryAnjianUnrespondable(frameId) || _characterChenDaoMobileShiOperations.IsMobileShiWanglieUnrespondable(frameId) || _characterWeiYanMobileShiOperations.IsMobileShiZhuangshiUnrespondable(frameId) || _characterHuangChongMobileShiOperations.IsShiHcSiliSlashUnrespondable(frameId) || _characterHuangGaiMouMobileOperations.IsMouZhaJiangUnrespondable(frameId) || _characterLvKuangLvXiangOlOperations.IsQigongUnrespondable(frameId) || _coreNonBasicSlashProfileOperations.HasIssuedNonBasicSlashDistance(frameId) || _characterZhangYanOlOperations.IsZhangYanLangdaoUnrespondable(frameId) || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { Action: { } action, IssuedNoResponse: { } issued } && issued.CardActionId == action.ActionId && issued.ParentFrameId == frameId;
-    void global::CardGame.Core.IIssuedPlayUseProgramHost.IssueCardNoResponseAndPlayUseBan(ProgramSkillFrame frame) => IssueCardNoResponseAndPlayUseBan(frame);
+    void IIssuedPlayUseProgramHost.IssueCardNoResponseAndPlayUseBan(ProgramSkillFrame frame) => IssueCardNoResponseAndPlayUseBan(frame);
     internal void IssueCardNoResponseAndPlayUseBan(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -46,7 +42,7 @@ internal sealed partial class CoreGameEngineIssuedPlayUsePoliciesRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IssuedCardNoResponseEvent(issued));
     }
 
-    internal static bool IsEligibleIssuedNoResponseCard(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_IssuedPlayUsePolicies.IsEligibleIssuedNoResponseCard(kind);
+    internal static bool IsEligibleIssuedNoResponseCard(CardKind kind) => RuntimeSkills.RuntimeRules_Core_IssuedPlayUsePolicies.IsEligibleIssuedNoResponseCard(kind);
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 140)]
     internal bool DistanceCardUseExemption140HasFirstActualPlayUseDistance(ProgramCardDistanceQuery q) => HasFirstActualPlayUseDistance(q.Actor);
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 150)]

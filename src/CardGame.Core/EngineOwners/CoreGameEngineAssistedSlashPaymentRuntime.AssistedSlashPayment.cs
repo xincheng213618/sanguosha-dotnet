@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAssistedSlashPaymentRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CoreGameEngineAssistedSlashPaymentRuntime
         var kind = Enum.Parse<CardKind>(selected.Parameters["effective-kind"]);
         IReadOnlyList<Card> cards;
         CardConversionSource? conversion;
-        if (selected.Cards.Count > 1 || global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var selectedSource) && _characterKongShuOlOperations.IsLeiluanSource(selectedSource))
+        if (selected.Cards.Count > 1 || CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var selectedSource) && _characterKongShuOlOperations.IsLeiluanSource(selectedSource))
         {
             if (selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString())
             {
@@ -21,7 +17,7 @@ internal sealed partial class CoreGameEngineAssistedSlashPaymentRuntime
             }
             else
             {
-                if (!global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out conversion) || conversion is null)
+                if (!CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out conversion) || conversion is null)
                     throw new InvalidOperationException("A multi-card Slash lost its conversion source.");
                 cards = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(actor, selected.Cards, kind, false, conversion)?.Cards ?? throw new InvalidOperationException("The physical Slash source cards became unavailable.");
             }
@@ -29,7 +25,7 @@ internal sealed partial class CoreGameEngineAssistedSlashPaymentRuntime
         else
         {
             var card = _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(actor)).Single(item => item.Id == selected.Cards.Single());
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._selectedUseConversion);
+            CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._selectedUseConversion);
             _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._hasSelectedUseConversionChoice = true;
             conversion = _coreCardConversionsOperations.GetSelectedUseConversion(actor, actor, card, kind);
             if (conversion is null)

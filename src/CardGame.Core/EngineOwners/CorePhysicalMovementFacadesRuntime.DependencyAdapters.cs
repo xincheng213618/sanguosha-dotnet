@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MovementRecordRuntime))]
-internal sealed class CorePhysicalMovementFacadesMovementRecordAdapter(global::System.Func<global::CardGame.Core.MovementRecordRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICorePhysicalMovementFacadesMovementRecordOperations
+[Core.ProgramCapability(typeof(MovementRecordRuntime))]
+internal sealed class CorePhysicalMovementFacadesMovementRecordAdapter(Func<MovementRecordRuntime> targetFactory) : ICorePhysicalMovementFacadesMovementRecordOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MovementRecordRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MovementRecordRuntime Get() => this._targetFactory();
+    private readonly Func<MovementRecordRuntime> _targetFactory = targetFactory;
+    public MovementRecordRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MovementEquipmentEffectsRuntime))]
-internal sealed class CorePhysicalMovementFacadesMovementEquipmentEffectsAdapter(global::System.Func<global::CardGame.Core.MovementEquipmentEffectsRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICorePhysicalMovementFacadesMovementEquipmentEffectsOperations
+[Core.ProgramCapability(typeof(MovementEquipmentEffectsRuntime))]
+internal sealed class CorePhysicalMovementFacadesMovementEquipmentEffectsAdapter(Func<MovementEquipmentEffectsRuntime> targetFactory) : ICorePhysicalMovementFacadesMovementEquipmentEffectsOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MovementEquipmentEffectsRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MovementEquipmentEffectsRuntime Get() => this._targetFactory();
+    private readonly Func<MovementEquipmentEffectsRuntime> _targetFactory = targetFactory;
+    public MovementEquipmentEffectsRuntime Get() => this._targetFactory();
 }

@@ -1,19 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangHuanAnniversaryRuntime
 {
-    internal static CardConversionSource ZhangHuanSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ZhangHuanSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedBeforeActivity, 46300)]
     [ProgramTargetWindow(ProgramTargetWindowStage.ImplicitSelfDrawTwo, 46300)]
     [ProgramTargetWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, 46300)]
     internal bool ZhangHuanTargetWindows(ProgramTargetCardWindowQuery q) => _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(p).GetInstanceTriggers(SkillProgramTriggerWindow.CardUseTargetsFinalized).Any(b => b.SkillId == AnniversaryZhangHuanComposition.Yiju));
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryZhangHuanHost.Begin(ProgramSkillFrame f) => BeginZhangHuan(f);
+    SkillProgramStepOutcome IAnniversaryZhangHuanHost.Begin(ProgramSkillFrame f) => BeginZhangHuan(f);
     internal IReadOnlyList<AnniversaryZhangHuanDiscard> ZhangHuanDiscards()
     {
         var invocations = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(i => i.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && i.ActualTurnOwnerSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat).ToDictionary(i => i.InvocationId);
@@ -79,7 +76,7 @@ internal sealed partial class CharacterZhangHuanAnniversaryRuntime
     [ProgramAnswer("anniversary-shuguo")]
     internal void AnswerZhangHuan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryZhangHuan: { Stage: AnniversaryZhangHuanStage.Choice } r } f || !ValidZhangHuan(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ZhangHuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryZhangHuan: { Stage: AnniversaryZhangHuanStage.Choice } r } f || !ValidZhangHuan(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ZhangHuanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shuguo rejects a stale discarded entity, prior sequence or native target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

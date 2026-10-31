@@ -1,8 +1,7 @@
 #nullable enable
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class XiZhiCaiProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterXiZhiCaiOlEntries> getCharacterXiZhiCaiOlRuntime) : IXiZhiCaiProgramHost
+internal sealed class XiZhiCaiProgramCapability(Func<RuntimeEntries.CharacterXiZhiCaiOlEntries> getCharacterXiZhiCaiOlRuntime) : IXiZhiCaiProgramHost
 {
     public SkillProgramStepOutcome ArmXianfuRelation(ProgramSkillFrame f, int t) => getCharacterXiZhiCaiOlRuntime().ArmXianfuRelation(f, t);
     public SkillProgramStepOutcome SettleXianfuNativeEcho(ProgramSkillFrame f) => getCharacterXiZhiCaiOlRuntime().SettleXianfuNativeEcho(f);

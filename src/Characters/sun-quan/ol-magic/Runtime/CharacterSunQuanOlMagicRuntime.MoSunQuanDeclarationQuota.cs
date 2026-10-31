@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunQuanOlMagicRuntime
 {
-    internal static bool IsMoQuanyuTrueSlashDeclaration(DeclaredCardPayment paid, CardDeclarationParentReturn parent) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_quan_ol_magic_MoSunQuanDeclarationQuota.IsMoQuanyuTrueSlashDeclaration(paid, parent);
+    internal static bool IsMoQuanyuTrueSlashDeclaration(DeclaredCardPayment paid, CardDeclarationParentReturn parent) => RuntimeSkills.RuntimeRules_sun_quan_ol_magic_MoSunQuanDeclarationQuota.IsMoQuanyuTrueSlashDeclaration(paid, parent);
     internal DeclaredCardPayment CaptureMoQuanyuDeclarationQuota(DeclaredCardPayment paid, CardDeclarationParentReturn parent, IReadOnlyList<int> targets)
     {
         if (!HasMoQuanyuSlash || !IsMoQuanyuTrueSlashDeclaration(paid, parent) || targets is not [var target])
@@ -15,7 +11,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         if (paid.MoQuanyuDeclarationQuota is not null || paid.Claimed || paid.OwnerFrameId != paid.DeclarationId || paid.ActorSeat != parent.ActorSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(parent.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || paid.Cost.From != CardLocation.Hand(paid.ProviderSeat) || _cardZonesOperations._cardZones.GetLocation(paid.Cost.CardId) != paid.Cost.From || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuDeclarationQuotaCapturedEvent>().Any(e => e.DeclarationId == paid.DeclarationId))
             throw new InvalidOperationException("Meteor must freeze the original unpaid declaration and its exact initial singleton once.");
         var kind = parent.FinalEffectiveKind ?? paid.DeclaredKind;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return paid;
         CardConversionSource? source = null;
         string? hash = null;
@@ -54,7 +50,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
 
     internal bool ValidMoQuanyuDeclarationQuota(DeclaredCardPayment paid, MoQuanyuDeclarationQuota q)
     {
-        if (paid.MoQuanyuDeclarationQuota != q || paid.DeclarationId != q.DeclarationId || q.DeclarationId <= 0 || paid.ActorSeat != q.ActorSeat || paid.ProviderSeat != q.ProviderSeat || paid.Cost.CardId != q.CardId || paid.Cost.From != q.From || paid.Source != q.DeclarationSource || paid.DeclaredKind != q.DeclaredKind || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(q.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(q.ProviderSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(q.TargetSeat) || q.From != CardLocation.Hand(q.ProviderSeat) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.DeclaredKind) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.OutputKind) || q.ActualTurn < 1 || q.ActualTurn > _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(q.TurnOwner) || q.SequenceBefore < 0 || q.SequenceBefore > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == paid.OwnerFrameId)is not { } owner || !(owner.AcceptedDeclarationPayment == paid || owner is CardDeclarationFrame d && d.Payment == paid) || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuDeclarationQuotaCapturedEvent>().Where(e => e.DeclarationId == q.DeclarationId).ToArray()is not [var captured] || captured.OwnerFrameId != q.DeclarationId || captured.Receipt != q || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuDeclarationPaymentRecordedEvent>().Where(e => e.DeclarationId == q.DeclarationId).ToArray()is not [var invoice] || invoice.MovementSequence <= q.SequenceBefore || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == invoice.MovementSequence && m.CardId == q.CardId && m.CardKind == paid.Cost.CardKind && m.From == q.From && m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay") != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<CardDeclarationCommittedEvent>().Count(e => e.DeclarationId == q.DeclarationId && e.OwnerSeat == q.ProviderSeat && e.ActorSeat == q.ActorSeat && e.DeclaredKind == q.DeclaredKind && e.TargetSeats.SequenceEqual([q.TargetSeat])) != 1)
+        if (paid.MoQuanyuDeclarationQuota != q || paid.DeclarationId != q.DeclarationId || q.DeclarationId <= 0 || paid.ActorSeat != q.ActorSeat || paid.ProviderSeat != q.ProviderSeat || paid.Cost.CardId != q.CardId || paid.Cost.From != q.From || paid.Source != q.DeclarationSource || paid.DeclaredKind != q.DeclaredKind || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(q.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(q.ProviderSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(q.TargetSeat) || q.From != CardLocation.Hand(q.ProviderSeat) || !CoreNativeCardClassificationsRuntime.IsSlashCard(q.DeclaredKind) || !CoreNativeCardClassificationsRuntime.IsSlashCard(q.OutputKind) || q.ActualTurn < 1 || q.ActualTurn > _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(q.TurnOwner) || q.SequenceBefore < 0 || q.SequenceBefore > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == paid.OwnerFrameId)is not { } owner || !(owner.AcceptedDeclarationPayment == paid || owner is CardDeclarationFrame d && d.Payment == paid) || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuDeclarationQuotaCapturedEvent>().Where(e => e.DeclarationId == q.DeclarationId).ToArray()is not [var captured] || captured.OwnerFrameId != q.DeclarationId || captured.Receipt != q || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuDeclarationPaymentRecordedEvent>().Where(e => e.DeclarationId == q.DeclarationId).ToArray()is not [var invoice] || invoice.MovementSequence <= q.SequenceBefore || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == invoice.MovementSequence && m.CardId == q.CardId && m.CardKind == paid.Cost.CardKind && m.From == q.From && m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay") != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<CardDeclarationCommittedEvent>().Count(e => e.DeclarationId == q.DeclarationId && e.OwnerSeat == q.ProviderSeat && e.ActorSeat == q.ActorSeat && e.DeclaredKind == q.DeclaredKind && e.TargetSeats.SequenceEqual([q.TargetSeat])) != 1)
             return false;
         if (q.Eligible)
         {
@@ -71,14 +67,14 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         allowed = false;
         var top = _resolutionStackOperations._resolutionStack.LastOrDefault();
         DeclaredCardPayment? paid;
-        if (top is CardDeclarationFrame { Stage: CardDeclarationStage.Applying } declaration && declaration.Return.ActorSeat == actor.Seat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(declaration.Payment.DeclaredKind))
+        if (top is CardDeclarationFrame { Stage: CardDeclarationStage.Applying } declaration && declaration.Return.ActorSeat == actor.Seat && CoreNativeCardClassificationsRuntime.IsSlashCard(declaration.Payment.DeclaredKind))
             paid = declaration.Payment;
         else
         {
             if (top is ResponseWindowFrame response)
                 top = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == response.ParentFrameId);
             paid = top?.AcceptedDeclarationPayment;
-            if (paid is not { Claimed: false } || paid.ActorSeat != actor.Seat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(paid.DeclaredKind) || _cardZonesOperations._cardZones.GetLocation(paid.Cost.CardId) != CardLocation.Processing)
+            if (paid is not { Claimed: false } || paid.ActorSeat != actor.Seat || !CoreNativeCardClassificationsRuntime.IsSlashCard(paid.DeclaredKind) || _cardZonesOperations._cardZones.GetLocation(paid.Cost.CardId) != CardLocation.Processing)
                 return false;
         }
 
@@ -88,12 +84,12 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
 
     internal bool TryInheritMoQuanyuDeclarationQuota(CardUseFrame use)
     {
-        if (!HasMoQuanyuSlash || use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (!HasMoQuanyuSlash || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             return false;
         var paid = use.AcceptedDeclarationPayment;
         if (paid is null && action.PhysicalCards is [var material])
             paid = _coreCardDeclarationsOperations.UnclaimedDeclarationPayment(action.ProviderSeat, material.CardId);
-        if (paid is null || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(paid.DeclaredKind))
+        if (paid is null || !CoreNativeCardClassificationsRuntime.IsSlashCard(paid.DeclaredKind))
             return false;
         // No initial-singleton declaration ticket means no Meteor privilege,
         // rather than permission to recapture the current live source.

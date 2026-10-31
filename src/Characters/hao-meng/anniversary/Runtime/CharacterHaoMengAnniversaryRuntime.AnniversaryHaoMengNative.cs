@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHaoMengAnniversaryRuntime
@@ -24,7 +20,7 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 49700)]
     internal void BindHaoMengUse(CardUseDeclaredEvent e)
     {
-        if (!HasAnniversaryHaoMengCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)is not { Action: { Type: CardActionType.Use } a } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind))
+        if (!HasAnniversaryHaoMengCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)is not { Action: { Type: CardActionType.Use } a } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind))
             return;
         var source = a.ConversionChain.SingleOrDefault(s => s.SkillId == AnniversaryHaoMengComposition.Skill);
         if (source is null)
@@ -51,7 +47,7 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
 
     internal bool IsHaoMengNativeUse(CardUseFrame use)
     {
-        if (use.AnniversaryHaoMengUse is not { } o || use.Action is not { Type: CardActionType.Use } a || o.UseId != use.Id || o.ActionId != a.ActionId || o.MaterialCount is < 1 or > 4 || o.Source.SkillId != AnniversaryHaoMengComposition.Skill || a.ProviderSeat != o.Source.OwnerSeat || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.EffectiveKind != use.CardKind || !a.ConversionChain.Contains(o.Source) || a.PhysicalCards.Count != o.MaterialCount || !use.PhysicalCardIds!.SequenceEqual(a.PhysicalCards.Select(c => c.CardId)) || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.Hash || _corePlayCardHistoryOperations.ViewAsRule(o.Source)is not { } rule || rule.Id != "distinct-hand-" + o.MaterialCount || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHaoMengUseIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (use.AnniversaryHaoMengUse is not { } o || use.Action is not { Type: CardActionType.Use } a || o.UseId != use.Id || o.ActionId != a.ActionId || o.MaterialCount is < 1 or > 4 || o.Source.SkillId != AnniversaryHaoMengComposition.Skill || a.ProviderSeat != o.Source.OwnerSeat || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat) || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.EffectiveKind != use.CardKind || !a.ConversionChain.Contains(o.Source) || a.PhysicalCards.Count != o.MaterialCount || !use.PhysicalCardIds!.SequenceEqual(a.PhysicalCards.Select(c => c.CardId)) || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.Hash || _corePlayCardHistoryOperations.ViewAsRule(o.Source)is not { } rule || rule.Id != "distinct-hand-" + o.MaterialCount || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHaoMengUseIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         var materials = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHaoMengMaterialEvent>().Where(e => e.UseId == use.Id).OrderBy(e => e.Index).ToArray();
         return materials.Length == o.MaterialCount && materials.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, o.MaterialCount)) && materials.Select(e => e.Material).SequenceEqual(a.PhysicalCards) && materials.All(e => e.Material.From == CardLocation.Hand(o.Source.OwnerSeat) && e.EffectiveSuit != Suit.None && Enum.IsDefined(e.EffectiveSuit)) && materials.Select(e => e.EffectiveSuit).Distinct().Count() == o.MaterialCount;

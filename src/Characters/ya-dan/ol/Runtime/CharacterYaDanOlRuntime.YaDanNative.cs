@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYaDanOlRuntime
@@ -30,7 +26,7 @@ internal sealed partial class CharacterYaDanOlRuntime
 
     internal bool IsQingyaDiscardQuery(CharacterState actor, int? id) => id is> 0 && QingyaDiscardQueryOwner(actor.Seat)is not null && IsQingyaSelectedDiscard(actor.Seat, id.Value);
     internal IReadOnlyList<LegalAction> QingyaNativeActions(ProgramSkillFrame f) => Array.AsReadOnly(f.YaDan!.Entities.Where(QingyaEntityStillAvailable).SelectMany(entity => _coreNativeLegalActionsOperations.BuildLegalActions(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], includeProgramActions: false, selectedPhysicalCardId: entity.CardId)).Where(a => a.CardId is> 0 && f.YaDan.Entities.Any(e => e.CardId == a.CardId) && a.ConversionSource is null && (a.AdditionalConversionSources?.Count ?? 0) == 0 && a.Kind is not (LegalActionKind.Recast or LegalActionKind.UseProgramSkill or LegalActionKind.UseEquipmentEffect or LegalActionKind.RevealGeneral or LegalActionKind.EndPlay)).ToArray());
-    internal static QingyaAction FreezeQingyaAction(LegalAction a) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ya_dan_ol_YaDanNative.FreezeQingyaAction(a);
+    internal static QingyaAction FreezeQingyaAction(LegalAction a) => RuntimeSkills.RuntimeRules_ya_dan_ol_YaDanNative.FreezeQingyaAction(a);
     internal void AnswerQingyaNativeUse(ProgramSkillFrame f, PromptChoice choice)
     {
         if (choice.Parameters.GetValueOrDefault("branch") == "decline")
@@ -105,7 +101,7 @@ internal sealed partial class CharacterYaDanOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 27260)]
-    internal bool ReturnQingyaAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnQingyaAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YaDan: { Stage: QingyaStage.NativeUse, NativeCompleted: true, NativeOrigin: { } o } } || o.UseId != completion.ResolutionId)
             return false;

@@ -1,14 +1,14 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class DuelHandle : global::CardGame.Core.GameEngine.ICardContinuationHandle
+internal sealed class DuelHandle : GameEngine.ICardContinuationHandle
 {
-    private readonly global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime;
-    private readonly global::CardGame.Core.NativeOwners.CardAttackHandleFactory createCardAttackHandle;
+    private readonly Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime;
+    private readonly CardAttackHandleFactory createCardAttackHandle;
     public long OwnerFrameId { get; }
     private DuelState State => getCoreGameEngineCardAttackStateRuntime().GetCardContinuations(OwnerFrameId).Duel ?? throw new InvalidOperationException("The Duel continuation lost its owner state.");
 
     private void Update(Func<DuelState, DuelState> update) => getCoreGameEngineCardAttackStateRuntime().UpdateCardContinuations(OwnerFrameId, state => state with { Duel = update(state.Duel!) });
-    internal DuelHandle(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, global::CardGame.Core.NativeOwners.CardAttackHandleFactory createCardAttackHandle, global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal DuelHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, CardAttackHandleFactory createCardAttackHandle, CardAttackHandle attack)
     {
         this.getCoreGameEngineCardAttackStateRuntime = getCoreGameEngineCardAttackStateRuntime;
         this.createCardAttackHandle = createCardAttackHandle;
@@ -16,14 +16,14 @@ internal sealed class DuelHandle : global::CardGame.Core.GameEngine.ICardContinu
         getCoreGameEngineCardAttackStateRuntime().UpdateCardContinuations(OwnerFrameId, state => state with { Duel = new DuelState { Active = false, ResponderSeat = attack.TargetSeat, } });
     }
 
-    internal DuelHandle(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, global::CardGame.Core.NativeOwners.CardAttackHandleFactory createCardAttackHandle, long ownerId)
+    internal DuelHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, CardAttackHandleFactory createCardAttackHandle, long ownerId)
     {
         this.getCoreGameEngineCardAttackStateRuntime = getCoreGameEngineCardAttackStateRuntime;
         this.createCardAttackHandle = createCardAttackHandle;
         OwnerFrameId = ownerId;
     }
 
-    public global::CardGame.Core.NativeOwners.CardAttackHandle Attack => createCardAttackHandle(OwnerFrameId);
+    public CardAttackHandle Attack => createCardAttackHandle(OwnerFrameId);
     public long ResolutionId => Attack.ResolutionId;
     public int SourceSeat => Attack.SourceSeat;
     public int TargetSeat => Attack.TargetSeat;

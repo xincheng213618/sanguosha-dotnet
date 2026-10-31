@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaManOlRuntime
@@ -24,7 +20,7 @@ internal sealed partial class CharacterHuaManOlRuntime
         {
             var targets = Array.AsReadOnly(Array.Empty<int>());
             var updated = _coreDesignatedExtraTargetsOperations.CloneDesignatedExtraTargetAction(action, targets);
-            _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(use with { HuaManSouyingMutation = mutation, TargetSeats = targets, TargetIndex = 0, Action = updated, TargetsAdjusted = true, SlashTargetsCancelled = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind), SequentialTrick = null, PreparedTargetAttacks = use.PreparedTargetAttacks is null ? null : Array.AsReadOnly(Array.Empty<CardAttackState>()), Continuations = use.Continuations with { FangtianHalberd = use.Continuations.FangtianHalberd is { Active: true } multi ? multi with { TargetSeats = targets } : use.Continuations.FangtianHalberd } }, updated);
+            _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(use with { HuaManSouyingMutation = mutation, TargetSeats = targets, TargetIndex = 0, Action = updated, TargetsAdjusted = true, SlashTargetsCancelled = CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind), SequentialTrick = null, PreparedTargetAttacks = use.PreparedTargetAttacks is null ? null : Array.AsReadOnly(Array.Empty<CardAttackState>()), Continuations = use.Continuations with { FangtianHalberd = use.Continuations.FangtianHalberd is { Active: true } multi ? multi with { TargetSeats = targets } : use.Continuations.FangtianHalberd } }, updated);
         }
         else
             _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { HuaManSouyingMutation = mutation });
@@ -47,7 +43,7 @@ internal sealed partial class CharacterHuaManOlRuntime
     internal bool TryGetSouyingCancelledVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primaryTarget)
     {
         primaryTarget = [];
-        if (!HasHuaManSouyingCancellation(use) || use.HuaManSouyingMutation is not { BeforeTargets: [var original], Qualification: { } q } r || original != q.TargetSeat || use is not { CardId: 0, PhysicalCardIds.Count: 0, ProgramUseCommitted: true, ProgramUseAccepted: true, TargetSeats.Count: 0 } || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardAttack is not { CardId: null, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id || attack.SourceSeat != use.SourceSeat || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActionId != q.ActionId || action.ActorSeat != q.ActorSeat || action.ProviderSeat != q.ProviderSeat || action.ActorSeat != use.SourceSeat || parent.OwnerSeat != action.ActorSeat || parent.SelectedTargetSeats is not [var selected] || selected != original || parent.InstructionIndex < 1)
+        if (!HasHuaManSouyingCancellation(use) || use.HuaManSouyingMutation is not { BeforeTargets: [var original], Qualification: { } q } r || original != q.TargetSeat || use is not { CardId: 0, PhysicalCardIds.Count: 0, ProgramUseCommitted: true, ProgramUseAccepted: true, TargetSeats.Count: 0 } || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardAttack is not { CardId: null, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id || attack.SourceSeat != use.SourceSeat || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActionId != q.ActionId || action.ActorSeat != q.ActorSeat || action.ProviderSeat != q.ProviderSeat || action.ActorSeat != use.SourceSeat || parent.OwnerSeat != action.ActorSeat || parent.SelectedTargetSeats is not [var selected] || selected != original || parent.InstructionIndex < 1)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame actualParent || actualParent.Id != parent.Id || actualParent != parent || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash)
@@ -56,7 +52,7 @@ internal sealed partial class CharacterHuaManOlRuntime
         if (parent.InstructionIndex > plan.Instructions.Count)
             return false;
         var paused = plan.GetPausedInstruction(parent.InstructionIndex).Effect;
-        var source = new CardConversionSource(parent.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
+        var source = new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
         if (paused.Op == SkillProgramEffectOp.UseVirtualCard)
         {
             if (paused.OutputKind != CardKind.Slash || !paused.UseCardActionWindows || paused.TargetRestriction is not (SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget or SkillProgramCardTargetRestriction.NormalSlashTarget) || !action.ConversionChain.SequenceEqual([source]))

@@ -1,21 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5GongsunZanRuntime
 {
     internal const string ShanheS5QiaomengReason = "skill-program.shanhe-qiaomeng.discard";
-    SkillProgramStepOutcome global::CardGame.Core.IShanheS5GongsunProgramHost.DiscardAttackRangeCardsFromSlashTarget(ProgramSkillFrame f) => BeginShanheS5Qiaomeng(f);
-    internal Card[] ShanheS5QiaomengCards(int owner, int target) => global::CardGame.Core.EngineOwners.CoreGameEngineShanheS5GongsunZanDefinitions.ShanheS5QiaomengZones.SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, target)).Where(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, card, new(zone, target), OwnedCardMoveIntent.Discard))).ToArray();
+    SkillProgramStepOutcome IShanheS5GongsunProgramHost.DiscardAttackRangeCardsFromSlashTarget(ProgramSkillFrame f) => BeginShanheS5Qiaomeng(f);
+    internal Card[] ShanheS5QiaomengCards(int owner, int target) => CoreGameEngineShanheS5GongsunZanDefinitions.ShanheS5QiaomengZones.SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, target)).Where(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, card, new(zone, target), OwnedCardMoveIntent.Discard))).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 5740)]
     internal bool CanOfferShanheS5Gongsun(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.DiscardAttackRangeCardsFromSlashTarget))
-            return context is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, TargetSeat: { } target, CardUse: { } identity } && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is { Action: { } action } use && action.ActionId == identity.CardActionId && action.ActorSeat == candidate.OwnerSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveDesignatedTargetSeats.Contains(target) && ShanheS5QiaomengCards(candidate.OwnerSeat, target).Length > 0;
+            return context is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, TargetSeat: { } target, CardUse: { } identity } && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is { Action: { } action } use && action.ActionId == identity.CardActionId && action.ActorSeat == candidate.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveDesignatedTargetSeats.Contains(target) && ShanheS5QiaomengCards(candidate.OwnerSeat, target).Length > 0;
         if (candidate.SkillId == "shanhe:s5-jiuzhu-505")
             return context is { Window: SkillProgramTriggerWindow.DyingResponse, TargetSeat: { } victim } && _coreTableSeatQueriesOperations.IsValidPlayerSeat(victim) && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].HasHpValue && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].Hp > 1 && _coreTeamActivityProgramsOperations.OtherRevealedPublicTeamAlly(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[victim]) && _coreMatchParticipantsPlayersAccess._players[victim].Hp <= 0 && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]).Count > 0;
         return true;
@@ -43,7 +40,7 @@ internal sealed partial class CoreGameEngineShanheS5GongsunZanRuntime
     internal IReadOnlyList<PromptChoice> ShanheS5QiaomengChoices(ProgramSkillFrame f)
     {
         var d = f.ShanheS5Qiaomeng!;
-        return Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, d.TargetSeat, global::CardGame.Core.EngineOwners.CoreGameEngineShanheS5GongsunZanDefinitions.ShanheS5QiaomengZones, OwnedCardMoveIntent.Discard, canSelect: (_, card) => !d.SelectedIds.Contains(card.Id)).Select(choice => choice with { Targets = Array.AsReadOnly(new[] { d.TargetSeat }), Parameters = new System.Collections.ObjectModel.ReadOnlyDictionary<string, string>(new Dictionary<string, string>(choice.Parameters) { ["program-action"] = "shanhe-qiaomeng-card" }) }).ToArray());
+        return Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, d.TargetSeat, CoreGameEngineShanheS5GongsunZanDefinitions.ShanheS5QiaomengZones, OwnedCardMoveIntent.Discard, canSelect: (_, card) => !d.SelectedIds.Contains(card.Id)).Select(choice => choice with { Targets = Array.AsReadOnly(new[] { d.TargetSeat }), Parameters = new System.Collections.ObjectModel.ReadOnlyDictionary<string, string>(new Dictionary<string, string>(choice.Parameters) { ["program-action"] = "shanhe-qiaomeng-card" }) }).ToArray());
     }
 
     internal void PublishShanheS5Qiaomeng(ProgramSkillFrame f)
@@ -67,7 +64,7 @@ internal sealed partial class CoreGameEngineShanheS5GongsunZanRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The range discard lost its owner.");
         var d = f.ShanheS5Qiaomeng ?? throw new InvalidOperationException("The range discard lost its original selection.");
-        if (d.Paid || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheS5QiaomengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (d.Paid || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheS5QiaomengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("The range discard no longer matches a published private zone slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[d.TargetSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class BoundaryChenQunHost(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterChenQunBoundaryMobileEntries> getCharacterChenQunBoundaryMobileRuntime) : IBoundaryChenQunHost, IBoundaryChenQunSelection
+internal sealed class BoundaryChenQunHost(Func<RuntimeEntries.CharacterChenQunBoundaryMobileEntries> getCharacterChenQunBoundaryMobileRuntime) : IBoundaryChenQunHost, IBoundaryChenQunSelection
 {
     public bool CanDiscard(int owner, Card card) => getCharacterChenQunBoundaryMobileRuntime().BoundaryDingpinCanDiscard(owner, card);
     public bool CanTarget(int owner, int target) => getCharacterChenQunBoundaryMobileRuntime().BoundaryDingpinCanTarget(owner, target);

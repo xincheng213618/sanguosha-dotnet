@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouFeiLeRuntime
 {
     internal const string LeZhouFeiXianshuGiftReason = "skill-program.le-zhou-fei.xianshu.gift";
     internal const string LeZhouFeiXianshuDrawReason = "skill-program.le-zhou-fei.xianshu.draw";
-    internal static CardConversionSource LeZhouFeiXianshuSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_fei_le_LeZhouFeiXianshu.LeZhouFeiXianshuSource(frame);
-    SkillProgramStepOutcome global::CardGame.Core.ILeZhouFeiXianshuHost.Resolve(ProgramSkillFrame frame) => BeginLeZhouFeiXianshu(frame);
-    bool global::CardGame.Core.ILeZhouFeiXianshuSelectionQuery.CanGive(int ownerSeat, Card card) => HasLingkongHandEntityMark(ownerSeat, card.Id);
+    internal static CardConversionSource LeZhouFeiXianshuSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_zhou_fei_le_LeZhouFeiXianshu.LeZhouFeiXianshuSource(frame);
+    SkillProgramStepOutcome ILeZhouFeiXianshuHost.Resolve(ProgramSkillFrame frame) => BeginLeZhouFeiXianshu(frame);
+    bool ILeZhouFeiXianshuSelectionQuery.CanGive(int ownerSeat, Card card) => HasLingkongHandEntityMark(ownerSeat, card.Id);
     internal ActualDiscardRecoveryPhaseKey? LeZhouFeiXianshuPlay(int ownerSeat)
     {
         var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
@@ -105,7 +101,7 @@ internal sealed partial class CharacterZhouFeiLeRuntime
             var action = XianshuHealthAction.None;
             if (target.IsAlive && owner.HasHpValue && target.HasHpValue)
             {
-                if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(receipt.GiftSuit) && target.Hp <= owner.Hp)
+                if (CoreNativeCardClassificationsRuntime.IsRedSuit(receipt.GiftSuit) && target.Hp <= owner.Hp)
                     action = XianshuHealthAction.Recover;
                 else if ((receipt.GiftSuit is Suit.Spade or Suit.Club) && target.Hp >= owner.Hp)
                     action = XianshuHealthAction.LoseHp;

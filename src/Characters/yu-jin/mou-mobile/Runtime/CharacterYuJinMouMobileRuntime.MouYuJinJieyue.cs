@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,13 +10,13 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
     internal bool CanOfferMouJieyue(ProgramTriggerLegalityContext c) => c.SkillId == MouJieyue && MouYuJinComposition.IsJieyue(c.Program) && c.Owner.IsAlive && c.Context.Window == SkillProgramTriggerWindow.TurnEnding && c.Context.SourceSeat == c.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Ending } phase && phase.ActorSeat == c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != c.OwnerSeat);
     internal bool MouJieyueRoot(ProgramSkillFrame f)
     {
-        if (f.SkillId != MouJieyue || f.TriggerId != "ending-armor-and-gift" || f.ActivationId != f.TriggerId || f.SelectedCardIds.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } c || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat || c.OccurrenceIndex != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !MouYuJinComposition.IsJieyue(p) || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != f.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
+        if (f.SkillId != MouJieyue || f.TriggerId != "ending-armor-and-gift" || f.ActivationId != f.TriggerId || f.SelectedCardIds.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } c || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat || c.OccurrenceIndex != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !MouYuJinComposition.IsJieyue(p) || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != f.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
             return false;
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         return i > 0 && _resolutionStackOperations._resolutionStack[i - 1].Id == parent.Id;
     }
 
-    internal bool MouJieyueArmorGranted(ProgramSkillFrame f) => f.MouYuJinJieyue is { } r && _coreProgramEventHistoryOperations.ProgramEventHistory<ArmorGrantedEvent>().Where(e => e.ProgramFrameId == f.Id && e.InstructionIndex == 2).ToArray()is [var grant] && grant.PlayerSeat == r.RecipientSeat && grant.Amount == 1 && grant.ArmorAfter == checked(grant.ArmorBefore + 1) && grant.Source == global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f);
+    internal bool MouJieyueArmorGranted(ProgramSkillFrame f) => f.MouYuJinJieyue is { } r && _coreProgramEventHistoryOperations.ProgramEventHistory<ArmorGrantedEvent>().Where(e => e.ProgramFrameId == f.Id && e.InstructionIndex == 2).ToArray()is [var grant] && grant.PlayerSeat == r.RecipientSeat && grant.Amount == 1 && grant.ArmorAfter == checked(grant.ArmorBefore + 1) && grant.Source == CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f);
     internal bool ValidMouJieyue(ProgramSkillFrame f)
     {
         if (!MouJieyueRoot(f) || f.MouYuJinJieyue is not { } r || r.Source != MouYuJinSource(f) || r.GameplayHash != f.GameplayHash || r.OriginalEndingWindowId != f.WindowContext!.ParentFrameId || !f.SelectedTargetSeats.SequenceEqual([r.RecipientSeat]) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.RecipientSeat) || r.RecipientSeat == f.OwnerSeat || r.Phase.ActorSeat != f.OwnerSeat || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Ending || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouYuJinJieyueReservedEvent>().Count(e => e == new MouYuJinJieyueReservedEvent(f.Id, r.Source, r.GameplayHash, r.OriginalEndingWindowId, r.Phase, r.RecipientSeat)) != 1)
@@ -87,7 +84,7 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
     internal void AnswerMouJieyueGift(PromptChoice selected)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
-        if (!ValidMouJieyue(f) || f.MouYuJinJieyue is not { Stage: MouYuJinJieyueStage.GiftChoice } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != r.RecipientSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouJieyueGiftChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidMouJieyue(f) || f.MouYuJinJieyue is not { Stage: MouYuJinJieyueStage.GiftChoice } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != r.RecipientSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouJieyueGiftChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Jieyue accepts only the actual recipient's canonical private HE gift or refusal.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.Parameters.GetValueOrDefault("option-id") == "decline" || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
@@ -164,7 +161,7 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
         var best = p.Choices.Where(c => c.Parameters.GetValueOrDefault("option-id") == "give").Select(c =>
         {
             var benefit = _coreAiBrainsAiBrainsAccess._aiBrains[giver.Seat].ScoreProgramTarget(view, f.OwnerSeat, new(0, 0, 0, 1, 0, 0, true, false));
-            return (Choice: c, Score: benefit - global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), giver) * 0.35d);
+            return (Choice: c, Score: benefit - CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), giver) * 0.35d);
         }).OrderByDescending(c => c.Score).ThenBy(c => c.Choice.Id.Value, StringComparer.Ordinal).FirstOrDefault();
         return best.Choice is not null && best.Score > 0 ? best.Choice : p.Choices.Single(c => c.Parameters.GetValueOrDefault("option-id") == "decline");
     }

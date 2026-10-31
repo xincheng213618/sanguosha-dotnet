@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
-internal sealed partial class CharacterTangZiOlRuntime : global::CardGame.Core.ISelectionWoundedQueries
+[Core.ProgramRuntimeModule, Core.ProgramCapability]
+internal sealed partial class CharacterTangZiOlRuntime : ISelectionWoundedQueries
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineTreatedWoundedEntries _coreTreatedWoundedOperations;
+    private readonly RuntimeEntries.CoreGameEngineTreatedWoundedEntries _coreTreatedWoundedOperations;
     private readonly ICharacterTangZiOlCoreProgramSelectionModulesOperations _coreProgramSelectionModulesOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CharacterTangZiOlRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineTreatedWoundedEntries coreTreatedWoundedOperations, ICharacterTangZiOlCoreProgramSelectionModulesOperations coreProgramSelectionModulesOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CharacterTangZiOlRuntime(RuntimeEntries.CoreGameEngineTreatedWoundedEntries coreTreatedWoundedOperations, ICharacterTangZiOlCoreProgramSelectionModulesOperations coreProgramSelectionModulesOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._coreTreatedWoundedOperations = coreTreatedWoundedOperations;
         this._coreProgramSelectionModulesOperations = coreProgramSelectionModulesOperations;

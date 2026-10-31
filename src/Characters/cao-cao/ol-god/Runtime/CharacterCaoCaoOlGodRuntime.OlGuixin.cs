@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -16,7 +13,7 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
         CardZoneKind.Equipment => [CardZoneKind.Equipment, CardZoneKind.Hand, CardZoneKind.Judgment],
         CardZoneKind.Judgment => [CardZoneKind.Judgment, CardZoneKind.Hand, CardZoneKind.Equipment],
         _ => throw new InvalidOperationException("OL Guixin requires one HEJ priority region.")};
-    SkillProgramStepOutcome global::CardGame.Core.IOlGuixinHost.Resolve(ProgramSkillFrame f) => BeginOlGuixin(f);
+    SkillProgramStepOutcome IOlGuixinHost.Resolve(ProgramSkillFrame f) => BeginOlGuixin(f);
     internal SkillProgramStepOutcome BeginOlGuixin(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -34,7 +31,7 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal static IReadOnlyList<PromptChoice> OlGuixinPriorityChoices(long id) => Array.AsReadOnly(global::CardGame.Core.EngineOwners.CharacterCaoCaoMobileGodDefinitions.MobileGuixinZones.Select(zone => new PromptChoice(new("ol-guixin." + id + "." + zone), zone switch
+    internal static IReadOnlyList<PromptChoice> OlGuixinPriorityChoices(long id) => Array.AsReadOnly(CharacterCaoCaoMobileGodDefinitions.MobileGuixinZones.Select(zone => new PromptChoice(new("ol-guixin." + id + "." + zone), zone switch
     {
         CardZoneKind.Hand => "优先手牌区",
         CardZoneKind.Equipment => "优先装备区",
@@ -123,7 +120,7 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
         return true;
     }
 
-    internal IReadOnlyList<OlGuixinCandidate> OlGuixinCandidates(ProgramSkillFrame f, int target) => Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, target, global::CardGame.Core.EngineOwners.CharacterCaoCaoMobileGodDefinitions.MobileGuixinZones, OwnedCardMoveIntent.Obtain).Select(c =>
+    internal IReadOnlyList<OlGuixinCandidate> OlGuixinCandidates(ProgramSkillFrame f, int target) => Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, target, CharacterCaoCaoMobileGodDefinitions.MobileGuixinZones, OwnedCardMoveIntent.Obtain).Select(c =>
     {
         var zone = Enum.Parse<CardZoneKind>(c.Parameters["source-zone"]);
         var slot = int.Parse(c.Parameters["slot-index"], CultureInfo.InvariantCulture);

@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunHuanAnniversaryRuntime
 {
-    internal static CardConversionSource SunHuanSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource SunHuanSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardMoveReason SunHuanDrawReason => new("skill.anniversary.niji.draw");
     internal static CardMoveReason SunHuanDiscardReason => new("skill.anniversary.niji.discard");
     internal bool HasAnniversarySunHuan => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversarySunHuanNijiDraw);
@@ -18,7 +15,7 @@ internal sealed partial class CharacterSunHuanAnniversaryRuntime
     [ProgramTargetWindow(ProgramTargetWindowStage.ImplicitSelfDrawTwo, 45400)]
     [ProgramTargetWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, 45400)]
     internal bool SunHuanImplicitTarget(ProgramTargetCardWindowQuery q) => HasAnniversarySunHuan;
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversarySunHuanHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginSunHuan(f, op);
+    SkillProgramStepOutcome IAnniversarySunHuanHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginSunHuan(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 45400, SkillProgramEffectOp.ResolveAnniversarySunHuanNijiEnding)]
     internal bool CanOfferSunHuanEnding(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => SunHuanDraws(c.OwnerSeat, c.SkillInstanceId).Any(d => d.Outcome.ActualDrawIds.Any(id => _cardZonesOperations._cardZones.Contains(CardLocation.Hand(c.OwnerSeat), id)));
     internal IEnumerable<AnniversarySunHuanDraw> SunHuanDraws(int seat, string instance) => _coreMatchParticipantsPlayersAccess._players[seat].AnniversaryNijiDraws.Where(d => d.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && d.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && d.Source.SkillInstanceId == instance);
@@ -98,7 +95,7 @@ internal sealed partial class CharacterSunHuanAnniversaryRuntime
     [ProgramAnswer("anniversary-niji")]
     internal void AnswerSunHuan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversarySunHuan: { Stage: AnniversarySunHuanStage.Choice } r } f || !ValidSunHuan(f) || !SunHuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversarySunHuan: { Stage: AnniversarySunHuanStage.Choice } r } f || !ValidSunHuan(f) || !SunHuanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Niji rejects stale drawn material or illegal native targets.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

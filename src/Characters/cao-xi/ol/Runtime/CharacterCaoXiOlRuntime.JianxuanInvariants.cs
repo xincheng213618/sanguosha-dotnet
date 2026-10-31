@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoXiOlRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CharacterCaoXiOlRuntime
         if (f.CaoXiJianxuan is not { } r || f.SkillId != "ol:jianxuan" || f.InstructionIndex != 1 || r.InstructionIndex != 1 || r.Source != CaoXiSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || !Enum.IsDefined(r.Stage) || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0 } c || c.ParentFrameId != r.ParentWindowId || c.DamageFrameId != r.DamageFrameId || c.TargetSeat != f.OwnerSeat || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveJianxuanRepeatedDraw || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CaoXiJianxuanStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ParentWindowId == r.ParentWindowId && e.DamageFrameId == r.DamageFrameId && e.ActualTurn == r.ActualTurn) != 1)
             return false;
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (i < 2 || _resolutionStackOperations._resolutionStack[i - 1] is not DamageTriggerWindowFrame w || w.Id != r.ParentWindowId || w.ParentFrameId != r.DamageFrameId || w.TargetSeat != f.OwnerSeat || w.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack[i - 2] is not DamageFrame damage || damage.Id != r.DamageFrameId || damage.TargetSeat != f.OwnerSeat || damage.Amount != c.Amount || damage.Amount <= 0)
+        if (i < 2 || _resolutionStackOperations._resolutionStack[i - 1] is not DamageTriggerWindowFrame w || w.Id != r.ParentWindowId || w.ParentFrameId != r.DamageFrameId || w.TargetSeat != f.OwnerSeat || w.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack[i - 2] is not DamageFrame damage || damage.Id != r.DamageFrameId || damage.TargetSeat != f.OwnerSeat || damage.Amount != c.Amount || damage.Amount <= 0)
             return false;
         var recipients = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CaoXiJianxuanRecipientEvent>().Where(e => e.FrameId == f.Id).ToArray();
         var paid = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CaoXiJianxuanDrawPaidEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Cursor).ToArray();

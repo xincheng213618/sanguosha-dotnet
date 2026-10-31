@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramShanheLuanxinRuntime
 {
     internal const string ShanheLuanxinSkillId = "shanhe:companion-luanxin";
-    void global::CardGame.Core.IShanheLuanxinProgramHost.QueueNextDraw(ProgramSkillFrame frame) => QueueShanheLuanxinNextDraw(frame);
+    void IShanheLuanxinProgramHost.QueueNextDraw(ProgramSkillFrame frame) => QueueShanheLuanxinNextDraw(frame);
     internal bool HasShanheLuanxinForeignHandDiscard(int owner, CardMovementBatchContext batch)
     {
         var sequences = batch.Movements.Select(movement => (long)movement.Sequence).ToHashSet();
@@ -34,7 +30,7 @@ internal sealed partial class CoreProgramShanheLuanxinRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (frame.SkillId != ShanheLuanxinSkillId || frame.TriggerId != "other-hand-gain" || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained, MovementBatch: { } batch } || !HasShanheLuanxinOtherHandGain(frame.OwnerSeat, batch) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLuanxinNextDrawIssuedEvent>().Any(issued => issued.ProgramFrameId == frame.Id && issued.InstructionIndex == frame.InstructionIndex))
             throw new InvalidOperationException("Luanxin requires its original completed other-player hand gain batch.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheLuanxinNextDrawIssuedEvent(frame.Id, frame.InstructionIndex, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, batch.Id, frame.OwnerSeat));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheLuanxinNextDrawIssuedEvent(frame.Id, frame.InstructionIndex, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, batch.Id, frame.OwnerSeat));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 81600)]

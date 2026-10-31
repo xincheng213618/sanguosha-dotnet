@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineHellEncounterHostRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineHellEncounterHostRuntime))]
 internal sealed partial class CoreGameEngineHellEncounterHostEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineHellEncounterHostRuntime> _resolve;
-    private CoreGameEngineHellEncounterHostEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineHellEncounterHostRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineHellEncounterHostRuntime> _resolve;
+    private CoreGameEngineHellEncounterHostEntries(Func<EngineOwners.CoreGameEngineHellEncounterHostRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineHellEncounterHostEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineHellEncounterHostRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineHellEncounterHostEntries Create(Func<EngineOwners.CoreGameEngineHellEncounterHostRuntime> resolve) => new(resolve);
 }

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillChoicesRuntime
     [ProgramAnswer("wushuang-original")]
     internal void ResolveWushuangOriginalChoice(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WushuangOriginalSkill: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != f.OwnerSeat || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WushuangOriginalSkill: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != f.OwnerSeat || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("An official skill answer lost its exact privately published prompt.");
         var option = choice.Parameters["option"];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -111,8 +108,8 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillChoicesRuntime
             var card = hand[index];
             var category = CardCatalog.Get(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[r.Target], card)).CategoryName;
             var rewritten = hand.Where(c => CardCatalog.Get(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[r.Target], c)).CategoryName != category).Select(c => c.Id).ToArray();
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), r.Target, "choufa-revealed", Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangChoufaRewrittenEvent(f.Id, f.OwnerSeat, r.Target, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreCardMovementJournalMovementSequenceAccess._movementSequence, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), rewritten));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), r.Target, "choufa-revealed", Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangChoufaRewrittenEvent(f.Id, f.OwnerSeat, r.Target, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreCardMovementJournalMovementSequenceAccess._movementSequence, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), rewritten));
             _coreWushuangOriginalSkillsOperations.FinishWushuangOriginal(f);
             return;
         }
@@ -160,7 +157,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillChoicesRuntime
         {
             var target = choice.Targets.Single();
             var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]);
-            var mask = (hand.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[target], c), SkillProgramCardCategory.Basic)) ? 1 : 0) | (hand.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[target], c), SkillProgramCardCategory.Trick)) ? 2 : 0) | (hand.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[target], c), SkillProgramCardCategory.Equipment)) ? 4 : 0);
+            var mask = (hand.Any(c => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[target], c), SkillProgramCardCategory.Basic)) ? 1 : 0) | (hand.Any(c => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[target], c), SkillProgramCardCategory.Trick)) ? 2 : 0) | (hand.Any(c => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[target], c), SkillProgramCardCategory.Equipment)) ? 4 : 0);
             f = _coreWushuangOriginalSkillsOperations.UpdateWushuangOriginal(f, r with { Stage = "lingren-guess", Target = target, Mask = mask });
             _coreWushuangOriginalSkillsOperations.RunWushuangOriginalSkill(f.Id);
             return;

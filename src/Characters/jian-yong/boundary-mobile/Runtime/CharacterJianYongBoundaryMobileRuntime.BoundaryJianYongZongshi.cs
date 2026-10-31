@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJianYongBoundaryMobileRuntime
@@ -74,7 +70,7 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
         return new(SkillProgramTriggerWindow.PindianResultDetermined, p.Id, c.OwnerSeat, SourceSeat: c.OwnerSeat, TargetSeat: r.SourceSeat == c.OwnerSeat ? r.OpponentSeat : r.SourceSeat, Facts: null);
     }
 
-    internal bool BoundaryZongshiParent(ProgramSkillFrame f, ResolutionFrame p) => p.BoundaryJianYongZongshiContest is { } r && r.ParentFrameId == p.Id && BoundaryZongshiNativeResult(p, out var result, out var comparison) && r.Result == result && r.ComparisonIndex == comparison && r.Cursor < r.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, r.Candidates[r.Cursor]) && f.WindowContext == BoundaryZongshiContext(p, r.Candidates[r.Cursor]);
+    internal bool BoundaryZongshiParent(ProgramSkillFrame f, ResolutionFrame p) => p.BoundaryJianYongZongshiContest is { } r && r.ParentFrameId == p.Id && BoundaryZongshiNativeResult(p, out var result, out var comparison) && r.Result == result && r.ComparisonIndex == comparison && r.Cursor < r.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, r.Candidates[r.Cursor]) && f.WindowContext == BoundaryZongshiContext(p, r.Candidates[r.Cursor]);
     [ProgramTriggerProof(ProgramTriggerProofPhase.NativeWindow, 160, SkillProgramTriggerWindow.PindianResultDetermined)]
     internal bool IsBoundaryJianYongZongshiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => context.Window == SkillProgramTriggerWindow.PindianResultDetermined && c.SkillId == BoundaryJianYongComposition.Zongshi && _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == context.ParentFrameId)is { BoundaryJianYongZongshiContest: { } r } parent && r.ParentFrameId == parent.Id && BoundaryZongshiNativeResult(parent, out var result, out var comparison) && r.Result == result && r.ComparisonIndex == comparison && r.Cursor < r.Candidates.Count && r.Candidates[r.Cursor] == c && context == BoundaryZongshiContext(parent, c);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 56500, SkillProgramEffectOp.ResolveBoundaryJianYongZongshi)]
@@ -167,7 +163,7 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack[^1];
         RequireBoundaryZongshi(f);
         var r = f.BoundaryJianYongZongshi!;
-        if (r.Choice != 0 || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], BoundaryZongshiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (r.Choice != 0 || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], BoundaryZongshiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Zongshi lost its exact original private peek choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Cards.Count == 0)
@@ -268,7 +264,7 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
 
     internal bool BoundaryZongshiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
-        if (f.BoundaryJianYongZongshi is not { Choice: 1 } r || child is not CardsMovedTriggerWindowFrame moved || !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || moved.Batch.ParentFrameId != f.Id)
+        if (f.BoundaryJianYongZongshi is not { Choice: 1 } r || child is not CardsMovedTriggerWindowFrame moved || !CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || moved.Batch.ParentFrameId != f.Id)
             return false;
         RequireBoundaryZongshi(f);
         return moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);

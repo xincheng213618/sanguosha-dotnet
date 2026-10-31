@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineMatchingRecastObserversEntries
 {
-    internal bool IsMatchingRecastChoice(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PendingDecision decision) => _resolve().IsMatchingRecastChoice(f, decision);
+    internal bool IsMatchingRecastChoice(ProgramSkillFrame f, PendingDecision decision) => _resolve().IsMatchingRecastChoice(f, decision);
     internal bool IsMatchingRecastDying() => _resolve().IsMatchingRecastDying();
-    internal bool MatchingRecastFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MatchingRecastFirstChild(f, child);
-    internal global::CardGame.Core.ProgramSkillFrame? MatchingRecastObserverRoot() => _resolve().MatchingRecastObserverRoot();
-    internal bool MatchingRecastStructuralEdge(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.ResolutionFrame child) => _resolve().MatchingRecastStructuralEdge(parent, child);
+    internal bool MatchingRecastFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MatchingRecastFirstChild(f, child);
+    internal ProgramSkillFrame? MatchingRecastObserverRoot() => _resolve().MatchingRecastObserverRoot();
+    internal bool MatchingRecastStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => _resolve().MatchingRecastStructuralEdge(parent, child);
     internal bool TryAdvanceMatchingRecastSubtree() => _resolve().TryAdvanceMatchingRecastSubtree();
-    internal bool ValidMatchingRecastReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidMatchingRecastReceipt(f);
+    internal bool ValidMatchingRecastReceipt(ProgramSkillFrame f) => _resolve().ValidMatchingRecastReceipt(f);
 }

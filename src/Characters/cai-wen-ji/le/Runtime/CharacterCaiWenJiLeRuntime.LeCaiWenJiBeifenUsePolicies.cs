@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiWenJiLeRuntime
@@ -96,7 +92,7 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
 
     internal bool HasIssuedBeifenUse(long useId, int actorSeat)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { BeifenUse: { } r, Action: { Type: CardActionType.Use } action } use || r.UseId != use.Id || r.ActionId != action.ActionId || action.ActorSeat != actorSeat || use.SourceSeat != actorSeat || r.Qualification.ActorSeat != actorSeat || !ValidBeifenQualification(r.Qualification) || !(use.CardKind == r.OriginalKind || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.OriginalKind) && use.CardKind == CardKind.FireSlash && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use)) || _coreProgramEventHistoryOperations.ProgramEventHistory<BeifenUseAcceptedEvent>().Where(e => e.UseId == useId).ToArray()is not [var accepted])
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { BeifenUse: { } r, Action: { Type: CardActionType.Use } action } use || r.UseId != use.Id || r.ActionId != action.ActionId || action.ActorSeat != actorSeat || use.SourceSeat != actorSeat || r.Qualification.ActorSeat != actorSeat || !ValidBeifenQualification(r.Qualification) || !(use.CardKind == r.OriginalKind || CoreNativeCardClassificationsRuntime.IsSlashCard(r.OriginalKind) && use.CardKind == CardKind.FireSlash && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use)) || _coreProgramEventHistoryOperations.ProgramEventHistory<BeifenUseAcceptedEvent>().Where(e => e.UseId == useId).ToArray()is not [var accepted])
             return false;
         var q = r.Qualification;
         return accepted.ActionId == action.ActionId && accepted.Source == q.Source && accepted.GameplayHash == q.GameplayHash && accepted.ActorSeat == actorSeat && accepted.MarkedHandCount == q.MarkedHandCount && accepted.OtherHandCount == q.OtherHandCount && accepted.OriginalKind == r.OriginalKind && accepted.SequenceBefore == q.SequenceBefore && accepted.DeclarationId == r.DeclarationId;

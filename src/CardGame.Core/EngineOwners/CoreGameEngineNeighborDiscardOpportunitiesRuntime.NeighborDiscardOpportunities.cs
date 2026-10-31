@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNeighborDiscardOpportunitiesRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CoreGameEngineNeighborDiscardOpportunitiesRuntime
         return owner;
     }
 
-    internal static bool IsNeighborDiscardTopTrigger(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NeighborDiscardOpportunities.IsNeighborDiscardTopTrigger(trigger);
+    internal static bool IsNeighborDiscardTopTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_NeighborDiscardOpportunities.IsNeighborDiscardTopTrigger(trigger);
     internal IEnumerable<IGameEvent> NeighborDiscardHistory() => _coreCommandJournalStorageEventsPendingEventsAccess._events.Select(e => e.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents);
     internal void CaptureNeighborDiscardOpportunity(long batchId, int actualTurn, IReadOnlyList<CardMovementRecord> movements)
     {

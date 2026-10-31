@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYouAnniversaryRuntime
 {
-    internal static CardConversionSource LiuYouSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource LiuYouSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal AnniversaryLiuYouStartedEvent[] LiuYouPhaseStarts(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuYouStartedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillId == AnniversaryLiuYouComposition.Skill && e.Phase == phase).ToArray();
     internal bool LiuYouPhaseAvailable(int owner) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat == owner && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == owner && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p) && LiuYouPhaseStarts(owner, p)is var starts && starts.Length < _coreMatchParticipantsPlayersAccess._players[owner].Hp && !starts.Any(s => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuYouResultEvent>().Any(e => e.FrameId == s.FrameId && e.Winner == owner));
     internal bool LiuYouTarget(int owner, int target) => LiuYouPhaseAvailable(owner) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && target != owner && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[owner]) && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[target]) && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(owner, target) && !LiuYouPhaseStarts(owner, _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()!).Any(e => e.Target == target);
-    bool global::CardGame.Core.IAnniversaryLiuYouQueries.Target(int owner, int target) => LiuYouTarget(owner, target);
-    int global::CardGame.Core.IAnniversaryLiuYouQueries.Hp(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].Hp;
-    void global::CardGame.Core.IAnniversaryLiuYouHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op)
+    bool IAnniversaryLiuYouQueries.Target(int owner, int target) => LiuYouTarget(owner, target);
+    int IAnniversaryLiuYouQueries.Hp(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].Hp;
+    void IAnniversaryLiuYouHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op)
     {
         if (op == SkillProgramEffectOp.PrepareAnniversaryLiuYouKannan)
             PrepareLiuYou(f);
@@ -73,7 +69,7 @@ internal sealed partial class CharacterLiuYouAnniversaryRuntime
     internal void CaptureAnniversaryLiuYouNextSlash(long cardUseFrameId)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(cardUseFrameId) ?? throw new InvalidOperationException("Kannan requires the actual committing card-use frame.");
-        if (use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || use.AnniversaryLiuYouSlashBonus is not null)
+        if (use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || use.AnniversaryLiuYouSlashBonus is not null)
             return;
         var grants = LiuYouUnconsumed(action.ActorSeat);
         if (grants.Length == 0)

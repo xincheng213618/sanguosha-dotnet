@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICharacterJiangWeiMouMouJiangWeiAnniversaryOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterJiangWeiMouMouJiangWeiAnniversaryOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MouJiangWeiAnniversaryRuntime Get();
+    MouJiangWeiAnniversaryRuntime Get();
 }
 
-internal interface ICharacterJiangWeiMouCorePlayerViewProjectionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterJiangWeiMouCorePlayerViewProjectionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
+    GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
 }

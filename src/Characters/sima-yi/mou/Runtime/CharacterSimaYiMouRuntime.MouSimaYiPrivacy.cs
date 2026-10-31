@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Collections.Frozen;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
     internal void BeginMouSmSecretUse(long useId, long eventStart, long logStart)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(useId)!;
-        if (use.Action is not { } a || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind))
+        if (use.Action is not { } a || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind))
             return;
         var b = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat]).GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCommitted).FirstOrDefault(b => b.SkillId == MouSimaYiComposition.Pingliao && MouSimaYiComposition.Private(b.Trigger));
         var original = use.AcceptedDeclarationPayment?.MouSimaYiSecret;
@@ -57,7 +54,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { MouSimaYiSecret = s with { LogSequences = s.LogSequences.Append(log.Sequence).ToArray() } });
     }
 
-    internal global::CardGame.Core.GameEngine.MouSmPublicProjection? PrepareMouSmPublicProjection()
+    internal GameEngine.MouSmPublicProjection? PrepareMouSmPublicProjection()
     {
         var leases = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Select(u => u.MouSimaYiSecret).OfType<MouSmSecretLease>().ToArray();
         var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Where(e => e is MouSmTargetsDisclosedEvent or MouSmSecretDeclarationRecordedEvent).ToArray();
@@ -67,7 +64,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
         return new(leases.SelectMany(x => x.EventSequences).Concat(disclosed.SelectMany(x => x.HeldEventSequences)).ToFrozenSet(), leases.SelectMany(x => x.LogSequences).Concat(disclosed.SelectMany(x => x.HeldLogSequences)).ToFrozenSet(), facts.OfType<MouSmSecretDeclarationRecordedEvent>().Select(x => x.DeclarationId).ToFrozenSet());
     }
 
-    internal static EventEnvelope? MouSmPublicEvent(EventEnvelope envelope, global::CardGame.Core.GameEngine.MouSmPublicProjection? projection)
+    internal static EventEnvelope? MouSmPublicEvent(EventEnvelope envelope, GameEngine.MouSmPublicProjection? projection)
     {
         if (projection is null)
             return envelope;
@@ -95,7 +92,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
 
     internal DeclaredCardPayment CaptureMouSmDeclaration(DeclaredCardPayment payment, CardDeclarationParentReturn parent)
     {
-        if (parent.Purpose is not (CardDeclarationPurpose.Use or CardDeclarationPurpose.ProvidedSlash or CardDeclarationPurpose.BorrowedSword or CardDeclarationPurpose.BorrowedSwordProvidedSlash or CardDeclarationPurpose.QinglongProvidedSlash) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(parent.FinalEffectiveKind ?? payment.DeclaredKind))
+        if (parent.Purpose is not (CardDeclarationPurpose.Use or CardDeclarationPurpose.ProvidedSlash or CardDeclarationPurpose.BorrowedSword or CardDeclarationPurpose.BorrowedSwordProvidedSlash or CardDeclarationPurpose.QinglongProvidedSlash) || !CoreNativeCardClassificationsRuntime.IsSlashCard(parent.FinalEffectiveKind ?? payment.DeclaredKind))
             return payment;
         var b = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[parent.ActorSeat]).GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCommitted).FirstOrDefault(b => b.SkillId == MouSimaYiComposition.Pingliao && MouSimaYiComposition.Private(b.Trigger));
         if (b is null)
@@ -109,11 +106,11 @@ internal sealed partial class CharacterSimaYiMouRuntime
 
     internal IReadOnlyList<int> MouSmDeclarationTargets(CardDeclarationFrame frame, int viewer, bool revealAll) => frame.Payment.MouSimaYiSecret is not null && !revealAll && viewer != frame.Return.ActorSeat ? Array.Empty<int>() : Array.AsReadOnly(frame.TargetSeats.ToArray());
     internal bool HoldMouSmAiAttack(int source, int target) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => u.SourceSeat == source && u.TargetSeats.Contains(target) && u.MouSimaYiSecret is { Released: false });
-    internal bool TryBeginMouSmPrivateWindow(global::CardGame.Core.NativeOwners.CardAttackHandle attack, MouSmPrivateCall call)
+    internal bool TryBeginMouSmPrivateWindow(NativeOwners.CardAttackHandle attack, MouSmPrivateCall call)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } a, MouSimaYiSecret: { Started: false, Released: false } s } u)
             return false;
-        if (a.ActionId != s.ActionId || a.ActorSeat != s.Source.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || s.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(s.Source.SkillId).Program?.GameplayHash || _resolutionStackOperations._resolutionStack[^1].Id != u.Id)
+        if (a.ActionId != s.ActionId || a.ActorSeat != s.Source.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || s.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(s.Source.SkillId).Program?.GameplayHash || _resolutionStackOperations._resolutionStack[^1].Id != u.Id)
             throw new InvalidOperationException("Pingliao lost its original secret Slash before target windows.");
         var trigger = _contentRegistryOperations._contentRegistry.GetSkill(s.Source.SkillId).Program!.Triggers.Single(t => t.Id == s.Source.BindingId);
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
@@ -132,7 +129,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
         return true;
     }
 
-    internal bool ValidMouSmPrivateWindow(ProgramCardTriggerWindowFrame p) => p.MouSimaYiPrivate is { } back && p.ParentFrameId == back.UseId && p.AttackOwnerFrameId == back.UseId && p.Continuation == ProgramCardContinuation.CommittedSlash && _coreCardUseLifecycleOperations.LifecycleCardUse(back.UseId)is { Action: { } a, MouSimaYiSecret: { Started: true } s } u && s.WindowId == p.Id && s.ActionId == back.ActionId && s.Call == back.Call && a.ActionId == back.ActionId && p.Action.ActionId == back.ActionId && a.Type == CardActionType.Use && a.ActorSeat == s.Source.OwnerSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && a.TargetSeats.SequenceEqual(p.Action.TargetSeats) && p.Candidates is [var c] && c.OwnerSeat == s.Source.OwnerSeat && c.SkillId == s.Source.SkillId && c.TriggerId == s.Source.BindingId && c.SkillInstanceId == s.Source.SkillInstanceId && c.GameplayHash == s.GameplayHash && s.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash;
+    internal bool ValidMouSmPrivateWindow(ProgramCardTriggerWindowFrame p) => p.MouSimaYiPrivate is { } back && p.ParentFrameId == back.UseId && p.AttackOwnerFrameId == back.UseId && p.Continuation == ProgramCardContinuation.CommittedSlash && _coreCardUseLifecycleOperations.LifecycleCardUse(back.UseId)is { Action: { } a, MouSimaYiSecret: { Started: true } s } u && s.WindowId == p.Id && s.ActionId == back.ActionId && s.Call == back.Call && a.ActionId == back.ActionId && p.Action.ActionId == back.ActionId && a.Type == CardActionType.Use && a.ActorSeat == s.Source.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && a.TargetSeats.SequenceEqual(p.Action.TargetSeats) && p.Candidates is [var c] && c.OwnerSeat == s.Source.OwnerSeat && c.SkillId == s.Source.SkillId && c.TriggerId == s.Source.BindingId && c.SkillInstanceId == s.Source.SkillInstanceId && c.GameplayHash == s.GameplayHash && s.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash;
     [ProgramIssuedTrigger(420)]
     internal bool IsIssuedMouSmPrivateCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {

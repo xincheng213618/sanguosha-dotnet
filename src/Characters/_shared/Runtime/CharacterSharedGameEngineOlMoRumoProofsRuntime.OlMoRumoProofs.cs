@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSharedGameEngineOlMoRumoProofsRuntime
@@ -18,6 +14,6 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoProofsRuntime
         return entries.SingleOrDefault();
     }
 
-    internal static ProgramTriggerCandidate OlMoRumoCandidate(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules__shared_OlMoRumo_Proofs.OlMoRumoCandidate(frame);
-    internal bool OlMoRumoCandidateSource(ProgramTriggerCandidate candidate) => candidate.SkillId == "ol:mo-rumo" && candidate.BindingId == "no-damage-round-ending" && candidate.Priority == 0 && candidate.OccurrenceIndex == 0 && OlMoRumoEntry(candidate.OwnerSeat)is { } entry && entry.EntryRound <= _coreActualRoundProgressRoundNumberAccess._roundNumber && candidate.SkillInstanceId == global::CardGame.Core.EngineOwners.CharacterSharedGameEngineOlMoRumoRuntime.OlMoRumoInstance(entry.EntryId) && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault("ol:mo-rumo")?.Program is { } program && program.GameplayHash == candidate.GameplayHash && program.Triggers is [{ Id: "no-damage-round-ending", Window: SkillProgramTriggerWindow.RoundEnding, Optional: false, Effects: [{ Op: SkillProgramEffectOp.ResolveOlMoRumoRoundPenalty }] }];
+    internal static ProgramTriggerCandidate OlMoRumoCandidate(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules__shared_OlMoRumo_Proofs.OlMoRumoCandidate(frame);
+    internal bool OlMoRumoCandidateSource(ProgramTriggerCandidate candidate) => candidate.SkillId == "ol:mo-rumo" && candidate.BindingId == "no-damage-round-ending" && candidate.Priority == 0 && candidate.OccurrenceIndex == 0 && OlMoRumoEntry(candidate.OwnerSeat)is { } entry && entry.EntryRound <= _coreActualRoundProgressRoundNumberAccess._roundNumber && candidate.SkillInstanceId == CharacterSharedGameEngineOlMoRumoRuntime.OlMoRumoInstance(entry.EntryId) && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault("ol:mo-rumo")?.Program is { } program && program.GameplayHash == candidate.GameplayHash && program.Triggers is [{ Id: "no-damage-round-ending", Window: SkillProgramTriggerWindow.RoundEnding, Optional: false, Effects: [{ Op: SkillProgramEffectOp.ResolveOlMoRumoRoundPenalty }] }];
 }

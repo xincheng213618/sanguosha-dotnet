@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuJinDingOlRuntime
 {
     internal const string QingyuanTakeReason = "skill-program.hu-jin-ding.qingyuan.take";
-    SkillProgramStepOutcome global::CardGame.Core.IHuJinDingProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginQingyuan(f, op);
+    SkillProgramStepOutcome IHuJinDingProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginQingyuan(f, op);
     internal IReadOnlyList<int> QingyuanNewPartnerChoices(int owner, string skill, string instance) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && !QingyuanPartners(owner, skill, instance).Any(mark => mark.PartnerSeat == p.Seat)).Select(p => p.Seat).ToArray());
     internal int[] QingyuanTakeHolders(int owner, string skill, string instance) => QingyuanPartners(owner, skill, instance).Where(IsLiveQingyuanPartner).Select(p => p.PartnerSeat).Distinct().Where(s => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Count > 0).Order().ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26820)]
@@ -29,7 +25,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     internal SkillProgramStepOutcome BeginQingyuan(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.Qingyuan is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanOfferHuJinDing(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
+        if (f.Qingyuan is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanOfferHuJinDing(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Qingyuan requires its exact unissued lifecycle or qualified hand-gain candidate.");
         var receipt = new QingyuanReceipt(HuJinDingSource(f), f.GameplayHash, op, f.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, QingyuanStage.ChoosingPartner, Damage: op == SkillProgramEffectOp.SelectQingyuanFirstDamagePartner ? _coreProgramEventHistoryOperations.ProgramEventHistory<QingyuanFirstDamageEvent>().Single(d => d.OwnerSeat == f.OwnerSeat) : null);
         if (op == SkillProgramEffectOp.TakeRandomQingyuanHandAfterGain)
@@ -75,7 +71,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     [ProgramAnswer("qingyuan-partner")]
     internal void AnswerQingyuanPartner(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Qingyuan: { Stage: QingyuanStage.ChoosingPartner } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !QingyuanPartnerChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Qingyuan: { Stage: QingyuanStage.ChoosingPartner } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !QingyuanPartnerChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Qingyuan lost its exact mandatory public partner choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var partner = choice.Targets.Single();

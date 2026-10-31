@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengJiChengCuiOlRuntime
@@ -76,7 +72,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (f.InstructionIndex != 1 || f.WindowContext is not { } c || !IsIssuedXumingCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex), c))
+        if (f.InstructionIndex != 1 || f.WindowContext is not { } c || !IsIssuedXumingCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex), c))
             throw new InvalidOperationException("Xuming lost its issued original actual-turn-end candidate.");
         var promises = PendingXumingPromises(f.OwnerSeat).Where(p => p.Source.SkillInstanceId == f.SkillInstanceId && p.GameplayHash == f.GameplayHash).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { XumingEnding = new(ChengJiSource(f), f.GameplayHash, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, c.ParentFrameId, XumingStage.Choosing) { Promises = promises } });

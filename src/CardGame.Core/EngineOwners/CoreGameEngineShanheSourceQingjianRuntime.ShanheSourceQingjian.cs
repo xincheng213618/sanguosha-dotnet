@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -23,7 +20,7 @@ internal sealed partial class CoreGameEngineShanheSourceQingjianRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var original = SourceQingjianOriginalGains(frame.OwnerSeat, frame.WindowContext);
-        if (frame.ShanheSourceQingjian is not null || frame.SkillId != ShanheSourceQingjianSkill || frame.WindowContext?.MovementBatch is not { } batch || original.Count == 0 || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not CardsMovedTriggerWindowFrame window || frame.WindowContext.ParentFrameId != window.Id || window.Batch != batch || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]))
+        if (frame.ShanheSourceQingjian is not null || frame.SkillId != ShanheSourceQingjianSkill || frame.WindowContext?.MovementBatch is not { } batch || original.Count == 0 || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not CardsMovedTriggerWindowFrame window || frame.WindowContext.ParentFrameId != window.Id || window.Batch != batch || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]))
             throw new InvalidOperationException("Source Qingjian requires its original actual gain batch and owned movement candidate.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheSourceQingjian = new(batch.Id, frame.InstructionIndex, Array.AsReadOnly(original.ToArray()), Array.AsReadOnly(Array.Empty<int>())) });
         PublishSourceQingjian(frame);
@@ -69,7 +66,7 @@ internal sealed partial class CoreGameEngineShanheSourceQingjianRuntime
     [ProgramAnswer("source-qingjian-distribute")]
     internal void AnswerSourceQingjian(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceQingjian: { ReturningChild: false } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || receipt.InstructionIndex != frame.InstructionIndex || !SourceQingjianChoices(frame).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceQingjian: { ReturningChild: false } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || receipt.InstructionIndex != frame.InstructionIndex || !SourceQingjianChoices(frame).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Source Qingjian requires its current original-gain entity and exact recipient choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -148,5 +145,5 @@ internal sealed partial class CoreGameEngineShanheSourceQingjianRuntime
         return choices.OrderBy(choice => CardCatalog.Get(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards[0]).Kind).HandKeepValue).FirstOrDefault() ?? decision.Choices.Single(choice => choice.Parameters.GetValueOrDefault("branch") == "finish");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceQingjianHost.DistributeOriginalGains(ProgramSkillFrame frame) => DistributeSourceQingjianGains(frame);
+    SkillProgramStepOutcome IShanheSourceQingjianHost.DistributeOriginalGains(ProgramSkillFrame frame) => DistributeSourceQingjianGains(frame);
 }

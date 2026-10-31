@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -15,7 +12,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
 
     internal bool SlashBenefitProgramParentMatches(ProgramSkillFrame f)
     {
-        if (f.WindowContext is not { SlashTargetBenefit: { } identity } context || !global::CardGame.Core.EngineOwners.CoreGameEngineSlashTargetBenefitWindowsRuntime.IsSlashTargetBenefitWindow(context.Window) || _resolutionStackOperations._resolutionStack.OfType<SlashTargetBenefitWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.ParentFrameId != identity.Use.CardUseFrameId || !_coreSlashTargetBenefitObserversOperations.SlashBenefitWindowMatches(parent) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || parent.Contexts[parent.CandidateIndex] != context || identity.Source.OwnerSeat != f.OwnerSeat || identity.Source.SkillId != f.SkillId || identity.Source.SkillInstanceId != f.SkillInstanceId || identity.GameplayHash != f.GameplayHash || !_coreSlashTargetBenefitWindowsOperations.MatchesSlashTargetBenefitUse(identity.Use))
+        if (f.WindowContext is not { SlashTargetBenefit: { } identity } context || !CoreGameEngineSlashTargetBenefitWindowsRuntime.IsSlashTargetBenefitWindow(context.Window) || _resolutionStackOperations._resolutionStack.OfType<SlashTargetBenefitWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.ParentFrameId != identity.Use.CardUseFrameId || !_coreSlashTargetBenefitObserversOperations.SlashBenefitWindowMatches(parent) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || parent.Contexts[parent.CandidateIndex] != context || identity.Source.OwnerSeat != f.OwnerSeat || identity.Source.SkillId != f.SkillId || identity.Source.SkillInstanceId != f.SkillInstanceId || identity.GameplayHash != f.GameplayHash || !_coreSlashTargetBenefitWindowsOperations.MatchesSlashTargetBenefitUse(identity.Use))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == parent.Id && f.InstructionIndex == 1;
@@ -26,7 +23,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
     [ProgramContinuation(ProgramContinuationKind.Resume, 590)]
     internal bool ResumeSlashTargetBenefit(long frameId)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != frameId || !global::CardGame.Core.EngineOwners.CoreGameEngineSlashTargetBenefitWindowsRuntime.IsSlashTargetBenefitWindow(f.WindowContext?.Window ?? default))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != frameId || !CoreGameEngineSlashTargetBenefitWindowsRuntime.IsSlashTargetBenefitWindow(f.WindowContext?.Window ?? default))
             return false;
         var settlement = f.WindowContext!.Window == SkillProgramTriggerWindow.SlashDodgeCancelledBenefit;
         // The initial unpaid instruction retains the ordinary executor's source
@@ -311,9 +308,9 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
 
         var cardOwner = d.Settlement ? f.OwnerSeat : d.Receipt.Use.TargetSeat;
         var discardScore = _coreAiBrainsAiBrainsAccess._aiBrains[decision.PlayerSeat].ScoreProgramTarget(view, cardOwner, new(0, 0, 0, 0, 0, 1, false, false));
-        return decision.Choices.OrderBy(c => (discardScore > 0 ? -1 : 1) * (c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[cardOwner]) : 5d)).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+        return decision.Choices.OrderBy(c => (discardScore > 0 ? -1 : 1) * (c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[cardOwner]) : 5d)).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISlashTargetBenefitProgramHost.OfferSlashTargetBenefit(ProgramSkillFrame f, string binding) => OfferSlashTargetBenefit(f, binding);
-    SkillProgramStepOutcome global::CardGame.Core.ISlashTargetBenefitProgramHost.SettleDodgeCancelledSlashBenefit(ProgramSkillFrame f) => SettleDodgeCancelledSlashBenefit(f);
+    SkillProgramStepOutcome ISlashTargetBenefitProgramHost.OfferSlashTargetBenefit(ProgramSkillFrame f, string binding) => OfferSlashTargetBenefit(f, binding);
+    SkillProgramStepOutcome ISlashTargetBenefitProgramHost.SettleDodgeCancelledSlashBenefit(ProgramSkillFrame f) => SettleDodgeCancelledSlashBenefit(f);
 }

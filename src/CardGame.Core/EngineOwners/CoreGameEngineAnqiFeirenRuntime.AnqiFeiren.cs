@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAnqiFeirenRuntime
@@ -24,7 +20,7 @@ internal sealed partial class CoreGameEngineAnqiFeirenRuntime
         if (candidates.Length == 0)
             return SkillProgramStepOutcome.Continue;
         var index = _randomOperations._random.Next(candidates.Length);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnqiFeirenSuppressedEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, window.Id, window.ParentFrameId, weapon.Id, target, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat, candidates[index], index, candidates.Length));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnqiFeirenSuppressedEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, window.Id, window.ParentFrameId, weapon.Id, target, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat, candidates[index], index, candidates.Length));
         _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
         return SkillProgramStepOutcome.Continue;
     }
@@ -42,5 +38,5 @@ internal sealed partial class CoreGameEngineAnqiFeirenRuntime
         }
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnqiFeirenHost.ResolveAnqiFeiren(ProgramSkillFrame frame) => ResolveAnqiFeiren(frame);
+    SkillProgramStepOutcome IAnqiFeirenHost.ResolveAnqiFeiren(ProgramSkillFrame frame) => ResolveAnqiFeiren(frame);
 }

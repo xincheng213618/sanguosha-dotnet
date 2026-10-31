@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheSanshouArmorEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheSanshouArmorRuntime> _resolve;
-    private CoreGameEngineShanheSanshouArmorEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheSanshouArmorRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineShanheSanshouArmorRuntime> _resolve;
+    private CoreGameEngineShanheSanshouArmorEntries(Func<EngineOwners.CoreGameEngineShanheSanshouArmorRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineShanheSanshouArmorEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheSanshouArmorRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineShanheSanshouArmorEntries Create(Func<EngineOwners.CoreGameEngineShanheSanshouArmorRuntime> resolve) => new(resolve);
 }

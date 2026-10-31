@@ -1,27 +1,23 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICharacterChengYuMouOlMouLidanOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterChengYuMouOlMouLidanOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MouLidanRuntime Get();
+    MouLidanRuntime Get();
 }
 
-internal interface ICharacterChengYuMouOlMouDanchiOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterChengYuMouOlMouDanchiOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MouDanchiRuntime Get();
+    MouDanchiRuntime Get();
 }
 
-internal interface ICharacterChengYuMouOlCoreNativeRuleQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterChengYuMouOlCoreNativeRuleQueriesOperations : IProgramRuntimeOperations
 {
     int GetCombatDistance(int sourceSeat, int targetSeat);
 }
 
-internal interface ICharacterChengYuMouOlCoreProgramTargetRulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterChengYuMouOlCoreProgramTargetRulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTargetRules TargetRules { get; }
+    ProgramTargetRules TargetRules { get; }
 }

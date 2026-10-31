@@ -74,7 +74,7 @@ internal sealed class NativeDrawAttemptRuntime(IProgramRuntimeFrames frames,
             frame.WindowContext is not { } context || ExactNativeDrawAttempt(context) is not { Replacement: null } attempt ||
             frames.ParentOf(active.Id) is not ProgramLifecycleTriggerWindowFrame window ||
             window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count ||
-            !global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]) ||
+            !RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]) ||
             context.NativeDraw is not { } native || frame.OwnerSeat != native.RecipientSeat ||
             !queries.IsValidSeat(sourceSeat) || sourceSeat == native.RecipientSeat ||
             sequenceBefore < native.SequenceBefore || sequenceBefore > queries.MovementSequence ||
@@ -103,7 +103,7 @@ internal sealed class NativeDrawAttemptRuntime(IProgramRuntimeFrames frames,
             frame.WindowContext is not { } context || ExactNativeDrawAttempt(context) is not { Replacement: null } attempt ||
             frames.ParentOf(active.Id) is not ProgramLifecycleTriggerWindowFrame window ||
             window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count ||
-            !global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]) ||
+            !RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]) ||
             !IsExactNativeDrawCandidate(window.Candidates[window.CandidateIndex], context) ||
             queries.DrawPileSlashReplacementProof(frame, attempt.Context) is not { } proof || proof.ProgramFrameId != frame.Id)
             throw new InvalidOperationException("A DrawPile replacement lost its exact issued request and entitlement.");
@@ -147,7 +147,7 @@ internal sealed class NativeDrawAttemptRuntime(IProgramRuntimeFrames frames,
         if (frame.WindowContext is not { } context || ExactNativeDrawAttempt(context) is null ||
             frames.Top is not ProgramLifecycleTriggerWindowFrame window ||
             window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count ||
-            !global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]))
+            !RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]))
             throw new InvalidOperationException("A pre-draw binding lost its exact candidate return.");
         cursors.AdvanceProgramLifecycleCursor(window);
         frames.Advance(window.Id);

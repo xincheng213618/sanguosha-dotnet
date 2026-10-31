@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramIssuedTriggerBridgesEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineProgramIssuedTriggerBridgesRuntime> _resolve;
-    private CoreGameEngineProgramIssuedTriggerBridgesEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineProgramIssuedTriggerBridgesRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineProgramIssuedTriggerBridgesRuntime> _resolve;
+    private CoreGameEngineProgramIssuedTriggerBridgesEntries(Func<EngineOwners.CoreGameEngineProgramIssuedTriggerBridgesRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineProgramIssuedTriggerBridgesEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineProgramIssuedTriggerBridgesRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineProgramIssuedTriggerBridgesEntries Create(Func<EngineOwners.CoreGameEngineProgramIssuedTriggerBridgesRuntime> resolve) => new(resolve);
 }

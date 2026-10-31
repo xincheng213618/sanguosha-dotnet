@@ -1,35 +1,31 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ProgramWindowCursorRuntime))]
-internal sealed class CoreCardActionsProgramWindowCursorAdapter(global::System.Func<global::CardGame.Core.ProgramWindowCursorRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreCardActionsProgramWindowCursorOperations
+[Core.ProgramCapability(typeof(ProgramWindowCursorRuntime))]
+internal sealed class CoreCardActionsProgramWindowCursorAdapter(Func<ProgramWindowCursorRuntime> targetFactory) : ICoreCardActionsProgramWindowCursorOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.ProgramWindowCursorRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramWindowCursorRuntime Get() => this._targetFactory();
+    private readonly Func<ProgramWindowCursorRuntime> _targetFactory = targetFactory;
+    public ProgramWindowCursorRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime))]
-internal sealed class CoreCardActionsCoreNativeRuleQueriesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreCardActionsCoreNativeRuleQueriesOperations
+[Core.ProgramCapability(typeof(CoreNativeRuleQueriesRuntime))]
+internal sealed class CoreCardActionsCoreNativeRuleQueriesAdapter(Func<CoreNativeRuleQueriesRuntime> targetFactory) : ICoreCardActionsCoreNativeRuleQueriesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> _targetFactory = targetFactory;
+    private readonly Func<CoreNativeRuleQueriesRuntime> _targetFactory = targetFactory;
     public int GetCombatDistance(int sourceSeat, int targetSeat) => this._targetFactory().GetCombatDistance(sourceSeat, targetSeat);
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramCardLegalityRuntime))]
-internal sealed class CoreCardActionsCoreProgramCardLegalityAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramCardLegalityRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreCardActionsCoreProgramCardLegalityOperations
+[Core.ProgramCapability(typeof(CoreProgramCardLegalityRuntime))]
+internal sealed class CoreCardActionsCoreProgramCardLegalityAdapter(Func<CoreProgramCardLegalityRuntime> targetFactory) : ICoreCardActionsCoreProgramCardLegalityOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramCardLegalityRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramCardLegality CardLegality { get => this._targetFactory().CardLegality; }
+    private readonly Func<CoreProgramCardLegalityRuntime> _targetFactory = targetFactory;
+    public ProgramCardLegality CardLegality { get => this._targetFactory().CardLegality; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramCardUsePaymentsRuntime))]
-internal sealed class CoreCardActionsCoreProgramCardUsePaymentsAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramCardUsePaymentsRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreCardActionsCoreProgramCardUsePaymentsOperations
+[Core.ProgramCapability(typeof(CoreProgramCardUsePaymentsRuntime))]
+internal sealed class CoreCardActionsCoreProgramCardUsePaymentsAdapter(Func<CoreProgramCardUsePaymentsRuntime> targetFactory) : ICoreCardActionsCoreProgramCardUsePaymentsOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramCardUsePaymentsRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramCardUsePayments CardUsePayments { get => this._targetFactory().CardUsePayments; }
+    private readonly Func<CoreProgramCardUsePaymentsRuntime> _targetFactory = targetFactory;
+    public ProgramCardUsePayments CardUsePayments { get => this._targetFactory().CardUsePayments; }
 }

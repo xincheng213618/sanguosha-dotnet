@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuKangWumiaoRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IWuLuKangHost.Shenduan(ProgramSkillFrame f) => BeginWuLuKangShenduan(f);
-    SkillProgramStepOutcome global::CardGame.Core.IWuLuKangHost.Kegou(ProgramSkillFrame f) => BeginWuLuKangKegou(f);
+    SkillProgramStepOutcome IWuLuKangHost.Shenduan(ProgramSkillFrame f) => BeginWuLuKangShenduan(f);
+    SkillProgramStepOutcome IWuLuKangHost.Kegou(ProgramSkillFrame f) => BeginWuLuKangKegou(f);
     internal SkillProgramStepOutcome BeginWuLuKangShenduan(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -124,7 +121,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.WuLuKangShenduan!;
-        if (!ValidWuLuKangShenduan(f) || r.Stage != WuLuKangShenduanStage.DiscardChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuLuKangShenduanChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidWuLuKangShenduan(f) || r.Stage != WuLuKangShenduanStage.DiscardChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuLuKangShenduanChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Shenduan requires its original participant's actual HE discard slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.Parameters["branch"] == "decline")
@@ -302,5 +299,5 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveWuLuKangShenduan)]
-    internal PromptChoice AiWuLuKangShenduan(PendingDecision pending, ProgramSkillFrame f) => pending.Choices.Where(c => c.Parameters["branch"] == "discard").OrderBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[pending.PlayerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).FirstOrDefault() ?? pending.Choices[0];
+    internal PromptChoice AiWuLuKangShenduan(PendingDecision pending, ProgramSkillFrame f) => pending.Choices.Where(c => c.Parameters["branch"] == "discard").OrderBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[pending.PlayerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).FirstOrDefault() ?? pending.Choices[0];
 }

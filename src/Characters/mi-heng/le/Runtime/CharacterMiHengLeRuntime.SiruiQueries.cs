@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMiHengLeRuntime
 {
     internal bool HasSiruiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesEqualNameLengthUse;
 
-    internal static int SiruiNameLength(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_mi_heng_le_SiruiQueries.SiruiNameLength(kind);
+    internal static int SiruiNameLength(CardKind kind) => RuntimeSkills.RuntimeRules_mi_heng_le_SiruiQueries.SiruiNameLength(kind);
     internal bool IsSiruiSource(CardConversionSource? source) => source is { SkillId: "le:sirui" } && _corePlayCardHistoryOperations.ViewAsRule(source)is { EqualNameLengthUse: true };
     internal ActualDiscardRecoveryPhaseKey? SiruiCurrentPhase(int actor)
     {
@@ -49,11 +44,11 @@ internal sealed partial class CharacterMiHengLeRuntime
             return _resolutionStackOperations._resolutionStack.LastOrDefault()is NullificationWindowFrame n && n.CandidateIndex < n.CandidateSeats.Count && n.CandidateSeats[n.CandidateIndex] == owner.Seat;
         if (kind == CardKind.Dodge)
             return _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, kind);
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { AwaitingProviders: true })
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { AwaitingProviders: true })
             return false;
         if (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { ActiveAttack: null } borrowed && borrowed.WeaponOwnerSeat == owner.Seat)
             return true;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack))
             return true;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)is not { } effect)
             return false;
@@ -64,27 +59,27 @@ internal sealed partial class CharacterMiHengLeRuntime
         return _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(f, effect.Op, owner.Seat);
     }
 
-    internal bool SiruiIgnoresSlashDistance(CharacterState actor, CardConversionSource? source) => source is not null && IsSiruiSource(source) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind) && CanUseSiruiPhase(actor, source);
+    internal bool SiruiIgnoresSlashDistance(CharacterState actor, CardConversionSource? source) => source is not null && IsSiruiSource(source) && CoreNativeCardClassificationsRuntime.IsSlashCard(_corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind) && CanUseSiruiPhase(actor, source);
     internal bool SiruiIgnoresSlashLimit(CharacterState actor, CardConversionSource? source) => SiruiIgnoresSlashDistance(actor, source);
-    internal IReadOnlyList<SlashUseVariant> SiruiPhysicalSlashVariants(CharacterState actor, Card card) => global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, forResponse: false).Any(source => IsSiruiSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind)).Select(kind => new SlashUseVariant(kind, AdditionalConversionSource: null, UsesZhuqueFan: false)).ToArray();
+    internal IReadOnlyList<SlashUseVariant> SiruiPhysicalSlashVariants(CharacterState actor, Card card) => CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, forResponse: false).Any(source => IsSiruiSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind)).Select(kind => new SlashUseVariant(kind, AdditionalConversionSource: null, UsesZhuqueFan: false)).ToArray();
     internal bool SiruiExplicitForcedSlashFrontier(CharacterState actor)
     {
         var top = _resolutionStackOperations._resolutionStack.LastOrDefault();
         bool At(long parent) => top?.Id == parent || top is ResponseWindowFrame response && response.ParentFrameId == parent;
-        return _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true, ActiveAttack: null } borrowed && borrowed.WeaponOwnerSeat == actor.Seat && At(borrowed.ResolutionId) || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == actor.Seat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && At(qinglong.Attack.ResolutionId);
+        return _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true, ActiveAttack: null } borrowed && borrowed.WeaponOwnerSeat == actor.Seat && At(borrowed.ResolutionId) || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == actor.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && At(qinglong.Attack.ResolutionId);
     }
 
     internal bool SiruiNativeConversionMatchesOutput(CharacterState actor, CardConversionSource source, CardKind kind) => !IsSiruiSource(source) || !SiruiExplicitForcedSlashFrontier(actor) || _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind;
-    internal bool SiruiAllowsUnspecifiedForcedSlash(CharacterState actor, Card card, CardKind kind) => !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !SiruiExplicitForcedSlashFrontier(actor) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, kind) || SiruiPhysicalSlashVariants(actor, card).Count == 0;
+    internal bool SiruiAllowsUnspecifiedForcedSlash(CharacterState actor, Card card, CardKind kind) => !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !SiruiExplicitForcedSlashFrontier(actor) || CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, kind) || SiruiPhysicalSlashVariants(actor, card).Count == 0;
     internal bool SiruiSlashAliasAllowed(CharacterState actor, bool forResponse) => IsSiruiTrueResponseUse(actor, CardKind.Slash) && (!forResponse || _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not null || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not null || _resolutionStackOperations._resolutionStack.LastOrDefault() is ProgramSkillFrame);
-    internal bool HasSiruiForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => _coreNativeDamageHandlesOperations.UsesFormalQinglongCrescentBlade && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(pending.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target) && global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => HasSiruiSlashDistance(actor, kind));
+    internal bool HasSiruiForcedSlash(CharacterState actor, CharacterState target, NativeOwners.QinglongCrescentBladeHandle pending) => _coreNativeDamageHandlesOperations.UsesFormalQinglongCrescentBlade && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(pending.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target) && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => HasSiruiSlashDistance(actor, kind));
     internal bool SiruiBorrowedChoiceAllowed(CharacterState actor, CharacterState target, Card card, PromptChoice choice)
     {
         if (SiruiPhysicalSlashVariants(actor, card).Count == 0)
             return true;
-        if (!Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("response-card-kind"), out var kind) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (!Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("response-card-kind"), out var kind) || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return false;
-        _ = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source);
+        _ = CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source);
         var from = _cardZonesOperations._cardZones.GetLocation(card.Id);
         var excluded = from == CardLocation.Equipment(actor.Seat) && _coreEquipmentContentOperations.EquipmentRules.Get(card.Kind).Slot == EquipmentSlot.Weapon ? card.Id : (int? )null;
         // The coarse native request may exist because Sirui can reach this
@@ -92,18 +87,18 @@ internal sealed partial class CharacterMiHengLeRuntime
         return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, target, card, source, kind, physicalCardIds: [card.Id], excludedEquipmentId: excluded);
     }
 
-    internal bool IsSiruiPhysicalSlashKind(CharacterState actor, Card card, CardKind kind) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, forResponse: false).Any(source => IsSiruiSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind);
+    internal bool IsSiruiPhysicalSlashKind(CharacterState actor, Card card, CardKind kind) => CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, forResponse: false).Any(source => IsSiruiSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind);
     internal CardKind SiruiSelectedSlashKind(CharacterState actor, Card card, CardKind fallback, CardConversionSource? explicitSource = null)
     {
         var selected = explicitSource ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion;
-        return selected is not null && IsSiruiSource(selected) && _corePlayCardHistoryOperations.ViewAsRule(selected)is { } rule && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, rule.OutputKind, false).Contains(selected) ? rule.OutputKind : fallback;
+        return selected is not null && IsSiruiSource(selected) && _corePlayCardHistoryOperations.ViewAsRule(selected)is { } rule && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, rule.OutputKind, false).Contains(selected) ? rule.OutputKind : fallback;
     }
 
     internal bool HasSiruiSlashDistance(CharacterState actor, CardKind kind, IReadOnlyList<int>? materialIds = null, CardConversionSource? conversionSource = null, long? existingUseFrameId = null)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return false;
-        if (existingUseFrameId is { } existing && materialIds is [var issuedId] && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(use => use.Id == existing && use.Sirui is { NativeKind: SiruiNativeUseKind.CardUse } r && r.CardId == issuedId && r.Source.OwnerSeat == actor.Seat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.OutputKind) && (use.CardKind == kind || _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use) && kind == CardKind.FireSlash) && ValidSiruiInvoice(use, r, requirePayment: false)))
+        if (existingUseFrameId is { } existing && materialIds is [var issuedId] && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(use => use.Id == existing && use.Sirui is { NativeKind: SiruiNativeUseKind.CardUse } r && r.CardId == issuedId && r.Source.OwnerSeat == actor.Seat && CoreNativeCardClassificationsRuntime.IsSlashCard(r.OutputKind) && (use.CardKind == kind || _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use) && kind == CardKind.FireSlash) && ValidSiruiInvoice(use, r, requirePayment: false)))
             return true;
         if (existingUseFrameId is not null || materialIds is { Count: not 1 })
             return false;

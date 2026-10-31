@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangFeiWumiaoRuntime
@@ -11,8 +7,8 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal const string WuHaoxianBinding = "collect-rank-three";
     internal const string WuHaoxianRecycleReason = "skill-program.wumiao-zhang-fei.haoxian.recycle";
     internal const string WuHaoxianObtainReason = "skill-program.wumiao-zhang-fei.haoxian.obtain";
-    internal static CardConversionSource WuHaoxianSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiHaoxian.WuHaoxianSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IWuZhangFeiHaoxianHost.ResolveHaoxian(ProgramSkillFrame frame) => BeginWuHaoxian(frame);
+    internal static CardConversionSource WuHaoxianSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiHaoxian.WuHaoxianSource(f);
+    SkillProgramStepOutcome IWuZhangFeiHaoxianHost.ResolveHaoxian(ProgramSkillFrame frame) => BeginWuHaoxian(frame);
     internal bool HasWuHaoxianOriginalPayment(ProgramSkillFrame f)
     {
         if (f.SkillId != WuHaoxianSkill || f.ActivationId != WuHaoxianBinding || f.TriggerId is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash)
@@ -191,7 +187,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex <= skills.Candidates.Count;
         if (child is ProgramLifecycleTriggerWindowFrame state && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange)
             return state.ResumeProgramFrameId == f.Id && state.CharacterStateContinuation == CharacterStateContinuation.Program && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
-        if (child is not CardsMovedTriggerWindowFrame moved || !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || moved.Batch.OriginOwnerSeat != f.OwnerSeat || moved.Batch.OriginSkillId != f.SkillId || moved.Batch.OriginSkillInstanceId != f.SkillInstanceId)
+        if (child is not CardsMovedTriggerWindowFrame moved || !CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || moved.Batch.OriginOwnerSeat != f.OwnerSeat || moved.Batch.OriginSkillId != f.SkillId || moved.Batch.OriginSkillInstanceId != f.SkillInstanceId)
             return false;
         var recycle = r.Stage == WuHaoxianStage.RecycleChildren;
         var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<WuHaoxianMovementPaidEvent>().SingleOrDefault(e => e.FrameId == f.Id && e.Recycle == recycle);

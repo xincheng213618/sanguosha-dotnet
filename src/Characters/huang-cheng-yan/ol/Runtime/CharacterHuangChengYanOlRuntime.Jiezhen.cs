@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangChengYanOlRuntime
@@ -32,7 +28,7 @@ internal sealed partial class CharacterHuangChengYanOlRuntime
         _coreCharacterHostOperations.AcquireRuntimeSkills(target, sourceSkillId, ["classic:bazhen"]);
         _characterHuangChengYanOlJiezhenConversionsAccess._jiezhenConversions[targetSeat] = new(active.OwnerSeat, replaceable, bazhenGrantId);
         _coreMatchLogOperations.AddLog("SkillTriggered", replaceable.Length == 0 ? $"{(target.Name)} 的技能已被替换为“八阵”。" : $"{(target.Name)} 的【{(string.Join("】【", replaceable.Select(GetSkillDisplayName)))}】被替换为“八阵”。", active.OwnerSeat, targetSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJiezhenConvertedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, targetSeat, replaceable));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJiezhenConvertedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, targetSeat, replaceable));
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return SkillProgramStepOutcome.Continue;
     }
@@ -59,7 +55,7 @@ internal sealed partial class CharacterHuangChengYanOlRuntime
         _characterHuangChengYanOlJiezhenConversionsAccess._jiezhenConversions.Remove(seat);
         var takenCardId = JiezhenTakeOneCardFromZones(active, seat);
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(target.Name)} 失去“八阵”并获得原技能。", active.OwnerSeat, seat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJiezhenRestoredEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, seat, state.ReplacedSkillIds, takenCardId));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJiezhenRestoredEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, seat, state.ReplacedSkillIds, takenCardId));
         if (takenCardId >= 0 && !_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return takenCardId >= 0 ? SkillProgramStepOutcome.AwaitChild : SkillProgramStepOutcome.Continue;

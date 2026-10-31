@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuRongBoundaryMobileRuntime
@@ -19,7 +15,7 @@ internal sealed partial class CharacterZhuRongBoundaryMobileRuntime
         _coreProgramLifecycleOperations.SetProgramCardSet(parent.Id, MobileZhuRongOpponent, [result.OpponentCardId], SkillProgramCardSetVisibility.Public, [CardLocation.DiscardPile]);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMobileZhuRongProgramHost.Exchange(ProgramSkillFrame frame) => ExchangeMobileZhuRongCards(frame);
+    SkillProgramStepOutcome IMobileZhuRongProgramHost.Exchange(ProgramSkillFrame frame) => ExchangeMobileZhuRongCards(frame);
     internal SkillProgramStepOutcome ExchangeMobileZhuRongCards(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

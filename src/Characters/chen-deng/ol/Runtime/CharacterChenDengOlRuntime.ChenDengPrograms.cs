@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenDengOlRuntime
@@ -38,6 +34,6 @@ internal sealed partial class CharacterChenDengOlRuntime
         return total;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IChenDengProgramHost.FengjiRoundChoice(ProgramSkillFrame frame, SkillProgramEffect effect) => FengjiProgramRoundChoice(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IChenDengProgramHost.XuanhuiSwapEffects(ProgramSkillFrame frame, SkillProgramEffect effect) => XuanhuiProgramSwapEffects(frame, effect);
+    SkillProgramStepOutcome IChenDengProgramHost.FengjiRoundChoice(ProgramSkillFrame frame, SkillProgramEffect effect) => FengjiProgramRoundChoice(frame, effect);
+    SkillProgramStepOutcome IChenDengProgramHost.XuanhuiSwapEffects(ProgramSkillFrame frame, SkillProgramEffect effect) => XuanhuiProgramSwapEffects(frame, effect);
 }

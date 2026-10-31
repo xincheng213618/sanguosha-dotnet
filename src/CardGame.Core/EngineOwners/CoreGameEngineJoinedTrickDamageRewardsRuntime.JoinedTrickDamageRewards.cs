@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
             return;
         }
 
-        if (!_coreUniqueLeaderTrickTargetsOperations.TracksUniqueLeaderTrickTargets || benefits.Count == 0 || use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || action.EffectiveKind != use.CardKind || !benefits.SequenceEqual(issued) || benefits.Select(b => (b.Source.OwnerSeat, b.Source.SkillId)).Distinct().Count() != benefits.Count)
+        if (!_coreUniqueLeaderTrickTargetsOperations.TracksUniqueLeaderTrickTargets || benefits.Count == 0 || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || action.EffectiveKind != use.CardKind || !benefits.SequenceEqual(issued) || benefits.Select(b => (b.Source.OwnerSeat, b.Source.SkillId)).Distinct().Count() != benefits.Count)
             throw new InvalidOperationException("A joined trick lost its actual Use or independent issued owner benefits.");
         foreach (var benefit in benefits)
         {
@@ -61,7 +57,7 @@ internal sealed partial class CoreGameEngineJoinedTrickDamageRewardsRuntime
 
     internal JoinedTrickDamageBenefit? ExactIssuedJoinedTrickDamageRewardCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, bool paid)
     {
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } card } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) || !paid && (!_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None) || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.Continuation is not (ProgramCardContinuation.CompletedCard or ProgramCardContinuation.CompletedSlash) || window.CompletedResponseReturn is not null || window.ParentFrameId != card.ParentCardUseFrameId || window.Action.ActionId != card.CardActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { JoinedTrickDamageBenefits: { } benefits, Action: { Type: CardActionType.Use } action } use || use.Step != ResolutionFrameStep.Completed || action.ActionId != card.CardActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || card.ActorSeat != action.ActorSeat || card.EffectiveKind != action.EffectiveKind || context.SourceSeat != action.ActorSeat || context.OwnerSeat != candidate.OwnerSeat || !window.Action.TargetSeats.SequenceEqual(action.TargetSeats) || !window.Action.PhysicalCards.SequenceEqual(action.PhysicalCards) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } card } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) || !paid && (!_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None) || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.Continuation is not (ProgramCardContinuation.CompletedCard or ProgramCardContinuation.CompletedSlash) || window.CompletedResponseReturn is not null || window.ParentFrameId != card.ParentCardUseFrameId || window.Action.ActionId != card.CardActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { JoinedTrickDamageBenefits: { } benefits, Action: { Type: CardActionType.Use } action } use || use.Step != ResolutionFrameStep.Completed || action.ActionId != card.CardActionId || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || card.ActorSeat != action.ActorSeat || card.EffectiveKind != action.EffectiveKind || context.SourceSeat != action.ActorSeat || context.OwnerSeat != candidate.OwnerSeat || !window.Action.TargetSeats.SequenceEqual(action.TargetSeats) || !window.Action.PhysicalCards.SequenceEqual(action.PhysicalCards) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return null;
         var benefit = benefits.SingleOrDefault(b => b.Source.OwnerSeat == candidate.OwnerSeat && b.Source.SkillId == candidate.SkillId && b.Source.SkillInstanceId == candidate.SkillInstanceId && b.GameplayHash == candidate.GameplayHash);
         var current = window.Candidates[window.CandidateIndex];

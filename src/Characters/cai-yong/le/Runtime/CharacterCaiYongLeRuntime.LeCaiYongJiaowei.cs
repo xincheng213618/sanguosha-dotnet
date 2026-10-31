@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiYongLeRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterCaiYongLeRuntime
     internal const string LeCaiYongJiaoweiInitialBinding = "mark-initial-entities";
     internal bool HasLeCaiYongJiaoweiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeLeCaiYongJiaowei);
 
-    internal static CardConversionSource JiaoweiSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cai_yong_le_LeCaiYongJiaowei.JiaoweiSource(frame);
+    internal static CardConversionSource JiaoweiSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_cai_yong_le_LeCaiYongJiaowei.JiaoweiSource(frame);
     // Registration only; the query still belongs to legacy GameEngine.LeCaiYongJiaowei.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 160)]
     internal void ProjectXianCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
@@ -70,7 +66,7 @@ internal sealed partial class CharacterCaiYongLeRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeCaiYongJiaoweiHost.Initialize(ProgramSkillFrame frame) => InitializeJiaowei(frame);
+    SkillProgramStepOutcome ILeCaiYongJiaoweiHost.Initialize(ProgramSkillFrame frame) => InitializeJiaowei(frame);
     internal void MarkFeibaiActualDrawEntities(ProgramSkillFrame frame, NativeDrawOutcome outcome)
     {
         if (!HasLeCaiYongJiaoweiCapability || frame.SkillId != "le:feibai" || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame current || current.Id != frame.Id || current.GameplayHash != frame.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program is not { } program || program.GameplayHash != frame.GameplayHash || !LeCaiYongComposition.IsFeibaiProgram(program) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(current)?.Op != SkillProgramEffectOp.ResolveLeCaiYongFeibai || !IsExactFeibaiFallbackDraw(current, outcome) || outcome.RecipientSeat != frame.OwnerSeat || outcome.RequestedCount != 2 || outcome.SequenceBefore < 0 || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.ActualDrawIds.Count > 2 || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<XianMarkingCompletedEvent>().Any(done => done.FrameId == frame.Id && done.Origin == XianMarkOrigin.FeibaiFallbackDraw))
@@ -83,7 +79,7 @@ internal sealed partial class CharacterCaiYongLeRuntime
     }
 
     internal bool JiaoweiActualTurnIsOpen(int turn) => _coreMatchSetupSetupCompleteAccess._setupComplete && turn > 0 && turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && _coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn && _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().LastOrDefault()?.TurnNumber == turn;
-    internal static bool IsJiaoweiOwnedZone(CardLocation location, int owner) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cai_yong_le_LeCaiYongJiaowei.IsJiaoweiOwnedZone(location, owner);
+    internal static bool IsJiaoweiOwnedZone(CardLocation location, int owner) => RuntimeSkills.RuntimeRules_cai_yong_le_LeCaiYongJiaowei.IsJiaoweiOwnedZone(location, owner);
     internal IReadOnlyList<JiaoweiLossSource> CaptureJiaoweiLossSources(IEnumerable<CardLocation> locations)
     {
         if (!HasLeCaiYongJiaoweiCapability || !JiaoweiActualTurnIsOpen(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber))
@@ -124,12 +120,12 @@ internal sealed partial class CharacterCaiYongLeRuntime
         return latest is not null && !_coreProgramEventHistoryOperations.ProgramEventHistory<JiaoweiDamagePreventedEvent>().Any(used => used.OwnerSeat == owner && used.ActualTurn == latest.ActualTurn && used.ArmId == latest.ArmId) ? latest : null;
     }
 
-    internal bool TryConsumeJiaoweiProtection(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, DamageNature nature)
+    internal bool TryConsumeJiaoweiProtection(GameEngine.IDamageAttempt attack, int amount, DamageNature nature)
     {
         if (amount <= 0 || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive || ActiveJiaoweiProtection(attack.TargetSeat)is not { } armed)
             return false;
         var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<JiaoweiLossQualifiedEvent>().Where(loss => loss.BatchId == armed.LossBatchId && loss.Source == armed.Source && loss.GameplayHash == armed.GameplayHash && loss.ActualTurn == armed.ActualTurn).ToArray();
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || _resolutionStackOperations._resolutionStack.Count(frame => frame.Id == attack.ResolutionId) != 1 || !attack.DamageAmountFinalized || armed.ArmId != armed.LossBatchId || armed.OwnerSeat != attack.TargetSeat || armed.ActualLostCount <= 0 || armed.Source.SkillId != LeCaiYongJiaoweiSkill || armed.Source.BindingId != LeCaiYongJiaoweiInitialBinding || _coreProgramEventHistoryOperations.ProgramEventHistory<JiaoweiProtectionArmedEvent>().Count(issued => issued == armed) != 1 || _contentRegistryOperations._contentRegistry.GetSkill(armed.Source.SkillId).Program?.GameplayHash != armed.GameplayHash || facts.Length != armed.ActualLostCount || facts.Select(fact => fact.CardId).Distinct().Count() != facts.Length || facts.Any(fact => !IsJiaoweiOwnedZone(fact.From, armed.OwnerSeat) || IsJiaoweiOwnedZone(fact.To, armed.OwnerSeat) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move => move.Sequence == fact.MovementSequence && move.CardId == fact.CardId && move.CardKind == fact.PrintedKind && move.From == fact.From && move.To == fact.To)))
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || _resolutionStackOperations._resolutionStack.Count(frame => frame.Id == attack.ResolutionId) != 1 || !attack.DamageAmountFinalized || armed.ArmId != armed.LossBatchId || armed.OwnerSeat != attack.TargetSeat || armed.ActualLostCount <= 0 || armed.Source.SkillId != LeCaiYongJiaoweiSkill || armed.Source.BindingId != LeCaiYongJiaoweiInitialBinding || _coreProgramEventHistoryOperations.ProgramEventHistory<JiaoweiProtectionArmedEvent>().Count(issued => issued == armed) != 1 || _contentRegistryOperations._contentRegistry.GetSkill(armed.Source.SkillId).Program?.GameplayHash != armed.GameplayHash || facts.Length != armed.ActualLostCount || facts.Select(fact => fact.CardId).Distinct().Count() != facts.Length || facts.Any(fact => !IsJiaoweiOwnedZone(fact.From, armed.OwnerSeat) || IsJiaoweiOwnedZone(fact.To, armed.OwnerSeat) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move => move.Sequence == fact.MovementSequence && move.CardId == fact.CardId && move.CardKind == fact.PrintedKind && move.From == fact.From && move.To == fact.To)))
             throw new InvalidOperationException("Jiaowei prevention requires the exact unexpired actual loss and current finalized native damage owner.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiaoweiDamagePreventedEvent(attack.ResolutionId, armed.OwnerSeat, armed.ActualTurn, armed.ArmId, armed.LossBatchId, attack.IsSourceLess ? null : attack.SourceSeat, amount, nature, attack.IsChainPropagation));
         _coreMatchLogOperations.AddLog("DamagePrevented", $"{(_coreMatchParticipantsPlayersAccess._players[armed.OwnerSeat].Name)} 的【焦尾】防止了本次{(amount)}点伤害。", armed.OwnerSeat, armed.OwnerSeat);
@@ -137,7 +133,7 @@ internal sealed partial class CharacterCaiYongLeRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeProgramWindow, 30)]
-    internal ProgramDamageInterception InterceptJiaoweiProtection(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, DamageNature nature) => TryConsumeJiaoweiProtection(attack, amount, nature) ? ProgramDamageInterception.Prevented : ProgramDamageInterception.Continue;
+    internal ProgramDamageInterception InterceptJiaoweiProtection(GameEngine.IDamageAttempt attack, int amount, DamageNature nature) => TryConsumeJiaoweiProtection(attack, amount, nature) ? ProgramDamageInterception.Prevented : ProgramDamageInterception.Continue;
     [ProgramPipelineHook(ProgramPipelinePhase.BeginMovementBatch, 600)]
     internal void CaptureMovementBatchStartJiaoweiLossSources(CardMovementBatchBuilder batch) => batch.JiaoweiLossSources = CaptureJiaoweiLossSources(batch.SourceCountsBefore.Keys);
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 3200)]

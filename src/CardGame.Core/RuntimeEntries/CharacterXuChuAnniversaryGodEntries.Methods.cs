@@ -2,23 +2,23 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterXuChuAnniversaryGodEntries
 {
-    internal void AnswerShenXuChu(global::CardGame.Core.PromptChoice selected) => _resolve().AnswerShenXuChu(selected);
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginShenXuChu(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginShenXuChu(supplied, op);
-    internal bool CanResolveZhuangpo(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanResolveZhuangpo(g);
-    internal global::CardGame.Core.PromptChoice ChooseShenXuChu(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseShenXuChu(p, f);
+    internal void AnswerShenXuChu(PromptChoice selected) => _resolve().AnswerShenXuChu(selected);
+    internal SkillProgramStepOutcome BeginShenXuChu(ProgramSkillFrame supplied, SkillProgramEffectOp op) => _resolve().BeginShenXuChu(supplied, op);
+    internal bool CanResolveZhuangpo(ProgramTriggerLegalityContext g) => _resolve().CanResolveZhuangpo(g);
+    internal PromptChoice ChooseShenXuChu(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseShenXuChu(p, f);
     internal void ContinueShenXuChu(long id) => _resolve().ContinueShenXuChu(id);
     internal bool DrainShenXuChu(long id) => _resolve().DrainShenXuChu(id);
-    internal void FinishShenXuChu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishShenXuChu(f);
-    internal void NextZhuangpoTarget(global::CardGame.Core.ProgramSkillFrame f) => _resolve().NextZhuangpoTarget(f);
-    internal void PublishShenXuChu(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishShenXuChu(f);
+    internal void FinishShenXuChu(ProgramSkillFrame f) => _resolve().FinishShenXuChu(f);
+    internal void NextZhuangpoTarget(ProgramSkillFrame f) => _resolve().NextZhuangpoTarget(f);
+    internal void PublishShenXuChu(ProgramSkillFrame f) => _resolve().PublishShenXuChu(f);
     internal bool ResumeShenXuChu(long id) => _resolve().ResumeShenXuChu(id);
-    internal void ReturnShenXuChuDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnShenXuChuDraw(supplied, outcome);
-    internal bool ReturnShenXuChuMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnShenXuChuMovement(f);
-    internal void ReturnZhengqingDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnZhengqingDraw(f, outcome);
-    internal void ReturnZhuangpoDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnZhuangpoDraw(f, outcome);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ShenXuChuChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ShenXuChuChoices(f);
+    internal void ReturnShenXuChuDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome) => _resolve().ReturnShenXuChuDraw(supplied, outcome);
+    internal bool ReturnShenXuChuMovement(ProgramSkillFrame f) => _resolve().ReturnShenXuChuMovement(f);
+    internal void ReturnZhengqingDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) => _resolve().ReturnZhengqingDraw(f, outcome);
+    internal void ReturnZhuangpoDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) => _resolve().ReturnZhuangpoDraw(f, outcome);
+    internal IReadOnlyList<PromptChoice> ShenXuChuChoices(ProgramSkillFrame f) => _resolve().ShenXuChuChoices(f);
     internal (int Damage, int[] Seats) ZhengqingMaximum() => _resolve().ZhengqingMaximum();
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ZhuangpoDiscardOptions(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhuangpoDiscardOptions(f);
-    internal int ZhuangpoDuelBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().ZhuangpoDuelBonus(attack);
-    internal global::CardGame.Core.ProgramCardTriggerWindowFrame? ZhuangpoParent(global::CardGame.Core.ProgramSkillWindowContext? w) => _resolve().ZhuangpoParent(w);
+    internal IReadOnlyList<PromptChoice> ZhuangpoDiscardOptions(ProgramSkillFrame f) => _resolve().ZhuangpoDiscardOptions(f);
+    internal int ZhuangpoDuelBonus(GameEngine.IDamageAttempt attack) => _resolve().ZhuangpoDuelBonus(attack);
+    internal ProgramCardTriggerWindowFrame? ZhuangpoParent(ProgramSkillWindowContext? w) => _resolve().ZhuangpoParent(w);
 }

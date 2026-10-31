@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoMouMobileRuntime
@@ -67,7 +63,7 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
     [ProgramAnswer("mou-da-qiao-liuli")]
     internal void AnswerMouDaQiaoHeart(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDaQiaoLiuli: { Choosing: true } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouDaQiaoHeartChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDaQiaoLiuli: { Choosing: true } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouDaQiaoHeartChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Liuli requires its current actual-owner reward choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouDaQiaoLiuli = r with { Choosing = false, MarkTargetSeat = choice.Targets.Count == 0 ? null : choice.Targets.Single() } });
@@ -96,7 +92,7 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouDaQiaoLiuliHeart)]
-    internal PromptChoice AiMouDaQiaoHeart(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Targets is [var target] && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? p.Choices.Last();
+    internal PromptChoice AiMouDaQiaoHeart(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Targets is [var target] && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? p.Choices.Last();
     [ProgramPipelineHook(ProgramPipelinePhase.IncludeTriggerCandidate, 3)]
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeMouDaQiaoPhaseCandidates(CharacterState owner, SkillProgramTriggerWindow window, IReadOnlyList<ProgramTriggerCandidate> ordinary)
     {

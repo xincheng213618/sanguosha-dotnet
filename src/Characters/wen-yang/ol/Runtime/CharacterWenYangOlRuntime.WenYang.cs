@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,10 +8,10 @@ internal sealed partial class CharacterWenYangOlRuntime
     internal const string WenYangHandDiscard = "skill-program.wen-yang.qingjiao.hand-discard", WenYangEndingDiscard = "skill-program.wen-yang.qingjiao.ending-discard", WenYangGain = "skill-program.wen-yang.qingjiao.obtain", WenYangDraw = "skill-program.wen-yang.lvli.draw";
     internal bool HasWenYangCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveQingjiaoWholeHandExchange);
 
-    internal static CardConversionSource WenYangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wen_yang_ol_WenYang.WenYangSource(f);
+    internal static CardConversionSource WenYangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_wen_yang_ol_WenYang.WenYangSource(f);
     internal int WenYangAwakeningLevel(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<WenYangAwakenedEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.Level).DefaultIfEmpty(0).Max();
     internal bool WenYangHasAwakened(int owner, int level) => _coreProgramEventHistoryOperations.ProgramEventHistory<WenYangAwakenedEvent>().Any(e => e.OwnerSeat == owner && e.Level == level);
-    SkillProgramStepOutcome global::CardGame.Core.IWenYangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWenYang(f, op);
+    SkillProgramStepOutcome IWenYangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWenYang(f, op);
     internal bool WenYangDamageParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
     {
         if (c.Window != SkillProgramTriggerWindow.AfterDamageApplied || c.OwnerSeat != candidate.OwnerSeat || c.Amount <= 0 || c.OccurrenceIndex != 0 || c.DamageFrameId is not { } id || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } w || w.ParentFrameId != id || w.TriggerWindow != c.Window || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex].ToProgramCandidate() != candidate)
@@ -127,7 +124,7 @@ internal sealed partial class CharacterWenYangOlRuntime
     [ProgramAnswer("wen-yang")]
     internal void AnswerWenYang(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WenYang: { Stage: WenYangStage.Choice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WenYangChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WenYang: { Stage: WenYangStage.Choice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WenYangChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Lvli requires the original owner's exact private branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];

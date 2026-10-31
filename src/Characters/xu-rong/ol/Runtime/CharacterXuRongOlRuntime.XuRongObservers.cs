@@ -1,14 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXuRongOlRuntime
 {
-    internal void CaptureXuRongActualDamageHp(long damageFrameId, global::CardGame.Core.GameEngine.IDamageAttempt attack, int hpBefore, int actualAmount)
+    internal void CaptureXuRongActualDamageHp(long damageFrameId, GameEngine.IDamageAttempt attack, int hpBefore, int actualAmount)
     {
         if (!_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(p).GetInstanceTriggers(SkillProgramTriggerWindow.DyingEntering).Any(b => b.Trigger.Effects is [{ Op: SkillProgramEffectOp.ReplenishShaJueAndClaimDyingCause }])))
             return;
@@ -73,8 +68,8 @@ internal sealed partial class CharacterXuRongOlRuntime
         if (i < 1)
             return false;
         if (r.DyingFrameId is { } dying)
-            return f.WindowContext?.Window == SkillProgramTriggerWindow.DyingEntering && f.WindowContext.XuRongDying is { } proof && proof.DyingFrameId == dying && proof.VictimSeat == r.SubjectSeat && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(d => d.Id == dying)?.XuRongProof == proof && _resolutionStackOperations._resolutionStack[i - 1] is ProgramLifecycleTriggerWindowFrame w && w.ResumeDyingFrameId == dying && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]);
-        return f.WindowContext?.Window == SkillProgramTriggerWindow.PlayPhaseStarting && _resolutionStackOperations._resolutionStack[i - 1] is PlayPhaseStartingBoundaryFrame phase && phase.Id == r.ParentFrameId && phase.OwnerSeat == r.SubjectSeat && phase.ItemIndex >= 0 && phase.ItemIndex < phase.Items.Count && phase.Items[phase.ItemIndex].Candidate is { } c && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c);
+            return f.WindowContext?.Window == SkillProgramTriggerWindow.DyingEntering && f.WindowContext.XuRongDying is { } proof && proof.DyingFrameId == dying && proof.VictimSeat == r.SubjectSeat && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(d => d.Id == dying)?.XuRongProof == proof && _resolutionStackOperations._resolutionStack[i - 1] is ProgramLifecycleTriggerWindowFrame w && w.ResumeDyingFrameId == dying && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]);
+        return f.WindowContext?.Window == SkillProgramTriggerWindow.PlayPhaseStarting && _resolutionStackOperations._resolutionStack[i - 1] is PlayPhaseStartingBoundaryFrame phase && phase.Id == r.ParentFrameId && phase.OwnerSeat == r.SubjectSeat && phase.ItemIndex >= 0 && phase.ItemIndex < phase.Items.Count && phase.Items[phase.ItemIndex].Candidate is { } c && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c);
     }
 
     internal bool ValidXuRong(ProgramSkillFrame f)

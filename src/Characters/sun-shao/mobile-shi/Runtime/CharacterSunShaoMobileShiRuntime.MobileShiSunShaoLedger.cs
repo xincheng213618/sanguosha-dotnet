@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunShaoMobileShiRuntime
@@ -22,7 +18,7 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
     internal bool ShiSsGanjueSlashDistance(ProgramSlashDistanceQuery query) => query.ExistingUseFrameId is { } id && IsShiSsGanjueStrikeUse(id);
     internal bool ShiSsGanjueCannotRespond(int sourceSeat, int responderSeat, CardKind? incomingKind, IReadOnlyList<int> targetSeats)
     {
-        if (!HasShiSsCapability || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || incomingKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || attack.ResolutionId == 0 || attack.SourceSeat != sourceSeat || attack.TargetSeat != responderSeat)
+        if (!HasShiSsCapability || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || incomingKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || attack.ResolutionId == 0 || attack.SourceSeat != sourceSeat || attack.TargetSeat != responderSeat)
             return false;
         var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiSsGanjueIssuedEvent>().LastOrDefault(entry => entry.UseId == attack.ResolutionId && entry.TargetSeat == responderSeat);
         if (issued is null)

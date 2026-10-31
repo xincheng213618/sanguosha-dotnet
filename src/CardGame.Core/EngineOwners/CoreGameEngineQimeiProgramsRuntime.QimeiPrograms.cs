@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineQimeiProgramsRuntime
 {
     internal bool HasQimeiCapability => _coreMatchParticipantsPlayersAccess._players.Any(p => p.QimeiActivePair is not null);
 
-    internal CardConversionSource QimeiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource QimeiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal IEnumerable<QimeiPairGrant> ActiveQimeiGrants()
     {
         if (!HasQimeiCapability)

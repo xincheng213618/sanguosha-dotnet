@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterRuanYuOlRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CharacterRuanYuOlRuntime
     }
 
     [ProgramIssuedTrigger(470)]
-    internal bool IsIssuedRuanYuXingzuoEndingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && CurrentRuanYuEndingDebt(c, context)is { } debt && (!_coreProgramEventHistoryOperations.ProgramEventHistory<XingzuoEndingConsumedEvent>().Any(e => e.DebtId == debt.DebtId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.RuanYu?.DebtId == debt.DebtId && f.WindowContext == context && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c)));
+    internal bool IsIssuedRuanYuXingzuoEndingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && CurrentRuanYuEndingDebt(c, context)is { } debt && (!_coreProgramEventHistoryOperations.ProgramEventHistory<XingzuoEndingConsumedEvent>().Any(e => e.DebtId == debt.DebtId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.RuanYu?.DebtId == debt.DebtId && f.WindowContext == context && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c)));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27430)]
     internal bool CanOfferRuanYu(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)
     {

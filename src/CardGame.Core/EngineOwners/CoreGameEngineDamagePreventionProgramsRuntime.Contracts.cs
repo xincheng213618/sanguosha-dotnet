@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreDamagePreventionProgramsCoreProgramRuntimeHooksOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreDamagePreventionProgramsCoreProgramRuntimeHooksOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramRuntimeHooks RuntimeHooks { get; }
+    ProgramRuntimeHooks RuntimeHooks { get; }
 }
 
-internal interface ICoreDamagePreventionProgramsProgramWindowCursorOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreDamagePreventionProgramsProgramWindowCursorOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramWindowCursorRuntime Get();
+    ProgramWindowCursorRuntime Get();
 }

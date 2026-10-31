@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5SimayiRuntime
@@ -29,5 +25,5 @@ internal sealed partial class CoreGameEngineShanheS5SimayiRuntime
         return gate.WindowContext is { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { MovementTiming: { Phase: TurnPhase.Discard } timing } batch, MovementIndex: { } index } && timing.PhaseActorSeat == gate.OwnerSeat && batch.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && index >= 0 && index < batch.Movements.Count && _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(batch.Movements[index]) && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(batch.Movements[index]) == CardLocation.Hand(gate.OwnerSeat);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IShanheS5BaiyinHost.GrantShanheS5Baiyin(ProgramSkillFrame frame) => GrantShanheS5Baiyin(frame);
+    SkillProgramStepOutcome IShanheS5BaiyinHost.GrantShanheS5Baiyin(ProgramSkillFrame frame) => GrantShanheS5Baiyin(frame);
 }

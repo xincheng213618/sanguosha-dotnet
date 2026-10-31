@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Collections.ObjectModel;
 using System.Globalization;
 
@@ -11,12 +8,12 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
 {
     internal int CurrentTurnHandExchangeSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static string CurrentTurnHandExchangeReason(ProgramSkillFrame frame, string part) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CurrentTurnHandExchange.CurrentTurnHandExchangeReason(frame, part);
-    internal static CardConversionSource CurrentTurnHandExchangeSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CurrentTurnHandExchange.CurrentTurnHandExchangeSource(frame);
+    internal static string CurrentTurnHandExchangeReason(ProgramSkillFrame frame, string part) => RuntimeSkills.RuntimeRules_Core_CurrentTurnHandExchange.CurrentTurnHandExchangeReason(frame, part);
+    internal static CardConversionSource CurrentTurnHandExchangeSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_Core_CurrentTurnHandExchange.CurrentTurnHandExchangeSource(frame);
     internal TurnEndingBoundaryFrame RequireCurrentTurnHandExchangeParent(ProgramSkillFrame frame)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, Facts: { } facts } context || frame.TriggerId is null || frame.ActivationId != frame.TriggerId || frame.InstructionIndex != 1 || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || context.OwnerSeat != frame.OwnerSeat || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not TurnEndingBoundaryFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || context.SourceSeat != parent.OwnerSeat || context.TargetSeat != parent.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program is not { } program || program.GameplayHash != frame.GameplayHash)
+        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, Facts: { } facts } context || frame.TriggerId is null || frame.ActivationId != frame.TriggerId || frame.InstructionIndex != 1 || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || context.OwnerSeat != frame.OwnerSeat || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not TurnEndingBoundaryFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || context.SourceSeat != parent.OwnerSeat || context.TargetSeat != parent.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program is not { } program || program.GameplayHash != frame.GameplayHash)
             throw new InvalidOperationException("Current-turn hand exchange lost its exact TurnEnding parent, candidate, instruction or source.");
         var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(frame);
         CurrentTurnHandExchangeContract.ValidateTrigger(frame.SkillId, trigger.Effects, trigger.Window, trigger.Subject, trigger.TurnOwnerScope, trigger.Optional, trigger.Condition);
@@ -315,5 +312,5 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
         return returns is [var returned] && returned == new CurrentTurnHandExchangeReturnIssuedEvent(frame.Id, frame.OwnerSeat, receipt.ParticipantSeat, receipt.FrozenGivenCount, receipt.RequiredReturnCount, receipt.ReturnBefore, receipt.ReturnAfter) && receipt.SelectedCardIds.Count == receipt.RequiredReturnCount && receipt.ReturnBefore >= receipt.GiftAfter && Invoice(receipt.ReturnBefore, receipt.ReturnAfter, "return", receipt.RequiredReturnCount, movement => receipt.SelectedCardIds.Contains(movement.CardId) && movement.To == CardLocation.Hand(receipt.ParticipantSeat) && movement.From == receipt.CandidateLocations[receipt.CandidateCardIds.ToList().IndexOf(movement.CardId)]) && receipt.SelectedCardIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(movement => movement.Sequence > receipt.ReturnBefore && movement.Sequence <= receipt.ReturnAfter && movement.CardId == id && movement.Reason.Value == CurrentTurnHandExchangeReason(frame, "return")) == 1);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ICurrentTurnHandExchangeHost.OfferCurrentTurnHandExchange(ProgramSkillFrame frame) => BeginCurrentTurnHandExchange(frame);
+    SkillProgramStepOutcome ICurrentTurnHandExchangeHost.OfferCurrentTurnHandExchange(ProgramSkillFrame frame) => BeginCurrentTurnHandExchange(frame);
 }

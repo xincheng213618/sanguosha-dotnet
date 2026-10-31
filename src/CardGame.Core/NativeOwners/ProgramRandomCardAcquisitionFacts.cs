@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramRandomCardAcquisitionFacts(global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineTableOrderEntries> getCoreGameEngineTableOrderRuntime) : IProgramRandomCardAcquisitionFacts
+internal sealed class ProgramRandomCardAcquisitionFacts(EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineTableOrderEntries> getCoreGameEngineTableOrderRuntime) : IProgramRandomCardAcquisitionFacts
 {
     public IReadOnlyList<CharacterState> Players => matchParticipantsState.ReferenceToPlayers;
 

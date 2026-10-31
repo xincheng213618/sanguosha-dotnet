@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramAtomicCardMovesRuntime
@@ -18,7 +14,7 @@ internal sealed partial class CoreGameEngineProgramAtomicCardMovesRuntime
             var card = _cardZonesOperations._cardZones.CardsAt(source).Single(item => item.Id == id);
             var target = destinationForCard?.Invoke(card, source) ?? destination;
             var phantomDestination = _characterZuoCiHappyGodOperations.PlanHappyZuoCiPhantomDestination(card, source, target, reason);
-            if (source.Zone == CardZoneKind.Equipment && card.IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, source, target))
+            if (source.Zone == CardZoneKind.Equipment && card.IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, source, target))
                 target = CardLocation.OutsideGame;
             target = _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(card, source, target, reason);
             target = _characterZhongHuiAnniversaryGodOperations.NormalizeLishiDiscardDestination(card, source, target, reason);

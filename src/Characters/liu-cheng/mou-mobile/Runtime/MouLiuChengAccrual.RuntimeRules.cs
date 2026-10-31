@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_liu_cheng_mou_mobile_MouLiuChengAccrual
 {
     internal static bool SameMouLiuChengAccrual(MouLiuChengAccrualClaim? a, MouLiuChengAccrualClaim? b) =>

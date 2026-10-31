@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,8 +8,8 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
     internal bool TracksNativeDrawInvocations => _nativeDrawInvoiceOperations.Get().TracksInvocations;
     internal long OutsidePhaseMovementSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static bool IsOutsidePhaseOperation(SkillProgramEffectOp op) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OutsidePhaseDrawDiscard.IsOutsidePhaseOperation(op);
-    internal static string OutsidePhaseMovementReason(ProgramSkillFrame f, bool draw) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OutsidePhaseDrawDiscard.OutsidePhaseMovementReason(f, draw);
+    internal static bool IsOutsidePhaseOperation(SkillProgramEffectOp op) => RuntimeSkills.RuntimeRules_Core_OutsidePhaseDrawDiscard.IsOutsidePhaseOperation(op);
+    internal static string OutsidePhaseMovementReason(ProgramSkillFrame f, bool draw) => RuntimeSkills.RuntimeRules_Core_OutsidePhaseDrawDiscard.OutsidePhaseMovementReason(f, draw);
     internal NativeDrawInvocationDraft? CaptureNativeDrawInvocation(int owner, int requested, CardMoveReason reason, CardConversionSource? directProducer) => _nativeDrawInvoiceOperations.Get().Capture(owner, requested, reason, directProducer);
     internal NativeDrawProgramOrigin? CaptureNativeDrawProgramOrigin(ProgramSkillFrame frame) => _nativeDrawInvoiceOperations.Get().CaptureProgramOrigin(frame);
     internal void CompleteNativeDrawInvocation(NativeDrawInvocationDraft? draft, IReadOnlyList<int> actualIds) => _nativeDrawInvoiceOperations.Get().Complete(draft, actualIds);
@@ -90,14 +87,14 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
         var parent = _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(w => w.Id == context.ParentFrameId);
         var candidate = parent.Candidates[parent.CandidateIndex];
         var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(f);
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || trigger.Effects[0].Op != op || !CanRunOutsidePhaseDrawDiscardTrigger(candidate, trigger, context))
+        if (!CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || trigger.Effects[0].Op != op || !CanRunOutsidePhaseDrawDiscardTrigger(candidate, trigger, context))
             throw new InvalidOperationException("Outside-phase draw/discard lost its exact current movement candidate.");
         var draw = op == SkillProgramEffectOp.DrawAfterActualOutsideDraw;
         var indexes = draw ? MatchingOutsideDrawIndexes(parent.Batch, candidate) : MatchingOutsideDiscardIndexes(parent.Batch, candidate);
         var r = new ProgramOutsidePhaseDrawDiscardReceipt
         {
             InstructionIndex = f.InstructionIndex,
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             Op = op,
             WindowFrameId = parent.Id,
@@ -263,7 +260,7 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
         return choice;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IOutsidePhaseDrawDiscardProgramHost.OutsidePhaseDrawDiscard(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginOutsidePhaseDrawDiscard(f, op);
+    SkillProgramStepOutcome IOutsidePhaseDrawDiscardProgramHost.OutsidePhaseDrawDiscard(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginOutsidePhaseDrawDiscard(f, op);
     [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 4200)]
     internal ProgramSkillWindowContext? TryCreateOutsideDiscardContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate)
     {

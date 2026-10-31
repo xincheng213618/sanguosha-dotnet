@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal readonly struct PlayerViewMatchQueries(global::CardGame.Core.EngineStates.CoreMatchDefinitionState matchDefinitionState, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState, global::System.Func<global::CardGame.Core.FrameStore> getFrameStore, global::CardGame.Core.EngineStates.CoreMatchOutcomeState matchOutcomeState, global::CardGame.Core.EngineStates.CoreActualTurnProgressState actualTurnProgressState, global::CardGame.Core.EngineStates.CoreGameEngineCardUseDebitsState gameEngineCardUseDebitsState, global::CardGame.Core.EngineStates.CoreMatchSetupState matchSetupState, global::System.Func<global::CardGame.Core.CommandSession> getCommandSession, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineTableOrderEntries> getCoreGameEngineTableOrderRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeCardContinuationCursorsEntries> getCoreNativeCardContinuationCursorsRuntime) : IPlayerViewMatchQueries
+internal readonly struct PlayerViewMatchQueries(EngineStates.CoreMatchDefinitionState matchDefinitionState, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<FrameStore> getFrameStore, EngineStates.CoreMatchOutcomeState matchOutcomeState, EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreGameEngineCardUseDebitsState gameEngineCardUseDebitsState, EngineStates.CoreMatchSetupState matchSetupState, Func<CommandSession> getCommandSession, Func<RuntimeEntries.CoreGameEngineTableOrderEntries> getCoreGameEngineTableOrderRuntime, Func<RuntimeEntries.CoreNativeCardContinuationCursorsEntries> getCoreNativeCardContinuationCursorsRuntime) : IPlayerViewMatchQueries
 {
     public ContentModeDefinition ModeDefinition => matchDefinitionState.ReferenceToModeDefinition;
     public int PlayerCount => matchParticipantsState.ReferenceToPlayers.Count;
@@ -26,5 +26,5 @@ internal readonly struct PlayerViewMatchQueries(global::CardGame.Core.EngineStat
 
     public IReadOnlyList<int> CurrentTableOrder() => getCoreGameEngineTableOrderRuntime().CurrentTableOrder();
     public CardUseFrame? ActiveFireAttack => getCoreNativeCardContinuationCursorsRuntime().ActiveFireAttack;
-    public IPlayerViewGroupCardQueries? ActiveGroupCard => getCoreNativeCardContinuationCursorsRuntime().ActiveGroupCard is { } group ? new global::CardGame.Core.NativeOwners.PlayerViewGroupCardQueries(group) : null;
+    public IPlayerViewGroupCardQueries? ActiveGroupCard => getCoreNativeCardContinuationCursorsRuntime().ActiveGroupCard is { } group ? new PlayerViewGroupCardQueries(group) : null;
 }

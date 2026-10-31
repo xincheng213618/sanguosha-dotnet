@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,12 +8,12 @@ internal sealed partial class CharacterMaYuanYiOlRuntime
     internal const string JibingStoreReason = "skill-program.ma-yuan-yi.jibing.store", WangjingDrawReason = "skill-program.ma-yuan-yi.wangjing.draw", BinghuoBind = "ma-yuan-yi-binghuo";
     internal bool HasMaYuanYiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ReplaceJibingDrawWithTwoBing);
 
-    internal static CardConversionSource MaYuanYiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ma_yuan_yi_ol_MaYuanYi.MaYuanYiSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IMaYuanYiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMaYuanYi(f, op);
+    internal static CardConversionSource MaYuanYiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_ma_yuan_yi_ol_MaYuanYi.MaYuanYiSource(f);
+    SkillProgramStepOutcome IMaYuanYiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMaYuanYi(f, op);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27370)]
     internal void RecordMaYuanYiBingAction(IGameEvent fact)
     {
-        if (!HasMaYuanYiCapability || fact is not CardActionAcceptedEvent { Action: var a } || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && a.EffectiveKind != CardKind.Dodge || a.PhysicalCards is not [var cost] || cost.From.Zone != CardZoneKind.PublicPersistentPile || cost.From.OwnerSeat != a.ProviderSeat || a.ConversionChain.SingleOrDefault(s => s.SkillId == "ol:jibing" && s.OwnerSeat == a.ProviderSeat)is not { } source || source.BindingId != (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) ? "bing-slash" : "bing-dodge") || _coreProgramEventHistoryOperations.ProgramEventHistory<MaYuanYiBingActionEvent>().Any(e => e.ActionId == a.ActionId))
+        if (!HasMaYuanYiCapability || fact is not CardActionAcceptedEvent { Action: var a } || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && a.EffectiveKind != CardKind.Dodge || a.PhysicalCards is not [var cost] || cost.From.Zone != CardZoneKind.PublicPersistentPile || cost.From.OwnerSeat != a.ProviderSeat || a.ConversionChain.SingleOrDefault(s => s.SkillId == "ol:jibing" && s.OwnerSeat == a.ProviderSeat)is not { } source || source.BindingId != (CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) ? "bing-slash" : "bing-dodge") || _coreProgramEventHistoryOperations.ProgramEventHistory<MaYuanYiBingActionEvent>().Any(e => e.ActionId == a.ActionId))
             return;
         var stored = _coreProgramEventHistoryOperations.ProgramEventHistory<MaYuanYiStoredEvent>().LastOrDefault(e => e.Source.SkillInstanceId == source.SkillInstanceId && e.Source.OwnerSeat == a.ProviderSeat && e.CardId == cost.CardId && e.Pile == cost.From);
         if (stored is null || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == stored.Sequence && m.CardId == cost.CardId && m.From == CardLocation.DrawPile && m.To == cost.From && m.Reason.Value == JibingStoreReason) != 1)
@@ -151,7 +148,7 @@ internal sealed partial class CharacterMaYuanYiOlRuntime
     [ProgramAnswer("ma-yuan-yi")]
     internal void AnswerMaYuanYiTarget(PromptChoice supplied)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MaYuanYi: { Stage: MaYuanYiStage.TargetChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MaYuanYiTargets(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [supplied])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MaYuanYi: { Stage: MaYuanYiStage.TargetChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MaYuanYiTargets(f).Any(x => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [supplied])))
             throw new InvalidOperationException("Binghuo requires its published actual target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var target = supplied.Targets.Single();

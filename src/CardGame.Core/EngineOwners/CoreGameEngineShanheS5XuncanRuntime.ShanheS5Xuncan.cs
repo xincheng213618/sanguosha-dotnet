@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
     internal ShanheS5SkillTargetEvent RequireShanheS5SkillTarget(ProgramSkillFrame f)
     {
         var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5SkillTargetEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        if (facts is not [var target] || target.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || target.GameplayHash != f.GameplayHash || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target.TargetSeat) || (f.SkillId == ShanheS5YunshenSkill ? f.SelectedTargetSeats is not [var selected] || selected != target.TargetSeat : f.SkillId != ShanheS5ShangshenSkill || f.WindowContext?.TargetSeat != target.TargetSeat))
+        if (facts is not [var target] || target.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || target.GameplayHash != f.GameplayHash || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target.TargetSeat) || (f.SkillId == ShanheS5YunshenSkill ? f.SelectedTargetSeats is not [var selected] || selected != target.TargetSeat : f.SkillId != ShanheS5ShangshenSkill || f.WindowContext?.TargetSeat != target.TargetSeat))
             throw new InvalidOperationException("Xuncan lost his original accepted skill target and source instance.");
         return target;
     }
@@ -35,7 +31,7 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
     {
         if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5SkillTargetEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Xuncan cannot accept the same skill target twice.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5SkillTargetEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, targetSeat));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5SkillTargetEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, targetSeat));
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         // Only these printed skills declare a target. Acquiring an unrelated skill
@@ -201,7 +197,7 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
     internal bool IsShanheS5YunshenUse(long useId) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5YunshenIssuedEvent>().Any(e => e.UseId == useId);
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 5771)]
-    internal bool ReturnShanheS5YunshenSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnShanheS5YunshenSlash(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheS5Yunshen: { } r } f || r.UseId != completion.ResolutionId)
             return false;
@@ -229,5 +225,5 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5771)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 5771)]
     internal bool ContinueAcceptedShanheS5Xuncan(ProgramSkillFrame f) => f.SkillId is ShanheS5YunshenSkill or ShanheS5ShangshenSkill && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5SkillTargetEvent>().Any(e => e.FrameId == f.Id) || f.SkillId == "shanhe:s5-leijie-3231" && (_resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().Any(j => j.ParentFrameId == f.Id && j.Reason == "shanhe.s5.leijie") || f.JudgmentOutcomeBindings?.Any(o => o.Reason == "shanhe.s5.leijie" && _coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(f, o)) == true) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5JudgmentEffectEvent>().Any(e => e.FrameId == f.Id);
-    SkillProgramStepOutcome global::CardGame.Core.IShanheS5XuncanHost.ResolveShanheS5Xuncan(ProgramSkillFrame f, SkillProgramEffect e) => ResolveShanheS5Xuncan(f, e);
+    SkillProgramStepOutcome IShanheS5XuncanHost.ResolveShanheS5Xuncan(ProgramSkillFrame f, SkillProgramEffect e) => ResolveShanheS5Xuncan(f, e);
 }

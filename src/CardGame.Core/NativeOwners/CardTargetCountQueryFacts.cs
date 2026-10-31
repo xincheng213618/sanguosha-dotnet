@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal readonly struct CardTargetCountQueryFacts(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries> getCoreGameEngineRuleQueriesRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineRoundFirstSlashTargetsEntries> getCoreGameEngineRoundFirstSlashTargetsRuntime, global::System.Func<global::CardGame.Core.TurnCardUseEffectStore> getTurnCardUseEffectStore, global::CardGame.Core.EngineStates.CoreActualTurnProgressState actualTurnProgressState, global::System.Func<global::CardGame.Core.ProgramTargetRules> getProgramTargetRules, CharacterState player, CardKind effectiveCardKind, long? declaredUseFrameId) : IMatchCardTargetCountQuery
+internal readonly struct CardTargetCountQueryFacts(Func<RuntimeEntries.CoreGameEngineRuleQueriesEntries> getCoreGameEngineRuleQueriesRuntime, Func<RuntimeEntries.CoreGameEngineRoundFirstSlashTargetsEntries> getCoreGameEngineRoundFirstSlashTargetsRuntime, Func<TurnCardUseEffectStore> getTurnCardUseEffectStore, EngineStates.CoreActualTurnProgressState actualTurnProgressState, Func<ProgramTargetRules> getProgramTargetRules, CharacterState player, CardKind effectiveCardKind, long? declaredUseFrameId) : IMatchCardTargetCountQuery
 {
     public CardKind EffectiveCardKind => effectiveCardKind;
     public IReadOnlyList<RuleQueryContribution> Contributions => getCoreGameEngineRuleQueriesRuntime().CollectNumericRuleContributions(player, SkillRuleQuery.CardTargetCount, effectiveCardKind);

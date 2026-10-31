@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuanShuJunOlRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         if (p.Request.Intent == HuanpeiIntent.KeBiNengBasic)
         {
             var k = f.KeBiNengPingduan!;
-            var a = new LegalAction(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) ? LegalActionKind.Slash : p.Kind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol, 0, p.Targets.Count == 0 ? null : p.Targets[0], "环佩：真实零实体基本牌", p.Kind, TargetSeats: p.Targets)
+            var a = new LegalAction(CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) ? LegalActionKind.Slash : p.Kind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol, 0, p.Targets.Count == 0 ? null : p.Targets[0], "环佩：真实零实体基本牌", p.Kind, TargetSeats: p.Targets)
             {
                 ConversionSource = p.Source
             };
@@ -85,7 +81,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     internal bool HasHuanpeiGenericBasic(ProgramSkillFrame f) => f.KeBiNengPingduan is { Stage: KeBiNengPingduanStage.BasicChoice } k && _characterKeBiNengOlOperations.ValidKeBiNeng(f) && HuanpeiSources(_coreMatchParticipantsPlayersAccess._players[k.ActorSeat]).Any(s => CanAdjustHuanpeiHand(_coreMatchParticipantsPlayersAccess._players[k.ActorSeat]) && HuanpeiNativePlayActions(_coreMatchParticipantsPlayersAccess._players[k.ActorSeat], s, true).Count > 0);
     internal bool HasAcceptedHuanpeiKeAction(ProgramSkillFrame f, LegalAction action)
     {
-        if (f.HuanpeiReturn is not { Payment: { } p } || !ValidHuanpeiPayment(p) || p.Request.Intent != HuanpeiIntent.KeBiNengBasic || p.Request.ParentFrameId != f.Id || p.Request.Cursor != f.InstructionIndex || f.KeBiNengPingduan is not { } k || p.Source.OwnerSeat != k.ActorSeat || action.CardId != 0 || action.SelectableCardIds.Count != 0 || action.ConversionSource != p.Source || action.PlayedCardKind != p.Kind || !action.TargetSeats.SequenceEqual(p.Targets) || action.Kind != (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) ? LegalActionKind.Slash : p.Kind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol))
+        if (f.HuanpeiReturn is not { Payment: { } p } || !ValidHuanpeiPayment(p) || p.Request.Intent != HuanpeiIntent.KeBiNengBasic || p.Request.ParentFrameId != f.Id || p.Request.Cursor != f.InstructionIndex || f.KeBiNengPingduan is not { } k || p.Source.OwnerSeat != k.ActorSeat || action.CardId != 0 || action.SelectableCardIds.Count != 0 || action.ConversionSource != p.Source || action.PlayedCardKind != p.Kind || !action.TargetSeats.SequenceEqual(p.Targets) || action.Kind != (CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) ? LegalActionKind.Slash : p.Kind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol))
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiKeActionAcceptedEvent>().Count(e => e == new HuanpeiKeActionAcceptedEvent(f.Id, f.InstructionIndex, k.Source, f.GameplayHash, p.ProgramFrameId, p.Kind)) == 1;
     }

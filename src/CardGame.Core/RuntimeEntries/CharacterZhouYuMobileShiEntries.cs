@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhouYuMobileShiEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterZhouYuMobileShiRuntime> _resolve;
-    private CharacterZhouYuMobileShiEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterZhouYuMobileShiRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterZhouYuMobileShiRuntime> _resolve;
+    private CharacterZhouYuMobileShiEntries(Func<EngineOwners.CharacterZhouYuMobileShiRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterZhouYuMobileShiEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterZhouYuMobileShiRuntime> resolve) => new(resolve);
+    internal static CharacterZhouYuMobileShiEntries Create(Func<EngineOwners.CharacterZhouYuMobileShiRuntime> resolve) => new(resolve);
 }

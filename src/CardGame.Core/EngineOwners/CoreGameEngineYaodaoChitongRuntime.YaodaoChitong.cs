@@ -1,42 +1,38 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineYaodaoChitongRuntime
 {
     internal const string YaodaoChitongSkill = "shanhe:yaodao-chitong";
-    SkillProgramStepOutcome global::CardGame.Core.IYaodaoChitongHost.BeginYaodaoChitong(ProgramSkillFrame f) => BeginYaodaoChitong(f);
-    SkillProgramStepOutcome global::CardGame.Core.IYaodaoChitongHost.ResolveYaodaoChitong(ProgramSkillFrame f, SkillProgramEffect e) => ResolveYaodaoChitong(f, e);
+    SkillProgramStepOutcome IYaodaoChitongHost.BeginYaodaoChitong(ProgramSkillFrame f) => BeginYaodaoChitong(f);
+    SkillProgramStepOutcome IYaodaoChitongHost.ResolveYaodaoChitong(ProgramSkillFrame f, SkillProgramEffect e) => ResolveYaodaoChitong(f, e);
     internal Card? ActiveYaodaoChitong(int seat, string skillId, string instance) => skillId == YaodaoChitongSkill && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.YaodaoChitong) ? _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat]).SingleOrDefault(c => c.Kind == CardKind.YaodaoChitong && _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(seat, skillId, instance, c)) : null;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 5790)]
-    internal int YaodaoChitongBlackSlashBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int YaodaoChitongBlackSlashBonus(GameEngine.IDamageAttempt attack)
     {
-        if (attack is not global::CardGame.Core.NativeOwners.CardAttackHandle || attack.IsSourceLess || attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || attack.SourceSeat != attack.CardUserSeat || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive || !_coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], CardKind.YaodaoChitong))
+        if (attack is not NativeOwners.CardAttackHandle || attack.IsSourceLess || attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || attack.SourceSeat != attack.CardUserSeat || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive || !_coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], CardKind.YaodaoChitong))
             return 0;
         // The accepted native action preserves a same-color, mixed-suit
         // material group; its absent common suit must not erase black color.
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action is { } action)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action) == false ? 1 : 0;
+            return CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action) == false ? 1 : 0;
         return attack.Card is { } card && _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[attack.CardUserSeat], card)is Suit.Spade or Suit.Club ? 1 : 0;
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 5791, SkillProgramEffectOp.BeginYaodaoChitong)]
-    internal bool CanOfferYaodaoChitong(ProgramTriggerLegalityContext gate) => ActiveYaodaoChitong(gate.OwnerSeat, gate.SkillId, gate.Candidate.SkillInstanceId)is not null && gate.WindowContext is { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } context } && _coreCardActionsOperations.ProgramCardAttack is { } attack && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && attack.SourceSeat == gate.OwnerSeat && context.ParentCardUseFrameId == attack.ResolutionId && attack.EffectiveCardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
+    internal bool CanOfferYaodaoChitong(ProgramTriggerLegalityContext gate) => ActiveYaodaoChitong(gate.OwnerSeat, gate.SkillId, gate.Candidate.SkillInstanceId)is not null && gate.WindowContext is { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } context } && _coreCardActionsOperations.ProgramCardAttack is { } attack && CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && attack.SourceSeat == gate.OwnerSeat && context.ParentCardUseFrameId == attack.ResolutionId && attack.EffectiveCardKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
     internal SkillProgramStepOutcome BeginYaodaoChitong(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        if (f.YaodaoChitong is not null || f.InstructionIndex != 1 || ActiveYaodaoChitong(f.OwnerSeat, f.SkillId, f.SkillInstanceId)is not { } weapon || f.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } context } window || _coreCardActionsOperations.ProgramCardAttack is not { } attack || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) || attack.SourceSeat != f.OwnerSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action } use || use.SourceSeat != f.OwnerSeat || context.ParentCardUseFrameId != use.Id || context.CardActionId != action.ActionId || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != attack.TargetSeat)
+        if (f.YaodaoChitong is not null || f.InstructionIndex != 1 || ActiveYaodaoChitong(f.OwnerSeat, f.SkillId, f.SkillInstanceId)is not { } weapon || f.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } context } window || _coreCardActionsOperations.ProgramCardAttack is not { } attack || !CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) || attack.SourceSeat != f.OwnerSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action } use || use.SourceSeat != f.OwnerSeat || context.ParentCardUseFrameId != use.Id || context.CardActionId != action.ActionId || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != attack.TargetSeat)
             throw new InvalidOperationException("Yaodao Chitong requires the exact equipped weapon and original source-owned Slash target window.");
-        var r = new YaodaoChitongReceipt(new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, weapon.Id, use.Id, action.ActionId, window.ParentFrameId, use.TargetIndex, attack.TargetSeat);
+        var r = new YaodaoChitongReceipt(new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, weapon.Id, use.Id, action.ActionId, window.ParentFrameId, use.TargetIndex, attack.TargetSeat);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { YaodaoChitong = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YaodaoChitongStartedEvent(f.Id, r));
         return SkillProgramStepOutcome.Continue;
     }
 
-    internal bool YaodaoChitongTarget(CardUseFrame use, global::CardGame.Core.NativeOwners.CardAttackHandle attack, int target)
+    internal bool YaodaoChitongTarget(CardUseFrame use, NativeOwners.CardAttackHandle attack, int target)
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || target == attack.TargetSeat || target == use.SourceSeat || use.TargetSeats.Contains(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
             return false;

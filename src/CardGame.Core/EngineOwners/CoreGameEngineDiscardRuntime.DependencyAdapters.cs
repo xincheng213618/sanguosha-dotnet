@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ManualDiscardRuntime))]
-internal sealed class CoreDiscardManualDiscardAdapter(global::System.Func<global::CardGame.Core.ManualDiscardRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreDiscardManualDiscardOperations
+[Core.ProgramCapability(typeof(ManualDiscardRuntime))]
+internal sealed class CoreDiscardManualDiscardAdapter(Func<ManualDiscardRuntime> targetFactory) : ICoreDiscardManualDiscardOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.ManualDiscardRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ManualDiscardRuntime Get() => this._targetFactory();
+    private readonly Func<ManualDiscardRuntime> _targetFactory = targetFactory;
+    public ManualDiscardRuntime Get() => this._targetFactory();
 }

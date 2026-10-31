@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5ZhulingRuntime
 {
     internal const string ShanheS5JixianX = "shanhe-s5-jixian-x";
-    SkillProgramStepOutcome global::CardGame.Core.IShanheS5JixianProgramHost.ResolveShanheS5Jixian(ProgramSkillFrame frame, string stage) => ResolveShanheS5Jixian(frame, stage);
+    SkillProgramStepOutcome IShanheS5JixianProgramHost.ResolveShanheS5Jixian(ProgramSkillFrame frame, string stage) => ResolveShanheS5Jixian(frame, stage);
     internal int ShanheS5JixianSkillCount(CharacterState p) => _coreNationalSkillsOperations.OwnedRuntimeSkills(p, p.General, true).Concat(p.SecondaryGeneral is { } secondary ? _coreNationalSkillsOperations.OwnedRuntimeSkills(p, secondary, false) : []).Select(s => s.ContentId).OfType<string>().Distinct(StringComparer.Ordinal).Count();
     internal int ShanheS5JixianMask(int owner, CharacterState target) => (_corePhysicalOwnedCardQueriesOperations.GetEquipment(target).Any(c => _coreFieldEquipmentOperations.FieldEquipmentSlot(c) == EquipmentSlot.Armor) ? 1 : 0) | (ShanheS5JixianSkillCount(target) > ShanheS5JixianSkillCount(_coreMatchParticipantsPlayersAccess._players[owner]) ? 2 : 0) | (target.HasHpValue && !_coreTreatedWoundedOperations.IsRuleWounded(target) ? 4 : 0);
     internal bool IsShanheS5JixianTarget(int owner, CharacterState target) => _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && target.IsAlive && owner != target.Seat && ShanheS5JixianMask(owner, target) != 0 && _coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], target, new(0, CardKind.Slash, Suit.None, 0), effectiveKind: CardKind.Slash, noEffectiveRank: true, physicalCardIds: []);
@@ -30,13 +26,13 @@ internal sealed partial class CoreGameEngineShanheS5ZhulingRuntime
 
         var frozen = RequireShanheS5JixianFrozen(f);
         var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5JixianSlashIssuedEvent>().Single(e => e.FrameId == f.Id);
-        if (issued.OwnerSeat != f.OwnerSeat || issued.OriginalTargetSeat != frozen.TargetSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == issued.UseId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind)) != 1)
+        if (issued.OwnerSeat != f.OwnerSeat || issued.OriginalTargetSeat != frozen.TargetSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == issued.UseId && CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind)) != 1)
             throw new InvalidOperationException("Jixian lost its exact completed native Slash.");
         if (stage == "draw")
         {
             if (f.InstructionIndex != 4 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5JixianDrawPaidEvent>().Any(e => e.FrameId == f.Id))
                 throw new InvalidOperationException("Jixian cannot repeat its frozen-X draw.");
-            return _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, frozen.X, global::CardGame.Core.EngineOwners.CoreGameEngineShanheS5ZhulingDefinitions.ShanheS5JixianDrawReason);
+            return _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, frozen.X, CoreGameEngineShanheS5ZhulingDefinitions.ShanheS5JixianDrawReason);
         }
 
         if (f.InstructionIndex != 5 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5JixianDrawPaidEvent>().Count(e => e.FrameId == f.Id && e.UseId == issued.UseId && e.Requested == frozen.X) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5JixianResolvedEvent>().Any(e => e.FrameId == f.Id))

@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiMobileGodRuntime
 {
     internal const string MobileJwAction = "mobile-jiang-wei";
-    internal static CardConversionSource MobileJwSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileJiangWeiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileJw(f, op);
+    internal static CardConversionSource MobileJwSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMobileJiangWeiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileJw(f, op);
     internal bool MobileJwHuitianUsed(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.OwnerSeat == owner && e.SkillId == "mobile:huitian" && e.BindingId == "higher-hp-extra-turn");
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 40600, SkillProgramEffectOp.ResolveMobileJiangWeiHuitianDeath)]
     internal bool AdmitMobileJwDeath(ProgramTriggerLegalityContext c) => MobileJwHuitianUsed(c.Owner.Seat);
@@ -58,7 +55,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
         {
             if (!MobileJwHuitianUsed(f.OwnerSeat))
                 throw new InvalidOperationException("Huitian death requires a previously accepted real extra-turn binding.");
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillCauseDeathDeclaredEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.OwnerSeat));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillCauseDeathDeclaredEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.OwnerSeat));
             _coreNativePlayerDeathOperations.BeginPlayerDeath(f.Id, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], null, null, null, causingProgramSkillFrameId: f.Id);
             return SkillProgramStepOutcome.AwaitChild;
         }
@@ -177,7 +174,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     [ProgramAnswer(MobileJwAction)]
     internal void AnswerMobileJw(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { } r } f || !MobileJwChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { } r } f || !MobileJwChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Mobile Jiang Wei requires the current original chooser and exact private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -299,7 +296,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
             var parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var current = parent.MobileJiangWei!;
             var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().SingleOrDefault(e => e.ParentFrameId == f.Id && e.Reason.Value == "mobile.tiantao.discard" && e.SequenceBefore == current.Before);
-            if (paid is { ActualCount: > 0 } && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == paid.InvocationId).All(e => !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence == e.CompletionSequence).CardKind)))
+            if (paid is { ActualCount: > 0 } && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == paid.InvocationId).All(e => !CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence == e.CompletionSequence).CardKind)))
                 _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, parent with { MobileJiangWei = current with { HpLossSeats = current.HpLossSeats.Append(r.Target).ToArray() } });
         });
     }
@@ -467,9 +464,9 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
         if (r.Stage == MobileJiangWeiStage.Region)
             return p.Choices.OrderBy(c => _cardZonesOperations._cardZones.Count(new((CardZoneKind)int.Parse(c.Parameters["value"], CultureInfo.InvariantCulture), f.OwnerSeat))).First();
         if (r.Stage == MobileJiangWeiStage.OtherTargets)
-            return p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "discard-target" && c.Targets.Count == 1 && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? p.Choices.Last();
+            return p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "discard-target" && c.Targets.Count == 1 && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? p.Choices.Last();
         if (r.Stage is MobileJiangWeiStage.Target or MobileJiangWeiStage.ThunderTarget)
-            return p.Choices.FirstOrDefault(c => !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? p.Choices.First();
+            return p.Choices.FirstOrDefault(c => !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? p.Choices.First();
         return p.Choices.First();
     }
 }

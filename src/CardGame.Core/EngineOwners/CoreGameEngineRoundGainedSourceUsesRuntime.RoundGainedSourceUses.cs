@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRoundGainedSourceUsesRuntime
@@ -43,7 +39,7 @@ internal sealed partial class CoreGameEngineRoundGainedSourceUsesRuntime
     internal bool InRoundGainedOwnPlay(CharacterState owner) => owner.IsAlive && _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat == owner.Seat && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play;
     internal bool HasRoundGainedBasicBonus(CharacterState owner, CardKind kind, IReadOnlyList<int> ids)
     {
-        if (!TracksRoundGainedSourceUses || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind) != SkillProgramCardCategory.Basic || ids is null || ids.Count == 0 || !InRoundGainedOwnPlay(owner))
+        if (!TracksRoundGainedSourceUses || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind) != SkillProgramCardCategory.Basic || ids is null || ids.Count == 0 || !InRoundGainedOwnPlay(owner))
             return false;
         var policies = _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.RoundGainedOtherSourceUse).ToArray();
         if (policies.Length == 0 || RoundGainedCurrentBoundary()is not { } boundary || ids.Any(id => _cardZonesOperations._cardZones.GetLocation(id).OwnerSeat != owner.Seat || _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(owner, id)is null))
@@ -60,7 +56,7 @@ internal sealed partial class CoreGameEngineRoundGainedSourceUsesRuntime
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.AfterSlashDebitIdentity, 20)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 30)]
-    internal bool HasIssuedRoundGainedBasicBonus(long useId, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { } action } use && action.ActorSeat == actor && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Basic && use.RoundGainedUseQualifications is { Count: > 0 } qualifications && qualifications.Any(q => q.ActorSeat == actor && ValidRoundGainedQualification(use, q));
+    internal bool HasIssuedRoundGainedBasicBonus(long useId, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { } action } use && action.ActorSeat == actor && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Basic && use.RoundGainedUseQualifications is { Count: > 0 } qualifications && qualifications.Any(q => q.ActorSeat == actor && ValidRoundGainedQualification(use, q));
     internal void IssueRoundGainedUseQualifications(long useId, CardActionContext? action)
     {
         if (!TracksRoundGainedSourceUses || action is not { Type: CardActionType.Use } || action.ResponderSeat is not null || action.OpponentSeat is not null || action.PhysicalCards.Count == 0 || action.ActorSeat != action.ProviderSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat) || !InRoundGainedOwnPlay(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat]) || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { PhysicalCardIds: { } physicalIds } use || use.Action?.ActionId != action.ActionId || use.SourceSeat != action.ActorSeat)
@@ -132,7 +128,7 @@ internal sealed partial class CoreGameEngineRoundGainedSourceUsesRuntime
             var program = _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program!;
             foreach (var trigger in program.Triggers.Where(t => t.Window == window && t.Effects is [{ } e] && e.Op == op))
             {
-                if (window == SkillProgramTriggerWindow.CardUseTargetsFinalized ? !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) : global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) != SkillProgramCardCategory.Equipment)
+                if (window == SkillProgramTriggerWindow.CardUseTargetsFinalized ? !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) : CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) != SkillProgramCardCategory.Equipment)
                     continue;
                 result.RemoveAll(c => c.OwnerSeat == q.ActorSeat && c.SkillId == q.Source.SkillId && c.TriggerId == trigger.Id && c.SkillInstanceId != q.Source.SkillInstanceId);
                 if (result.Any(c => c.OwnerSeat == q.ActorSeat && c.SkillId == q.Source.SkillId && c.TriggerId == trigger.Id && c.SkillInstanceId == q.Source.SkillInstanceId))
@@ -154,12 +150,12 @@ internal sealed partial class CoreGameEngineRoundGainedSourceUsesRuntime
         var equipment = context.Window == SkillProgramTriggerWindow.CardUseCommitted;
         var op = equipment ? SkillProgramEffectOp.DrawForRoundGainedEquipmentUse : SkillProgramEffectOp.AdjustOneRoundGainedOrdinaryTrickTarget;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
-        if (q is null || current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.TriggerId != candidate.BindingId || current.SkillInstanceId != candidate.SkillInstanceId || current.GameplayHash != candidate.GameplayHash || program?.GameplayHash != candidate.GameplayHash || trigger?.Window != context.Window || trigger.Effects is not [{ } effect] || effect.Op != op || _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) != context || window.Continuation != (equipment ? ProgramCardContinuation.CommittedSimpleCard : ProgramCardContinuation.FinalizedTrick) || (equipment ? global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) != SkillProgramCardCategory.Equipment : !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind)) || index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != use.Id || !ValidRoundGainedQualification(use, q) || (equipment ? !HasExactRoundGainedCommittedEquipmentUse(use, q) : !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action)))
+        if (q is null || current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.TriggerId != candidate.BindingId || current.SkillInstanceId != candidate.SkillInstanceId || current.GameplayHash != candidate.GameplayHash || program?.GameplayHash != candidate.GameplayHash || trigger?.Window != context.Window || trigger.Effects is not [{ } effect] || effect.Op != op || _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) != context || window.Continuation != (equipment ? ProgramCardContinuation.CommittedSimpleCard : ProgramCardContinuation.FinalizedTrick) || (equipment ? CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) != SkillProgramCardCategory.Equipment : !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind)) || index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != use.Id || !ValidRoundGainedQualification(use, q) || (equipment ? !HasExactRoundGainedCommittedEquipmentUse(use, q) : !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action)))
             return null;
         return q;
     }
 
-    internal bool HasExactRoundGainedCommittedEquipmentUse(CardUseFrame use, RoundGainedUseQualification q) => use.ProgramUseCommitted && use.Action is { Type: CardActionType.Use } action && action.ActorSeat == q.ActorSeat && action.ProviderSeat == q.ActorSeat && action.ResponderSeat is null && action.OpponentSeat is null && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Equipment && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == use.CardId && e.CardKind == use.CardKind && e.SourceSeat == q.ActorSeat) == 1 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().Count(e => e.ResolutionId == use.Id && e.TargetSeats.SequenceEqual(action.TargetSeats)) == 1;
+    internal bool HasExactRoundGainedCommittedEquipmentUse(CardUseFrame use, RoundGainedUseQualification q) => use.ProgramUseCommitted && use.Action is { Type: CardActionType.Use } action && action.ActorSeat == q.ActorSeat && action.ProviderSeat == q.ActorSeat && action.ResponderSeat is null && action.OpponentSeat is null && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Equipment && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == use.CardId && e.CardKind == use.CardKind && e.SourceSeat == q.ActorSeat) == 1 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().Count(e => e.ResolutionId == use.Id && e.TargetSeats.SequenceEqual(action.TargetSeats)) == 1;
     [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 60)]
     internal bool HasIssuedRoundGainedUseCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => ExactIssuedRoundGainedUseCandidate(candidate, context)is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 490)]

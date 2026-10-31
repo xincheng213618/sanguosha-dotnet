@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal readonly struct ActionQueryScope(global::CardGame.Core.EngineStates.CoreGameEngineActionQueriesState gameEngineActionQueriesState, bool hasNativeOwner, global::CardGame.Core.NativeOwners.ActionQuery? previous = null) : IDisposable
+internal readonly struct ActionQueryScope(EngineStates.CoreGameEngineActionQueriesState gameEngineActionQueriesState, bool hasNativeOwner, ActionQuery? previous = null) : IDisposable
 {
     public void Dispose()
     {

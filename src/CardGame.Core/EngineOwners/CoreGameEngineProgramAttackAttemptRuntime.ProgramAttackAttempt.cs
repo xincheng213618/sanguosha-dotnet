@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
 {
-    internal bool TryAdvanceChainedDamageTarget(global::CardGame.Core.GameEngine.IDamageAttempt attack, out int fromSeat)
+    internal bool TryAdvanceChainedDamageTarget(GameEngine.IDamageAttempt attack, out int fromSeat)
     {
         _coreProgramDamageHooksOperations.DamageHooks.AdvanceChain(ProgramDamagePhase.BeforeChainAdvance, attack);
         // A zero segment cannot issue zero damage to the next recipient.
@@ -33,7 +29,7 @@ internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
         _coreRuntimeOperations.ReplaceRuntimeFrame(_resolutionStackOperations._resolutionStack[index].Id, program with { AttackAttempt = update(program.AttackAttempt) });
     }
 
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? CurrentDamageAttempt
+    internal GameEngine.IDamageAttempt? CurrentDamageAttempt
     {
         get
         {
@@ -43,9 +39,9 @@ internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
         }
     }
 
-    internal bool IsCardAttackSuspendedByProgramDamage => _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null && CurrentDamageAttempt is global::CardGame.Core.NativeOwners.ProgramAttackHandle;
+    internal bool IsCardAttackSuspendedByProgramDamage => _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null && CurrentDamageAttempt is NativeOwners.ProgramAttackHandle;
 
-    internal void CompleteProgramAttack(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void CompleteProgramAttack(GameEngine.IDamageAttempt attack)
     {
         if (_coreShanheS5YimieOperations.TryBeginShanheS5YimieRecovery(attack))
             return;

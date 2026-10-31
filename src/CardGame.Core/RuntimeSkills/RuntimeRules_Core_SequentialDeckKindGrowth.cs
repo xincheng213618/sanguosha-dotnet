@@ -1,10 +1,10 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_SequentialDeckKindGrowth
 {
     internal static CardConversionSource SequentialDeckKindGrowthSource(ProgramSkillFrame frame) =>
-        new(frame.SkillId, CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+        new(frame.SkillId, RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
 
     internal static string SequentialDeckKindGrowthReason(long frameId, int step) =>
         $"skill-program.sequential-deck-kind-growth.{frameId}.{step}.gain";

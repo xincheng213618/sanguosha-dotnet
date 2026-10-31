@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunQuanOlMagicRuntime
 {
     internal bool HasMoQiangangCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMoSunQuanQiangangEntry);
 
-    internal static CardConversionSource MoQiangangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_quan_ol_magic_MoSunQuanQiangang.MoQiangangSource(f);
+    internal static CardConversionSource MoQiangangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_sun_quan_ol_magic_MoSunQuanQiangang.MoQiangangSource(f);
     internal bool TryGetMoQiangangOrigin(int ownerSeat, out CardConversionSource source, out string gameplayHash)
     {
         source = null !;
@@ -29,7 +25,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     internal bool MoQiangangEntered(int ownerSeat) => TryGetMoQiangangOrigin(ownerSeat, out _, out _);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 28930, SkillProgramEffectOp.ResolveMoSunQuanQiangangEntry)]
     internal bool CanActivateMoQiangang(ProgramActivationLegalityContext gate) => HasMoQiangangCapability && _coreMatchSetupSetupCompleteAccess._setupComplete && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == gate.OwnerSeat && gate.Owner.IsAlive && !MoQiangangEntered(gate.OwnerSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(gate.Owner, "ol:mo-tianen") && gate.Owner.SkillGrants.Grants.Any(g => g.SkillId == "ol:mo-tianen" && !g.IsModeRule) && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == gate.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase);
-    SkillProgramStepOutcome global::CardGame.Core.IMoSunQuanQiangangHost.Resolve(ProgramSkillFrame f) => BeginMoQiangang(f);
+    SkillProgramStepOutcome IMoSunQuanQiangangHost.Resolve(ProgramSkillFrame f) => BeginMoQiangang(f);
     internal SkillProgramStepOutcome BeginMoQiangang(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

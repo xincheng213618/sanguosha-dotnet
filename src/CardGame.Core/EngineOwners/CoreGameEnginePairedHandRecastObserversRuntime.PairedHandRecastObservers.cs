@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePairedHandRecastObserversRuntime
 {
     internal bool ValidPairedHandRecastReceipt(ProgramSkillFrame f)
     {
-        if (f.PairedHandRecast is not { } r || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.Owner.Seat != f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Partner.Seat) || r.Partner.Seat == f.OwnerSeat || f.SelectedCardIds is not [var original] || r.Owner.Material is not { } ownerMaterial || original != ownerMaterial.CardId || f.SelectedTargetSeats is not [var partner] || partner != r.Partner.Seat || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || r.PhaseInstanceId <= 0 || r.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Cursor is < 0 or > 2 || !Enum.IsDefined(r.Stage) || _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id) != 0)
+        if (f.PairedHandRecast is not { } r || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.Owner.Seat != f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Partner.Seat) || r.Partner.Seat == f.OwnerSeat || f.SelectedCardIds is not [var original] || r.Owner.Material is not { } ownerMaterial || original != ownerMaterial.CardId || f.SelectedTargetSeats is not [var partner] || partner != r.Partner.Seat || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || r.PhaseInstanceId <= 0 || r.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || r.Cursor is < 0 or > 2 || !Enum.IsDefined(r.Stage) || _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id) != 0)
             return false;
         var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
         if (plan.Activation is not { MinCards: 1, MaxCards: 1, MinTargets: 1, MaxTargets: 1, UsesPerPhase: 1, UsesPerTurn: null, UsesPerGame: null, TargetKind: SkillProgramTargetKind.OtherLivingWithHand } activation || activation.UsageGroup != r.UsageGroup || !activation.SourceZones.SequenceEqual([CardZoneKind.Hand]) || activation.Effects is not [{ Op: SkillProgramEffectOp.PairedHandRecast, Target: SkillProgramEffectTarget.SelectedTarget, Amount: 1, Condition.Kind: SkillProgramConditionKind.Always }] || plan.Instructions is not [{ Op: SkillProgramEffectOp.PairedHandRecast }] || _coreGameEngineSkillProgramsProgramPhaseUsesAccess._programPhaseUses.GetValueOrDefault((f.OwnerSeat, f.SkillId, r.UsageGroup)) != 1 || r.EligiblePartnerMaterials.Count == 0 || r.EligiblePartnerMaterials.Select(m => m.CardId).Distinct().Count() != r.EligiblePartnerMaterials.Count || r.EligiblePartnerMaterials.Any(m => m.CardId <= 0 || !Enum.IsDefined(m.PrintedKind) || m.From != CardLocation.Hand(partner)) || r.Partner.Material is { } selected && !r.EligiblePartnerMaterials.Contains(selected))
@@ -62,10 +58,10 @@ internal sealed partial class CoreGameEnginePairedHandRecastObserversRuntime
         if (completions.Length != 0)
             return false;
         if (r.Stage == PairedHandRecastStage.Ready)
-            return f.PendingMovementContinuation is null && (r.Cursor == 2 || global::CardGame.Core.EngineOwners.CoreGameEnginePairedHandRecastRuntime.CurrentPairedRecast(r)is { CostIssued: false, Skipped: false });
-        if (r.Cursor >= 2 || f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != global::CardGame.Core.EngineOwners.CoreGameEnginePairedHandRecastRuntime.CurrentPairedRecast(r).Seat)
+            return f.PendingMovementContinuation is null && (r.Cursor == 2 || CoreGameEnginePairedHandRecastRuntime.CurrentPairedRecast(r)is { CostIssued: false, Skipped: false });
+        if (r.Cursor >= 2 || f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != CoreGameEnginePairedHandRecastRuntime.CurrentPairedRecast(r).Seat)
             return false;
-        var current = global::CardGame.Core.EngineOwners.CoreGameEnginePairedHandRecastRuntime.CurrentPairedRecast(r);
+        var current = CoreGameEnginePairedHandRecastRuntime.CurrentPairedRecast(r);
         return r.Stage == PairedHandRecastStage.CostChildren ? current.CostIssued && !current.DrawIssued : r.Stage == PairedHandRecastStage.DrawChildren && current.CostIssued && current.DrawIssued;
     }
 
@@ -73,7 +69,7 @@ internal sealed partial class CoreGameEnginePairedHandRecastObserversRuntime
     {
         if (f.PairedHandRecast is not { Stage: PairedHandRecastStage.CostChildren or PairedHandRecastStage.DrawChildren } r || !ValidPairedHandRecastReceipt(f) || child is not CardsMovedTriggerWindowFrame moved)
             return false;
-        var p = global::CardGame.Core.EngineOwners.CoreGameEnginePairedHandRecastRuntime.CurrentPairedRecast(r);
+        var p = CoreGameEnginePairedHandRecastRuntime.CurrentPairedRecast(r);
         var drawing = r.Stage == PairedHandRecastStage.DrawChildren;
         var before = drawing ? p.DrawBefore : p.CostBefore;
         var after = drawing ? p.DrawAfter : p.CostAfter;

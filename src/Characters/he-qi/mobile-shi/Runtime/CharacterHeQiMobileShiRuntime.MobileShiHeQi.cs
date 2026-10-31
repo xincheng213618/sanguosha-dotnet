@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHeQiMobileShiRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShiHeQiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiHq(f, op);
+    SkillProgramStepOutcome IShiHeQiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiHq(f, op);
     internal SkillProgramStepOutcome BeginShiHq(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.ShiHeQi is not null || f.InstructionIndex != 1 || f.SkillId != ShiHqQizhou || f.WindowContext is not { } w || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is not [{ } e] || e.Op != op || op == SkillProgramEffectOp.ResolveMobileShiHeQiQizhouMark && (f.TriggerId != "field-entry-mark" || w.MovementBatch is not { } batch || !batch.Movements.Any(m => ShiHqEntersField(m, f.OwnerSeat))) || op == SkillProgramEffectOp.ResolveMobileShiHeQiQizhouDraw && (f.TriggerId != "draw-extra-yingji" || w.Window != SkillProgramTriggerWindow.DrawPhaseStarting || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat) || op == SkillProgramEffectOp.ResolveMobileShiHeQiYingjiCleanup && !IsIssuedShiHqCleanupCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, w.OccurrenceIndex), w))
+        if (f.ShiHeQi is not null || f.InstructionIndex != 1 || f.SkillId != ShiHqQizhou || f.WindowContext is not { } w || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is not [{ } e] || e.Op != op || op == SkillProgramEffectOp.ResolveMobileShiHeQiQizhouMark && (f.TriggerId != "field-entry-mark" || w.MovementBatch is not { } batch || !batch.Movements.Any(m => ShiHqEntersField(m, f.OwnerSeat))) || op == SkillProgramEffectOp.ResolveMobileShiHeQiQizhouDraw && (f.TriggerId != "draw-extra-yingji" || w.Window != SkillProgramTriggerWindow.DrawPhaseStarting || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat) || op == SkillProgramEffectOp.ResolveMobileShiHeQiYingjiCleanup && !IsIssuedShiHqCleanupCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, w.OccurrenceIndex), w))
             throw new InvalidOperationException("Qizhou requires its original actual field entry, draw phase or issued whole-turn cleanup.");
         var stage = op == SkillProgramEffectOp.ResolveMobileShiHeQiQizhouMark ? ShiHqStage.Target : op == SkillProgramEffectOp.ResolveMobileShiHeQiQizhouDraw ? ShiHqStage.Drawing : ShiHqStage.CleanupChildren;
         var r = new ShiHqReceipt(ShiHqSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, w.ParentFrameId, op, stage)
@@ -89,7 +86,7 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
     [ProgramAnswer("mobile-shi-he-qi")]
     internal void AnswerShiHq(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiHeQi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiHqChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiHeQi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiHqChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Qizhou changed its current private target or opaque hand-slot selection.");
         RequireShiHq(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -109,7 +106,7 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
         // sign its next one. A selected Slash therefore cannot reward itself.
         _coreProgramSkillChangesOperations.SetProgramBooleanState(f, "next-mark-draw", false);
         MarkShiHqEntity(f, material.CardId, r.Target, ShiHqMarkOrigin.SelectedHand);
-        var next = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(material.Kind);
+        var next = CoreNativeCardClassificationsRuntime.IsSlashCard(material.Kind);
         if (next)
             _coreProgramSkillChangesOperations.SetProgramBooleanState(f, "next-mark-draw", true);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiHqSelectedEvent(f.Id, r.Target, material.CardId, reward, next));
@@ -192,7 +189,7 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 49000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 49000)]
-    internal bool KeepPaidShiHq(ProgramSkillFrame f) => f.ShiHeQi is { Stage: ShiHqStage.Drawing or ShiHqStage.DrawChildren or ShiHqStage.CleanupChildren or ShiHqStage.Complete } || f.SkillId == ShiHqQizhou && f.ShiHeQi is null && f.WindowContext is { } w && IsIssuedShiHqCleanupCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, w.OccurrenceIndex), w);
+    internal bool KeepPaidShiHq(ProgramSkillFrame f) => f.ShiHeQi is { Stage: ShiHqStage.Drawing or ShiHqStage.DrawChildren or ShiHqStage.CleanupChildren or ShiHqStage.Complete } || f.SkillId == ShiHqQizhou && f.ShiHeQi is null && f.WindowContext is { } w && IsIssuedShiHqCleanupCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, w.OccurrenceIndex), w);
     internal bool ShiHqMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => f.ShiHeQi is { } r && effect?.Op == r.Operation && r.Stage is ShiHqStage.DrawChildren or ShiHqStage.CleanupChildren && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiHeQiQizhouMark)]
     internal PromptChoice ChooseShiHqAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Targets.Contains(f.OwnerSeat)) ?? p.Choices.First();

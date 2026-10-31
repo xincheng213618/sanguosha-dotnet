@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEndingPairDrawsRuntime
 {
     internal long EndingPairSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal CardConversionSource EndingPairSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal static string EndingPairRoundUsage(string state) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_EndingPairDraws.EndingPairRoundUsage(state);
+    internal CardConversionSource EndingPairSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static string EndingPairRoundUsage(string state) => RuntimeSkills.RuntimeRules_Core_EndingPairDraws.EndingPairRoundUsage(state);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 770)]
     internal bool CanRunEndingPair(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => t.Effects.FirstOrDefault(e => e.Op == SkillProgramEffectOp.DrawEndingPairThenBlockRoundIfUnequal)is not { } e || context.Window == SkillProgramTriggerWindow.TurnEnding && _coreActualRoundProgressRoundNumberAccess._roundNumber > 0 && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(c.OwnerSeat, c.SkillId, EndingPairRoundUsage(e.StateId!), SkillUsageScope.Round) == 0;
-    internal bool ExactEndingPairParent(ProgramSkillFrame f, long? expected = null) => f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } context && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().LastOrDefault()is { } ending && ending.Id == context.ParentFrameId && (expected is null || ending.Id == expected) && ending.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && ending.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && context.SourceSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && context.TargetSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
+    internal bool ExactEndingPairParent(ProgramSkillFrame f, long? expected = null) => f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } context && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().LastOrDefault()is { } ending && ending.Id == context.ParentFrameId && (expected is null || ending.Id == expected) && ending.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && ending.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && context.SourceSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && context.TargetSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
     internal IReadOnlyList<int>? PublishedEndingPairActorForAi(CharacterState owner, IReadOnlyList<SkillProgramEffect> effects, ProgramSkillWindowContext? context)
     {
         if (!effects.Any(e => e.Op == SkillProgramEffectOp.DrawEndingPairThenBlockRoundIfUnequal))

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -83,7 +80,7 @@ internal sealed partial class CharacterGuYongOlRuntime
     [ProgramAnswer("ordinary-bingyi")]
     internal void AnswerOrdinaryBingyi(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OrdinaryBingyi: { Stage: OrdinaryBingyiStage.SelectingRecipients } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !OrdinaryBingyiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OrdinaryBingyi: { Stage: OrdinaryBingyiStage.SelectingRecipients } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !OrdinaryBingyiChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Ordinary Bingyi requires a current original recipient choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.Parameters["branch"] == "toggle")

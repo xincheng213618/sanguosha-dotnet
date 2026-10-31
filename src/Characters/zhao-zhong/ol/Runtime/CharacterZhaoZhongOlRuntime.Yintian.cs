@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoZhongOlRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     internal bool HasYintianCapability => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveYintianFirstRecovery) == true;
     internal bool YintianActualTurnOpen => _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.TurnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
 
-    internal static bool IsYintianRecoveryTrigger(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhao_zhong_ol_Yintian.IsYintianRecoveryTrigger(trigger);
+    internal static bool IsYintianRecoveryTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_zhao_zhong_ol_Yintian.IsYintianRecoveryTrigger(trigger);
     internal void CaptureYintianRecoveryQualification(HpChangeContext change)
     {
         if (!HasYintianCapability || !YintianActualTurnOpen || change.Kind != HpChangeKind.Recovery || change.HpAfter <= change.HpBefore || change.Amount != change.HpAfter - change.HpBefore || !_coreGameEngineHpChangeProgramsPendingHpChangesAccess._pendingHpChanges.Contains(change))
@@ -65,7 +61,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
         return frame.TriggerId is { } id && frame.WindowContext is { } context && IsIssuedYintianRecoveryCandidate(new(frame.OwnerSeat, frame.SkillId, id, frame.SkillInstanceId, frame.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(frame).Priority, context.OccurrenceIndex), context);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IYintianHost.Execute(ProgramSkillFrame frame) => ResolveYintianFirstRecovery(frame);
+    SkillProgramStepOutcome IYintianHost.Execute(ProgramSkillFrame frame) => ResolveYintianFirstRecovery(frame);
     internal SkillProgramStepOutcome ResolveYintianFirstRecovery(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiMouOlRuntime
@@ -11,11 +6,11 @@ internal sealed partial class CharacterDengAiMouOlRuntime
     internal const string MouDengAiCollectReason = "skill-program.mou-ol:jigu.collect", MouDengAiExchangeReason = "skill-program.mou-ol:jigu.exchange", MouDengAiRemoveReason = "skill-program.mou-ol:jiewan.remove";
     internal bool HasMouDengAiOl => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.CollectMouDengAiJigu) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.UseMouDengAiJiewan);
 
-    internal static CardConversionSource MouDengAiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MouDengAiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal PublicPersistentPileSource[] MouDengAiPiles(int owner) => _corePublicPileSourcesOperations.PublicPileSources(owner).Where(s => s.SkillId == MouDengAiOlComposition.Jigu).ToArray();
     internal Card[] MouDengAiGu(int owner) => MouDengAiPiles(owner).SelectMany(_corePublicPileSourcesOperations.PublicPileCards).ToArray();
     internal bool MouDengAiIsGu(int owner, int id) => MouDengAiPiles(owner).Any(p => p.Location == _cardZonesOperations._cardZones.GetLocation(id));
-    SkillProgramStepOutcome global::CardGame.Core.IMouDengAiOlHost.Start(ProgramSkillFrame f, SkillProgramEffectOp op) => StartMouDengAiOl(f, op);
+    SkillProgramStepOutcome IMouDengAiOlHost.Start(ProgramSkillFrame f, SkillProgramEffectOp op) => StartMouDengAiOl(f, op);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 33400)]
     internal void ObserveMouDengAiEntry(IGameEvent fact)
     {

@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreParticipantHandProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IParticipantHandProgramHost.ViewAndTakeHand(ProgramSkillFrame frame, int sourceSeat, int count) => BeginPrivateHandTake(frame.Id, sourceSeat, count);
-    SkillProgramStepOutcome global::CardGame.Core.IParticipantHandProgramHost.RequestHandRepayment(ProgramSkillFrame frame, int sourceSeat) => BeginHandRepayment(frame.Id, sourceSeat);
+    SkillProgramStepOutcome IParticipantHandProgramHost.ViewAndTakeHand(ProgramSkillFrame frame, int sourceSeat, int count) => BeginPrivateHandTake(frame.Id, sourceSeat, count);
+    SkillProgramStepOutcome IParticipantHandProgramHost.RequestHandRepayment(ProgramSkillFrame frame, int sourceSeat) => BeginHandRepayment(frame.Id, sourceSeat);
     internal IEnumerable<CardSnapshot> GetParticipantPrivatelyViewedCards(int viewerSeat) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OwnerSeat == viewerSeat && f.PrivateHandTake is { Paid: false }).SelectMany(f => f.PrivateHandTake!.ViewedCardIds.Select(id => _cardZonesOperations._cardZones.CardsAt(CardLocation.Hand(f.PrivateHandTake.SourceSeat)).Single(c => c.Id == id))).Select(_coreSnapshotValueProjectionOperations.ToSnapshot);
     internal SkillProgramStepOutcome BeginPrivateHandTake(long frameId, int sourceSeat, int count)
     {
@@ -181,7 +177,7 @@ internal sealed partial class CoreParticipantHandProgramsRuntime
         if (frame.WindowContext?.Window == SkillProgramTriggerWindow.DrawPhaseEnded)
             return;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-        if (index < 2 || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects, CardUse: { } cardContext } context || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame window || window.Id != context.ParentFrameId || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != context.Window || window.Continuation is not (ProgramCardContinuation.BeforeTargetEffects or ProgramCardContinuation.BeforeTrickTargetEffects) || _resolutionStackOperations._resolutionStack[index - 2] is not CardUseFrame use || use.Id != window.ParentFrameId || window.Action.Type != CardActionType.Use || use.Action is not { Type: CardActionType.Use } action || action.ActionId != window.Action.ActionId || action.ActorSeat != window.Action.ActorSeat || action.ProviderSeat != window.Action.ProviderSeat || action.RequesterSeat != window.Action.RequesterSeat || action.EffectiveKind != window.Action.EffectiveKind || !action.PhysicalCards.SequenceEqual(window.Action.PhysicalCards) || cardContext.CardActionId != action.ActionId || cardContext.ActorSeat != action.ActorSeat || context.SourceSeat != action.ActorSeat || context.OwnerSeat != frame.OwnerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
+        if (index < 2 || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects, CardUse: { } cardContext } context || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame window || window.Id != context.ParentFrameId || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != context.Window || window.Continuation is not (ProgramCardContinuation.BeforeTargetEffects or ProgramCardContinuation.BeforeTrickTargetEffects) || _resolutionStackOperations._resolutionStack[index - 2] is not CardUseFrame use || use.Id != window.ParentFrameId || window.Action.Type != CardActionType.Use || use.Action is not { Type: CardActionType.Use } action || action.ActionId != window.Action.ActionId || action.ActorSeat != window.Action.ActorSeat || action.ProviderSeat != window.Action.ProviderSeat || action.RequesterSeat != window.Action.RequesterSeat || action.EffectiveKind != window.Action.EffectiveKind || !action.PhysicalCards.SequenceEqual(window.Action.PhysicalCards) || cardContext.CardActionId != action.ActionId || cardContext.ActorSeat != action.ActorSeat || context.SourceSeat != action.ActorSeat || context.OwnerSeat != frame.OwnerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             throw new InvalidOperationException("An awaited bound gift lost its exact card-use window and owning action.");
         var candidate = window.Candidates[window.CandidateIndex];
         var effect = ParticipantHandPaused(frame);
@@ -217,9 +213,9 @@ internal sealed partial class CoreParticipantHandProgramsRuntime
             ValidateBoundParticipantGiftWindow(frame);
         if (!ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()))
             return;
-        if (frame.PrivateHandTake is { Paid: false } view && (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, PrivateHandTakeChoices(frame)) || view.ViewedCardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(view.SourceSeat))))
+        if (frame.PrivateHandTake is { Paid: false } view && (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, PrivateHandTakeChoices(frame)) || view.ViewedCardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(view.SourceSeat))))
             throw new InvalidOperationException("The private hand prompt lost its chooser-safe frozen source.");
-        if (frame.HandRepayment is { Paid: false } request && (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != request.SourceSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, HandRepaymentChoices(frame))))
+        if (frame.HandRepayment is { Paid: false } request && (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != request.SourceSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, HandRepaymentChoices(frame))))
             throw new InvalidOperationException("The hand repayment prompt changed its valid effective suits.");
     }
 
@@ -229,7 +225,7 @@ internal sealed partial class CoreParticipantHandProgramsRuntime
         if (frame.PrivateHandTake is not null)
             return decision.Choices.OrderByDescending(c => CardCatalog.Get(_cardZonesOperations._cardZones.CardsAt(CardLocation.Hand(frame.PrivateHandTake.SourceSeat)).Single(card => card.Id == c.Cards.Single()).Kind).HandKeepValue).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
         var source = _coreMatchParticipantsPlayersAccess._players[frame.HandRepayment!.SourceSeat];
-        var gift = decision.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_corePhysicalOwnedCardQueriesOperations.GetHand(source).Single(card => card.Id == c.Cards.Single()), source)).ThenBy(c => c.Id.Value, StringComparer.Ordinal).FirstOrDefault();
-        return gift is not null && (source.Hp <= 1 || global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_corePhysicalOwnedCardQueriesOperations.GetHand(source).Single(c => c.Id == gift.Cards.Single()), source) < 50) ? gift : decision.Choices.Single(c => c.Parameters.GetValueOrDefault("repayment") == "lose-hp");
+        var gift = decision.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_corePhysicalOwnedCardQueriesOperations.GetHand(source).Single(card => card.Id == c.Cards.Single()), source)).ThenBy(c => c.Id.Value, StringComparer.Ordinal).FirstOrDefault();
+        return gift is not null && (source.Hp <= 1 || CoreNativeAiDecisionsRuntime.GetKeepValue(_corePhysicalOwnedCardQueriesOperations.GetHand(source).Single(c => c.Id == gift.Cards.Single()), source) < 50) ? gift : decision.Choices.Single(c => c.Parameters.GetValueOrDefault("repayment") == "lose-hp");
     }
 }

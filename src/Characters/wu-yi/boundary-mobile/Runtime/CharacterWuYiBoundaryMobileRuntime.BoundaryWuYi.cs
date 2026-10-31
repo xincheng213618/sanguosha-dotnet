@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuYiBoundaryMobileRuntime
 {
     internal bool HasBoundaryWuYi => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmBoundaryWuYiBenxi);
 
-    internal static CardConversionSource BoundaryWuYiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryWuYiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteBoundaryWuYi(f, op);
+    internal static CardConversionSource BoundaryWuYiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IBoundaryWuYiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteBoundaryWuYi(f, op);
     internal SkillProgramStepOutcome ExecuteBoundaryWuYi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -36,7 +32,7 @@ internal sealed partial class CharacterWuYiBoundaryMobileRuntime
 
         if (op == SkillProgramEffectOp.ResolveBoundaryWuYiTargets)
             return BeginBoundaryWuYiTargets(f);
-        if (!CanOfferBoundaryWuYiReward(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), f.WindowContext!))
+        if (!CanOfferBoundaryWuYiReward(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), f.WindowContext!))
             throw new InvalidOperationException("Benxi reward requires its exact once-completed issued card's actual damage.");
         var identity = f.WindowContext!.CardUse!;
         var grant = BoundaryWuYiIssuedGrant(identity.ParentCardUseFrameId, identity.CardActionId, f.OwnerSeat, f.SkillInstanceId)!;
@@ -84,7 +80,7 @@ internal sealed partial class CharacterWuYiBoundaryMobileRuntime
             action = accepted.Action;
         // The shared ledger is entered only for genuine uses; Slash played to
         // a Duel or a supplied faction response never gains an entry here.
-        if (action is null || !_coreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess._actualPlayPhaseUseActions.Contains(action.ActionId) || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Basic && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind))
+        if (action is null || !_coreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess._actualPlayPhaseUseActions.Contains(action.ActionId) || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Basic && !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind))
             return;
         foreach (var grant in ActiveBoundaryWuYiGrants(action.ActorSeat).Where(g => !_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWuYiBenxiConsumedEvent>().Any(e => e.GrantFrameId == g.FrameId)).ToArray())
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryWuYiBenxiConsumedEvent(grant.FrameId, action.ActionId, useId, action.ActorSeat, action.EffectiveKind, grant.Phase));

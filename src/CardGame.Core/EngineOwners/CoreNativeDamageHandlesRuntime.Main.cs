@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeDamageHandlesRuntime
 {
-    internal static bool SameAttackOwner(global::CardGame.Core.GameEngine.IDamageAttempt? left, global::CardGame.Core.GameEngine.IDamageAttempt? right) => left is not null && right is not null && left.ResolutionId == right.ResolutionId;
-    internal static bool SameContinuationOwner(global::CardGame.Core.GameEngine.ICardContinuationHandle? left, global::CardGame.Core.GameEngine.ICardContinuationHandle? right) => left is not null && right is not null && left.GetType() == right.GetType() && left.OwnerFrameId == right.OwnerFrameId;
-    internal global::CardGame.Core.NativeOwners.CardAttackHandle? GetJudgmentAttack(JudgmentFrame frame)
+    internal static bool SameAttackOwner(GameEngine.IDamageAttempt? left, GameEngine.IDamageAttempt? right) => left is not null && right is not null && left.ResolutionId == right.ResolutionId;
+    internal static bool SameContinuationOwner(GameEngine.ICardContinuationHandle? left, GameEngine.ICardContinuationHandle? right) => left is not null && right is not null && left.GetType() == right.GetType() && left.OwnerFrameId == right.OwnerFrameId;
+    internal NativeOwners.CardAttackHandle? GetJudgmentAttack(JudgmentFrame frame)
     {
         if (frame.Continuation is JudgmentContinuationKind.Indulgence or JudgmentContinuationKind.SupplyShortage or JudgmentContinuationKind.Lightning)
             return null;
@@ -22,12 +18,12 @@ internal sealed partial class CoreNativeDamageHandlesRuntime
 
     internal Card? GetJudgmentCard(JudgmentFrame frame) => frame.CardId is { } cardId ? _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(cardId)).Single(card => card.Id == cardId) : null;
     internal Card? GetDelayedJudgmentCard(JudgmentFrame frame) => frame.DelayedCardId is { } cardId ? _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(cardId)).Single(card => card.Id == cardId) : null;
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? GetDyingAttack(DyingFrame frame)
+    internal GameEngine.IDamageAttempt? GetDyingAttack(DyingFrame frame)
     {
-        return GetCompletedDyingAttack(new global::CardGame.Core.GameEngine.DyingCompletionReceipt(frame.Id, frame.ParentFrameId, frame.VictimSeat, frame.Continuation));
+        return GetCompletedDyingAttack(new GameEngine.DyingCompletionReceipt(frame.Id, frame.ParentFrameId, frame.VictimSeat, frame.Continuation));
     }
 
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? GetCompletedDyingAttack(global::CardGame.Core.GameEngine.DyingCompletionReceipt receipt)
+    internal GameEngine.IDamageAttempt? GetCompletedDyingAttack(GameEngine.DyingCompletionReceipt receipt)
     {
         if (receipt.Continuation is DyingContinuationKind.ProgramSkill or DyingContinuationKind.WenhePoison or DyingContinuationKind.SkillInvocation)
             return null;
@@ -36,7 +32,7 @@ internal sealed partial class CoreNativeDamageHandlesRuntime
         return attack;
     }
 
-    internal global::CardGame.Core.GameEngine.IDamageAttempt GetDamageTriggerAttack(DamageTriggerWindowFrame frame) => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } active && active.Id == frame.Id && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } attack ? attack : throw new InvalidOperationException("The damage trigger lost its active attack.");
+    internal GameEngine.IDamageAttempt GetDamageTriggerAttack(DamageTriggerWindowFrame frame) => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } active && active.Id == frame.Id && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } attack ? attack : throw new InvalidOperationException("The damage trigger lost its active attack.");
     internal bool SupportsGodFactionSelection => _modeRulesOperations._modeRules.SupportsGodFactionSelection;
     internal bool IsClassicIdentityMode => _modeRulesOperations._modeRules.IsClassicIdentityContext;
     internal bool UsesClassicBattleRules => _modeRulesOperations._modeRules.UsesClassicBattleRules;

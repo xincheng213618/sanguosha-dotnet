@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceChunlao3161Runtime
 {
-    internal int[] MatchingShanheSourceChunlaoIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => batch.Movements.Select((move, index) => (move, index, origin: _coreAdjacentDiscardStorageOperations.AdjacentDiscardOrigin(move))).Where(x => x.move.To == CardLocation.DiscardPile && _cardZonesOperations._cardZones.GetLocation(x.move.CardId) == CardLocation.DiscardPile && x.origin is { } o && global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(o.EffectiveKind) && _coreMatchParticipantsPlayersAccess._players[o.SourceSeat].IsAlive && _coreNativeRuleQueriesOperations.GetCombatDistance(o.SourceSeat, candidate.OwnerSeat) <= 1).Select(x => x.index).ToArray();
+    internal int[] MatchingShanheSourceChunlaoIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => batch.Movements.Select((move, index) => (move, index, origin: _coreAdjacentDiscardStorageOperations.AdjacentDiscardOrigin(move))).Where(x => x.move.To == CardLocation.DiscardPile && _cardZonesOperations._cardZones.GetLocation(x.move.CardId) == CardLocation.DiscardPile && x.origin is { } o && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(o.EffectiveKind) && _coreMatchParticipantsPlayersAccess._players[o.SourceSeat].IsAlive && _coreNativeRuleQueriesOperations.GetCombatDistance(o.SourceSeat, candidate.OwnerSeat) <= 1).Select(x => x.index).ToArray();
     internal SkillProgramStepOutcome BeginShanheSourceChunlaoStorage(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != ShanheSourceJiangdongTrioIds.Chunlao || f.ShanheSourceChunlaoStorage is not null || f.WindowContext is not { MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count || _coreAdjacentDiscardStorageOperations.AdjacentDiscardOrigin(batch.Movements[index])is not { } origin || !MatchingShanheSourceChunlaoIndexes(batch, new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0)).Contains(index))
+        if (f.SkillId != ShanheSourceJiangdongTrioIds.Chunlao || f.ShanheSourceChunlaoStorage is not null || f.WindowContext is not { MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count || _coreAdjacentDiscardStorageOperations.AdjacentDiscardOrigin(batch.Movements[index])is not { } origin || !MatchingShanheSourceChunlaoIndexes(batch, new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0)).Contains(index))
             throw new InvalidOperationException("Source3161 requires its exact original distance-one discarded Slash.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheSourceChunlaoStorage = new(batch.Movements[index].CardId, origin.SourceSeat, batch.Movements[index].Sequence) });
         var choices = ShanheSourceChunlaoStorageChoices(f);
@@ -32,7 +29,7 @@ internal sealed partial class CoreGameEngineShanheSourceChunlao3161Runtime
     [ProgramAnswer("shanhe-source-chunlao-store")]
     internal void AnswerShanheSourceChunlaoStorage(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceChunlaoStorage: { Paid: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.SourceSeat || !ShanheSourceChunlaoStorageChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceChunlaoStorage: { Paid: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.SourceSeat || !ShanheSourceChunlaoStorageChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Source3161 requires the original discarding player's exact choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["branch"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[r.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _cardZonesOperations._cardZones.GetLocation(r.CardId) != CardLocation.DiscardPile)
@@ -67,7 +64,7 @@ internal sealed partial class CoreGameEngineShanheSourceChunlao3161Runtime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.OfferShanheSourceChunlaoStorage)]
-    internal PromptChoice AiShanheSourceChunlaoStorage(PendingDecision p, ProgramSkillFrame f) => p.Choices.Single(c => c.Parameters["branch"] == (f.ShanheSourceChunlaoStorage!.SourceSeat == f.OwnerSeat || global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.ShanheSourceChunlaoStorage.SourceSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) ? "store" : "decline"));
+    internal PromptChoice AiShanheSourceChunlaoStorage(PendingDecision p, ProgramSkillFrame f) => p.Choices.Single(c => c.Parameters["branch"] == (f.ShanheSourceChunlaoStorage!.SourceSeat == f.OwnerSeat || CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.ShanheSourceChunlaoStorage.SourceSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) ? "store" : "decline"));
     [ProgramPipelineHook(ProgramPipelinePhase.SelectLegacyDiscardIndexes, 1100)]
     internal int[]? SelectWindowIndexes_MatchingShanheSourceChunlaoIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger)
     {

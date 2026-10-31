@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFuRongOlRuntime
 {
     internal const string FuRongCostReason = "skill-program.fu-rong.xiaosi.discard";
-    internal CardConversionSource FuRongSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource FuRongSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool FuRongSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
-    internal bool FuRongLegalCost(int seat, Card c, CardLocation from) => !c.IsGeneralWeapon && from.OwnerSeat == seat && from.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[seat], c), SkillProgramCardCategory.Basic) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, from, OwnedCardMoveIntent.Discard) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, from, OwnedCardMoveIntent.Discard);
+    internal bool FuRongLegalCost(int seat, Card c, CardLocation from) => !c.IsGeneralWeapon && from.OwnerSeat == seat && from.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[seat], c), SkillProgramCardCategory.Basic) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, from, OwnedCardMoveIntent.Discard) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, from, OwnedCardMoveIntent.Discard);
     internal bool FuRongHasCost(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat)).Any(c => FuRongLegalCost(seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id)));
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 26310, SkillProgramEffectOp.DiscardBasicPairAndReuse)]
     internal bool AllowsFuRongActivation(CharacterState actor) => FuRongHasCost(actor.Seat);
@@ -196,7 +193,7 @@ internal sealed partial class CharacterFuRongOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26310)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26310)]
     internal bool ContinuePaidFuRongPair(ProgramSkillFrame f) => f.FuRongPair?.OwnerPayment is not null;
-    SkillProgramStepOutcome global::CardGame.Core.IFuRongProgramHost.DiscardBasicPairAndReuse(ProgramSkillFrame f, int target) => BeginFuRongPair(f, target);
+    SkillProgramStepOutcome IFuRongProgramHost.DiscardBasicPairAndReuse(ProgramSkillFrame f, int target) => BeginFuRongPair(f, target);
     [ProgramAiChoice(SkillProgramEffectOp.DiscardBasicPairAndReuse)]
-    internal PromptChoice SelectAiFuRongPair(PendingDecision prompt, ProgramSkillFrame f) => f.FuRongPair!.Stage == FuRongPairStage.UseChoice ? prompt.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "use") ?? prompt.Choices.Last() : prompt.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat])).ThenBy(c => c.Cards.Single()).First();
+    internal PromptChoice SelectAiFuRongPair(PendingDecision prompt, ProgramSkillFrame f) => f.FuRongPair!.Stage == FuRongPairStage.UseChoice ? prompt.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "use") ?? prompt.Choices.Last() : prompt.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat])).ThenBy(c => c.Cards.Single()).First();
 }

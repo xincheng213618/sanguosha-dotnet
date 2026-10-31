@@ -6,7 +6,7 @@ internal sealed class ActionQuery(int players,(int Seat, Card Card)? printedTarg
     {
         internal readonly (int Seat, Card Card)? PrintedTargetTemplate = printedTargetTemplate;
         internal readonly SkillBindingShard?[] Bindings = new SkillBindingShard?[players];
-        internal readonly Dictionary<(int Seat, Card Card), IReadOnlyList<global::CardGame.Core.GameEngine.ProgramCardIdentityMatch>> Identities = [];
+        internal readonly Dictionary<(int Seat, Card Card), IReadOnlyList<GameEngine.ProgramCardIdentityMatch>> Identities = [];
         internal readonly Dictionary<(int Seat, Card Card, CardKind Kind, bool Response, bool Dying),
             IReadOnlyList<CardConversionSource>> Conversions = [];
         internal readonly Dictionary<(int Source, int Target, int? Excluded), RuleQueryEvaluation> Distances = [];

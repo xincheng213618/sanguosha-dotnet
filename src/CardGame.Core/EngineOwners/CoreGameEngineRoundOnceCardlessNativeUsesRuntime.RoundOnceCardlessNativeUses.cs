@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRoundOnceCardlessNativeUsesRuntime
@@ -140,7 +135,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeUsesRuntime
 
     internal IReadOnlyList<PromptChoice> RoundOnceCardlessForcedSlashChoices(CharacterState actor, CharacterState target, long originalId, bool qinglong)
     {
-        if (qinglong ? _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != originalId || blade.Attack.SourceSeat != actor.Seat || blade.Attack.TargetSeat != target.Seat || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack) : _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not { } borrowed || borrowed.ResolutionId != originalId || borrowed.WeaponOwnerSeat != actor.Seat || borrowed.SlashTargetSeat != target.Seat || borrowed.ActiveAttack is not null || _coreNativeBorrowedSwordOperations.GetWeapon(actor)is null)
+        if (qinglong ? _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != originalId || blade.Attack.SourceSeat != actor.Seat || blade.Attack.TargetSeat != target.Seat || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack) : _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not { } borrowed || borrowed.ResolutionId != originalId || borrowed.WeaponOwnerSeat != actor.Seat || borrowed.SlashTargetSeat != target.Seat || borrowed.ActiveAttack is not null || _coreNativeBorrowedSwordOperations.GetWeapon(actor)is null)
             return[];
         var result = new List<PromptChoice>();
         foreach (var(source, rule)in RoundOnceCardlessForcedSlashRules(actor, target, qinglong))
@@ -153,14 +148,14 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeUsesRuntime
                 ["original-frame-id"] = originalId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 ["forced-use"] = qinglong ? "qinglong" : "borrowed-sword"
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
             result.Add(new(new ChoiceId($"round-cardless.forced-{(parameters["forced-use"])}.{(originalId)}.{(source.BindingId)}.{(source.SkillInstanceId)}"), $"发动【{(_coreCardConversionsOperations.ProgramConversionName(source))}】，视为使用【{(CardCatalog.Get(kind).DisplayName)}】攻击 {(target.Name)}。", [], [target.Seat], parameters));
         }
 
         return Array.AsReadOnly(result.ToArray());
     }
 
-    internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule)> RoundOnceCardlessForcedSlashRules(CharacterState actor, CharacterState target, bool qinglong) => RoundOnceCardlessRules(actor).Where(r => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Rule.OutputKind) && (qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, r.Rule.OutputKind, null, false, Suit.None, 0) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, r.Rule.OutputKind, Suit.None, false, null, 0, [])) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, r.Rule.OutputKind, Suit.None));
+    internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule)> RoundOnceCardlessForcedSlashRules(CharacterState actor, CharacterState target, bool qinglong) => RoundOnceCardlessRules(actor).Where(r => CoreNativeCardClassificationsRuntime.IsSlashCard(r.Rule.OutputKind) && (qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, r.Rule.OutputKind, null, false, Suit.None, 0) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, r.Rule.OutputKind, Suit.None, false, null, 0, [])) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, r.Rule.OutputKind, Suit.None));
     internal bool TryResolveRoundOnceCardlessForcedSlash(PromptChoice selected, bool advance)
     {
         if (selected.Parameters.GetValueOrDefault("action") != "round-once-cardless-forced-slash" && selected.Parameters.GetValueOrDefault("response") != "round-once-cardless-forced-slash")
@@ -168,13 +163,13 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeUsesRuntime
         if (selected.Parameters.GetValueOrDefault("forced-use")is not ("borrowed-sword" or "qinglong"))
             return false;
         var qinglong = selected.Parameters["forced-use"] == "qinglong";
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || prompt.Kind != (qinglong ? DecisionKind.QinglongCrescentBlade : DecisionKind.RespondSlash) || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || selected.Cards.Count != 0 || selected.Targets is not [var targetSeat] || !long.TryParse(selected.Parameters.GetValueOrDefault("original-frame-id"), out var originalId) || !Enum.TryParse<CardKind>(selected.Parameters.GetValueOrDefault("output-kind"), out var kind))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || prompt.Kind != (qinglong ? DecisionKind.QinglongCrescentBlade : DecisionKind.RespondSlash) || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || selected.Cards.Count != 0 || selected.Targets is not [var targetSeat] || !long.TryParse(selected.Parameters.GetValueOrDefault("original-frame-id"), out var originalId) || !Enum.TryParse<CardKind>(selected.Parameters.GetValueOrDefault("output-kind"), out var kind))
             throw new InvalidOperationException("A zero forced Slash changed its exact published producer, target or name.");
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
-        if (!RoundOnceCardlessForcedSlashChoices(actor, target, originalId, qinglong).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (!RoundOnceCardlessForcedSlashChoices(actor, target, originalId, qinglong).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("A forced zero Slash lost its original legal same-target use and shared allowance.");
-        var conversion = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
+        var conversion = CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
         _coreCardConversionsOperations.CaptureSelectedResponseConversion(selected);
         if (qinglong)
         {
@@ -204,7 +199,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeUsesRuntime
         return true;
     }
 
-    internal void BeginRoundOnceCardlessForcedSlash(CharacterState actor, CharacterState target, CardKind kind, CardConversionSource source, global::CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit)
+    internal void BeginRoundOnceCardlessForcedSlash(CharacterState actor, CharacterState target, CardKind kind, CardConversionSource source, NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit)
     {
         _coreRoundOnceCardlessBasicOperations.ConsumeRoundOnceCardlessBasic(source, false);
         var card = new Card(0, kind, Suit.None, 0);

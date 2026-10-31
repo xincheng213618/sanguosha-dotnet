@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiaoQiaoMouOlRuntime
@@ -88,7 +84,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             throw new InvalidOperationException("FireAttack changed its original accepted source and retained card.");
         _coreRuntimeOperations.ReplaceRuntimeTop(pending = pending with { PublicHandRevealSelection = null });
         var source = _coreMatchParticipantsPlayersAccess._players[pending.SourceSeat];
-        var target = _coreMatchParticipantsPlayersAccess._players[global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending)];
+        var target = _coreMatchParticipantsPlayersAccess._players[CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending)];
         var revealed = _coreAdvancedLifecycleOperations.GetAdvancedCard(pending.FireAttackSelection!.RevealedCardId!.Value);
         var matchingDiscard = _coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId);
         var revealInstead = true;

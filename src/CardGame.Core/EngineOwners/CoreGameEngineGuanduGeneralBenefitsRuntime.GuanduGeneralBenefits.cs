@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGuanduGeneralBenefitsRuntime
@@ -45,7 +41,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralBenefitsRuntime
     {
         var r = f.GuanduGeneral!;
         if (r.Stage == "begin")
-            f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r = r with { Stage = "zezhu-take-next", Seats = global::CardGame.Core.EngineOwners.CoreGameEngineGuanduGeneralsRuntime.FreezeGuanduSeats(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreGuanduActivitiesOperations.IsGuanduCommander(p.Seat)).Select(p => p.Seat)), Index = 0 });
+            f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r = r with { Stage = "zezhu-take-next", Seats = CoreGameEngineGuanduGeneralsRuntime.FreezeGuanduSeats(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreGuanduActivitiesOperations.IsGuanduCommander(p.Seat)).Select(p => p.Seat)), Index = 0 });
         if (r.Stage == "zezhu-take")
         {
             _coreGuanduGeneralChoicesOperations.PublishGuanduGeneralChoice(f, f.OwnerSeat, _coreGuanduGeneralChoicesOperations.GuanduForeignGainChoices(f, r.Seats![r.Index]));
@@ -145,7 +141,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralBenefitsRuntime
 
     internal void GuanduHandLimitPenalty(ProgramSkillFrame f, int target)
     {
-        var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, f.Id, 0, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), SkillRuleQuery.HandLimit, SkillRuleOperation.Add, -1, affectedSeat: target);
+        var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, f.Id, 0, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), SkillRuleQuery.HandLimit, SkillRuleOperation.Add, -1, affectedSeat: target);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnRuleModifierGrantedEvent(grant));
     }
 
@@ -177,7 +173,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralBenefitsRuntime
                 return;
             }
 
-            f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r with { Stage = "liangying-enemies", Index = 0, Seats = global::CardGame.Core.EngineOwners.CoreGameEngineGuanduGeneralsRuntime.FreezeGuanduSeats(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !_coreGuanduActivitiesOperations.GuanduAllies(f.OwnerSeat, p.Seat)).Select(p => p.Seat)) });
+            f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r with { Stage = "liangying-enemies", Index = 0, Seats = CoreGameEngineGuanduGeneralsRuntime.FreezeGuanduSeats(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !_coreGuanduActivitiesOperations.GuanduAllies(f.OwnerSeat, p.Seat)).Select(p => p.Seat)) });
             _coreProgramLifecycleOperations.ChangeProgramMaximumHp(f, -1, "guandu:liangying");
             _coreGuanduGeneralsOperations.RunGuanduGeneral(f.Id);
             return;
@@ -201,7 +197,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralBenefitsRuntime
         var r = f.GuanduGeneral!;
         if (r.Stage == "begin")
         {
-            f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r with { Seats = global::CardGame.Core.EngineOwners.CoreGameEngineGuanduGeneralsRuntime.FreezeGuanduSeats(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && _coreGuanduActivitiesOperations.GuanduAllies(f.OwnerSeat, p.Seat)).Select(p => p.Seat)) });
+            f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r with { Seats = CoreGameEngineGuanduGeneralsRuntime.FreezeGuanduSeats(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && _coreGuanduActivitiesOperations.GuanduAllies(f.OwnerSeat, p.Seat)).Select(p => p.Seat)) });
             _coreGuanduGeneralsOperations.DrawGuanduGeneral(f, f.OwnerSeat, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.GuanduGrain) + 1, "sushou-give");
             return;
         }
@@ -276,7 +272,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralBenefitsRuntime
         if (r.Stage != "beizhan-draw")
             throw new InvalidOperationException("Beizhan lost its target before drawing.");
         var target = _coreMatchParticipantsPlayersAccess._players[r.TargetSeat];
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduBeizhanArmedEvent(f.Id, f.OwnerSeat, r.TargetSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduBeizhanArmedEvent(f.Id, f.OwnerSeat, r.TargetSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f)));
         _coreGuanduGeneralsOperations.DrawGuanduGeneral(f, target.Seat, Math.Max(0, target.MaxHp - _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count), "finish");
     }
 

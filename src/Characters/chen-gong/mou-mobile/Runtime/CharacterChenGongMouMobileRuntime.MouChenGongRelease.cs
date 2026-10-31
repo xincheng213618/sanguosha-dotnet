@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,7 +9,7 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
     internal bool CanOfferMouChenGongRelease(ProgramTriggerLegalityContext c) => c.SkillId == MouChenGongComposition.Mingce && c.Owner.IsAlive && c.Context.Window == SkillProgramTriggerWindow.PlayPhaseStarting && c.Context.SourceSeat == c.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == c.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) && c.Owner.Markers.GetValueOrDefault(PlayerMarkerKind.MouChenGongCe) > 0 && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != c.OwnerSeat);
     internal bool MouChenGongReleaseParent(ProgramSkillFrame f)
     {
-        if (f.SkillId != MouChenGongComposition.Mingce || f.TriggerId != "release-plan" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting } c || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || _resolutionStackOperations._resolutionStack.OfType<PlayPhaseStartingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != f.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
+        if (f.SkillId != MouChenGongComposition.Mingce || f.TriggerId != "release-plan" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting } c || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || _resolutionStackOperations._resolutionStack.OfType<PlayPhaseStartingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != f.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == parent.Id;
@@ -37,7 +34,7 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouChenGongRelease!;
-        if (!MouChenGongReleaseRoot(f) || r.Stage != MouChenGongReleaseStage.TargetChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouChenGongReleaseChoices(f).Where(c => c.Id == selected.Id).ToArray()) || selected.Targets is not [var target] || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.MouChenGongCe)is not > 0)
+        if (!MouChenGongReleaseRoot(f) || r.Stage != MouChenGongReleaseStage.TargetChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouChenGongReleaseChoices(f).Where(c => c.Id == selected.Id).ToArray()) || selected.Targets is not [var target] || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.MouChenGongCe)is not > 0)
             throw new InvalidOperationException("Mingce release requires its one living other and a fresh positive accepted Ce snapshot.");
         var x = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.MouChenGongCe);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

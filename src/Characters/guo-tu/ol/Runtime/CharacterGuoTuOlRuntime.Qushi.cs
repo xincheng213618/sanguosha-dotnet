@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoTuOlRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IQushiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginQushi(f, op);
+    SkillProgramStepOutcome IQushiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginQushi(f, op);
     internal SkillProgramStepOutcome BeginQushi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -21,7 +17,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         }
         else
         {
-            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext!.OccurrenceIndex);
+            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext!.OccurrenceIndex);
             if (!IsIssuedQushiEndingCandidate(c, f.WindowContext) || CurrentQushiEndingSeal(c, f.WindowContext)is not { } issued)
                 throw new InvalidOperationException("Qushi cannot remove a different private seal or borrow an unissued Ending.");
             seal = issued;
@@ -80,7 +76,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     [ProgramAnswer("qushi")]
     internal void AnswerQushi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Qushi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !QushiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Qushi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !QushiChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Qushi requires its exact private original Hand/holder choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -98,7 +94,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         StartQushiMovement(ref f, QushiStage.SealChildren, holder);
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(f.OwnerSeat), location, new(QushiSealReason), m =>
         {
-            var seal = new QushiSeal(f.Id, r.Source, r.GameplayHash, holder, card.Id, card.Kind, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind), location, m.Sequence);
+            var seal = new QushiSeal(f.Id, r.Source, r.GameplayHash, holder, card.Id, card.Kind, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind), location, m.Sequence);
             var now = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(now with { Qushi = now.Qushi!with { Seal = seal, HolderSeat = holder } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QushiSealPlacedEvent(seal));
@@ -167,7 +163,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         if (r.Stage == QushiStage.RemoveChildren)
         {
             var uses = QushiActualUses(r.HolderSeat!.Value);
-            var same = uses.Any(u => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(u.EffectiveKind) == r.Seal!.Category);
+            var same = uses.Any(u => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(u.EffectiveKind) == r.Seal!.Category);
             var maximum = uses.Select(u => u.TargetCount).DefaultIfEmpty(0).Max();
             var count = same ? Math.Min(5, maximum) : 0;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Qushi = r with { DrawCount = count } });
@@ -219,5 +215,5 @@ internal sealed partial class CharacterGuoTuOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveQushiDrawAndPrivateSeal, SkillProgramEffectOp.ResolveQushiIssuedHolderEnding)]
-    internal PromptChoice ChooseQushi(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Cards.Count == 0 ? 0 : global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Targets.FirstOrDefault()).First();
+    internal PromptChoice ChooseQushi(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Cards.Count == 0 ? 0 : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Targets.FirstOrDefault()).First();
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineUnnullifiableOrdinaryTricksRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CoreGameEngineUnnullifiableOrdinaryTricksRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 370)]
     internal void ObserveUnnullifiableOrdinaryTrick(IGameEvent payload)
     {
-        if (!HasOrdinaryTrickCannotNullifyCapability || payload is not CardUseDeclaredEvent declared || _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use || action.EffectiveKind == CardKind.Nullification || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind))
+        if (!HasOrdinaryTrickCannotNullifyCapability || payload is not CardUseDeclaredEvent declared || _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use || action.EffectiveKind == CardKind.Nullification || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind))
             return;
         var binding = _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], SkillProgramCardPolicyKind.CannotNullifyOwnOrdinaryTrick, action.EffectiveKind).FirstOrDefault();
         if (binding.Source is null)
@@ -34,7 +30,7 @@ internal sealed partial class CoreGameEngineUnnullifiableOrdinaryTricksRuntime
     {
         if (use.OrdinaryTrickCannotNullify is not { } r)
             return;
-        if (!HasOrdinaryTrickCannotNullifyCapability || r.CardUseFrameId != use.Id || use.Action is not { Type: CardActionType.Use } action || r.ActionId != action.ActionId || r.ActorSeat != action.ActorSeat || r.ActorSeat != use.SourceSeat || r.Source.OwnerSeat != r.ActorSeat || r.EffectiveKind != use.CardKind || r.EffectiveKind != action.EffectiveKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(r.EffectiveKind) || r.EffectiveKind == CardKind.Nullification || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(r.Source.SkillId)?.Program?.CardPolicies.SingleOrDefault(p => p.Id == r.Source.BindingId && p.Kind == SkillProgramCardPolicyKind.CannotNullifyOwnOrdinaryTrick)is not { } policy || !policy.CardKinds.Contains(r.EffectiveKind) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OrdinaryTrickCannotNullifyIssuedEvent>().Count(e => e.Receipt == r) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.SourceSeat == r.ActorSeat && e.CardKind == r.EffectiveKind && e.CardId == use.CardId) != 1)
+        if (!HasOrdinaryTrickCannotNullifyCapability || r.CardUseFrameId != use.Id || use.Action is not { Type: CardActionType.Use } action || r.ActionId != action.ActionId || r.ActorSeat != action.ActorSeat || r.ActorSeat != use.SourceSeat || r.Source.OwnerSeat != r.ActorSeat || r.EffectiveKind != use.CardKind || r.EffectiveKind != action.EffectiveKind || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(r.EffectiveKind) || r.EffectiveKind == CardKind.Nullification || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(r.Source.SkillId)?.Program?.CardPolicies.SingleOrDefault(p => p.Id == r.Source.BindingId && p.Kind == SkillProgramCardPolicyKind.CannotNullifyOwnOrdinaryTrick)is not { } policy || !policy.CardKinds.Contains(r.EffectiveKind) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OrdinaryTrickCannotNullifyIssuedEvent>().Count(e => e.Receipt == r) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.SourceSeat == r.ActorSeat && e.CardKind == r.EffectiveKind && e.CardId == use.CardId) != 1)
             throw new InvalidOperationException("An issued cannot-nullify ordinary trick lost its exact original use/facts.");
     }
 }

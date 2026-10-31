@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangJinzhiRuntime
@@ -32,12 +28,12 @@ internal sealed partial class CoreGameEngineWushuangJinzhiRuntime
         var count = WushuangJinzhiNextCount(owner.Seat);
         // These entities pay a discard. They are not the virtual basic card's
         // hand materials, so use/response-only hand bans do not forbid payment.
-        var cards = WushuangJinzhiDiscardableCards(owner).GroupBy(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, c))).ToArray();
+        var cards = WushuangJinzhiDiscardableCards(owner).GroupBy(c => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, c))).ToArray();
         var selections = new List<ProgramMultiCardViewAsSelection>();
         foreach (var instance in instances)
             foreach (var rule in instance.Program.ViewAs.Where(v => v.OutputKind == kind && (response ? v.ForResponse : v.ForPlay)))
                 foreach (var group in cards.Where(g => g.Count() >= count))
-                    foreach (var selected in global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.EnumerateCardCombinations(group.OrderBy(c => c.Id).ToArray(), count))
+                    foreach (var selected in CoreGameEngineCardConversionsRuntime.EnumerateCardCombinations(group.OrderBy(c => c.Id).ToArray(), count))
                         selections.Add(new(selected, new(instance.SkillId, rule.Id, owner.Seat, instance.SkillInstanceId), kind));
         return selections.Where(s => _coreProgramCardLegalityOperations.IsProgramViewAsAllowed(owner, s.OutputKind, s.Cards.Select(c => c.Id).ToArray(), s.Source, response)).ToArray();
     }
@@ -48,7 +44,7 @@ internal sealed partial class CoreGameEngineWushuangJinzhiRuntime
         if (!IsWushuangJinzhiSource(query.Source))
             return false;
         var cards = query.CardIds.Select(_coreAdvancedLifecycleOperations.GetAdvancedCard).ToArray();
-        return cards.Length != WushuangJinzhiNextCount(query.Owner.Seat) || cards.Select(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(query.Owner, c))).Distinct().Count() != 1 || cards.Any(c => c.IsGeneralWeapon || _cardZonesOperations._cardZones.GetLocation(c.Id).OwnerSeat != query.Owner.Seat || _cardZonesOperations._cardZones.GetLocation(c.Id).Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(query.Owner.Seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard));
+        return cards.Length != WushuangJinzhiNextCount(query.Owner.Seat) || cards.Select(c => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(query.Owner, c))).Distinct().Count() != 1 || cards.Any(c => c.IsGeneralWeapon || _cardZonesOperations._cardZones.GetLocation(c.Id).OwnerSeat != query.Owner.Seat || _cardZonesOperations._cardZones.GetLocation(c.Id).Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(query.Owner.Seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard));
     }
 
     internal void ContinueWushuangJinzhi(ProgramSkillFrame f)

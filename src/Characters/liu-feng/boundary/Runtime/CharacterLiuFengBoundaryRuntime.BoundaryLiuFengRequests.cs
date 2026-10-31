@@ -1,9 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
+
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -31,7 +27,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         // makes this skill owner the real user. Pure Played requests are excluded.
         if (kind == DecisionKind.RespondSlash && _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is null && _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true, ActiveAttack: null } b && b.ResolutionId == owner && b.WeaponOwnerSeat == actor)
             return N(BoundaryLiuFengIntent.BorrowedSword, [b.SlashTargetSeat]);
-        if (kind == DecisionKind.QinglongCrescentBlade && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.ResolutionId == owner && q.Attack.SourceSeat == actor && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack))
+        if (kind == DecisionKind.QinglongCrescentBlade && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.ResolutionId == owner && q.Attack.SourceSeat == actor && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack))
             return N(BoundaryLiuFengIntent.Qinglong, [q.Attack.TargetSeat]);
         if (kind != DecisionKind.ProgramTrigger || top is not ProgramSkillFrame p || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(p)is not { } effect)
             return null;
@@ -97,7 +93,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
             {
                 [BoundaryLiuFengOpen] = "open"
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
             choices.Add(new(new($"boundary-liu-feng.open.{(n.RequestFrameId)}.{(source.SkillInstanceId)}"), "发动侵凌：弃置一张牌，视为使用杀", [], [], args));
         }
 
@@ -134,9 +130,9 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
     internal void OpenBoundaryLiuFengRequest(PromptChoice selected)
     {
         var p = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("Qinling lost its actual native request.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
         var n = CaptureBoundaryLiuFengNeed(p.PlayerSeat, p.Kind, _resolutionStackOperations._resolutionStack.LastOrDefault()) ?? throw new InvalidOperationException("Qinling cannot replace a pure Played request.");
-        if (!p.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || !BoundaryLiuFengSources(p.PlayerSeat).Contains(source) || !BoundaryLiuFengHasCost(p.PlayerSeat) || !n.Targets.Any(t => BoundaryLiuFengRequestTarget(n, t)))
+        if (!p.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || !BoundaryLiuFengSources(p.PlayerSeat).Contains(source) || !BoundaryLiuFengHasCost(p.PlayerSeat) || !n.Targets.Any(t => BoundaryLiuFengRequestTarget(n, t)))
             throw new InvalidOperationException("Qinling lost its original live actor, source, allowance or target.");
         var hash = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.GameplayHash;
         var f = new ProgramSkillFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, p.PlayerSeat, source.SkillId, source.BindingId, hash, 0, [], [])
@@ -159,8 +155,8 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
 
     internal bool HasBoundaryLiuFengProgramSlash(CharacterState actor, IEnumerable<int> targets) => BoundaryLiuFengSources(actor.Seat).Any() && BoundaryLiuFengHasCost(actor.Seat) && CaptureBoundaryLiuFengNeed(actor.Seat, DecisionKind.ProgramTrigger, _resolutionStackOperations._resolutionStack.LastOrDefault())is { } n && n.Targets.Any(t => targets.Contains(t) && BoundaryLiuFengRequestTarget(n, t));
     internal bool HasBoundaryLiuFengGenericBasic(ProgramSkillFrame f) => f.KeBiNengPingduan is { } r && HasBoundaryLiuFengProgramSlash(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat], _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != r.ActorSeat).Select(p => p.Seat));
-    internal bool HasBoundaryLiuFengForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == pending.ResolutionId && pending.ActiveAttack is null && pending.WeaponOwnerSeat == actor.Seat && pending.SlashTargetSeat == target.Seat && BoundaryLiuFengSources(actor.Seat).Any() && BoundaryLiuFengHasCost(actor.Seat) && actor.IsAlive && target.IsAlive && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, CardKind.Slash, CardActionType.Use) && _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, CardKind.Slash, Suit.None, false, null, 0, []);
-    internal bool HasBoundaryLiuFengForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == pending.Attack.ResolutionId && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && BoundaryLiuFengSources(actor.Seat).Any() && BoundaryLiuFengHasCost(actor.Seat) && actor.IsAlive && target.IsAlive && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, CardKind.Slash, CardActionType.Use) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, CardKind.Slash, null, false, Suit.None, 0, []);
+    internal bool HasBoundaryLiuFengForcedSlash(CharacterState actor, CharacterState target, NativeOwners.BorrowedSwordHandle pending) => CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == pending.ResolutionId && pending.ActiveAttack is null && pending.WeaponOwnerSeat == actor.Seat && pending.SlashTargetSeat == target.Seat && BoundaryLiuFengSources(actor.Seat).Any() && BoundaryLiuFengHasCost(actor.Seat) && actor.IsAlive && target.IsAlive && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, CardKind.Slash, CardActionType.Use) && _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, CardKind.Slash, Suit.None, false, null, 0, []);
+    internal bool HasBoundaryLiuFengForcedSlash(CharacterState actor, CharacterState target, NativeOwners.QinglongCrescentBladeHandle pending) => CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == pending.Attack.ResolutionId && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && BoundaryLiuFengSources(actor.Seat).Any() && BoundaryLiuFengHasCost(actor.Seat) && actor.IsAlive && target.IsAlive && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, CardKind.Slash, CardActionType.Use) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, CardKind.Slash, null, false, Suit.None, 0, []);
     internal bool TryAdvanceBoundaryLiuFengAi()
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } p || _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat].IsHuman)

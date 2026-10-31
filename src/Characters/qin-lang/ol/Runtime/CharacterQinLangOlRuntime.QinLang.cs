@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,13 +8,13 @@ internal sealed partial class CharacterQinLangOlRuntime
     internal const string QinLangDrawReason = "skill-program.qin-lang.xianying.draw", QinLangDiscardReason = "skill-program.qin-lang.xianying.discard";
     internal bool HasQinLangCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveXianyingDrawDiscard);
 
-    internal static CardConversionSource QinLangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_qin_lang_ol_QinLang.QinLangSource(f);
-    internal static bool SameQinLangSource(CardConversionSource a, CardConversionSource b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_qin_lang_ol_QinLang.SameQinLangSource(a, b);
+    internal static CardConversionSource QinLangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_qin_lang_ol_QinLang.QinLangSource(f);
+    internal static bool SameQinLangSource(CardConversionSource a, CardConversionSource b) => RuntimeSkills.RuntimeRules_qin_lang_ol_QinLang.SameQinLangSource(a, b);
     internal bool QinLangCountUsed(int owner, int round, int count) => _coreProgramEventHistoryOperations.ProgramEventHistory<QinLangXianyingDiscardPaidEvent>().Any(e => e.Source.OwnerSeat == owner && e.RoundNumber == round && e.Count == count);
     internal bool QinLangGrantConsumed(long id) => _coreProgramEventHistoryOperations.ProgramEventHistory<QinLangXianyingGrantConsumedEvent>().Any(e => e.GrantFrameId == id);
     internal IEnumerable<QinLangXianyingGrantedEvent> OutstandingQinLangGrants(int turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<QinLangXianyingGrantedEvent>().Where(e => e.ActualTurn == turn && !QinLangGrantConsumed(e.FrameId));
     internal IReadOnlyList<QinLangXianyingCard> QinLangDiscardable(ProgramSkillFrame f) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(f.OwnerSeat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(f.OwnerSeat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(f.OwnerSeat, f.SkillId, f.SkillInstanceId, c)).Select(c => new QinLangXianyingCard(c.Id, c.Kind, _cardZonesOperations._cardZones.GetLocation(c.Id), QinLangName(_cardZonesOperations._cardZones.GetLocation(c.Id).Zone == CardZoneKind.Hand ? _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c) : c.Kind))).ToArray());
-    SkillProgramStepOutcome global::CardGame.Core.IQinLangHost.Resolve(ProgramSkillFrame f, SkillProgramEffect effect) => BeginQinLang(f, effect.Op == SkillProgramEffectOp.ResolveXianyingTurnEndUses);
+    SkillProgramStepOutcome IQinLangHost.Resolve(ProgramSkillFrame f, SkillProgramEffect effect) => BeginQinLang(f, effect.Op == SkillProgramEffectOp.ResolveXianyingTurnEndUses);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.Collection, 27170)]
     internal bool CollectQinLang(SkillProgramTrigger t) => t.Effects is not [{ Op: SkillProgramEffectOp.ResolveXianyingTurnEndUses }];
     internal IReadOnlyList<TurnEndingBoundaryItem> IncludeQinLangXianyingAfterTurnEndedItems(DeferredTurnEndFrame parent, IReadOnlyList<TurnEndingBoundaryItem> ordinary)
@@ -49,7 +46,7 @@ internal sealed partial class CharacterQinLangOlRuntime
             throw new InvalidOperationException("Xianying requires its actual preparation/damage or issued actual-turn-end instruction.");
         if (ending)
         {
-            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
+            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
             if (!IsIssuedQinLangXianyingCandidate(c, context))
                 throw new InvalidOperationException("Xianying lost its exact frozen ending candidate.");
         }
@@ -75,8 +72,8 @@ internal sealed partial class CharacterQinLangOlRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal static CardKind QinLangName(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_qin_lang_ol_QinLang.QinLangName(kind);
-    internal static bool QinLangImitable(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_qin_lang_ol_QinLang.QinLangImitable(kind);
+    internal static CardKind QinLangName(CardKind kind) => RuntimeSkills.RuntimeRules_qin_lang_ol_QinLang.QinLangName(kind);
+    internal static bool QinLangImitable(CardKind kind) => RuntimeSkills.RuntimeRules_qin_lang_ol_QinLang.QinLangImitable(kind);
     internal IReadOnlyList<PromptChoice> QinLangChoices(ProgramSkillFrame f)
     {
         var r = f.QinLangXianying!;
@@ -146,7 +143,7 @@ internal sealed partial class CharacterQinLangOlRuntime
     [ProgramAnswer("qin-lang-xianying")]
     internal void AnswerQinLang(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { QinLangXianying: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !QinLangChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { QinLangXianying: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !QinLangChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xianying changed its private chooser, frozen payment or actual legal use.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -282,5 +279,5 @@ internal sealed partial class CharacterQinLangOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27170)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27170)]
-    internal bool ContinuePaidQinLang(ProgramSkillFrame f) => f.QinLangXianying is { Paid: true } && ValidQinLang(f) || f.QinLangXianying is { Grants.Count: > 0 } && ValidQinLang(f) || f.QinLangXianying is null && f.WindowContext is { Window: SkillProgramTriggerWindow.AfterTurnEnded } context && IsIssuedQinLangXianyingCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
+    internal bool ContinuePaidQinLang(ProgramSkillFrame f) => f.QinLangXianying is { Paid: true } && ValidQinLang(f) || f.QinLangXianying is { Grants.Count: > 0 } && ValidQinLang(f) || f.QinLangXianying is null && f.WindowContext is { Window: SkillProgramTriggerWindow.AfterTurnEnded } context && IsIssuedQinLangXianyingCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
 }

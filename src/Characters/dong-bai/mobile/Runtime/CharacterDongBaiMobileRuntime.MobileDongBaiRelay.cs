@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongBaiMobileRuntime
@@ -71,7 +67,7 @@ internal sealed partial class CharacterDongBaiMobileRuntime
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         RequireMobileLianzhuReceipt(f);
         var r = f.MobileLianzhu!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.Holder || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MobileLianzhuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.Holder || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MobileLianzhuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Mobile Lianzhu lost the real holder's private authority or exact current choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[r.Holder].IsAlive || ActiveMobileLianzhu(f.OwnerSeat)?.FrameId != r.IssuedFrameId)
@@ -194,7 +190,7 @@ internal sealed partial class CharacterDongBaiMobileRuntime
             throw new InvalidOperationException("Mobile Lianzhu relay needs its exact once-consumed gain occurrence.");
         if (r.Stage is MobileLianzhuStage.Choice or MobileLianzhuStage.SelectingGift)
         {
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && (p.PlayerSeat != r.Holder || !p.IsPrivate || p.SkillPrompt?.SkillId != MobileLianzhu || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, MobileLianzhuChoices(f))))
+            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p && (p.PlayerSeat != r.Holder || !p.IsPrivate || p.SkillPrompt?.SkillId != MobileLianzhu || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, MobileLianzhuChoices(f))))
                 throw new InvalidOperationException("Mobile Lianzhu lost the exact original holder choice after its real gain.");
             return;
         }

@@ -1,11 +1,7 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-internal interface ICoreActualPhaseEndsActualPhaseEndOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreActualPhaseEndsActualPhaseEndOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ActualPhaseEndRuntime Get();
+    ActualPhaseEndRuntime Get();
 }

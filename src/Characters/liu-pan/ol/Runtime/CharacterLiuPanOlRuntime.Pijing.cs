@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuPanOlRuntime
 {
     internal const string PijingGiftReason = "skill-program.liu-pan.pijing.random-gift", PijingDrawReason = "skill-program.liu-pan.pijing.next-use-draw";
-    SkillProgramStepOutcome global::CardGame.Core.ILiuPanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginPijing(f, op);
+    SkillProgramStepOutcome ILiuPanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginPijing(f, op);
     internal SkillProgramStepOutcome BeginPijing(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var use = RequirePijingUse(f, out var window);
         var next = op == SkillProgramEffectOp.ResolvePijingNextSoleTargetChoice;
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
+        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
         if (f.Pijing is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || (!next ? !PijingInitialEligible(candidate, context) : !IsIssuedPijingCandidate(candidate, context)))
             throw new InvalidOperationException("Pijing cannot replace or issue an ineligible original target/lease resolution.");
         var group = next ? PijingIssuedGroup(candidate, context, out _, out _) : null;
@@ -164,6 +160,6 @@ internal sealed partial class CharacterLiuPanOlRuntime
             return p.Choices.First(c => c.Parameters.GetValueOrDefault("branch") == "draw");
         var use = RequirePijingUse(f, out _);
         var helpful = use.CardKind is CardKind.DrawTwo or CardKind.PeachGarden or CardKind.FiveGrains;
-        return p.Choices.FirstOrDefault(c => c.Targets.Count > 0 && (c.Parameters.GetValueOrDefault("branch") == "remove" ? !helpful && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) : helpful == global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]))) ?? p.Choices.Last();
+        return p.Choices.FirstOrDefault(c => c.Targets.Count > 0 && (c.Parameters.GetValueOrDefault("branch") == "remove" ? !helpful && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) : helpful == CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]))) ?? p.Choices.Last();
     }
 }

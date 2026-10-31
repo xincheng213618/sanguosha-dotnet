@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterKongShuOlRuntime
@@ -108,7 +104,7 @@ internal sealed partial class CharacterKongShuOlRuntime
             return false;
         if (p.Kind == action.EffectiveKind)
             return true;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(p.UseId)is not { CurrentSlashFirePolicy: { OriginalAction: { } original } } use || p.ResponseUse || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) || action.EffectiveKind != CardKind.FireSlash || original.ActionId != p.ActionId || original.EffectiveKind != p.Kind)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(p.UseId)is not { CurrentSlashFirePolicy: { OriginalAction: { } original } } use || p.ResponseUse || !CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) || action.EffectiveKind != CardKind.FireSlash || original.ActionId != p.ActionId || original.EffectiveKind != p.Kind)
             return false;
         _coreCurrentSlashFireOffersOperations.AssertCurrentSlashFirePolicy(use);
         return true;
@@ -131,7 +127,7 @@ internal sealed partial class CharacterKongShuOlRuntime
     [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 210)]
     internal bool IsIssuedLeiluanCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
-        if (candidate.SkillId != "ol:leiluan" || context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]) != candidate || IssuedLeiluanPayment(window.Action)is not { } p || p.Source.OwnerSeat != candidate.OwnerSeat || p.Source.SkillInstanceId != candidate.SkillInstanceId || p.GameplayHash != candidate.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program is not { } program || program.GameplayHash != candidate.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == candidate.BindingId)?.Effects is not [{ Op: SkillProgramEffectOp.ResolveLeiluanLastHandUseBenefit }] || context.CardUse?.CardActionId != p.ActionId || !LeiluanActionMatches(p, window.Action))
+        if (candidate.SkillId != "ol:leiluan" || context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]) != candidate || IssuedLeiluanPayment(window.Action)is not { } p || p.Source.OwnerSeat != candidate.OwnerSeat || p.Source.SkillInstanceId != candidate.SkillInstanceId || p.GameplayHash != candidate.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program is not { } program || program.GameplayHash != candidate.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == candidate.BindingId)?.Effects is not [{ Op: SkillProgramEffectOp.ResolveLeiluanLastHandUseBenefit }] || context.CardUse?.CardActionId != p.ActionId || !LeiluanActionMatches(p, window.Action))
             return false;
         return !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LeiluanBenefitIssuedEvent>().Any(e => e.PaymentId == p.Id);
     }

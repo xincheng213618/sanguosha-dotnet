@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheXingtianRuntime
@@ -34,7 +30,7 @@ internal sealed partial class CoreGameEngineShanheXingtianRuntime
             return;
         _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(f);
         var index = f.InstructionIndex - 1;
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f);
+        var source = CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f);
         var ban = _turnCardUseEffectsOperations._turnCardUseEffects.GrantTargetRestriction(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, f.Id, -2 * index - 1, source, SkillProgramCardTargetRestriction.CannotUseOrPlayForTurn, target);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardTargetRestrictionGrantedEvent(ban));
         var armor = _turnCardUseEffectsOperations._turnCardUseEffects.GrantTargetRestriction(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, f.Id, -2 * index - 2, source, SkillProgramCardTargetRestriction.ArmorIneffectiveForTurn, target);
@@ -59,5 +55,5 @@ internal sealed partial class CoreGameEngineShanheXingtianRuntime
         return true;
     }
 
-    void global::CardGame.Core.IShanheXingtianHost.ApplyShanheXingtianSeal(ProgramSkillFrame f) => ApplyShanheXingtianSeal(f);
+    void IShanheXingtianHost.ApplyShanheXingtianSeal(ProgramSkillFrame f) => ApplyShanheXingtianSeal(f);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
         _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(frame);
         if (frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || targetSeat == frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat))
             throw new InvalidOperationException("An original-target grant requires its actual turn actor and a different target.");
-        var grant = new OriginalTargetAdditionGrant(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), targetSeat, frame.GameplayHash);
+        var grant = new OriginalTargetAdditionGrant(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), targetSeat, frame.GameplayHash);
         var old = _coreGameEngineOriginalTargetAdditionsOriginalTargetAdditionGrantsAccess._originalTargetAdditionGrants.SingleOrDefault(g => g.ParentFrameId == frame.Id && g.EffectIndex == grant.EffectIndex);
         if (old is not null)
         {
@@ -29,12 +25,12 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
 
     internal void IssueOriginalTargetAdditionPolicy(long id, CardActionContext? action)
     {
-        if (action is not { Type: CardActionType.Use } || action.ActorSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && CardUseCategoryCatalog.Get(action.EffectiveKind) != CardUseCategories.InstantTrick)
+        if (action is not { Type: CardActionType.Use } || action.ActorSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && CardUseCategoryCatalog.Get(action.EffectiveKind) != CardUseCategories.InstantTrick)
             return;
         var grants = _coreGameEngineOriginalTargetAdditionsOriginalTargetAdditionGrantsAccess._originalTargetAdditionGrants.Where(g => g.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && g.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && g.Source.OwnerSeat == action.ActorSeat && _coreMatchParticipantsPlayersAccess._players[g.TargetSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat], g.Source.SkillId, g.Source.SkillInstanceId)).Select(g => g with { IssuedDirectedEffects = _coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess._directedTurnCardPolicies.Where(p => p.TurnNumber == g.TurnNumber && p.TurnSeat == g.TurnSeat && p.ActorSeat == action.ActorSeat && p.TargetSeat == g.TargetSeat && p.Source.SkillId == g.Source.SkillId && p.Source.SkillInstanceId == g.Source.SkillInstanceId && p.Source.OwnerSeat == g.Source.OwnerSeat && (p.CardKinds.Count == 0 || ProgramCardKindMatch.Contains(p.CardKinds, action.EffectiveKind))).Aggregate(DirectedTurnCardPolicyEffect.None, (flags, p) => flags | p.Effects) }).ToArray();
         if (grants.Length == 0)
             return;
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, use => use with { OriginalTargetAddition = new(Array.AsReadOnly(grants)), UnlimitedUse = use.UnlimitedUse || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && action.TargetSeats.Count > 0 && action.TargetSeats.All(target => grants.Any(g => g.TargetSeat == target && g.IssuedDirectedEffects.HasFlag(DirectedTurnCardPolicyEffect.BypassSlashLimit))) });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, use => use with { OriginalTargetAddition = new(Array.AsReadOnly(grants)), UnlimitedUse = use.UnlimitedUse || CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && action.TargetSeats.Count > 0 && action.TargetSeats.All(target => grants.Any(g => g.TargetSeat == target && g.IssuedDirectedEffects.HasFlag(DirectedTurnCardPolicyEffect.BypassSlashLimit))) });
         foreach (var grant in grants)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OriginalTargetAdditionIssuedEvent(id, action.ActionId, grant));
     }
@@ -89,9 +85,9 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
             return false;
         var actor = _coreMatchParticipantsPlayersAccess._players[action.ActorSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[grant.TargetSeat];
-        if (!target.IsAlive || action.EffectiveDesignatedTargetSeats.Contains(target.Seat) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, use.CardKind, use.Id) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, action.EffectiveSuit ?? Suit.None, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, action.EffectiveSuit))
+        if (!target.IsAlive || action.EffectiveDesignatedTargetSeats.Contains(target.Seat) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, use.CardKind, use.Id) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, action.EffectiveSuit ?? Suit.None, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, action.EffectiveSuit))
             return false;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, target, new Card(-1, use.CardKind, action.EffectiveSuit ?? Suit.None, action.EffectiveRank ?? 0), effectiveKind: use.CardKind, ignoreDistance: grant.IssuedDirectedEffects.HasFlag(DirectedTurnCardPolicyEffect.IgnoreDistance), existingUseFrameId: use.Id, specificEffectiveRank: action.EffectiveRank);
         return use.CardKind switch
         {
@@ -107,7 +103,7 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
         };
     }
 
-    internal bool HasIssuedOriginalTargetAdditionTail(CardUseFrame use) => use.OriginalTargetAddition is { Added: true } receipt && use.Action is { Type: CardActionType.Use } action && use.SourceSeat == action.ActorSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveKind == use.CardKind && receipt.Grants.Any(g => g.Source.OwnerSeat == action.ActorSeat && action.EffectiveDesignatedTargetSeats.Contains(g.TargetSeat));
+    internal bool HasIssuedOriginalTargetAdditionTail(CardUseFrame use) => use.OriginalTargetAddition is { Added: true } receipt && use.Action is { Type: CardActionType.Use } action && use.SourceSeat == action.ActorSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveKind == use.CardKind && receipt.Grants.Any(g => g.Source.OwnerSeat == action.ActorSeat && action.EffectiveDesignatedTargetSeats.Contains(g.TargetSeat));
     internal bool TryGetOriginalTargetVirtualSlashReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primaryTarget)
     {
         primaryTarget = Array.Empty<int>();
@@ -129,7 +125,7 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
             return true;
         if (_coreCurrentEnhancementVirtualReturnOperations.TryGetCurrentEnhancementVirtualPrimaryReturn(use, parent, out primaryTarget))
             return true;
-        if (!HasIssuedOriginalTargetAdditionTail(use) || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.CardAttack is not { CardId: null, EffectiveCardKind: CardKind.Slash, PhysicalCardIds.Count: 0 } attack || attack.SourceSeat != use.SourceSeat || attack.ProgramSkillCardUseFrameId != parent.Id || use.TargetSeats.Count < 2 || use.TargetSeats.Distinct().Count() != use.TargetSeats.Count || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash } action || action.ActorSeat != use.SourceSeat || action.ProviderSeat != action.ActorSeat || action.PhysicalCards.Count != 0 || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || !action.TargetSeats.SequenceEqual(use.TargetSeats) || action.EffectiveSuit != Suit.None || action.EffectiveRank != 0 || string.IsNullOrWhiteSpace(parent.SkillId) || string.IsNullOrWhiteSpace(parent.SkillInstanceId) || string.IsNullOrWhiteSpace(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent)) || parent.InstructionIndex <= 0)
+        if (!HasIssuedOriginalTargetAdditionTail(use) || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.CardAttack is not { CardId: null, EffectiveCardKind: CardKind.Slash, PhysicalCardIds.Count: 0 } attack || attack.SourceSeat != use.SourceSeat || attack.ProgramSkillCardUseFrameId != parent.Id || use.TargetSeats.Count < 2 || use.TargetSeats.Distinct().Count() != use.TargetSeats.Count || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash } action || action.ActorSeat != use.SourceSeat || action.ProviderSeat != action.ActorSeat || action.PhysicalCards.Count != 0 || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || !action.TargetSeats.SequenceEqual(use.TargetSeats) || action.EffectiveSuit != Suit.None || action.EffectiveRank != 0 || string.IsNullOrWhiteSpace(parent.SkillId) || string.IsNullOrWhiteSpace(parent.SkillInstanceId) || string.IsNullOrWhiteSpace(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent)) || parent.InstructionIndex <= 0)
             return false;
         var useIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
         if (useIndex <= 0 || !ReferenceEquals(_resolutionStackOperations._resolutionStack[useIndex - 1], parent) || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash)
@@ -148,7 +144,7 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
         var exactProducer = paused.Op switch
         {
             SkillProgramEffectOp.OfferVirtualSlashOrDraw => parent.SelectedTargetSeats is [var actor] && actor == action.ActorSeat && action.ConversionChain.Count == 0,
-            SkillProgramEffectOp.UseVirtualSlash => parent.OwnerSeat == action.ActorSeat && action.ConversionChain.Count == 1 && action.ConversionChain[0] == new CardConversionSource(parent.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId) && (paused.TargetReference is null ? parent.SelectedTargetSeats is [var selected] && selected == originalTarget : paused.TargetReference.Kind == ProgramParticipantRef.EventTarget && parent.WindowContext?.TargetSeat == originalTarget),
+            SkillProgramEffectOp.UseVirtualSlash => parent.OwnerSeat == action.ActorSeat && action.ConversionChain.Count == 1 && action.ConversionChain[0] == new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId) && (paused.TargetReference is null ? parent.SelectedTargetSeats is [var selected] && selected == originalTarget : paused.TargetReference.Kind == ProgramParticipantRef.EventTarget && parent.WindowContext?.TargetSeat == originalTarget),
             SkillProgramEffectOp.UseVirtualCard or SkillProgramEffectOp.OfferUnlimitedVirtualSlash => parent.OwnerSeat == action.ActorSeat && parent.SelectedTargetSeats is [var selected] && selected == originalTarget && action.ConversionChain.Count == 0 && paused.UseCardActionWindows && paused.OutputKind == CardKind.Slash && paused.TargetRestriction == SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget && (parent.TriggerId is not null || paused.Op == SkillProgramEffectOp.OfferUnlimitedVirtualSlash),
             _ => false
         };
@@ -160,7 +156,7 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
         return true;
     }
 
-    internal int CompletedFangtianOriginalTargetIndex(global::CardGame.Core.NativeOwners.FangtianHalberdHandle multi)
+    internal int CompletedFangtianOriginalTargetIndex(NativeOwners.FangtianHalberdHandle multi)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(multi.ResolutionId);
         // The old group cursor counts completed original targets. Enhanced
@@ -243,10 +239,10 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
         // Use the existing public role attitude; hidden hands never enter this decision.
         var use = _coreCurrentCardEnhancementsOperations.EnhancementCardUse(frame);
         var helpful = use.CardKind is CardKind.DrawTwo or CardKind.IronChain;
-        return decision.Choices.Where(c => c.Targets.Count > 0).FirstOrDefault(c => helpful == global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? decision.Choices.Single(c => c.Targets.Count == 0);
+        return decision.Choices.Where(c => c.Targets.Count > 0).FirstOrDefault(c => helpful == CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? decision.Choices.Single(c => c.Targets.Count == 0);
     }
 
     internal void ExpireOriginalTargetAdditionGrants(int turn, int seat) => _coreGameEngineOriginalTargetAdditionsOriginalTargetAdditionGrantsAccess._originalTargetAdditionGrants.RemoveAll(g => g.TurnNumber == turn && g.TurnSeat == seat);
-    void global::CardGame.Core.IOriginalTargetAdditionProgramHost.GrantOriginalTargetAddition(ProgramSkillFrame frame, int targetSeat) => GrantOriginalTargetAddition(frame, targetSeat);
-    SkillProgramStepOutcome global::CardGame.Core.IOriginalTargetAdditionProgramHost.OfferOriginalTargetAddition(ProgramSkillFrame frame) => OfferOriginalTargetAddition(frame);
+    void IOriginalTargetAdditionProgramHost.GrantOriginalTargetAddition(ProgramSkillFrame frame, int targetSeat) => GrantOriginalTargetAddition(frame, targetSeat);
+    SkillProgramStepOutcome IOriginalTargetAdditionProgramHost.OfferOriginalTargetAddition(ProgramSkillFrame frame) => OfferOriginalTargetAddition(frame);
 }

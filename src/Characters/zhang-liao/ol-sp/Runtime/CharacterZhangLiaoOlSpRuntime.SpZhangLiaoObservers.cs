@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangLiaoOlSpRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
 
     internal string SpZhangLiaoMovementReason(ProgramSkillFrame f) => f.SpZhangLiao!.Stage switch
     {
-        SpZhangLiaoStage.Payment => $"skill-program.{(f.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.reveal",
+        SpZhangLiaoStage.Payment => $"skill-program.{(f.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.reveal",
         SpZhangLiaoStage.PaymentChildren => "skill-program.ol:mubing.DiscardSelected",
         SpZhangLiaoStage.ObtainChildren => "skill-program.ol:mubing.ObtainSelected",
         SpZhangLiaoStage.GiftChildren => "skill-program.ol:mubing.GiveSelected",

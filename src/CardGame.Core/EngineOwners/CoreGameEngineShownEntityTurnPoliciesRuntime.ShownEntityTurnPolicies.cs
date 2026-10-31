@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShownEntityTurnPoliciesRuntime
@@ -18,8 +14,8 @@ internal sealed partial class CoreGameEngineShownEntityTurnPoliciesRuntime
             return false;
         return _resolutionStackOperations._resolutionStack[index - 1] switch
         {
-            PlayPhaseStartingBoundaryFrame parent when parent.OwnerSeat == frame.OwnerSeat && parent.ItemIndex >= 0 && parent.ItemIndex < parent.Items.Count && parent.Items[parent.ItemIndex].Candidate is { } candidate => global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate),
-            ProgramLifecycleTriggerWindowFrame parent when parent.Window == SkillProgramTriggerWindow.PlayPhaseStarting && parent.OwnerSeat == frame.OwnerSeat && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count => global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]),
+            PlayPhaseStartingBoundaryFrame parent when parent.OwnerSeat == frame.OwnerSeat && parent.ItemIndex >= 0 && parent.ItemIndex < parent.Items.Count && parent.Items[parent.ItemIndex].Candidate is { } candidate => CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate),
+            ProgramLifecycleTriggerWindowFrame parent when parent.Window == SkillProgramTriggerWindow.PlayPhaseStarting && parent.OwnerSeat == frame.OwnerSeat && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count => CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]),
             _ => false
         };
     }
@@ -33,17 +29,17 @@ internal sealed partial class CoreGameEngineShownEntityTurnPoliciesRuntime
             throw new InvalidOperationException("Shown entity policy lost its exact actual Play start and public single-card reveal.");
         if (!owner.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _cardZonesOperations._cardZones.GetLocation(id) != from || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
             return;
-        if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramCardsRevealedEvent>().Count(e => e.FrameId == frame.Id && e.OwnerSeat == owner.Seat && e.SkillId == frame.SkillId && e.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) && e.Bind == bind && e.Cards.Count == 1 && e.Cards[0].Id == id) != 1)
+        if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramCardsRevealedEvent>().Count(e => e.FrameId == frame.Id && e.OwnerSeat == owner.Seat && e.SkillId == frame.SkillId && e.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) && e.Bind == bind && e.Cards.Count == 1 && e.Cards[0].Id == id) != 1)
             throw new InvalidOperationException("Shown entity policy requires its one actual public reveal fact.");
         if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShownEntityTurnPolicyGrantedEvent>().Any(e => e.Policy.ProgramFrameId == frame.Id))
             throw new InvalidOperationException("The shown entity policy cannot be reissued by its completed instruction.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame);
+        var source = CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame);
         var affected = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner.Seat && _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, p.Seat) == 1).Select(p => p.Seat).ToArray();
         var sequences = new List<long>();
         if (suit is Suit.Spade or Suit.Club or Suit.Heart or Suit.Diamond)
             foreach (var target in affected)
             {
-                var restriction = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandColorRestriction(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, frame.Id, -1 - target, source, target, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(suit), requiresChromaticSuit: true);
+                var restriction = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandColorRestriction(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, frame.Id, -1 - target, source, target, CoreNativeCardClassificationsRuntime.IsRedSuit(suit), requiresChromaticSuit: true);
                 sequences.Add(restriction.GrantSequence);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HandCardColorRestrictionGrantedEvent(restriction));
             }
@@ -72,7 +68,7 @@ internal sealed partial class CoreGameEngineShownEntityTurnPoliciesRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.FactModifiers, 30)]
-    internal IEnumerable<(CardUseEffectSource Source, int Amount)> GetShownEntityUseDamageBenefits(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal IEnumerable<(CardUseEffectSource Source, int Amount)> GetShownEntityUseDamageBenefits(GameEngine.IDamageAttempt attack)
     {
         if (attack.IsChainPropagation || attack.IsSourceLess || attack.SourceSeat != attack.CardUserSeat || attack.EffectiveCardKind is null)
             return[];
@@ -124,9 +120,9 @@ internal sealed partial class CoreGameEngineShownEntityTurnPoliciesRuntime
         if (program?.GameplayHash != p.GameplayHash || trigger?.Effects is not [_, _, { Op: SkillProgramEffectOp.IssueShownEntityTurnPolicy, StateId: { } state }] || state != p.StateId || p.EffectIndex != 2 || p.ProgramFrameId <= 0 || p.ActualPlayStartingFrameId <= 0 || p.ActualPlayStartingFrameId >= p.ProgramFrameId || p.TurnNumber < 1 || p.ActualTurnOwnerSeat != p.Source.OwnerSeat || p.OriginalFrom != CardLocation.Hand(p.Source.OwnerSeat) || !Enum.IsDefined(p.FrozenSuit) || p.AffectedSeats is not System.Collections.IList { IsReadOnly: true } || p.RestrictionSequences is not System.Collections.IList { IsReadOnly: true } || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.OwnerSeat == p.Source.OwnerSeat && e.SkillId == p.Source.SkillId && e.BindingId == p.Source.BindingId && e.SkillInstanceId == p.Source.SkillInstanceId && e.Window == SkillProgramTriggerWindow.PlayPhaseStarting) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramCardsRevealedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.OwnerSeat == p.Source.OwnerSeat && e.SkillId == p.Source.SkillId && e.BindingId == p.Source.BindingId && e.Cards.Count == 1 && e.Cards[0].Id == p.CardId) != 1 || p.RestrictionSequences.Count != (chromatic ? p.AffectedSeats.Count : 0))
             throw new InvalidOperationException("Shown entity policy lost its true source/reveal and actual own Play-start issuance.");
         for (var i = 0; i < p.RestrictionSequences.Count; i++)
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<HandCardColorRestrictionGrantedEvent>().Count(e => e.Restriction.GrantSequence == p.RestrictionSequences[i] && e.Restriction.ParentFrameId == p.ProgramFrameId && e.Restriction.TurnNumber == p.TurnNumber && e.Restriction.TurnSeat == p.ActualTurnOwnerSeat && e.Restriction.Source == p.Source && e.Restriction.AffectedSeat == p.AffectedSeats[i] && e.Restriction.IsRed == global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(p.FrozenSuit) && e.Restriction.RequiresChromaticSuit) != 1)
+            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<HandCardColorRestrictionGrantedEvent>().Count(e => e.Restriction.GrantSequence == p.RestrictionSequences[i] && e.Restriction.ParentFrameId == p.ProgramFrameId && e.Restriction.TurnNumber == p.TurnNumber && e.Restriction.TurnSeat == p.ActualTurnOwnerSeat && e.Restriction.Source == p.Source && e.Restriction.AffectedSeat == p.AffectedSeats[i] && e.Restriction.IsRed == CoreNativeCardClassificationsRuntime.IsRedSuit(p.FrozenSuit) && e.Restriction.RequiresChromaticSuit) != 1)
                 throw new InvalidOperationException("Shown entity policy lost an exact public frozen recipient/color restriction.");
     }
 
-    void global::CardGame.Core.IShownEntityTurnPolicyHost.IssueShownEntityTurnPolicy(ProgramSkillFrame f, string bind, string stateId) => IssueShownEntityTurnPolicy(f, bind, stateId);
+    void IShownEntityTurnPolicyHost.IssueShownEntityTurnPolicy(ProgramSkillFrame f, string bind, string stateId) => IssueShownEntityTurnPolicy(f, bind, stateId);
 }

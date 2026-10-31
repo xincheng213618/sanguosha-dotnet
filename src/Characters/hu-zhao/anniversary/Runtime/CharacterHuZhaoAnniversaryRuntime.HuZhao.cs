@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 using System.Numerics;
 
@@ -11,11 +8,11 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
 {
     internal const string HuZhaoDrawReason = "skill-program.anniversary:midu.draw";
     internal const string HuZhaoJudgmentReason = "skill-program.anniversary:midu.abolish-judgment";
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryHuZhaoHost.Resolve(ProgramSkillFrame frame) => BeginHuZhaoMidu(frame);
-    internal CardConversionSource HuZhaoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal int HuZhaoAvailable(int seat) => global::CardGame.Core.EngineOwners.CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots.Select((s, i) => _coreMatchParticipantsPlayersAccess._players[seat].EquipmentSlotCapacity(s) > 0 ? 1 << i : 0).Aggregate(_coreMatchParticipantsPlayersAccess._players[seat].JudgmentAreaAbolished ? 0 : 32, (a, b) => a | b);
+    SkillProgramStepOutcome IAnniversaryHuZhaoHost.Resolve(ProgramSkillFrame frame) => BeginHuZhaoMidu(frame);
+    internal CardConversionSource HuZhaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal int HuZhaoAvailable(int seat) => CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots.Select((s, i) => _coreMatchParticipantsPlayersAccess._players[seat].EquipmentSlotCapacity(s) > 0 ? 1 << i : 0).Aggregate(_coreMatchParticipantsPlayersAccess._players[seat].JudgmentAreaAbolished ? 0 : 32, (a, b) => a | b);
     internal static int HuZhaoCount(int mask) => BitOperations.PopCount((uint)mask);
-    internal static string HuZhaoAreaName(int index) => index == 5 ? "判定区" : global::CardGame.Core.EngineOwners.CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots[index] switch
+    internal static string HuZhaoAreaName(int index) => index == 5 ? "判定区" : CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots[index] switch
     {
         EquipmentSlot.Weapon => "武器栏",
         EquipmentSlot.Armor => "防具栏",
@@ -65,7 +62,7 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
     [ProgramAnswer("anniversary-hu-zhao")]
     internal void AnswerHuZhaoMidu(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuZhaoMidu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ValidHuZhaoMidu(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], HuZhaoChoices(f).Where(x => x.Id == c.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuZhaoMidu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ValidHuZhaoMidu(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], HuZhaoChoices(f).Where(x => x.Id == c.Id).ToArray()))
             throw new InvalidOperationException("Midu lost its exact owner/area/recipient menu.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var mode = c.Parameters["mode"];
@@ -97,11 +94,11 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
             {
                 if (restore)
                 {
-                    if (!_coreAdvancedLifecycleOperations.RestoreEquipmentSlot(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], global::CardGame.Core.EngineOwners.CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots[i]))
+                    if (!_coreAdvancedLifecycleOperations.RestoreEquipmentSlot(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots[i]))
                         throw new InvalidOperationException("Midu restoration lost its abolished slot.");
                 }
                 else
-                    _coreAdvancedLifecycleOperations.SetEquipmentSlotCapacity(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], global::CardGame.Core.EngineOwners.CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots[i], 0);
+                    _coreAdvancedLifecycleOperations.SetEquipmentSlotCapacity(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots[i], 0);
             }
 
         if ((mask & 32) != 0)
@@ -179,7 +176,7 @@ internal sealed partial class CharacterHuZhaoAnniversaryRuntime
     {
         if (q.Source.Seat == q.Target.Seat)
             return;
-        int Bonus(CharacterState p) => !p.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(p, HuZhaoComposition.Xianwang) ? 0 : global::CardGame.Core.EngineOwners.CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots.Count(s => p.EquipmentSlotCapacity(s) == 0) switch
+        int Bonus(CharacterState p) => !p.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(p, HuZhaoComposition.Xianwang) ? 0 : CharacterHuZhaoAnniversaryDefinitions.HuZhaoSlots.Count(s => p.EquipmentSlotCapacity(s) == 0) switch
         {
             0 => 0,
             < 3 => 1,

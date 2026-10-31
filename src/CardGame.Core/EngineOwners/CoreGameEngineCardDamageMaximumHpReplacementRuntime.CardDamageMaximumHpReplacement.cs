@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCardDamageMaximumHpReplacementRuntime
 {
-    internal int CalculateCardDamageLayer(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int CalculateCardDamageLayer(GameEngine.IDamageAttempt attack)
     {
-        if (attack is not global::CardGame.Core.NativeOwners.CardAttackHandle card || attack.IsChainPropagation || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.EffectiveCardKind is not { } kind)
+        if (attack is not NativeOwners.CardAttackHandle card || attack.IsChainPropagation || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.EffectiveCardKind is not { } kind)
             return attack.DamageAmount;
         if (_coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).CardDamageLayerAmount is { } issued)
             return issued;
@@ -22,11 +18,11 @@ internal sealed partial class CoreGameEngineCardDamageMaximumHpReplacementRuntim
         return amount;
     }
 
-    internal static string MaximumHpReplacementUsage(string policyId) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CardDamageMaximumHpReplacement.MaximumHpReplacementUsage(policyId);
-    internal bool TryReplaceCardDamageWithMaximumHpLoss(global::CardGame.Core.GameEngine.IDamageAttempt attack, out bool pending)
+    internal static string MaximumHpReplacementUsage(string policyId) => RuntimeSkills.RuntimeRules_Core_CardDamageMaximumHpReplacement.MaximumHpReplacementUsage(policyId);
+    internal bool TryReplaceCardDamageWithMaximumHpLoss(GameEngine.IDamageAttempt attack, out bool pending)
     {
         pending = false;
-        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.FirstRoundCardDamageBecomesMaximumHpLoss) || attack is not global::CardGame.Core.NativeOwners.CardAttackHandle card || attack.IsSourceLess || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.IsChainPropagation || attack.DamageAmountFinalized || attack.CardUserSeat != attack.SourceSeat || attack.EffectiveCardKind is not { } kind || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].HasHpValue || _coreActualRoundProgressRoundNumberAccess._roundNumber < 1)
+        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.FirstRoundCardDamageBecomesMaximumHpLoss) || attack is not NativeOwners.CardAttackHandle card || attack.IsSourceLess || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.IsChainPropagation || attack.DamageAmountFinalized || attack.CardUserSeat != attack.SourceSeat || attack.EffectiveCardKind is not { } kind || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].HasHpValue || _coreActualRoundProgressRoundNumberAccess._roundNumber < 1)
             return false;
         foreach (var binding in _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], SkillProgramCardPolicyKind.FirstRoundCardDamageBecomesMaximumHpLoss, kind))
         {

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRecordedSuitSlashRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CoreGameEngineRecordedSuitSlashRuntime
     internal void RevealRecordedSuitSlash(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } context, TargetSeat: { } target } || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == context.ParentCardUseFrameId)is not { Action: { } action } use || action.ActionId != context.CardActionId || action.Type != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != frame.OwnerSeat || action.EffectiveDesignatedTargetSeats.Count != 1 || action.EffectiveDesignatedTargetSeats[0] != target)
+        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } context, TargetSeat: { } target } || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == context.ParentCardUseFrameId)is not { Action: { } action } use || action.ActionId != context.CardActionId || action.Type != CardActionType.Use || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != frame.OwnerSeat || action.EffectiveDesignatedTargetSeats.Count != 1 || action.EffectiveDesignatedTargetSeats[0] != target)
             throw new InvalidOperationException("Recorded-suit Slash lost its exact sole target and owning action.");
         var mask = ProgramRecordedSuitSlash.Suits.Where(suit => _coreProgramPersistentStateOperations.GetProgramBooleanState(frame, ProgramRecordedSuitSlash.StateId(effect.StateId!, suit))).Aggregate(0, (bits, suit) => bits | ProgramRecordedSuitSlash.Bit(suit));
         var count = Math.Max(0, System.Numerics.BitOperations.PopCount((uint)mask) - 1);
@@ -25,10 +21,10 @@ internal sealed partial class CoreGameEngineRecordedSuitSlashRuntime
 
     internal IEnumerable<ProgramRecordedSuitSlashReceipt> RecordedSuitSlashReceipts(long frameId, int target) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == frameId)is { Action: { } action, RecordedSuitSlashReceipts: { } receipts } ? receipts.Where(r => r.CardUseFrameId == frameId && r.ActionId == action.ActionId && r.ActorSeat == action.ActorSeat && r.TargetSeat == target && action.EffectiveDesignatedTargetSeats.Contains(target)) : [];
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 40)]
-    internal int RecordedSuitSlashDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is global::CardGame.Core.NativeOwners.CardAttackHandle && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) ? RecordedSuitSlashReceipts(attack.ResolutionId, attack.TargetSeat).Sum(r => r.DamageBonus) : 0;
+    internal int RecordedSuitSlashDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) ? RecordedSuitSlashReceipts(attack.ResolutionId, attack.TargetSeat).Sum(r => r.DamageBonus) : 0;
     internal bool IsRecordedSuitResponseAllowed(CharacterState responder, IReadOnlyList<Card> cards, CardKind kind)
     {
-        if (kind != CardKind.Dodge || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) || responder.Seat != attack.TargetSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.CurrentCandidateSeat != responder.Seat)
+        if (kind != CardKind.Dodge || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) || responder.Seat != attack.TargetSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.CurrentCandidateSeat != responder.Seat)
             return true;
         var bit = ProgramRecordedSuitSlash.Bit(_coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(responder, cards));
         return !RecordedSuitSlashReceipts(attack.ResolutionId, attack.TargetSeat).Any(r => (r.SuitMask & bit) != 0);
@@ -42,5 +38,5 @@ internal sealed partial class CoreGameEngineRecordedSuitSlashRuntime
                 _coreProgramPersistentStateOperations.SetProgramBooleanState(receipt.ActorSeat, receipt.SkillId, receipt.SkillInstanceId, ProgramRecordedSuitSlash.StateId(receipt.StatePrefix, suit), false);
     }
 
-    void global::CardGame.Core.IRecordedSuitSlashProgramHost.RevealRecordedSuitSlash(ProgramSkillFrame frame, SkillProgramEffect effect) => RevealRecordedSuitSlash(frame, effect);
+    void IRecordedSuitSlashProgramHost.RevealRecordedSuitSlash(ProgramSkillFrame frame, SkillProgramEffect effect) => RevealRecordedSuitSlash(frame, effect);
 }

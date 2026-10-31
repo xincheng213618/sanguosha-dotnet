@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRuntime
 {
     internal const string FixedTargetFactionResultBind = "fixed-target-slash";
     internal const string DeclaredDeckCardBind = "declared-deck-card";
-    SkillProgramStepOutcome global::CardGame.Core.IFixedSlashAndDeclaredDeckProgramHost.UseOwnerSlashAgainstTurnOwner(ProgramSkillFrame frame, bool ignoreDistance) => BeginOwnerSlashAgainstTurnOwner(frame, ignoreDistance);
-    SkillProgramStepOutcome global::CardGame.Core.IFixedSlashAndDeclaredDeckProgramHost.DeclareDeckCriterionAndGiveMatchingCard(ProgramSkillFrame frame) => BeginDeclaredDeckCriterion(frame);
+    SkillProgramStepOutcome IFixedSlashAndDeclaredDeckProgramHost.UseOwnerSlashAgainstTurnOwner(ProgramSkillFrame frame, bool ignoreDistance) => BeginOwnerSlashAgainstTurnOwner(frame, ignoreDistance);
+    SkillProgramStepOutcome IFixedSlashAndDeclaredDeckProgramHost.DeclareDeckCriterionAndGiveMatchingCard(ProgramSkillFrame frame) => BeginDeclaredDeckCriterion(frame);
     internal SkillProgramStepOutcome BeginOwnerSlashAgainstTurnOwner(ProgramSkillFrame frame, bool ignoreDistance)
     {
         var target = frame.WindowContext?.TargetSeat;
@@ -45,7 +41,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         var choices = new List<PromptChoice>();
         foreach (var card in _coreActionQueriesOperations.GetSlashUseCards(actor))
         {
-            var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(actor, card).FirstOrDefault(item => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(item.Identity.OutputKind));
+            var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(actor, card).FirstOrDefault(item => CoreNativeCardClassificationsRuntime.IsSlashCard(item.Identity.OutputKind));
             var baseKind = identity?.Identity.OutputKind ?? _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(actor, card);
             foreach (var kind in _coreNativeTargetLegalityOperations.GetSlashUseKinds(actor, baseKind))
             {
@@ -58,14 +54,14 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         }
 
         foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(actor)).DistinctBy(card => card.Id))
-            foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => kind != CardKind.Slash))
+            foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => kind != CardKind.Slash))
                 foreach (var conversion in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, forResponse: false))
                 {
                     if (_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) || !PaymentRange([card], conversion) || !Legal(card, kind, conversion))
                         continue;
                     var p = Parameters("use");
                     p["effective-kind"] = kind.ToString();
-                    global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, conversion);
+                    CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, conversion);
                     choices.Add(new(new($"fixed-slash.{(frame.Id)}.typed.{(kind)}.{(conversion.SkillId)}.{(conversion.BindingId)}.{(card.Id)}"), $"将牌当【{(CardCatalog.Get(kind).DisplayName)}】使用", [card.Id], [target.Seat], p));
                 }
 
@@ -80,19 +76,19 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
             choices.Add(new(new($"fixed-slash.{(frame.Id)}.zhangba.{(string.Join('-', ids))}"), "使用丈八蛇矛：将两张手牌当【杀】使用", ids, [target.Seat], p));
         }
 
-        foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+        foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
             foreach (var selection in _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(actor, kind, false).Where(item => _corePlayCardHistoryOperations.ViewAsRule(item.Source)is { RoundDistinctBasicUse: null, LeiluanBasicUse: null } || item.OutputKind == kind))
             {
                 if (!PaymentRange(selection.Cards) || !Legal(selection.Cards[0], kind, selection.Source, selection.Cards.Count > 1, materials: selection.Cards.Select(c => c.Id).ToArray()))
                     continue;
                 var p = Parameters("use");
                 p["effective-kind"] = kind.ToString();
-                global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, selection.Source);
+                CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, selection.Source);
                 var ids = selection.Cards.Select(card => card.Id).ToArray();
                 choices.Add(new(new($"fixed-slash.{(frame.Id)}.multi.{(selection.Source.SkillId)}.{(selection.Source.BindingId)}.{(string.Join('-', ids))}"), "将所选牌当【杀】使用", ids, [target.Seat], p));
             }
 
-        if (!d.Issued && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(actor, CardKind.Slash)is { } policy && global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => IsFixedTargetFactionSlashLegal(frame, kind)))
+        if (!d.Issued && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(actor, CardKind.Slash)is { } policy && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => IsFixedTargetFactionSlashLegal(frame, kind)))
         {
             var p = Parameters("faction");
             p["skill"] = policy.SkillId;
@@ -126,7 +122,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         var kind = Enum.Parse<CardKind>(selected.Parameters["effective-kind"]);
         IReadOnlyList<Card> cards;
         CardConversionSource? conversion;
-        if (selected.Cards.Count > 1 || global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var selectedSource) && _characterKongShuOlOperations.IsLeiluanSource(selectedSource))
+        if (selected.Cards.Count > 1 || CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var selectedSource) && _characterKongShuOlOperations.IsLeiluanSource(selectedSource))
         {
             if (selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString())
             {
@@ -135,7 +131,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
             }
             else
             {
-                if (!global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out conversion) || conversion is null)
+                if (!CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out conversion) || conversion is null)
                     throw new InvalidOperationException("A fixed Slash lost its multi-card conversion.");
                 cards = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(actor, selected.Cards, kind, false, conversion)?.Cards ?? throw new InvalidOperationException("A fixed Slash lost its physical payment.");
             }
@@ -143,7 +139,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         else
         {
             var card = _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(actor)).Single(card => card.Id == selected.Cards.Single());
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._selectedUseConversion);
+            CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._selectedUseConversion);
             _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._hasSelectedUseConversionChoice = true;
             conversion = _coreCardConversionsOperations.GetSelectedUseConversion(actor, actor, card, kind);
             if (conversion is null)
@@ -181,7 +177,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateFixedTargetFactionSlashParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame frame)
+    internal bool ValidateFixedTargetFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame frame)
     {
         if (frame.FixedTargetSlash is not { Issued: true } draft)
             return false;
@@ -201,7 +197,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal IReadOnlyList<PromptChoice> DeclaredDeckCriterionChoices(ProgramSkillFrame frame) => global::CardGame.Core.EngineOwners.CoreGameEngineFixedSlashAndDeclaredDeckProgramsDefinitions.DeckCriteria.Select(criterion =>
+    internal IReadOnlyList<PromptChoice> DeclaredDeckCriterionChoices(ProgramSkillFrame frame) => CoreGameEngineFixedSlashAndDeclaredDeckProgramsDefinitions.DeckCriteria.Select(criterion =>
     {
         var p = FixedSlashAndDeclaredDeckParameters(frame, "declared-deck-criterion");
         p["criterion"] = criterion;
@@ -215,7 +211,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         };
         return new PromptChoice(new($"declared-deck.{(frame.Id)}.{(criterion)}"), $"声明{(label)}", [], [], p);
     }).ToArray();
-    internal static bool MatchesDeclaredDeckCriterion(Card card, string criterion) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_FixedSlashAndDeclaredDeckPrograms.MatchesDeclaredDeckCriterion(card, criterion);
+    internal static bool MatchesDeclaredDeckCriterion(Card card, string criterion) => RuntimeSkills.RuntimeRules_Core_FixedSlashAndDeclaredDeckPrograms.MatchesDeclaredDeckCriterion(card, criterion);
     internal IReadOnlyList<PromptChoice> DeclaredDeckRecipientChoices(ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Gender == GeneralGender.Male).Select(player =>
     {
         var p = FixedSlashAndDeclaredDeckParameters(frame, "declared-deck-recipient");
@@ -281,7 +277,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         if (matched)
             _coreProgramLifecycleOperations.SetProgramCardSet(frame.Id, DeclaredDeckCardBind, [card.Id], SkillProgramCardSetVisibility.Public, [CardLocation.DrawPile]);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDeckCriterionRevealedEvent(frame.Id, frame.OwnerSeat, d.Criterion, card.Id, matched));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, DeclaredDeckCardBind, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, DeclaredDeckCardBind, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, matched ? CardLocation.Processing : CardLocation.DiscardPile, new(matched ? "program.declared-deck.match" : "program.declared-deck.unmatched"));
         _coreDeckProgramsOperations.AwaitDeckProgramMovement(frame.Id);
     }
@@ -350,7 +346,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
             "declared-deck-recipient" when frame.DeckCriterion is { Stage: "recipient" } => DeclaredDeckRecipientChoices(frame),
             _ => throw new InvalidOperationException("Fixed Slash or declared deck choice changed its stage.")};
         var canonical = choices.SingleOrDefault(choice => choice.Id == selected.Id);
-        if (canonical is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], [canonical]) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat)
+        if (canonical is null || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], [canonical]) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat)
             throw new InvalidOperationException("Fixed Slash or deck choice changed its physical payment or recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreDeckProgramsOperations.DeckProgramSourceValid(frame) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)

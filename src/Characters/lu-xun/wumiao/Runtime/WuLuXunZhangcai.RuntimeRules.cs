@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_lu_xun_wumiao_WuLuXunZhangcai
 {
     internal static string WuLuXunZhangcaiBinding(SkillProgramTriggerWindow window) => window switch

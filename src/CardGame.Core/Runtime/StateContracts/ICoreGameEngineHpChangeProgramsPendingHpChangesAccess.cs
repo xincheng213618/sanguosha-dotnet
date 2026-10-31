@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineHpChangeProgramsPendingHpChangesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineHpChangeProgramsPendingHpChangesAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.HpChangeContext> _pendingHpChanges { get; }
+    ref readonly List<HpChangeContext> _pendingHpChanges { get; }
 }

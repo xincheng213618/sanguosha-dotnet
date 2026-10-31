@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiaoQiaoLeRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     internal const string QiqinObtainReason = "skill-program.le-xiao-qiao.qiqin.obtain";
     internal bool HasLeXiaoQiaoQiqinCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeQiqinInitialEntities);
 
-    internal static CardConversionSource QiqinSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xiao_qiao_le_LeXiaoQiaoQiqin.QiqinSource(f);
+    internal static CardConversionSource QiqinSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_xiao_qiao_le_LeXiaoQiaoQiqin.QiqinSource(f);
     // Registration only; the query still belongs to legacy GameEngine.LeXiaoQiaoQiqin and GameEngine.LeDaQiaoZixiPlacement.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 220)]
     internal void ProjectQiqinCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
@@ -60,8 +56,8 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
         return IsIssuedQiqinCandidate(c, context) || f.InstructionIndex == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<QiqinInitializedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var issued] && issued.Source == QiqinSource(f) && issued.GameplayHash == f.GameplayHash;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeXiaoQiaoQiqinHost.Initialize(ProgramSkillFrame f) => InitializeQiqin(f);
-    SkillProgramStepOutcome global::CardGame.Core.ILeXiaoQiaoQiqinHost.Collect(ProgramSkillFrame f) => BeginQiqinCollect(f);
+    SkillProgramStepOutcome ILeXiaoQiaoQiqinHost.Initialize(ProgramSkillFrame f) => InitializeQiqin(f);
+    SkillProgramStepOutcome ILeXiaoQiaoQiqinHost.Collect(ProgramSkillFrame f) => BeginQiqinCollect(f);
     internal SkillProgramStepOutcome InitializeQiqin(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

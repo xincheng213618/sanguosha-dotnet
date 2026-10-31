@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuoXianOlRuntime
 {
-    internal static CardConversionSource DailiSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_luo_xian_ol_LuoXian.DailiSource(frame);
+    internal static CardConversionSource DailiSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_luo_xian_ol_LuoXian.DailiSource(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26420)]
     internal bool CanOfferDaili(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveDailiTurnEnd) || context.Window == SkillProgramTriggerWindow.AfterTurnEnded && PubliclyRevealedHandCount(candidate.OwnerSeat) % 2 == 0;
     internal SkillProgramStepOutcome ResolveDailiTurnEnd(ProgramSkillFrame supplied)
@@ -72,5 +68,5 @@ internal sealed partial class CharacterLuoXianOlRuntime
     internal IEnumerable<CardMovementRecord> DailiDrawnMovements(ProgramSkillFrame frame) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DailiCardDrawnEvent>().Where(e => e.FrameId == frame.Id).Select(e => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence == e.MovementSequence));
     [ProgramContinuation(ProgramContinuationKind.Movement, 26420)]
     internal bool ReturnDailiMovement(ProgramSkillFrame frame) => frame.Daili is not null && ResumeDaili(frame.Id);
-    SkillProgramStepOutcome global::CardGame.Core.ILuoXianProgramHost.ResolveDailiTurnEnd(ProgramSkillFrame frame) => ResolveDailiTurnEnd(frame);
+    SkillProgramStepOutcome ILuoXianProgramHost.ResolveDailiTurnEnd(ProgramSkillFrame frame) => ResolveDailiTurnEnd(frame);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuChengMouMobileRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
             return[];
         var result = new List<MouLiuChengUsePlan>();
         void Add(LegalActionKind action, IReadOnlyList<int> targets, string text, int? card = null, CardKind? required = null, bool adjusted = false) => result.Add(new(kind, action, card, required, text, adjusted) { Targets = targets });
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+        if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
         {
             var options = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: false, conversionSource: source).Where(p => p.ActionKind != LegalActionKind.Recast).ToArray();
             var ordinary = options.Select(p => new LegalAction(p.ActionKind, 0, p.TargetSeats.Count == 1 ? p.TargetSeats[0] : null, p.Description, kind, p.TargetCardId, p.TargetSeats) { ConversionSource = source }).ToList();
@@ -28,7 +24,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         }
 
         var neutral = new Card(0, kind, Suit.None, 0);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var actions = new List<LegalAction>();
             var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, physicalCardIds: [], physicalSuit: Suit.None, effectiveColor: null, effectiveRank: 0, conversionSource: source, countsTowardLimit: false)).ToArray();
@@ -61,7 +57,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         var useId = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: source);
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.MouLiuChengOrigin is null)
             throw new InvalidOperationException("MouLiuCheng must bind its distinct zero-material issuance before native effects.");
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
         {
             var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(useId)!.TargetSeats;
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, actor.Seat, targets[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: p.Kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], p.Kind), programSkillCardUseFrameId: f.Id);
@@ -80,7 +76,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(useId, card, actor.Seat, _coreCardUseLifecycleOperations.LifecycleCardUse(useId)!.TargetSeats, p.ActionKind, p.TargetCardId, p.RequiredKind, p.Kind);
     }
 
-    internal static bool SameMouLiuChengPlan(MouLiuChengUsePlan a, MouLiuChengUsePlan b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_cheng_mou_mobile_MouLiuChengNative.SameMouLiuChengPlan(a, b);
+    internal static bool SameMouLiuChengPlan(MouLiuChengUsePlan a, MouLiuChengUsePlan b) => RuntimeSkills.RuntimeRules_liu_cheng_mou_mobile_MouLiuChengNative.SameMouLiuChengPlan(a, b);
     internal CardActionContext PrepareMouLiuChengAction(CardActionContext action)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLiuChengCompletion: { Stage: MouLiuChengStage.NativeIssuing } r } f)
@@ -129,10 +125,10 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
 
     internal bool SkipMouLiuChengFinishedMovement(long id, Card c) => c.Id == 0 && IsMouLiuChengZeroUse(id) && c.Kind == _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind;
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 20)]
-    internal bool FinishMouLiuChengAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishMouLiuChengAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (attack.Card is not null || !IsMouLiuChengUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (attack.Card is not null || !IsMouLiuChengUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);

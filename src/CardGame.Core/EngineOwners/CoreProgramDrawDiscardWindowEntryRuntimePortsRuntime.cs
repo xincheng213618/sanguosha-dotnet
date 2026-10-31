@@ -1,24 +1,20 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
-internal sealed partial class CoreProgramDrawDiscardWindowEntryRuntimePortsRuntime : global::CardGame.Core.IProgramDrawDiscardWindowEntryFacts, global::CardGame.Core.IProgramDrawDiscardWindowObservers
+[Core.ProgramRuntimeModule, Core.ProgramCapability]
+internal sealed partial class CoreProgramDrawDiscardWindowEntryRuntimePortsRuntime : IProgramDrawDiscardWindowEntryFacts, IProgramDrawDiscardWindowObservers
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterGuoYuanMobileShiEntries _characterGuoYuanMobileShiOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterHanSongAnniversaryEntries _characterHanSongAnniversaryOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries _characterYanPuOlOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterZhangNiBoundaryMobileEntries _characterZhangNiBoundaryMobileOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterZhangShiPingOlEntries _characterZhangShiPingOlOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineAttributedMarkerEventsEntries _coreAttributedMarkerEventsOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineGuanduActivitiesEntries _coreGuanduActivitiesOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRecipientCategoryMarksEntries _coreRecipientCategoryMarksOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineTableOrderEntries _coreTableOrderOperations;
-    internal CoreProgramDrawDiscardWindowEntryRuntimePortsRuntime(global::CardGame.Core.RuntimeEntries.CharacterGuoYuanMobileShiEntries characterGuoYuanMobileShiOperations, global::CardGame.Core.RuntimeEntries.CharacterHanSongAnniversaryEntries characterHanSongAnniversaryOperations, global::CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries characterYanPuOlOperations, global::CardGame.Core.RuntimeEntries.CharacterZhangNiBoundaryMobileEntries characterZhangNiBoundaryMobileOperations, global::CardGame.Core.RuntimeEntries.CharacterZhangShiPingOlEntries characterZhangShiPingOlOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineAttributedMarkerEventsEntries coreAttributedMarkerEventsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineGuanduActivitiesEntries coreGuanduActivitiesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRecipientCategoryMarksEntries coreRecipientCategoryMarksOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineTableOrderEntries coreTableOrderOperations)
+    private readonly RuntimeEntries.CharacterGuoYuanMobileShiEntries _characterGuoYuanMobileShiOperations;
+    private readonly RuntimeEntries.CharacterHanSongAnniversaryEntries _characterHanSongAnniversaryOperations;
+    private readonly RuntimeEntries.CharacterYanPuOlEntries _characterYanPuOlOperations;
+    private readonly RuntimeEntries.CharacterZhangNiBoundaryMobileEntries _characterZhangNiBoundaryMobileOperations;
+    private readonly RuntimeEntries.CharacterZhangShiPingOlEntries _characterZhangShiPingOlOperations;
+    private readonly RuntimeEntries.CoreGameEngineAttributedMarkerEventsEntries _coreAttributedMarkerEventsOperations;
+    private readonly RuntimeEntries.CoreGameEngineGuanduActivitiesEntries _coreGuanduActivitiesOperations;
+    private readonly RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
+    private readonly RuntimeEntries.CoreGameEngineRecipientCategoryMarksEntries _coreRecipientCategoryMarksOperations;
+    private readonly RuntimeEntries.CoreGameEngineTableOrderEntries _coreTableOrderOperations;
+    internal CoreProgramDrawDiscardWindowEntryRuntimePortsRuntime(RuntimeEntries.CharacterGuoYuanMobileShiEntries characterGuoYuanMobileShiOperations, RuntimeEntries.CharacterHanSongAnniversaryEntries characterHanSongAnniversaryOperations, RuntimeEntries.CharacterYanPuOlEntries characterYanPuOlOperations, RuntimeEntries.CharacterZhangNiBoundaryMobileEntries characterZhangNiBoundaryMobileOperations, RuntimeEntries.CharacterZhangShiPingOlEntries characterZhangShiPingOlOperations, RuntimeEntries.CoreGameEngineAttributedMarkerEventsEntries coreAttributedMarkerEventsOperations, RuntimeEntries.CoreGameEngineGuanduActivitiesEntries coreGuanduActivitiesOperations, RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, RuntimeEntries.CoreGameEngineRecipientCategoryMarksEntries coreRecipientCategoryMarksOperations, RuntimeEntries.CoreGameEngineTableOrderEntries coreTableOrderOperations)
     {
         this._characterGuoYuanMobileShiOperations = characterGuoYuanMobileShiOperations;
         this._characterHanSongAnniversaryOperations = characterHanSongAnniversaryOperations;

@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
 {
-    internal static CardConversionSource DyingSuitsSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DyingSuitsPeachPrograms.DyingSuitsSource(f);
-    internal static string DyingSuitsDrawReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DyingSuitsPeachPrograms.DyingSuitsDrawReason(f);
-    internal static string DyingSuitsDiscardReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DyingSuitsPeachPrograms.DyingSuitsDiscardReason(f);
+    internal static CardConversionSource DyingSuitsSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_DyingSuitsPeachPrograms.DyingSuitsSource(f);
+    internal static string DyingSuitsDrawReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_DyingSuitsPeachPrograms.DyingSuitsDrawReason(f);
+    internal static string DyingSuitsDiscardReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_DyingSuitsPeachPrograms.DyingSuitsDiscardReason(f);
     internal bool HasIssuedDyingSuitsRound(int owner, string skill) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DyingSuitsDrawIssuedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.ActualRound == _coreActualRoundProgressRoundNumberAccess._roundNumber);
     internal int[] DyingSuitsRecipients(int owner, int victim) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && p.Seat != victim).Select(p => p.Seat).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 70)]
@@ -36,7 +33,7 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
 
         var r = new DyingSuitsReceipt(1, DyingSuitsSource(f), f.GameplayHash, _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, entry.Id, dying.Id, dying.VictimSeat, _coreDyingSuitsAndHistoricalUseObserversOperations.CaptureDyingSuitsOriginalCursor(dying, entry), DyingSuitsStage.Recipient, [], [], []);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DyingSuits = r });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DyingSuitsOriginalCursorIssuedEvent(f.Id, global::CardGame.Core.EngineOwners.CoreGameEngineDyingSuitsAndHistoricalUseObserversRuntime.DyingSuitsCursorHash(r.OriginalCursor)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DyingSuitsOriginalCursorIssuedEvent(f.Id, CoreGameEngineDyingSuitsAndHistoricalUseObserversRuntime.DyingSuitsCursorHash(r.OriginalCursor)));
         PublishDyingSuitsChoice(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -276,6 +273,6 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDyingSuitsAndEndingHistoryHost.DrawDiscardSuits(ProgramSkillFrame f) => BeginDyingSuits(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDyingSuitsAndEndingHistoryHost.EndingHistoricalUses(ProgramSkillFrame f) => _coreEndingHistoricalUsesOperations.BeginEndingHistoricalUses(f);
+    SkillProgramStepOutcome IDyingSuitsAndEndingHistoryHost.DrawDiscardSuits(ProgramSkillFrame f) => BeginDyingSuits(f);
+    SkillProgramStepOutcome IDyingSuitsAndEndingHistoryHost.EndingHistoricalUses(ProgramSkillFrame f) => _coreEndingHistoricalUsesOperations.BeginEndingHistoricalUses(f);
 }

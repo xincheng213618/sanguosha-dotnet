@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouFangOlRuntime
@@ -81,7 +77,7 @@ internal sealed partial class CharacterZhouFangOlRuntime
         _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(frame.OwnerSeat, chooserSeat, card, CardLocation.Hand(owner.Seat), new($"skill-program.{(frame.SkillId)}.youdi-discard"));
         var took = false;
         var chooser = _coreMatchParticipantsPlayersAccess._players[chooserSeat];
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))
         {
             var chooserHand = _corePhysicalOwnedCardQueriesOperations.GetHand(chooser);
             if (chooserHand.Count > 0)
@@ -94,14 +90,14 @@ internal sealed partial class CharacterZhouFangOlRuntime
         }
 
         var drawn = 0;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(owner, card)))
+        if (!CoreNativeCardClassificationsRuntime.IsRedSuit(_coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(owner, card)))
         {
             _corePhysicalDrawFacadesOperations.DrawCards(owner, 1, true, new($"skill-program.{(frame.SkillId)}.youdi-draw"));
             drawn = 1;
         }
 
         _coreMatchLogOperations.AddLog("SkillEffect", took && drawn > 0 ? $"{(owner.Name)} 诱敌弃置【{(card.DisplayName)}】：获得 {(_coreMatchParticipantsPlayersAccess._players[chooserSeat].Name)} 一张手牌并摸一张牌。" : took ? $"{(owner.Name)} 诱敌弃置【{(card.DisplayName)}】：获得 {(_coreMatchParticipantsPlayersAccess._players[chooserSeat].Name)} 一张手牌。" : drawn > 0 ? $"{(owner.Name)} 诱敌弃置【{(card.DisplayName)}】：摸一张牌。" : $"{(owner.Name)} 诱敌弃置【{(card.DisplayName)}】。", owner.Seat, chooserSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYoudiBaitEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, chooserSeat, card.Id, took, drawn));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYoudiBaitEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, chooserSeat, card.Id, took, drawn));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }

@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEnginePaidColorDamageClaimObserversRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEnginePaidColorDamageClaimObserversRuntime))]
 internal sealed partial class CoreGameEnginePaidColorDamageClaimObserversEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePaidColorDamageClaimObserversRuntime> _resolve;
-    private CoreGameEnginePaidColorDamageClaimObserversEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePaidColorDamageClaimObserversRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEnginePaidColorDamageClaimObserversRuntime> _resolve;
+    private CoreGameEnginePaidColorDamageClaimObserversEntries(Func<EngineOwners.CoreGameEnginePaidColorDamageClaimObserversRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEnginePaidColorDamageClaimObserversEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePaidColorDamageClaimObserversRuntime> resolve) => new(resolve);
+    internal static CoreGameEnginePaidColorDamageClaimObserversEntries Create(Func<EngineOwners.CoreGameEnginePaidColorDamageClaimObserversRuntime> resolve) => new(resolve);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanXiangAnniversaryRuntime
@@ -111,9 +107,9 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 46800)]
-    internal bool CaptureYanXiangColorDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageId)
+    internal bool CaptureYanXiangColorDamage(GameEngine.IDamageAttempt attack, long damageId)
     {
-        if (attack is not global::CardGame.Core.NativeOwners.CardAttackHandle a || !a.DamageWasApplied || _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { AnniversaryYanXiangUse: { } origin, Action: { } action } use || !IsYanXiangNativeUse(use) || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == damageId)is not DamageFrame { Amount: > 0 } damage || action.EffectiveIsRed is not { } color)
+        if (attack is not NativeOwners.CardAttackHandle a || !a.DamageWasApplied || _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { AnniversaryYanXiangUse: { } origin, Action: { } action } use || !IsYanXiangNativeUse(use) || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == damageId)is not DamageFrame { Amount: > 0 } damage || action.EffectiveIsRed is not { } color)
             return false;
         if (!_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYanXiangColorBannedEvent>().Any(e => e.UseId == use.Id && e.DamageId == damageId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryYanXiangColorBannedEvent(origin.FrameId, use.Id, action.ActionId, damageId, damage.TargetSeat, color, YanXiangOwnReturns(damage.TargetSeat)));

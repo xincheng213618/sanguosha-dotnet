@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoYanOlRuntime
@@ -39,10 +35,10 @@ internal sealed partial class CharacterZhaoYanOlRuntime
         return false;
     }
 
-    internal static bool IsTongxieMember(ProgramTongxieArmedEvent arm, int seat) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhao_yan_ol_ZhaoYanPrograms.IsTongxieMember(arm, seat);
+    internal static bool IsTongxieMember(ProgramTongxieArmedEvent arm, int seat) => RuntimeSkills.RuntimeRules_zhao_yan_ol_ZhaoYanPrograms.IsTongxieMember(arm, seat);
     internal IEnumerable<int> TongxieFollowUpResponders(IReadOnlyList<int> members, int actorSeat, int targetSeat)
     {
-        return members.Where(seat => seat != actorSeat && seat != targetSeat).Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive).Where(seat => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Any(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))).OrderBy(seat => _coreTableOrderOperations.RelativeTableOrder(actorSeat, seat)).ThenBy(seat => seat);
+        return members.Where(seat => seat != actorSeat && seat != targetSeat).Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive).Where(seat => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Any(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))).OrderBy(seat => _coreTableOrderOperations.RelativeTableOrder(actorSeat, seat)).ThenBy(seat => seat);
     }
 
     internal IEnumerable<int> TongxieEligiblePreventers(IReadOnlyList<int> members, int protectedSeat)
@@ -81,7 +77,7 @@ internal sealed partial class CharacterZhaoYanOlRuntime
         if (_contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.TongxieFollowUp) != true || movement.Reason != CardMoveReasons.UseFinished || movement.From != CardLocation.Processing || movement.To != CardLocation.DiscardPile)
             return;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(frame => frame.Action is { Type: CardActionType.Use } action && action.PhysicalCards is [var cost] && cost.CardId == movement.CardId);
-        if (use?.Action is not { } accepted || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(accepted.EffectiveKind) || use.TargetSeats is not [var target] || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
+        if (use?.Action is not { } accepted || !CoreNativeCardClassificationsRuntime.IsSlashCard(accepted.EffectiveKind) || use.TargetSeats is not [var target] || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
             return;
         if (!_coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && ActiveTongxieArm(owner.Seat)is { } arm && IsTongxieMember(arm, accepted.ActorSeat)))
             return;
@@ -172,12 +168,12 @@ internal sealed partial class CharacterZhaoYanOlRuntime
             owner.Seat
         }.Concat(chosen).Order().ToArray();
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】：" + $"{(DescribeTongxieMembers(members))}称为“同协”角色（直到{(owner.Name)}的下回合开始）。", active.OwnerSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTongxieArmedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, Array.AsReadOnly(members)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTongxieArmedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, Array.AsReadOnly(members)));
         DrawForUniqueLeastTongxieHand(active, members);
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
 
-    internal static int[] ParseTongxieArmSeats(string? seats) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhao_yan_ol_ZhaoYanPrograms.ParseTongxieArmSeats(seats);
+    internal static int[] ParseTongxieArmSeats(string? seats) => RuntimeSkills.RuntimeRules_zhao_yan_ol_ZhaoYanPrograms.ParseTongxieArmSeats(seats);
     internal string DescribeTongxieMembers(IReadOnlyList<int> members) => string.Join("、", members.Select(seat => _coreMatchParticipantsPlayersAccess._players[seat].Name));
     internal void DrawForUniqueLeastTongxieHand(ProgramSkillFrame active, IReadOnlyList<int> members)
     {
@@ -231,7 +227,7 @@ internal sealed partial class CharacterZhaoYanOlRuntime
                 DescribeTongxieActors("放弃追杀", pending.DeclinedBy)
             }.Where(segment => segment.Length > 0).ToArray();
             _coreMatchLogOperations.AddLog("SkillEffect", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 的【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】追杀结算完成" + (segments.Length > 0 ? $"：{(string.Join("，", segments))}。" : "。"), active.OwnerSeat, pending.TargetSeat);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTongxieFollowUpResolvedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, pending.ActorSeat, pending.TargetSeat, Array.AsReadOnly(pending.UsedBy.ToArray()), Array.AsReadOnly(pending.DeclinedBy.ToArray()), Array.AsReadOnly(pending.UsedCardIds.ToArray())));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTongxieFollowUpResolvedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, pending.ActorSeat, pending.TargetSeat, Array.AsReadOnly(pending.UsedBy.ToArray()), Array.AsReadOnly(pending.DeclinedBy.ToArray()), Array.AsReadOnly(pending.UsedCardIds.ToArray())));
             return SkillProgramStepOutcome.Continue;
         }
 
@@ -247,7 +243,7 @@ internal sealed partial class CharacterZhaoYanOlRuntime
         var responder = _coreMatchParticipantsPlayersAccess._players[responderSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[pending.TargetSeat];
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
-        var slashes = _corePhysicalOwnedCardQueriesOperations.GetHand(responder).Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)).OrderBy(card => card.Id).ToArray();
+        var slashes = _corePhysicalOwnedCardQueriesOperations.GetHand(responder).Where(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)).OrderBy(card => card.Id).ToArray();
         if (slashes.Length == 0)
         {
             // The candidate list was frozen at window start; a lost slash skips
@@ -297,7 +293,7 @@ internal sealed partial class CharacterZhaoYanOlRuntime
             throw new InvalidOperationException("The Tongxie follow-up answer is malformed.");
         var location = _cardZonesOperations._cardZones.GetLocation(cardId);
         var card = location == CardLocation.Hand(responderSeat) ? _cardZonesOperations._cardZones.CardsAt(location).SingleOrDefault(item => item.Id == cardId) : null;
-        if (card is null || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))
+        if (card is null || !CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "所选【杀】已离开使用者手牌，同协追杀结算已取消。");
             return;
@@ -425,7 +421,7 @@ internal sealed partial class CharacterZhaoYanOlRuntime
             throw new InvalidOperationException("The Tongxie guard finalize lost its preventer.");
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id)with { TongxieGuard = null });
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 的【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】保护生效：" + $"{(_coreMatchParticipantsPlayersAccess._players[pending.ProtectedSeat].Name)} 受到的 {(pending.PreventedAmount)} 点伤害被防止，" + $"{(_coreMatchParticipantsPlayersAccess._players[preventerSeat].Name)} 失去1点体力。", active.OwnerSeat, pending.ProtectedSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTongxieGuardedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, pending.ProtectedSeat, preventerSeat, pending.PreventedAmount));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTongxieGuardedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, pending.ProtectedSeat, preventerSeat, pending.PreventedAmount));
         return SkillProgramStepOutcome.Continue;
     }
     // 同协 arm: price every offered member set; each chosen member scores as a
@@ -489,9 +485,9 @@ internal sealed partial class CharacterZhaoYanOlRuntime
         return value > 0 ? prevent : decline;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IZhaoYanProgramHost.TongxieArm(ProgramSkillFrame frame, SkillProgramEffect effect) => TongxieProgramArm(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IZhaoYanProgramHost.TongxieFollowUp(ProgramSkillFrame frame, SkillProgramEffect effect) => TongxieProgramFollowUp(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IZhaoYanProgramHost.TongxieGuard(ProgramSkillFrame frame, SkillProgramEffect effect) => TongxieProgramGuard(frame, effect);
+    SkillProgramStepOutcome IZhaoYanProgramHost.TongxieArm(ProgramSkillFrame frame, SkillProgramEffect effect) => TongxieProgramArm(frame, effect);
+    SkillProgramStepOutcome IZhaoYanProgramHost.TongxieFollowUp(ProgramSkillFrame frame, SkillProgramEffect effect) => TongxieProgramFollowUp(frame, effect);
+    SkillProgramStepOutcome IZhaoYanProgramHost.TongxieGuard(ProgramSkillFrame frame, SkillProgramEffect effect) => TongxieProgramGuard(frame, effect);
     [ProgramPipelineHook(ProgramPipelinePhase.SelectLegacyDiscardIndexes, 700)]
     internal int[]? SelectWindowIndexes_MatchingTongxieSettledSlashIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger)
     {

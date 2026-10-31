@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunHongOlRuntime
 {
     internal const string ZenrunTakeReason = "skill-program.sun-hong.zenrun.obtain";
     internal const string ZenrunCompensationReason = "skill-program.sun-hong.zenrun.compensation";
-    internal CardConversionSource ZenrunSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource ZenrunSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasPrintedGeneralSkillTargetBan(CardConversionSource source, int target) => HasPrintedGeneralSkillTargetBan(source.OwnerSeat, source.SkillId, target, source.SkillInstanceId);
     internal bool HasPrintedGeneralSkillTargetBan(int owner, string skillId, int target, string? skillInstanceId = null)
     {
@@ -31,11 +27,11 @@ internal sealed partial class CharacterSunHongOlRuntime
         return candidate.SkillId == "ol:zenrun" && candidate.BindingId == "replace-native-draw" && context.NativeDraw is { } draw && draw.RecipientSeat == candidate.OwnerSeat && _coreNativeDrawAttemptsOperations.ExactNativeDrawAttempt(context)is { Replacement: null } && ZenrunPhaseAvailable(candidate.OwnerSeat, draw.ActualPhase) && _coreMatchParticipantsPlayersAccess._players.Any(p => ZenrunSourceLegal(candidate.OwnerSeat, p.Seat, draw.RequestedCount));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISunHongZenrunHost.Resolve(ProgramSkillFrame f) => BeginZenrun(f);
+    SkillProgramStepOutcome ISunHongZenrunHost.Resolve(ProgramSkillFrame f) => BeginZenrun(f);
     internal SkillProgramStepOutcome BeginZenrun(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.Zenrun is not null || f.InstructionIndex != 1 || f.SkillId != "ol:zenrun" || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "replace-native-draw" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { NativeDraw: { } draw } context || !_coreNativeDrawAttemptsOperations.IsExactNativeDrawCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context) || !ZenrunPhaseAvailable(f.OwnerSeat, draw.ActualPhase))
+        if (f.Zenrun is not null || f.InstructionIndex != 1 || f.SkillId != "ol:zenrun" || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "replace-native-draw" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { NativeDraw: { } draw } context || !_coreNativeDrawAttemptsOperations.IsExactNativeDrawCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context) || !ZenrunPhaseAvailable(f.OwnerSeat, draw.ActualPhase))
             throw new InvalidOperationException("Zenrun needs the genuine unconsumed native draw attempt in its actual phase.");
         var r = new ZenrunReceipt(ZenrunSource(f), f.GameplayHash, context.ParentFrameId, draw, ZenrunStage.Target)
         {
@@ -119,7 +115,7 @@ internal sealed partial class CharacterSunHongOlRuntime
     [ProgramAnswer("sun-hong-zenrun")]
     internal void AnswerZenrun(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zenrun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == ZenrunStage.VictimChoice ? r.SourceSeat : f.OwnerSeat) || !ZenrunChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zenrun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == ZenrunStage.VictimChoice ? r.SourceSeat : f.OwnerSeat) || !ZenrunChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zenrun lost the exact opaque chooser or original native choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

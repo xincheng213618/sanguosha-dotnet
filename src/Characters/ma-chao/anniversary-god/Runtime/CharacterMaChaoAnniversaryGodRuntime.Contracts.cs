@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICharacterMaChaoAnniversaryGodCoreEquipmentContentOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterMaChaoAnniversaryGodCoreEquipmentContentOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.EquipmentContentRegistry EquipmentRules { get; }
+    EquipmentContentRegistry EquipmentRules { get; }
 }
 
-internal interface ICharacterMaChaoAnniversaryGodCoreProgramCardLegalityOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterMaChaoAnniversaryGodCoreProgramCardLegalityOperations : IProgramRuntimeOperations
 {
     bool IsProgramEntityPhysicalRestricted(int actorSeat, int cardId);
-    bool IsProgramMaterialUseForbidden(int actorSeat, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IEnumerable<int> cardIds, bool response = false);
-    bool IsProgramViewAsAllowed(global::CardGame.Core.CharacterState owner, global::CardGame.Core.CardKind kind, global::System.Collections.Generic.IReadOnlyList<int> cardIds, global::CardGame.Core.CardConversionSource source, bool forResponse, bool dyingUse = false, int? requestedUseTarget = default);
-    global::CardGame.Core.ProgramCardLegality CardLegality { get; }
+    bool IsProgramMaterialUseForbidden(int actorSeat, CardKind kind, IEnumerable<int> cardIds, bool response = false);
+    bool IsProgramViewAsAllowed(CharacterState owner, CardKind kind, IReadOnlyList<int> cardIds, CardConversionSource source, bool forResponse, bool dyingUse = false, int? requestedUseTarget = default);
+    ProgramCardLegality CardLegality { get; }
 }

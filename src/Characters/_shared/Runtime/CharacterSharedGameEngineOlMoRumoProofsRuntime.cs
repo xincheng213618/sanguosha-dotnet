@@ -1,22 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CharacterSharedGameEngineOlMoRumoProofsRuntime
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterDiaoChanOlMagicEntries _characterDiaoChanOlMagicOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterLuBuOlMagicEntries _characterLuBuOlMagicOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterSunQuanOlMagicEntries _characterSunQuanOlMagicOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelProgramPipelineHooksAccess _programPipelineHooksOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
-    internal CharacterSharedGameEngineOlMoRumoProofsRuntime(global::CardGame.Core.RuntimeEntries.CharacterDiaoChanOlMagicEntries characterDiaoChanOlMagicOperations,global::CardGame.Core.RuntimeEntries.CharacterLuBuOlMagicEntries characterLuBuOlMagicOperations,global::CardGame.Core.RuntimeEntries.CharacterSunQuanOlMagicEntries characterSunQuanOlMagicOperations,global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations,global::CardGame.Core.EngineOwners.IKernelProgramPipelineHooksAccess programPipelineHooksOperations,global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations,global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries coreTableSeatQueriesOperations,global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess)
+    private readonly RuntimeEntries.CharacterDiaoChanOlMagicEntries _characterDiaoChanOlMagicOperations;
+    private readonly RuntimeEntries.CharacterLuBuOlMagicEntries _characterLuBuOlMagicOperations;
+    private readonly RuntimeEntries.CharacterSunQuanOlMagicEntries _characterSunQuanOlMagicOperations;
+    private readonly IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly IKernelProgramPipelineHooksAccess _programPipelineHooksOperations;
+    private readonly RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations;
+    private readonly RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations;
+    private readonly EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess _coreActualRoundProgressRoundNumberAccess;
+    internal CharacterSharedGameEngineOlMoRumoProofsRuntime(RuntimeEntries.CharacterDiaoChanOlMagicEntries characterDiaoChanOlMagicOperations,RuntimeEntries.CharacterLuBuOlMagicEntries characterLuBuOlMagicOperations,RuntimeEntries.CharacterSunQuanOlMagicEntries characterSunQuanOlMagicOperations,IKernelContentRegistryAccess contentRegistryOperations,IKernelProgramPipelineHooksAccess programPipelineHooksOperations,RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations,RuntimeEntries.CoreTableSeatQueriesEntries coreTableSeatQueriesOperations,EngineStates.Contracts.ICoreActualRoundProgressRoundNumberAccess coreActualRoundProgressRoundNumberAccess)
     {
         this._characterDiaoChanOlMagicOperations = characterDiaoChanOlMagicOperations;
         this._characterLuBuOlMagicOperations = characterLuBuOlMagicOperations;

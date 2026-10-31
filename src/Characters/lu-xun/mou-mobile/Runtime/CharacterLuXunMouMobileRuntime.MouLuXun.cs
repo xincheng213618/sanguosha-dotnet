@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
 {
     internal bool HasMouLuXun => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RecordMouLuXunQianxun);
 
-    internal static CardConversionSource MouLuXunSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MouLuXunSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal CardKind[] MouLuXunRecordedNames(int owner)
     {
         var result = new HashSet<CardKind>();
@@ -57,9 +54,9 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
         if (parent.Id != context.ParentFrameId)
             return false;
         if (parent is CardEffectBeforeApplyFrame effect)
-            return effect.CandidateIndex < effect.Candidates.Count && effect.Candidates[effect.CandidateIndex] is { } c && c.FrozenContext == context && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(c));
+            return effect.CandidateIndex < effect.Candidates.Count && effect.Candidates[effect.CandidateIndex] is { } c && c.FrozenContext == context && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(c));
         if (parent is PlayPhaseStartingBoundaryFrame starting)
-            return starting.OwnerSeat == f.OwnerSeat && starting.ItemIndex < starting.Items.Count && starting.Items[starting.ItemIndex].Candidate is { } c && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c);
+            return starting.OwnerSeat == f.OwnerSeat && starting.ItemIndex < starting.Items.Count && starting.Items[starting.ItemIndex].Candidate is { } c && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c);
         return parent is DeferredTurnEndFrame ending && _coreAfterTurnEndedProgramsOperations.MatchesAfterTurnEndedChild(ending, f, context);
     }
 
@@ -142,7 +139,7 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
     [ProgramAnswer("mou-lu-xun")]
     internal void AnswerMouLuXun(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLuXun: { } r } f || !ValidMouLuXun(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouLuXunChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLuXun: { } r } f || !ValidMouLuXun(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouLuXunChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Lu Xun accepts only its exact current physical entities, record and ordered native target plan.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var verb = choice.Parameters["verb"];
@@ -171,7 +168,7 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
             var kind = Enum.Parse<CardKind>(choice.Parameters["value"]);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuXunNameRemovedEvent(f.Id, f.OwnerSeat, kind, r.ActualTurn));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouLuXun = r with { Kind = kind, Paid = true, Stage = MouLuXunStage.UseChoice } });
-            if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) || MouLuXunUseOptions(f).Count == 0)
+            if (!CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) || MouLuXunUseOptions(f).Count == 0)
             {
                 FinishMouLuXun(f);
                 return;
@@ -210,5 +207,5 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouLuXunHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginMouLuXun(f, operation);
+    SkillProgramStepOutcome IMouLuXunHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginMouLuXun(f, operation);
 }

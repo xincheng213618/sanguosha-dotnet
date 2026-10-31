@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaYiHappyGodRuntime
 {
     internal const string HappySimaRenjie = "happy:renjie", HappySimaJilue = "happy:jilue", HappySimaWansha = "happy:jilue-wansha";
-    internal static CardConversionSource HappySimaSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource HappySimaSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool AllowsHappySimaPeach(int actor) => actor == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat], HappySimaWansha);
     internal int HappySimaDiscardCount(int owner, ProgramSkillWindowContext? context)
     {
@@ -29,7 +25,7 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 41840, SkillProgramEffectOp.OfferHappySimaJilueFirstDraw)]
     internal bool AllowsHappySimaActivation(ProgramActivationLegalityContext g) => g.SkillId != HappySimaJilue || !_coreNationalSkillsOperations.HasRuntimeSkill(g.Owner, HappySimaWansha);
-    SkillProgramStepOutcome global::CardGame.Core.IHappySimaYiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.GainHappySimaRenjie ? GainHappySimaRen(f) : BeginHappySimaFirstDraw(f);
+    SkillProgramStepOutcome IHappySimaYiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.GainHappySimaRenjie ? GainHappySimaRen(f) : BeginHappySimaFirstDraw(f);
     internal SkillProgramStepOutcome GainHappySimaRen(ProgramSkillFrame f)
     {
         if (f.SkillId != HappySimaRenjie || f.InstructionIndex != 1 || f.WindowContext is not { } context)
@@ -66,7 +62,7 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
     {
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var start = Array.FindIndex(history, e => e is ProgramSkillStartedEvent a && a.FrameId == f.Id && a.SkillId == f.SkillId && a.OwnerSeat == f.OwnerSeat && a.ActivationId == f.ActivationId || e is ProgramBindingStartedEvent t && t.FrameId == f.Id && t.SkillId == f.SkillId && t.OwnerSeat == f.OwnerSeat && t.BindingId == f.TriggerId && t.SkillInstanceId == f.SkillInstanceId);
-        return start < 0 ? null : history.Take(start).OfType<PlayerMarkerChangedEvent>().LastOrDefault(e => e.PlayerSeat == f.OwnerSeat && e.Marker == PlayerMarkerKind.Ren && e.Delta == -1 && e.Reason == $"skill-program.{(f.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.cost");
+        return start < 0 ? null : history.Take(start).OfType<PlayerMarkerChangedEvent>().LastOrDefault(e => e.PlayerSeat == f.OwnerSeat && e.Marker == PlayerMarkerKind.Ren && e.Delta == -1 && e.Reason == $"skill-program.{(f.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.cost");
     }
 
     internal SkillProgramStepOutcome BeginHappySimaFirstDraw(ProgramSkillFrame supplied)
@@ -107,7 +103,7 @@ internal sealed partial class CharacterSimaYiHappyGodRuntime
     [ProgramAnswer("happy-sima-first-draw")]
     internal void AnswerHappySimaFirstDraw(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappySimaYi: { Stage: HappySimaYiStage.Choice } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HappySimaFirstChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappySimaYi: { Stage: HappySimaYiStage.Choice } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HappySimaFirstChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Happy Jilue requires the exact original first-use choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var take = choice.Parameters["mode"] == "draw";

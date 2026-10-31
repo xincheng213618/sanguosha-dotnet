@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangJiMouRuntime
@@ -68,48 +64,48 @@ internal sealed partial class CharacterJiangJiMouRuntime
     }
 
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedBeforeActivity, 36300)]
-    internal bool MouJjFinalized(ProgramTargetCardWindowQuery q) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouJiangJiYingshi) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(q.Kind);
+    internal bool MouJjFinalized(ProgramTargetCardWindowQuery q) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouJiangJiYingshi) && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(q.Kind);
     [ProgramTargetWindow(ProgramTargetWindowStage.ImplicitSelfDrawTwo, 36300)]
     [ProgramTargetWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, 36300)]
     internal bool MouJjImplicit(ProgramTargetCardWindowQuery q) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouJiangJiYingshi);
-    int global::CardGame.Core.IMouJiangJiFacts.Turn => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber;
+    int IMouJiangJiFacts.Turn => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber;
 
-    int global::CardGame.Core.IMouJiangJiFacts.TurnOwner => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
+    int IMouJiangJiFacts.TurnOwner => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
 
-    long global::CardGame.Core.IMouJiangJiFacts.PhaseId => _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId;
+    long IMouJiangJiFacts.PhaseId => _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId;
 
-    long global::CardGame.Core.IMouJiangJiFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+    long IMouJiangJiFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
-    bool global::CardGame.Core.IMouJiangJiFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouJiangJiFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    bool global::CardGame.Core.IMouJiangJiFacts.Alive(int s) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive;
-    bool global::CardGame.Core.IMouJiangJiFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
-    string global::CardGame.Core.IMouJiangJiFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
-    bool global::CardGame.Core.IMouJiangJiFacts.ActualPlay(int s) => ((global::CardGame.Core.IMouJiangJiFacts)this).Alive(s) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == s && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && ((global::CardGame.Core.IMouJiangJiFacts)this).PhaseId > 0;
-    int global::CardGame.Core.IMouJiangJiFacts.EquipmentCount(int s) => ((global::CardGame.Core.IMouJiangJiFacts)this).Alive(s) ? _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[s]).Count : 0;
-    SkillProgram? global::CardGame.Core.IMouJiangJiFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
-    IEnumerable<T> global::CardGame.Core.IMouJiangJiFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    IReadOnlyList<int> global::CardGame.Core.IMouJiangJiFacts.ShijuOwners(int actor) => !((global::CardGame.Core.IMouJiangJiFacts)this).ActualPlay(actor) || ((global::CardGame.Core.IMouJiangJiFacts)this).Cards(actor, false).Count == 0 ? [] : Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreSkillProgramsOperations.EnabledSkillPrograms(p).Any(s => s.Id == MouJiangJiRuntime.Shiju)).Select(p => p.Seat).ToArray());
-    IReadOnlyList<MouJiangJiCard> global::CardGame.Core.IMouJiangJiFacts.Cards(int seat, bool discard) => !((global::CardGame.Core.IMouJiangJiFacts)this).Alive(seat) ? [] : Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, seat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, new(z, seat), discard ? OwnedCardMoveIntent.Discard : OwnedCardMoveIntent.Transfer) && (!discard || !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, new(z, seat), OwnedCardMoveIntent.Discard))).Select(c => new MouJiangJiCard(c.Id, new(z, seat), c.Kind, c.DisplayName))).ToArray());
-    bool global::CardGame.Core.IMouJiangJiFacts.Disabled(int seat, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(seat, MouJiangJiRuntime.Yingshi, instance, "disabled");
-    bool global::CardGame.Core.IMouJiangJiFacts.Parent(ProgramSkillFrame f)
+    bool IMouJiangJiFacts.Alive(int s) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive;
+    bool IMouJiangJiFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
+    string IMouJiangJiFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
+    bool IMouJiangJiFacts.ActualPlay(int s) => ((IMouJiangJiFacts)this).Alive(s) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == s && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && ((IMouJiangJiFacts)this).PhaseId > 0;
+    int IMouJiangJiFacts.EquipmentCount(int s) => ((IMouJiangJiFacts)this).Alive(s) ? _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[s]).Count : 0;
+    SkillProgram? IMouJiangJiFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
+    IEnumerable<T> IMouJiangJiFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IReadOnlyList<int> IMouJiangJiFacts.ShijuOwners(int actor) => !((IMouJiangJiFacts)this).ActualPlay(actor) || ((IMouJiangJiFacts)this).Cards(actor, false).Count == 0 ? [] : Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreSkillProgramsOperations.EnabledSkillPrograms(p).Any(s => s.Id == MouJiangJiRuntime.Shiju)).Select(p => p.Seat).ToArray());
+    IReadOnlyList<MouJiangJiCard> IMouJiangJiFacts.Cards(int seat, bool discard) => !((IMouJiangJiFacts)this).Alive(seat) ? [] : Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, seat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, new(z, seat), discard ? OwnedCardMoveIntent.Discard : OwnedCardMoveIntent.Transfer) && (!discard || !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, new(z, seat), OwnedCardMoveIntent.Discard))).Select(c => new MouJiangJiCard(c.Id, new(z, seat), c.Kind, c.DisplayName))).ToArray());
+    bool IMouJiangJiFacts.Disabled(int seat, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(seat, MouJiangJiRuntime.Yingshi, instance, "disabled");
+    bool IMouJiangJiFacts.Parent(ProgramSkillFrame f)
     {
         if (f.SkillId == MouJiangJiRuntime.Shiju)
         {
-            if (f.TriggerId is not null || f.ActivationId != "give-and-use" || f.WindowContext is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || ((global::CardGame.Core.IMouJiangJiFacts)this).History<ProgramSkillStartedEvent>().Count(p => p.FrameId == f.Id && p.OwnerSeat == f.OwnerSeat && p.SkillId == f.SkillId && p.ActivationId == f.ActivationId) != 1)
+            if (f.TriggerId is not null || f.ActivationId != "give-and-use" || f.WindowContext is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || ((IMouJiangJiFacts)this).History<ProgramSkillStartedEvent>().Count(p => p.FrameId == f.Id && p.OwnerSeat == f.OwnerSeat && p.SkillId == f.SkillId && p.ActivationId == f.ActivationId) != 1)
                 return false;
-            return f.ActivatingSeat is not { } actor ? f.ActivationPhase is null : f.ActivationPhase is { } phase && ((global::CardGame.Core.IMouJiangJiFacts)this).History<ProgramSharedActivationStartedEvent>().Count(p => p.FrameId == f.Id && p.ActorSeat == actor && p.Source == MouJiangJiRuntime.Source(f) && p.Phase == phase) == 1;
+            return f.ActivatingSeat is not { } actor ? f.ActivationPhase is null : f.ActivationPhase is { } phase && ((IMouJiangJiFacts)this).History<ProgramSharedActivationStartedEvent>().Count(p => p.FrameId == f.Id && p.ActorSeat == actor && p.Source == MouJiangJiRuntime.Source(f) && p.Phase == phase) == 1;
         }
 
         if (f.TriggerId != "ordinary-trick-target" || f.WindowContext is not { } w || f.ActivationId != f.TriggerId)
             return false;
         var at = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        return at > 0 && _resolutionStackOperations._resolutionStack[at - 1].Id == w.ParentFrameId && ((global::CardGame.Core.IMouJiangJiFacts)this).Use(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0, w.OccurrenceIndex), w)is not null;
+        return at > 0 && _resolutionStackOperations._resolutionStack[at - 1].Id == w.ParentFrameId && ((IMouJiangJiFacts)this).Use(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0, w.OccurrenceIndex), w)is not null;
     }
 
-    MouJiangJiUse? global::CardGame.Core.IMouJiangJiFacts.Use(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
+    MouJiangJiUse? IMouJiangJiFacts.Use(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
     {
-        if (c.SkillId != MouJiangJiRuntime.Yingshi || w.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || w.OwnerSeat != c.OwnerSeat || w.CardUse is not { } card || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame window || window.ParentFrameId != card.ParentCardUseFrameId || window.CompletedResponseReturn is not null || window.Continuation != ProgramCardContinuation.FinalizedTrick || window.TrickContinuation is null || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } use || a.ActorSeat != c.OwnerSeat || a.ActionId != card.CardActionId || window.Action.ActionId != a.ActionId || use.SourceSeat != c.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
+        if (c.SkillId != MouJiangJiRuntime.Yingshi || w.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || w.OwnerSeat != c.OwnerSeat || w.CardUse is not { } card || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame window || window.ParentFrameId != card.ParentCardUseFrameId || window.CompletedResponseReturn is not null || window.Continuation != ProgramCardContinuation.FinalizedTrick || window.TrickContinuation is null || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } use || a.ActorSeat != c.OwnerSeat || a.ActionId != card.CardActionId || window.Action.ActionId != a.ActionId || use.SourceSeat != c.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return null;
         var now = window.Candidates[window.CandidateIndex];
         if (now.OwnerSeat != c.OwnerSeat || now.SkillId != c.SkillId || now.TriggerId != c.BindingId || now.SkillInstanceId != c.SkillInstanceId || now.GameplayHash != c.GameplayHash)
@@ -121,12 +117,12 @@ internal sealed partial class CharacterJiangJiMouRuntime
         };
     }
 
-    IReadOnlyList<LegalAction> global::CardGame.Core.IMouJiangJiFacts.UseOptions(ProgramSkillFrame f) => MouJjUseOptions(f);
-    CardKind global::CardGame.Core.IMouJiangJiFacts.UseKind(int actor, LegalAction action) => action.PlayedCardKind ?? _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[actor], _corePlayCardHistoryOperations.ApplyProgramUseAppearance(_coreMatchParticipantsPlayersAccess._players[actor], _coreAdvancedLifecycleOperations.GetAdvancedCard(action.CardId!.Value), action.ConversionSource));
-    void global::CardGame.Core.IMouJiangJiNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
-    void global::CardGame.Core.IMouJiangJiNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
-    bool global::CardGame.Core.IMouJiangJiNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    void global::CardGame.Core.IMouJiangJiNative.Give(ProgramSkillFrame f)
+    IReadOnlyList<LegalAction> IMouJiangJiFacts.UseOptions(ProgramSkillFrame f) => MouJjUseOptions(f);
+    CardKind IMouJiangJiFacts.UseKind(int actor, LegalAction action) => action.PlayedCardKind ?? _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[actor], _corePlayCardHistoryOperations.ApplyProgramUseAppearance(_coreMatchParticipantsPlayersAccess._players[actor], _coreAdvancedLifecycleOperations.GetAdvancedCard(action.CardId!.Value), action.ConversionSource));
+    void IMouJiangJiNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+    void IMouJiangJiNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    bool IMouJiangJiNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
+    void IMouJiangJiNative.Give(ProgramSkillFrame f)
     {
         if (!MouJiangJi.Valid(f) || f.MouJiangJi is not { Stage: MouJiangJiStage.GiveChildren, Card: { } card } r || _cardZonesOperations._cardZones.GetLocation(card.Id) != card.From)
             throw new InvalidOperationException("Shiju requires its own committed actual HE entity.");
@@ -150,9 +146,9 @@ internal sealed partial class CharacterJiangJiMouRuntime
         });
     }
 
-    void global::CardGame.Core.IMouJiangJiNative.Use(ProgramSkillFrame f) => IssueMouJjUse(f);
-    void global::CardGame.Core.IMouJiangJiNative.Repeat(ProgramSkillFrame f) => IssueMouJjRepeat(f);
-    void global::CardGame.Core.IMouJiangJiNative.Discard(ProgramSkillFrame f)
+    void IMouJiangJiNative.Use(ProgramSkillFrame f) => IssueMouJjUse(f);
+    void IMouJiangJiNative.Repeat(ProgramSkillFrame f) => IssueMouJjRepeat(f);
+    void IMouJiangJiNative.Discard(ProgramSkillFrame f)
     {
         if (!MouJiangJi.Valid(f) || f.MouJiangJi is not { Stage: MouJiangJiStage.DiscardChildren } r || r.Selected.Any(id => !_characterJiangJiMouOperations.CreateMouJiangJiFacts().Cards(r.Target, true).Any(c => c.Id == id)))
             throw new InvalidOperationException("Yingshi requires its actual target's selected payable HE.");
@@ -168,7 +164,7 @@ internal sealed partial class CharacterJiangJiMouRuntime
         });
     }
 
-    void global::CardGame.Core.IMouJiangJiNative.Disable(ProgramSkillFrame f)
+    void IMouJiangJiNative.Disable(ProgramSkillFrame f)
     {
         if (!MouJiangJi.Valid(f) || f.MouJiangJi is not { Stage: MouJiangJiStage.DiscardChildren } r)
             throw new InvalidOperationException("Yingshi cannot disable before its issued discard branch returns.");
@@ -177,9 +173,9 @@ internal sealed partial class CharacterJiangJiMouRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 36300)]
-    internal bool MouJjDamage(global::CardGame.Core.GameEngine.IDamageAttempt a, long id)
+    internal bool MouJjDamage(GameEngine.IDamageAttempt a, long id)
     {
-        if (!a.DamageWasApplied || a is not global::CardGame.Core.NativeOwners.CardAttackHandle || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == id)is not DamageFrame { Amount: > 0 })
+        if (!a.DamageWasApplied || a is not NativeOwners.CardAttackHandle || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == id)is not DamageFrame { Amount: > 0 })
             return false;
         foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.MouJiangJi is { Stage: MouJiangJiStage.NativeUse, Native: { } n } && n.UseId == a.ResolutionId).ToArray())
             MouJiangJi.Damage(f);

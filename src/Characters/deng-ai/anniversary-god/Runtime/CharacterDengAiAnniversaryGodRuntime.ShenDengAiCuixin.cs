@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiAnniversaryGodRuntime
 {
     internal CardUseFrame? ShenDaCuixinOriginal(ProgramSkillWindowContext w, int owner, string skillId) => w.CardUse is { } c && w.Window == SkillProgramTriggerWindow.CardUseCompleted && _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } a } use && use.ShenDengAiCuixin is null && a.ActionId == c.CardActionId && a.ActorSeat == owner && (skillId == "happy:cuixin" || skillId == ShenDaCuixin && a.ProviderSeat == owner && a.PhysicalCards.Count > 0 && a.PhysicalCards.All(p => p.From == CardLocation.Hand(owner))) ? use : null;
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ShenDaRepeatPlan> ShenDaRepeatPlans(int owner, CardKind kind, IReadOnlyList<int> originalTargets)
+    internal IReadOnlyList<GameEngine.ShenDaRepeatPlan> ShenDaRepeatPlans(int owner, CardKind kind, IReadOnlyList<int> originalTargets)
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[owner];
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.IsCardUseForbidden(owner, kind, CardActionType.Use) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(owner, kind, [])))
@@ -24,15 +20,15 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
                 targets.Add(p);
         }
 
-        var result = new List<global::CardGame.Core.GameEngine.ShenDaRepeatPlan>();
+        var result = new List<GameEngine.ShenDaRepeatPlan>();
         foreach (var target in targets.Distinct())
         {
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             {
                 if (_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: [], countsTowardLimit: false) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, target, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None))
                     result.Add(new("slash:" + target, kind, LegalActionKind.Slash, [target], "摧心：视为对“" + _coreMatchParticipantsPlayersAccess._players[target].Name + "”使用【" + CardCatalog.Get(kind).DisplayName + "】"));
             }
-            else if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+            else if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
             {
                 foreach (var option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: []))
                 {
@@ -49,11 +45,11 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
                     result.Add(new("trick:" + target + ":" + option.Id.Value, kind, option.ActionKind, seats, "摧心：视为对“" + _coreMatchParticipantsPlayersAccess._players[target].Name + "”使用【" + CardCatalog.Get(kind).DisplayName + "】", option.TargetCardId, option.RequiredCardKind));
                 }
             }
-            else if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(kind) && kind != CardKind.Lightning)
+            else if (CoreNativeCardClassificationsRuntime.IsDelayedCard(kind) && kind != CardKind.Lightning)
             {
                 var t = _coreMatchParticipantsPlayersAccess._players[target];
                 if (!t.JudgmentAreaAbolished && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(t, kind) && !_coreProgramCardPoliciesOperations.HasCardPolicy(t, SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget) && (kind != CardKind.SupplyShortage || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.IgnoreUseDistance, kind) || _coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(actor, t, kind) || _coreNativeRuleQueriesOperations.GetCombatDistance(owner, target) <= _coreRuleQueriesOperations.GetCardUseDistanceLimit(actor, kind)) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, target, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, kind, Suit.None) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(owner, target, kind) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner, target, Suit.None))
-                    result.Add(new("delayed:" + target, kind, global::CardGame.Core.EngineOwners.CoreGameEngineDelayedPlacementTargetProgramsRuntime.DelayedPlacementActionKind(kind), [target], "摧心：视为对“" + t.Name + "”使用【" + CardCatalog.Get(kind).DisplayName + "】"));
+                    result.Add(new("delayed:" + target, kind, CoreGameEngineDelayedPlacementTargetProgramsRuntime.DelayedPlacementActionKind(kind), [target], "摧心：视为对“" + t.Name + "”使用【" + CardCatalog.Get(kind).DisplayName + "】"));
             }
         }
 
@@ -79,7 +75,7 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShenDengAi = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenDengAiCursorSuspendedEvent(f.Id, original.Id, r.OriginalActionId));
         Card card;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(p.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsDelayedCard(p.Kind))
         {
             var generated = checked(_coreTrustedCardZoneDiagnosticsOperations.CreateCardZoneDiagnostics().Select(c => c.CardId).DefaultIfEmpty(0).Max() + 1);
             card = new(generated, p.Kind, Suit.None, 0);
@@ -95,7 +91,7 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
             throw new InvalidOperationException("Cuixin must sign its genuine native Use before effects.");
         if (card.Id > 0)
             _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.OutsideGame, CardLocation.Processing, new("skill-program.shen-deng-ai.cuixin.carrier"));
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
         {
             var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
             var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
@@ -119,7 +115,7 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenDengAi: { Stage: ShenDengAiStage.NativeUse, UseId: 0 } r } f)
             return a;
-        if (!global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaCuixin(f.SkillId) || a.ActorSeat != f.OwnerSeat || a.ProviderSeat != f.OwnerSeat || a.PhysicalCards.Count != 0 || a.ConversionChain.Count != 0 || a.EffectiveKind != r.OutputKind)
+        if (!CharacterDengAiHappyGodRuntime.IsShenDaCuixin(f.SkillId) || a.ActorSeat != f.OwnerSeat || a.ProviderSeat != f.OwnerSeat || a.PhysicalCards.Count != 0 || a.ConversionChain.Count != 0 || a.EffectiveKind != r.OutputKind)
             throw new InvalidOperationException("Cuixin cannot normalize another producer's action.");
         return _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(a.ActionId, a.ParentActionId, a.Type, a.ActorSeat, a.ProviderSeat, a.RequesterSeat, a.ResponderSeat, a.OpponentSeat, a.EffectiveKind, a.TargetSeats, a.PhysicalCards, a.ConversionChain, a.DesignatedTargetSeats, effectiveSuit: Suit.None, effectiveRank: 0, effectiveIsRed: null));
     }
@@ -140,15 +136,15 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenDengAiNativeIssuedEvent(origin));
     }
 
-    internal bool IsShenDaCuixinUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ShenDengAiCuixin: { } o, Action: { } a } use && id == o.UseId && a.ActionId == o.ActionId && use.CardKind == o.Kind && use.CardId == o.CarrierId && use.PhysicalCardIds is { Count: 0 } && a.Type == CardActionType.Use && a.EffectiveKind == o.Kind && a.PhysicalCards.Count == 0 && a.ConversionChain.Count == 0 && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.ProviderSeat == o.ActorSeat && a.RequesterSeat is null && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is ProgramSkillFrame { ShenDengAi: { Stage: ShenDengAiStage.NativeUse } r } f && r.UseId == id && r.ActionId == a.ActionId && r.Source == o.Source && r.GameplayHash == o.GameplayHash && global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaCuixin(f.SkillId) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
-    internal bool IsShenDaCuixinTrick(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.CardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && IsShenDaCuixinUse(id);
+    internal bool IsShenDaCuixinUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ShenDengAiCuixin: { } o, Action: { } a } use && id == o.UseId && a.ActionId == o.ActionId && use.CardKind == o.Kind && use.CardId == o.CarrierId && use.PhysicalCardIds is { Count: 0 } && a.Type == CardActionType.Use && a.EffectiveKind == o.Kind && a.PhysicalCards.Count == 0 && a.ConversionChain.Count == 0 && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.ProviderSeat == o.ActorSeat && a.RequesterSeat is null && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is ProgramSkillFrame { ShenDengAi: { Stage: ShenDengAiStage.NativeUse } r } f && r.UseId == id && r.ActionId == a.ActionId && r.Source == o.Source && r.GameplayHash == o.GameplayHash && CharacterDengAiHappyGodRuntime.IsShenDaCuixin(f.SkillId) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
+    internal bool IsShenDaCuixinTrick(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.CardKind is { } kind && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && IsShenDaCuixinUse(id);
     internal Card ReadShenDaCuixinAppearance(long id, CardAppearanceReference a) => IsShenDaCuixinUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } u && a.Id == u.CardId && a.Kind == u.CardKind && a.Suit == Suit.None && a.Rank == 0 ? new(a.Id, a.Kind, Suit.None, 0) : throw new InvalidOperationException("Cuixin lost its exact native continuation appearance.");
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 38500)]
-    internal bool FinishShenDaCuixinAttack(global::CardGame.Core.NativeOwners.CardAttackHandle a, out bool paused)
+    internal bool FinishShenDaCuixinAttack(NativeOwners.CardAttackHandle a, out bool paused)
     {
         paused = false;
-        if (a.Card is not null || !IsShenDaCuixinUse(a.ResolutionId) || _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.CardKind is not (CardKind.Duel or CardKind.FireAttack or CardKind.UnexpectedAssault))
+        if (a.Card is not null || !IsShenDaCuixinUse(a.ResolutionId) || _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.CardKind is not (CardKind.Duel or CardKind.FireAttack or CardKind.UnexpectedAssault))
             return false;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, use.CardId, use.CardKind));
@@ -186,7 +182,7 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 38500)]
-    internal bool ReturnShenDaCuixinAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnShenDaCuixinAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenDengAi: { Stage: ShenDengAiStage.NativeChildren } r } f || r.UseId != completion.ResolutionId)
             return false;

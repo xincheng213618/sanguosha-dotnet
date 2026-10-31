@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBaoSanNiangOlRuntime
@@ -19,18 +15,18 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
             return false;
         if (r.Operation == SkillProgramEffectOp.TakeConvertedSlashTargetAndResetLimitedSkill)
         {
-            if (_resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame window || window.Id != c.ParentFrameId || c.Window != SkillProgramTriggerWindow.CardUseCompleted || window.ParentFrameId != r.OriginalUseId || window.Action.ActionId != r.OriginalActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.OriginalUseId!.Value)is not { Step: ResolutionFrameStep.Completed } use || !_coreNonBasicSlashProfileOperations.HasIssuedNonBasicSlashDistance(use.Id) || !use.TargetSeats.SequenceEqual(r.Targets))
+            if (_resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame window || window.Id != c.ParentFrameId || c.Window != SkillProgramTriggerWindow.CardUseCompleted || window.ParentFrameId != r.OriginalUseId || window.Action.ActionId != r.OriginalActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.OriginalUseId!.Value)is not { Step: ResolutionFrameStep.Completed } use || !_coreNonBasicSlashProfileOperations.HasIssuedNonBasicSlashDistance(use.Id) || !use.TargetSeats.SequenceEqual(r.Targets))
                 return false;
             if (r.GainedCardId is { } gained)
             {
-                if (r.GainedFrom is not { } from || from.OwnerSeat != r.Recipient || r.GainedCardKind is null || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && m.CardId == gained && m.CardKind == r.GainedCardKind && m.From == from && m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoGainReason && (m.To == CardLocation.Hand(f.OwnerSeat) || m.To == CardLocation.OutsideGame)) != 1 || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBao2025MovementIssuedEvent>().Any(x => x.FrameId == f.Id && x.Receipt.GainedCardId == gained && x.Receipt.MovementBefore == r.MovementBefore && x.Receipt.MovementAfter == r.MovementAfter))
+                if (r.GainedFrom is not { } from || from.OwnerSeat != r.Recipient || r.GainedCardKind is null || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && m.CardId == gained && m.CardKind == r.GainedCardKind && m.From == from && m.Reason == CharacterBaoSanNiangOlDefinitions.BaoGainReason && (m.To == CardLocation.Hand(f.OwnerSeat) || m.To == CardLocation.OutsideGame)) != 1 || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBao2025MovementIssuedEvent>().Any(x => x.FrameId == f.Id && x.Receipt.GainedCardId == gained && x.Receipt.MovementBefore == r.MovementBefore && x.Receipt.MovementAfter == r.MovementAfter))
                     return false;
             }
 
             return r.Stage is ProgramBao2025Stage.TakeTarget or ProgramBao2025Stage.TakeCard or ProgramBao2025Stage.GainChildren or ProgramBao2025Stage.ResetChoice or ProgramBao2025Stage.ResetHpChildren;
         }
 
-        if (_resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame lifecycle || lifecycle.Id != c.ParentFrameId || lifecycle.Window != c.Window || lifecycle.CandidateIndex < 0 || lifecycle.CandidateIndex >= lifecycle.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, lifecycle.Candidates[lifecycle.CandidateIndex]))
+        if (_resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame lifecycle || lifecycle.Id != c.ParentFrameId || lifecycle.Window != c.Window || lifecycle.CandidateIndex < 0 || lifecycle.CandidateIndex >= lifecycle.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, lifecycle.Candidates[lifecycle.CandidateIndex]))
             return false;
         if (r.Operation == SkillProgramEffectOp.PayTwoForChosenAssaultAndApplyTargetOutcomes)
         {
@@ -39,7 +35,7 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
             var paid = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBao2025MovementIssuedEvent>().Where(x => x.FrameId == f.Id).ToArray();
             if (r.Stage is ProgramBao2025Stage.AssaultCost or ProgramBao2025Stage.AssaultTargets)
                 return paid.Length == 0;
-            if (paid is not [var payment] || payment.Receipt.Cards.Count != 2 || !payment.Receipt.Cards.SequenceEqual(r.Cards) || !payment.Receipt.From.SequenceEqual(r.From) || payment.Receipt.MovementAfter < payment.Receipt.MovementBefore || r.Cards.Select((id, i) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.From == r.From[i] && m.To == CardLocation.DiscardPile && m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoCostReason && m.Sequence > payment.Receipt.MovementBefore && m.Sequence <= payment.Receipt.MovementAfter) != 1).Any(v => v))
+            if (paid is not [var payment] || payment.Receipt.Cards.Count != 2 || !payment.Receipt.Cards.SequenceEqual(r.Cards) || !payment.Receipt.From.SequenceEqual(r.From) || payment.Receipt.MovementAfter < payment.Receipt.MovementBefore || r.Cards.Select((id, i) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.From == r.From[i] && m.To == CardLocation.DiscardPile && m.Reason == CharacterBaoSanNiangOlDefinitions.BaoCostReason && m.Sequence > payment.Receipt.MovementBefore && m.Sequence <= payment.Receipt.MovementAfter) != 1).Any(v => v))
                 return false;
             if (r.AssaultUseId is { } useId)
             {
@@ -91,7 +87,7 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
         if (child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged)
             return skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && (m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoGainReason || m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoCostReason || m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoOutcomeReason));
+            return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && (m.Reason == CharacterBaoSanNiangOlDefinitions.BaoGainReason || m.Reason == CharacterBaoSanNiangOlDefinitions.BaoCostReason || m.Reason == CharacterBaoSanNiangOlDefinitions.BaoOutcomeReason));
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == root.Id && hp.ResumeFrameId == root.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && (r.Stage == ProgramBao2025Stage.ResetHpChildren && hp.Change.Kind == HpChangeKind.Loss && hp.Change.TargetSeat == root.OwnerSeat && hp.Change.Amount == 1 || r.Stage == ProgramBao2025Stage.DyingRecoveryChildren && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.TargetSeat == root.OwnerSeat || hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1 && HasBaoSilverLionPayment(root, hp.Change.TargetSeat));
         if (child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root))
@@ -101,7 +97,7 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame state && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && state.ResumeProgramFrameId == root.Id && state.CharacterStateContinuation == CharacterStateContinuation.Program && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == root.Id);
     }
 
-    internal bool HasBaoSilverLionPayment(ProgramSkillFrame f, int seat) => f.Bao2025 is { } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && m.From == CardLocation.Equipment(seat) && m.CardKind == CardKind.SilverLion && (m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoGainReason || m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoCostReason || m.Reason == global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoOutcomeReason));
+    internal bool HasBaoSilverLionPayment(ProgramSkillFrame f, int seat) => f.Bao2025 is { } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter && m.From == CardLocation.Equipment(seat) && m.CardKind == CardKind.SilverLion && (m.Reason == CharacterBaoSanNiangOlDefinitions.BaoGainReason || m.Reason == CharacterBaoSanNiangOlDefinitions.BaoCostReason || m.Reason == CharacterBaoSanNiangOlDefinitions.BaoOutcomeReason));
     internal ProgramSkillFrame? BaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.BaoFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 450)]
     internal bool TryAdvanceBaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
@@ -115,20 +111,20 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
             return decision.Choices.Single(c => c.Parameters["branch"] == "grant");
         if (r.Stage == ProgramBao2025Stage.AssaultTargets)
         {
-            var enemy = decision.Choices.FirstOrDefault(c => c.Parameters["branch"].StartsWith("add-", StringComparison.Ordinal) && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]));
+            var enemy = decision.Choices.FirstOrDefault(c => c.Parameters["branch"].StartsWith("add-", StringComparison.Ordinal) && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]));
             return enemy ?? decision.Choices.Single(c => c.Parameters["branch"] == "confirm");
         }
 
         if (r.Stage == ProgramBao2025Stage.AssaultCost)
-            return decision.Choices.Where(c => c.Cards.Count == 2).OrderBy(c => c.Cards.Sum(id => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))).First();
+            return decision.Choices.Where(c => c.Cards.Count == 2).OrderBy(c => c.Cards.Sum(id => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))).First();
         if (r.Stage is ProgramBao2025Stage.TakeTarget or ProgramBao2025Stage.DyingTarget)
-            return decision.Choices.FirstOrDefault(c => c.Targets.Count == 1 && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]) == (r.Stage == ProgramBao2025Stage.DyingTarget)) ?? decision.Choices.First(c => c.Targets.Count == 1);
+            return decision.Choices.FirstOrDefault(c => c.Targets.Count == 1 && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]) == (r.Stage == ProgramBao2025Stage.DyingTarget)) ?? decision.Choices.First(c => c.Targets.Count == 1);
         return decision.Choices.First();
     }
 
     internal bool BaoHasSpentFriendlyResetSkill(ProgramSkillFrame f)
     {
         var resetId = _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects.Single().SourceBind!;
-        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && (p.Seat == f.OwnerSeat || global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], p))).Any(p => _coreNationalSkillsOperations.GetSkillBindingShard(p).ProgramInstances.Where(i => i.SkillId == resetId).Any(i => i.Program.Triggers.Any(t => t.UsageScope == SkillUsageScope.Game && t.UsageLimit == 1 && t.Effects is [{ Op: SkillProgramEffectOp.PayTwoForChosenAssaultAndApplyTargetOutcomes }] && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(p.Seat, resetId, _coreProgramLifecycleOperations.ProgramTriggerUsageId(new(p.Seat, resetId, t.Id, i.SkillInstanceId, i.Program.GameplayHash, t.Priority)), SkillUsageScope.Game) > 0)));
+        return _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && (p.Seat == f.OwnerSeat || CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], p))).Any(p => _coreNationalSkillsOperations.GetSkillBindingShard(p).ProgramInstances.Where(i => i.SkillId == resetId).Any(i => i.Program.Triggers.Any(t => t.UsageScope == SkillUsageScope.Game && t.UsageLimit == 1 && t.Effects is [{ Op: SkillProgramEffectOp.PayTwoForChosenAssaultAndApplyTargetOutcomes }] && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(p.Seat, resetId, _coreProgramLifecycleOperations.ProgramTriggerUsageId(new(p.Seat, resetId, t.Id, i.SkillInstanceId, i.Program.GameplayHash, t.Priority)), SkillUsageScope.Game) > 0)));
     }
 }

@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePhaseGiftBasicEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePhaseGiftBasicRuntime> _resolve;
-    private CoreGameEnginePhaseGiftBasicEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePhaseGiftBasicRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEnginePhaseGiftBasicRuntime> _resolve;
+    private CoreGameEnginePhaseGiftBasicEntries(Func<EngineOwners.CoreGameEnginePhaseGiftBasicRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEnginePhaseGiftBasicEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePhaseGiftBasicRuntime> resolve) => new(resolve);
+    internal static CoreGameEnginePhaseGiftBasicEntries Create(Func<EngineOwners.CoreGameEnginePhaseGiftBasicRuntime> resolve) => new(resolve);
 }

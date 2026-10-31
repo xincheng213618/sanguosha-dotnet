@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanXiangAnniversaryRuntime
@@ -24,7 +20,7 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
             if (name == CardKind.Slash)
             {
                 var actions = new List<LegalAction>();
-                foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+                foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
                 {
                     if (YanXiangColorBanned(actor.Seat, YanXiangUseColor(actor.Seat, kind, [card.Id], [r.Source])))
                         continue;
@@ -58,7 +54,7 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
         var id = _coreNativeCardUseOperations.BeginCardUse(card, r.Actor, p.Targets, p.Kind, physicalCardIds: [card.Id], conversionSource: r.Source);
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)?.AnniversaryYanXiangUse is null)
             throw new InvalidOperationException("Suishi must bind its original actual native Use before paying its material.");
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
         {
             _coreNativeMaterialSlashOperations.CompleteNativeMaterialSlash(id, actor, [card], p.Kind, _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats, r.Source, _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[p.Targets[0]], p.Kind));
             return;

@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiRuBoundaryMobileRuntime
 {
     internal const string BoundaryLiRuGiftReason = "skill.boundary-li-ru.mieji.give", BoundaryLiRuDiscardReason = "skill.boundary-li-ru.mieji.discard";
-    IReadOnlyList<int> global::CardGame.Core.IBoundaryLiRuQueries.LostCardTargets(int owner) => BoundaryLiRuLostCardTargets(owner);
-    bool global::CardGame.Core.IBoundaryLiRuQueries.HasHeCards(int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment2(target).Count > 0;
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryLiRuHost.ResolveMieji(ProgramSkillFrame frame) => ResolveBoundaryLiRuMieji(frame);
+    IReadOnlyList<int> IBoundaryLiRuQueries.LostCardTargets(int owner) => BoundaryLiRuLostCardTargets(owner);
+    bool IBoundaryLiRuQueries.HasHeCards(int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment2(target).Count > 0;
+    SkillProgramStepOutcome IBoundaryLiRuHost.ResolveMieji(ProgramSkillFrame frame) => ResolveBoundaryLiRuMieji(frame);
     internal IReadOnlyList<int> BoundaryLiRuLostCardTargets(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && _coreActualTurnProgressTurnNumberAccess._turnNumber > 0 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && m.From.OwnerSeat == p.Seat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.From != m.To)).Select(p => p.Seat).ToArray();
-    internal CardConversionSource BoundaryLiRuSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource BoundaryLiRuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal IEnumerable<(Card Card, CardLocation From)> BoundaryLiRuMiejiCards(int target, bool gift) => (gift ? new[]
     {
         CardZoneKind.Hand
@@ -24,7 +20,7 @@ internal sealed partial class CharacterLiRuBoundaryMobileRuntime
         CardZoneKind.Equipment
     }
 
-    ).SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, target)).Where(c => gift ? global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Trick : global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) != SkillProgramCardCategory.Trick && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(target, c, new(zone, target), OwnedCardMoveIntent.Discard)).Select(c => (c, new CardLocation(zone, target))));
+    ).SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, target)).Where(c => gift ? CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Trick : CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) != SkillProgramCardCategory.Trick && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(target, c, new(zone, target), OwnedCardMoveIntent.Discard)).Select(c => (c, new CardLocation(zone, target))));
     internal SkillProgramStepOutcome ResolveBoundaryLiRuMieji(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -213,5 +209,5 @@ internal sealed partial class CharacterLiRuBoundaryMobileRuntime
     internal bool KeepPaidBoundaryLiRuMieji(ProgramSkillFrame f) => f.BoundaryLiRuMieji is { Stage: BoundaryLiRuMiejiStage.Movement } && ValidBoundaryLiRuMieji(f);
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryLiRuMieji)]
-    internal PromptChoice AiBoundaryLiRuMieji(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "gift") ?? p.Choices.OrderBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(card => card.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).First();
+    internal PromptChoice AiBoundaryLiRuMieji(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "gift") ?? p.Choices.OrderBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(card => card.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).First();
 }

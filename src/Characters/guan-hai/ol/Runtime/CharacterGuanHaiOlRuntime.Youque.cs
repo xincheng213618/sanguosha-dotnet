@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanHaiOlRuntime
@@ -42,7 +38,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     }
 
-    internal static string YouqueResultBind(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guan_hai_ol_Youque.YouqueResultBind(f);
+    internal static string YouqueResultBind(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_guan_hai_ol_Youque.YouqueResultBind(f);
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveYouqueIssuedSlashDamageBenefit)]
     internal void ReturnYouqueDraw(ProgramSkillFrame f, NativeDrawOutcome o)
     {

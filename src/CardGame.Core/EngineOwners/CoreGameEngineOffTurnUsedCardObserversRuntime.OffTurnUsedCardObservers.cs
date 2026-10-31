@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
     {
         if (parent is ProgramSkillFrame program && child is ProgramLifecycleTriggerWindowFrame window)
             return window.Window == SkillProgramTriggerWindow.SkillsChanged && window.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && window.ResumeProgramFrameId == program.Id && _coreTableSeatQueriesOperations.IsValidPlayerSeat(window.OwnerSeat) && window.Candidates.Count > 0 && window.CandidateIndex >= 0 && window.CandidateIndex <= window.Candidates.Count && window.Candidates.All(c => c.OwnerSeat == window.OwnerSeat && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Window == SkillProgramTriggerWindow.SkillsChanged);
-        return parent is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex < skills.Candidates.Count && child is ProgramSkillFrame observer && observer.WindowContext is { Window: SkillProgramTriggerWindow.SkillsChanged } context && context.ParentFrameId == skills.Id && context.OwnerSeat == observer.OwnerSeat && context.SourceSeat == skills.OwnerSeat && context.TargetSeat == skills.OwnerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(observer, skills.Candidates[skills.CandidateIndex]) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == observer.Id && e.OwnerSeat == observer.OwnerSeat && e.SkillId == observer.SkillId && e.BindingId == observer.TriggerId && e.SkillInstanceId == observer.SkillInstanceId && e.Window == context.Window) == 1;
+        return parent is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex < skills.Candidates.Count && child is ProgramSkillFrame observer && observer.WindowContext is { Window: SkillProgramTriggerWindow.SkillsChanged } context && context.ParentFrameId == skills.Id && context.OwnerSeat == observer.OwnerSeat && context.SourceSeat == skills.OwnerSeat && context.TargetSeat == skills.OwnerSeat && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(observer, skills.Candidates[skills.CandidateIndex]) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == observer.Id && e.OwnerSeat == observer.OwnerSeat && e.SkillId == observer.SkillId && e.BindingId == observer.TriggerId && e.SkillInstanceId == observer.SkillInstanceId && e.Window == context.Window) == 1;
     }
 
     internal bool OffTurnUsedCardGiftStructuralEdge(ResolutionFrame parent, ResolutionFrame child)

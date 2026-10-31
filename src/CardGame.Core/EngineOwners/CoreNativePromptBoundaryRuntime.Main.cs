@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativePromptBoundaryRuntime
@@ -57,7 +53,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
     }
 
     internal PromptId CreatePromptId() => new(++_corePlayerDecisionNextPromptIdAccess._nextPromptId);
-    internal static IReadOnlyList<PromptChoice> CreatePlayChoices(IReadOnlyList<LegalAction> legalActions) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.CreatePlayChoices(legalActions);
+    internal static IReadOnlyList<PromptChoice> CreatePlayChoices(IReadOnlyList<LegalAction> legalActions) => RuntimeSkills.RuntimeRules_Core_CommonRules.CreatePlayChoices(legalActions);
     internal IReadOnlyList<PromptChoice> CreateResponseChoices(IReadOnlyList<Card> responseCards, CardKind requiredCardKind, CardKind? incomingCard = null, Func<Card, CardKind>? effectiveCardKindSelector = null, bool includeBagua = false, bool includeFactionDefense = false, bool includeFactionSlash = false, CharacterState? responder = null)
     {
         var responseName = CardCatalog.Get(requiredCardKind).DisplayName;
@@ -76,13 +72,13 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
             if (responder is not null && !_coreNativeResponseMaterialQueriesOperations.CanUseCardAsResponse(responder, card, requiredCardKind))
                 return Array.Empty<PromptChoice>();
             var effectiveCardKind = effectiveCardKindSelector?.Invoke(card) ?? requiredCardKind;
-            var cardDescription = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, requiredCardKind) ? $"打出【{(responseName)}】" : $"将【{(card.DisplayName)}】当作【{(responseName)}】";
+            var cardDescription = CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, requiredCardKind) ? $"打出【{(responseName)}】" : $"将【{(card.DisplayName)}】当作【{(responseName)}】";
             var description = isDodge ? isGroupAttack ? $"{(cardDescription)}，响应【{(incomingName)}】。" : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } uncancelable && _coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(uncancelable) ? $"{(cardDescription)}，响应这次{(incomingAttackName)}；此杀不能被抵消。" : $"{(cardDescription)}，抵消这次{(incomingAttackName)}。" : isGroupAttack ? $"{(cardDescription)}，响应【{(incomingName)}】。" : $"{(cardDescription)}，继续应战【决斗】。";
             var programSources = responder is null ? [] : _coreActionQueriesOperations.GetProgramViewAsConversions(responder, card, effectiveCardKind, forResponse: true);
             var hasIdentity = responder is not null && _coreCardConversionsOperations.HasProgramCardIdentity(responder, card);
             var identitySources = responder is null ? [] : _coreCardConversionsOperations.GetProgramCardIdentitySources(responder, card, effectiveCardKind, forResponse: true);
             var originalPile = responder is not null && _coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(responder, card, effectiveCardKind, true);
-            var includeUnspecified = !hasIdentity && (responder is null || !_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(responder, card) || originalPile) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, requiredCardKind);
+            var includeUnspecified = !hasIdentity && (responder is null || !_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(responder, card) || originalPile) && CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, requiredCardKind);
             var sources = new List<CardConversionSource?>();
             if (includeUnspecified)
                 sources.Add(null);
@@ -104,7 +100,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
                 if (source is null && originalPile)
                     parameters["native-original-public-pile"] = "true";
                 if (source is not null)
-                    global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
+                    CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
                 var suffix = source is null ? string.Empty : $".conversion-{(index)}";
                 return new PromptChoice(new ChoiceId($"respond.{(responseAction)}.card-{(card.Id)}{(suffix)}"), _coreCardConversionsOperations.DescribeConversion(source, description), [card.Id], [], parameters);
             });
@@ -127,7 +123,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
                     ["required-card"] = responseName,
                     ["response-card-kind"] = CardKind.Slash.ToString()
                 };
-                global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
+                CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
                 choices.Add(new PromptChoice(new ChoiceId($"respond.program-view-as-slash.{(selection.Source.SkillId.Length)}:" + $"{(selection.Source.SkillId)}.{(selection.Source.BindingId)}.cards-{(string.Join('-', cardIds))}"), isGroupAttack ? $"发动【{(_coreCardConversionsOperations.ProgramConversionName(selection.Source))}】，将 {(cardIds.Length)} 张手牌当【杀】响应【{(incomingName)}】。" : $"发动【{(_coreCardConversionsOperations.ProgramConversionName(selection.Source))}】，将 {(cardIds.Length)} 张手牌当【杀】继续应战【决斗】。", cardIds, [], parameters));
             }
         }
@@ -138,7 +134,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
         {
             choices.Add(new PromptChoice(new ChoiceId("respond.bagua"), isSlashAttack ? _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } uncancelableBagua && _coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(uncancelableBagua) ? $"发动【八卦阵】判定，红色牌视为打出【闪】响应{(incomingAttackName)}；此杀不能被抵消。" : $"发动【八卦阵】判定，红色牌视为打出【闪】抵消{(incomingAttackName)}。" : "发动【八卦阵】判定，红色牌视为打出【闪】。", [], [], new Dictionary<string, string> { ["response"] = "bagua", ["required-card"] = responseName, ["equipment"] = CardKind.BaguaFormation.ToString() }));
             if (responder?.IsHuman == true)
-                choices.Add(global::CardGame.Core.EngineOwners.CoreGameEngineBaguaResponsesRuntime.BaguaSkipChoice());
+                choices.Add(CoreGameEngineBaguaResponsesRuntime.BaguaSkipChoice());
         }
 
         if (isDodge && includeFactionDefense)

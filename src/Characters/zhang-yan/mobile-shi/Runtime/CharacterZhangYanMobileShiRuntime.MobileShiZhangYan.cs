@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,18 +7,18 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
 {
     internal const string ShiZyFeijing = "mobile:shi-feijing", ShiZyXiaoge = "mobile:shi-xiaoge";
     internal const string ShiZyDiscard = "skill.mobile-shi-zhang-yan.feijing.discard", ShiZyObtain = "skill.mobile-shi-zhang-yan.xiaoge.obtain";
-    internal static CardConversionSource ShiZySource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IShiZhangYanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiZy(f, op);
+    internal static CardConversionSource ShiZySource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IShiZhangYanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiZy(f, op);
     internal CardUseFrame? ShiZyCardWindow(ProgramTriggerCandidate c, ProgramSkillWindowContext w, SkillProgramTriggerWindow window)
     {
-        if (w.Window != window || w.CardUse is not { } info || info.ActorSeat != c.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame p || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(p) != window || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(p.Candidates[p.CandidateIndex]) != c || _coreCardUseLifecycleOperations.LifecycleCardUse(info.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } use || a.ActionId != info.CardActionId || p.ParentFrameId != use.Id || p.Action.ActionId != a.ActionId || use.SourceSeat != c.OwnerSeat || a.ActorSeat != c.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.EffectiveDesignatedTargetSeats is not [var target] || target == c.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
+        if (w.Window != window || w.CardUse is not { } info || info.ActorSeat != c.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame p || CoreGameEngineCardActionsRuntime.GetCardActionWindow(p) != window || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || CoreGameEngineCardActionsRuntime.ToSharedCandidate(p.Candidates[p.CandidateIndex]) != c || _coreCardUseLifecycleOperations.LifecycleCardUse(info.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } use || a.ActionId != info.CardActionId || p.ParentFrameId != use.Id || p.Action.ActionId != a.ActionId || use.SourceSeat != c.OwnerSeat || a.ActorSeat != c.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.EffectiveDesignatedTargetSeats is not [var target] || target == c.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
             return null;
         return window == SkillProgramTriggerWindow.CardUseCompleted && use.Step != ResolutionFrameStep.Completed ? null : use;
     }
 
     internal CardUseFrame? ShiZyDamageUse(int owner, ProgramSkillWindowContext w)
     {
-        if (w is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, SourceSeat: { } source, TargetSeat: { } victim, Amount: > 0 } || source != owner || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || attack.SourceSeat != owner || attack.CardUserSeat != owner || attack.TargetSeat != victim || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action, ShiZhangYanPath: { } path } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.ActorSeat != owner || path.OriginalActor != owner || path.UseId != use.Id || path.ActionId != action.ActionId || !path.Extra.Contains(victim) || !path.Payments.Any(p => p.Seat == victim && p.DiscardSequence > 0))
+        if (w is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, SourceSeat: { } source, TargetSeat: { } victim, Amount: > 0 } || source != owner || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || attack.SourceSeat != owner || attack.CardUserSeat != owner || attack.TargetSeat != victim || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action, ShiZhangYanPath: { } path } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.ActorSeat != owner || path.OriginalActor != owner || path.UseId != use.Id || path.ActionId != action.ActionId || !path.Extra.Contains(victim) || !path.Payments.Any(p => p.Seat == victim && p.DiscardSequence > 0))
             return null;
         return use;
     }
@@ -109,7 +106,7 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
     {
         var a = use.Action!;
         var target = _coreMatchParticipantsPlayersAccess._players[seat];
-        return target.IsAlive && seat != a.ActorSeat && !use.TargetSeats.Contains(seat) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(a.ActorSeat, seat, use.CardKind, use.Id) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, a.EffectiveSuit ?? Suit.None, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(a)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(a.ActorSeat, seat, a.EffectiveSuit);
+        return target.IsAlive && seat != a.ActorSeat && !use.TargetSeats.Contains(seat) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(a.ActorSeat, seat, use.CardKind, use.Id) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, a.EffectiveSuit ?? Suit.None, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(a)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(a.ActorSeat, seat, a.EffectiveSuit);
     }
 
     internal IReadOnlyList<PromptChoice> ShiZyChoices(ProgramSkillFrame f)
@@ -152,7 +149,7 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
     [ProgramAnswer("mobile-shi-zhang-yan")]
     internal void AnswerShiZy(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiZhangYan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ShiZyChooser(f) || !ShiZyChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiZhangYan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ShiZyChooser(f) || !ShiZyChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Feijing lost the actual path, independent Hand chooser or public color option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

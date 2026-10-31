@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineTurnHandLimitKindExemptionsRuntime
 {
-    void global::CardGame.Core.ITurnHandLimitKindExemptionProgramHost.GrantTurnHandLimitCardKindExemption(ProgramSkillFrame frame, IReadOnlyList<CardKind> cardKinds) => GrantProgramTurnHandLimitCardKindExemption(frame, cardKinds);
+    void ITurnHandLimitKindExemptionProgramHost.GrantTurnHandLimitCardKindExemption(ProgramSkillFrame frame, IReadOnlyList<CardKind> cardKinds) => GrantProgramTurnHandLimitCardKindExemption(frame, cardKinds);
     internal void GrantProgramTurnHandLimitCardKindExemption(ProgramSkillFrame frame, IReadOnlyList<CardKind> cardKinds, SkillProgramDamageModifierExpiration expiration = SkillProgramDamageModifierExpiration.CurrentTurnEnd)
     {
         _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(frame);
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
             return;
-        var policy = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandLimitKindExemption(_coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, frame.Id, frame.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), cardKinds, expiration);
+        var policy = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandLimitKindExemption(_coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, frame.Id, frame.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), cardKinds, expiration);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnHandLimitCardKindExemptionGrantedEvent(policy));
     }
 

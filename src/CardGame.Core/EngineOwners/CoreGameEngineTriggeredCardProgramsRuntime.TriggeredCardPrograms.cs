@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
         if (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement)?.OwnerSeat != ownerSeat || _cardZonesOperations._cardZones.GetLocation(movement.CardId) != CardLocation.DiscardPile)
             return false;
         var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(item => item.Id == movement.CardId);
-        return card.Suit is Suit.Spade or Suit.Club && ProgramCardSetFilter.Matches(card.Kind, card.Suit, [], [SkillProgramCardCategory.Basic], [], []) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.SupplyShortage, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[ownerSeat], card)));
+        return card.Suit is Suit.Spade or Suit.Club && ProgramCardSetFilter.Matches(card.Kind, card.Suit, [], [SkillProgramCardCategory.Basic], [], []) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.SupplyShortage, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[ownerSeat], card)));
     }
 
     internal SkillProgramStepOutcome UseTriggeredProgramVirtualSlash(ProgramSkillFrame frame, int targetSeat)
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
         var source = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-        var provenance = new CardConversionSource(active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId);
+        var provenance = new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId);
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, source.Seat, source.Seat, null, null, null, CardKind.Slash, [targetSeat], [], [provenance], effectiveSuit: Suit.None, effectiveRank: 0));
         _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, source.Seat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: []) { Action = action });
         _characterMengDaOlOperations.IssueGoudeSlashUse(resolutionId, active, action);
@@ -63,11 +59,11 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
         if (_cardZonesOperations._cardZones.GetLocation(movement.CardId) != CardLocation.DiscardPile || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
         var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(item => item.Id == movement.CardId);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit) || card.Suit == Suit.None || !ProgramCardSetFilter.Matches(card.Kind, card.Suit, [], [SkillProgramCardCategory.Basic], [], []))
+        if (CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit) || card.Suit == Suit.None || !ProgramCardSetFilter.Matches(card.Kind, card.Suit, [], [SkillProgramCardCategory.Basic], [], []))
             throw new InvalidOperationException("The frozen discarded card is not a black basic card.");
-        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || targetSeat == active.OwnerSeat || _coreMatchParticipantsPlayersAccess._players[targetSeat].JudgmentAreaAbolished || _coreActualTurnsOperations.HasJudgmentEffectiveCard(_coreMatchParticipantsPlayersAccess._players[targetSeat], kind) || _coreCardUseModulesOperations.IsCardUseForbidden(active.OwnerSeat, kind, CardActionType.Use) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(active.OwnerSeat, targetSeat, kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[targetSeat], kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], card))))
+        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || targetSeat == active.OwnerSeat || _coreMatchParticipantsPlayersAccess._players[targetSeat].JudgmentAreaAbolished || _coreActualTurnsOperations.HasJudgmentEffectiveCard(_coreMatchParticipantsPlayersAccess._players[targetSeat], kind) || _coreCardUseModulesOperations.IsCardUseForbidden(active.OwnerSeat, kind, CardActionType.Use) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(active.OwnerSeat, targetSeat, kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[targetSeat], kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], card))))
             return SkillProgramStepOutcome.Continue;
-        var source = new CardConversionSource(active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId);
+        var source = new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId);
         var resolutionId = _coreNativeCardUseOperations.BeginCardUse(card, active.OwnerSeat, [targetSeat], kind, conversionSource: source);
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Processing, CardMoveReasons.Use);
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(resolutionId, card, active.OwnerSeat, [targetSeat], LegalActionKind.SupplyShortage, playedCardKind: kind);
@@ -77,8 +73,8 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
     internal Card[] EquipmentColorDiscardCandidates(int ownerSeat)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[ownerSeat];
-        var colors = _cardZonesOperations._cardZones.CardsAt(CardLocation.Equipment(ownerSeat)).Select(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card))).Distinct().ToArray();
-        return _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.Equipment(ownerSeat))).Where(card => !ProgramCardSetFilter.Matches(card.Kind, card.Suit, [], [SkillProgramCardCategory.Basic], [], []) && _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card) != Suit.None && colors.Contains(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)))).OrderBy(card => card.Id).ToArray();
+        var colors = _cardZonesOperations._cardZones.CardsAt(CardLocation.Equipment(ownerSeat)).Select(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card))).Distinct().ToArray();
+        return _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.Equipment(ownerSeat))).Where(card => !ProgramCardSetFilter.Matches(card.Kind, card.Suit, [], [SkillProgramCardCategory.Basic], [], []) && _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card) != Suit.None && colors.Contains(CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)))).OrderBy(card => card.Id).ToArray();
     }
 
     internal SkillProgramStepOutcome PayProgramEquipmentColorDiscard(ProgramSkillFrame frame, string resultBind)
@@ -132,8 +128,8 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ITriggeredCardProgramHost.UseTriggeredVirtualSlash(ProgramSkillFrame frame, int targetSeat) => UseTriggeredProgramVirtualSlash(frame, targetSeat);
-    SkillProgramStepOutcome global::CardGame.Core.ITriggeredCardProgramHost.UseDiscardedCardAsDelayedTrick(ProgramSkillFrame frame, int targetSeat, CardKind kind) => UseProgramDiscardedCardAsDelayedTrick(frame, targetSeat, kind);
-    SkillProgramStepOutcome global::CardGame.Core.ITriggeredCardProgramHost.PayEquipmentColorDiscard(ProgramSkillFrame frame, string resultBind) => PayProgramEquipmentColorDiscard(frame, resultBind);
-    void global::CardGame.Core.ITriggeredCardProgramHost.GrantPlayPhaseColorRestriction(ProgramSkillFrame frame, string sourceBind, int targetSeat) => _coreProgramPhaseColorRestrictionsOperations.GrantProgramPlayPhaseColorRestriction(frame, sourceBind, targetSeat);
+    SkillProgramStepOutcome ITriggeredCardProgramHost.UseTriggeredVirtualSlash(ProgramSkillFrame frame, int targetSeat) => UseTriggeredProgramVirtualSlash(frame, targetSeat);
+    SkillProgramStepOutcome ITriggeredCardProgramHost.UseDiscardedCardAsDelayedTrick(ProgramSkillFrame frame, int targetSeat, CardKind kind) => UseProgramDiscardedCardAsDelayedTrick(frame, targetSeat, kind);
+    SkillProgramStepOutcome ITriggeredCardProgramHost.PayEquipmentColorDiscard(ProgramSkillFrame frame, string resultBind) => PayProgramEquipmentColorDiscard(frame, resultBind);
+    void ITriggeredCardProgramHost.GrantPlayPhaseColorRestriction(ProgramSkillFrame frame, string sourceBind, int targetSeat) => _coreProgramPhaseColorRestrictionsOperations.GrantProgramPlayPhaseColorRestriction(frame, sourceBind, targetSeat);
 }

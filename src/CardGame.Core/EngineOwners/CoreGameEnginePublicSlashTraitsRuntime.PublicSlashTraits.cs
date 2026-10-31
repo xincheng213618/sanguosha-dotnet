@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePublicSlashTraitsRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CoreGameEnginePublicSlashTraitsRuntime
         // Only the acting player's own capabilities and public mode/debt state
         // contribute. Reuse native nature sources without creating an attack,
         // capturing a use receipt or consuming a once-per-turn allowance.
-        var nature = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetDamageNature(kind);
+        var nature = CoreNativeCardClassificationsRuntime.GetDamageNature(kind);
         if (_coreShenwuNpcProgramsOperations.ShenwuEnabled(actor, "shenwu:zhaohuo") || _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.CrimsonSoulZither))
             nature = DamageNature.Fire;
         nature = _modeRuntimeOperations._modeRuntime.TransformDamageNature(nature);
@@ -29,7 +25,7 @@ internal sealed partial class CoreGameEnginePublicSlashTraitsRuntime
                 // The native rule also grants bypass against a policy owner.
                 // Only policy sources already visible to this exact actor can
                 // influence the estimate; hidden opponent grants stay hidden.
-                var visible = global::CardGame.Core.EngineOwners.CoreGameEnginePublicDamagePredictionRuntime.VisiblePredictionSkillIds(ownerView.Players.Single(player => player.Seat == directedTarget));
+                var visible = CoreGameEnginePublicDamagePredictionRuntime.VisiblePredictionSkillIds(ownerView.Players.Single(player => player.Seat == directedTarget));
                 ignoresArmor = _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[directedTarget], SkillProgramCardPolicyKind.BlackSlashIgnoresArmorBothDirections).Any(binding => visible.Contains(binding.Source.SkillId));
             }
         }

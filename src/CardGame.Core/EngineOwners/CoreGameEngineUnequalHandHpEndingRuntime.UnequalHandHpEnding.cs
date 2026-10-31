@@ -1,20 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineUnequalHandHpEndingRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.ITargetedTrickAndHandHpHost.ResolveUnequalHandHpEnding(ProgramSkillFrame frame) => BeginUnequalHandHpEnding(frame);
-    SkillProgramStepOutcome global::CardGame.Core.ITargetedTrickAndHandHpHost.AdjustTargetedOrdinaryTrick(ProgramSkillFrame frame) => _coreTargetedOrdinaryTrickOperations.BeginTargetedOrdinaryTrick(frame);
-    internal CardConversionSource TargetedTrickHandHpSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome ITargetedTrickAndHandHpHost.ResolveUnequalHandHpEnding(ProgramSkillFrame frame) => BeginUnequalHandHpEnding(frame);
+    SkillProgramStepOutcome ITargetedTrickAndHandHpHost.AdjustTargetedOrdinaryTrick(ProgramSkillFrame frame) => _coreTargetedOrdinaryTrickOperations.BeginTargetedOrdinaryTrick(frame);
+    internal CardConversionSource TargetedTrickHandHpSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int[] UnequalHandHpTargets(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count != p.Hp).Select(p => p.Seat).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 100)]
     internal bool CanOfferUnequalHandHp(SkillProgramTrigger trigger, ProgramSkillWindowContext context, int owner) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveUnequalHandHpEnding) || context.Window == SkillProgramTriggerWindow.PlayEnding && owner == _coreActualTurnProgressCurrentSeatAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && UnequalHandHpTargets(owner).Length > 0;
-    internal static string UnequalHandHpReason(ProgramSkillFrame f, string step) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_UnequalHandHpEnding.UnequalHandHpReason(f, step);
+    internal static string UnequalHandHpReason(ProgramSkillFrame f, string step) => RuntimeSkills.RuntimeRules_Core_UnequalHandHpEnding.UnequalHandHpReason(f, step);
     internal SkillProgramStepOutcome BeginUnequalHandHpEnding(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -95,7 +92,7 @@ internal sealed partial class CoreGameEngineUnequalHandHpEndingRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("No owning unequal hand/HP frame.");
         RequireUnequalHandHpReceipt(f);
         var r = f.UnequalHandHp!;
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], UnequalHandHpChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], UnequalHandHpChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("The exact hand/HP participant or payment changed.");
         var branch = choice.Parameters["branch"];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

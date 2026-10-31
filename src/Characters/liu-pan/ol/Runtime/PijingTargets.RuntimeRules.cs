@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_liu_pan_ol_PijingTargets
 {
     internal static IReadOnlyList<int> PijingFoldTargets(IReadOnlyList<int> original,IReadOnlyList<PijingToggle> toggles,CardKind kind)

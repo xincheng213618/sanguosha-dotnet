@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYongAnniversaryRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
     internal int AnniversaryLiuYongLimit(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuYongLimitExpandedEvent>().Any(e => e.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) ? 2 : 1;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 43400, SkillProgramEffectOp.ResolveAnniversaryLiuYongZhuning)]
     internal bool CanActivateAnniversaryLiuYong(CharacterState owner) => owner.IsAlive && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuYongStartedEvent>().Count(e => e.Source.OwnerSeat == owner.Seat && e.Mode == "gift" && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) < AnniversaryLiuYongLimit(owner.Seat);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryLiuYongHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryLiuYong(f, op);
+    SkillProgramStepOutcome IAnniversaryLiuYongHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryLiuYong(f, op);
     internal SkillProgramStepOutcome BeginAnniversaryLiuYong(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -84,7 +80,7 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
     [ProgramAnswer("anniversary-liuyong")]
     internal void AnswerAnniversaryLiuYong(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryLiuYong: { } r } f || !AnniversaryLiuYongChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryLiuYong: { } r } f || !AnniversaryLiuYongChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Liu Yong rejects a stale private material or native target plan.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

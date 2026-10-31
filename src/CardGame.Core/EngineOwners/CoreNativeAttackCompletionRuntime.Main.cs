@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeAttackCompletionRuntime
 {
-    internal void CompleteAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CompleteAttack(NativeOwners.CardAttackHandle attack)
     {
         if (_coreDyingCursorRuntimeOperations.ActiveDying is not null)
         {
@@ -24,7 +20,7 @@ internal sealed partial class CoreNativeAttackCompletionRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDamageTransferCardsDrawnEvent(attack.ResolutionId, transferFollowup.SkillId, transferFollowup.OwnerSeat, transferFollowup.TargetSeat, drawCount));
         }
 
-        if (!attack.IsProgramJudgmentDamage && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack } group && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(group.CurrentAttack, attack))
+        if (!attack.IsProgramJudgmentDamage && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack } group && CoreNativeDamageHandlesRuntime.SameAttackOwner(group.CurrentAttack, attack))
         {
             _characterLuXunWumiaoOperations.RetireWuXiongmuCardDamageCompleted(attack);
             group.CurrentAttack = null;
@@ -50,7 +46,7 @@ internal sealed partial class CoreNativeAttackCompletionRuntime
         }
 
         _characterLuXunWumiaoOperations.RetireWuXiongmuCardDamageCompleted(attack);
-        if (_coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd is { } fangtian && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(fangtian.CurrentAttack, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd is { } fangtian && CoreNativeDamageHandlesRuntime.SameAttackOwner(fangtian.CurrentAttack, attack))
         {
             fangtian.DamageWasApplied |= attack.DamageWasApplied;
             fangtian.CurrentAttack = null;
@@ -102,7 +98,7 @@ internal sealed partial class CoreNativeAttackCompletionRuntime
         CompleteAttackAfterCardResolution(completion);
     }
 
-    internal void CompleteAttackAfterCardResolution(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal void CompleteAttackAfterCardResolution(GameEngine.AttackCompletionReceipt completion)
     {
         _coreOriginalUseLightningOperations.PreserveNativeDelayedAttackCompletion(completion);
         var delayedPhysicalExclusion = completion.DelayedTurn ? _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().Single(f => f.Id == completion.ResolutionId).OriginalUseLightningExcludedCardId : null;

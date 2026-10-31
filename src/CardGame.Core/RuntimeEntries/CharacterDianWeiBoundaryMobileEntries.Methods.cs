@@ -2,5 +2,5 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterDianWeiBoundaryMobileEntries
 {
-    internal void ConsumeMobileDianWeiTarget(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().ConsumeMobileDianWeiTarget(supplied);
+    internal void ConsumeMobileDianWeiTarget(ProgramSkillFrame supplied) => _resolve().ConsumeMobileDianWeiTarget(supplied);
 }

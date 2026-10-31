@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
         if (context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, TargetSeat: { } target } || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } window || window.Id != context.ParentFrameId || window.ParentFrameId != context.DamageFrameId)
             return null;
         var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
-        return attack is global::CardGame.Core.NativeOwners.CardAttackHandle && !attack.IsChainPropagation && attack.DamageWasApplied && attack.TargetSeat == target && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { BoundaryLiyong: { } right, Action: { } action } use && BoundaryZhangFeiSourceMatches(right, candidate) && action.ActionId == right.CardActionId && action.EffectiveDesignatedTargetSeats.Contains(target) ? use : null;
+        return attack is NativeOwners.CardAttackHandle && !attack.IsChainPropagation && attack.DamageWasApplied && attack.TargetSeat == target && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { BoundaryLiyong: { } right, Action: { } action } use && BoundaryZhangFeiSourceMatches(right, candidate) && action.ActionId == right.CardActionId && action.EffectiveDesignatedTargetSeats.Contains(target) ? use : null;
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.IncludeTriggerCandidate, 58600)]

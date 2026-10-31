@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
         {
             var kind = rule.OutputKind;
             var card = new Card(0, kind, Suit.None, 0);
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             {
                 var targets = _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, card, source, effectiveKind: kind);
                 foreach (var target in targets)
@@ -44,7 +40,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
                 result.Add(new(LegalActionKind.Peach, 0, null, _coreCardConversionsOperations.DescribeConversion(source, "视为使用【桃】"), kind) { ConversionSource = source });
             else if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && (_characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || (_coreAdvancedPoliciesOperations.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.HasFriendQihuiAllowance(actor)) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, CardKind.Alcohol)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None))
                 result.Add(new(LegalActionKind.Alcohol, 0, null, _coreCardConversionsOperations.DescribeConversion(source, "视为使用【酒】"), kind) { ConversionSource = source });
-            else if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
+            else if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
                 foreach (var option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: false))
                     result.Add(new(option.ActionKind, 0, option.TargetSeats.Count == 1 ? option.TargetSeats[0] : null, _coreCardConversionsOperations.DescribeConversion(source, option.Description), kind, option.TargetCardId, option.TargetSeats) { ConversionSource = source });
         }
@@ -90,7 +86,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
 
     internal IReadOnlyList<PromptChoice> TieredRoundZeroForcedSlashChoices(CharacterState actor, CharacterState target, long originalId, bool qinglong)
     {
-        if (qinglong ? _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != originalId || blade.Attack.SourceSeat != actor.Seat || blade.Attack.TargetSeat != target.Seat || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack) : _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not { } borrowed || borrowed.ResolutionId != originalId || borrowed.WeaponOwnerSeat != actor.Seat || borrowed.SlashTargetSeat != target.Seat || borrowed.ActiveAttack is not null || _coreNativeBorrowedSwordOperations.GetWeapon(actor)is null)
+        if (qinglong ? _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != originalId || blade.Attack.SourceSeat != actor.Seat || blade.Attack.TargetSeat != target.Seat || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack) : _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not { } borrowed || borrowed.ResolutionId != originalId || borrowed.WeaponOwnerSeat != actor.Seat || borrowed.SlashTargetSeat != target.Seat || borrowed.ActiveAttack is not null || _coreNativeBorrowedSwordOperations.GetWeapon(actor)is null)
             return[];
         var result = new List<PromptChoice>();
         foreach (var(source, rule, _)in TieredRoundZeroForcedSlashRules(actor, target, qinglong))
@@ -105,26 +101,26 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
                 ["original-frame-id"] = originalId.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 ["forced-use"] = qinglong ? "qinglong" : "borrowed-sword"
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
             result.Add(new(new ChoiceId($"tiered-zero.forced-{(parameters["forced-use"])}.{(originalId)}.{(source.BindingId)}.{(source.SkillInstanceId)}"), $"发动【{(_coreCardConversionsOperations.ProgramConversionName(source))}】，视为使用【{(CardCatalog.Get(kind).DisplayName)}】攻击 {(target.Name)}。", [], [target.Seat], parameters));
         }
 
         return Array.AsReadOnly(result.ToArray());
     }
 
-    internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> TieredRoundZeroForcedSlashRules(CharacterState actor, CharacterState target, bool qinglong) => TieredRoundZeroRules(actor).Where(r => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Rule.OutputKind) && (qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, r.Rule.OutputKind, null, false, Suit.None, 0) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, r.Rule.OutputKind, Suit.None, false, null, 0, [])) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, r.Rule.OutputKind, Suit.None));
+    internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> TieredRoundZeroForcedSlashRules(CharacterState actor, CharacterState target, bool qinglong) => TieredRoundZeroRules(actor).Where(r => CoreNativeCardClassificationsRuntime.IsSlashCard(r.Rule.OutputKind) && (qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, r.Rule.OutputKind, null, false, Suit.None, 0) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, r.Rule.OutputKind, Suit.None, false, null, 0, [])) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, r.Rule.OutputKind, Suit.None));
     internal bool TryResolveTieredRoundZeroForcedSlash(PromptChoice selected, bool advance)
     {
         if (selected.Parameters.GetValueOrDefault("forced-use")is not ("borrowed-sword" or "qinglong"))
             return false;
         var qinglong = selected.Parameters["forced-use"] == "qinglong";
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || prompt.Kind != (qinglong ? DecisionKind.QinglongCrescentBlade : DecisionKind.RespondSlash) || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || selected.Cards.Count != 0 || selected.Targets is not [var targetSeat] || !long.TryParse(selected.Parameters.GetValueOrDefault("original-frame-id"), out var originalId) || !Enum.TryParse<CardKind>(selected.Parameters.GetValueOrDefault("output-kind"), out var kind))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || prompt.Kind != (qinglong ? DecisionKind.QinglongCrescentBlade : DecisionKind.RespondSlash) || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || selected.Cards.Count != 0 || selected.Targets is not [var targetSeat] || !long.TryParse(selected.Parameters.GetValueOrDefault("original-frame-id"), out var originalId) || !Enum.TryParse<CardKind>(selected.Parameters.GetValueOrDefault("output-kind"), out var kind))
             throw new InvalidOperationException("A zero forced Slash changed its exact published producer, target or name.");
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
-        if (!TieredRoundZeroForcedSlashChoices(actor, target, originalId, qinglong).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (!TieredRoundZeroForcedSlashChoices(actor, target, originalId, qinglong).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("A forced zero Slash lost its original legal same-target use and shared allowance.");
-        var conversion = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
+        var conversion = CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
         _coreCardConversionsOperations.CaptureSelectedResponseConversion(selected);
         if (_characterWoLongFengChuOlOperations.TryBeginEquipmentSlotNamedForcedSlash(actor, conversion, kind, selected, qinglong))
             return true;
@@ -156,7 +152,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
         return true;
     }
 
-    internal void BeginTieredRoundForcedZeroSlash(CharacterState actor, CharacterState target, CardKind kind, CardConversionSource source, global::CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit)
+    internal void BeginTieredRoundForcedZeroSlash(CharacterState actor, CharacterState target, CardKind kind, CardConversionSource source, NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit)
     {
         var card = new Card(0, kind, Suit.None, 0);
         var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [target.Seat], kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, kind), physicalCardIds: [], conversionSource: source);
@@ -216,7 +212,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
         // Resolve the published option before BeginCardUse consumes any
         // one-use target adjustment or quota and freezes its accepted action.
         CardKind? requiredKind = null;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+        if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
         {
             var options = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: true);
             if (action.ProgramActivationId == "next-card-target-adjustment")
@@ -239,7 +235,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
             return;
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
             if (targets.Count == 0)
@@ -290,7 +286,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
         if (r.OwnerFrameId != use.Id || r.CardActionId != action.ActionId || !TieredRoundIssuedActorMatches(issuedView, r) || action.ProviderSeat != r.ActorSeat || action.RequesterSeat is not null || action.EffectiveKind != r.EffectiveKind || r.MaterialCount != action.PhysicalCards.Count || !(use.PhysicalCardIds ?? []).SequenceEqual(action.PhysicalCards.Select(c => c.CardId)) || action.ConversionChain is not [var source] || source != r.Source || r.Source.OwnerSeat != r.ActorSeat || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || string.IsNullOrWhiteSpace(r.Source.BindingId) || r.FrozenTier is < 0 or > 2 || r.MaterialCount != (r.FrozenTier == 2 ? 0 : 1) || zeroOnly && (r.FrozenTier != 2 || use.CardId != 0) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program is not { } definition || definition.GameplayHash != r.GameplayHash || _coreActivityOrdinaryTricksOperations.ActivityRuntimeProgram(definition).ViewAs.SingleOrDefault(v => v.Id == r.Source.BindingId)is not { TieredRoundConversion: { } policy } rule || policy.StateId != r.StateId || policy.UsageId != r.UsageId || rule.OutputKind != r.EffectiveKind || rule.InputCount != r.MaterialCount || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TieredRoundConversionUseIssuedEvent>().Count(e => e.Receipt == r) != 1)
             return false;
         // This is issued identity, not a second current-shard permission query.
-        return _skillRuntimeStateOperations._skillRuntimeState.GetUsage(r.ActorSeat, r.Source.SkillId, global::CardGame.Core.EngineOwners.CoreProgramTieredRoundConversionRuntime.TieredRoundUsage(policy), r.FrozenTier == 0 ? SkillUsageScope.Phase : SkillUsageScope.Round) == 1;
+        return _skillRuntimeStateOperations._skillRuntimeState.GetUsage(r.ActorSeat, r.Source.SkillId, CoreProgramTieredRoundConversionRuntime.TieredRoundUsage(policy), r.FrozenTier == 0 ? SkillUsageScope.Phase : SkillUsageScope.Round) == 1;
     }
 
     internal CardActionContext? TieredRoundIssuedOriginalOutputAction(CardUseFrame use, TieredRoundConversionUseReceipt receipt)
@@ -299,7 +295,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
             return null;
         if (use.CurrentSlashFirePolicy is not { } fire)
             return use.CardKind == receipt.EffectiveKind ? action : null;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(receipt.EffectiveKind) || fire.OriginalKind != receipt.EffectiveKind || fire.OriginalAction.ActionId != receipt.CardActionId || fire.OriginalAction.Type != CardActionType.Use || fire.OriginalAction.EffectiveKind != receipt.EffectiveKind)
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(receipt.EffectiveKind) || fire.OriginalKind != receipt.EffectiveKind || fire.OriginalAction.ActionId != receipt.CardActionId || fire.OriginalAction.Type != CardActionType.Use || fire.OriginalAction.EffectiveKind != receipt.EffectiveKind)
             return null;
         // Only the real 5403 issued policy can append a fire conversion source.
         // Its mature assertion proves original/current actors and materials,
@@ -354,10 +350,10 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 110)]
-    internal bool FinishTieredRoundZeroAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishTieredRoundZeroAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (attack.Card is not null || !IsTieredRoundZeroUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && kind != CardKind.Duel && kind != CardKind.AgainstCurrent && !(kind == CardKind.FireAttack && _coreTieredRoundZeroReturnsOperations.MatchesTieredRoundZeroFireAttackAttack(attack)))
+        if (attack.Card is not null || !IsTieredRoundZeroUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && kind != CardKind.Duel && kind != CardKind.AgainstCurrent && !(kind == CardKind.FireAttack && _coreTieredRoundZeroReturnsOperations.MatchesTieredRoundZeroFireAttackAttack(attack)))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);

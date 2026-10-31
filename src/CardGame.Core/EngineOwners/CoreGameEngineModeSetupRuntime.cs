@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineModeSetupRuntime
 {
-    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelParticipantSetupAccess _participantSetupOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelCreateParticipantSetupContextOperations _kernelCoreGameEngineModeSetupOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionGeneralPoolAccess _coreMatchDefinitionGeneralPoolAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupAvailableGeneralsSelectionOrderAccess _coreMatchSetupAvailableGeneralsSelectionOrderAccess;
-    internal CoreGameEngineModeSetupRuntime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations, global::CardGame.Core.EngineOwners.IKernelParticipantSetupAccess participantSetupOperations, global::CardGame.Core.EngineOwners.IKernelCreateParticipantSetupContextOperations kernelCoreGameEngineModeSetupOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionGeneralPoolAccess coreMatchDefinitionGeneralPoolAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupAvailableGeneralsSelectionOrderAccess coreMatchSetupAvailableGeneralsSelectionOrderAccess)
+    private readonly IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    private readonly IKernelParticipantSetupAccess _participantSetupOperations;
+    private readonly IKernelCreateParticipantSetupContextOperations _kernelCoreGameEngineModeSetupOperations;
+    private readonly EngineStates.Contracts.ICoreMatchDefinitionGeneralPoolAccess _coreMatchDefinitionGeneralPoolAccess;
+    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    private readonly EngineStates.Contracts.ICoreMatchSetupAvailableGeneralsSelectionOrderAccess _coreMatchSetupAvailableGeneralsSelectionOrderAccess;
+    internal CoreGameEngineModeSetupRuntime(IKernelContentRegistryAccess contentRegistryOperations, IKernelMatchModeRuntimeAccess modeRuntimeOperations, IKernelParticipantSetupAccess participantSetupOperations, IKernelCreateParticipantSetupContextOperations kernelCoreGameEngineModeSetupOperations, EngineStates.Contracts.ICoreMatchDefinitionGeneralPoolAccess coreMatchDefinitionGeneralPoolAccess, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess, EngineStates.Contracts.ICoreMatchSetupAvailableGeneralsSelectionOrderAccess coreMatchSetupAvailableGeneralsSelectionOrderAccess)
     {
         this._contentRegistryOperations = contentRegistryOperations;
         this._modeRuntimeOperations = modeRuntimeOperations;

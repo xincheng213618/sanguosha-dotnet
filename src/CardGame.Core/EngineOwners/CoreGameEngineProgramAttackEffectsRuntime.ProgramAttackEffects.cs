@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramAttackEffectsRuntime
 {
-    internal bool IsProgramSlashRedirectBaseTarget(global::CardGame.Core.NativeOwners.CardAttackHandle attack, int redirectorSeat, int targetSeat)
+    internal bool IsProgramSlashRedirectBaseTarget(NativeOwners.CardAttackHandle attack, int redirectorSeat, int targetSeat)
     {
         if (attack.TargetSeat != redirectorSeat || !_coreMatchParticipantsPlayersAccess._players[redirectorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || targetSeat == redirectorSeat || targetSeat == attack.SourceSeat)
             return false;
@@ -15,7 +11,7 @@ internal sealed partial class CoreGameEngineProgramAttackEffectsRuntime
         return (_coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd is null || !_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == attack.ResolutionId).TargetSeats.Contains(targetSeat)) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(attack.SourceSeat, targetSeat, kind, attack.ResolutionId) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(_coreMatchParticipantsPlayersAccess._players[targetSeat]);
     }
 
-    internal bool IsProgramSlashRedirectTarget(global::CardGame.Core.NativeOwners.CardAttackHandle attack, int redirectorSeat, int targetSeat, bool paymentCompleted = false)
+    internal bool IsProgramSlashRedirectTarget(NativeOwners.CardAttackHandle attack, int redirectorSeat, int targetSeat, bool paymentCompleted = false)
     {
         if (_characterDaQiaoMobileOperations.PostCostSlashRedirectFrame(attack, redirectorSeat)is { } frame)
             return paymentCompleted ? _characterDaQiaoMobileOperations.IsPostCostSlashRedirectTarget(attack, redirectorSeat, targetSeat, null) : _characterDaQiaoMobileOperations.HasPostCostSlashRedirectPayment(frame, attack, targetSeat);
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEngineProgramAttackEffectsRuntime
         if (frame.WindowContext is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } context, TargetSeat: { } target })
         {
             var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == context.ParentCardUseFrameId);
-            if (use is not { Action: { Type: CardActionType.Use } action } || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActionId != context.CardActionId || action.ActorSeat != frame.OwnerSeat || context.ActorSeat != frame.OwnerSeat || !action.EffectiveDesignatedTargetSeats.Contains(target) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
+            if (use is not { Action: { Type: CardActionType.Use } action } || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActionId != context.CardActionId || action.ActorSeat != frame.OwnerSeat || context.ActorSeat != frame.OwnerSeat || !action.EffectiveDesignatedTargetSeats.Contains(target) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
                 throw new InvalidOperationException("A final-target response prohibition lost its original Slash and exact designated target.");
             if (!_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
                 return;
@@ -52,7 +48,7 @@ internal sealed partial class CoreGameEngineProgramAttackEffectsRuntime
         }
 
         var attack = _coreCardActionsOperations.ProgramCardAttack ?? throw new InvalidOperationException("A response prohibition requires the active Slash.");
-        if (frame.WindowContext?.Window != SkillProgramTriggerWindow.SlashBeforeResponse || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || frame.OwnerSeat != attack.SourceSeat || frame.WindowContext.TargetSeat != attack.TargetSeat)
+        if (frame.WindowContext?.Window != SkillProgramTriggerWindow.SlashBeforeResponse || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || frame.OwnerSeat != attack.SourceSeat || frame.WindowContext.TargetSeat != attack.TargetSeat)
             throw new InvalidOperationException("Response prohibition lost its frozen attack boundary.");
         attack.ProhibitDodgeBy(_contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Name);
     }
@@ -60,7 +56,7 @@ internal sealed partial class CoreGameEngineProgramAttackEffectsRuntime
     internal void RedirectCurrentProgramAttack(ProgramSkillFrame frame, int targetSeat)
     {
         var attack = _coreCardActionsOperations.ProgramCardAttack ?? throw new InvalidOperationException("Attack redirection requires the active Slash.");
-        if (frame.WindowContext?.Window != SkillProgramTriggerWindow.SlashTargetRedirecting || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || frame.OwnerSeat != attack.TargetSeat)
+        if (frame.WindowContext?.Window != SkillProgramTriggerWindow.SlashTargetRedirecting || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || frame.OwnerSeat != attack.TargetSeat)
             throw new InvalidOperationException("Attack redirection lost its frozen legal target.");
         if (!IsProgramSlashRedirectTarget(attack, frame.OwnerSeat, targetSeat, paymentCompleted: true))
         {

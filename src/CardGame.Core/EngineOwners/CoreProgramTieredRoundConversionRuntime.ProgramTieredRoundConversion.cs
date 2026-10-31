@@ -1,19 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramTieredRoundConversionRuntime
 {
     internal bool TracksTrueRoundCardNames => _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesTieredRoundConversions || _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesLeiluanBasicUse;
 
-    internal static bool IsTieredRoundOutput(CardKind kind) => CardCatalog.Get(kind).CategoryName == "基本牌" || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind);
+    internal static bool IsTieredRoundOutput(CardKind kind) => CardCatalog.Get(kind).CategoryName == "基本牌" || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind);
     internal int TieredRoundTier(int ownerSeat, string stateId) => _coreGameEngineConfiguredConversionsConfiguredConversionTiersAccess._configuredConversionTiers.GetValueOrDefault((ownerSeat, stateId));
     internal static string TieredRoundUsage(ProgramTieredRoundConversionPolicy policy) => "tiered-round-conversion:" + policy.StateId + ":" + policy.UsageId;
-    internal bool TrueRoundHasUsedName(CardKind kind) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TrueRoundCardNameUsedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(e.EffectiveKind) == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind));
+    internal bool TrueRoundHasUsedName(CardKind kind) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TrueRoundCardNameUsedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(e.EffectiveKind) == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind));
     internal bool CanUseTieredRoundConversion(CharacterState actor, IndexedSkillProgramInstance instance, SkillProgramViewAs rule, bool responseUse, bool dyingUse)
     {
         if (_characterWoLongFengChuOlOperations.TryGetEquipmentSlotNamedConversionAvailability(actor, instance, rule, responseUse, dyingUse, out var equipmentAvailable))
@@ -98,7 +93,7 @@ internal sealed partial class CoreProgramTieredRoundConversionRuntime
 
     internal bool TryRecordTrueRoundDodgeUse(CardActionContext action)
     {
-        if (action.Type != CardActionType.Response || action.EffectiveKind != CardKind.Dodge || action.ActorSeat != action.ProviderSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is not null || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) || attack.TargetSeat != action.ActorSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || action.ParentActionId != use.Action?.ActionId || action.OpponentSeat != attack.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat) || !_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], CardKind.Dodge))
+        if (action.Type != CardActionType.Response || action.EffectiveKind != CardKind.Dodge || action.ActorSeat != action.ProviderSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is not null || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) || attack.TargetSeat != action.ActorSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || action.ParentActionId != use.Action?.ActionId || action.OpponentSeat != attack.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat) || !_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], CardKind.Dodge))
             return false;
         // This observer runs at the real Accepted boundary. Native, converted
         // and Bagua Dodge uses share the same mature Slash-defense classification;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBaOlRuntime
@@ -10,9 +6,9 @@ internal sealed partial class CharacterLiuBaOlRuntime
     internal const string TongduGiftReason = "skill-program.liu-ba.tongdu.gift", TongduReturnReason = "skill-program.liu-ba.tongdu.return", LiuBaExchangeReason = "skill-program.liu-ba.zhubi.exchange";
     internal bool HasLiuBaCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.RecastZhubiAndMarkActualDraw) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.IssueTongduHandGift);
 
-    internal static CardConversionSource LiuBaSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_ba_ol_LiuBa.LiuBaSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.ILiuBaHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginLiuBa(f, op);
-    int global::CardGame.Core.ILiuBaSelectionQuery.MaximumHp(int ownerSeat) => _coreMatchParticipantsPlayersAccess._players[ownerSeat].MaxHp;
+    internal static CardConversionSource LiuBaSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_liu_ba_ol_LiuBa.LiuBaSource(f);
+    SkillProgramStepOutcome ILiuBaHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginLiuBa(f, op);
+    int ILiuBaSelectionQuery.MaximumHp(int ownerSeat) => _coreMatchParticipantsPlayersAccess._players[ownerSeat].MaxHp;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27390)]
     internal bool CanOfferLiuBa(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)
     {
@@ -46,7 +42,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
             if (f.TriggerId is not null || f.ActivationId != "recast-coin" || context is not null || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreGameEngineSkillProgramsProgramPhaseUsesAccess._programPhaseUses.GetValueOrDefault((f.OwnerSeat, f.SkillId, ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Activation!.UsageGroup)) > _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp)
                 throw new InvalidOperationException("Zhubi lost its current maximum-HP quota and real Play.");
         }
-        else if (context is null || !CanOfferLiuBa(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
+        else if (context is null || !CanOfferLiuBa(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Liu Ba lost the exact native preparation, PlayEnding debt or holder Ending entitlement.");
         if (!issued && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("Liu Ba cannot start an unpaid operation after source loss.");
@@ -141,7 +137,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
     [ProgramAnswer("liu-ba")]
     internal void AnswerLiuBa(PromptChoice supplied)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiuBa: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != LiuBaChooser(f) || !LiuBaChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [supplied])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiuBa: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != LiuBaChooser(f) || !LiuBaChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [supplied])))
             throw new InvalidOperationException("Liu Ba requires the exact current participant's private answer.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

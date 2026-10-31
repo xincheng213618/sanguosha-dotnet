@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOwnedDeathBenefitReturnsRuntime
@@ -56,7 +52,7 @@ internal sealed partial class CoreGameEngineOwnedDeathBenefitReturnsRuntime
         return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OwnedDeathBenefitReturnIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.OwnerDeathWindowFrameId == window.Id && e.OriginalDeathFrameId == death.Id && e.OriginalDyingFrameId == r.OriginalDying?.FrameId && e.OwnerSeat == f.OwnerSeat && e.RecipientSeat == fixedRecipient.RecipientSeat && e.Source == _corePairObtainShownGiftsOperations.PairBenefitSource(f) && e.GameplayHash == f.GameplayHash && e.FrozenReturnHash == OwnedDeathBenefitReturnHash(r)) == 1;
     }
 
-    internal static string OwnedDeathBenefitReturnHash(ProgramOwnedDeathBenefitReturn receipt) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OwnedDeathBenefitReturns.OwnedDeathBenefitReturnHash(receipt);
+    internal static string OwnedDeathBenefitReturnHash(ProgramOwnedDeathBenefitReturn receipt) => RuntimeSkills.RuntimeRules_Core_OwnedDeathBenefitReturns.OwnedDeathBenefitReturnHash(receipt);
     internal bool IsOriginalDyingSuspendedByOwnedDeathBenefit(DyingFrame dying) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(dying.VictimSeat) && !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.OwnedDeathBenefitReturn?.OriginalDying?.FrameId == dying.Id && ExactOwnedDeathBenefitReturn(f));
     internal void FinishOwnedDeathBenefitReturn(ProgramSkillFrame f, bool completed)
     {
@@ -69,5 +65,5 @@ internal sealed partial class CoreGameEngineOwnedDeathBenefitReturnsRuntime
     // Do not clear the receipt early and accidentally expose the original dying while the root remains active.
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IOwnedDeathBenefitProgramHost.SelectIssuedFixedRecipientWithDeathReturn(ProgramSkillFrame frame, SkillProgramEffect effect) => SelectIssuedFixedRecipientWithDeathReturn(frame, effect);
+    SkillProgramStepOutcome IOwnedDeathBenefitProgramHost.SelectIssuedFixedRecipientWithDeathReturn(ProgramSkillFrame frame, SkillProgramEffect effect) => SelectIssuedFixedRecipientWithDeathReturn(frame, effect);
 }

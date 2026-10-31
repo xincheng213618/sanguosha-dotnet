@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuYongBoundaryMobileRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryGuYongHost.Execute(ProgramSkillFrame frame, SkillProgramEffect effect) => effect.Op == SkillProgramEffectOp.PrepareBoundaryGuYongShenxing ? FreezeBoundaryGuYongColors(frame, effect) : PrepareBoundaryGuYongBingyi(frame, effect);
-    internal static int BoundaryGuYongColor(Suit suit) => suit == Suit.None ? -1 : global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(suit) ? 1 : 0;
+    SkillProgramStepOutcome IBoundaryGuYongHost.Execute(ProgramSkillFrame frame, SkillProgramEffect effect) => effect.Op == SkillProgramEffectOp.PrepareBoundaryGuYongShenxing ? FreezeBoundaryGuYongColors(frame, effect) : PrepareBoundaryGuYongBingyi(frame, effect);
+    internal static int BoundaryGuYongColor(Suit suit) => suit == Suit.None ? -1 : CoreNativeCardClassificationsRuntime.IsRedSuit(suit) ? 1 : 0;
     internal SkillProgramStepOutcome FreezeBoundaryGuYongColors(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -33,7 +29,7 @@ internal sealed partial class CharacterGuYongBoundaryMobileRuntime
         if (frame.SkillId != "boundary:bingyi-mobile" || frame.TriggerId != "ending-reveal-share" || frame.InstructionIndex != 2 || frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnEnding || hand.Count == 0 || !binding.CardIds.Order().SequenceEqual(hand.Select(card => card.Id).Order()))
             throw new InvalidOperationException("Mobile Bingyi requires its original complete nonempty hand at its own ending window.");
         var sameColor = hand.Select(card => BoundaryGuYongColor(_coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card))).Distinct().Count() == 1;
-        var sameType = hand.Select(card => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind)).Distinct().Count() == 1;
+        var sameType = hand.Select(card => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind)).Distinct().Count() == 1;
         _coreProgramCategoryChallengesOperations.RevealProgramBoundCards(frame, effect.SourceBind!);
         if (!sameColor && !sameType)
         {

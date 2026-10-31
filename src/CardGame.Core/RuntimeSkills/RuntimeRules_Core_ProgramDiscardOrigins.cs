@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_ProgramDiscardOrigins
 {
     internal const string PairedColorDiscardReason = "skill-program.paired-color-response.discard";
@@ -30,6 +30,6 @@ internal static class RuntimeRules_Core_ProgramDiscardOrigins
                 nameof(SkillProgramEffectOp.RequestAttackRangeAid) or
                 nameof(SkillProgramEffectOp.PayEquipmentColorDiscard) or nameof(SkillProgramEffectOp.DiscardDrawAndOfferUniqueHpPeer)) return true;
         }
-        return CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.IsDiscardMovementReason(reason);
+        return RuntimeRules_Core_ProgramDiscardTopPlacement.IsDiscardMovementReason(reason);
     }
 }

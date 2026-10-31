@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -16,7 +13,7 @@ internal sealed partial class CoreGameEnginePlacedEquipmentBenefitsRuntime
     internal bool CanRunPlacedEquipmentBenefit(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => !t.Effects.Any(e => e.Op == SkillProgramEffectOp.PlaceOwnedEquipmentThenResolveSlotBenefit) || context.Window == SkillProgramTriggerWindow.TurnEnding && c.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat])).Any(card => _coreEquipmentContentOperations.EquipmentRules.IsEquipment(card.Kind) && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(c.OwnerSeat, c.SkillId, c.SkillInstanceId, card) && CanPlaceBenefitEquipment(c.OwnerSeat, card, _cardZonesOperations._cardZones.GetLocation(card.Id)));
     internal bool PlacedEquipmentParentMatches(ProgramSkillFrame f)
     {
-        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || f.TriggerId is null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || context.OwnerSeat != f.OwnerSeat || context.SourceSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } ending || ending.OwnerSeat != f.OwnerSeat || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || ending.ItemIndex < 0 || ending.ItemIndex >= ending.Items.Count || ending.Items[ending.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is not [{ Op: SkillProgramEffectOp.PlaceOwnedEquipmentThenResolveSlotBenefit }])
+        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || f.TriggerId is null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || context.OwnerSeat != f.OwnerSeat || context.SourceSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } ending || ending.OwnerSeat != f.OwnerSeat || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || ending.ItemIndex < 0 || ending.ItemIndex >= ending.Items.Count || ending.Items[ending.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is not [{ Op: SkillProgramEffectOp.PlaceOwnedEquipmentThenResolveSlotBenefit }])
             return false;
         return true; // No whole Facts equality: dictionary/list reference identity is not an owning proof.
     }
@@ -91,7 +88,7 @@ internal sealed partial class CoreGameEnginePlacedEquipmentBenefitsRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (!PlacedEquipmentParentMatches(f) || f.PlacedEquipmentBenefit is not null || !PlacedEquipmentSourceCurrent(f))
             throw new InvalidOperationException("Equipment placement requires its exact optional own Ending candidate.");
-        var r = new ProgramPlacedEquipmentBenefitReceipt(f.InstructionIndex, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, f.WindowContext!.ParentFrameId, f.WindowContext.OccurrenceIndex, PlacedEquipmentBenefitStage.EquipmentChoice);
+        var r = new ProgramPlacedEquipmentBenefitReceipt(f.InstructionIndex, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, f.WindowContext!.ParentFrameId, f.WindowContext.OccurrenceIndex, PlacedEquipmentBenefitStage.EquipmentChoice);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PlacedEquipmentBenefit = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlacedEquipmentBenefitStartedEvent(f.Id, r.Source, r.GameplayHash, r.TurnNumber, r.TurnOwnerSeat, r.EndingFrameId, r.OccurrenceIndex));
         PublishPlacedEquipmentChoice(f);
@@ -297,5 +294,5 @@ internal sealed partial class CoreGameEnginePlacedEquipmentBenefitsRuntime
         return decision.Choices.Where(c => c.Parameters["step"] != "cancel").OrderBy(c => c.Parameters.GetValueOrDefault("source-zone") == "Hand" ? 0 : 1).ThenBy(c => c.Id.Value, StringComparer.Ordinal).FirstOrDefault() ?? decision.Choices[0];
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IPlacedEquipmentBenefitProgramHost.PlaceOwnedEquipmentThenResolveSlotBenefit(ProgramSkillFrame f) => BeginPlacedEquipmentBenefit(f);
+    SkillProgramStepOutcome IPlacedEquipmentBenefitProgramHost.PlaceOwnedEquipmentThenResolveSlotBenefit(ProgramSkillFrame f) => BeginPlacedEquipmentBenefit(f);
 }

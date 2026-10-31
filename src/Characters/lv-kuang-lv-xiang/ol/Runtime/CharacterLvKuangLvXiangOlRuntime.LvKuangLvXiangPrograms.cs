@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLvKuangLvXiangOlRuntime
 {
     internal const string LiehouReason = "skill-program.liehou.hand-relay";
-    internal static CardConversionSource LvKuangLvXiangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lv_kuang_lv_xiang_ol_LvKuangLvXiangPrograms.LvKuangLvXiangSource(f);
+    internal static CardConversionSource LvKuangLvXiangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lv_kuang_lv_xiang_ol_LvKuangLvXiangPrograms.LvKuangLvXiangSource(f);
     internal bool LvKuangLvXiangCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     internal bool LvKuangLvXiangActivationTargetAllowed(CharacterState target, SkillProgramActivation a, int ownerSeat) => !ProgramInstructionResolver.Default.Features(a).HasOperation(SkillProgramEffectOp.ResolveLiehouRangeHandRelay) || target.IsAlive && target.Seat != ownerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count > 0 && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(ownerSeat, target.Seat);
     internal bool QigongOriginal(ProgramTriggerCandidate c, ProgramSkillWindowContext w, out CardUseFrame original, bool requireLivingTarget = true)
     {
         original = null !;
-        if (w.Window != SkillProgramTriggerWindow.SlashFullyDodged || w.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame parent || parent.Continuation != ProgramCardContinuation.SlashFullyDodged || parent.ParentFrameId != identity.ParentCardUseFrameId || _coreCardUseLifecycleOperations.LifecycleCardUse(parent.ParentFrameId)is not { Action: { Type: CardActionType.Use } a, CardAttack: { } attack } use || a.ActionId != identity.CardActionId || a.ActorSeat != c.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || a.EffectiveDesignatedTargetSeats.Count != 1 || use.TargetSeats is not [var target] || target != attack.TargetSeat || attack.RequiredDodgeResponses < 1 || attack.SuccessfulDodgeResponses != attack.RequiredDodgeResponses || parent.AttackOwnerFrameId != use.Id || parent.Action.ActionId != a.ActionId || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])is not { } actual || actual.OwnerSeat != c.OwnerSeat || actual.SkillId != c.SkillId || actual.SkillInstanceId != c.SkillInstanceId || actual.BindingId != c.BindingId || actual.GameplayHash != c.GameplayHash || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, a))
+        if (w.Window != SkillProgramTriggerWindow.SlashFullyDodged || w.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame parent || parent.Continuation != ProgramCardContinuation.SlashFullyDodged || parent.ParentFrameId != identity.ParentCardUseFrameId || _coreCardUseLifecycleOperations.LifecycleCardUse(parent.ParentFrameId)is not { Action: { Type: CardActionType.Use } a, CardAttack: { } attack } use || a.ActionId != identity.CardActionId || a.ActorSeat != c.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || a.EffectiveDesignatedTargetSeats.Count != 1 || use.TargetSeats is not [var target] || target != attack.TargetSeat || attack.RequiredDodgeResponses < 1 || attack.SuccessfulDodgeResponses != attack.RequiredDodgeResponses || parent.AttackOwnerFrameId != use.Id || parent.Action.ActionId != a.ActionId || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])is not { } actual || actual.OwnerSeat != c.OwnerSeat || actual.SkillId != c.SkillId || actual.SkillInstanceId != c.SkillInstanceId || actual.BindingId != c.BindingId || actual.GameplayHash != c.GameplayHash || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, a))
             return false;
         original = use;
         return !requireLivingTarget || _coreMatchParticipantsPlayersAccess._players[target].IsAlive;
@@ -77,7 +73,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
         return Array.AsReadOnly(result.Select(PromptChoiceProjection.Freeze).ToArray());
     }
 
-    internal static int[] LvKuangLvXiangValidTargets(ProgramSkillFrame f, IReadOnlyList<PromptChoice> choices) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lv_kuang_lv_xiang_ol_LvKuangLvXiangPrograms.LvKuangLvXiangValidTargets(f, choices);
+    internal static int[] LvKuangLvXiangValidTargets(ProgramSkillFrame f, IReadOnlyList<PromptChoice> choices) => RuntimeSkills.RuntimeRules_lv_kuang_lv_xiang_ol_LvKuangLvXiangPrograms.LvKuangLvXiangValidTargets(f, choices);
     internal int LvChooser(ProgramSkillFrame f) => f.LvKuangLvXiang!.Stage switch
     {
         "receive" => f.LvKuangLvXiang.Target,
@@ -118,7 +114,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
     [ProgramAnswer("lv-kuang-lv-xiang")]
     internal void AnswerLvKuangLvXiang(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LvKuangLvXiang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != LvChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LvKuangLvXiangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LvKuangLvXiang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != LvChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LvKuangLvXiangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("The relay lost its actual private chooser or legal native payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Payments.Count == 0 && !LvKuangLvXiangCurrent(f))
@@ -206,5 +202,5 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveQigongActualDodgedSlashRequest, SkillProgramEffectOp.ResolveLiehouRangeHandRelay)]
     internal PromptChoice LvKuangLvXiangAi(PendingDecision p, ProgramSkillFrame f) => p.Choices[0];
-    SkillProgramStepOutcome global::CardGame.Core.ILvKuangLvXiangProgramHost.ExecuteLvKuangLvXiang(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteLvKuangLvXiang(f, op);
+    SkillProgramStepOutcome ILvKuangLvXiangProgramHost.ExecuteLvKuangLvXiang(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteLvKuangLvXiang(f, op);
 }

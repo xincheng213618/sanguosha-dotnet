@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFriendDuelResponsesRuntime
 {
-    internal IReadOnlyList<PromptChoice> FriendDuelResponseChoices(global::CardGame.Core.NativeOwners.DuelHandle duel, CharacterState responder)
+    internal IReadOnlyList<PromptChoice> FriendDuelResponseChoices(NativeOwners.DuelHandle duel, CharacterState responder)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(duel.ResolutionId);
         if (use?.FriendRecastDuel is not { } origin || !_coreFriendEventsOperations.IsFriendRecastDuelUse(use.Id) || use.FriendRecastDuelResponses >= origin.RecastCount || responder.Seat != duel.ResponderSeat || _coreCardUseModulesOperations.IsCardUseForbidden(responder.Seat, CardKind.Slash, CardActionType.Response))
@@ -43,7 +40,7 @@ internal sealed partial class CoreGameEngineFriendDuelResponsesRuntime
         var duel = _coreNativeCardContinuationCursorsOperations.ActiveDuel ?? throw new InvalidOperationException("Recast Duel payment lost its active Duel.");
         var responder = _coreMatchParticipantsPlayersAccess._players[duel.ResponderSeat];
         var canonical = FriendDuelResponseChoices(duel, responder).SingleOrDefault(c => c.Id == supplied.Id);
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondSlash } prompt || prompt.PlayerSeat != responder.Seat || canonical is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [supplied]) || supplied.Cards is not [var id])
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondSlash } prompt || prompt.PlayerSeat != responder.Seat || canonical is null || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [supplied]) || supplied.Cards is not [var id])
             throw new InvalidOperationException("Recast Duel accepts only its exact published current discard.");
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(duel.ResolutionId)!;
         var from = _cardZonesOperations._cardZones.GetLocation(id);

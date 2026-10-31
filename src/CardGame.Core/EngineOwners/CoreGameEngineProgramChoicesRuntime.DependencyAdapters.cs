@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ProgramPaidCardRuntime))]
-internal sealed class CoreProgramChoicesProgramPaidCardAdapter(global::System.Func<global::CardGame.Core.ProgramPaidCardRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreProgramChoicesProgramPaidCardOperations
+[Core.ProgramCapability(typeof(ProgramPaidCardRuntime))]
+internal sealed class CoreProgramChoicesProgramPaidCardAdapter(Func<ProgramPaidCardRuntime> targetFactory) : ICoreProgramChoicesProgramPaidCardOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.ProgramPaidCardRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramPaidCardRuntime Get() => this._targetFactory();
+    private readonly Func<ProgramPaidCardRuntime> _targetFactory = targetFactory;
+    public ProgramPaidCardRuntime Get() => this._targetFactory();
 }

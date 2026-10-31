@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineHellActivitiesRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CoreGameEngineHellActivitiesRuntime
             return null;
         var initial = window.Continuation == ProgramLifecycleContinuation.CompleteGameStarting && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.NotStarted;
         var appearance = window.Continuation == ProgramLifecycleContinuation.ResumeHellAppearance && window.Window == SkillProgramTriggerWindow.GameStarting ? window.HellAppearanceId : null;
-        if ((!initial && appearance is null) || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]))
+        if ((!initial && appearance is null) || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]))
             return null;
         return new(frame.SkillId, initial, appearance, window.Candidates.Select(candidate => candidate.OwnerSeat).ToArray());
     }

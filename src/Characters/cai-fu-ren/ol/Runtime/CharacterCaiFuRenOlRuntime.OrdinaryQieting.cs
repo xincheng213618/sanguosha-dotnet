@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,13 +10,13 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     internal bool CanMoveOrdinaryQietingEquipment(ProgramSkillFrame f, Card card)
     {
         var peer = f.OrdinaryQieting!.Qualification.TurnOwnerSeat;
-        return !card.IsGeneralWeapon && _coreEquipmentPlacementAndHpPairOperations.CanPlaceOwnedEquipment(peer, f.OwnerSeat, card, CardLocation.Equipment(peer)) && (global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) || _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).All(c => _coreEquipmentContentOperations.EquipmentRules.Get(c.Kind).Slot != _coreEquipmentContentOperations.EquipmentRules.Get(card.Kind).Slot));
+        return !card.IsGeneralWeapon && _coreEquipmentPlacementAndHpPairOperations.CanPlaceOwnedEquipment(peer, f.OwnerSeat, card, CardLocation.Equipment(peer)) && (CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) || _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).All(c => _coreEquipmentContentOperations.EquipmentRules.Get(c.Kind).Slot != _coreEquipmentContentOperations.EquipmentRules.Get(card.Kind).Slot));
     }
 
     internal SkillProgramStepOutcome BeginOrdinaryQieting(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.OrdinaryQieting is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsKnownCaiFuRenQietingBinding(f.SkillId, f.TriggerId) || f.WindowContext is not { OrdinaryQieting: { } q } c || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is not { } parent || !IsEligibleOrdinaryCaiFuRenQietingCandidate(parent, new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex), c))
+        if (f.OrdinaryQieting is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CharacterCaiFuRenBoundaryMobileRuntime.IsKnownCaiFuRenQietingBinding(f.SkillId, f.TriggerId) || f.WindowContext is not { OrdinaryQieting: { } q } c || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is not { } parent || !IsEligibleOrdinaryCaiFuRenQietingCandidate(parent, new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex), c))
             throw new InvalidOperationException("Ordinary Qieting requires its exact unused-on-others actual turn and original binding.");
         var r = new OrdinaryQietingReceipt(OrdinaryCaiFuRenSource(f), f.GameplayHash, q, parent.Id, c.OccurrenceIndex, OrdinaryQietingStage.Choice);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { OrdinaryQieting = r });
@@ -30,13 +27,13 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
 
     internal IReadOnlyList<PromptChoice> OrdinaryQietingChoices(ProgramSkillFrame f)
     {
-        if (global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) && f.OrdinaryQieting?.Stage == OrdinaryQietingStage.Viewing)
+        if (CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) && f.OrdinaryQieting?.Stage == OrdinaryQietingStage.Viewing)
             return _characterCaiFuRenBoundaryMobileOperations.BoundaryMobileQietingHandChoices(f);
         if (f.OrdinaryQieting is not { Stage: OrdinaryQietingStage.Choice, Paid: false } r || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return[];
         PromptChoice Choice(string option, string label, IReadOnlyList<int> cards) => new(new($"ordinary-qieting.{(f.Id)}.{(option)}"), label, cards, [f.OwnerSeat], new Dictionary<string, string> { ["program-action"] = "ordinary-qieting", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["option"] = option });
-        var choices = _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[r.Qualification.TurnOwnerSeat]).Where(c => CanMoveOrdinaryQietingEquipment(f, c)).OrderBy(c => c.Id).Select(c => Choice($"equipment:{(c.Id)}", global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) ? $"将【{(c.DisplayName)}】置入你的装备区" : $"将【{(c.DisplayName)}】置入你的空装备栏", [c.Id])).ToList();
-        if (global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.Qualification.TurnOwnerSeat]).Count > 0)
+        var choices = _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[r.Qualification.TurnOwnerSeat]).Where(c => CanMoveOrdinaryQietingEquipment(f, c)).OrderBy(c => c.Id).Select(c => Choice($"equipment:{(c.Id)}", CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) ? $"将【{(c.DisplayName)}】置入你的装备区" : $"将【{(c.DisplayName)}】置入你的空装备栏", [c.Id])).ToList();
+        if (CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.Qualification.TurnOwnerSeat]).Count > 0)
             choices.Add(Choice("hand", "观看其两张手牌，获得其中一张", []));
         choices.Add(Choice("draw", "摸一张牌", []));
         return Array.AsReadOnly(choices.ToArray());
@@ -53,7 +50,7 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
 
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { Step = ResolutionFrameStep.AwaitingResponse });
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) ? "窃听：观看两张手牌取一、置入装备，或摸一张牌。" : "窃听：置入其一张空槽装备，或摸一张牌。", choices.SelectMany(c => c.Cards).Distinct().ToArray(), [f.OwnerSeat], SourceSeat: f.OrdinaryQieting!.Qualification.TurnOwnerSeat)
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) ? "窃听：观看两张手牌取一、置入装备，或摸一张牌。" : "窃听：置入其一张空槽装备，或摸一张牌。", choices.SelectMany(c => c.Cards).Distinct().ToArray(), [f.OwnerSeat], SourceSeat: f.OrdinaryQieting!.Qualification.TurnOwnerSeat)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             IsPrivate = true,
@@ -68,13 +65,13 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     [ProgramAnswer("ordinary-qieting")]
     internal void AnswerOrdinaryQieting(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame mobile && global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(mobile))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame mobile && CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(mobile))
         {
             _characterCaiFuRenBoundaryMobileOperations.AnswerBoundaryMobileQieting(mobile, selected);
             return;
         }
 
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OrdinaryQieting: { Stage: OrdinaryQietingStage.Choice, Paid: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !OrdinaryQietingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OrdinaryQieting: { Stage: OrdinaryQietingStage.Choice, Paid: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !OrdinaryQietingChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Ordinary Qieting requires its current original single option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var option = selected.Parameters["option"];
@@ -184,5 +181,5 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting)]
-    internal PromptChoice ChooseOrdinaryQietingAi(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderByDescending(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 5d).ThenBy(c => c.Cards.FirstOrDefault()).First();
+    internal PromptChoice ChooseOrdinaryQietingAi(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderByDescending(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 5d).ThenBy(c => c.Cards.FirstOrDefault()).First();
 }

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,12 +8,12 @@ internal sealed partial class CharacterWangKuangOlRuntime
     internal const string RenxiaDrawReason = "skill-program.wang-kuang.renxia.draw", RenxiaDiscardReason = "skill-program.wang-kuang.renxia.discard";
     internal bool HasWangKuangCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveRenxiaRepeatedBranch);
 
-    internal static CardConversionSource WangKuangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_kuang_ol_WangKuang.WangKuangSource(f);
+    internal static CardConversionSource WangKuangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_wang_kuang_ol_WangKuang.WangKuangSource(f);
     internal WangKuangRenxiaPhaseKey WangKuangCurrentPhase(int owner) => new(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, owner, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
-    internal static bool IsWangKuangDamageCardKind(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_kuang_ol_WangKuang.IsWangKuangDamageCardKind(kind);
+    internal static bool IsWangKuangDamageCardKind(CardKind kind) => RuntimeSkills.RuntimeRules_wang_kuang_ol_WangKuang.IsWangKuangDamageCardKind(kind);
     internal bool WangKuangHandHasDamage(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Any(c => IsWangKuangDamageCardKind(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[owner], c)));
     internal IReadOnlyList<WangKuangRenxiaCard> WangKuangDiscardable(int owner, string instance) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(owner)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, "ol:renxia", instance, c)).Select(c => new WangKuangRenxiaCard(c.Id, _cardZonesOperations._cardZones.GetLocation(c.Id))).ToArray());
-    SkillProgramStepOutcome global::CardGame.Core.IWangKuangProgramHost.Resolve(ProgramSkillFrame f, bool ending) => BeginWangKuang(f, ending);
+    SkillProgramStepOutcome IWangKuangProgramHost.Resolve(ProgramSkillFrame f, bool ending) => BeginWangKuang(f, ending);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.Collection, 26910)]
     internal bool CollectWangKuang(SkillProgramTrigger t) => t.Effects is not [{ Op: SkillProgramEffectOp.ResolveRenxiaOppositeAtPlayEnding }];
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26910)]
@@ -29,7 +26,7 @@ internal sealed partial class CharacterWangKuangOlRuntime
     {
         if (!HasWangKuangCapability || c.SkillId != "ol:renxia" || c.BindingId != "issued-opposite-at-play-end" || context.Window != SkillProgramTriggerWindow.PlayEnding || context.OwnerSeat != c.OwnerSeat || c.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { WangKuangRenxiaEndingPhase: { } phase } parent || phase.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || phase.OwnerSeat != c.OwnerSeat || parent.OwnerSeat != c.OwnerSeat || parent.Window != context.Window || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != c)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<WangKuangRenxiaObligationIssuedEvent>().Any(e => e.Phase == phase && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.Source.SkillInstanceId == c.SkillInstanceId && e.GameplayHash == c.GameplayHash && ValidWangKuangObligation(e) && (!WangKuangObligationConsumed(e.ActiveFrameId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.WangKuangRenxia is { Ending: true } r && r.ObligationId == e.ActiveFrameId && r.Phase == phase && f.WindowContext == context && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c))));
+        return _coreProgramEventHistoryOperations.ProgramEventHistory<WangKuangRenxiaObligationIssuedEvent>().Any(e => e.Phase == phase && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.Source.SkillInstanceId == c.SkillInstanceId && e.GameplayHash == c.GameplayHash && ValidWangKuangObligation(e) && (!WangKuangObligationConsumed(e.ActiveFrameId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.WangKuangRenxia is { Ending: true } r && r.ObligationId == e.ActiveFrameId && r.Phase == phase && f.WindowContext == context && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c))));
     }
 
     internal SkillProgramStepOutcome BeginWangKuang(ProgramSkillFrame input, bool ending)
@@ -40,7 +37,7 @@ internal sealed partial class CharacterWangKuangOlRuntime
         WangKuangRenxiaObligationIssuedEvent? promise = null;
         if (ending)
         {
-            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext!.OccurrenceIndex);
+            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext!.OccurrenceIndex);
             if (!IsIssuedWangKuangRenxiaCandidate(c, f.WindowContext))
                 throw new InvalidOperationException("Renxia lost the exact issued PlayEnding candidate.");
             var phase = _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(w => w.Id == f.WindowContext.ParentFrameId).WangKuangRenxiaEndingPhase!;
@@ -104,7 +101,7 @@ internal sealed partial class CharacterWangKuangOlRuntime
     [ProgramAnswer("wang-kuang-renxia")]
     internal void AnswerWangKuang(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WangKuangRenxia: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WangKuangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WangKuangRenxia: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WangKuangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Renxia lost its original private chooser.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == WangKuangRenxiaStage.BranchChoice)
@@ -251,9 +248,9 @@ internal sealed partial class CharacterWangKuangOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26910)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26910)]
-    internal bool ContinuePaidWangKuang(ProgramSkillFrame f) => f.WangKuangRenxia is { } r ? (r.Ending || r.Cursor > 0) && ValidWangKuang(f) : f.InstructionIndex is 0 or 1 && f.TriggerId == "issued-opposite-at-play-end" && f.WindowContext is { } context && IsIssuedWangKuangRenxiaCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
+    internal bool ContinuePaidWangKuang(ProgramSkillFrame f) => f.WangKuangRenxia is { } r ? (r.Ending || r.Cursor > 0) && ValidWangKuang(f) : f.InstructionIndex is 0 or 1 && f.TriggerId == "issued-opposite-at-play-end" && f.WindowContext is { } context && IsIssuedWangKuangRenxiaCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveRenxiaRepeatedBranch, SkillProgramEffectOp.ResolveRenxiaOppositeAtPlayEnding)]
-    internal PromptChoice ChooseWangKuangAi(PendingDecision p, ProgramSkillFrame f) => f.WangKuangRenxia?.Stage == WangKuangRenxiaStage.BranchChoice ? p.Choices.First(c => c.Parameters["branch"] == "draw") : p.Choices.OrderBy(c => IsWangKuangDamageCardKind(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()))) ? 0 : 1).ThenBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
+    internal PromptChoice ChooseWangKuangAi(PendingDecision p, ProgramSkillFrame f) => f.WangKuangRenxia?.Stage == WangKuangRenxiaStage.BranchChoice ? p.Choices.First(c => c.Parameters["branch"] == "draw") : p.Choices.OrderBy(c => IsWangKuangDamageCardKind(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()))) ? 0 : 1).ThenBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
     [ProgramIssuedTrigger(660, ProgramIssuedTriggerMatch.Decision)]
     internal bool? DecideIssuedTrigger660(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(candidate.SkillId)?.Program is { } renxiaProgram && ProgramInstructionResolver.Default.FindTrigger(renxiaProgram, candidate.BindingId)?.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ResolveRenxiaOppositeAtPlayEnding) == true ? IsIssuedWangKuangRenxiaCandidate(candidate, context) : null;
 }

@@ -1,9 +1,7 @@
-using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_guan_yu_wumiao_WumiaoFlood
 {
     internal static bool WumiaoFloodDiscardEntryMatches(WumiaoFloodDiscardMovement entry, CardMovementRecord movement) =>

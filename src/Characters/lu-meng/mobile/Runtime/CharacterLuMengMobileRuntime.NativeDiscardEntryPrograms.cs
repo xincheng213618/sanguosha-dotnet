@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuMengMobileRuntime
 {
     internal bool TryBeginPreEntryDiscardPolicy(CharacterState current)
     {
-        if (_coreCurrentTurnStatisticsUsedOrPlayedSlashDuringPlayPhaseAccess._usedOrPlayedSlashDuringPlayPhase || _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDiscardPhase) || !current.IsAlive)
+        if (_coreCurrentTurnStatisticsUsedOrPlayedSlashDuringPlayPhaseAccess._usedOrPlayedSlashDuringPlayPhase || _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDiscardPhase) || !current.IsAlive)
             return false;
         var policies = _coreProgramCardPoliciesOperations.CardPolicies(current, SkillProgramCardPolicyKind.OfferSkipDiscard).Where(item => item.Policy.BeforePhaseEntry == true).ToArray();
         if (policies.Length == 0)

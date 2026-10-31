@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuZhiBoundaryMobileRuntime
 {
     internal const string BoundaryAnguoAction = "boundary-zhu-zhi-anguo";
-    internal static CardConversionSource BoundaryAnguoSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    internal static CardConversionSource BoundaryAnguoSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     internal bool HasBoundaryAnguoMark(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreMatchParticipantsPlayersAccess._players[seat].Markers.GetValueOrDefault(PlayerMarkerKind.MobileBoundaryAnguo) > 0;
     internal bool HadBoundaryAnguoMark(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerMarkerChangedEvent>().Any(e => e.Marker == PlayerMarkerKind.MobileBoundaryAnguo && e.PlayerSeat == seat && e.Delta > 0);
     internal int[] BoundaryAnguoNewRecipients(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && !HadBoundaryAnguoMark(p.Seat)).Select(p => p.Seat).ToArray();
@@ -29,7 +26,7 @@ internal sealed partial class CharacterZhuZhiBoundaryMobileRuntime
         };
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryZhuZhiHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => operation == SkillProgramEffectOp.PayBoundaryZhuZhiAnguo ? BeginBoundaryAnguoPayment(frame) : BeginBoundaryAnguo(frame, operation == SkillProgramEffectOp.BeginBoundaryZhuZhiRescue);
+    SkillProgramStepOutcome IBoundaryZhuZhiHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => operation == SkillProgramEffectOp.PayBoundaryZhuZhiAnguo ? BeginBoundaryAnguoPayment(frame) : BeginBoundaryAnguo(frame, operation == SkillProgramEffectOp.BeginBoundaryZhuZhiRescue);
     internal SkillProgramStepOutcome BeginBoundaryAnguo(ProgramSkillFrame supplied, bool rescue)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -117,7 +114,7 @@ internal sealed partial class CharacterZhuZhiBoundaryMobileRuntime
     [ProgramAnswer(BoundaryAnguoAction)]
     internal void AnswerBoundaryAnguo(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryZhuZhi: { } receipt } frame || !ValidBoundaryAnguo(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], BoundaryAnguoChoices(frame).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryZhuZhi: { } receipt } frame || !ValidBoundaryAnguo(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], BoundaryAnguoChoices(frame).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Anguo requires its actual fresh recipient or currently payable original rescue choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAlcoholIdentityPoliciesRuntime
@@ -24,16 +20,16 @@ internal sealed partial class CoreGameEngineAlcoholIdentityPoliciesRuntime
     internal bool IsEffectiveHandKindExempt(CharacterState owner, Card card, IReadOnlySet<CardKind> kinds) => card.Kind == CardKind.MantianGuohai || _coreWushuangTacticRulesOperations.IsWushuangHandLimitExempt(owner, card) || kinds.Contains(card.Kind) || card.Kind == CardKind.Alcohol && kinds.Contains(CardKind.Slash) && HasAlcoholKingIdentityPolicy(owner);
     internal int? CaptureAlcoholActionRank(int providerSeat, CardKind kind, IReadOnlyList<int> ids)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || ids.Count != 1)
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || ids.Count != 1)
             return null;
         var card = _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(ids[0])).Single(c => c.Id == ids[0]);
         return CaptureAlcoholIdentityRank(_coreMatchParticipantsPlayersAccess._players[providerSeat], card);
     }
 
-    internal int? CaptureAlcoholResponseRank(CharacterState provider, CardKind kind, IReadOnlyList<CardActionCost> costs) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && costs.Count == 1 && costs[0].CardKind == CardKind.Alcohol && costs[0].From.OwnerSeat == provider.Seat && costs[0].From.Zone is CardZoneKind.Hand or CardZoneKind.WoodenOxGrain && HasAlcoholKingIdentityPolicy(provider) ? 13 : null;
+    internal int? CaptureAlcoholResponseRank(CharacterState provider, CardKind kind, IReadOnlyList<CardActionCost> costs) => CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && costs.Count == 1 && costs[0].CardKind == CardKind.Alcohol && costs[0].From.OwnerSeat == provider.Seat && costs[0].From.Zone is CardZoneKind.Hand or CardZoneKind.WoodenOxGrain && HasAlcoholKingIdentityPolicy(provider) ? 13 : null;
     internal bool IsForeignTurnAlcoholUseForbidden(int actorSeat, CardKind kind, CardActionType type) => kind == CardKind.Alcohol && type == CardActionType.Use && _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber > 0 && actorSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat].IsAlive && _coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat], SkillProgramCardPolicyKind.ForeignTurnAlcoholUseProhibition, CardKind.Alcohol);
     internal bool IsAlcoholIdentityOwnedLocation(CharacterState owner, Card card) => card.Kind == CardKind.Alcohol && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.WoodenOxGrain(owner.Seat) && HasAlcoholKingIdentityPolicy(owner);
-    internal static bool HasDyingAlcoholProducer(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_AlcoholIdentityPolicies.HasDyingAlcoholProducer(trigger);
+    internal static bool HasDyingAlcoholProducer(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_AlcoholIdentityPolicies.HasDyingAlcoholProducer(trigger);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 840)]
     internal bool CanRunProgramDyingAlcoholPolicy(SkillProgramTrigger trigger, ProgramSkillWindowContext context, int responder)
     {

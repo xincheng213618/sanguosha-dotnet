@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,7 +10,7 @@ internal sealed partial class CharacterHeJinOlRuntime
         death = null !;
         window = null !;
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (i < 2 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramDeathTriggerWindowFrame w || _resolutionStackOperations._resolutionStack[i - 2] is not DeathFrame d || w.DeathFrameId != d.Id || w.OwnerSeat != f.OwnerSeat || d.VictimSeat != f.OwnerSeat || w.KillerSeat != d.KillerSeat || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) || f.WindowContext is not { Window: SkillProgramTriggerWindow.OwnerDied } c || c.ParentFrameId != w.Id || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != d.KillerSeat || c.TargetSeat != d.VictimSeat || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
+        if (i < 2 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramDeathTriggerWindowFrame w || _resolutionStackOperations._resolutionStack[i - 2] is not DeathFrame d || w.DeathFrameId != d.Id || w.OwnerSeat != f.OwnerSeat || d.VictimSeat != f.OwnerSeat || w.KillerSeat != d.KillerSeat || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) || f.WindowContext is not { Window: SkillProgramTriggerWindow.OwnerDied } c || c.ParentFrameId != w.Id || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != d.KillerSeat || c.TargetSeat != d.VictimSeat || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
             return false;
         death = d;
         window = w;
@@ -74,7 +71,7 @@ internal sealed partial class CharacterHeJinOlRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Yanhuo lost its owner.");
         var r = f.HeJinYanhuo!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !HeJinYanhuoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !HeJinYanhuoChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Yanhuo needs its deceased owner's exact opaque card choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["branch"] == "card")
@@ -119,6 +116,6 @@ internal sealed partial class CharacterHeJinOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    internal static string HeJinDeathReturnHash(HeJinYanhuoReceipt r) => global::CardGame.Core.RuntimeSkills.RuntimeRules_he_jin_ol_HeJinYanhuo.HeJinDeathReturnHash(r);
+    internal static string HeJinDeathReturnHash(HeJinYanhuoReceipt r) => RuntimeSkills.RuntimeRules_he_jin_ol_HeJinYanhuo.HeJinDeathReturnHash(r);
     internal bool IsOriginalDyingSuspendedByHeJinYanhuo(DyingFrame dying) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(dying.VictimSeat) && !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.HeJinYanhuo?.OriginalDying?.FrameId == dying.Id && ValidHeJinYanhuo(f));
 }

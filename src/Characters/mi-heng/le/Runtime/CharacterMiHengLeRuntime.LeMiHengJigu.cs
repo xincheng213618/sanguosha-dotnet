@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMiHengLeRuntime
@@ -10,8 +6,8 @@ internal sealed partial class CharacterMiHengLeRuntime
     internal const string JiguDrawReason = "skill-program.mi-heng.jigu.draw";
     internal bool HasLeMiHengJiguCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeJiguInitialEntities) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw);
 
-    internal static CardConversionSource JiguSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.JiguSource(f);
-    internal static bool IsJiguDamageTrigger(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.IsJiguDamageTrigger(t);
+    internal static CardConversionSource JiguSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.JiguSource(f);
+    internal static bool IsJiguDamageTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.IsJiguDamageTrigger(t);
     // Registration only; the query still belongs to legacy GameEngine.LeMiHengJigu.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 100)]
     internal void ProjectJiguCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
@@ -61,8 +57,8 @@ internal sealed partial class CharacterMiHengLeRuntime
         return _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(w)is { } attack && d.ParentFrameId == attack.ResolutionId && (attack.IsSourceLess ? context.SourceSeat is null : context.SourceSeat == attack.SourceSeat);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeMiHengJiguHost.Initialize(ProgramSkillFrame frame) => InitializeJigu(frame);
-    SkillProgramStepOutcome global::CardGame.Core.ILeMiHengJiguHost.Draw(ProgramSkillFrame frame) => BeginJiguDraw(frame);
+    SkillProgramStepOutcome ILeMiHengJiguHost.Initialize(ProgramSkillFrame frame) => InitializeJigu(frame);
+    SkillProgramStepOutcome ILeMiHengJiguHost.Draw(ProgramSkillFrame frame) => BeginJiguDraw(frame);
     internal SkillProgramStepOutcome InitializeJigu(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -98,7 +94,7 @@ internal sealed partial class CharacterMiHengLeRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal static JiguActivationPaidEvent JiguPayment(long id, JiguReceipt r) => global::CardGame.Core.RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.JiguPayment(id, r);
+    internal static JiguActivationPaidEvent JiguPayment(long id, JiguReceipt r) => RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.JiguPayment(id, r);
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw)]
     internal void ReturnJiguDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {

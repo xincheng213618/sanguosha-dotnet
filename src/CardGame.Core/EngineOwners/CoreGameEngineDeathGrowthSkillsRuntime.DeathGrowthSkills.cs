@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -30,7 +27,7 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillsRuntime
         var dying = death.ReturnKind == DeathReturnKind.Dying ? _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Single(d => d.Id == death.ParentFrameId) : null;
         var damage = dying?.Continuation == DyingContinuationKind.Damage ? _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().Single(d => d.Id == dying.ParentFrameId) : null;
         var before = _coreCardMovementJournalMovementSequenceAccess._movementSequence;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DeathGrowthSkill = new(f.InstructionIndex, window.Id, window.DeathFrameId, window.VictimSeat, DeathGrowthSource(f), f.GameplayHash, Array.AsReadOnly(effect.SkillIds.ToArray()), effect.Amount, before, before, 0, OriginalDeathHash: global::CardGame.Core.EngineOwners.CoreGameEngineDeathGrowthSkillObserversRuntime.DeathGrowthCursorHash(death), OriginalDyingFrameId: dying?.Id, OriginalDyingHash: dying is null ? null : global::CardGame.Core.EngineOwners.CoreGameEngineDeathGrowthSkillObserversRuntime.DeathGrowthCursorHash(dying), OriginalDamageHash: damage is null ? null : global::CardGame.Core.EngineOwners.CoreGameEngineDeathGrowthSkillObserversRuntime.DeathGrowthCursorHash(damage)), PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DeathGrowthSkill = new(f.InstructionIndex, window.Id, window.DeathFrameId, window.VictimSeat, DeathGrowthSource(f), f.GameplayHash, Array.AsReadOnly(effect.SkillIds.ToArray()), effect.Amount, before, before, 0, OriginalDeathHash: CoreGameEngineDeathGrowthSkillObserversRuntime.DeathGrowthCursorHash(death), OriginalDyingFrameId: dying?.Id, OriginalDyingHash: dying is null ? null : CoreGameEngineDeathGrowthSkillObserversRuntime.DeathGrowthCursorHash(dying), OriginalDamageHash: damage is null ? null : CoreGameEngineDeathGrowthSkillObserversRuntime.DeathGrowthCursorHash(damage)), PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
         var drawn = _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], effect.Amount, true, new(DeathGrowthDrawReason));
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DeathGrowthSkill = f.DeathGrowthSkill!with { MovementAfter = _coreCardMovementJournalMovementSequenceAccess._movementSequence, DrawCount = drawn.Count } });
@@ -76,7 +73,7 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillsRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A death-growth choice lost its owning frame.");
         _coreDeathGrowthSkillObserversOperations.RequireDeathGrowthSkill(f);
         var r = f.DeathGrowthSkill!;
-        if (r.Stage != DeathGrowthSkillStage.ChooseSkill || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DeathGrowthChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (r.Stage != DeathGrowthSkillStage.ChooseSkill || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DeathGrowthChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The selected death-growth skill is stale, already owned or belongs to another chooser.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var id = selected.Parameters["skill-id"];
@@ -116,5 +113,5 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 30)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30)]
     internal bool CanContinueDeathGrowthSkill(ProgramSkillFrame f) => f.DeathGrowthSkill is not null && _coreDeathGrowthSkillObserversOperations.ValidDeathGrowthSkill(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDeathGrowthSkillHost.DrawAfterOtherDeathThenChooseMissingSkill(ProgramSkillFrame f, SkillProgramEffect e) => BeginDeathGrowthSkill(f, e);
+    SkillProgramStepOutcome IDeathGrowthSkillHost.DrawAfterOtherDeathThenChooseMissingSkill(ProgramSkillFrame f, SkillProgramEffect e) => BeginDeathGrowthSkill(f, e);
 }

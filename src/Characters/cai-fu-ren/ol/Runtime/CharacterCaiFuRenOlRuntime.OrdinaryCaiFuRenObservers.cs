@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiFuRenOlRuntime
@@ -24,7 +20,7 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     {
         if (f.OrdinaryQieting is not { Paid: true } r || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || m.Sequence <= r.Before || m.Sequence > r.After)
             return false;
-        if (global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) && r.Stage == OrdinaryQietingStage.MovementChildren)
+        if (CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f) && r.Stage == OrdinaryQietingStage.MovementChildren)
             return _characterCaiFuRenBoundaryMobileOperations.IsBoundaryMobileQietingPaidMovement(f, m);
         if (r.Stage == OrdinaryQietingStage.MovementChildren)
             return m.CardId == r.CardId && m.CardKind == r.PrintedKind && m.From == CardLocation.Equipment(r.Qualification.TurnOwnerSeat) && m.To == CardLocation.Equipment(f.OwnerSeat) && m.Reason.Value == OrdinaryQietingMoveReason || r.PrintedKind == CardKind.WoodenOx && r.GrainIds.Contains(m.CardId) && m.From == CardLocation.WoodenOxGrain(r.Qualification.TurnOwnerSeat) && m.To == CardLocation.WoodenOxGrain(f.OwnerSeat) && m.Reason == CardMoveReasons.WoodenOxTransfer;
@@ -36,21 +32,21 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
         if (f.OrdinaryQieting is not { Paid: true } r)
             return false;
         if (r.Stage == OrdinaryQietingStage.Draw && f.NativeDraw is not null)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
+            return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
             return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
         if (child is RecoveryReplacementFrame recovery)
             return IsOrdinaryCaiFuRenRecoveryParent(f, recovery);
-        if (child is HpChangedTriggerWindowFrame mobileHp && global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f))
+        if (child is HpChangedTriggerWindowFrame mobileHp && CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f))
             return _characterCaiFuRenBoundaryMobileOperations.IsBoundaryMobileQietingHpChild(f, mobileHp);
         if (child is HpChangedTriggerWindowFrame hp)
             return r.Stage == OrdinaryQietingStage.MovementChildren && r.PrintedKind == CardKind.SilverLion && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.ParentFrameId == f.Id && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == r.Qualification.TurnOwnerSeat && hp.Change.TargetSeat == r.Qualification.TurnOwnerSeat && hp.Change.Amount == 1;
-        return child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsOrdinaryQietingPaidMovement(f, m));
+        return child is CardsMovedTriggerWindowFrame moved && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsOrdinaryQietingPaidMovement(f, m));
     }
 
-    internal bool OrdinaryQietingObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
+    internal bool OrdinaryQietingObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? OrdinaryQietingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.OrdinaryQietingFirstChild(f, child), (index) => this.OrdinaryQietingObserverSuffix(index));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 300)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 290)]
@@ -58,7 +54,7 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     {
         if (f.OrdinaryQieting is not { Paid: true } r)
             return false;
-        if (recovery.ParentFrameId == f.Id && global::CardGame.Core.EngineOwners.CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f))
+        if (recovery.ParentFrameId == f.Id && CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f))
             return _characterCaiFuRenBoundaryMobileOperations.IsBoundaryMobileQietingRecovery(f, recovery);
         if (recovery.ParentFrameId == f.Id)
             return r.Stage == OrdinaryQietingStage.MovementChildren && r.PrintedKind == CardKind.SilverLion && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.SourceSeat == r.Qualification.TurnOwnerSeat && recovery.Attempt.TargetSeat == r.Qualification.TurnOwnerSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.CardId == r.CardId && recovery.Attempt.Completion.MoveReason?.Value == OrdinaryQietingMoveReason;

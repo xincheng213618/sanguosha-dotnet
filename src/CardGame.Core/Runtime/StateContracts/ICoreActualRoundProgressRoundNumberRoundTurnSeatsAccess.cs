@@ -1,8 +1,8 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreActualRoundProgressRoundNumberRoundTurnSeatsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreActualRoundProgressRoundNumberRoundTurnSeatsAccess : IProgramRuntimeOperations
 {
     ref int _roundNumber { get; }
 
-    ref readonly global::System.Collections.Generic.HashSet<int> _roundTurnSeats { get; }
+    ref readonly HashSet<int> _roundTurnSeats { get; }
 }

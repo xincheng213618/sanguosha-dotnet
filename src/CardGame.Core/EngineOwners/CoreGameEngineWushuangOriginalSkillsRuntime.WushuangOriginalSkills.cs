@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangOriginalSkillsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IWushuangOriginalSkillHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginWushuangOriginalSkill(frame, operation);
+    SkillProgramStepOutcome IWushuangOriginalSkillHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginWushuangOriginalSkill(frame, operation);
     internal bool WushuangOriginalEnabled(CharacterState owner, string id) => owner.IsAlive && _contentRegistryOperations._contentRegistry.Skills.ContainsKey(id) && _coreSkillProgramsOperations.EnabledSkillPrograms(owner).Any(p => p.Id == id);
     internal SkillProgramStepOutcome BeginWushuangOriginalSkill(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {

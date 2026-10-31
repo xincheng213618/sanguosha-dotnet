@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiWenJiLeRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
     internal ShuangjiaMarkRuntime ShuangjiaMarks => (ShuangjiaMarkRuntime)_closedShuangjiaMarkRuntimeSource.Get();
     internal bool HasLeCaiWenJiShuangjiaCapability => ShuangjiaMarks.HasCapability;
 
-    internal static CardConversionSource ShuangjiaSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    internal static CardConversionSource ShuangjiaSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     internal bool HasShuangjiaEntityMark(int cardId) => ShuangjiaMarks.HasEntityMark(cardId);
     internal bool IsShuangjiaHandLimitExempt(CharacterState owner, int cardId) => ShuangjiaMarks.IsHandLimitExempt(owner.Seat, cardId);
     internal ProgramLifecycleTriggerWindowFrame CaptureShuangjiaInitialEntities(ProgramLifecycleTriggerWindowFrame window)
@@ -50,7 +46,7 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
         return frame.InstructionIndex == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<ShuangjiaInitializedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var initialized] && initialized.Source == ShuangjiaSource(frame) && initialized.GameplayHash == frame.GameplayHash;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeCaiWenJiShuangjiaHost.InitializeShuangjia(ProgramSkillFrame frame) => InitializeShuangjia(frame);
+    SkillProgramStepOutcome ILeCaiWenJiShuangjiaHost.InitializeShuangjia(ProgramSkillFrame frame) => InitializeShuangjia(frame);
     internal SkillProgramStepOutcome InitializeShuangjia(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

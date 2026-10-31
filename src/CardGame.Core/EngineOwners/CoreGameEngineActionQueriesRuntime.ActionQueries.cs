@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineActionQueriesRuntime
 {
-    internal global::CardGame.Core.NativeOwners.ActionQueryScope BeginActionQuery()
+    internal NativeOwners.ActionQueryScope BeginActionQuery()
     {
         if (_coreGameEngineActionQueriesActionQueryAccess._actionQuery is not null)
             return default;
-        _coreGameEngineActionQueriesActionQueryAccess._actionQuery = new global::CardGame.Core.NativeOwners.ActionQuery(_coreMatchParticipantsPlayersAccess._players.Count);
+        _coreGameEngineActionQueriesActionQueryAccess._actionQuery = new NativeOwners.ActionQuery(_coreMatchParticipantsPlayersAccess._players.Count);
         return _kernelCoreGameEngineActionQueriesOperations.CreateActionQueryScope();
     }
 
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramCardIdentityMatch> GetProgramCardIdentityMatches(CharacterState owner, Card card)
+    internal IReadOnlyList<GameEngine.ProgramCardIdentityMatch> GetProgramCardIdentityMatches(CharacterState owner, Card card)
     {
         if (_coreGameEngineActionQueriesActionQueryAccess._actionQuery is not { } query)
             return _coreCardConversionsOperations.FindProgramCardIdentityMatches(owner, card);
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEngineActionQueriesRuntime
     internal IReadOnlyList<LegalAction> BuildMobileWumouPrintedTargetActions(CharacterState actor, Card card)
     {
         var previous = _coreGameEngineActionQueriesActionQueryAccess._actionQuery;
-        _coreGameEngineActionQueriesActionQueryAccess._actionQuery = new global::CardGame.Core.NativeOwners.ActionQuery(_coreMatchParticipantsPlayersAccess._players.Count, (actor.Seat, card));
+        _coreGameEngineActionQueriesActionQueryAccess._actionQuery = new NativeOwners.ActionQuery(_coreMatchParticipantsPlayersAccess._players.Count, (actor.Seat, card));
         using var scope = _kernelCoreGameEngineActionQueriesOperations.CreateActionQueryScope(previous);
         return Array.AsReadOnly(_coreNativeLegalActionsOperations.BuildLegalActionsCore(actor, includeProgramActions: false, selectedPhysicalCardId: card.Id, nativeOriginalCard: card).Where(action => action.CardId == card.Id && action.ConversionSource is null && (action.AdditionalConversionSources is null || action.AdditionalConversionSources.Count == 0) && action.Kind is not (LegalActionKind.Recast or LegalActionKind.EndPlay or LegalActionKind.UseEquipmentEffect or LegalActionKind.UseProgramSkill or LegalActionKind.RevealGeneral) && action.MaxCardCount <= 1 && (action.PlayedCardKind ?? card.Kind) == card.Kind).ToArray());
     }

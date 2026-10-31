@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime))]
 internal sealed partial class CoreGameEngineRoundGainedEquipmentObserversEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime> _resolve;
-    private CoreGameEngineRoundGainedEquipmentObserversEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime> _resolve;
+    private CoreGameEngineRoundGainedEquipmentObserversEntries(Func<EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineRoundGainedEquipmentObserversEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineRoundGainedEquipmentObserversEntries Create(Func<EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime> resolve) => new(resolve);
 }

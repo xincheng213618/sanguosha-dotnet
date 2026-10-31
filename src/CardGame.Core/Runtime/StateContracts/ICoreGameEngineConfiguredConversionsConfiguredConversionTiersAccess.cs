@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineConfiguredConversionsConfiguredConversionTiersAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineConfiguredConversionsConfiguredConversionTiersAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.Dictionary<(int Seat, string State), int> _configuredConversionTiers { get; }
+    ref readonly Dictionary<(int Seat, string State), int> _configuredConversionTiers { get; }
 }

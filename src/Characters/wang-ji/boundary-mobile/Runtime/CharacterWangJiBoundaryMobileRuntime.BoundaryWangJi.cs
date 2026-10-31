@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,9 +7,9 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
 {
     internal const string BoundaryWjQizhi = "boundary:qizhi-mobile", BoundaryWjJinqu = "boundary:jinqu-mobile", BoundaryWjAction = "boundary-wang-ji";
     internal const string BoundaryWjDiscardReason = "skill-program.boundary:qizhi-mobile.discard";
-    internal static CardConversionSource BoundaryWjSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    internal static CardConversionSource BoundaryWjSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     internal int BoundaryWjCharge(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(PlayerMarkerKind.BoundaryWangJiCharge);
-    internal bool BoundaryWjCard(CardActionContext action) => _coreFriendTrioOperations.IsFriendActualCardUse(action) && (global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) == SkillProgramCardCategory.Basic || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind));
+    internal bool BoundaryWjCard(CardActionContext action) => _coreFriendTrioOperations.IsFriendActualCardUse(action) && (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) == SkillProgramCardCategory.Basic || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind));
     internal BoundaryWangJiTurnEvent? BoundaryWjTurn() => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangJiTurnEvent>().LastOrDefault(entry => entry.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && entry.OwnerSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
     internal int BoundaryWjPeak(int owner)
     {
@@ -29,8 +26,8 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
 
     internal IReadOnlyList<int> BoundaryWjRecipients(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangJiRecipientEvent>().Where(entry => entry.Source.OwnerSeat == owner && entry.Source.SkillId == BoundaryWjQizhi && entry.Phase == phase).Select(entry => entry.TargetSeat).Distinct().OrderBy(seat => _coreTableOrderOperations.RelativeTableOrder(owner, seat)).ToArray();
     internal bool CanSpendBoundaryWj(int owner, int target) => BoundaryWjCharge(owner) > 0 && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == owner && !_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangJiSpentEvent>().Any(entry => entry.Source.OwnerSeat == owner && entry.Phase == phase && entry.TargetSeat == target);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryWangJiHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginBoundaryWj(frame, operation);
-    bool global::CardGame.Core.IBoundaryWangJiSelection.CanSpend(int owner, int target) => CanSpendBoundaryWj(owner, target);
+    SkillProgramStepOutcome IBoundaryWangJiHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginBoundaryWj(frame, operation);
+    bool IBoundaryWangJiSelection.CanSpend(int owner, int target) => CanSpendBoundaryWj(owner, target);
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedInstantTrickRequirement, 54400)]
     [ProgramTargetWindow(ProgramTargetWindowStage.ImplicitSelfDrawTwo, 54400)]
     [ProgramTargetWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, 54400)]
@@ -38,7 +35,7 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
     internal bool BoundaryWjCompletedWindow(ProgramSkillWindowContext context, out ProgramCardTriggerWindowFrame window)
     {
         window = null !;
-        if (context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame current || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(current) != context.Window || current.Action.ActionId != identity.CardActionId || !BoundaryWjCard(current.Action))
+        if (context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame current || CoreGameEngineCardActionsRuntime.GetCardActionWindow(current) != context.Window || current.Action.ActionId != identity.CardActionId || !BoundaryWjCard(current.Action))
             return false;
         if (current.Action.Type == CardActionType.Use)
         {
@@ -190,7 +187,7 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
     [ProgramAnswer(BoundaryWjAction)]
     internal void AnswerBoundaryWj(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryWangJi: { } receipt } frame || !ValidBoundaryWj(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !BoundaryWjChoices(frame).Any(candidate => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([candidate], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryWangJi: { } receipt } frame || !ValidBoundaryWj(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !BoundaryWjChoices(frame).Any(candidate => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([candidate], [choice])))
             throw new InvalidOperationException("Wang Ji's private choice changed its original owner, inspected hand or native frame.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -313,5 +310,5 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
     [ProgramViewContributor(ProgramViewContribution.PrivateCards, 54400)]
     internal CardSnapshot[] BoundaryWjPrivateHand(int viewer) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(frame => frame.OwnerSeat == viewer && frame.BoundaryWangJi is { Stage: BoundaryWangJiStage.Inspect } && ValidBoundaryWj(frame)).SelectMany(frame => frame.BoundaryWangJi!.Viewed.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(frame.BoundaryWangJi.Targets[frame.BoundaryWangJi.Cursor])).Select(id => _closedHandCardViewQueriesSource.Get().Project(_coreMatchParticipantsPlayersAccess._players[frame.BoundaryWangJi.Targets[frame.BoundaryWangJi.Cursor]], _coreAdvancedLifecycleOperations.GetAdvancedCard(id)))).ToArray();
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryWangJiQizhi, SkillProgramEffectOp.ResolveBoundaryWangJiJinqu)]
-    internal PromptChoice AiBoundaryWj(PendingDecision decision, ProgramSkillFrame frame) => frame.BoundaryWangJi!.Stage == BoundaryWangJiStage.Charge ? decision.Choices.FirstOrDefault(choice => choice.Targets.Contains(frame.OwnerSeat)) ?? decision.Choices.First() : decision.Choices.OrderByDescending(choice => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[frame.BoundaryWangJi.Targets[frame.BoundaryWangJi.Cursor]])).First();
+    internal PromptChoice AiBoundaryWj(PendingDecision decision, ProgramSkillFrame frame) => frame.BoundaryWangJi!.Stage == BoundaryWangJiStage.Charge ? decision.Choices.FirstOrDefault(choice => choice.Targets.Contains(frame.OwnerSeat)) ?? decision.Choices.First() : decision.Choices.OrderByDescending(choice => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[frame.BoundaryWangJi.Targets[frame.BoundaryWangJi.Cursor]])).First();
 }

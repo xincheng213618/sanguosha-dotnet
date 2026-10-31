@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 using CardGame.Core.Campaigns;
 
@@ -10,10 +7,10 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceXiyingRuntime
 {
     internal const string SourceXiyingDiscard = "skill-program.source-xiying-1180.discard", SourceXiyingReward = "skill-program.source-xiying-1180.reward";
-    internal static CardConversionSource SourceXiyingSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource SourceXiyingSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool SourceXiyingMode => _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id == ShanheBattleSetup.BattleModeId && _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is not null;
 
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceXiyingHost.Resolve(ProgramSkillFrame f) => BeginSourceXiying(f);
+    SkillProgramStepOutcome IShanheSourceXiyingHost.Resolve(ProgramSkillFrame f) => BeginSourceXiying(f);
     internal bool SourceXiyingPlayParent(int owner, ProgramTriggerCandidate candidate, ProgramSkillWindowContext c) => SourceXiyingMode && c.Window == SkillProgramTriggerWindow.PlayPhaseStarting && c.OwnerSeat == owner && c.SourceSeat == owner && c.TargetSeat == owner && owner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber > 0 && _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId > 0 && _resolutionStackOperations._resolutionStack.OfType<PlayPhaseStartingBoundaryFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is { } p && p.OwnerSeat == owner && p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count && p.Items[p.ItemIndex].Candidate == candidate;
     internal IReadOnlyList<PromptChoice> SourceXiyingPaymentChoices(ProgramSkillFrame f, int actor, bool initial) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, actor, actor, initial ? [CardZoneKind.Hand] : [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard).Where(c => c.Cards.Count == 1 && (!initial || CardCatalog.Get(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()).Kind).CategoryName != "基本牌")).ToArray();
     internal SkillProgramStepOutcome BeginSourceXiying(ProgramSkillFrame supplied)
@@ -69,7 +66,7 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingRuntime
     [ProgramAnswer("source-xiying")]
     internal void AnswerSourceXiying(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceXiying: { } r } f || r.Stage is not (ShanheSourceXiyingStage.Cost or ShanheSourceXiyingStage.Targets) || selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !SourceXiyingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceXiying: { } r } f || r.Stage is not (ShanheSourceXiyingStage.Cost or ShanheSourceXiyingStage.Targets) || selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !SourceXiyingChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Source1180 lost its exact current owner/other-character payment choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var target = r.Stage == ShanheSourceXiyingStage.Cost ? f.OwnerSeat : r.Seats[r.Index];
@@ -78,7 +75,7 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingRuntime
             if (r.Stage != ShanheSourceXiyingStage.Targets || target == f.OwnerSeat)
                 throw new InvalidOperationException("Only the current other character can accept this exact ban.");
             _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(f);
-            var ban = _turnCardUseEffectsOperations._turnCardUseEffects.GrantTargetRestriction(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, f.Id, -r.Index - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), SkillProgramCardTargetRestriction.CannotUseOrPlayForTurn, target);
+            var ban = _turnCardUseEffectsOperations._turnCardUseEffects.GrantTargetRestriction(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, f.Id, -r.Index - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), SkillProgramCardTargetRestriction.CannotUseOrPlayForTurn, target);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardTargetRestrictionGrantedEvent(ban));
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheSourceXiying = r with { Index = r.Index + 1 } });
         }

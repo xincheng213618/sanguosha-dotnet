@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouFeiBoundaryMobileRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryZhouFeiHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginBoundaryZf(frame, operation);
+    SkillProgramStepOutcome IBoundaryZhouFeiHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginBoundaryZf(frame, operation);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 54700)]
     internal bool OfferBoundaryZf(ProgramTriggerLegalityContext gate)
     {
@@ -160,7 +157,7 @@ internal sealed partial class CharacterZhouFeiBoundaryMobileRuntime
     [ProgramAnswer(BoundaryZfAction)]
     internal void AnswerBoundaryZf(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryZhouFei: { } receipt } frame || !ValidBoundaryZf(frame) || !BoundaryZfChoices(frame).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryZhouFei: { } receipt } frame || !ValidBoundaryZf(frame) || !BoundaryZfChoices(frame).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Zhou Fei's original source, opaque slot or native card use changed.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });

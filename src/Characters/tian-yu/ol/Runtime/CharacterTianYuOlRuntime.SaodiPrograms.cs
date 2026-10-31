@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTianYuOlRuntime
@@ -22,7 +18,7 @@ internal sealed partial class CharacterTianYuOlRuntime
         var targets = Array.AsReadOnly(use.TargetSeats.Concat(additions).ToArray());
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, old => old with { TargetSeats = targets, Action = _coreProgramCardUseRolesOperations.CloneRoleAction(action, action.ActorSeat, targets), TargetsAdjusted = old.TargetsAdjusted || old.CardKind == CardKind.BorrowedSword });
         _coreTieredRoundActualTargetWindowsOperations.SyncIssuedTieredRoundZeroTrickTargetWindows(use.Id, action);
-        var bindingId = global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active);
+        var bindingId = CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active);
         foreach (var seat in additions)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSaodiTargetsAddedEvent(active.Id, active.SkillId, bindingId, active.SkillInstanceId, active.OwnerSeat, use.Id, action.ActionId, seat));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】，" + string.Join("、", additions.Select(seat => _coreMatchParticipantsPlayersAccess._players[seat].Name)) + "也成为此牌的目标。", active.OwnerSeat);
@@ -36,9 +32,9 @@ internal sealed partial class CharacterTianYuOlRuntime
             return false;
         var actor = _coreMatchParticipantsPlayersAccess._players[action.ActorSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
-        if (!target.IsAlive || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, targetSeat, use.CardKind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, action.EffectiveSuit ?? Suit.None, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, targetSeat, action.EffectiveSuit))
+        if (!target.IsAlive || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, targetSeat, use.CardKind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, action.EffectiveSuit ?? Suit.None, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, targetSeat, action.EffectiveSuit))
             return false;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, target, new Card(-1, use.CardKind, action.EffectiveSuit ?? Suit.None, action.EffectiveRank ?? 0), effectiveKind: use.CardKind, ignoreDistance: true, existingUseFrameId: use.Id, specificEffectiveRank: action.EffectiveRank);
         return use.CardKind switch
         {

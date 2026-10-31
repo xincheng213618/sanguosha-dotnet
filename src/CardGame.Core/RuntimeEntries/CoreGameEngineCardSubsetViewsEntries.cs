@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineCardSubsetViewsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineCardSubsetViewsRuntime> _resolve;
-    private CoreGameEngineCardSubsetViewsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineCardSubsetViewsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineCardSubsetViewsRuntime> _resolve;
+    private CoreGameEngineCardSubsetViewsEntries(Func<EngineOwners.CoreGameEngineCardSubsetViewsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineCardSubsetViewsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineCardSubsetViewsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineCardSubsetViewsEntries Create(Func<EngineOwners.CoreGameEngineCardSubsetViewsRuntime> resolve) => new(resolve);
 }

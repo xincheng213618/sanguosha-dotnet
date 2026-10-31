@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangDeckCardsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IWushuangDeckCardsHost.ObtainWushuangDeckCards(ProgramSkillFrame frame, SkillProgramEffect effect) => ObtainWushuangDeckCards(frame, effect);
+    SkillProgramStepOutcome IWushuangDeckCardsHost.ObtainWushuangDeckCards(ProgramSkillFrame frame, SkillProgramEffect effect) => ObtainWushuangDeckCards(frame, effect);
     internal SkillProgramStepOutcome ObtainWushuangDeckCards(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -15,10 +11,10 @@ internal sealed partial class CoreGameEngineWushuangDeckCardsRuntime
             throw new InvalidOperationException("A pile gain requires its active single-duel program instruction.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_corePhysicalDrawFacadesOperations.EnsureDrawPile())
             return SkillProgramStepOutcome.Continue;
-        var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().Where(c => (effect.OutputKind is null || c.Kind == effect.OutputKind) && (effect.CardCategories.Count == 0 || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(c.Kind, effect.CardCategories))).Take(effect.Amount).Select(c => c.Id).ToArray();
+        var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().Where(c => (effect.OutputKind is null || c.Kind == effect.OutputKind) && (effect.CardCategories.Count == 0 || CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(c.Kind, effect.CardCategories))).Take(effect.Amount).Select(c => c.Id).ToArray();
         if (cards.Length == 0)
             return SkillProgramStepOutcome.Continue;
-        var receipt = new WushuangDeckGainReceipt(f.InstructionIndex, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, effect.Amount, effect.OutputKind, effect.CardCategories.Count == 0 ? null : effect.CardCategories[0], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
+        var receipt = new WushuangDeckGainReceipt(f.InstructionIndex, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, effect.Amount, effect.OutputKind, effect.CardCategories.Count == 0 ? null : effect.CardCategories[0], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
         {
             CardIds = cards
         };
@@ -37,10 +33,10 @@ internal sealed partial class CoreGameEngineWushuangDeckCardsRuntime
 
     internal bool ValidWushuangDeckGain(ProgramSkillFrame f)
     {
-        if (f.WushuangDeckGain is not { } r || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.BatchId <= 0 || r.SequenceAfter <= r.SequenceBefore || r.CardIds.Count is < 1 or > 4 || r.CardIds.Count > r.Requested || r.CardIds.Distinct().Count() != r.CardIds.Count)
+        if (f.WushuangDeckGain is not { } r || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.BatchId <= 0 || r.SequenceAfter <= r.SequenceBefore || r.CardIds.Count is < 1 or > 4 || r.CardIds.Count > r.Requested || r.CardIds.Distinct().Count() != r.CardIds.Count)
             return false;
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter).ToArray();
-        return moves.Length == r.CardIds.Count && moves.Select(m => m.CardId).SequenceEqual(r.CardIds) && moves.All(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == "wushuang.obtain-deck-cards" && (r.Kind is null || m.CardKind == r.Kind) && (r.Category is null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(m.CardKind, [r.Category.Value]))) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangDeckCardsObtainedEvent>().Count(e => e.ProgramFrameId == f.Id && e.InstructionIndex == r.InstructionIndex && e.BatchId == r.BatchId && e.Count == moves.Length && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter) == 1;
+        return moves.Length == r.CardIds.Count && moves.Select(m => m.CardId).SequenceEqual(r.CardIds) && moves.All(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == "wushuang.obtain-deck-cards" && (r.Kind is null || m.CardKind == r.Kind) && (r.Category is null || CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(m.CardKind, [r.Category.Value]))) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangDeckCardsObtainedEvent>().Count(e => e.ProgramFrameId == f.Id && e.InstructionIndex == r.InstructionIndex && e.BatchId == r.BatchId && e.Count == moves.Length && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter) == 1;
     }
     [ProgramContinuation(ProgramContinuationKind.Movement, 62000)]
     internal bool ReturnWushuangDeckGain(ProgramSkillFrame f)

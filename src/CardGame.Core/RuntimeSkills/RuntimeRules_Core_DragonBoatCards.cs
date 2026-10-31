@@ -1,9 +1,7 @@
-using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_DragonBoatCards
 {
     internal static bool IsDragonBoatCard(CardKind kind) => kind is CardKind.Zong or CardKind.RealgarWine or

@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHanDangBoundaryMobileRuntime
@@ -16,11 +11,11 @@ internal sealed partial class CharacterHanDangBoundaryMobileRuntime
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var startIndex = Array.FindLastIndex(history, entry => entry is ProgramAttackRangeAidStartedEvent start && start.FrameId == frame.Id);
-        if (startIndex < 0 || history[startIndex] is not ProgramAttackRangeAidStartedEvent started || started.SkillId != frame.SkillId || started.BindingId != global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || started.OwnerSeat != frame.OwnerSeat || started.TargetSeat != target || !started.ResponderSeats.SequenceEqual(aid.ResponderSeats))
+        if (startIndex < 0 || history[startIndex] is not ProgramAttackRangeAidStartedEvent started || started.SkillId != frame.SkillId || started.BindingId != CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || started.OwnerSeat != frame.OwnerSeat || started.TargetSeat != target || !started.ResponderSeats.SequenceEqual(aid.ResponderSeats))
             return false;
         var prior = history.Skip(startIndex + 1).OfType<ProgramAttackRangeAidChoiceResolvedEvent>().Where(entry => entry.FrameId == frame.Id).ToArray();
         var skipped = history.Skip(startIndex + 1).OfType<ProgramAttackRangeAidResponderSkippedEvent>().Where(entry => entry.FrameId == frame.Id).ToArray();
-        if (prior.Length + skipped.Length != aid.ResponderIndex + (aid.Payment is { Stage: ProgramAttackRangeAidPaymentStage.MovementChildren } ? 1 : 0) || prior.Any(entry => entry.SkillId != frame.SkillId || entry.BindingId != global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || entry.OwnerSeat != frame.OwnerSeat || entry.TargetSeat != target) || prior.Select(entry => entry.ResponderSeat).Concat(skipped.Select(entry => entry.ResponderSeat)).Distinct().Count() != prior.Length + skipped.Length || skipped.Any(entry => entry.ResponderIndex < 0 || entry.ResponderIndex >= aid.ResponderIndex || aid.ResponderSeats[entry.ResponderIndex] != entry.ResponderSeat) || !aid.ResponderSeats.Take(aid.ResponderIndex + (aid.Payment is { Stage: ProgramAttackRangeAidPaymentStage.MovementChildren } ? 1 : 0)).ToHashSet().SetEquals(prior.Select(entry => entry.ResponderSeat).Concat(skipped.Select(entry => entry.ResponderSeat))))
+        if (prior.Length + skipped.Length != aid.ResponderIndex + (aid.Payment is { Stage: ProgramAttackRangeAidPaymentStage.MovementChildren } ? 1 : 0) || prior.Any(entry => entry.SkillId != frame.SkillId || entry.BindingId != CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || entry.OwnerSeat != frame.OwnerSeat || entry.TargetSeat != target) || prior.Select(entry => entry.ResponderSeat).Concat(skipped.Select(entry => entry.ResponderSeat)).Distinct().Count() != prior.Length + skipped.Length || skipped.Any(entry => entry.ResponderIndex < 0 || entry.ResponderIndex >= aid.ResponderIndex || aid.ResponderSeats[entry.ResponderIndex] != entry.ResponderSeat) || !aid.ResponderSeats.Take(aid.ResponderIndex + (aid.Payment is { Stage: ProgramAttackRangeAidPaymentStage.MovementChildren } ? 1 : 0)).ToHashSet().SetEquals(prior.Select(entry => entry.ResponderSeat).Concat(skipped.Select(entry => entry.ResponderSeat))))
             return false;
         if (aid.Payment is not { } payment)
             return true;
@@ -50,7 +45,7 @@ internal sealed partial class CharacterHanDangBoundaryMobileRuntime
         if (!ValidProgramAttackRangeAid(frame) || frame.AttackRangeAid is not { Payment: { Stage: ProgramAttackRangeAidPaymentStage.Drawing, CardId: null } payment } aid || outcome.RecipientSeat != aid.TargetSeat || outcome.RequestedCount != 1)
             throw new InvalidOperationException("Attack-range aid requires its original responder's one typed native draw.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { AttackRangeAid = aid with { Payment = payment with { Stage = ProgramAttackRangeAidPaymentStage.MovementChildren, Draw = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter } }, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidChoiceResolvedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, payment.ResponderSeat, aid.TargetSeat, null, Array.AsReadOnly(outcome.ActualDrawIds.ToArray())));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidChoiceResolvedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, payment.ResponderSeat, aid.TargetSeat, null, Array.AsReadOnly(outcome.ActualDrawIds.ToArray())));
         ContinueProgramAttackRangeAidPayment(frame.Id);
     }
 

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess : IProgramRuntimeOperations
 {
     ref int _cardUseDebitPhaseInstanceId { get; }
 }

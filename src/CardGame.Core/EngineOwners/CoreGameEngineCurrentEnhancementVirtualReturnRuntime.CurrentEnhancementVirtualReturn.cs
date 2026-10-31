@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCurrentEnhancementVirtualReturnRuntime
@@ -10,12 +6,12 @@ internal sealed partial class CoreGameEngineCurrentEnhancementVirtualReturnRunti
     internal bool TryGetCurrentEnhancementVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primaryTarget)
     {
         primaryTarget = [];
-        if (use is not { CardId: 0, CardKind: CardKind.Slash, PhysicalCardIds.Count: 0, ProgramUseCommitted: true, ProgramUseAccepted: true, TargetSeats.Count: 2 } || !_coreCurrentEnhancementSlashRedirectsOperations.HasCurrentEnhancementVirtualProducer(use) || use.CardAttack is not { CardId: null, EffectiveCardKind: CardKind.Slash, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id || attack.SourceSeat != use.SourceSeat || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash, PhysicalCards.Count: 0, TargetSeats.Count: 2, EffectiveSuit: Suit.None, EffectiveRank: 0 } action || action.ActorSeat != use.SourceSeat || action.ProviderSeat != use.SourceSeat || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || parent.OwnerSeat != use.SourceSeat || parent.InstructionIndex < 1 || string.IsNullOrWhiteSpace(parent.SkillInstanceId) || string.IsNullOrWhiteSpace(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent)) || use.EnhancementOwnerSeat != action.ActorSeat || !use.Enhancements.HasFlag(CurrentCardEnhancement.ExtraTarget))
+        if (use is not { CardId: 0, CardKind: CardKind.Slash, PhysicalCardIds.Count: 0, ProgramUseCommitted: true, ProgramUseAccepted: true, TargetSeats.Count: 2 } || !_coreCurrentEnhancementSlashRedirectsOperations.HasCurrentEnhancementVirtualProducer(use) || use.CardAttack is not { CardId: null, EffectiveCardKind: CardKind.Slash, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id || attack.SourceSeat != use.SourceSeat || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash, PhysicalCards.Count: 0, TargetSeats.Count: 2, EffectiveSuit: Suit.None, EffectiveRank: 0 } action || action.ActorSeat != use.SourceSeat || action.ProviderSeat != use.SourceSeat || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || parent.OwnerSeat != use.SourceSeat || parent.InstructionIndex < 1 || string.IsNullOrWhiteSpace(parent.SkillInstanceId) || string.IsNullOrWhiteSpace(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent)) || use.EnhancementOwnerSeat != action.ActorSeat || !use.Enhancements.HasFlag(CurrentCardEnhancement.ExtraTarget))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
         if (index < 1 || !ReferenceEquals(_resolutionStackOperations._resolutionStack[index - 1], parent) || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash)
             return false;
-        var issuer = new CardConversionSource(parent.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
+        var issuer = new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
         var plan = ProgramInstructionResolver.Default.Resolve(parent, program);
         if (parent.InstructionIndex > plan.Instructions.Count)
             return false;

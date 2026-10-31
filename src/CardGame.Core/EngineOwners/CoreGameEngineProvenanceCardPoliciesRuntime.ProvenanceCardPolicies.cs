@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProvenanceCardPoliciesRuntime
 {
-    internal static bool IsProvenanceOwnedZone(CardLocation location, int owner) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProvenanceCardPolicies.IsProvenanceOwnedZone(location, owner);
+    internal static bool IsProvenanceOwnedZone(CardLocation location, int owner) => RuntimeSkills.RuntimeRules_Core_ProvenanceCardPolicies.IsProvenanceOwnedZone(location, owner);
     internal void TryFreezeProvenanceCounterspellSource(CharacterState owner, IReadOnlyList<int> physicalCardIds, ref CardConversionSource? source) => source = FreezeProvenanceCounterspellSource(owner, physicalCardIds);
     internal CardConversionSource? FreezeProvenanceCounterspellSource(CharacterState owner, IReadOnlyList<int> ids) => FreezeProvenanceCardSource(owner, ids);
     internal bool HasProvenanceCounterspellMaterials(CharacterState owner, IReadOnlyList<int> validIds) => validIds.Any(id => FreezeProvenanceCardSource(owner, [id])is not null);

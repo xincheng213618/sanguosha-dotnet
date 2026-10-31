@@ -1,8 +1,8 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineRecipientCategoryMarksRecipientCategoryMarkLedgerStartedRecipientCategoryMarksAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineRecipientCategoryMarksRecipientCategoryMarkLedgerStartedRecipientCategoryMarksAccess : IProgramRuntimeOperations
 {
     ref bool _recipientCategoryMarkLedgerStarted { get; }
 
-    ref readonly global::System.Collections.Generic.Dictionary<global::CardGame.Core.GameEngine.RecipientCategoryMarkKey, global::CardGame.Core.RecipientCategoryMarkToken> _recipientCategoryMarks { get; }
+    ref readonly Dictionary<GameEngine.RecipientCategoryMarkKey, RecipientCategoryMarkToken> _recipientCategoryMarks { get; }
 }

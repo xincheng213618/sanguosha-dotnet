@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,10 +8,10 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     internal const string MouZuifengSkill = "mou-ol:zuifeng";
     internal const string MouZuifengBinding = "unique-suit-view-and-wine";
     internal const string MouZuifengDiscardReason = "skill-program.mou-zhou-yu.zuifeng.discard";
-    internal static CardConversionSource MouZuifengSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_yu_ol_mou_MouZhouYuZuifeng.MouZuifengSource(f);
+    internal static CardConversionSource MouZuifengSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhou_yu_ol_mou_MouZhouYuZuifeng.MouZuifengSource(f);
     internal bool HasMouZuifengCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouZhouYuZuifeng);
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouZhouYuZuifengHost.Resolve(ProgramSkillFrame f) => BeginMouZuifeng(f);
+    SkillProgramStepOutcome IMouZhouYuZuifengHost.Resolve(ProgramSkillFrame f) => BeginMouZuifeng(f);
     internal ActualDiscardRecoveryPhaseKey? MouZuifengPlay(int seat)
     {
         var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
@@ -103,7 +100,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     [ProgramAnswer("mou-zuifeng")]
     internal void AnswerMouZuifeng(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouZuifeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != MouZuifengChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouZuifengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouZuifeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != MouZuifengChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouZuifengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Zuifeng lost its private actual chooser or exact original published command.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];

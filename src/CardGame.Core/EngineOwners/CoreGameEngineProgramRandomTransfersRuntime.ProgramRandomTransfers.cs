@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramRandomTransfersRuntime
@@ -34,7 +30,7 @@ internal sealed partial class CoreGameEngineProgramRandomTransfersRuntime
         var reason = new CardMoveReason($"skill-program.{(frame.SkillId)}.transferRandomOwnedCard");
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { PendingMovementContinuation = new ProgramMovementContinuation(targetSeat, 0, null) });
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { PendingMovementContinuation = null, PublicHandRevealSelection = new("random-hand-transfer", frame.InstructionIndex, 0, card.Id, card.Kind, CardLocation.Hand(frame.OwnerSeat), CardLocation.Hand(targetSeat), frame.OwnerSeat, frame.OwnerSeat, resultBind, card.Suit) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, resultBind, Array.AsReadOnly(new[] { snapshot })));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, resultBind, Array.AsReadOnly(new[] { snapshot })));
         if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frame.Id, "random-hand-transfer"))
             return SkillProgramStepOutcome.AwaitChild;
         ContinueRandomTransferAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));

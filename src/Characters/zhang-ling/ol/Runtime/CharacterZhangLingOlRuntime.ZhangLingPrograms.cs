@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangLingOlRuntime
@@ -11,11 +7,11 @@ internal sealed partial class CharacterZhangLingOlRuntime
     internal bool TracksCategoryTalismans => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.PlaceBoundHandAsCategoryTalisman);
 
     internal CategoryTalismanPlacedEvent? LiveCategoryTalisman(int seat) => !TracksCategoryTalismans ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<CategoryTalismanPlacedEvent>().LastOrDefault(e => e.HolderSeat == seat && _cardZonesOperations._cardZones.GetLocation(e.CardId) == e.Pile.Location && !_coreProgramEventHistoryOperations.ProgramEventHistory<CategoryTalismanReleasedEvent>().Any(release => release.PlacementFrameId == e.FrameId));
-    internal bool IsCategoryTalismanUseForbidden(int actorSeat, CardKind effectiveKind, CardActionType type) => type is CardActionType.Use or CardActionType.Response && LiveCategoryTalisman(actorSeat)is { } talisman && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(effectiveKind) == talisman.Category;
-    SkillProgramStepOutcome global::CardGame.Core.IZhangLingProgramHost.PlaceCategoryTalisman(ProgramSkillFrame frame, string bind) => PlaceCategoryTalisman(frame, bind);
-    SkillProgramStepOutcome global::CardGame.Core.IZhangLingProgramHost.ReleaseCategoryTalisman(ProgramSkillFrame frame) => ReleaseCategoryTalisman(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IZhangLingProgramHost.UseHuqiSlash(ProgramSkillFrame frame, string bind) => UseHuqiSlash(frame, bind);
-    IReadOnlyList<int> global::CardGame.Core.ICategoryTalismanSelectionQuery.EligibleRecipients(int ownerSeat) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != ownerSeat && LiveCategoryTalisman(p.Seat)is null).Select(p => p.Seat).ToArray());
+    internal bool IsCategoryTalismanUseForbidden(int actorSeat, CardKind effectiveKind, CardActionType type) => type is CardActionType.Use or CardActionType.Response && LiveCategoryTalisman(actorSeat)is { } talisman && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(effectiveKind) == talisman.Category;
+    SkillProgramStepOutcome IZhangLingProgramHost.PlaceCategoryTalisman(ProgramSkillFrame frame, string bind) => PlaceCategoryTalisman(frame, bind);
+    SkillProgramStepOutcome IZhangLingProgramHost.ReleaseCategoryTalisman(ProgramSkillFrame frame) => ReleaseCategoryTalisman(frame);
+    SkillProgramStepOutcome IZhangLingProgramHost.UseHuqiSlash(ProgramSkillFrame frame, string bind) => UseHuqiSlash(frame, bind);
+    IReadOnlyList<int> ICategoryTalismanSelectionQuery.EligibleRecipients(int ownerSeat) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != ownerSeat && LiveCategoryTalisman(p.Seat)is null).Select(p => p.Seat).ToArray());
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 26050)]
     internal void ObserveZhangLingNativeFacts(IGameEvent payload)
     {
@@ -28,7 +24,7 @@ internal sealed partial class CharacterZhangLingOlRuntime
             {
                 var damageId = frame.WindowContext?.DamageFrameId;
                 var source = damageId is { } nativeDamage ? _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhangLingDamageAppliedEvent>().SingleOrDefault(e => e.DamageFrameId == nativeDamage)?.SourceSeat : null;
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangLingBindingIssuedEvent(id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, damageId, source));
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangLingBindingIssuedEvent(id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, damageId, source));
             }
         }
 
@@ -38,7 +34,7 @@ internal sealed partial class CharacterZhangLingOlRuntime
         if (record is null || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(record)?.OwnerSeat is not { } owner || owner != phase.ActorSeat || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CategoryTalismanDiscardRecordedEvent>().Any(e => e.MovementSequence == record.Sequence))
             return;
         var card = _cardZonesOperations._cardZones.CardsAt(record.To).Single(c => c.Id == record.CardId);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CategoryTalismanDiscardRecordedEvent(phase, owner, card.Id, record.Sequence, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CategoryTalismanDiscardRecordedEvent(phase, owner, card.Id, record.Sequence, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind)));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 65)]
@@ -80,7 +76,7 @@ internal sealed partial class CharacterZhangLingOlRuntime
             throw new InvalidOperationException("A talisman requires one currently owned hand entity and one other unmarked recipient.");
         var card = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Single(c => c.Id == cardId);
         var grantId = $"state:category-talisman:{(frame.Id)}";
-        var pile = new PublicPersistentPileSource(target, CategoryTalismanSkill, grantId, 1, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(CategoryTalismanSkill, grantId));
+        var pile = new PublicPersistentPileSource(target, CategoryTalismanSkill, grantId, 1, CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(CategoryTalismanSkill, grantId));
         _cardZonesOperations._cardZones.EnsurePublicPersistentPile(pile.Location);
         _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.Add((target, CategoryTalismanSkill, grantId), pile);
         _coreMatchParticipantsPlayersAccess._players[target].SkillGrants.Grant(new(grantId, CategoryTalismanSkill, grantId, "state:category-talisman"));
@@ -89,7 +85,7 @@ internal sealed partial class CharacterZhangLingOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { CategoryTalismanMovement = movement, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
         _corePhysicalMovementFacadesOperations.MoveCard(card, movement.From, movement.To, new("program.category-talisman.place"));
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { CategoryTalismanMovement = movement with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CategoryTalismanPlacedEvent(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, target, cardId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind), grantId, pile, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CategoryTalismanPlacedEvent(frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, target, cardId, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind), grantId, pile, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         if (!_coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(frame))
             ReturnCategoryTalismanMovement(frame);
         return SkillProgramStepOutcome.AwaitChild;
@@ -138,5 +134,5 @@ internal sealed partial class CharacterZhangLingOlRuntime
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26050)]
-    internal bool ContinueIssuedZhangLingBinding(ProgramSkillFrame frame) => frame.CategoryTalismanMovement is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhangLingBindingIssuedEvent>().Any(e => e.FrameId == frame.Id && e.GameplayHash == frame.GameplayHash && e.Source == new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId));
+    internal bool ContinueIssuedZhangLingBinding(ProgramSkillFrame frame) => frame.CategoryTalismanMovement is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhangLingBindingIssuedEvent>().Any(e => e.FrameId == frame.Id && e.GameplayHash == frame.GameplayHash && e.Source == new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId));
 }

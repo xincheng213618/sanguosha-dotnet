@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoPiMouRuntime
@@ -39,7 +35,7 @@ internal sealed partial class CharacterCaoPiMouRuntime
             return false;
         if (!ids.Any(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(actor)))
             return false;
-        var category = global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(effectiveKind);
+        var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(effectiveKind);
         return ActiveMouCaoPiControls(actor).Any(c => c.Kind switch
         {
             MouCaoPiControlKind.BasicHandOnly => category != SkillProgramCardCategory.Basic,

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSimultaneousPindianObserversRuntime
@@ -38,7 +34,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianObserversRuntime
         if (!_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) || m.Sequence <= r.MovementBefore || m.Sequence > r.MovementAfter)
             return false;
         if (r.PaymentKind == "top-reserve")
-            return r.TopReceipts.Any(t => t.CardId == m.CardId && t.ReservationMovementSequence == m.Sequence) && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineSimultaneousPindianSelectionsDefinitions.SimultaneousTopReservationReason;
+            return r.TopReceipts.Any(t => t.CardId == m.CardId && t.ReservationMovementSequence == m.Sequence) && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason == CoreGameEngineSimultaneousPindianSelectionsDefinitions.SimultaneousTopReservationReason;
         if (r.PaymentKind == "top-refill")
             return m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle;
         if (r.PaymentKind == "reveal")

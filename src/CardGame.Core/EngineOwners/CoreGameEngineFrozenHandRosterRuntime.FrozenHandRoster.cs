@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
@@ -12,7 +7,7 @@ internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
     internal bool FrozenHandRosterEndingParentMatches(ProgramSkillFrame f)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        return f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } c && f.TriggerId is not null && f.ActivationId == f.TriggerId && f.InstructionIndex == 1 && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats.Count == 0 && c.OwnerSeat == f.OwnerSeat && c.SourceSeat == f.OwnerSeat && c.TargetSeat == f.OwnerSeat && index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame parent && parent.Id == c.ParentFrameId && parent.OwnerSeat == f.OwnerSeat && parent.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && parent.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && parent.ItemIndex >= 0 && parent.ItemIndex < parent.Items.Count && parent.Items[parent.ItemIndex] is { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } && c.OccurrenceIndex == candidate.OccurrenceIndex && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
+        return f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } c && f.TriggerId is not null && f.ActivationId == f.TriggerId && f.InstructionIndex == 1 && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats.Count == 0 && c.OwnerSeat == f.OwnerSeat && c.SourceSeat == f.OwnerSeat && c.TargetSeat == f.OwnerSeat && index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame parent && parent.Id == c.ParentFrameId && parent.OwnerSeat == f.OwnerSeat && parent.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && parent.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && parent.ItemIndex >= 0 && parent.ItemIndex < parent.Items.Count && parent.Items[parent.ItemIndex] is { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } && c.OccurrenceIndex == candidate.OccurrenceIndex && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     }
 
     internal bool FrozenHandRosterCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId && p.GameplayHash == f.GameplayHash);
@@ -39,7 +34,7 @@ internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal static Dictionary<string, string> FrozenHandParameters(ProgramSkillFrame f, string branch) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_FrozenHandRoster.FrozenHandParameters(f, branch);
+    internal static Dictionary<string, string> FrozenHandParameters(ProgramSkillFrame f, string branch) => RuntimeSkills.RuntimeRules_Core_FrozenHandRoster.FrozenHandParameters(f, branch);
     internal int FrozenHandRosterChooser(ProgramSkillFrame f) => f.FrozenHandRoster!.Stage == "participant" ? f.FrozenHandRoster.Seats[f.FrozenHandRoster.Cursor] : f.OwnerSeat;
     internal IReadOnlyList<PromptChoice> FrozenHandRosterChoices(ProgramSkillFrame f)
     {
@@ -102,7 +97,7 @@ internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
     [ProgramAnswer("frozen-hand-roster")]
     internal void ResolveFrozenHandRosterChoice(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FrozenHandRoster: not null } f || !FrozenHandRosterCurrent(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != FrozenHandRosterChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], FrozenHandRosterChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FrozenHandRoster: not null } f || !FrozenHandRosterCurrent(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != FrozenHandRosterChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], FrozenHandRosterChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Frozen roster choice lost its real chooser and exact current frozen-set candidates.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.FrozenHandRoster!;
@@ -236,7 +231,7 @@ internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
     {
         var r = f.FrozenHandRoster!;
         if (r.Stage == "participant")
-            return p.Choices.Single(c => c.Parameters["branch"] == (p.PlayerSeat == f.OwnerSeat || global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) ? "draw" : "decline"));
+            return p.Choices.Single(c => c.Parameters["branch"] == (p.PlayerSeat == f.OwnerSeat || CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) ? "draw" : "decline"));
         var snapshot = _corePlayerViewProjectionOperations.CreateSnapshot(f.OwnerSeat);
         var hint = r.Stage == "damage" ? new SkillProgramAiHint(0, 0, 0, 0, 0, 1, false, false) : new SkillProgramAiHint(1, 0, 0, 0, 0, 0, false, false);
         var candidates = p.Choices.Where(c => c.Targets.Count == 1).Select(c => (Choice: c, Score: _coreAiBrainsAiBrainsAccess._aiBrains[f.OwnerSeat].ScoreProgramTarget(snapshot, c.Targets[0], hint))).OrderByDescending(c => c.Score).ThenBy(c => c.Choice.Targets[0]).ToArray();
@@ -245,5 +240,5 @@ internal sealed partial class CoreGameEngineFrozenHandRosterRuntime
         return candidates[0].Choice;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IFrozenHandRosterHost.ResolveFrozenHandRosterEndingExchange(ProgramSkillFrame f) => ResolveFrozenHandRosterEndingExchange(f);
+    SkillProgramStepOutcome IFrozenHandRosterHost.ResolveFrozenHandRosterEndingExchange(ProgramSkillFrame f) => ResolveFrozenHandRosterEndingExchange(f);
 }

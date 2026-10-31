@@ -1,9 +1,9 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreGameEngineAlternatingSuitAndCompletedTopState : global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess
+internal sealed class CoreGameEngineAlternatingSuitAndCompletedTopState : Contracts.ICoreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess
 {
-    private global::System.Collections.Generic.Dictionary<(int Turn, int Actor, string Skill, global::CardGame.Core.SkillProgramCardCategory Category), long> _firstTurnCategoryUses = [];
-    internal ref readonly global::System.Collections.Generic.Dictionary<(int Turn, int Actor, string Skill, global::CardGame.Core.SkillProgramCardCategory Category), long> ReferenceToFirstTurnCategoryUses => ref _firstTurnCategoryUses;
+    private Dictionary<(int Turn, int Actor, string Skill, SkillProgramCardCategory Category), long> _firstTurnCategoryUses = [];
+    internal ref readonly Dictionary<(int Turn, int Actor, string Skill, SkillProgramCardCategory Category), long> ReferenceToFirstTurnCategoryUses => ref _firstTurnCategoryUses;
 
-    ref readonly global::System.Collections.Generic.Dictionary<(int Turn, int Actor, string Skill, global::CardGame.Core.SkillProgramCardCategory Category), long> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess._firstTurnCategoryUses => ref _firstTurnCategoryUses;
+    ref readonly Dictionary<(int Turn, int Actor, string Skill, SkillProgramCardCategory Category), long> Contracts.ICoreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess._firstTurnCategoryUses => ref _firstTurnCategoryUses;
 }

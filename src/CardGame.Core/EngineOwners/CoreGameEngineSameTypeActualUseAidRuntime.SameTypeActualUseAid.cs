@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,18 +8,18 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
     internal const string SameTypeAidGiftReason = "program.same-type-actual-use-aid.gift";
     internal bool HasSameTypeActualUseAid => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferSameTypeDifferentNameOrExtraTarget);
 
-    internal static bool IsSameTypeAidEffectiveCard(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SameTypeActualUseAid.IsSameTypeAidEffectiveCard(kind);
-    internal static bool IsSameTypeAidCard(CardKind paid, CardKind effective) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SameTypeActualUseAid.IsSameTypeAidCard(paid, effective);
-    internal CardConversionSource SameTypeAidSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static bool IsSameTypeAidEffectiveCard(CardKind kind) => RuntimeSkills.RuntimeRules_Core_SameTypeActualUseAid.IsSameTypeAidEffectiveCard(kind);
+    internal static bool IsSameTypeAidCard(CardKind paid, CardKind effective) => RuntimeSkills.RuntimeRules_Core_SameTypeActualUseAid.IsSameTypeAidCard(paid, effective);
+    internal CardConversionSource SameTypeAidSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SameTypeAidIdentity? FreezeSameTypeAidUse(int ownerSeat, ProgramSkillWindowContext context)
     {
         if (!HasSameTypeActualUseAid)
             return null;
-        if (context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } window && window.Id == context.ParentFrameId && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) == context.Window && window.Action is { Type: CardActionType.Use } action && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { } use && use.Action?.ActionId == action.ActionId && action.ActorSeat == use.SourceSeat && action.EffectiveKind == use.CardKind && use.TargetSeats.Contains(ownerSeat) && action.TargetSeats.Contains(ownerSeat) && IsSameTypeAidEffectiveCard(action.EffectiveKind))
+        if (context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } window && window.Id == context.ParentFrameId && CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) == context.Window && window.Action is { Type: CardActionType.Use } action && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { } use && use.Action?.ActionId == action.ActionId && action.ActorSeat == use.SourceSeat && action.EffectiveKind == use.CardKind && use.TargetSeats.Contains(ownerSeat) && action.TargetSeats.Contains(ownerSeat) && IsSameTypeAidEffectiveCard(action.EffectiveKind))
             return new(use.Id, action.ActionId, action.ActorSeat, action.ProviderSeat, action.EffectiveKind, ownerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
         // Mature virtual Shensu has no Action. Only this true producer enters the
         // second trigger; physical/action-bearing uses are served by Finalized.
-        if (context.Window == SkillProgramTriggerWindow.OtherActualUseTargeted && context.ActualUseTarget is { ActionId: null, LegacyProducerProgramId: { } producer } legacy && legacy.TargetSeat == ownerSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(legacy.EffectiveKind) && _coreActualUseTargetProgramsOperations.MatchesActualUseTarget(legacy))
+        if (context.Window == SkillProgramTriggerWindow.OtherActualUseTargeted && context.ActualUseTarget is { ActionId: null, LegacyProducerProgramId: { } producer } legacy && legacy.TargetSeat == ownerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(legacy.EffectiveKind) && _coreActualUseTargetProgramsOperations.MatchesActualUseTarget(legacy))
             return new(legacy.CardUseFrameId, null, legacy.ActorSeat, legacy.ProviderSeat, legacy.EffectiveKind, ownerSeat, legacy.ActualTurnNumber, legacy.ActualTurnOwnerSeat, producer);
         return null;
     }
@@ -41,7 +38,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
     {
         if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.OfferSameTypeDifferentNameOrExtraTarget))
             return true;
-        return _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].Hp > 0 && FreezeSameTypeAidUse(candidate.OwnerSeat, context)is { } identity && global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.MatchesClassicQiuyuanAidContext(candidate.SkillId, candidate.OwnerSeat, context, identity) && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(identity.CardUseFrameId, candidate.OwnerSeat) && SameTypeAidRecipients(identity, candidate.SkillId).Length > 0;
+        return _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].Hp > 0 && FreezeSameTypeAidUse(candidate.OwnerSeat, context)is { } identity && CharacterFuHuangHouClassicRuntime.MatchesClassicQiuyuanAidContext(candidate.SkillId, candidate.OwnerSeat, context, identity) && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(identity.CardUseFrameId, candidate.OwnerSeat) && SameTypeAidRecipients(identity, candidate.SkillId).Length > 0;
     }
 
     internal bool CanAddSameTypeAidTarget(SameTypeAidIdentity identity, int seat, bool ignoreSlashDistance = false)
@@ -50,12 +47,12 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
             return false;
         var action = use.Action;
         var suit = action?.EffectiveSuit ?? Suit.None;
-        var color = action is null ? null : global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action);
+        var color = action is null ? null : CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action);
         var actor = _coreMatchParticipantsPlayersAccess._players[identity.ActorSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[seat];
         if (_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, identity.EffectiveKind, suit, color) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, seat, suit))
             return false;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(identity.EffectiveKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(identity.EffectiveKind))
         {
             if (action is null)
                 return !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target); // exact legacy producer already uses unlimited distance
@@ -91,12 +88,12 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
         return paused.Op is SkillProgramEffectOp.UseVirtualCard or SkillProgramEffectOp.OfferUnlimitedVirtualSlash && paused.OutputKind == CardKind.Slash && paused.TargetRestriction == SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget;
     }
 
-    internal int[] SameTypeAidRecipients(SameTypeAidIdentity identity, string skillId) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != identity.OriginalOwnerTarget && p.Seat != identity.ActorSeat && (!global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.IsClassicQiuyuanAid(skillId) || !_coreCardUseLifecycleOperations.LifecycleCardUse(identity.CardUseFrameId)!.TargetSeats.Contains(p.Seat)) && (CanAddSameTypeAidTarget(identity, p.Seat, global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.SameTypeAidIgnoresSlashDistance(skillId)) || _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count + (global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.IsClassicQiuyuanAid(skillId) ? 0 : _corePhysicalOwnedCardQueriesOperations.GetEquipment(p).Count) > 0)).Select(p => p.Seat).Order().ToArray();
+    internal int[] SameTypeAidRecipients(SameTypeAidIdentity identity, string skillId) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != identity.OriginalOwnerTarget && p.Seat != identity.ActorSeat && (!CharacterFuHuangHouClassicRuntime.IsClassicQiuyuanAid(skillId) || !_coreCardUseLifecycleOperations.LifecycleCardUse(identity.CardUseFrameId)!.TargetSeats.Contains(p.Seat)) && (CanAddSameTypeAidTarget(identity, p.Seat, CharacterFuHuangHouClassicRuntime.SameTypeAidIgnoresSlashDistance(skillId)) || _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count + (CharacterFuHuangHouClassicRuntime.IsClassicQiuyuanAid(skillId) ? 0 : _corePhysicalOwnedCardQueriesOperations.GetEquipment(p).Count) > 0)).Select(p => p.Seat).Order().ToArray();
     internal bool SameTypeAidUnpaidSourceValid(ProgramSkillFrame f) => f.SameTypeAid is { } r && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && MatchesSameTypeAidUse(r.Use) && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(r.Use.CardUseFrameId, f.OwnerSeat) && (r.RecipientSeat is null || _coreMatchParticipantsPlayersAccess._players[r.RecipientSeat.Value].IsAlive);
     internal SkillProgramStepOutcome BeginSameTypeAid(ProgramSkillFrame frame)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (f.SameTypeAid is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || FreezeSameTypeAidUse(f.OwnerSeat, context)is not { } use || !global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.MatchesClassicQiuyuanAidContext(f.SkillId, f.OwnerSeat, context, use))
+        if (f.SameTypeAid is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || FreezeSameTypeAidUse(f.OwnerSeat, context)is not { } use || !CharacterFuHuangHouClassicRuntime.MatchesClassicQiuyuanAidContext(f.SkillId, f.OwnerSeat, context, use))
             throw new InvalidOperationException("Aid requires one exact original target/use opportunity.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SameTypeAid = new(f.InstructionIndex, SameTypeAidSource(f), f.GameplayHash, use, SameTypeAidStage.ChoosingRecipient) });
         PublishSameTypeAidPrompt(f);
@@ -117,7 +114,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
         if (r.Stage != SameTypeAidStage.ChoosingAnswer || r.RecipientSeat is not { } recipient)
             return[];
         var choices = new List<PromptChoice>();
-        foreach (var raw in _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, recipient, recipient, global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.SameTypeAidPaymentZones(f.SkillId), OwnedCardMoveIntent.Transfer, canSelect: (_, card) => !card.IsGeneralWeapon && global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.IsSameTypeAidPaymentKind(f.SkillId, card.Kind, r.Use.EffectiveKind), destination: SkillProgramCardDestination.OwnerHand, destinationSeat: f.OwnerSeat))
+        foreach (var raw in _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, recipient, recipient, CharacterFuHuangHouClassicRuntime.SameTypeAidPaymentZones(f.SkillId), OwnedCardMoveIntent.Transfer, canSelect: (_, card) => !card.IsGeneralWeapon && CharacterFuHuangHouClassicRuntime.IsSameTypeAidPaymentKind(f.SkillId, card.Kind, r.Use.EffectiveKind), destination: SkillProgramCardDestination.OwnerHand, destinationSeat: f.OwnerSeat))
         {
             var parameters = new Dictionary<string, string>(raw.Parameters);
             foreach (var pair in SameTypeAidParameters(f, "give"))
@@ -125,7 +122,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
             choices.Add(raw with { Parameters = parameters });
         }
 
-        if (CanAddSameTypeAidTarget(r.Use, recipient, global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.SameTypeAidIgnoresSlashDistance(f.SkillId)))
+        if (CanAddSameTypeAidTarget(r.Use, recipient, CharacterFuHuangHouClassicRuntime.SameTypeAidIgnoresSlashDistance(f.SkillId)))
             choices.Add(new(new($"same-type-aid.{(f.Id)}.become-target"), "成为此牌的额外目标", [], [recipient], SameTypeAidParameters(f, "target")));
         // Candidate seats use only public HE counts. A private hand without a
         // matching card must not leak its eligibility to the original chooser.
@@ -146,7 +143,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
 
         var chooser = r.Stage == SameTypeAidStage.ChoosingRecipient ? f.OwnerSeat : r.RecipientSeat!.Value;
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, chooser, r.Stage == SameTypeAidStage.ChoosingRecipient ? "选择一名其他角色求援。" : global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.IsClassicQiuyuanAid(f.SkillId) ? "交给原目标一张手牌【闪】，或成为此【杀】的额外目标。" : f.SkillId == "boundary:qiuyuan-mobile" ? "交给原目标一张【杀】以外的基本牌，或成为此【杀】的额外目标。" : "交给原目标同类型不同牌名的一张牌，或成为原牌额外目标。", choices.SelectMany(c => c.Cards).Distinct().ToArray(), choices.SelectMany(c => c.Targets).Distinct().ToArray(), f.OwnerSeat)
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, chooser, r.Stage == SameTypeAidStage.ChoosingRecipient ? "选择一名其他角色求援。" : CharacterFuHuangHouClassicRuntime.IsClassicQiuyuanAid(f.SkillId) ? "交给原目标一张手牌【闪】，或成为此【杀】的额外目标。" : f.SkillId == "boundary:qiuyuan-mobile" ? "交给原目标一张【杀】以外的基本牌，或成为此【杀】的额外目标。" : "交给原目标同类型不同牌名的一张牌，或成为原牌额外目标。", choices.SelectMany(c => c.Cards).Distinct().ToArray(), choices.SelectMany(c => c.Targets).Distinct().ToArray(), f.OwnerSeat)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             IsPrivate = true,
@@ -163,7 +160,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack.Last().Id);
         _coreForeignContestAidObserversOperations.AssertSameTypeAid(f);
         var r = f.SameTypeAid ?? throw new InvalidOperationException("Aid answer lost its owning receipt.");
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SameTypeAidStage.ChoosingRecipient ? f.OwnerSeat : r.RecipientSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, SameTypeAidChoices(f)) || !SameTypeAidChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets)))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SameTypeAidStage.ChoosingRecipient ? f.OwnerSeat : r.RecipientSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, SameTypeAidChoices(f)) || !SameTypeAidChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets)))
             throw new InvalidOperationException("Aid changed its frozen chooser, payment slot or current target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!SameTypeAidUnpaidSourceValid(f))
@@ -194,7 +191,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
 
         if (option == "target")
         {
-            if (!CanAddSameTypeAidTarget(r.Use, donor, global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.SameTypeAidIgnoresSlashDistance(f.SkillId)))
+            if (!CanAddSameTypeAidTarget(r.Use, donor, CharacterFuHuangHouClassicRuntime.SameTypeAidIgnoresSlashDistance(f.SkillId)))
                 throw new InvalidOperationException("Aid cannot add an illegal or duplicate target.");
             AddSameTypeAidTarget(f, donor);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { SameTypeAid = r with { AddedTarget = true, Stage = SameTypeAidStage.Complete } });
@@ -202,10 +199,10 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
             return;
         }
 
-        if (option != "give" || selected.Cards is not [var id] || _cardZonesOperations._cardZones.GetLocation(id)is not { OwnerSeat: { } sourceOwner } from || sourceOwner != donor || !global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.SameTypeAidPaymentZones(f.SkillId).Contains(from.Zone))
+        if (option != "give" || selected.Cards is not [var id] || _cardZonesOperations._cardZones.GetLocation(id)is not { OwnerSeat: { } sourceOwner } from || sourceOwner != donor || !CharacterFuHuangHouClassicRuntime.SameTypeAidPaymentZones(f.SkillId).Contains(from.Zone))
             throw new InvalidOperationException("Aid requires one real recipient-owned HE entity.");
         var card = _cardZonesOperations._cardZones.CardsAt(from).Single(c => c.Id == id);
-        if (card.IsGeneralWeapon || !global::CardGame.Core.EngineOwners.CharacterFuHuangHouClassicRuntime.IsSameTypeAidPaymentKind(f.SkillId, card.Kind, r.Use.EffectiveKind))
+        if (card.IsGeneralWeapon || !CharacterFuHuangHouClassicRuntime.IsSameTypeAidPaymentKind(f.SkillId, card.Kind, r.Use.EffectiveKind))
             throw new InvalidOperationException("Aid payment changed its exact type or card name.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SameTypeAid = r with { Stage = SameTypeAidStage.GiftChildren }, PendingMovementContinuation = new(donor, 0, null) });
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(f.OwnerSeat), new(SameTypeAidGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, donor, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
@@ -245,7 +242,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
 
     internal void AppendSameTypeAidFinalizedCandidates(long useId, CardActionContext action, int newTarget)
     {
-        var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(w => w.ParentFrameId == useId && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) == SkillProgramTriggerWindow.CardUseTargetsFinalized);
+        var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(w => w.ParentFrameId == useId && CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) == SkillProgramTriggerWindow.CardUseTargetsFinalized);
         if (window is null)
             return;
         var additions = _coreCardActionsOperations.CollectSharedCardActionCandidates(action, SkillProgramTriggerWindow.CardUseTargetsFinalized, [newTarget], null, window.Continuation).Where(c => c.OwnerSeat == newTarget && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program!.Triggers.Single(t => t.Id == c.TriggerId).Effects.Any(e => e.Op == SkillProgramEffectOp.OfferSameTypeDifferentNameOrExtraTarget) && !window.Candidates.Any(old => old.OwnerSeat == c.OwnerSeat && old.SkillId == c.SkillId && old.TriggerId == c.TriggerId && old.SkillInstanceId == c.SkillInstanceId)).Select(c => c.FrozenContext is { } context ? c with { FrozenContext = context with { ParentFrameId = window.Id, CardUse = context.CardUse!with { ParentCardUseFrameId = useId } } } : c).ToArray();
@@ -293,7 +290,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
             return decision.Choices.OrderByDescending(c => _coreAiBrainsAiBrainsAccess._aiBrains[decision.PlayerSeat].ScoreProgramTarget(snapshot, c.Targets.Single(), harm)).ThenBy(c => c.Targets.Single()).First();
         }
 
-        var give = decision.Choices.Where(c => c.Parameters.GetValueOrDefault("aid-option") == "give").OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat])).ThenBy(c => c.Cards.Single()).FirstOrDefault();
+        var give = decision.Choices.Where(c => c.Parameters.GetValueOrDefault("aid-option") == "give").OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat])).ThenBy(c => c.Cards.Single()).FirstOrDefault();
         var target = decision.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("aid-option") == "target");
         var ownerBenefit = _coreAiBrainsAiBrainsAccess._aiBrains[decision.PlayerSeat].ScoreProgramTarget(snapshot, f.OwnerSeat, new(0, 0, 0, 1, 0, 0, false, false));
         return give is not null && (ownerBenefit > 0 || target is null || _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat].Hp <= 1) ? give : target ?? give ?? decision.Choices.Single();
@@ -308,7 +305,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
             return false;
         // The same ActionId survives legitimate role and color rewrites. Its
         // original material/actor is not replaced by a later mutable use actor.
-        return fact.Use.CardActionId is { } actionId ? use.Action?.ActionId == actionId && history.OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == actionId && e.Action.Type == CardActionType.Use) && (use.CardKind == fact.Use.EffectiveKind || _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(fact.Use.EffectiveKind)) : use.Action is null && fact.Use.LegacyProducerProgramId is { } producer && MatchesSameTypeAidLegacyProducer(use, producer);
+        return fact.Use.CardActionId is { } actionId ? use.Action?.ActionId == actionId && history.OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == actionId && e.Action.Type == CardActionType.Use) && (use.CardKind == fact.Use.EffectiveKind || _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use) && CoreNativeCardClassificationsRuntime.IsSlashCard(fact.Use.EffectiveKind)) : use.Action is null && fact.Use.LegacyProducerProgramId is { } producer && MatchesSameTypeAidLegacyProducer(use, producer);
     }
 
     internal bool HasSameTypeAidTargetTail(CardUseFrame use) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SameTypeAidTargetAddedEvent>().Any(e => IsSameTypeAidTargetFact(use, e));

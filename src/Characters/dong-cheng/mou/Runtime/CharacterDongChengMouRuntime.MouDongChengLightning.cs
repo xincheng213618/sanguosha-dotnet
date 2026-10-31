@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongChengMouRuntime
@@ -16,14 +12,14 @@ internal sealed partial class CharacterDongChengMouRuntime
         return claims?.Any(p => p.ProtectionFrameId == f.Id && p.Source == f.MouDongCheng!.Source && p.BeforeWindowId == beforeId) == true;
     }
 
-    MouDcDelayedCause? global::CardGame.Core.IMouDcLightningFacts.DyingCause(PlayerDyingEvent fact)
+    MouDcDelayedCause? IMouDcLightningFacts.DyingCause(PlayerDyingEvent fact)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DyingFrame { Continuation: DyingContinuationKind.Damage } dying || dying.Id != fact.ResolutionId || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(f => f.Id == dying.ParentFrameId)is not { Amount: > 0 } damage || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not global::CardGame.Core.NativeOwners.CardAttackHandle { IsDelayedJudgmentDamage: true, IsSourceLess: true, DamageWasApplied: true } attack || attack.ResolutionId != damage.ParentFrameId || attack.TargetSeat != fact.VictimSeat || _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(j => j.Id == attack.ResolutionId)is not { OriginalUseLightning: { } a } j || !MouDcNativeLightning(j) || a.Origin.Source is not { SkillId: MouDongChengRuntime.Douwei, BindingId: "discard-damage-use" } source || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(source.SkillId)?.Program?.GameplayHash != a.Origin.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDcUseIssuedEvent>().Count(x => x.UseId == a.Origin.UseId && x.ActionId == a.Origin.ActionId && x.Owner == source.OwnerSeat && x.Kind == CardKind.Lightning) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(x => x.ResolutionId == a.Origin.UseId) != 1)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DyingFrame { Continuation: DyingContinuationKind.Damage } dying || dying.Id != fact.ResolutionId || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(f => f.Id == dying.ParentFrameId)is not { Amount: > 0 } damage || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not NativeOwners.CardAttackHandle { IsDelayedJudgmentDamage: true, IsSourceLess: true, DamageWasApplied: true } attack || attack.ResolutionId != damage.ParentFrameId || attack.TargetSeat != fact.VictimSeat || _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(j => j.Id == attack.ResolutionId)is not { OriginalUseLightning: { } a } j || !MouDcNativeLightning(j) || a.Origin.Source is not { SkillId: MouDongChengRuntime.Douwei, BindingId: "discard-damage-use" } source || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(source.SkillId)?.Program?.GameplayHash != a.Origin.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDcUseIssuedEvent>().Count(x => x.UseId == a.Origin.UseId && x.ActionId == a.Origin.ActionId && x.Owner == source.OwnerSeat && x.Kind == CardKind.Lightning) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(x => x.ResolutionId == a.Origin.UseId) != 1)
             return null;
         return new(a.Origin.UseId, a.Origin.ActionId, source, a.Origin.GameplayHash, a.Id, j.Id, damage.Id, fact.VictimSeat);
     }
 
-    MouDcSettlement? global::CardGame.Core.IMouDcLightningFacts.NextSettlement(long id)
+    MouDcSettlement? IMouDcLightningFacts.NextSettlement(long id)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not JudgmentFrame { NativeDelayedAttackCompletion: { } ret } j || j.Id != id || ret.ResolutionId != id || !ret.DelayedTurn || ret.ProgramFrameId is not null || !MouDcNativeLightning(j))
             return null;
@@ -33,7 +29,7 @@ internal sealed partial class CharacterDongChengMouRuntime
         return j.MouDongChengReward is { Settled: false } reward && _coreMatchParticipantsPlayersAccess._players[reward.Cause.Source.OwnerSeat].IsAlive ? new(id, reward.Cause.Source, reward.Cause.GameplayHash, true, 0, reward.DyingId, reward.Cause.OriginalUseId) : null;
     }
 
-    bool global::CardGame.Core.IMouDcLightningFacts.SettlementParent(ProgramSkillFrame f)
+    bool IMouDcLightningFacts.SettlementParent(ProgramSkillFrame f)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         if (f.MouDongChengSettlement is not { } s || f.ActivationId != "native-delayed-settlement" || f.TriggerId is not null || f.WindowContext is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.OwnerSeat != s.OriginalSource.OwnerSeat || f.SkillId != s.OriginalSource.SkillId || f.SkillInstanceId != s.OriginalSource.SkillInstanceId || f.GameplayHash != s.OriginalHash || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not JudgmentFrame { NativeDelayedAttackCompletion: { } ret } j || j.Id != s.JudgmentId || ret.ResolutionId != j.Id || !ret.DelayedTurn || ret.ProgramFrameId is not null || !MouDcNativeLightning(j) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDcSettlementIssuedEvent>().Count(x => x.FrameId == f.Id && x.Return == s) != 1)
@@ -43,8 +39,8 @@ internal sealed partial class CharacterDongChengMouRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 37401, SkillProgramEffectOp.ResolveMouDongChengDelayedSettlement)]
     internal bool MouDcInternalSettlementIsNotCommand(CharacterState owner) => false;
-    ProgramSkillFrame global::CardGame.Core.IMouDcLightningNative.BindSettlement(ProgramSkillFrame child, long judgment) => _coreOriginalUseLightningOperations.BindNativeDelayedAttackChild(child, judgment);
-    void global::CardGame.Core.IMouDcLightningNative.MarkReward(MouDcDelayedCause cause, long dying)
+    ProgramSkillFrame IMouDcLightningNative.BindSettlement(ProgramSkillFrame child, long judgment) => _coreOriginalUseLightningOperations.BindNativeDelayedAttackChild(child, judgment);
+    void IMouDcLightningNative.MarkReward(MouDcDelayedCause cause, long dying)
     {
         if (_resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(j => j.Id == cause.JudgmentId)is not { OriginalUseLightning: { } a } j || a.Id != cause.AttachmentId || a.Origin.UseId != cause.OriginalUseId || a.Origin.Source != cause.Source || a.Origin.GameplayHash != cause.GameplayHash || j.MouDongChengReward is not null)
             throw new InvalidOperationException("Only the first causal native Lightning dying may earn its original whole-Use reward.");
@@ -52,8 +48,8 @@ internal sealed partial class CharacterDongChengMouRuntime
         _coreMatchParticipantsPlayersAccess._players[cause.Source.OwnerSeat].MouDongChengDisabledTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber;
     }
 
-    void global::CardGame.Core.IMouDcLightningNative.ResumeCleanup(long judgment) => _coreOriginalUseLightningOperations.ResumeNativeDelayedAttackCompletion(judgment);
-    void global::CardGame.Core.IMouDcLightningNative.MarkSettlement(MouDcSettlement s)
+    void IMouDcLightningNative.ResumeCleanup(long judgment) => _coreOriginalUseLightningOperations.ResumeNativeDelayedAttackCompletion(judgment);
+    void IMouDcLightningNative.MarkSettlement(MouDcSettlement s)
     {
         if (_resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(j => j.Id == s.JudgmentId)is not { NativeDelayedAttackCompletion: not null } j)
             throw new InvalidOperationException("Settlement must retain its complete native delayed return.");
@@ -66,7 +62,7 @@ internal sealed partial class CharacterDongChengMouRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeCleanup, 37400)]
-    internal bool BeforeMouDcDelayedCleanup(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool BeforeMouDcDelayedCleanup(GameEngine.AttackCompletionReceipt completion)
     {
         if (!completion.DelayedTurn || completion.ProgramFrameId is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not JudgmentFrame j || j.Id != completion.ResolutionId || j.MouDongChengReward is null && j.MouDongChengClaims is null)
             return false;

@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiZhiCaiOlRuntime
 {
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? ChouceOriginalAttack(ChoucePointReceipt r)
+    internal GameEngine.IDamageAttempt? ChouceOriginalAttack(ChoucePointReceipt r)
     {
         var owner = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.OriginalAttackId);
         return owner switch
@@ -26,7 +22,7 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
         if (r.Source != XiZhiCaiSource(f) || r.GameplayHash != f.GameplayHash || r.DamageTargetSeat != f.OwnerSeat || r.PointIndex < 0 || r.PointIndex >= r.OriginalAmount || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.ParentFrameId != r.DamageWindowId || c.OccurrenceIndex != r.PointIndex || f.InstructionIndex < r.StartInstructionIndex || f.InstructionIndex > r.StartInstructionIndex + 1 || !Enum.IsDefined(p.Stage) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChouceJudgmentIssuedEvent>().Count(e => e.FrameId == f.Id && e.Receipt == r) != 1)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame w || w.Id != r.DamageWindowId || w.ParentFrameId != r.DamageFrameId || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()))
+        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame w || w.Id != r.DamageWindowId || w.ParentFrameId != r.DamageFrameId || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()))
             return false;
         var original = ChouceOriginalAttack(r);
         if (original is null || original.ResolutionId != r.OriginalAttackId || original.TargetSeat != r.DamageTargetSeat || original.DamageAmount != r.OriginalAmount || !original.DamageWasApplied || (original.IsSourceLess || original.IsDelayedJudgmentDamage ? null : (int? )original.SourceSeat) != r.DamageSourceSeat)

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterZhangLingOlSynchronizingCategoryTalismansAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterZhangLingOlSynchronizingCategoryTalismansAccess : IProgramRuntimeOperations
 {
     ref bool _synchronizingCategoryTalismans { get; }
 }

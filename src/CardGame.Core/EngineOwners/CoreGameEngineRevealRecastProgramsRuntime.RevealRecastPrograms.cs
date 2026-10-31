@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRevealRecastProgramsRuntime
@@ -90,7 +86,7 @@ internal sealed partial class CoreGameEngineRevealRecastProgramsRuntime
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Paired reveal lost its program frame.");
         var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
         var canonical = PairedHandRevealChoices(frame, effect).SingleOrDefault(choice => choice.Id == selected.Id);
-        if (effect.Op != SkillProgramEffectOp.RevealSelectedHandAgainstTarget || canonical is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [selected]) || frame.ChoiceBindings.Any(binding => binding.Name == effect.ResultBind))
+        if (effect.Op != SkillProgramEffectOp.RevealSelectedHandAgainstTarget || canonical is null || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [selected]) || frame.ChoiceBindings.Any(binding => binding.Name == effect.ResultBind))
             throw new InvalidOperationException("Paired reveal choice changed its physical card, target or result binding.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[frame.SelectedTargetSeats.Single()];
@@ -98,16 +94,16 @@ internal sealed partial class CoreGameEngineRevealRecastProgramsRuntime
         var targetCard = _corePhysicalOwnedCardQueriesOperations.GetHand(target).Single(card => card.Id == canonical.Cards.Single());
         var ownerKind = _coreActionQueriesOperations.GetProgramCardIdentityMatches(owner, ownerCard).FirstOrDefault()?.Identity.OutputKind ?? ownerCard.Kind;
         var targetKind = _coreActionQueriesOperations.GetProgramCardIdentityMatches(target, targetCard).FirstOrDefault()?.Identity.OutputKind ?? targetCard.Kind;
-        var outcome = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(ownerKind) && targetKind != CardKind.Dodge ? "damage" : !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(ownerKind) && targetKind == CardKind.Dodge ? "obtain" : "none";
+        var outcome = CoreNativeCardClassificationsRuntime.IsSlashCard(ownerKind) && targetKind != CardKind.Dodge ? "damage" : !CoreNativeCardClassificationsRuntime.IsSlashCard(ownerKind) && targetKind == CardKind.Dodge ? "obtain" : "none";
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), owner.Seat, effect.ResultBind!, [_coreSnapshotValueProjectionOperations.ToSnapshot(ownerCard), _coreSnapshotValueProjectionOperations.ToSnapshot(targetCard)]));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), owner.Seat, effect.ResultBind!, [_coreSnapshotValueProjectionOperations.ToSnapshot(ownerCard), _coreSnapshotValueProjectionOperations.ToSnapshot(targetCard)]));
         _coreProgramSlashRequestOperations.CommitProgramChoiceResult(frame.Id, effect.ResultBind!, outcome, target.Seat, "双方同时公开实体手牌。");
         if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(frame.Id, PublicHandRevealReturnKind.Program))
             return;
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IRevealRecastProgramHost.RecastSelectedCards(ProgramSkillFrame frame, string stateId, int threshold) => RecastProgramSelectedCards(frame, stateId, threshold);
-    void global::CardGame.Core.IRevealRecastProgramHost.DrawCompletedCardParticipants(ProgramSkillFrame frame, string stateId, int threshold) => DrawProgramCompletedCardParticipants(frame, stateId, threshold);
-    SkillProgramStepOutcome global::CardGame.Core.IRevealRecastProgramHost.RevealSelectedHandAgainstTarget(ProgramSkillFrame frame, string resultBind) => RevealProgramSelectedHandAgainstTarget(frame, resultBind);
+    SkillProgramStepOutcome IRevealRecastProgramHost.RecastSelectedCards(ProgramSkillFrame frame, string stateId, int threshold) => RecastProgramSelectedCards(frame, stateId, threshold);
+    void IRevealRecastProgramHost.DrawCompletedCardParticipants(ProgramSkillFrame frame, string stateId, int threshold) => DrawProgramCompletedCardParticipants(frame, stateId, threshold);
+    SkillProgramStepOutcome IRevealRecastProgramHost.RevealSelectedHandAgainstTarget(ProgramSkillFrame frame, string resultBind) => RevealProgramSelectedHandAgainstTarget(frame, resultBind);
 }

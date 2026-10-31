@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYangBiaoAnniversaryRuntime
@@ -144,7 +140,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 43700)]
-    internal bool ReturnYangBiaoAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnYangBiaoAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryYangBiao: { Stage: AnniversaryYangBiaoStage.ReturnedUse, HadAttack: true, Plan.Kind: CardKind.Slash } r } f || completion.ResolutionId != r.UseId)
             return false;

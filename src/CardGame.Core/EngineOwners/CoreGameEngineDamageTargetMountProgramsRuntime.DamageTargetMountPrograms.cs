@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDamageTargetMountProgramsRuntime
 {
-    internal static bool IsPrintedMount(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DamageTargetMountPrograms.IsPrintedMount(kind);
+    internal static bool IsPrintedMount(CardKind kind) => RuntimeSkills.RuntimeRules_Core_DamageTargetMountPrograms.IsPrintedMount(kind);
     internal CardUseFrame? ActualDamageTargetMountUse(int ownerSeat, ProgramSkillWindowContext context)
     {
         if (context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target } || source != ownerSeat || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || damage.Id != context.ParentFrameId || damage.ParentFrameId != context.DamageFrameId)
@@ -23,13 +20,13 @@ internal sealed partial class CoreGameEngineDamageTargetMountProgramsRuntime
     internal IReadOnlyList<PromptChoice> DamageTargetMountChoices(long frameId, int ownerSeat, int targetSeat, string? skillId = null)
     {
         if (ownerSeat != targetSeat)
-            return _coreProgramOtherOwnedCardDiscardsOperations.BuildOtherOwnedCardDiscardChoices(frameId, ownerSeat, global::CardGame.Core.EngineOwners.CharacterGongsunZanBoundaryMobileRuntime.DamageTargetMountZonesFor(skillId), new CardMoveReason("skill-program.damage-target-mount.discard")).Where(c => c.Targets.SequenceEqual([targetSeat])).Select(c => c with { Parameters = new Dictionary<string, string>(c.Parameters) { ["program-action"] = "damage-target-mount" } }).ToArray();
+            return _coreProgramOtherOwnedCardDiscardsOperations.BuildOtherOwnedCardDiscardChoices(frameId, ownerSeat, CharacterGongsunZanBoundaryMobileRuntime.DamageTargetMountZonesFor(skillId), new CardMoveReason("skill-program.damage-target-mount.discard")).Where(c => c.Targets.SequenceEqual([targetSeat])).Select(c => c with { Parameters = new Dictionary<string, string>(c.Parameters) { ["program-action"] = "damage-target-mount" } }).ToArray();
         // The current text permits the actual victim to be this same source through chain/transfer.
         // Keep the mature only-other helper unchanged; this opt-in alone adds self-owned slots.
         var result = new List<PromptChoice>();
         if (!_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive)
             return result;
-        foreach (var zone in global::CardGame.Core.EngineOwners.CharacterGongsunZanBoundaryMobileRuntime.DamageTargetMountZonesFor(skillId))
+        foreach (var zone in CharacterGongsunZanBoundaryMobileRuntime.DamageTargetMountZonesFor(skillId))
         {
             var cards = _cardZonesOperations._cardZones.CardsAt(new(zone, targetSeat));
             for (var slot = 0; slot < cards.Count; slot++)
@@ -56,7 +53,7 @@ internal sealed partial class CoreGameEngineDamageTargetMountProgramsRuntime
         if (active.DamageTargetMount is not null)
             throw new InvalidOperationException("Mount discard cannot pay twice.");
         var target = context.TargetSeat!.Value;
-        _coreRuntimeOperations.ReplaceRuntimeTop(active with { DamageTargetMount = new(active.InstructionIndex, active.OwnerSeat, target, context.ParentFrameId, context.DamageFrameId!.Value, use.Id, action.ActionId, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.SkillInstanceId, active.GameplayHash) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(active with { DamageTargetMount = new(active.InstructionIndex, active.OwnerSeat, target, context.ParentFrameId, context.DamageFrameId!.Value, use.Id, action.ActionId, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.SkillInstanceId, active.GameplayHash) });
         var choices = DamageTargetMountChoices(f.Id, f.OwnerSeat, target, f.SkillId);
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
         var region = f.SkillId == "boundary:qiaomeng-mobile" ? "装备区" : "区域";
@@ -126,18 +123,18 @@ internal sealed partial class CoreGameEngineDamageTargetMountProgramsRuntime
 
     internal bool IsValidDamageTargetMount(ProgramSkillFrame f)
     {
-        if (f.DamageTargetMount is not { } d || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0 } c || d.InstructionIndex != f.InstructionIndex || d.InstructionIndex < 1 || d.OwnerSeat != f.OwnerSeat || d.TargetSeat != c.TargetSeat || d.DamageWindowId != c.ParentFrameId || d.DamageFrameId != c.DamageFrameId || c.SourceSeat != f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(d.TargetSeat) || d.SkillId != f.SkillId || d.BindingId != global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) || d.SkillInstanceId != f.SkillInstanceId || d.GameplayHash != f.GameplayHash)
+        if (f.DamageTargetMount is not { } d || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0 } c || d.InstructionIndex != f.InstructionIndex || d.InstructionIndex < 1 || d.OwnerSeat != f.OwnerSeat || d.TargetSeat != c.TargetSeat || d.DamageWindowId != c.ParentFrameId || d.DamageFrameId != c.DamageFrameId || c.SourceSeat != f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(d.TargetSeat) || d.SkillId != f.SkillId || d.BindingId != CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) || d.SkillInstanceId != f.SkillInstanceId || d.GameplayHash != f.GameplayHash)
             return false;
         var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
         if (plan.Instructions.Count != 1 || plan.Instructions[0].Op != SkillProgramEffectOp.DiscardDamageTargetAndClaimMount || plan.Trigger?.Subject != SkillProgramTriggerSubject.DamageSource || plan.Trigger.Optional != true)
             return false;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == d.CardUseFrameId);
-        if (use?.Action is not { Type: CardActionType.Use } action || action.ActionId != d.CardActionId || action.ActorSeat != d.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || !_characterGongsunZanBoundaryMobileOperations.DamageTargetMountUseMatchesEdition(f.SkillId, use))
+        if (use?.Action is not { Type: CardActionType.Use } action || action.ActionId != d.CardActionId || action.ActorSeat != d.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || !_characterGongsunZanBoundaryMobileOperations.DamageTargetMountUseMatchesEdition(f.SkillId, use))
             return false;
         if (d.Receipt is not { } r)
             return !d.ClaimIssued && d.ClaimMovementSequence is null;
         var actual = _coreCardMovementJournalCardMovementsAccess._cardMovements.SingleOrDefault(m => m.Sequence == r.MovementSequence);
-        return actual is not null && actual.CardId == r.CardId && actual.CardKind == r.PrintedKind && actual.From == r.From && actual.To == r.To && actual.Reason.Value == r.Reason && r.Reason == "skill-program.damage-target-mount.discard" && r.From.OwnerSeat == d.TargetSeat && global::CardGame.Core.EngineOwners.CharacterGongsunZanBoundaryMobileRuntime.DamageTargetMountZonesFor(f.SkillId).Contains(r.From.Zone) && r.To == _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId), r.From, r.PrintedKind == CardKind.GeneralWeapon && r.From.Zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : CardLocation.DiscardPile) && r.IsMount == IsPrintedMount(r.PrintedKind) && (d.ClaimMovementSequence is null ? !d.ClaimIssued : d.ClaimIssued && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == d.ClaimMovementSequence && m.CardId == r.CardId && m.CardKind == r.PrintedKind && m.From == r.To && (m.To == CardLocation.Hand(d.OwnerSeat) || _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(m, CardLocation.Hand(d.OwnerSeat))) && m.Reason.Value == "skill-program.damage-target-mount.claim"));
+        return actual is not null && actual.CardId == r.CardId && actual.CardKind == r.PrintedKind && actual.From == r.From && actual.To == r.To && actual.Reason.Value == r.Reason && r.Reason == "skill-program.damage-target-mount.discard" && r.From.OwnerSeat == d.TargetSeat && CharacterGongsunZanBoundaryMobileRuntime.DamageTargetMountZonesFor(f.SkillId).Contains(r.From.Zone) && r.To == _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId), r.From, r.PrintedKind == CardKind.GeneralWeapon && r.From.Zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : CardLocation.DiscardPile) && r.IsMount == IsPrintedMount(r.PrintedKind) && (d.ClaimMovementSequence is null ? !d.ClaimIssued : d.ClaimIssued && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == d.ClaimMovementSequence && m.CardId == r.CardId && m.CardKind == r.PrintedKind && m.From == r.To && (m.To == CardLocation.Hand(d.OwnerSeat) || _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(m, CardLocation.Hand(d.OwnerSeat))) && m.Reason.Value == "skill-program.damage-target-mount.claim"));
     }
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 840)]
@@ -180,5 +177,5 @@ internal sealed partial class CoreGameEngineDamageTargetMountProgramsRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 800)]
     internal bool CanContinuePaidDamageTargetMount(ProgramSkillFrame f) => f.DamageTargetMount?.Receipt is not null && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && IsValidDamageTargetMount(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDamageTargetMountProgramHost.DiscardDamageTargetAndClaimMount(ProgramSkillFrame f) => BeginDamageTargetMount(f);
+    SkillProgramStepOutcome IDamageTargetMountProgramHost.DiscardDamageTargetAndClaimMount(ProgramSkillFrame f) => BeginDamageTargetMount(f);
 }

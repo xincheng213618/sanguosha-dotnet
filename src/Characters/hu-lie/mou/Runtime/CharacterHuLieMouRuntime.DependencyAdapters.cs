@@ -1,28 +1,24 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime))]
-internal sealed class CharacterHuLieMouCoreProgramTargetRulesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterHuLieMouCoreProgramTargetRulesOperations
+[Core.ProgramCapability(typeof(CoreProgramTargetRulesRuntime))]
+internal sealed class CharacterHuLieMouCoreProgramTargetRulesAdapter(Func<CoreProgramTargetRulesRuntime> targetFactory) : ICharacterHuLieMouCoreProgramTargetRulesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
+    private readonly Func<CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
+    public ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MouHuLieRuntime))]
-internal sealed class CharacterHuLieMouMouHuLieAdapter(global::System.Func<global::CardGame.Core.MouHuLieRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterHuLieMouMouHuLieOperations
+[Core.ProgramCapability(typeof(MouHuLieRuntime))]
+internal sealed class CharacterHuLieMouMouHuLieAdapter(Func<MouHuLieRuntime> targetFactory) : ICharacterHuLieMouMouHuLieOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MouHuLieRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MouHuLieRuntime Get() => this._targetFactory();
+    private readonly Func<MouHuLieRuntime> _targetFactory = targetFactory;
+    public MouHuLieRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime))]
-internal sealed class CharacterHuLieMouCorePlayerViewProjectionAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterHuLieMouCorePlayerViewProjectionOperations
+[Core.ProgramCapability(typeof(CorePlayerViewProjectionRuntime))]
+internal sealed class CharacterHuLieMouCorePlayerViewProjectionAdapter(Func<CorePlayerViewProjectionRuntime> targetFactory) : ICharacterHuLieMouCorePlayerViewProjectionOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
+    private readonly Func<CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
+    public GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime
     internal bool HasPrepPoisonParent(ProgramSkillFrame f)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == f.Id);
-        return index > 0 && f.TriggerId is not null && f.InstructionIndex == 3 && ResolvePrepPoisonOutcomeByRoundDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f)) && f.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context && context.OwnerSeat == f.OwnerSeat && context.SourceSeat == f.OwnerSeat && context.TargetSeat == f.OwnerSeat && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame parent && parent.Id == context.ParentFrameId && parent.OwnerSeat == f.OwnerSeat && parent.Window == context.Window && parent.Continuation == ProgramLifecycleContinuation.NormalTurnStart && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]);
+        return index > 0 && f.TriggerId is not null && f.InstructionIndex == 3 && ResolvePrepPoisonOutcomeByRoundDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f)) && f.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context && context.OwnerSeat == f.OwnerSeat && context.SourceSeat == f.OwnerSeat && context.TargetSeat == f.OwnerSeat && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame parent && parent.Id == context.ParentFrameId && parent.OwnerSeat == f.OwnerSeat && parent.Window == context.Window && parent.Continuation == ProgramLifecycleContinuation.NormalTurnStart && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]);
     }
 
     internal SkillProgramStepOutcome ResolvePrepPoisonOutcomeByRound(ProgramSkillFrame supplied)
@@ -43,8 +39,8 @@ internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime
         // Undefined HP has no numeric loss value. Diamond cure needs no HP at all.
         if (!cured && !owner.HasHpValue)
             return SkillProgramStepOutcome.Continue;
-        var revoked = cured ? _coreDamageTargetSkillRoundDrawOperations.OwnedAndRestorableRoundSkillGrants(owner, f.SkillId).Where(g => !g.IsModeRule).Select(global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime.RoundSkillIdentity).Distinct().ToArray() : [];
-        var receipt = new PrepPoisonOutcomeReceipt(new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, f.WindowContext!.ParentFrameId, outcome, Math.Max(0, _coreActualRoundProgressRoundNumberAccess._roundNumber), cured, cured ? 0 : Math.Max(0, _coreActualRoundProgressRoundNumberAccess._roundNumber), cured ? 0 : owner.Hp)
+        var revoked = cured ? _coreDamageTargetSkillRoundDrawOperations.OwnedAndRestorableRoundSkillGrants(owner, f.SkillId).Where(g => !g.IsModeRule).Select(CoreGameEngineDamageTargetSkillRoundDrawRuntime.RoundSkillIdentity).Distinct().ToArray() : [];
+        var receipt = new PrepPoisonOutcomeReceipt(new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, f.WindowContext!.ParentFrameId, outcome, Math.Max(0, _coreActualRoundProgressRoundNumberAccess._roundNumber), cured, cured ? 0 : Math.Max(0, _coreActualRoundProgressRoundNumberAccess._roundNumber), cured ? 0 : owner.Hp)
         {
             Stage = cured ? PrepPoisonOutcomeStage.SkillLossChildren : PrepPoisonOutcomeStage.HpLossChildren,
             RevokedGrants = revoked
@@ -58,7 +54,7 @@ internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime
             for (var i = 0; i < revoked.Length; i++)
             {
                 var identity = revoked[i];
-                var live = owner.SkillGrants.Grants.SingleOrDefault(g => global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime.SameRoundSkillIdentity(g, identity));
+                var live = owner.SkillGrants.Grants.SingleOrDefault(g => CoreGameEngineDamageTargetSkillRoundDrawRuntime.SameRoundSkillIdentity(g, identity));
                 if (live is not null && !owner.SkillGrants.RemoveGrant(live.GrantId))
                     throw new InvalidOperationException("Preparation poison cure changed its exact removed grant.");
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PrepPoisonGrantRevokedEvent(f.Id, i, f.OwnerSeat, identity));
@@ -117,7 +113,7 @@ internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime
 
     internal void RequirePrepPoisonOutcome(ProgramSkillFrame f)
     {
-        if (f.PrepPoisonOutcome is not { } r || !HasPrepPoisonParent(f) || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.PrepWindowId != f.WindowContext!.ParentFrameId || r.Outcome.InstructionIndex != 1 || r.Outcome.TargetSeat != f.OwnerSeat || r.Outcome.Name != _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects[2].SourceBind || !_coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(f, r.Outcome) || r.Cured != (r.Outcome.Suit == Suit.Diamond) || r.RoundNumber < 0 || r.RequestedHpLoss != (r.Cured ? 0 : r.RoundNumber) || r.Stage != (r.Cured ? PrepPoisonOutcomeStage.SkillLossChildren : PrepPoisonOutcomeStage.HpLossChildren) || r.RevokedGrants.Distinct().Count() != r.RevokedGrants.Count || r.RevokedGrants.Any(g => g.SkillId != f.SkillId) || _coreProgramEventHistoryOperations.ProgramEventHistory<PrepPoisonOutcomeIssuedEvent>().Count(e => e == new PrepPoisonOutcomeIssuedEvent(f.Id, r.Source, r.GameplayHash, r.PrepWindowId, r.Outcome.JudgmentFrameId, r.Outcome.Name, r.RoundNumber, r.Cured, r.RequestedHpLoss)) != 1)
+        if (f.PrepPoisonOutcome is not { } r || !HasPrepPoisonParent(f) || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.PrepWindowId != f.WindowContext!.ParentFrameId || r.Outcome.InstructionIndex != 1 || r.Outcome.TargetSeat != f.OwnerSeat || r.Outcome.Name != _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects[2].SourceBind || !_coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(f, r.Outcome) || r.Cured != (r.Outcome.Suit == Suit.Diamond) || r.RoundNumber < 0 || r.RequestedHpLoss != (r.Cured ? 0 : r.RoundNumber) || r.Stage != (r.Cured ? PrepPoisonOutcomeStage.SkillLossChildren : PrepPoisonOutcomeStage.HpLossChildren) || r.RevokedGrants.Distinct().Count() != r.RevokedGrants.Count || r.RevokedGrants.Any(g => g.SkillId != f.SkillId) || _coreProgramEventHistoryOperations.ProgramEventHistory<PrepPoisonOutcomeIssuedEvent>().Count(e => e == new PrepPoisonOutcomeIssuedEvent(f.Id, r.Source, r.GameplayHash, r.PrepWindowId, r.Outcome.JudgmentFrameId, r.Outcome.Name, r.RoundNumber, r.Cured, r.RequestedHpLoss)) != 1)
             throw new InvalidOperationException("Preparation poison lost its frozen exact final judgment, source or payment.");
         if (!_coreProgramEventHistoryOperations.ProgramEventHistory<PrepPoisonGrantRevokedEvent>().Where(e => e.ProgramFrameId == f.Id).SequenceEqual(r.RevokedGrants.Select((g, i) => new PrepPoisonGrantRevokedEvent(f.Id, i, f.OwnerSeat, g))) || r.Cured && (r.HpLossApplied || r.ActualHpLoss != 0 || r.HpAfter != 0 || r.HpBefore != 0) || !r.Cured && r.RevokedGrants.Count != 0)
             throw new InvalidOperationException("Preparation poison cure lost its exact once-revoked grant identities.");
@@ -143,5 +139,5 @@ internal sealed partial class CoreGameEnginePrepPoisonOutcomesRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IPrepPoisonOutcomeHost.ResolvePrepPoisonOutcomeByRound(ProgramSkillFrame frame) => ResolvePrepPoisonOutcomeByRound(frame);
+    SkillProgramStepOutcome IPrepPoisonOutcomeHost.ResolvePrepPoisonOutcomeByRound(ProgramSkillFrame frame) => ResolvePrepPoisonOutcomeByRound(frame);
 }

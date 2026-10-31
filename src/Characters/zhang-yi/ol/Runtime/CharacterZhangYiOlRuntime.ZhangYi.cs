@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangYiOlRuntime
@@ -10,8 +6,8 @@ internal sealed partial class CharacterZhangYiOlRuntime
     internal const string ZhangYiDrawReason = "skill-program.zhang-yi.kangrui.draw";
     internal bool HasZhangYiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveKangruiFirstOwnTurnDamage);
 
-    internal CardConversionSource ZhangYiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IZhangYiProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhangYi(f, op);
+    internal CardConversionSource ZhangYiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IZhangYiProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhangYi(f, op);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 26400)]
     internal void ObserveZhangYiActualDamage(IGameEvent payload)
     {
@@ -48,7 +44,7 @@ internal sealed partial class CharacterZhangYiOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         var dianjun = op == SkillProgramEffectOp.ResolveDianjunActualTurnEnd;
-        if (f.ZhangYi is not null || f.InstructionIndex != 1 || f.WindowContext is not { } c || f.SkillId != (dianjun ? "ol:dianjun" : "ol:kangrui") || !CanOfferZhangYi(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), c) || c.TargetSeat is not { } target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
+        if (f.ZhangYi is not null || f.InstructionIndex != 1 || f.WindowContext is not { } c || f.SkillId != (dianjun ? "ol:dianjun" : "ol:kangrui") || !CanOfferZhangYi(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), c) || c.TargetSeat is not { } target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
             throw new InvalidOperationException("Zhang Yi requires its exact actual end or first own-turn positive damage.");
         var r = new ZhangYiReceipt(ZhangYiSource(f), f.GameplayHash, f.InstructionIndex, c.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, target, dianjun ? ZhangYiStage.DianjunDamage : ZhangYiStage.KangruiDraw, c.DamageFrameId, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZhangYi = r });
@@ -83,7 +79,7 @@ internal sealed partial class CharacterZhangYiOlRuntime
     [ProgramAnswer("zhang-yi-kangrui")]
     internal void AnswerZhangYi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangYi: { Stage: ZhangYiStage.KangruiChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhangYiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangYi: { Stage: ZhangYiStage.KangruiChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhangYiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Kangrui lost its paid draw, frozen injured actor or exact choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];

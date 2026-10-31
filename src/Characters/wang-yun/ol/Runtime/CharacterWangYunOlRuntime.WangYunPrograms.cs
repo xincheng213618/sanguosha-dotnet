@@ -1,17 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangYunOlRuntime
 {
     internal const string WangYunPlanMoveReason = "program.wang-yun.plan-payment";
-    internal static bool WangYunMaterial(Card card) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_yun_ol_WangYunPrograms.WangYunMaterial(card);
+    internal static bool WangYunMaterial(Card card) => RuntimeSkills.RuntimeRules_wang_yun_ol_WangYunPrograms.WangYunMaterial(card);
     internal bool WangYunActivationCardAllowed(SkillProgramActivation a, Card card) => WangYunActivationCardAllowed(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, a, card);
     internal bool WangYunActivationCardAllowed(int ownerSeat, SkillProgramActivation a, Card card)
     {
@@ -21,10 +14,10 @@ internal sealed partial class CharacterWangYunOlRuntime
         return !features.HasOperation(SkillProgramEffectOp.UseThreeRandomTricksFromSelectedMaterial) || WangYunMaterial(card);
     }
 
-    internal CardConversionSource WangYunSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource WangYunSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillProgramEffect? WangYunPausedEffect(ProgramSkillFrame f) => f.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
     internal bool WangYunActivationMatches(ProgramSkillFrame f, SkillProgramEffectOp op) => f.TriggerId is null && f.WindowContext is null && f.InstructionIndex == 1 && f.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is [var instruction] && instruction.Op == op;
-    internal static Dictionary<string, string> WangYunArgs(ProgramSkillFrame f, string branch) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_yun_ol_WangYunPrograms.WangYunArgs(f, branch);
+    internal static Dictionary<string, string> WangYunArgs(ProgramSkillFrame f, string branch) => RuntimeSkills.RuntimeRules_wang_yun_ol_WangYunPrograms.WangYunArgs(f, branch);
     internal int WangYunChooser(ProgramSkillFrame f) => f.WangYunPlan?.Stage == "branch" ? f.WangYunPlan.Actor : f.OwnerSeat;
     internal void PublishWangYun(ProgramSkillFrame f)
     {
@@ -57,7 +50,7 @@ internal sealed partial class CharacterWangYunOlRuntime
     [ProgramAnswer("wang-yun-plan")]
     internal void ResolveWangYunChoice(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.WangYunPlan is null && f.WangYunTrick is null || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != WangYunChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], (f.WangYunPlan is not null ? WangYunPlanChoices(f) : WangYunTrickChoices(f)).Where(c => c.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.WangYunPlan is null && f.WangYunTrick is null || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != WangYunChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], (f.WangYunPlan is not null ? WangYunPlanChoices(f) : WangYunTrickChoices(f)).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Wang Yun lost the exact actual chooser or current material/target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (f.WangYunTrick is not null)
@@ -166,7 +159,7 @@ internal sealed partial class CharacterWangYunOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IWangYunProgramHost.ResolveLianjiPaidWeaponAndSlash(ProgramSkillFrame f) => ResolveLianjiPaidWeaponAndSlash(f);
-    SkillProgramStepOutcome global::CardGame.Core.IWangYunProgramHost.AwakenFromIssuedLianjiSlashDamage(ProgramSkillFrame f) => AwakenFromIssuedLianjiSlashDamage(f);
-    SkillProgramStepOutcome global::CardGame.Core.IWangYunProgramHost.UseThreeRandomTricksFromSelectedMaterial(ProgramSkillFrame f) => UseThreeRandomTricksFromSelectedMaterial(f);
+    SkillProgramStepOutcome IWangYunProgramHost.ResolveLianjiPaidWeaponAndSlash(ProgramSkillFrame f) => ResolveLianjiPaidWeaponAndSlash(f);
+    SkillProgramStepOutcome IWangYunProgramHost.AwakenFromIssuedLianjiSlashDamage(ProgramSkillFrame f) => AwakenFromIssuedLianjiSlashDamage(f);
+    SkillProgramStepOutcome IWangYunProgramHost.UseThreeRandomTricksFromSelectedMaterial(ProgramSkillFrame f) => UseThreeRandomTricksFromSelectedMaterial(f);
 }

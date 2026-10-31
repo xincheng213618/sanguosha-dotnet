@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MobileDongBaiHost(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterDongBaiMobileEntries> getCharacterDongBaiMobileRuntime) : IMobileDongBaiHost
+internal sealed class MobileDongBaiHost(Func<RuntimeEntries.CharacterDongBaiMobileEntries> getCharacterDongBaiMobileRuntime) : IMobileDongBaiHost
 {
     public SkillProgramStepOutcome Execute(ProgramSkillFrame f, SkillProgramEffect effect) => effect.Op switch
     {

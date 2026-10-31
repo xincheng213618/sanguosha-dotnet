@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreProgramArmorOperationsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramArmorOperationsRuntime> _resolve;
-    private CoreProgramArmorOperationsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramArmorOperationsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreProgramArmorOperationsRuntime> _resolve;
+    private CoreProgramArmorOperationsEntries(Func<EngineOwners.CoreProgramArmorOperationsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreProgramArmorOperationsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramArmorOperationsRuntime> resolve) => new(resolve);
+    internal static CoreProgramArmorOperationsEntries Create(Func<EngineOwners.CoreProgramArmorOperationsRuntime> resolve) => new(resolve);
 }

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineNextCardTargetAdjustmentsNextCardTargetAdjustmentOwnersAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineNextCardTargetAdjustmentsNextCardTargetAdjustmentOwnersAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.CardConversionSource> _nextCardTargetAdjustmentOwners { get; }
+    ref readonly Dictionary<int, CardConversionSource> _nextCardTargetAdjustmentOwners { get; }
 }

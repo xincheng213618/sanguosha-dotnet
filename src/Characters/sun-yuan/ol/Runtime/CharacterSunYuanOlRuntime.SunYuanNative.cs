@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunYuanOlRuntime
@@ -21,11 +17,11 @@ internal sealed partial class CharacterSunYuanOlRuntime
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateSayingFactionSlashParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f) => TryGetSayingSlashRequest(f, out var actor, out var targets) && pending.IsAssistedProgramUse && pending.OwnerFrameId == f.Id && pending.ProgramSkillFrameId == f.Id && pending.OwnerSeat == actor && targets is [var target] && pending.TargetSeat == target && pending.AssistedResultBind == "saying-slash" && pending.PolicySource is { } policy && pending.ProviderFactionId == policy.FactionId && policy.RequiredKind == CardKind.Slash && _coreProgramEventHistoryOperations.ProgramEventHistory<SayingFactionRequestedEvent>().Count(e => e.FrameId == f.Id && e.ActorSeat == actor && e.TargetSeat == target && e.Source == policy) == 1;
+    internal bool ValidateSayingFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f) => TryGetSayingSlashRequest(f, out var actor, out var targets) && pending.IsAssistedProgramUse && pending.OwnerFrameId == f.Id && pending.ProgramSkillFrameId == f.Id && pending.OwnerSeat == actor && targets is [var target] && pending.TargetSeat == target && pending.AssistedResultBind == "saying-slash" && pending.PolicySource is { } policy && pending.ProviderFactionId == policy.FactionId && policy.RequiredKind == CardKind.Slash && _coreProgramEventHistoryOperations.ProgramEventHistory<SayingFactionRequestedEvent>().Count(e => e.FrameId == f.Id && e.ActorSeat == actor && e.TargetSeat == target && e.Source == policy) == 1;
     internal void PrepareSayingSuppliedSlash(ProgramSkillFrame supplied, int actorSeat, int providerSeat, int targetSeat, CardKind kind, IReadOnlyList<Card> materials, CardConversionSource? conversionSource, IReadOnlyList<CardConversionSource>? additionalConversionSources = null)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!IsSayingSlashRequest(f) || !TryGetSayingSlashRequest(f, out var actor, out var targets) || actor != actorSeat || !targets.SequenceEqual([targetSeat]) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(providerSeat) || materials.Select(c => c.Id).Distinct().Count() != materials.Count || materials.Any(c => c.Id <= 0 || !_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Id)).Any(actual => actual.Id == c.Id && actual.Kind == c.Kind)))
+        if (!IsSayingSlashRequest(f) || !TryGetSayingSlashRequest(f, out var actor, out var targets) || actor != actorSeat || !targets.SequenceEqual([targetSeat]) || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(providerSeat) || materials.Select(c => c.Id).Distinct().Count() != materials.Count || materials.Any(c => c.Id <= 0 || !_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Id)).Any(actual => actual.Id == c.Id && actual.Kind == c.Kind)))
             throw new InvalidOperationException("Saying's supplied Slash lost its exact current holder, target or primary group.");
         var r = f.SunYuan!;
         var sources = (conversionSource is { } source ? new[]
@@ -93,7 +89,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
 
     internal bool IsIssuedSayingUse(CardUseFrame use)
     {
-        if (use.SayingSlash is not { } o || use.Action is not { Type: CardActionType.Use } a || use.Id != o.UseId || a.ActionId != o.ActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Selection.ActorSeat, o.Selection.ProviderSeat) || a.ProviderSeat != o.Selection.ProviderSeat || !a.PhysicalCards.SequenceEqual(o.OriginalAction.PhysicalCards) || !use.PhysicalCardIds!.SequenceEqual(o.Selection.Materials.Select(c => c.CardId)) || _coreProgramEventHistoryOperations.ProgramEventHistory<SayingSlashIssuedEvent>().Count(e => e.FrameId == o.ProgramFrameId && e.UseId == use.Id && e.ActionId == o.ActionId && e.OriginalActionHash == SunYuanHash(o.OriginalAction)) != 1)
+        if (use.SayingSlash is not { } o || use.Action is not { Type: CardActionType.Use } a || use.Id != o.UseId || a.ActionId != o.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Selection.ActorSeat, o.Selection.ProviderSeat) || a.ProviderSeat != o.Selection.ProviderSeat || !a.PhysicalCards.SequenceEqual(o.OriginalAction.PhysicalCards) || !use.PhysicalCardIds!.SequenceEqual(o.Selection.Materials.Select(c => c.CardId)) || _coreProgramEventHistoryOperations.ProgramEventHistory<SayingSlashIssuedEvent>().Count(e => e.FrameId == o.ProgramFrameId && e.UseId == use.Id && e.ActionId == o.ActionId && e.OriginalActionHash == SunYuanHash(o.OriginalAction)) != 1)
             return false;
         var original = a;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -146,7 +142,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 27490)]
-    internal bool ReturnSayingAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnSayingAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunYuan: { NativeReturned: true, Native: { } o } } || completion.ResolutionId != o.UseId)
             return false;

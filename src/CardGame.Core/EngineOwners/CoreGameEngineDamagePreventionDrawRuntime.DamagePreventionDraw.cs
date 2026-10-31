@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDamagePreventionDrawRuntime
@@ -23,5 +19,5 @@ internal sealed partial class CoreGameEngineDamagePreventionDrawRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(current with { PreventionDrawReceipt = new(current.InstructionIndex - 1, parent.Id, parent.SourceSeat, parent.TargetSeat, parent.Amount, multiplier, beforeSequence, afterSequence, actualCount) });
         return _coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat);
     }
-    SkillProgramStepOutcome global::CardGame.Core.IDamagePreventionDrawProgramHost.PreventDamageAndDrawMultiple(ProgramSkillFrame frame, int multiplier) => PreventDamageAndDrawMultiple(frame, multiplier);
+    SkillProgramStepOutcome IDamagePreventionDrawProgramHost.PreventDamageAndDrawMultiple(ProgramSkillFrame frame, int multiplier) => PreventDamageAndDrawMultiple(frame, multiplier);
 }

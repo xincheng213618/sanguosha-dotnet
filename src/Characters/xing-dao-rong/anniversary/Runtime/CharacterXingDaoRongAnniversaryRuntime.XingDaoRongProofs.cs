@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
         if (f.SkillId != XingDaoRongComposition.Skill || f.TriggerId != XingDaoRongComposition.Starting || f.ActivationId != f.TriggerId || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting } c || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != f.OwnerSeat || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == c.Window) != 1)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is PlayPhaseStartingBoundaryFrame p && p.Id == c.ParentFrameId && p.OwnerSeat == f.OwnerSeat && p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count && p.Items[p.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
+        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is PlayPhaseStartingBoundaryFrame p && p.Id == c.ParentFrameId && p.OwnerSeat == f.OwnerSeat && p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count && p.Items[p.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
     }
 
     internal bool ValidXingDaoRong(ProgramSkillFrame f)
@@ -49,11 +45,11 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
         if (f.XingDaoRongXuHe is not { } r || !ValidXingDaoRong(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == XingDaoRongXuHeStage.Drawing && r.Index < r.Targets.Count && draw.Context.RecipientSeat == r.Targets[r.Index] && draw.Context.RequestedCount == 1 && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == XingDaoRongXuHeStage.Drawing && r.Index < r.Targets.Count && draw.Context.RecipientSeat == r.Targets[r.Index] && draw.Context.RequestedCount == 1 && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
         if (r.Stage is not (XingDaoRongXuHeStage.DiscardChildren or XingDaoRongXuHeStage.DrawChildren))
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (r.Discard is not { CardKind: CardKind.SilverLion, From.Zone: CardZoneKind.Equipment } paid)
@@ -64,7 +60,7 @@ internal sealed partial class CharacterXingDaoRongAnniversaryRuntime
         return child is HpChangedTriggerWindowFrame hp && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.ParentFrameId == f.Id && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == target && hp.Change.TargetSeat == target && hp.Change.Amount == 1;
     }
 
-    internal bool XingDaoRongObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (j) => _coreObserverSubtreesOperations.IsMovementObserverEdge(j) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[j], _resolutionStackOperations2._resolutionStack()[j - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[j], _resolutionStackOperations2._resolutionStack()[j - 1]), (j, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(j, dying));
+    internal bool XingDaoRongObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (j) => _coreObserverSubtreesOperations.IsMovementObserverEdge(j) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[j], _resolutionStackOperations2._resolutionStack()[j - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[j], _resolutionStackOperations2._resolutionStack()[j - 1]), (j, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(j, dying));
     internal ProgramSkillFrame? XingDaoRongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.XingDaoRongFirstChild(f, child), (i) => this.XingDaoRongObserverSuffix(i));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 45700)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 45700)]

@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuoJunOlRuntime
 {
     internal const string HuoJunDiscardReason = "skill-program.huo-jun.fenrui.discard";
-    internal static string HuoJunSlotName(EquipmentSlot s) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huo_jun_ol_HuoJunFenrui.HuoJunSlotName(s);
-    internal CardConversionSource HuoJunSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IHuoJunProgramHost.RestoreSlotAndUseMatchingEquipment(ProgramSkillFrame f) => BeginHuoJunFenrui(f);
+    internal static string HuoJunSlotName(EquipmentSlot s) => RuntimeSkills.RuntimeRules_huo_jun_ol_HuoJunFenrui.HuoJunSlotName(s);
+    internal CardConversionSource HuoJunSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IHuoJunProgramHost.RestoreSlotAndUseMatchingEquipment(ProgramSkillFrame f) => BeginHuoJunFenrui(f);
     internal bool HuoJunHasAbolishedSlot(int seat) => Enum.GetValues<EquipmentSlot>().Any(s => _coreMatchParticipantsPlayersAccess._players[seat].EquipmentSlotCapacity(s) == 0);
     internal bool HuoJunDiscardable(int seat, CardZoneKind zone, Card c) => !c.IsGeneralWeapon && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, new(zone, seat), OwnedCardMoveIntent.Discard);
     internal bool HuoJunHasDiscard(int seat) => new[]
@@ -25,7 +22,7 @@ internal sealed partial class CharacterHuoJunOlRuntime
     internal SkillProgramStepOutcome BeginHuoJunFenrui(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.HuoJunFenrui is not null || f.TriggerId is null || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.OwnerSeat != f.OwnerSeat || window.ItemIndex < 0 || window.ItemIndex >= window.Items.Count || window.Items[window.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || !HuoJunHasAbolishedSlot(f.OwnerSeat) || !HuoJunHasDiscard(f.OwnerSeat))
+        if (f.HuoJunFenrui is not null || f.TriggerId is null || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.OwnerSeat != f.OwnerSeat || window.ItemIndex < 0 || window.ItemIndex >= window.Items.Count || window.Items[window.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || !HuoJunHasAbolishedSlot(f.OwnerSeat) || !HuoJunHasDiscard(f.OwnerSeat))
             throw new InvalidOperationException("Fenrui requires its actual ending candidate, one discardable entity and an abolished equipment category.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HuoJunFenrui = new(HuoJunSource(f), f.GameplayHash, f.InstructionIndex, window.Id, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, HuoJunFenruiStage.Cost) });
         PublishHuoJunFenrui(f);
@@ -79,7 +76,7 @@ internal sealed partial class CharacterHuoJunOlRuntime
     [ProgramAnswer("huo-jun-fenrui")]
     internal void AnswerHuoJunFenrui(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuoJunFenrui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HuoJunFenruiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuoJunFenrui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HuoJunFenruiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Fenrui lost its exact private payer, restored slot or current equipment-count target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || r.CostCardId is null && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
@@ -213,5 +210,5 @@ internal sealed partial class CharacterHuoJunOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26210)]
     internal bool CanContinuePaidHuoJunFenrui(ProgramSkillFrame f) => f.HuoJunFenrui is { CostCardId: not null } r && _coreProgramEventHistoryOperations.ProgramEventHistory<HuoJunFenruiCostPaidEvent>().Any(e => e.FrameId == f.Id && e.Source == r.Source);
     [ProgramAiChoice(SkillProgramEffectOp.RestoreSlotAndUseMatchingEquipment)]
-    internal PromptChoice AiHuoJunFenrui(PendingDecision p, ProgramSkillFrame f) => f.HuoJunFenrui!.Stage == HuoJunFenruiStage.Cost ? p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First() : p.Choices.OrderByDescending(c => c.Parameters["branch"] == "damage" ? _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count - _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count : 0).First();
+    internal PromptChoice AiHuoJunFenrui(PendingDecision p, ProgramSkillFrame f) => f.HuoJunFenrui!.Stage == HuoJunFenruiStage.Cost ? p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First() : p.Choices.OrderByDescending(c => c.Parameters["branch"] == "damage" ? _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count - _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count : 0).First();
 }

@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDingFengMobileRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IMobileFenxunHost.Grant(ProgramSkillFrame frame) => GrantMobileFenxun(frame);
+    SkillProgramStepOutcome IMobileFenxunHost.Grant(ProgramSkillFrame frame) => GrantMobileFenxun(frame);
     internal SkillProgramStepOutcome GrantMobileFenxun(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -15,7 +11,7 @@ internal sealed partial class CharacterDingFengMobileRuntime
             throw new InvalidOperationException("Mobile Fenxun requires the original completed one-card discard receipt.");
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
             return SkillProgramStepOutcome.Continue;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileFenxunDistanceGrantedEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, target, card));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileFenxunDistanceGrantedEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, target, card));
         return SkillProgramStepOutcome.Continue;
     }
 
@@ -30,6 +26,6 @@ internal sealed partial class CharacterDingFengMobileRuntime
         var grants = history.OfType<MobileFenxunDistanceGrantedEvent>().Where(e => e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.ActualTurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && e.Source.OwnerSeat == source.Seat && e.TargetSeat == target.Seat).ToArray();
         if (grants.Length == 0)
             return original;
-        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-mobile-fenxun", global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"mobile-fenxun:{(g.ProgramFrameId)}", SkillRuleOperation.Set, 1)).ToArray());
+        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-mobile-fenxun", CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"mobile-fenxun:{(g.ProgramFrameId)}", SkillRuleOperation.Set, 1)).ToArray());
     }
 }

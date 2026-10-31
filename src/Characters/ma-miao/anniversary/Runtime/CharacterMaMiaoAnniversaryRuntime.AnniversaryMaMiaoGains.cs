@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaMiaoAnniversaryRuntime
@@ -18,7 +14,7 @@ internal sealed partial class CharacterMaMiaoAnniversaryRuntime
             if (batch.ParentFrameId is { } useId && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { CardKind: CardKind.Snatch, Action: { } action } use && action.EffectiveKind == CardKind.Snatch && action.ActorSeat == use.SourceSeat && action.ActorSeat != holder && action.EffectiveDesignatedTargetSeats.Contains(holder) && entry.Reason == CardMoveReasons.Snatch && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == useId && e.SourceSeat == action.ActorSeat && e.CardKind == CardKind.Snatch))
                 Record(action.ActorSeat, useId, true, null, null);
             else if (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame p && batch.ParentFrameId == p.Id && batch.OriginOwnerSeat == p.OwnerSeat && batch.OriginSkillId == p.SkillId && batch.OriginSkillInstanceId == p.SkillInstanceId && _contentRegistryOperations._contentRegistry.GetSkill(p.SkillId).Program?.GameplayHash == p.GameplayHash && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(p)is { Op: SkillProgramEffectOp.SelectAndMoveOwnedCard, Destination: SkillProgramCardDestination.SelectedTargetHand, CardOwnerRef: { } owner, TargetReference: { } recipientRef } effect && effect.Zones.Contains(entry.From.Zone) && _coreProgramCardPaymentsOperations.ResolveProgramParticipant(p, owner) == holder && entry.Reason.Value == $"skill-program.{(p.SkillId)}.{(effect.Op)}")
-                Record(_coreProgramCardPaymentsOperations.ResolveProgramParticipant(p, recipientRef), p.Id, false, new(p.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(p), p.OwnerSeat, p.SkillInstanceId), p.GameplayHash);
+                Record(_coreProgramCardPaymentsOperations.ResolveProgramParticipant(p, recipientRef), p.Id, false, new(p.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(p), p.OwnerSeat, p.SkillInstanceId), p.GameplayHash);
             void Record(int recipient, long producer, bool snatch, CardConversionSource? source, string? hash)
             {
                 if (recipient != holder && _coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaMiaoTransferProducerEvent>().Any(e => e.EntrySequence == entry.Sequence))

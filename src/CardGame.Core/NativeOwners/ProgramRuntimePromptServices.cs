@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramRuntimePromptServices(global::System.Func<global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries> getCorePendingDecisionPolicyPipelineRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativePromptBoundaryEntries> getCoreNativePromptBoundaryRuntime, global::CardGame.Core.EngineStates.CoreMatchOutcomeState matchOutcomeState) : IProgramRuntimePrompts
+internal sealed class ProgramRuntimePromptServices(Func<RuntimeEntries.CorePendingDecisionPolicyPipelineEntries> getCorePendingDecisionPolicyPipelineRuntime, Func<RuntimeEntries.CoreNativePromptBoundaryEntries> getCoreNativePromptBoundaryRuntime, EngineStates.CoreMatchOutcomeState matchOutcomeState) : IProgramRuntimePrompts
 {
     public PendingDecision? Current => getCorePendingDecisionPolicyPipelineRuntime()._pendingDecision;
 

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanLeRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     internal const string DiouSkill = "le:diou", DiouBinding = "completed-tanban-use";
     internal bool HasDiouCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveDiouTanbanUse);
 
-    internal static CardConversionSource DiouSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_diao_chan_le_LeDiaoChanDiou_Qualification.DiouSource(f);
+    internal static CardConversionSource DiouSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_diao_chan_le_LeDiaoChanDiou_Qualification.DiouSource(f);
     internal void CaptureDiouQualification(ResolutionFrame supplied, CardActionContext action)
     {
         if (!HasDiouCapability || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouQualificationAcceptedEvent>().Any(e => e.NativeParentId == supplied.Id && e.ActionId == action.ActionId))
@@ -76,7 +72,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 
     internal DeclaredCardPayment CaptureDiouDeclaration(DeclaredCardPayment paid, CardDeclarationParentReturn parent)
     {
-        if (!HasDiouCapability || !global::CardGame.Core.EngineOwners.CharacterXiaoQiaoLeRuntime.WeiwanDeclarationIsTrueUse(parent))
+        if (!HasDiouCapability || !CharacterXiaoQiaoLeRuntime.WeiwanDeclarationIsTrueUse(parent))
             return paid;
         var claims = new List<DiouUseClaim>();
         if (HasTanbanEntityMark(paid.Cost.CardId))
@@ -109,14 +105,14 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         {
             if (response.EffectiveKind == CardKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } counterspell && _coreResponseUseCompletionOperations.IsCompletedResponseUse(response, ProgramCardContinuation.NullificationResponse))
                 CaptureDiouQualification(counterspell, response);
-            else if (response.EffectiveKind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.EffectiveCardKind is { } incoming && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == response.ActorSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } parent && _coreResponseUseCompletionOperations.IsCompletedResponseUse(response, ProgramCardContinuation.Dodge))
+            else if (response.EffectiveKind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.EffectiveCardKind is { } incoming && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == response.ActorSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } parent && _coreResponseUseCompletionOperations.IsCompletedResponseUse(response, ProgramCardContinuation.Dodge))
                 CaptureDiouQualification(parent, response);
         }
     }
 
     internal bool ValidDiouClaim(DiouUseClaim q, CardActionContext action)
     {
-        if (q.Source.SkillId != DiouSkill || q.Source.BindingId != DiouBinding || q.Source.OwnerSeat != q.ActorSeat || q.ActionId != action.ActionId || q.ProviderSeat != action.ProviderSeat || q.TanbanMaterialCount < 1 || q.MaterialCount != action.PhysicalCards.Count || q.MovementSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash != q.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouUseClaimedEvent>().Count(e => e.Claim == q) != 1 || q.EffectiveKind != action.EffectiveKind && !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.EffectiveKind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind)) || !_characterZhouYuOlMouOperations.MouGuquActorLineageMatches(q.NativeParentId, q.ActionId, q.ActorSeat, action.ActorSeat, q.ProviderSeat, action.Type))
+        if (q.Source.SkillId != DiouSkill || q.Source.BindingId != DiouBinding || q.Source.OwnerSeat != q.ActorSeat || q.ActionId != action.ActionId || q.ProviderSeat != action.ProviderSeat || q.TanbanMaterialCount < 1 || q.MaterialCount != action.PhysicalCards.Count || q.MovementSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash != q.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouUseClaimedEvent>().Count(e => e.Claim == q) != 1 || q.EffectiveKind != action.EffectiveKind && !(CoreNativeCardClassificationsRuntime.IsSlashCard(q.EffectiveKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind)) || !_characterZhouYuOlMouOperations.MouGuquActorLineageMatches(q.NativeParentId, q.ActionId, q.ActorSeat, action.ActorSeat, q.ProviderSeat, action.Type))
             return false;
         var materials = _coreProgramEventHistoryOperations.ProgramEventHistory<DiouMaterialQualifiedEvent>().Where(e => e.NativeParentId == q.NativeParentId && e.ActionId == q.ActionId && e.Source == q.Source).OrderBy(e => e.Index).ToArray();
         return materials.Length == q.MaterialCount && materials.Count(m => m.Tanban) == q.TanbanMaterialCount && materials.Select(m => m.CardId).Distinct().Count() == materials.Length && materials.Select((m, i) => m.Index == i && action.PhysicalCards.Any(c => c.CardId == m.CardId && c.CardKind == m.PrintedKind && c.From == m.From)).All(b => b);
@@ -124,7 +120,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 
     internal DiouUseClaim? CompletedDiouClaim(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (c.SkillId != DiouSkill || c.BindingId != DiouBinding || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } used || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != SkillProgramTriggerWindow.CardUseCompleted || w.Action.ActionId != used.CardActionId || w.Action.Type == CardActionType.Response && w.CompletedResponseReturn is null || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)?.DiouClaims is not { } claims)
+        if (c.SkillId != DiouSkill || c.BindingId != DiouBinding || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } used || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != SkillProgramTriggerWindow.CardUseCompleted || w.Action.ActionId != used.CardActionId || w.Action.Type == CardActionType.Response && w.CompletedResponseReturn is null || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)?.DiouClaims is not { } claims)
             return null;
         return claims.SingleOrDefault(q => q.NativeParentId == w.ParentFrameId && q.ActionId == used.CardActionId && q.Source.OwnerSeat == c.OwnerSeat && q.Source.SkillInstanceId == c.SkillInstanceId && q.GameplayHash == c.GameplayHash && ValidDiouClaim(q, w.Action));
     }

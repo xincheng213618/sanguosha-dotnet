@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYangYiOlRuntime
@@ -37,7 +33,7 @@ internal sealed partial class CharacterYangYiOlRuntime
         };
     }
 
-    internal static bool IsJuanxiaSingleTargetTrick(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yang_yi_ol_YangYiPrograms.IsJuanxiaSingleTargetTrick(kind);
+    internal static bool IsJuanxiaSingleTargetTrick(CardKind kind) => RuntimeSkills.RuntimeRules_yang_yi_ol_YangYiPrograms.IsJuanxiaSingleTargetTrick(kind);
     internal SkillProgramStepOutcome PresentJuanxiaTrickPrompt(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -58,7 +54,7 @@ internal sealed partial class CharacterYangYiOlRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        var candidates = global::CardGame.Core.EngineOwners.CharacterYangYiOlDefinitions.JuanxiaTrickOrder.Where(kind => IsJuanxiaTrickCandidate(active.OwnerSeat, state.TargetSeat, kind, state.UsedKinds)).ToArray();
+        var candidates = CharacterYangYiOlDefinitions.JuanxiaTrickOrder.Where(kind => IsJuanxiaTrickCandidate(active.OwnerSeat, state.TargetSeat, kind, state.UsedKinds)).ToArray();
         if (candidates.Length == 0)
         {
             FinishJuanxiaLaunch(active);
@@ -87,7 +83,7 @@ internal sealed partial class CharacterYangYiOlRuntime
             return;
         if (state.UsedCount > 0 && _coreMatchParticipantsPlayersAccess._players[state.TargetSeat].IsAlive)
         {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJuanxiaDebtEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.TargetSeat, state.UsedCount));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJuanxiaDebtEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.TargetSeat, state.UsedCount));
             _coreMatchLogOperations.AddLog("SkillEffect", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 狷狭：{(_coreMatchParticipantsPlayersAccess._players[state.TargetSeat].Name)} 的下一个结束阶段开始时，其可以视为对 {(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 使用 {(state.UsedCount)} 张【杀】。", active.OwnerSeat, state.TargetSeat);
         }
 
@@ -133,7 +129,7 @@ internal sealed partial class CharacterYangYiOlRuntime
         }
     }
 
-    internal static IReadOnlyList<string> AppendJuanxiaKind(IReadOnlyList<string> kinds, CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yang_yi_ol_YangYiPrograms.AppendJuanxiaKind(kinds, kind);
+    internal static IReadOnlyList<string> AppendJuanxiaKind(IReadOnlyList<string> kinds, CardKind kind) => RuntimeSkills.RuntimeRules_yang_yi_ol_YangYiPrograms.AppendJuanxiaKind(kinds, kind);
     internal void BeginJuanxiaVirtualDuel(ProgramSkillFrame frame, JuanxiaLaunchState state)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -145,7 +141,7 @@ internal sealed partial class CharacterYangYiOlRuntime
         _coreNativeCardContinuationCursorsOperations.ActiveDuel = _kernelCoreMainOperations.CreateDuelHandle(attack);
         _coreCardAttackStateOperations.UpdateCardAttackState(active.Id, state => state!with { ProgramUseInstructionIndex = active.InstructionIndex });
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】，视为对 {(_coreMatchParticipantsPlayersAccess._players[state.TargetSeat].Name)} 使用【决斗】。", active.OwnerSeat, state.TargetSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJuanxiaTrickUsedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.TargetSeat, CardKind.Duel.ToString(), 0, false));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJuanxiaTrickUsedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.TargetSeat, CardKind.Duel.ToString(), 0, false));
         _coreNativeDuelOperations.BeginDuelResponse(_coreNativeCardContinuationCursorsOperations.ActiveDuel);
     }
 
@@ -155,7 +151,7 @@ internal sealed partial class CharacterYangYiOlRuntime
         if (frame.JuanxiaLaunch is not { Stage: JuanxiaStage.Child, PendingKind: null } launch || frame.SelectedTargetSeats is not [var target] || target != launch.TargetSeat || launch.UsedCount != launch.UsedKinds.Count || launch.UsedCount is < 1 or > MaximumJuanxiaTrickCount || launch.UsedKinds.Count(kind => kind == "Duel") != 1 || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || frame.TriggerId is null || frame.ActivationId != frame.TriggerId || context.OwnerSeat != frame.OwnerSeat || context.SourceSeat != frame.OwnerSeat || context.TargetSeat != frame.OwnerSeat)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not TurnEndingBoundaryFrame ending || ending.Id != context.ParentFrameId || ending.OwnerSeat != frame.OwnerSeat || ending.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || ending.ItemIndex < 0 || ending.ItemIndex >= ending.Items.Count || ending.Items[ending.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate))
+        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not TurnEndingBoundaryFrame ending || ending.Id != context.ParentFrameId || ending.OwnerSeat != frame.OwnerSeat || ending.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || ending.ItemIndex < 0 || ending.ItemIndex >= ending.Items.Count || ending.Items[ending.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate))
             return false;
         targetSeat = target;
         return true;
@@ -237,7 +233,7 @@ internal sealed partial class CharacterYangYiOlRuntime
         _corePhysicalMovementFacadesOperations.MoveCard(card, from, destination, new($"skill-program.{(active.SkillId)}.{(kind switch {CardKind.Snatch => "snatch", _ => "dismantle"})}"));
         _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(logicalDiscard);
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】，视为对 {(target.Name)} 使用【{(CardCatalog.Get(kind).DisplayName)}】。", active.OwnerSeat, target.Seat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJuanxiaTrickUsedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, target.Seat, kind.ToString(), card.Id, false));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJuanxiaTrickUsedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, target.Seat, kind.ToString(), card.Id, false));
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id)with { JuanxiaLaunch = state with { UsedCount = state.UsedCount + 1, UsedKinds = AppendJuanxiaKind(state.UsedKinds, kind), Stage = JuanxiaStage.Child, PendingKind = null } });
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
@@ -269,8 +265,8 @@ internal sealed partial class CharacterYangYiOlRuntime
         var state = active.JuanxiaLaunch ?? throw new InvalidOperationException("The Juanxia fire payment lost its frame state.");
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
-        var revealedIsRed = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(revealed.Suit);
-        var costs = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit) == revealedIsRed).OrderBy(card => card.Id).ToArray();
+        var revealedIsRed = CoreNativeCardClassificationsRuntime.IsRedSuit(revealed.Suit);
+        var costs = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Where(card => CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit) == revealedIsRed).OrderBy(card => card.Id).ToArray();
         var choices = costs.Select(card => new PromptChoice(new ChoiceId($"juanxia-fire.frame-{(frame.Id)}.card-{(card.Id)}"), $"弃置【{(card.DisplayName)}】，对 {(_coreMatchParticipantsPlayersAccess._players[state.TargetSeat].Name)} 造成1点火焰伤害。", [card.Id], [state.TargetSeat], new Dictionary<string, string> { ["program-action"] = "juanxia-fire-payment", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["card-id"] = card.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) })).Append(new PromptChoice(new ChoiceId($"juanxia-fire.frame-{(frame.Id)}.decline"), "放弃伤害。", [], [], new Dictionary<string, string> { ["program-action"] = "juanxia-fire-payment", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["card-id"] = string.Empty })).ToArray();
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, active.OwnerSeat, $"【{(presentation.Name)}】火攻：展示的是【{(revealed.DisplayName)}】，请选择弃置一张同颜色牌或放弃伤害。", costs.Select(card => card.Id).ToArray(), [state.TargetSeat], active.OwnerSeat)
         {
@@ -306,13 +302,13 @@ internal sealed partial class CharacterYangYiOlRuntime
             var costFrom = _cardZonesOperations._cardZones.GetLocation(costId);
             var cost = _cardZonesOperations._cardZones.CardsAt(costFrom).SingleOrDefault(card => card.Id == costId);
             var revealedCard = _cardZonesOperations._cardZones.CardsAt(revealedLocation).SingleOrDefault(card => card.Id == state.RevealedCardId) ?? throw new InvalidOperationException("The Juanxia fire reveal left its shown hand card.");
-            if (cost is null || costFrom.OwnerSeat != active.OwnerSeat || costFrom.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(cost.Suit) != global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(revealedCard.Suit))
+            if (cost is null || costFrom.OwnerSeat != active.OwnerSeat || costFrom.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || CoreNativeCardClassificationsRuntime.IsRedSuit(cost.Suit) != CoreNativeCardClassificationsRuntime.IsRedSuit(revealedCard.Suit))
                 throw new InvalidOperationException("The Juanxia fire payment is no longer a legal same-color card.");
             _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(active.OwnerSeat, active.OwnerSeat, cost, costFrom, CardMoveReasons.FireAttackDiscard);
         }
 
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】，视为对 {(_coreMatchParticipantsPlayersAccess._players[state.TargetSeat].Name)} 使用【火攻】{((paid ? "，造成1点火焰伤害。" : "，未造成伤害。"))}", active.OwnerSeat, state.TargetSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJuanxiaTrickUsedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.TargetSeat, CardKind.FireAttack.ToString(), state.RevealedCardId, paid));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJuanxiaTrickUsedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.TargetSeat, CardKind.FireAttack.ToString(), state.RevealedCardId, paid));
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id)with { JuanxiaLaunch = state with { UsedCount = state.UsedCount + 1, UsedKinds = AppendJuanxiaKind(state.UsedKinds, CardKind.FireAttack), Stage = JuanxiaStage.Child, PendingKind = null, RevealedCardId = 0 } });
         if (!paid)
         {
@@ -450,7 +446,7 @@ internal sealed partial class CharacterYangYiOlRuntime
             var offered = state.LaunchCounts[index];
             var used = Math.Min(offered, Math.Max(0, remainingUsed));
             remainingUsed -= used;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJuanxiaRetaliationEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.DebtorSeat, state.LaunchFrameIds[index], offered, used));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJuanxiaRetaliationEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.DebtorSeat, state.LaunchFrameIds[index], offered, used));
         }
 
         if (offeredTotal > 0)
@@ -494,8 +490,8 @@ internal sealed partial class CharacterYangYiOlRuntime
         }
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IYangYiProgramHost.JuanxiaDeclareTricks(ProgramSkillFrame frame, SkillProgramEffect effect) => JuanxiaProgramDeclareTricks(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IYangYiProgramHost.JuanxiaRetaliation(ProgramSkillFrame frame, SkillProgramEffect effect) => JuanxiaProgramRetaliation(frame, effect);
+    SkillProgramStepOutcome IYangYiProgramHost.JuanxiaDeclareTricks(ProgramSkillFrame frame, SkillProgramEffect effect) => JuanxiaProgramDeclareTricks(frame, effect);
+    SkillProgramStepOutcome IYangYiProgramHost.JuanxiaRetaliation(ProgramSkillFrame frame, SkillProgramEffect effect) => JuanxiaProgramRetaliation(frame, effect);
     [PublicHandRevealReturn("juanxia-fire-shown-hand")]
     internal void ReturnJuanxiaPublicHand(ProgramSkillFrame frame)
     {

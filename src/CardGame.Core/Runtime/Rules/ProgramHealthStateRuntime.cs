@@ -109,5 +109,5 @@ internal sealed class ProgramHealthStateRuntime(IProgramRuntimeFrames frames, IP
     }
 
     private static string BindingId(ProgramSkillFrame frame) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame);
+        RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame);
 }

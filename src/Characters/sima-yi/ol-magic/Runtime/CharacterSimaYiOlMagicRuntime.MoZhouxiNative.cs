@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaYiOlMagicRuntime
@@ -34,7 +30,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 33900)]
-    internal bool FinishMoSimaYiSlash(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishMoSimaYiSlash(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MoSimaYiSlash: not null } use || !IsMoSimaYiRetaliation(use))
@@ -74,7 +70,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 33900)]
-    internal bool ReturnMoSimaYiAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt receipt)
+    internal bool ReturnMoSimaYiAttack(GameEngine.AttackCompletionReceipt receipt)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoSimaYi: { Stage: MoSimaYiStage.NativeSlash, NativeReturned: true } r } f || r.NativeUseId != receipt.ResolutionId)
             return false;

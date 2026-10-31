@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoJiaMobileGodRuntime
 {
     internal const string ShenGuoJiaHuishi = "mobile:huishi", ShenGuoJiaTianyi = "mobile:tianyi", ShenGuoJiaHuiShi = "mobile:huishi-gift", ShenGuoJiaZuoxing = "mobile:zuoxing";
-    SkillProgramStepOutcome global::CardGame.Core.IShenGuoJiaHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginShenGuoJia(frame, operation);
-    bool global::CardGame.Core.IProgramAwakeningOverrideQuery.Granted(int owner, string skill, string? binding) => HasShenGuoJiaAwakeningCondition(owner, skill, binding);
-    bool global::CardGame.Core.IProgramAwakeningOverrideQuery.Issued(ProgramSkillFrame frame) => HasShenGuoJiaAwakeningReceipt(frame);
-    internal CardConversionSource ShenGuoJiaSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    SkillProgramStepOutcome IShenGuoJiaHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginShenGuoJia(frame, operation);
+    bool IProgramAwakeningOverrideQuery.Granted(int owner, string skill, string? binding) => HasShenGuoJiaAwakeningCondition(owner, skill, binding);
+    bool IProgramAwakeningOverrideQuery.Issued(ProgramSkillFrame frame) => HasShenGuoJiaAwakeningReceipt(frame);
+    internal CardConversionSource ShenGuoJiaSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 38000, SkillProgramEffectOp.ResolveShenGuoJiaHuishi)]
     internal bool CanActivateShenGuoJiaHuishi(CharacterState owner) => owner.HasHpValue && owner.MaxHp < 10;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 38001, SkillProgramEffectOp.ResolveShenGuoJiaZuoxing)]
@@ -118,7 +115,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
     [ProgramAnswer("shen-guo-jia")]
     internal void AnswerShenGuoJia(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenGuoJia: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShenGuoJiaChoices(frame).Where(current => current.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenGuoJia: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShenGuoJiaChoices(frame).Where(current => current.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Shen Guo Jia requires the published current owner choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];

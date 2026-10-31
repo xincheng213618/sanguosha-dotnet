@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangYueyingOlMouRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
 
     internal bool IsMouBingcaiFirstBasicAction(CardUseFrame use, CardActionContext action)
     {
-        if (!HasMouHuangYueyingBingcaiCapability || !_coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Basic)
+        if (!HasMouHuangYueyingBingcaiCapability || !_coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Basic)
             return false;
         var first = _coreWholeActualTurnUsesOperations.WholeActualTurnUseHistory().FirstOrDefault(e => e.CardCategoryMask == 1 << (int)SkillProgramCardCategory.Basic);
         return first is { WholeActualTurnUseSequence: > 0, RoundActionType: CardActionType.Use } && first.OriginFrameId == use.Id && !first.IsNullificationUse && (first.CardActionId == action.ActionId || first.CardActionId is null && _coreActualTurnLegacyCompletionOperations.IsExactLegacyActualUseCompletion(use));
@@ -21,7 +17,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
     {
         use = null !;
         window = null !;
-        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != context.Window || w.ParentFrameId != identity.ParentCardUseFrameId || w.Action.ActionId != identity.CardActionId || w.Action.EffectiveKind != identity.EffectiveKind || w.Action.ActorSeat != identity.ActorSeat || w.Action.Type != CardActionType.Use || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { } action } actual || actual.Action.ActionId != w.Action.ActionId || actual.SourceSeat != action.ActorSeat || action.EffectiveKind != actual.CardKind || !IsMouBingcaiFirstBasicAction(actual, action))
+        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != context.Window || w.ParentFrameId != identity.ParentCardUseFrameId || w.Action.ActionId != identity.CardActionId || w.Action.EffectiveKind != identity.EffectiveKind || w.Action.ActorSeat != identity.ActorSeat || w.Action.Type != CardActionType.Use || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { } action } actual || actual.Action.ActionId != w.Action.ActionId || actual.SourceSeat != action.ActorSeat || action.EffectiveKind != actual.CardKind || !IsMouBingcaiFirstBasicAction(actual, action))
             return false;
         use = actual;
         window = w;
@@ -41,7 +37,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         use = _coreActualTurnLegacyCompletionOperations.NormalizeActualTurnLegacyCompletedUse(use, parentId);
         if (use.Action is null)
             throw new InvalidOperationException("The opted-in first-basic Alcohol lost its native action normalization.");
-        var source = new CardConversionSource(parent.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
+        var source = new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
         var receipt = new MouBingcaiLegacyAlcoholReturn(id, parentId, dyingId, parent.InstructionIndex, source, parent.GameplayHash, use.Action.ActionId, MouBingcaiLegacyAlcoholStage.Targets);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, current => current with { MouBingcaiLegacyAlcohol = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouBingcaiLegacyAlcoholIssuedEvent(id, parentId, dyingId, receipt.InstructionIndex, source, receipt.ProducerHash, receipt.ActionId));
@@ -55,7 +51,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { CardId: 0, CardKind: CardKind.Alcohol, PhysicalCardIds.Count: 0, MouBingcaiLegacyAlcohol: { } r, Action: { Type: CardActionType.Use } a } use || r.UseId != id || a.ActionId != r.ActionId || !Enum.IsDefined(r.Stage) || !_coreActualTurnLegacyCompletionOperations.IsExactLegacyActualUseCompletion(use) || !use.TargetSeats.SequenceEqual([use.SourceSeat]) || a.EffectiveSuit != Suit.None || a.EffectiveRank != 0)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramSkillFrame parent && parent.Id == r.ProgramParentId && parent.InstructionIndex == r.InstructionIndex && parent.GameplayHash == r.ProducerHash && parent.WindowContext?.ParentFrameId == r.DyingId && parent.OwnerSeat == use.SourceSeat && r.ProducerSource == new CardConversionSource(parent.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId) && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(parent)?.Op == SkillProgramEffectOp.UseVirtualDyingAlcohol && _coreProgramEventHistoryOperations.ProgramEventHistory<MouBingcaiLegacyAlcoholIssuedEvent>().Count(e => e == new MouBingcaiLegacyAlcoholIssuedEvent(id, r.ProgramParentId, r.DyingId, r.InstructionIndex, r.ProducerSource, r.ProducerHash, r.ActionId)) == 1;
+        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramSkillFrame parent && parent.Id == r.ProgramParentId && parent.InstructionIndex == r.InstructionIndex && parent.GameplayHash == r.ProducerHash && parent.WindowContext?.ParentFrameId == r.DyingId && parent.OwnerSeat == use.SourceSeat && r.ProducerSource == new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId) && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(parent)?.Op == SkillProgramEffectOp.UseVirtualDyingAlcohol && _coreProgramEventHistoryOperations.ProgramEventHistory<MouBingcaiLegacyAlcoholIssuedEvent>().Count(e => e == new MouBingcaiLegacyAlcoholIssuedEvent(id, r.ProgramParentId, r.DyingId, r.InstructionIndex, r.ProducerSource, r.ProducerHash, r.ActionId)) == 1;
     }
 
     [NativeUseValidation(28961)]

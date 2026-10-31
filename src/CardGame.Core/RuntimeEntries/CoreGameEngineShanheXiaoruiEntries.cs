@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheXiaoruiEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheXiaoruiRuntime> _resolve;
-    private CoreGameEngineShanheXiaoruiEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheXiaoruiRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineShanheXiaoruiRuntime> _resolve;
+    private CoreGameEngineShanheXiaoruiEntries(Func<EngineOwners.CoreGameEngineShanheXiaoruiRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineShanheXiaoruiEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheXiaoruiRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineShanheXiaoruiEntries Create(Func<EngineOwners.CoreGameEngineShanheXiaoruiRuntime> resolve) => new(resolve);
 }

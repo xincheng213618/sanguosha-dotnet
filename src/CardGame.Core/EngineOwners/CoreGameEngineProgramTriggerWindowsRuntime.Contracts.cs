@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreProgramTriggerWindowsProgramPhaseBoundaryOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramTriggerWindowsProgramPhaseBoundaryOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramPhaseBoundaryRuntime Get();
+    ProgramPhaseBoundaryRuntime Get();
 }
 
-internal interface ICoreProgramTriggerWindowsProgramLifecycleWindowOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramTriggerWindowsProgramLifecycleWindowOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramLifecycleWindowRuntime Get();
+    ProgramLifecycleWindowRuntime Get();
 }

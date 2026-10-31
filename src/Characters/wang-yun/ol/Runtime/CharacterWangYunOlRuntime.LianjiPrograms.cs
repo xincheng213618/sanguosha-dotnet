@@ -1,11 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangYunOlRuntime
@@ -102,12 +95,12 @@ internal sealed partial class CharacterWangYunOlRuntime
                         var args = WangYunArgs(f, "slash");
                         args["effective-kind"] = CardKind.Slash.ToString();
                         args["round-once-cardless"] = "true";
-                        global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
+                        CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
                         choices.Add(new(new($"wang-yun.{(f.Id)}.cardless-{(source.SkillInstanceId)}-{(source.BindingId)}"), "以本轮实际卫境额度视为使用【杀】", [], [target], args));
                     }
 
                 foreach (var card in _coreActionQueriesOperations.GetSlashUseCards(actor))
-                    foreach (var kind in _coreNativeTargetLegalityOperations.GetSlashUseKinds(actor, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) ? card.Kind : CardKind.Slash))
+                    foreach (var kind in _coreNativeTargetLegalityOperations.GetSlashUseKinds(actor, CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) ? card.Kind : CardKind.Slash))
                     {
                         if (!Legal(card, kind) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, [card.Id]))
                             continue;
@@ -127,7 +120,7 @@ internal sealed partial class CharacterWangYunOlRuntime
                     choices.Add(new(new($"wang-yun.{(f.Id)}.zhangba-{(string.Join('-', ids))}"), "使用丈八蛇矛的实际两张手牌", ids, [target], args));
                 }
 
-                foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+                foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
                     foreach (var selected in _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(actor, kind, false).Where(s => !_characterKongShuOlOperations.IsLeiluanSource(s.Source) || s.OutputKind == kind))
                     {
                         var ids = selected.Cards.Select(c => c.Id).ToArray();
@@ -135,7 +128,7 @@ internal sealed partial class CharacterWangYunOlRuntime
                             continue;
                         var args = WangYunArgs(f, "slash");
                         args["effective-kind"] = kind.ToString();
-                        global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, selected.Source);
+                        CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, selected.Source);
                         choices.Add(new(new($"wang-yun.{(f.Id)}.multi-{(selected.Source.SkillInstanceId)}-{(selected.Source.BindingId)}-{(string.Join('-', ids))}"), "将自己的实际材料当【杀】使用", ids, [target], args));
                     }
             }
@@ -158,7 +151,7 @@ internal sealed partial class CharacterWangYunOlRuntime
         var cards = selected.Cards.Select(id => _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(c => c.Id == id)).ToArray();
         if (cards.Length == 0)
         {
-            if (selected.Parameters.GetValueOrDefault("round-once-cardless") != "true" || kind != CardKind.Slash || !global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var source) || source is null || source.OwnerSeat != actor.Seat || !WangYunPlanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+            if (selected.Parameters.GetValueOrDefault("round-once-cardless") != "true" || kind != CardKind.Slash || !CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var source) || source is null || source.OwnerSeat != actor.Seat || !WangYunPlanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
                 throw new InvalidOperationException("Lianji empty materials require an exact published independent cardless source.");
             var payment = _coreRoundOnceCardlessBasicOperations.ConsumeRoundOnceCardlessBasic(source, false);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangYunPlan = r with { Stage = "issuing-slash", IssuingIds = [], IssuingKind = CardKind.Slash, NativeUse = null, NativeReturned = false, RoundOncePayment = payment } });
@@ -184,7 +177,7 @@ internal sealed partial class CharacterWangYunOlRuntime
         CardConversionSource? conversion = null;
         if (selected.Parameters.GetValueOrDefault("equipment") != CardKind.ZhangbaSerpentSpear.ToString())
         {
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._selectedUseConversion);
+            CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._selectedUseConversion);
             _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._hasSelectedUseConversionChoice = true;
             if (cards.Length > 1 || _characterKongShuOlOperations.IsLeiluanSource(_coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._selectedUseConversion))
             {

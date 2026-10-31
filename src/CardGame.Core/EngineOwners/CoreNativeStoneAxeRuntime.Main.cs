@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeStoneAxeRuntime
 {
-    internal bool TryBeginStoneAxeChoice(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryBeginStoneAxeChoice(NativeOwners.CardAttackHandle attack)
     {
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
-        var effectiveKind = global::CardGame.Core.EngineOwners.CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack);
+        var effectiveKind = CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack);
         var discardableCards = GetStoneAxeDiscardCards(source);
         if (!_coreNativeDamageHandlesOperations.UsesFormalStoneAxe || effectiveKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash) || !source.IsAlive || !target.IsAlive || !_coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.StoneAxe) || discardableCards.Count < 2)
         {
@@ -59,7 +55,7 @@ internal sealed partial class CoreNativeStoneAxeRuntime
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveStoneAxe ?? throw new InvalidOperationException("There is no Stone Axe choice to resolve.");
         var attack = pending.Attack;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.StoneAxe } decision || decision.PlayerSeat != attack.SourceSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.StoneAxe } decision || decision.PlayerSeat != attack.SourceSeat)
         {
             throw new InvalidOperationException("The Stone Axe choice is not the current Slash continuation.");
         }
@@ -89,7 +85,7 @@ internal sealed partial class CoreNativeStoneAxeRuntime
 
             foreach (var card in selectedCards)
             {
-                if ((card.IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, originalLocations[card.Id], CardLocation.OutsideGame) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial2(card.Id, originalLocations[card.Id], CardLocation.OutsideGame)) && originalLocations[card.Id] == CardLocation.Equipment(source.Seat) && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.OutsideGame)
+                if ((card.IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, originalLocations[card.Id], CardLocation.OutsideGame) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial2(card.Id, originalLocations[card.Id], CardLocation.OutsideGame)) && originalLocations[card.Id] == CardLocation.Equipment(source.Seat) && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.OutsideGame)
                     continue;
                 _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.StoneAxeDiscard);
             }

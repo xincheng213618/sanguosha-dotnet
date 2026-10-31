@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime))]
 internal sealed partial class CoreGameEngineFirstSlashDuelBenefitObserversEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime> _resolve;
-    private CoreGameEngineFirstSlashDuelBenefitObserversEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime> _resolve;
+    private CoreGameEngineFirstSlashDuelBenefitObserversEntries(Func<EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineFirstSlashDuelBenefitObserversEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineFirstSlashDuelBenefitObserversEntries Create(Func<EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime> resolve) => new(resolve);
 }

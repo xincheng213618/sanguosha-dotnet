@@ -1,8 +1,7 @@
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_ActorHandLimitTargetPrograms
 {
     internal static CardActionContext ActorHandLimitTargetCollectionAction(CardUseFrame use)

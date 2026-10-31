@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoYunMobileShiRuntime
@@ -30,7 +26,7 @@ internal sealed partial class CharacterZhaoYunMobileShiRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 67201)]
-    internal int MobileShiCuifengDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int MobileShiCuifengDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (attack.IsChainPropagation || attack.EffectiveCardKind != CardKind.Duel || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { VirtualOrdinaryTrickOrigin: { SkillId: MobileShiCuifengSkill } origin } use)
             return 0;
@@ -41,6 +37,6 @@ internal sealed partial class CharacterZhaoYunMobileShiRuntime
         // would count a two-card conversion twice. Uses remain excluded. Read
         // at damage time so Slash responses to this very Duel also increase X,
         // regardless of which duelist ultimately becomes the damage source.
-        return _corePlayCardHistoryOperations.EventsSinceLastBoundary(item => item is TurnStartedEvent or TurnEndedEvent).OfType<CardActionAcceptedEvent>().Where(item => item.Action.Type == CardActionType.Response && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(item.Action.EffectiveKind)).Select(item => item.Action.ActionId).Distinct().Count();
+        return _corePlayCardHistoryOperations.EventsSinceLastBoundary(item => item is TurnStartedEvent or TurnEndedEvent).OfType<CardActionAcceptedEvent>().Where(item => item.Action.Type == CardActionType.Response && CoreNativeCardClassificationsRuntime.IsSlashCard(item.Action.EffectiveKind)).Select(item => item.Action.ActionId).Distinct().Count();
     }
 }

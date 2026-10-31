@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuZhiMouOlRuntime
@@ -46,7 +42,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     internal bool IsMouLzCounterUse(CardUseFrame u) => u.MouLuZhiOlCounter is { } o && u.Id == o.UseId && u.CardId == 0 && u.CardKind == CardKind.Slash && u.PhysicalCardIds is { Count: 0 } && u.Action is { Type: CardActionType.Use, PhysicalCards.Count: 0 } a && a.ActionId == o.ActionId && a.ProviderSeat == o.ActorSeat && a.RequesterSeat is null && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { MouLuZhiOl: { Stage: MouLuZhiOlStage.NativeUse, Paid: true } r } f && ValidMouLz(f) && r.Source == o.Source && r.GameplayHash == o.GameplayHash && r.UseId == u.Id && r.ActionId == a.ActionId && r.CounterTarget == o.TargetSeat && o.ActorSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlCounterIssuedEvent>().Count(e => e.Origin == o) == 1 && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, o.ActorSeat, o.ActorSeat);
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 32901)]
-    internal bool FinishMouLzCounterAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishMouLzCounterAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouLuZhiOlCounter: not null } u || !IsMouLzCounterUse(u))
@@ -86,7 +82,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 32901)]
-    internal bool ReturnMouLzCounterAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt c)
+    internal bool ReturnMouLzCounterAttack(GameEngine.AttackCompletionReceipt c)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLuZhiOl: { Stage: MouLuZhiOlStage.NativeUse, NativeReturned: true } r } f || r.UseId != c.ResolutionId)
             return false;
@@ -137,9 +133,9 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 32900)]
-    internal bool RecordMouLzDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageId)
+    internal bool RecordMouLzDamage(GameEngine.IDamageAttempt attack, long damageId)
     {
-        if (attack is not global::CardGame.Core.NativeOwners.CardAttackHandle a || !a.DamageWasApplied || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == damageId)is not DamageFrame { Amount: > 0 } d)
+        if (attack is not NativeOwners.CardAttackHandle a || !a.DamageWasApplied || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == damageId)is not DamageFrame { Amount: > 0 } d)
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId);
         var direct = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == attack.ResolutionId && f.MouLuZhiOlDirectDuel is not null);

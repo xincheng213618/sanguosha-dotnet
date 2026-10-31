@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoZhangBoundaryMobileRuntime
 {
-    internal static CardConversionSource BoundaryCaoZhangSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryCaoZhangHost.Execute(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteBoundaryCaoZhang(f, e);
+    internal static CardConversionSource BoundaryCaoZhangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IBoundaryCaoZhangHost.Execute(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteBoundaryCaoZhang(f, e);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 55500)]
     internal bool CanOfferBoundaryCaoZhang(ProgramTriggerCandidate c) => c.SkillId != BoundaryCaoZhangComposition.Skill || c.BindingId != "discard-assault" || _coreForeignEquipmentDiscardPoliciesOperations.HasDiscardableHeBy(c.OwnerSeat, c.OwnerSeat);
     internal bool ValidBoundaryJiangchiPreparation(ProgramSkillFrame f, BoundaryJiangchiPreparation r) => f.SkillId == BoundaryCaoZhangComposition.Skill && r.Source == BoundaryCaoZhangSource(f) && r.Hash == f.GameplayHash && r.Phase.Kind == ActualDiscardRecoveryPhaseKind.Play && r.Phase.ActorSeat == f.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) && r.DebitPhase > 0 && r.Before >= 0 && r.Before <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && r.Mode == (f.TriggerId == "draw-restraint" ? "restraint" : f.TriggerId == "discard-assault" ? "assault" : null) && f.WindowContext is { Window: SkillProgramTriggerWindow.PlayPhaseStarting, SourceSeat: var actor, TargetSeat: var target } context && actor == f.OwnerSeat && target == f.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<PlayPhaseStartingBoundaryFrame>().Any(parent => parent.Id == context.ParentFrameId && parent.OwnerSeat == f.OwnerSeat);
@@ -58,7 +54,7 @@ internal sealed partial class CharacterCaoZhangBoundaryMobileRuntime
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 55500)]
-    internal bool BoundaryJiangchiCardDistance(ProgramCardDistanceQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && ActiveBoundaryJiangchi(q.Actor.Seat)is { Mode: "assault" };
+    internal bool BoundaryJiangchiCardDistance(ProgramCardDistanceQuery q) => CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && ActiveBoundaryJiangchi(q.Actor.Seat)is { Mode: "assault" };
     [ProgramDistanceRule(ProgramDistanceStage.ConvertedSlashExemption, 55500)]
     internal bool BoundaryJiangchiConvertedDistance(ProgramSlashConversionDistanceQuery q) => ActiveBoundaryJiangchi(q.Owner.Seat)is { Mode: "assault" };
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 55500)]
@@ -68,7 +64,7 @@ internal sealed partial class CharacterCaoZhangBoundaryMobileRuntime
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPhysicalSlash, 55500)]
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPaidWeaponSlash, 55500)]
     [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 55500)]
-    internal bool BoundaryJiangchiSlashDistance(ProgramSlashDistanceQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && ActiveBoundaryJiangchi(q.Actor.Seat)is { Mode: "assault" };
+    internal bool BoundaryJiangchiSlashDistance(ProgramSlashDistanceQuery q) => CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && ActiveBoundaryJiangchi(q.Actor.Seat)is { Mode: "assault" };
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeIntrinsicUseBan, 55500)]
-    internal bool BoundaryJiangchiUseBan(ProgramCardUseQuery q) => q.ActionType == CardActionType.Use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && ActiveBoundaryJiangchi(q.ActorSeat)is { Mode: "restraint" };
+    internal bool BoundaryJiangchiUseBan(ProgramCardUseQuery q) => q.ActionType == CardActionType.Use && CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && ActiveBoundaryJiangchi(q.ActorSeat)is { Mode: "restraint" };
 }

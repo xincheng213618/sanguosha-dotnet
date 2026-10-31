@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
 {
     internal const string AnniversaryFuPairAction = "anniversary-fu-rong-fu-qian";
-    internal static CardConversionSource AnniversaryFuPairSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource AnniversaryFuPairSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static ProgramTriggerCandidate AnniversaryFuPairCandidate(ProgramSkillFrame f) => new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
     internal bool HasAnniversaryFuPair => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmAnniversaryFuRongFuQianXuewei);
 
@@ -69,7 +66,7 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
         SkillProgramEffectOp.ArmAnniversaryFuRongFuQianXuewei => CanArmAnniversaryXuewei(c, context),
         SkillProgramEffectOp.ResolveAnniversaryFuRongFuQianXuewei => _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && AnniversaryXueweiWitness(c, context)is not null,
         _ => CanOfferAnniversaryYuguan(c, context)};
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryFuRongFuQianHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryFuPair(f, op);
+    SkillProgramStepOutcome IAnniversaryFuRongFuQianHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryFuPair(f, op);
     internal SkillProgramStepOutcome BeginAnniversaryFuPair(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -172,7 +169,7 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
     [ProgramAnswer(AnniversaryFuPairAction)]
     internal void AnswerAnniversaryFuPair(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryFuRongFuQian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !AnniversaryFuPairChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryFuRongFuQian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !AnniversaryFuPairChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Fu Rong Fu Qian requires his original current public target selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

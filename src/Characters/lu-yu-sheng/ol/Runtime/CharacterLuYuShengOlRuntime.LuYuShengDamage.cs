@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuYuShengOlRuntime
 {
-    internal int LuYuShengChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex) : -1;
+    internal int LuYuShengChainCursor(GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? (attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex) : -1;
     internal LuYuShengDamageReceipt? LuYuShengDamageState(long id) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id) switch
     {
         CardUseFrame f => f.LuYuShengDamage,
@@ -26,11 +22,11 @@ internal sealed partial class CharacterLuYuShengOlRuntime
             _ => throw new InvalidOperationException("Cangxin requires its exact owning native damage producer.")});
     }
 
-    internal void SetLuYuShengDamageAmount(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount)
+    internal void SetLuYuShengDamageAmount(GameEngine.IDamageAttempt attack, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || amount < 0)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || amount < 0)
             throw new InvalidOperationException("Cangxin cannot edit another native damage instance.");
-        if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (attack is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, s => s with { DamageAmount = amount });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, s => s!with { DamageAmount = amount });
@@ -59,12 +55,12 @@ internal sealed partial class CharacterLuYuShengOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LuYuShengDamageAdjustedEvent(f.Id, receipt, actualHearts, apply));
     }
 
-    internal void PrepareLuYuShengChainAdvance(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void PrepareLuYuShengChainAdvance(GameEngine.IDamageAttempt attack)
     {
         if (LuYuShengDamageState(attack.ResolutionId)is not { } r)
             return;
-        var remaining = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
-        var cursor = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
+        var remaining = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
+        var cursor = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
         if (remaining is null || !remaining.Skip(cursor).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive))
             return;
         if (attack.IsChainPropagation && r.ChainCursor == LuYuShengChainCursor(attack) && (r.TransferredTargetSeat ?? r.TargetSeat) == attack.TargetSeat)

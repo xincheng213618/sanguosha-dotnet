@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterHuangChengYanOlJiezhenConversionsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterHuangChengYanOlJiezhenConversionsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.GameEngine.JiezhenConversionState> _jiezhenConversions { get; }
+    ref readonly Dictionary<int, GameEngine.JiezhenConversionState> _jiezhenConversions { get; }
 }

@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MouGuanPingRuntime))]
-internal sealed class CharacterGuanPingMouMouGuanPingAdapter(global::System.Func<global::CardGame.Core.MouGuanPingRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterGuanPingMouMouGuanPingOperations
+[Core.ProgramCapability(typeof(MouGuanPingRuntime))]
+internal sealed class CharacterGuanPingMouMouGuanPingAdapter(Func<MouGuanPingRuntime> targetFactory) : ICharacterGuanPingMouMouGuanPingOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MouGuanPingRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MouGuanPingRuntime Get() => this._targetFactory();
+    private readonly Func<MouGuanPingRuntime> _targetFactory = targetFactory;
+    public MouGuanPingRuntime Get() => this._targetFactory();
 }

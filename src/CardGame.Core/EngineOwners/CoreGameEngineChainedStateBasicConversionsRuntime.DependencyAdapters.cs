@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime))]
-internal sealed class CoreChainedStateBasicConversionsCorePlayerViewProjectionAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreChainedStateBasicConversionsCorePlayerViewProjectionOperations
+[Core.ProgramCapability(typeof(CorePlayerViewProjectionRuntime))]
+internal sealed class CoreChainedStateBasicConversionsCorePlayerViewProjectionAdapter(Func<CorePlayerViewProjectionRuntime> targetFactory) : ICoreChainedStateBasicConversionsCorePlayerViewProjectionOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
+    private readonly Func<CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
+    public GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreCommandSessionQueriesRuntime))]
-internal sealed class CoreChainedStateBasicConversionsCoreCommandSessionQueriesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreCommandSessionQueriesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreChainedStateBasicConversionsCoreCommandSessionQueriesOperations
+[Core.ProgramCapability(typeof(CoreCommandSessionQueriesRuntime))]
+internal sealed class CoreChainedStateBasicConversionsCoreCommandSessionQueriesAdapter(Func<CoreCommandSessionQueriesRuntime> targetFactory) : ICoreChainedStateBasicConversionsCoreCommandSessionQueriesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreCommandSessionQueriesRuntime> _targetFactory = targetFactory;
+    private readonly Func<CoreCommandSessionQueriesRuntime> _targetFactory = targetFactory;
     public long Revision { get => this._targetFactory().Revision; }
 }

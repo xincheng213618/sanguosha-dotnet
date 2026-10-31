@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramEquipmentExchangesRuntime
@@ -49,7 +45,7 @@ internal sealed partial class CoreGameEngineProgramEquipmentExchangesRuntime
             var slot = _coreFieldEquipmentOperations.FieldEquipmentSlot(item.Card);
             var key = (item.Recipient, slot);
             var count = occupied.GetValueOrDefault(key);
-            var destination = item.Card.IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(item.Card, CardLocation.Equipment(item.Source), CardLocation.Equipment(item.Recipient)) ? CardLocation.OutsideGame : count < _coreMatchParticipantsPlayersAccess._players[item.Recipient].EquipmentSlotCapacity(slot) ? CardLocation.Equipment(item.Recipient) : CardLocation.DiscardPile;
+            var destination = item.Card.IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(item.Card, CardLocation.Equipment(item.Source), CardLocation.Equipment(item.Recipient)) ? CardLocation.OutsideGame : count < _coreMatchParticipantsPlayersAccess._players[item.Recipient].EquipmentSlotCapacity(slot) ? CardLocation.Equipment(item.Recipient) : CardLocation.DiscardPile;
             destination = _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(item.Card, CardLocation.Equipment(item.Source), destination);
             if (destination.Zone == CardZoneKind.Equipment)
                 occupied[key] = count + 1;

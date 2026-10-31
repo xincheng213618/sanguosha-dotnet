@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangfuSongWumiaoRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.FactModifiers, 50)]
-    internal IEnumerable<(CardUseEffectSource Source, int Amount)> WuHfDamageBonuses(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal IEnumerable<(CardUseEffectSource Source, int Amount)> WuHfDamageBonuses(GameEngine.IDamageAttempt attack)
     {
         // Native elemental propagation already carries the finalized first
         // damage amount, including this bonus; never add the same bonus twice.

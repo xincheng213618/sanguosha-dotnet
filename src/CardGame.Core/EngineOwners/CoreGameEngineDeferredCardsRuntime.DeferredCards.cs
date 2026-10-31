@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDeferredCardsRuntime
@@ -31,10 +27,10 @@ internal sealed partial class CoreGameEngineDeferredCardsRuntime
             _coreGameEngineDeferredBenefitsProgramsProgramNextTurnRuleModifiersAccess._programNextTurnRuleModifiers.RemoveAll(item => item.TargetSeat == current.Seat && item.Query == SkillRuleQuery.DrawCount);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDeferredCardProgramHost.ViewTopCardsAndObtainMatchingCards(ProgramSkillFrame frame, int seat, int amount, IReadOnlyList<SkillProgramCardCategory> categories) => BeginParticipantTopView(frame, seat, amount);
-    SkillProgramStepOutcome global::CardGame.Core.IDeferredCardProgramHost.DepositBoundCardsUntilNextTurn(ProgramSkillFrame frame, string bind) => DepositDeferredPile(frame, bind);
-    SkillProgramStepOutcome global::CardGame.Core.IDeferredCardProgramHost.ObtainDeferredPile(ProgramSkillFrame frame) => ObtainDeferredPile(frame);
-    void global::CardGame.Core.IDeferredCardProgramHost.RewardDeferredProviders(ProgramSkillFrame frame) => RewardDeferredProviders(frame);
+    SkillProgramStepOutcome IDeferredCardProgramHost.ViewTopCardsAndObtainMatchingCards(ProgramSkillFrame frame, int seat, int amount, IReadOnlyList<SkillProgramCardCategory> categories) => BeginParticipantTopView(frame, seat, amount);
+    SkillProgramStepOutcome IDeferredCardProgramHost.DepositBoundCardsUntilNextTurn(ProgramSkillFrame frame, string bind) => DepositDeferredPile(frame, bind);
+    SkillProgramStepOutcome IDeferredCardProgramHost.ObtainDeferredPile(ProgramSkillFrame frame) => ObtainDeferredPile(frame);
+    void IDeferredCardProgramHost.RewardDeferredProviders(ProgramSkillFrame frame) => RewardDeferredProviders(frame);
     internal SkillProgramStepOutcome BeginParticipantTopView(ProgramSkillFrame frame, int seat, int amount)
     {
         if (!_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || seat == frame.OwnerSeat || frame.ParticipantTopView is not null)
@@ -70,7 +66,7 @@ internal sealed partial class CoreGameEngineDeferredCardsRuntime
         if (effect.Op != SkillProgramEffectOp.ViewTopCardsAndObtainMatchingCards || frame.ParticipantTopView is not { } view || frame.SelectedTargetSeats.Single() != view.Seat || !selected.Cards.SequenceEqual(view.CardIds) || selected.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || view.CardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Processing))
             throw new InvalidOperationException("Private top-card confirmation does not match the frozen participant view.");
         var cards = view.CardIds.Select(id => _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == id)).ToArray();
-        var gained = cards.Where(card => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(card.Kind, effect.CardCategories)).ToArray();
+        var gained = cards.Where(card => CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(card.Kind, effect.CardCategories)).ToArray();
         var remaining = cards.Except(gained).ToArray();
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { ParticipantTopView = null, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });

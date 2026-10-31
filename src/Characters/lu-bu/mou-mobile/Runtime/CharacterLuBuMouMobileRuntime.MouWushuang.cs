@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuBuMouMobileRuntime
 {
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 31600, SkillProgramEffectOp.ResolveMouLuBuWushuangBonus)]
-    internal bool CanMouLbBonus(int owner, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.BeforeDamageApplied && c.SourceSeat == owner && c.TargetSeat is { } victim && victim != owner && c.Amount > 0 && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsSourceLess: false } attack && attack.SourceSeat == owner && attack.TargetSeat == victim && attack.EffectiveCardKind is { } kind && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind == CardKind.Duel) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuBuWushuangBonusEvent>().Any(e => e.Source.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber) && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? attack is global::CardGame.Core.NativeOwners.CardAttackHandle slash && slash.SuccessfulDodgeResponses == 0 : !_coreProgramEventHistoryOperations.ProgramEventHistory<DuelResponseEvent>().Any(e => e.ResolutionId == attack.ResolutionId && e.ResponderSeat == victim && e.UsedSlash));
+    internal bool CanMouLbBonus(int owner, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.BeforeDamageApplied && c.SourceSeat == owner && c.TargetSeat is { } victim && victim != owner && c.Amount > 0 && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsSourceLess: false } attack && attack.SourceSeat == owner && attack.TargetSeat == victim && attack.EffectiveCardKind is { } kind && (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind == CardKind.Duel) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuBuWushuangBonusEvent>().Any(e => e.Source.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber) && (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? attack is NativeOwners.CardAttackHandle slash && slash.SuccessfulDodgeResponses == 0 : !_coreProgramEventHistoryOperations.ProgramEventHistory<DuelResponseEvent>().Any(e => e.ResolutionId == attack.ResolutionId && e.ResponderSeat == victim && e.UsedSlash));
     internal SkillProgramStepOutcome ResolveMouLbBonus(ProgramSkillFrame f)
     {
         var c = f.WindowContext!;

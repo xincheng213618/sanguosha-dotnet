@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,8 +9,8 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
     internal static CardMoveReason GaoXiangDiscardReason => new("skill-program.anniversary:chiying.discard");
     internal static CardMoveReason GaoXiangGainReason => new("skill-program.anniversary:chiying.obtain-basics");
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryGaoXiangHost.Begin(ProgramSkillFrame f) => BeginGaoXiang(f);
-    internal CardConversionSource GaoXiangSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryGaoXiangHost.Begin(ProgramSkillFrame f) => BeginGaoXiang(f);
+    internal CardConversionSource GaoXiangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillProgramStepOutcome BeginGaoXiang(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -68,7 +65,7 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
     [ProgramAnswer(GaoXiangAction)]
     internal void AnswerGaoXiang(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GaoXiangChiying: { } r } f || !ValidGaoXiang(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != GaoXiangChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], GaoXiangChoices(f).Where(c => c.Id == answer.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GaoXiangChiying: { } r } f || !ValidGaoXiang(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != GaoXiangChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], GaoXiangChoices(f).Where(c => c.Id == answer.Id).ToArray()))
             throw new InvalidOperationException("Chiying requires the exact current participant and published private card slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -186,7 +183,7 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
                     return true;
                 }
 
-                var gain = r.Actor == f.OwnerSeat ? [] : r.Discards.Where(m => m.To == CardLocation.DiscardPile && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(m.PrintedKind) == SkillProgramCardCategory.Basic && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile).ToArray();
+                var gain = r.Actor == f.OwnerSeat ? [] : r.Discards.Where(m => m.To == CardLocation.DiscardPile && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(m.PrintedKind) == SkillProgramCardCategory.Basic && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile).ToArray();
                 if (gain.Length == 0)
                 {
                     _coreSkillProgramsOperations.FinishProgramSkill(f, true);

@@ -1,14 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreShenwuExpandedProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShenwuExpandedProgramHost.ExecuteShenwuExpanded(ProgramSkillFrame frame, SkillProgramEffectOp op) => ExecuteShenwuExpanded(frame, op);
+    SkillProgramStepOutcome IShenwuExpandedProgramHost.ExecuteShenwuExpanded(ProgramSkillFrame frame, SkillProgramEffectOp op) => ExecuteShenwuExpanded(frame, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27720)]
     internal bool AllowsShenwuExpandedTrigger(ProgramTriggerLegalityContext gate)
     {
@@ -27,7 +22,7 @@ internal sealed partial class CoreShenwuExpandedProgramsRuntime
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var end = Array.FindLastIndex(history, fact => fact is TurnEndedEvent turn && turn.ActorSeat == actor && turn.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber);
         var start = end < 0 ? -1 : Array.FindLastIndex(history, end, fact => fact is TurnStartedEvent turn && turn.ActorSeat == actor && turn.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber);
-        return start >= 0 && !history.Skip(start + 1).Take(end - start - 1).OfType<CardUseDeclaredEvent>().Any(use => use.SourceSeat == actor && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind));
+        return start >= 0 && !history.Skip(start + 1).Take(end - start - 1).OfType<CardUseDeclaredEvent>().Any(use => use.SourceSeat == actor && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind));
     }
 
     internal SkillProgramStepOutcome ExecuteShenwuExpanded(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -106,7 +101,7 @@ internal sealed partial class CoreShenwuExpandedProgramsRuntime
         {
             var others = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != frame.OwnerSeat).Select(p => p.Seat).ToList();
             var roll = op == SkillProgramEffectOp.ResolveShenwuHonglian ? _randomOperations._random.Next(4) : 0;
-            var cards = op == SkillProgramEffectOp.ResolveShenwuHonglian ? _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card))).ToList() : [];
+            var cards = op == SkillProgramEffectOp.ResolveShenwuHonglian ? _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card))).ToList() : [];
             _randomOperations._random.Shuffle(cards);
             var selected = cards.Take(roll).ToArray();
             if (op == SkillProgramEffectOp.ResolveShenwuHonglian)
@@ -163,7 +158,7 @@ internal sealed partial class CoreShenwuExpandedProgramsRuntime
             if (EquipmentCatalog.IsEquipment(card.Kind) && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].EquipmentSlotCapacity(EquipmentCatalog.Get(card.Kind).Slot) > 0 && !_coreCardUseModulesOperations.IsCardUseForbidden(frame.OwnerSeat, card.Kind, CardActionType.Use) && !_coreHandComparisonOperations.IsSelfTargetForbiddenAction(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card.Kind, [frame.OwnerSeat]))
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShenwuExpanded = r with { Stage = "complete" }, ReexecuteParticipantInstruction = true });
-                var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+                var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
                 var use = _coreNativeCardUseOperations.BeginCardUse(card, frame.OwnerSeat, [], conversionSource: source);
                 _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(frame.OwnerSeat), CardLocation.Processing, CardMoveReasons.EquipmentUse);
                 if (!_coreFinalizedCardTargetsOperations.TryBeginEquipmentTargetPrograms(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card, use))

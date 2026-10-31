@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBianOlRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterLiuBianOlRuntime
         if (!owner.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
             return SkillProgramStepOutcome.Continue;
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 的【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】生效：其他群势力角色的回合内，诗怨改为每回合每项限两次。", owner.Seat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYuWeiActiveTurnEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYuWeiActiveTurnEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber));
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return SkillProgramStepOutcome.Continue;
     }

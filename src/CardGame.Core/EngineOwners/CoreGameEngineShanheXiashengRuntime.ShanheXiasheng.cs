@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheXiashengRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheXiashengHost.ResolveXiasheng(ProgramSkillFrame frame, string stage) => BeginShanheXiasheng(frame, stage);
+    SkillProgramStepOutcome IShanheXiashengHost.ResolveXiasheng(ProgramSkillFrame frame, string stage) => BeginShanheXiasheng(frame, stage);
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedInstantTrickRequirement, 5408)]
     internal bool ShanheXiashengRequiresTargetWindow(ProgramTargetCardWindowQuery query) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShanheXiasheng);
     internal (int Red, int Black) ShanheXiashengColors(int seat)
@@ -17,7 +13,7 @@ internal sealed partial class CoreGameEngineShanheXiashengRuntime
     }
 
     internal CardActionContext? ShanheXiashengAction(int owner, ProgramSkillWindowContext context) => context.CardUse is { } identity && identity.ActorSeat == owner && _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(window => window.Id == context.ParentFrameId)is { } window && window.Action.ActionId == identity.CardActionId && window.Action.ActorSeat == owner && (window.Action.Type == CardActionType.Use || window.Action.Type == CardActionType.Response && window.Action.EffectiveKind is CardKind.Dodge or CardKind.Nullification) ? window.Action : null;
-    internal IReadOnlyList<IReadOnlyList<int>> ShanheXiashengExtraTargets(CardUseFrame use) => _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidates(use).Where(targets => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) ? _coreRecipientCategorySlashTargetsOperations.CanBeRecipientCategorySlashTarget(use, _coreMatchParticipantsPlayersAccess._players[targets[0]]) : use.CardKind != CardKind.Snatch || _coreProgramCardUseRolesOperations.CanBeProgramCardUseRoleTarget(use, _coreMatchParticipantsPlayersAccess._players[targets[0]])).ToArray();
+    internal IReadOnlyList<IReadOnlyList<int>> ShanheXiashengExtraTargets(CardUseFrame use) => _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidates(use).Where(targets => CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) ? _coreRecipientCategorySlashTargetsOperations.CanBeRecipientCategorySlashTarget(use, _coreMatchParticipantsPlayersAccess._players[targets[0]]) : use.CardKind != CardKind.Snatch || _coreProgramCardUseRolesOperations.CanBeProgramCardUseRoleTarget(use, _coreMatchParticipantsPlayersAccess._players[targets[0]])).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 5408)]
     internal bool CanOfferShanheXiasheng(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -60,7 +56,7 @@ internal sealed partial class CoreGameEngineShanheXiashengRuntime
         };
         var choices = ShanheXiashengExtraTargets(use).Select(targets => new PromptChoice(new($"xiasheng.{(frame.Id)}.{(string.Join(".", targets))}"), "夏晟：额外指定" + string.Join("、", targets.Select(seat => _coreMatchParticipantsPlayersAccess._players[seat].Name)), [], targets, Parameters())).Append(new(new($"xiasheng.{(frame.Id)}.decline"), "不追加目标", [], [], Parameters())).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheXiasheng = frame.ShanheXiasheng!with { Choices = choices, OriginalTargets = use.TargetSeats }, Step = ResolutionFrameStep.AwaitingResponse });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DesignatedExtraTargetOfferedEvent(frame.Id, use.Id, action.ActionId, frame.InstructionIndex, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, frame.ShanheXiasheng.OriginalTargets, choices.SelectMany(choice => choice.Targets.Take(1)).Distinct().ToArray()));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DesignatedExtraTargetOfferedEvent(frame.Id, use.Id, action.ActionId, frame.InstructionIndex, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, frame.ShanheXiasheng.OriginalTargets, choices.SelectMany(choice => choice.Targets.Take(1)).Distinct().ToArray()));
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId);
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, frame.OwnerSeat, "夏晟：可为此红色牌额外指定一个合法目标", [], choices.SelectMany(choice => choice.Targets).Distinct().ToArray(), frame.OwnerSeat)
         {
@@ -77,7 +73,7 @@ internal sealed partial class CoreGameEngineShanheXiashengRuntime
     [ProgramAnswer("shanhe-xiasheng")]
     internal void AnswerShanheXiasheng(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheXiasheng: { Stage: "target" } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || frame.WindowContext?.ParentFrameId != receipt.ParentWindowId || receipt.Choices.SingleOrDefault(choice => choice.Id == selected.Id)is not { } choice || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]) || !_coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(frame.OwnerSeat, frame.WindowContext, out var use, out var window) || use.Action!.ActionId != receipt.ActionId)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheXiasheng: { Stage: "target" } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || frame.WindowContext?.ParentFrameId != receipt.ParentWindowId || receipt.Choices.SingleOrDefault(choice => choice.Id == selected.Id)is not { } choice || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]) || !_coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(frame.OwnerSeat, frame.WindowContext, out var use, out var window) || use.Action!.ActionId != receipt.ActionId)
             throw new InvalidOperationException("Xiasheng lost its exact original red use or issued legal target choice.");
         if (choice.Targets.Count > 0)
         {
@@ -93,7 +89,7 @@ internal sealed partial class CoreGameEngineShanheXiashengRuntime
         }
 
         var result = _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)!.TargetSeats;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DesignatedExtraTargetResolvedEvent(frame.Id, use.Id, receipt.ActionId, frame.InstructionIndex, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, receipt.OriginalTargets, choice.Targets, result));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DesignatedExtraTargetResolvedEvent(frame.Id, use.Id, receipt.ActionId, frame.InstructionIndex, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, receipt.OriginalTargets, choice.Targets, result));
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { ShanheXiasheng = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCapturedEquipmentDrawsRuntime
@@ -37,7 +33,7 @@ internal sealed partial class CoreGameEngineCapturedEquipmentDrawsRuntime
         var equipped = _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[recipient]).Where(c => _coreFieldEquipmentOperations.FieldEquipmentSlot(c) == slot).ToArray();
         var replaced = equipped.Length >= _coreMatchParticipantsPlayersAccess._players[recipient].EquipmentSlotCapacity(slot) ? equipped[0] : null;
         var before = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var receipt = new ProgramCapturedEquipmentDrawReceipt(f.InstructionIndex, bind, source, f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, recipient, id, from, slot, replaced?.Id, replaced?.IsGeneralWeapon ?? false, before, before, 0, CapturedEquipmentDrawStage.Placed);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null), CapturedEquipmentDraw = receipt });
         if (replaced is not null)

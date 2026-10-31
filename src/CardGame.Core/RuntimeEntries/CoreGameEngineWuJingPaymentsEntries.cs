@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineWuJingPaymentsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineWuJingPaymentsRuntime> _resolve;
-    private CoreGameEngineWuJingPaymentsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineWuJingPaymentsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineWuJingPaymentsRuntime> _resolve;
+    private CoreGameEngineWuJingPaymentsEntries(Func<EngineOwners.CoreGameEngineWuJingPaymentsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineWuJingPaymentsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineWuJingPaymentsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineWuJingPaymentsEntries Create(Func<EngineOwners.CoreGameEngineWuJingPaymentsRuntime> resolve) => new(resolve);
 }

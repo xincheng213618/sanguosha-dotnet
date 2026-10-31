@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiAnniversaryGodRuntime
 {
-    internal bool IsShenDaCarrier(int id) => id > 0 && _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess._generatedPhysicalCardIds.Contains(id) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiCarrierCreatedEvent>().Where(e => e.CardId == id).ToArray()is [var f] && global::CardGame.Core.EngineOwners.CharacterDengAiHappyGodRuntime.IsShenDaCuixin(f.Source.SkillId) && _contentRegistryOperations._contentRegistry.GetSkill(f.Source.SkillId).Program?.GameplayHash == f.GameplayHash && _coreAdvancedLifecycleOperations.GetAdvancedCard(id)is { Suit: Suit.None, Rank: 0 } c && c.Kind == f.Kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(c.Kind);
+    internal bool IsShenDaCarrier(int id) => id > 0 && _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess._generatedPhysicalCardIds.Contains(id) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiCarrierCreatedEvent>().Where(e => e.CardId == id).ToArray()is [var f] && CharacterDengAiHappyGodRuntime.IsShenDaCuixin(f.Source.SkillId) && _contentRegistryOperations._contentRegistry.GetSkill(f.Source.SkillId).Program?.GameplayHash == f.GameplayHash && _coreAdvancedLifecycleOperations.GetAdvancedCard(id)is { Suit: Suit.None, Rank: 0 } c && c.Kind == f.Kind && CoreNativeCardClassificationsRuntime.IsDelayedCard(c.Kind);
     internal CardLocation NormalizeShenDaCarrierDestination(Card card, CardLocation from, CardLocation to)
     {
         if (!IsShenDaCarrier(card.Id) || from == to || to == CardLocation.OutsideGame)

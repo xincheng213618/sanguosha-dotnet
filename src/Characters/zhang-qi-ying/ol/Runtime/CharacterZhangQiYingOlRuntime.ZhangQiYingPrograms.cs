@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangQiYingOlRuntime
 {
     internal const string ZhenyiGainReason = "skill-program.zhenyi.three-categories";
-    internal static CardConversionSource ZhangQiYingSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhang_qi_ying_ol_ZhangQiYingPrograms.ZhangQiYingSource(f);
+    internal static CardConversionSource ZhangQiYingSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhang_qi_ying_ol_ZhangQiYingPrograms.ZhangQiYingSource(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 480)]
     internal bool CanOfferZhangQiYing(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -43,7 +39,7 @@ internal sealed partial class CharacterZhangQiYingOlRuntime
             throw new InvalidOperationException("Zhang Qi Ying lost its exact unpaid source and native window.");
         if (op == SkillProgramEffectOp.InitializeFaluSuitTokens)
         {
-            foreach (var marker in global::CardGame.Core.EngineOwners.CharacterZhangQiYingOlDefinitions.FaluTokens)
+            foreach (var marker in CharacterZhangQiYingOlDefinitions.FaluTokens)
                 SetFaluToken(f, marker, 1, "gameStarting");
             return SkillProgramStepOutcome.Continue;
         }
@@ -97,7 +93,7 @@ internal sealed partial class CharacterZhangQiYingOlRuntime
                 SkillProgramCardCategory.Basic,
                 SkillProgramCardCategory.Trick,
                 SkillProgramCardCategory.Equipment
-            }.Select(k => _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(card => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, k))).Where(card => card is not null).Select(card => card!.Id).ToArray();
+            }.Select(k => _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(card => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, k))).Where(card => card is not null).Select(card => card!.Id).ToArray();
             var r = new ZhangQiYingReceipt(ZhangQiYingSource(f), f.GameplayHash, c.ParentFrameId, f.InstructionIndex, "gain-children", _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             {
                 Cards = cards
@@ -119,5 +115,5 @@ internal sealed partial class CharacterZhangQiYingOlRuntime
         throw new InvalidOperationException("Unknown Zhang Qi Ying operation.");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IZhangQiYingProgramHost.ExecuteZhangQiYing(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteZhangQiYing(f, op);
+    SkillProgramStepOutcome IZhangQiYingProgramHost.ExecuteZhangQiYing(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteZhangQiYing(f, op);
 }

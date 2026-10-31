@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -18,7 +15,7 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
         _ => 0
     }));
     internal static int ShiXxySuitCount(int mask) => System.Numerics.BitOperations.PopCount((uint)mask);
-    internal static CardConversionSource ShiXxySource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiXxySource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int ShiXxyRoundMask(int owner, int actor) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiXinXianYingViewedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Actor == actor && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber).Aggregate(0, (n, e) => n | e.SuitMask);
     internal int ShiXxyRoundUsed(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiXinXianYingQingshiIssuedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.FromJiejie);
     internal bool ShiXxySameCamp(int owner, int target)
@@ -36,7 +33,7 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
         return a.Role is Role.Lord or Role.Loyalist && b.Role is Role.Lord or Role.Loyalist || a.Role == Role.Rebel && b.Role == Role.Rebel;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IShiXinXianYingHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op, int actor) => BeginShiXxy(f, op, actor);
+    SkillProgramStepOutcome IShiXinXianYingHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op, int actor) => BeginShiXxy(f, op, actor);
     internal SkillProgramStepOutcome BeginShiXxy(ProgramSkillFrame supplied, SkillProgramEffectOp op, int actor)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -67,7 +64,7 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
         var r = f.ShiXinXianYing!;
         PromptChoice C(string branch, string label, int? target = null, int? card = null, CardZoneKind? zone = null, int? index = null) => new(new($"shi-xin-xian-ying.{(f.Id)}.{(r.Stage)}.{(branch)}.{(target ?? -1)}.{(zone)}.{(index ?? card ?? -1)}"), label, card is { } id ? [id] : [], target is { } seat ? [seat] : [], new Dictionary<string, string> { ["program-action"] = "shi-xin-xian-ying", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = branch, ["zone"] = zone?.ToString() ?? "", ["index"] = (index ?? -1).ToString(CultureInfo.InvariantCulture) });
         if (r.Stage == ShiXinXianYingStage.Suit)
-            return global::CardGame.Core.EngineOwners.CharacterXinXianYingMobileShiDefinitions.ShiXxySuits.Select(s => C(s.ToString(), s switch
+            return CharacterXinXianYingMobileShiDefinitions.ShiXxySuits.Select(s => C(s.ToString(), s switch
             {
                 Suit.Spade => "选择黑桃",
                 Suit.Heart => "选择红桃",
@@ -137,7 +134,7 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
     [ProgramAnswer("shi-xin-xian-ying")]
     internal void AnswerShiXxy(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiXinXianYing: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiXxyChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiXinXianYing: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiXxyChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shi Xin Xian Ying rejects a stale choice or an invented foreign hand entity.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

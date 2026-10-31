@@ -1,47 +1,43 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDianWeiMouRuntime
 {
     internal MouDianWeiRuntime MouDianWei => _mouDianWeiOperations.Get();
 
-    int global::CardGame.Core.IMouDianWeiFacts.Turn => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber;
+    int IMouDianWeiFacts.Turn => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber;
 
-    int global::CardGame.Core.IMouDianWeiFacts.TurnOwner => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
+    int IMouDianWeiFacts.TurnOwner => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
 
-    long global::CardGame.Core.IMouDianWeiFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+    long IMouDianWeiFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
-    bool global::CardGame.Core.IMouDianWeiFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouDianWeiFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    int global::CardGame.Core.IMouDianWeiFacts.Hp(int s) => _coreMatchParticipantsPlayersAccess._players[s].Hp;
-    int global::CardGame.Core.IMouDianWeiFacts.MaxHp(int s) => _coreMatchParticipantsPlayersAccess._players[s].MaxHp;
-    int global::CardGame.Core.IMouDianWeiFacts.Hand(int s) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Count;
-    bool global::CardGame.Core.IMouDianWeiFacts.Alive(int s) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive;
-    bool global::CardGame.Core.IMouDianWeiFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
-    string global::CardGame.Core.IMouDianWeiFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
-    IEnumerable<T> global::CardGame.Core.IMouDianWeiFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    SkillProgram? global::CardGame.Core.IMouDianWeiFacts.Program(string s) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(s)?.Program;
-    bool global::CardGame.Core.IMouDianWeiFacts.Parent(ProgramSkillFrame f, SkillProgramEffectOp op)
+    int IMouDianWeiFacts.Hp(int s) => _coreMatchParticipantsPlayersAccess._players[s].Hp;
+    int IMouDianWeiFacts.MaxHp(int s) => _coreMatchParticipantsPlayersAccess._players[s].MaxHp;
+    int IMouDianWeiFacts.Hand(int s) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Count;
+    bool IMouDianWeiFacts.Alive(int s) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive;
+    bool IMouDianWeiFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
+    string IMouDianWeiFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
+    IEnumerable<T> IMouDianWeiFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    SkillProgram? IMouDianWeiFacts.Program(string s) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(s)?.Program;
+    bool IMouDianWeiFacts.Parent(ProgramSkillFrame f, SkillProgramEffectOp op)
     {
         if (op == SkillProgramEffectOp.ResolveMouDianWeiKuangzhan)
             return f.SkillId == MouDianWeiComposition.Kuangzhan && f.ActivationId == "draw-and-contest" && f.TriggerId is null && f.WindowContext is null && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(p => p.FrameId == f.Id && p.SkillId == f.SkillId && p.OwnerSeat == f.OwnerSeat && p.ActivationId == f.ActivationId) == 1;
         var window = op == SkillProgramEffectOp.ResolveMouDianWeiKangyongStart ? SkillProgramTriggerWindow.TurnStartBeforeNormalFlow : SkillProgramTriggerWindow.AfterTurnEnded;
-        if (f.SkillId != MouDianWeiComposition.Kangyong || f.TriggerId != f.ActivationId || f.TriggerId != (window == SkillProgramTriggerWindow.AfterTurnEnded ? "repay-actual-turn-end" : "recover-actual-turn-start") || f.WindowContext is not { } c || c.OwnerSeat != f.OwnerSeat || c.Window != window || f.OwnerSeat != ((global::CardGame.Core.IMouDianWeiFacts)this).TurnOwner)
+        if (f.SkillId != MouDianWeiComposition.Kangyong || f.TriggerId != f.ActivationId || f.TriggerId != (window == SkillProgramTriggerWindow.AfterTurnEnded ? "repay-actual-turn-end" : "recover-actual-turn-start") || f.WindowContext is not { } c || c.OwnerSeat != f.OwnerSeat || c.Window != window || f.OwnerSeat != ((IMouDianWeiFacts)this).TurnOwner)
             return false;
         var n = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         if (window == SkillProgramTriggerWindow.AfterTurnEnded)
-            return n > 0 && _resolutionStackOperations._resolutionStack[n - 1] is DeferredTurnEndFrame ended && ended.Id == c.ParentFrameId && ended.OwnerSeat == f.OwnerSeat && ended.TurnNumber == ((global::CardGame.Core.IMouDianWeiFacts)this).Turn && c.SourceSeat == f.OwnerSeat && c.TargetSeat == f.OwnerSeat && _coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(ended) && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(ended));
-        return n > 0 && _resolutionStackOperations._resolutionStack[n - 1] is ProgramLifecycleTriggerWindowFrame p && p.Id == c.ParentFrameId && p.Window == window && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]);
+            return n > 0 && _resolutionStackOperations._resolutionStack[n - 1] is DeferredTurnEndFrame ended && ended.Id == c.ParentFrameId && ended.OwnerSeat == f.OwnerSeat && ended.TurnNumber == ((IMouDianWeiFacts)this).Turn && c.SourceSeat == f.OwnerSeat && c.TargetSeat == f.OwnerSeat && _coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(ended) && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(ended));
+        return n > 0 && _resolutionStackOperations._resolutionStack[n - 1] is ProgramLifecycleTriggerWindowFrame p && p.Id == c.ParentFrameId && p.Window == window && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]);
     }
 
-    IReadOnlyList<int> global::CardGame.Core.IMouDianWeiFacts.Opponents(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Count == 0 && !_characterLuKangWumiaoOperations.CanWuLuKangDiscardForPindian(_coreMatchParticipantsPlayersAccess._players[owner]) ? [] : _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(owner, p.Seat) && (_corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0 || _characterLuKangWumiaoOperations.CanWuLuKangDiscardForPindian(p))).Select(p => p.Seat).Order().ToArray();
-    IReadOnlyList<int> global::CardGame.Core.IMouDianWeiFacts.NotWon(int owner) => _corePlayCardHistoryOperations.EventsSinceLastBoundary(x => x is TurnStartedEvent or TurnEndedEvent).OfType<PindianResultDeterminedEvent>().SelectMany(x => new[] { x.Result.SourceSeat, x.Result.OpponentSeat }.Where(s => !x.Result.WonBy(s))).Where(s => s != owner && ((global::CardGame.Core.IMouDianWeiFacts)this).Alive(s)).Distinct().Order().ToArray();
-    bool global::CardGame.Core.IMouDianWeiFacts.CanSlash(int actor, int target) => _coreForeignTurnContestsOperations.CanUseForeignTurnContestSlash(actor, target);
-    PindianResult global::CardGame.Core.IMouDianWeiFacts.Result(ProgramSkillFrame f)
+    IReadOnlyList<int> IMouDianWeiFacts.Opponents(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Count == 0 && !_characterLuKangWumiaoOperations.CanWuLuKangDiscardForPindian(_coreMatchParticipantsPlayersAccess._players[owner]) ? [] : _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(owner, p.Seat) && (_corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0 || _characterLuKangWumiaoOperations.CanWuLuKangDiscardForPindian(p))).Select(p => p.Seat).Order().ToArray();
+    IReadOnlyList<int> IMouDianWeiFacts.NotWon(int owner) => _corePlayCardHistoryOperations.EventsSinceLastBoundary(x => x is TurnStartedEvent or TurnEndedEvent).OfType<PindianResultDeterminedEvent>().SelectMany(x => new[] { x.Result.SourceSeat, x.Result.OpponentSeat }.Where(s => !x.Result.WonBy(s))).Where(s => s != owner && ((IMouDianWeiFacts)this).Alive(s)).Distinct().Order().ToArray();
+    bool IMouDianWeiFacts.CanSlash(int actor, int target) => _coreForeignTurnContestsOperations.CanUseForeignTurnContestSlash(actor, target);
+    PindianResult IMouDianWeiFacts.Result(ProgramSkillFrame f)
     {
         var r = f.MouDianWei ?? throw new InvalidOperationException("Missing contest parent receipt.");
         var bind = MouDianWeiRuntime.Bind(r);
@@ -52,10 +48,10 @@ internal sealed partial class CharacterDianWeiMouRuntime
         return fact.Result;
     }
 
-    void global::CardGame.Core.IMouDianWeiNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
-    void global::CardGame.Core.IMouDianWeiNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
-    bool global::CardGame.Core.IMouDianWeiNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    void global::CardGame.Core.IMouDianWeiNative.Pindian(ProgramSkillFrame f)
+    void IMouDianWeiNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+    void IMouDianWeiNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    bool IMouDianWeiNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
+    void IMouDianWeiNative.Pindian(ProgramSkillFrame f)
     {
         if (!MouDianWei.Valid(f) || f.MouDianWei is not { Stage: MouDianWeiStage.Pindian } r || !_characterDianWeiMouOperations.CreateMouDianWeiFacts().Opponents(f.OwnerSeat).Contains(r.Opponent))
             throw new InvalidOperationException("Kuangzhan requires one currently legal actual Pindian opponent.");
@@ -67,7 +63,7 @@ internal sealed partial class CharacterDianWeiMouRuntime
         _corePindianOperations.BeginSharedPindian(f.Id, new(f.SkillId, skill.Name, skill.Name, skill.Description), f.OwnerSeat, r.Opponent, programResultBind: bind, programResultVisibility: SkillProgramCardSetVisibility.Public);
     }
 
-    void global::CardGame.Core.IMouDianWeiNative.Slash(ProgramSkillFrame f, int actor, IReadOnlyList<int> targets)
+    void IMouDianWeiNative.Slash(ProgramSkillFrame f, int actor, IReadOnlyList<int> targets)
     {
         if (!MouDianWei.Valid(f) || f.MouDianWei is not { Stage: MouDianWeiStage.Slash, Slash: null } r || targets.Count == 0 || targets.Distinct().Count() != targets.Count || targets.Any(s => !_coreForeignTurnContestsOperations.CanUseForeignTurnContestSlash(actor, s)) || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || _coreNativeCardContinuationCursorsOperations.ActiveDuel is not null)
             throw new InvalidOperationException("Kuangzhan must issue its own original comparison's legal native Slash.");
@@ -109,14 +105,14 @@ internal sealed partial class CharacterDianWeiMouRuntime
             _coreNativeSlashUseOperations.BeginSlashTargetResolution(attack);
     }
 
-    void global::CardGame.Core.IMouDianWeiNative.Recover(ProgramSkillFrame f)
+    void IMouDianWeiNative.Recover(ProgramSkillFrame f)
     {
         if (!MouDianWei.Valid(f) || f.MouDianWei is not { Stage: MouDianWeiStage.RecoveryChildren })
             throw new InvalidOperationException("Kangyong recovery requires its exact actual-turn-start parent.");
         _coreNextSlashProgramsOperations.RecoverProgramToMaximum(f);
     }
 
-    void global::CardGame.Core.IMouDianWeiNative.Lose(ProgramSkillFrame f, int amount)
+    void IMouDianWeiNative.Lose(ProgramSkillFrame f, int amount)
     {
         if (!MouDianWei.Valid(f) || f.MouDianWei is not { Stage: MouDianWeiStage.LossChildren } r || amount != r.ActualLoss || amount < 0 || amount > Math.Max(0, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp - 1))
             throw new InvalidOperationException("Kangyong repays only actual recovered HP while preserving at least one HP.");
@@ -125,7 +121,7 @@ internal sealed partial class CharacterDianWeiMouRuntime
 
     internal bool IsMouDianWeiSlashUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouDianWei: { } ret } use && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == ret.ProgramId)is { } f && MouDianWei.Valid(f) && f.MouDianWei is { Stage: MouDianWeiStage.Slash } r && r.Slash == ret && use.Id == ret.UseId && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && (use.CurrentSlashFirePolicy?.OriginalAction ?? use.Action)is { } action && action.ActionId == ret.ActionId && action.ActorSeat == ret.Actor && action.ProviderSeat == ret.Actor && action.PhysicalCards.Count == 0 && ret.Targets.Select((target, index) => new MouDianWeiSlashIssuedEvent(f.Id, ret.Index, ret.ContestId, ret.UseId, ret.ActionId, ret.Actor, target, index)).SequenceEqual(_coreProgramEventHistoryOperations.ProgramEventHistory<MouDianWeiSlashIssuedEvent>().Where(e => e.UseId == ret.UseId));
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 35300)]
-    internal bool MouDianWeiSlashComplete(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool MouDianWeiSlashComplete(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.ProgramFrameId is not { } parent || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == parent)is not { MouDianWei: { Stage: MouDianWeiStage.Slash, Slash: { } ret } } f)
             return false;

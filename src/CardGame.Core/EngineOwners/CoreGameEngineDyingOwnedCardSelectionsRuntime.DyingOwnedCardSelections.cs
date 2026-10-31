@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDyingOwnedCardSelectionsRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CoreGameEngineDyingOwnedCardSelectionsRuntime
         dying = null !;
         entry = null !;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (index < 2 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame e || e.Window != SkillProgramTriggerWindow.DyingEntering || e.Continuation != ProgramLifecycleContinuation.ResumeDyingEntry || _resolutionStackOperations._resolutionStack[index - 2] is not DyingFrame d || e.ResumeDyingFrameId != d.Id || e.OwnerSeat != d.VictimSeat || root.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering } context || context.ParentFrameId != e.Id || context.OwnerSeat != root.OwnerSeat || context.TargetSeat != d.VictimSeat || e.CandidateIndex < 0 || e.CandidateIndex >= e.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, e.Candidates[e.CandidateIndex]))
+        if (index < 2 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame e || e.Window != SkillProgramTriggerWindow.DyingEntering || e.Continuation != ProgramLifecycleContinuation.ResumeDyingEntry || _resolutionStackOperations._resolutionStack[index - 2] is not DyingFrame d || e.ResumeDyingFrameId != d.Id || e.OwnerSeat != d.VictimSeat || root.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering } context || context.ParentFrameId != e.Id || context.OwnerSeat != root.OwnerSeat || context.TargetSeat != d.VictimSeat || e.CandidateIndex < 0 || e.CandidateIndex >= e.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, e.Candidates[e.CandidateIndex]))
             return false;
         dying = d;
         entry = e;
@@ -81,7 +77,7 @@ internal sealed partial class CoreGameEngineDyingOwnedCardSelectionsRuntime
         }
 
         var card = cards[slot];
-        var nonBasic = !global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(card.Kind, [SkillProgramCardCategory.Basic]);
+        var nonBasic = !CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(card.Kind, [SkillProgramCardCategory.Basic]);
         var before = _coreCardMovementJournalCardMovementsAccess._cardMovements.Count == 0 ? 0 : _coreCardMovementJournalCardMovementsAccess._cardMovements[^1].Sequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { SelectedTargetSeats = Array.AsReadOnly(new[] { dying.VictimSeat }), DyingOwnedCard = new(0, dying.Id, entry.Id, dying.VictimSeat, effect.ResultBind!, nonBasic, nonBasic ? card.Id : null, nonBasic ? location : null, before) });
         // Basic cards never enter a binding, public reveal fact, label or receipt identity.
@@ -92,6 +88,6 @@ internal sealed partial class CoreGameEngineDyingOwnedCardSelectionsRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.SelectDyingOwnedCard)]
-    internal PromptChoice SelectAiDyingOwnedCard(PendingDecision decision) => decision.Choices.OrderBy(c => c.Cards.Count == 1 && _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Any(card => card.Id == c.Cards[0] && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(card.Kind, [SkillProgramCardCategory.Basic])) ? 0 : 1).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
-    SkillProgramStepOutcome global::CardGame.Core.IDyingOwnedCardProgramHost.SelectDyingOwnedCard(ProgramSkillFrame f, SkillProgramEffect e) => SelectDyingOwnedCard(f, e);
+    internal PromptChoice SelectAiDyingOwnedCard(PendingDecision decision) => decision.Choices.OrderBy(c => c.Cards.Count == 1 && _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Any(card => card.Id == c.Cards[0] && !CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(card.Kind, [SkillProgramCardCategory.Basic])) ? 0 : 1).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    SkillProgramStepOutcome IDyingOwnedCardProgramHost.SelectDyingOwnedCard(ProgramSkillFrame f, SkillProgramEffect e) => SelectDyingOwnedCard(f, e);
 }

@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuanShuJunOlRuntime
 {
-    internal static string HuanShuJunDecisionHash(PendingDecision p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanShuJunObservers.HuanShuJunDecisionHash(p);
+    internal static string HuanShuJunDecisionHash(PendingDecision p) => RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanShuJunObservers.HuanShuJunDecisionHash(p);
     internal bool HuanShuJunPaidOrPreparing(ProgramSkillFrame f) => f.HuanShuJun is not null && HuanShuJunComposition.Handles(f.HuanShuJun.Op) && f.HuanShuJun.Source == HuanShuJunSource(f) && f.HuanShuJun.GameplayHash == f.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanShuJunStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == f.HuanShuJun.Source && e.GameplayHash == f.GameplayHash && e.Op == f.HuanShuJun.Op && e.WindowId == f.HuanShuJun.WindowId) == 1;
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28100)]
@@ -54,7 +50,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         if (child is CardUseFrame use)
             return r.Stage == HuanShuJunStage.NativeUse && r.Native?.UseId == use.Id && IsIssuedWenyiUse(use);
         if (r.Stage == HuanShuJunStage.Drawing && f.NativeDraw is not null)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
+            return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is RecoveryReplacementFrame recovery)
             return IsHuanShuJunRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
@@ -63,7 +59,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
             return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
-        if (child is not CardsMovedTriggerWindowFrame moved || !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || moved.Batch.OriginOwnerSeat != f.OwnerSeat || moved.Batch.OriginSkillId != f.SkillId || moved.Batch.OriginSkillInstanceId != f.SkillInstanceId || moved.Batch.Movements.Count == 0)
+        if (child is not CardsMovedTriggerWindowFrame moved || !CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || moved.Batch.OriginOwnerSeat != f.OwnerSeat || moved.Batch.OriginSkillId != f.SkillId || moved.Batch.OriginSkillInstanceId != f.SkillInstanceId || moved.Batch.Movements.Count == 0)
             return false;
         if (r.Stage == HuanShuJunStage.NativeChildren && r.NativeReturned && r.Native is { } native)
             return moved.Batch.ParentFrameId == native.UseId && _coreProgramEventHistoryOperations.ProgramEventHistory<WenyiNativeReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == native.UseId && e.ActionId == native.ActionId) == 1;
@@ -77,7 +73,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         return parent is ProgramSkillFrame { Zenrun: not null } replacement && _characterSunHongOlOperations.ZenrunFirstChild(replacement, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child);
     }
 
-    internal bool HuanShuJunObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || this.HuanShuJunReplacementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
+    internal bool HuanShuJunObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || this.HuanShuJunReplacementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     internal ProgramSkillFrame? HuanShuJunObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.HuanShuJunFirstChild(f, c), (i) => this.HuanShuJunObserverSuffix(i));
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 28100)]

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanHaiOlRuntime
@@ -20,19 +16,19 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         if (kind != CardKind.Dodge)
             return false;
         var attack = _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } defense && defense.CurrentCandidateSeat == owner.Seat ? defense.Attack : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack;
-        return attack is not null && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge) && (attack.TargetSeat == owner.Seat || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } d && d.CurrentCandidateSeat == owner.Seat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(d.Attack, attack));
+        return attack is not null && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge) && (attack.TargetSeat == owner.Seat || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } d && d.CurrentCandidateSeat == owner.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(d.Attack, attack));
     }
 
-    internal bool TryCompleteXieweiFactionDefense(global::CardGame.Core.NativeOwners.FactionDefenseHandle pending, CharacterState provider, ProgramMultiCardViewAsSelection selection)
+    internal bool TryCompleteXieweiFactionDefense(NativeOwners.FactionDefenseHandle pending, CharacterState provider, ProgramMultiCardViewAsSelection selection)
     {
         if (!IsXieweiSelection(selection))
             return false;
         var attack = pending.Attack;
-        if (selection.OutputKind != CardKind.Dodge || selection.Source.OwnerSeat != provider.Seat || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || pending.CurrentCandidateSeat != provider.Seat || provider.Seat == pending.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat].IsAlive || !provider.IsAlive || attack.TargetSeat != pending.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge) || pending.Source.FactionId != "magic-any" && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(provider) != pending.Source.FactionId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ResponseWindowFrame response || response.ParentFrameId != attack.ResolutionId || response.ResponderSeat != pending.OwnerSeat || response.RequiredCardKind != CardKind.Dodge || selection.Cards.Count != 2 || selection.Cards.Select(c => c.Id).Distinct().Count() != 2 || selection.Cards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.Id) != CardLocation.Hand(provider.Seat)) || _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(provider, selection.Cards.Select(c => c.Id).ToArray(), CardKind.Dodge, true, selection.Source)is null)
+        if (selection.OutputKind != CardKind.Dodge || selection.Source.OwnerSeat != provider.Seat || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense, pending) || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || pending.CurrentCandidateSeat != provider.Seat || provider.Seat == pending.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat].IsAlive || !provider.IsAlive || attack.TargetSeat != pending.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge) || pending.Source.FactionId != "magic-any" && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(provider) != pending.Source.FactionId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ResponseWindowFrame response || response.ParentFrameId != attack.ResolutionId || response.ResponderSeat != pending.OwnerSeat || response.RequiredCardKind != CardKind.Dodge || selection.Cards.Count != 2 || selection.Cards.Select(c => c.Id).Distinct().Count() != 2 || selection.Cards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.Id) != CardLocation.Hand(provider.Seat)) || _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(provider, selection.Cards.Select(c => c.Id).ToArray(), CardKind.Dodge, true, selection.Source)is null)
             throw new InvalidOperationException("Xiewei's faction Dodge requires its current original Slash, living requester/provider, exact two Hand cards and issued faction candidate.");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt)
         {
-            if (prompt.Kind != DecisionKind.RespondDodge || !prompt.IsPrivate || prompt.PlayerSeat != provider.Seat || prompt.TargetSeat != pending.OwnerSeat || prompt.RequiredCardKind != CardKind.Dodge || !prompt.Choices.Any(c => c.Cards.Order().SequenceEqual(selection.Cards.Select(card => card.Id).Order()) && global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(c.Parameters, out var source) && source == selection.Source))
+            if (prompt.Kind != DecisionKind.RespondDodge || !prompt.IsPrivate || prompt.PlayerSeat != provider.Seat || prompt.TargetSeat != pending.OwnerSeat || prompt.RequiredCardKind != CardKind.Dodge || !prompt.Choices.Any(c => c.Cards.Order().SequenceEqual(selection.Cards.Select(card => card.Id).Order()) && CoreGameEngineCardConversionsRuntime.TryReadConversionSource(c.Parameters, out var source) && source == selection.Source))
                 throw new InvalidOperationException("Xiewei cannot answer a different or unpublished private faction request.");
         }
         else if (provider.IsHuman)
@@ -58,7 +54,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         var key = (source.OwnerSeat, source.SkillId, source.SkillInstanceId);
         if (_coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.TryGetValue(key, out var existing))
             return existing;
-        var pileId = _corePublicPileSourcesOperations.PublicPileSources(source.OwnerSeat).Any(s => s.PublicPileId is null) ? global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(source.SkillId, source.SkillInstanceId) : null;
+        var pileId = _corePublicPileSourcesOperations.PublicPileSources(source.OwnerSeat).Any(s => s.PublicPileId is null) ? CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(source.SkillId, source.SkillInstanceId) : null;
         var pile = new PublicPersistentPileSource(source.OwnerSeat, source.SkillId, source.SkillInstanceId, int.MaxValue, pileId);
         _cardZonesOperations._cardZones.EnsurePublicPersistentPile(pile.Location);
         _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.Add(key, pile);
@@ -179,7 +175,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XieweiOutputBoundEvent(p.Id, p.UseId, p.ActionId, p.ActorSeat, p.OwnerSeat, p.RequesterSeat, p.Kind, true));
     }
 
-    internal static bool XieweiActionCosts(XieweiNativePayment p, CardActionContext a) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guan_hai_ol_XieweiPayments.XieweiActionCosts(p, a);
+    internal static bool XieweiActionCosts(XieweiNativePayment p, CardActionContext a) => RuntimeSkills.RuntimeRules_guan_hai_ol_XieweiPayments.XieweiActionCosts(p, a);
     internal bool ValidXieweiPayment(XieweiNativePayment p)
     {
         if (p.Materials.Count != 2 || p.Materials.Select(c => c.CardId).Distinct().Count() != 2 || p.Materials.Any(c => c.From != CardLocation.Hand(p.OwnerSeat)) || p.Source.OwnerSeat != p.OwnerSeat || p.Pile.OwnerSeat != p.OwnerSeat || p.Pile.SkillId != p.Source.SkillId || p.Pile.SkillInstanceId != p.Source.SkillInstanceId || _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash != p.GameplayHash || !IsXieweiSource(p.Source) || _coreProgramEventHistoryOperations.ProgramEventHistory<XieweiPaymentPreparedEvent>().Count(e => e == new XieweiPaymentPreparedEvent(p.Id, p.UseId, p.Source, p.GameplayHash, p.OwnerSeat, p.ActorSeat, p.RequesterSeat, p.ActualTurn, p.TurnOwner, p.ResponseUse, p.Kind, p.Pile, p.Before)) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<XieweiMaterialFrozenEvent>().Where(e => e.PaymentId == p.Id).OrderBy(e => e.Index).Select(e => new GuanHaiMaterial(e.CardId, e.Kind, e.From)).SequenceEqual(p.Materials) || p.Paid != (p.Movements.Count == 2))

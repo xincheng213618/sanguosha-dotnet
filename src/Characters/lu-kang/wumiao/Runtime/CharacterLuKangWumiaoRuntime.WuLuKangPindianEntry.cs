@@ -1,17 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuKangWumiaoRuntime
 {
-    internal static bool IsWuLuKangSelectedPindianSource(SkillProgramActivation a) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangPindianEntry.IsWuLuKangSelectedPindianSource(a);
+    internal static bool IsWuLuKangSelectedPindianSource(SkillProgramActivation a) => RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangPindianEntry.IsWuLuKangSelectedPindianSource(a);
     internal bool WuLuKangCanOmitPindianSource(int owner, SkillProgramActivation activation) => IsWuLuKangSelectedPindianSource(activation) && CanWuLuKangDiscardForPindian(_coreMatchParticipantsPlayersAccess._players[owner]);
     internal bool WuLuKangActivationTargetHasPindianSource(ProgramExecutionPlan plan, CharacterState target) => _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count > 0 || (plan.Features.HasOperation(SkillProgramEffectOp.Pindian) || plan.Features.HasOperation(SkillProgramEffectOp.StartPindian) || plan.Features.HasOperation(SkillProgramEffectOp.StartSimultaneousPindian) || plan.Features.HasOperation(SkillProgramEffectOp.ResolveYouqueMinimumBaitPindian)) && CanWuLuKangDiscardForPindian(target);
-    internal static bool IsWuLuKangPindianTargetInstruction(IReadOnlyList<SkillProgramEffect> instructions, int index) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangPindianEntry.IsWuLuKangPindianTargetInstruction(instructions, index);
+    internal static bool IsWuLuKangPindianTargetInstruction(IReadOnlyList<SkillProgramEffect> instructions, int index) => RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangPindianEntry.IsWuLuKangPindianTargetInstruction(instructions, index);
     internal IReadOnlyList<int> WuLuKangProgramSelectionSeats(int owner, SkillProgramEffect selection, IReadOnlyList<SkillProgramEffect> instructions, ProgramSkillWindowContext? context = null) => _programTargetSelectionOperations.Get().SelectionSeats(owner, selection, instructions, context);
     internal IReadOnlyList<int> WuLuKangProgramSelectionSeats(ProgramSkillFrame frame, SkillProgramTargetKind kind, IReadOnlyList<CardZoneKind> zones, PlayerMarkerKind? marker, ProgramParticipantReference? actor) => _programTargetSelectionOperations.Get().SelectionSeats(frame, kind, zones, marker, actor);
     internal bool WuLuKangProgramSelectionTargetEligible(ProgramSkillFrame frame, SkillProgramTargetKind kind, IReadOnlyList<CardZoneKind> zones, int seat, PlayerMarkerKind? marker, ProgramParticipantReference? actor) => _programTargetSelectionOperations.Get().SelectionTargetEligible(frame, kind, zones, seat, marker, actor);

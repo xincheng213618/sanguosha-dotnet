@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_zhou_qun_ol_ZhouQunWeather
 {
     internal static (string Id, string Name) ZhouQunWeather(Suit suit) => suit switch

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangYanMobileShiRuntime
@@ -47,7 +43,7 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
             CardActionId = 0
         }
 
-        ) || o.InitialActorSeat != f.OwnerSeat || o.InitialTargetSeat != r.Target || !ValidShiZy(f) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { Step: ResolutionFrameStep.Completed, Action: { } slash } original || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(original.CardKind) || slash.ActionId != r.ActionId || slash.ActorSeat != f.OwnerSeat || original.SourceSeat != f.OwnerSeat || original.TargetIndex != r.OriginalTargetIndex || original.CardAttack?.Active != false || r.OriginalAttackActive is null || slash.EffectiveDesignatedTargetSeats is not [var target] || target != r.Target)
+        ) || o.InitialActorSeat != f.OwnerSeat || o.InitialTargetSeat != r.Target || !ValidShiZy(f) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { Step: ResolutionFrameStep.Completed, Action: { } slash } original || !CoreNativeCardClassificationsRuntime.IsSlashCard(original.CardKind) || slash.ActionId != r.ActionId || slash.ActorSeat != f.OwnerSeat || original.SourceSeat != f.OwnerSeat || original.TargetIndex != r.OriginalTargetIndex || original.CardAttack?.Active != false || r.OriginalAttackActive is null || slash.EffectiveDesignatedTargetSeats is not [var target] || target != r.Target)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == use.Id);
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == f.Id && _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, a.ActorSeat, o.InitialActorSeat);
@@ -89,7 +85,7 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
         ContinueShiZy(f.Id);
     }
 
-    internal CardUseFrame? FrozenShiZyCompletedSlash(ProgramSkillFrame f) => f.ShiZhangYan is { Op: SkillProgramEffectOp.ResolveMobileShiZhangYanXiaogeDuel, OriginalAttackActive: not null, OriginalTargetIndex: { } cursor } r && ValidShiZy(f) && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } action, CardAttack: not null } use && use.SourceSeat == f.OwnerSeat && action.ActorSeat == f.OwnerSeat && use.TargetIndex == cursor && action.ActionId == r.ActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveDesignatedTargetSeats is [var target] && target == r.Target && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == r.WindowId)is ProgramCardTriggerWindowFrame window && window.ParentFrameId == use.Id && window.AttackOwnerFrameId == use.Id && window.Continuation == ProgramCardContinuation.CompletedSlash && window.CompletedResponseReturn is null && global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(window.Action, action) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardKind == use.CardKind) == 1 ? use : null;
+    internal CardUseFrame? FrozenShiZyCompletedSlash(ProgramSkillFrame f) => f.ShiZhangYan is { Op: SkillProgramEffectOp.ResolveMobileShiZhangYanXiaogeDuel, OriginalAttackActive: not null, OriginalTargetIndex: { } cursor } r && ValidShiZy(f) && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } action, CardAttack: not null } use && use.SourceSeat == f.OwnerSeat && action.ActorSeat == f.OwnerSeat && use.TargetIndex == cursor && action.ActionId == r.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveDesignatedTargetSeats is [var target] && target == r.Target && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == r.WindowId)is ProgramCardTriggerWindowFrame window && window.ParentFrameId == use.Id && window.AttackOwnerFrameId == use.Id && window.Continuation == ProgramCardContinuation.CompletedSlash && window.CompletedResponseReturn is null && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(window.Action, action) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardKind == use.CardKind) == 1 ? use : null;
     internal void RestoreShiZyCompletedSlash(ProgramSkillFrame f)
     {
         var r = f.ShiZhangYan!;

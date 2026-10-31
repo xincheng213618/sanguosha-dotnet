@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSourceFactionPreventionsRuntime
 {
-    internal static string SourceFactionPreventionUsage(string stateId, string faction) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SourceFactionPreventions.SourceFactionPreventionUsage(stateId, faction);
+    internal static string SourceFactionPreventionUsage(string stateId, string faction) => RuntimeSkills.RuntimeRules_Core_SourceFactionPreventions.SourceFactionPreventionUsage(stateId, faction);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 60)]
     internal bool CanRunSourceFactionPrevention(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -20,7 +16,7 @@ internal sealed partial class CoreGameEngineSourceFactionPreventionsRuntime
     internal SkillProgramStepOutcome PreventDamageAndConsumeSourceFaction(ProgramSkillFrame frame, string stateId)
     {
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (frame.SourceFactionPrevention is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, SourceSeat: { } source, TargetSeat: { } target } context || target != frame.OwnerSeat || source == target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source) || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not BeforeDamageProgramWindowFrame parent || parent.Id != context.ParentFrameId || parent.TargetSeat != target || parent.SourceSeat != source || parent.Prevented || parent.Amount <= 0 || context.Amount != parent.Amount || _coreDamagePreventionProgramsOperations.BeforeDamageHasNoSource(parent) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex].Candidate))
+        if (frame.SourceFactionPrevention is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, SourceSeat: { } source, TargetSeat: { } target } context || target != frame.OwnerSeat || source == target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source) || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not BeforeDamageProgramWindowFrame parent || parent.Id != context.ParentFrameId || parent.TargetSeat != target || parent.SourceSeat != source || parent.Prevented || parent.Amount <= 0 || context.Amount != parent.Amount || _coreDamagePreventionProgramsOperations.BeforeDamageHasNoSource(parent) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex].Candidate))
             throw new InvalidOperationException("Source-faction prevention requires its exact live foreign damage candidate.");
         if (_corePublicFactionCountsOperations.GetPublicEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[source])is not { } faction)
         {
@@ -39,7 +35,7 @@ internal sealed partial class CoreGameEngineSourceFactionPreventionsRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { SourceFactionPrevention = new(frame.InstructionIndex - 1, parent.Id, parent.ParentFrameId, source, target, parent.Amount, stateId, faction, usage, before) });
         _coreDamagePreventionProgramsOperations.PreventProgramCurrentDamage(frame);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SkillUsageConsumedEvent(frame.OwnerSeat, frame.SkillId, usage, SkillUsageScope.Game, 1));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSourceFactionPreventionIssuedEvent(frame.Id, parent.Id, source, target, parent.Amount, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, stateId, faction, usage));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSourceFactionPreventionIssuedEvent(frame.Id, parent.Id, source, target, parent.Amount, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, stateId, faction, usage));
         if (!_coreMatchParticipantsPlayersAccess._players[source].IsAlive)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "伤害仍由已阵亡角色造成；防伤和势力额度已发行，得牌尾部因接收者阵亡取消。");
@@ -51,7 +47,7 @@ internal sealed partial class CoreGameEngineSourceFactionPreventionsRuntime
 
     internal bool IsValidSourceFactionPrevention(ProgramSkillFrame root, BeforeDamageProgramWindowFrame parent)
     {
-        if (root.SourceFactionPrevention is not { } receipt || root.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || context.ParentFrameId != parent.Id || context.SourceSeat != receipt.SourceSeat || context.TargetSeat != root.OwnerSeat || context.Amount != parent.Amount || receipt.BeforeDamageFrameId != parent.Id || receipt.DamageOwnerFrameId != parent.ParentFrameId || receipt.SourceSeat != parent.SourceSeat || receipt.TargetSeat != root.OwnerSeat || parent.TargetSeat != root.OwnerSeat || receipt.SourceSeat == root.OwnerSeat || receipt.PreventedAmount != parent.Amount || !parent.Prevented || parent.Amount <= 0 || receipt.MovementSequenceBefore < 0 || string.IsNullOrWhiteSpace(receipt.SourceFactionId) || receipt.InstructionIndex != 0 || root.InstructionIndex is < 1 or > 2 || receipt.UsageId != SourceFactionPreventionUsage(receipt.StateId, receipt.SourceFactionId) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, parent.Candidates[parent.CandidateIndex].Candidate) || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(root.OwnerSeat, root.SkillId, receipt.UsageId, SkillUsageScope.Game) != 1)
+        if (root.SourceFactionPrevention is not { } receipt || root.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || context.ParentFrameId != parent.Id || context.SourceSeat != receipt.SourceSeat || context.TargetSeat != root.OwnerSeat || context.Amount != parent.Amount || receipt.BeforeDamageFrameId != parent.Id || receipt.DamageOwnerFrameId != parent.ParentFrameId || receipt.SourceSeat != parent.SourceSeat || receipt.TargetSeat != root.OwnerSeat || parent.TargetSeat != root.OwnerSeat || receipt.SourceSeat == root.OwnerSeat || receipt.PreventedAmount != parent.Amount || !parent.Prevented || parent.Amount <= 0 || receipt.MovementSequenceBefore < 0 || string.IsNullOrWhiteSpace(receipt.SourceFactionId) || receipt.InstructionIndex != 0 || root.InstructionIndex is < 1 or > 2 || receipt.UsageId != SourceFactionPreventionUsage(receipt.StateId, receipt.SourceFactionId) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, parent.Candidates[parent.CandidateIndex].Candidate) || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(root.OwnerSeat, root.SkillId, receipt.UsageId, SkillUsageScope.Game) != 1)
             return false;
         var program = _contentRegistryOperations._contentRegistry.GetSkill(root.SkillId).Program;
         if (program is null || program.GameplayHash != root.GameplayHash)
@@ -59,10 +55,10 @@ internal sealed partial class CoreGameEngineSourceFactionPreventionsRuntime
         var effects = ProgramInstructionResolver.Default.Resolve(root, program).Instructions;
         if (effects.Count != 2 || effects[0].Op != SkillProgramEffectOp.PreventDamageAndConsumeSourceFaction || effects[0].StateId != receipt.StateId || !IsSourceFactionYieldTransfer(effects[1]))
             return false;
-        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSourceFactionPreventionIssuedEvent>().Any(e => e.FrameId == root.Id && e.BeforeDamageFrameId == parent.Id && e.SourceSeat == receipt.SourceSeat && e.TargetSeat == receipt.TargetSeat && e.PreventedAmount == receipt.PreventedAmount && e.StateId == receipt.StateId && e.SourceFactionId == receipt.SourceFactionId && e.UsageId == receipt.UsageId && e.GameplayHash == root.GameplayHash && e.Source == new CardConversionSource(root.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId));
+        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSourceFactionPreventionIssuedEvent>().Any(e => e.FrameId == root.Id && e.BeforeDamageFrameId == parent.Id && e.SourceSeat == receipt.SourceSeat && e.TargetSeat == receipt.TargetSeat && e.PreventedAmount == receipt.PreventedAmount && e.StateId == receipt.StateId && e.SourceFactionId == receipt.SourceFactionId && e.UsageId == receipt.UsageId && e.GameplayHash == root.GameplayHash && e.Source == new CardConversionSource(root.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId));
     }
 
-    internal static bool IsSourceFactionYieldTransfer(SkillProgramEffect effect) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SourceFactionPreventions.IsSourceFactionYieldTransfer(effect);
+    internal static bool IsSourceFactionYieldTransfer(SkillProgramEffect effect) => RuntimeSkills.RuntimeRules_Core_SourceFactionPreventions.IsSourceFactionYieldTransfer(effect);
     internal ProgramSkillFrame? SourceFactionYieldObserverRoot(long beforeDamageId)
     {
         for (var index = 1; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
@@ -119,5 +115,5 @@ internal sealed partial class CoreGameEngineSourceFactionPreventionsRuntime
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 430)]
     internal bool IsSourceFactionYieldProgramDying() => _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().Any(f => HasSourceFactionYieldDying(f.Id));
 
-    SkillProgramStepOutcome global::CardGame.Core.ISourceFactionPreventionProgramHost.PreventDamageAndConsumeSourceFaction(ProgramSkillFrame f, string stateId) => PreventDamageAndConsumeSourceFaction(f, stateId);
+    SkillProgramStepOutcome ISourceFactionPreventionProgramHost.PreventDamageAndConsumeSourceFaction(ProgramSkillFrame f, string stateId) => PreventDamageAndConsumeSourceFaction(f, stateId);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanLeRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             return[];
         var result = new List<DiouUsePlan>();
         void Add(LegalActionKind action, IReadOnlyList<int> targets, string text, int? card = null, CardKind? required = null, bool adjusted = false) => result.Add(new(kind, action, card, required, text, adjusted) { Targets = targets });
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+        if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
         {
             var options = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: false, conversionSource: source).Where(p => p.ActionKind != LegalActionKind.Recast).ToArray();
             var ordinary = options.Select(p => new LegalAction(p.ActionKind, 0, p.TargetSeats.Count == 1 ? p.TargetSeats[0] : null, p.Description, kind, p.TargetCardId, p.TargetSeats) { ConversionSource = source }).ToList();
@@ -28,7 +24,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         }
 
         var neutral = new Card(0, kind, Suit.None, 0);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var actions = new List<LegalAction>();
             var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, physicalCardIds: [], conversionSource: source)).ToArray();
@@ -66,11 +62,11 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             if (actor.EquipmentSlotCapacity(_coreEquipmentContentOperations.EquipmentRules.Get(kind).Slot) > 0 && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, actor.Seat, kind) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None))
                 Add(LegalActionKind.Equip, [actor.Seat], $"视为使用并装备【{(neutral.DisplayName)}】");
         }
-        else if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(kind))
+        else if (CoreNativeCardClassificationsRuntime.IsDelayedCard(kind))
         {
             foreach (var t in _coreMatchParticipantsPlayersAccess._players.Where(t => t.IsAlive && !t.JudgmentAreaAbolished && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(t, kind) && !_coreProgramCardPoliciesOperations.HasCardPolicy(t, SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget) && (kind == CardKind.Lightning ? t.Seat == actor.Seat : t.Seat != actor.Seat) && (kind != CardKind.SupplyShortage || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.IgnoreUseDistance, kind) || _coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(actor, t, kind) || _coreNativeRuleQueriesOperations.GetCombatDistance(actor.Seat, t.Seat) <= _coreRuleQueriesOperations.GetCardUseDistanceLimit(actor, kind)) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, t.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, kind, Suit.None) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(actor.Seat, t.Seat, kind) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, t.Seat, Suit.None)))
                 if (_coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(actor, [t.Seat]).Contains(t.Seat))
-                    Add(global::CardGame.Core.EngineOwners.CoreGameEngineDelayedPlacementTargetProgramsRuntime.DelayedPlacementActionKind(kind), [t.Seat], $"视为对{(t.Name)}使用【{(neutral.DisplayName)}】");
+                    Add(CoreGameEngineDelayedPlacementTargetProgramsRuntime.DelayedPlacementActionKind(kind), [t.Seat], $"视为对{(t.Name)}使用【{(neutral.DisplayName)}】");
         }
 
         return Array.AsReadOnly(result.ToArray());
@@ -88,7 +84,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         for (var i = 0; i < p.Targets.Count; i++)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouTargetAcceptedEvent(f.Id, i, p.Targets[i]));
         Card card;
-        if (_coreEquipmentContentOperations.EquipmentRules.IsEquipment(p.Kind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(p.Kind))
+        if (_coreEquipmentContentOperations.EquipmentRules.IsEquipment(p.Kind) || CoreNativeCardClassificationsRuntime.IsDelayedCard(p.Kind))
         {
             var id = checked(_coreTrustedCardZoneDiagnosticsOperations.CreateCardZoneDiagnostics().Select(c => c.CardId).DefaultIfEmpty(0).Max() + 1);
             card = new(id, p.Kind, Suit.None, 0);
@@ -139,7 +135,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             return;
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
         {
             var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(useId)!.TargetSeats;
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, actor.Seat, targets[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: p.Kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], p.Kind), programSkillCardUseFrameId: f.Id);
@@ -160,7 +156,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(useId, card, actor.Seat, _coreCardUseLifecycleOperations.LifecycleCardUse(useId)!.TargetSeats, p.ActionKind, p.TargetCardId, p.RequiredKind, p.Kind);
     }
 
-    internal static bool SameDiouPlan(DiouUsePlan a, DiouUsePlan b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_diao_chan_le_LeDiaoChanDiou_Native.SameDiouPlan(a, b);
+    internal static bool SameDiouPlan(DiouUsePlan a, DiouUsePlan b) => RuntimeSkills.RuntimeRules_diao_chan_le_LeDiaoChanDiou_Native.SameDiouPlan(a, b);
     internal CardActionContext PrepareDiouAction(CardActionContext action)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Diou: { Stage: DiouStage.NativeIssuing } r } f)
@@ -231,10 +227,10 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 30)]
-    internal bool FinishDiouAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishDiouAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (attack.Card is not null || !IsDiouUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && kind is not (CardKind.Duel or CardKind.FireAttack))
+        if (attack.Card is not null || !IsDiouUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && kind is not (CardKind.Duel or CardKind.FireAttack))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);

@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IDiscardBudgetAndFactionGiftHost.ResolveDiscardBudgetParticipants(ProgramSkillFrame f) => BeginDiscardBudget(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDiscardBudgetAndFactionGiftHost.PreventOwnPlayOutsideTargetRangeDamage(ProgramSkillFrame f) => PreventOwnPlayOutsideRange(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDiscardBudgetAndFactionGiftHost.DiscardOutsideRangeAfterInsufficientUses(ProgramSkillFrame f) => BeginOutsideRangeDiscard(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDiscardBudgetAndFactionGiftHost.OfferCompletedFactionCostGift(ProgramSkillFrame f, string faction) => BeginCompletedFactionGift(f, faction);
+    SkillProgramStepOutcome IDiscardBudgetAndFactionGiftHost.ResolveDiscardBudgetParticipants(ProgramSkillFrame f) => BeginDiscardBudget(f);
+    SkillProgramStepOutcome IDiscardBudgetAndFactionGiftHost.PreventOwnPlayOutsideTargetRangeDamage(ProgramSkillFrame f) => PreventOwnPlayOutsideRange(f);
+    SkillProgramStepOutcome IDiscardBudgetAndFactionGiftHost.DiscardOutsideRangeAfterInsufficientUses(ProgramSkillFrame f) => BeginOutsideRangeDiscard(f);
+    SkillProgramStepOutcome IDiscardBudgetAndFactionGiftHost.OfferCompletedFactionCostGift(ProgramSkillFrame f, string faction) => BeginCompletedFactionGift(f, faction);
     internal bool BudgetGiftSourceValid(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId);
     internal Dictionary<string, string> BudgetGiftParameters(ProgramSkillFrame f, string action, string mode) => new()
     {
@@ -196,7 +192,7 @@ internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsRuntime
                 return true;
             }
 
-            var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, f.Id, f.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), SkillRuleQuery.SlashLimit, SkillRuleOperation.Add, 1, affectedSeat: gift.ProviderSeat);
+            var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, f.Id, f.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), SkillRuleQuery.SlashLimit, SkillRuleOperation.Add, 1, affectedSeat: gift.ProviderSeat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnRuleModifierGrantedEvent(granted));
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { CompletedFactionGiftDraft = null });
             return false;
@@ -264,7 +260,7 @@ internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsRuntime
 
     internal CardActionContext FactionGiftAction(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } use } ? _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w => w.Id == f.WindowContext.ParentFrameId && w.Action.ActionId == use.CardActionId).Action : throw new InvalidOperationException("Faction gift lost its actual completed action.");
     internal string? CompletedFactionGiftFaction(ProgramSkillFrame f) => ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect.ProviderFactionId;
-    internal bool CompletedFactionGiftLive(ProgramSkillFrame f, ProgramCompletedFactionGiftDraft d) => BudgetGiftSourceValid(f) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId, Role.Lord) && _coreMatchParticipantsPlayersAccess._players[d.ProviderSeat].IsAlive && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[d.ProviderSeat]) == CompletedFactionGiftFaction(f) && d.ProviderSeat != f.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == d.ProviderSeat && d.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && FactionGiftAction(f)is { Type: CardActionType.Use } action && action.ActionId == d.ActionId && action.ActorSeat == d.ProviderSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind);
+    internal bool CompletedFactionGiftLive(ProgramSkillFrame f, ProgramCompletedFactionGiftDraft d) => BudgetGiftSourceValid(f) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId, Role.Lord) && _coreMatchParticipantsPlayersAccess._players[d.ProviderSeat].IsAlive && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[d.ProviderSeat]) == CompletedFactionGiftFaction(f) && d.ProviderSeat != f.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == d.ProviderSeat && d.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && FactionGiftAction(f)is { Type: CardActionType.Use } action && action.ActionId == d.ActionId && action.ActorSeat == d.ProviderSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind);
     internal int[] AvailableFactionGiftCosts(CardActionContext a) => a.PhysicalCards.Where(p => _cardZonesOperations._cardZones.GetLocation(p.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile).Select(p => p.CardId).ToArray();
     internal bool FactionGiftUsed(int provider) => _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is PhaseChangedEvent or TurnStartedEvent).OfType<CompletedFactionCostGiftedEvent>().Any(e => e.ProviderSeat == provider && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
     internal SkillProgramStepOutcome BeginCompletedFactionGift(ProgramSkillFrame f, string faction)

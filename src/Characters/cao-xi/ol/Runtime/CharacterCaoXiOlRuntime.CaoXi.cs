@@ -1,20 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoXiOlRuntime
 {
     internal const string CaoXiDrawReason = "skill-program.cao-xi.jianxuan.draw";
-    internal static CardConversionSource CaoXiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cao_xi_ol_CaoXi.CaoXiSource(f);
+    internal static CardConversionSource CaoXiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cao_xi_ol_CaoXi.CaoXiSource(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26810)]
     internal bool CanOfferCaoXi(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)
     {
         if (t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveGangshuAttributeIncrement))
-            return context.Window == SkillProgramTriggerWindow.CardUseCompleted && context.CardUse is { } use && use.ActorSeat == c.OwnerSeat && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(use.EffectiveKind, [SkillProgramCardCategory.Basic]) && global::CardGame.Core.EngineOwners.CharacterCaoXiOlDefinitions.CaoXiQueries.Any(q => CurrentCaoXiNumbers(c.OwnerSeat).Value(q) < 5);
+            return context.Window == SkillProgramTriggerWindow.CardUseCompleted && context.CardUse is { } use && use.ActorSeat == c.OwnerSeat && !CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(use.EffectiveKind, [SkillProgramCardCategory.Basic]) && CharacterCaoXiOlDefinitions.CaoXiQueries.Any(q => CurrentCaoXiNumbers(c.OwnerSeat).Value(q) < 5);
         if (t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveJianxuanRepeatedDraw))
             return context.Window == SkillProgramTriggerWindow.AfterDamageApplied && context.TargetSeat == c.OwnerSeat && context.Amount > 0 && context.DamageFrameId is { } id && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Any(w => w.Id == context.ParentFrameId && w.ParentFrameId == id && w.TargetSeat == c.OwnerSeat && w.TriggerWindow == SkillProgramTriggerWindow.AfterDamageApplied);
         return true;
@@ -24,7 +21,7 @@ internal sealed partial class CharacterCaoXiOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         var gangshu = op == SkillProgramEffectOp.ResolveGangshuAttributeIncrement;
-        if (f.CaoXiGangshu is not null || f.CaoXiJianxuan is not null || f.InstructionIndex != 1 || f.WindowContext is not { } c || f.SkillId != (gangshu ? "ol:gangshu" : "ol:jianxuan") || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanOfferCaoXi(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
+        if (f.CaoXiGangshu is not null || f.CaoXiJianxuan is not null || f.InstructionIndex != 1 || f.WindowContext is not { } c || f.SkillId != (gangshu ? "ol:gangshu" : "ol:jianxuan") || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanOfferCaoXi(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
             throw new InvalidOperationException("Cao Xi requires its exact completed nonbasic use or one actual positive damage instance.");
         if (gangshu)
         {
@@ -52,7 +49,7 @@ internal sealed partial class CharacterCaoXiOlRuntime
             ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture)
         };
         if (f.CaoXiGangshu is { } r)
-            return Array.AsReadOnly(global::CardGame.Core.EngineOwners.CharacterCaoXiOlDefinitions.CaoXiQueries.Where(q => r.Numbers.Value(q) < 5).Select(q => new PromptChoice(new($"cao-xi.{(f.Id)}.{(q)}"), (q == SkillRuleQuery.AttackRange ? "攻击范围" : q == SkillRuleQuery.DrawCount ? "下个摸牌阶段摸牌数" : "出牌阶段使用杀的次数上限") + $"：{(r.Numbers.Value(q))}→{(r.Numbers.Value(q) + 1)}", [], [], new Dictionary<string, string>(Params()) { ["query"] = q.ToString() })).ToArray());
+            return Array.AsReadOnly(CharacterCaoXiOlDefinitions.CaoXiQueries.Where(q => r.Numbers.Value(q) < 5).Select(q => new PromptChoice(new($"cao-xi.{(f.Id)}.{(q)}"), (q == SkillRuleQuery.AttackRange ? "攻击范围" : q == SkillRuleQuery.DrawCount ? "下个摸牌阶段摸牌数" : "出牌阶段使用杀的次数上限") + $"：{(r.Numbers.Value(q))}→{(r.Numbers.Value(q) + 1)}", [], [], new Dictionary<string, string>(Params()) { ["query"] = q.ToString() })).ToArray());
         return Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).OrderBy(p => p.Seat).Select(p => new PromptChoice(new($"cao-xi.{(f.Id)}.recipient.{(p.Seat)}"), $"令{(p.Name)}摸牌", [], [p.Seat], new Dictionary<string, string>(Params()) { ["recipient"] = p.Seat.ToString(CultureInfo.InvariantCulture) })).ToArray());
     }
 
@@ -77,7 +74,7 @@ internal sealed partial class CharacterCaoXiOlRuntime
     internal void AnswerCaoXi(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Cao Xi lost the decision owner.");
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !CaoXiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != f.OwnerSeat || !CaoXiChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Cao Xi requires its exact source-owned decision.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (f.CaoXiGangshu is { } r)
@@ -143,5 +140,5 @@ internal sealed partial class CharacterCaoXiOlRuntime
         return p.Choices.OrderByDescending(c => c.Targets is [var seat] && seat == f.OwnerSeat ? 1 : 0).ThenByDescending(c => c.Targets is [var seat] && numbers.Contains(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count + 1) ? 1 : 0).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ICaoXiProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCaoXi(f, op);
+    SkillProgramStepOutcome ICaoXiProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCaoXi(f, op);
 }

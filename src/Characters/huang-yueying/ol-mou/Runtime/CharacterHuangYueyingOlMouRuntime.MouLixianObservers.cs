@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangYueyingOlMouRuntime
@@ -37,7 +33,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         if (_resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame parent || _coreCardUseLifecycleOperations.LifecycleCardUse(parent.ParentFrameId)is not { } native || !IsIssuedMouLixianUse(native) || parent.Action.ActionId != native.Action!.ActionId || _resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame child || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count)
             return false;
         var candidate = parent.Candidates[parent.CandidateIndex];
-        return global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(child, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)) && child.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext2(parent, candidate);
+        return CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(child, CoreGameEngineCardActionsRuntime.ToSharedCandidate(candidate)) && child.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext2(parent, candidate);
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouHuangYueyingLixian)]

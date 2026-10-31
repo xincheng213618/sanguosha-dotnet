@@ -1,19 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXuRongOlRuntime
 {
     internal const string XuRongTakeReason = "program.xionghuo.random-take", XuRongClaimReason = "program.shajue2023.claim";
-    internal CardConversionSource XuRongSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource XuRongSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int XuRongPool(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].MarkerSourceCounts.GetValueOrDefault((PlayerMarkerKind.Baoli, owner));
     internal IEnumerable<XionghuoGrant> XuRongSubjectGrants(int owner, int subject) => _coreMatchParticipantsPlayersAccess._players[subject].XionghuoGrants.Where(g => g.TargetSeat == subject && g.Source.OwnerSeat == owner && LiveXionghuoSource(g));
     internal int XuRongHandLimitPenalty(CharacterState owner) => owner.XuRongRestrictions.Count(r => r.Branch == 1 && r.SubjectSeat == owner.Seat && r.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && r.ActualTurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
-    internal bool IsXuRongSlashTargetForbidden(int actor, int target, CardKind kind) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreMatchParticipantsPlayersAccess._players[actor].XuRongRestrictions.Any(r => r.Branch == 0 && r.SubjectSeat == actor && r.Source.OwnerSeat == target && r.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && r.ActualTurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
+    internal bool IsXuRongSlashTargetForbidden(int actor, int target, CardKind kind) => CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreMatchParticipantsPlayersAccess._players[actor].XuRongRestrictions.Any(r => r.Branch == 0 && r.SubjectSeat == actor && r.Source.OwnerSeat == target && r.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && r.ActualTurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 470)]
     internal void ObserveXuRongTurnExpiry(IGameEvent payload)
     {
@@ -207,5 +202,5 @@ internal sealed partial class CharacterXuRongOlRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IXuRongProgramHost.ExecuteXuRong(SkillProgramEffectOp op, ProgramSkillFrame frame) => ExecuteXuRong(op, frame);
+    SkillProgramStepOutcome IXuRongProgramHost.ExecuteXuRong(SkillProgramEffectOp op, ProgramSkillFrame frame) => ExecuteXuRong(op, frame);
 }

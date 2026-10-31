@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
@@ -26,7 +23,7 @@ internal sealed partial class CoreProgramShanheSourceZhaoranRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (!IsShanheSourceZhaoranMode || frame.SkillId != ShanheSourceZhaoranSkill || frame.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting } context || context.OwnerSeat != frame.OwnerSeat || context.TargetSeat != frame.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != frame.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId <= 0 || ActiveShanheSourceZhaoranArm(frame.OwnerSeat)is not null)
             throw new InvalidOperationException("Source Zhaoran must arm once on its owner's exact actual Play entry.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceZhaoranArmedEvent(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceZhaoranArmedEvent(frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId));
     }
 
     internal void CaptureShanheSourceZhaoranSuitLosses(CardMovementBatchContext batch)
@@ -58,13 +55,13 @@ internal sealed partial class CoreProgramShanheSourceZhaoranRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var loss = EligibleShanheSourceZhaoranSuit(frame.OwnerSeat, frame.SkillInstanceId, frame.WindowContext);
-        if (frame.SkillId != ShanheSourceZhaoranSkill || loss is null || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not CardsMovedTriggerWindowFrame window || frame.WindowContext?.ParentFrameId != window.Id || window.Batch.Id != loss.BatchId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]))
+        if (frame.SkillId != ShanheSourceZhaoranSkill || loss is null || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not CardsMovedTriggerWindowFrame window || frame.WindowContext?.ParentFrameId != window.Id || window.Batch.Id != loss.BatchId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex]))
             throw new InvalidOperationException("Source Zhaoran lost its exact first last-suit batch and original movement owner.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceZhaoranSuitClaimedEvent(frame.Id, loss.ArmFrameId, frame.OwnerSeat, loss.BatchId, loss.MovementIndex, loss.Suit));
     }
 
-    void global::CardGame.Core.IShanheSourceZhaoranHost.Arm(ProgramSkillFrame frame) => ArmShanheSourceZhaoran(frame);
-    void global::CardGame.Core.IShanheSourceZhaoranHost.ClaimSuit(ProgramSkillFrame frame) => ClaimShanheSourceZhaoranSuit(frame);
+    void IShanheSourceZhaoranHost.Arm(ProgramSkillFrame frame) => ArmShanheSourceZhaoran(frame);
+    void IShanheSourceZhaoranHost.ClaimSuit(ProgramSkillFrame frame) => ClaimShanheSourceZhaoranSuit(frame);
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 200)]
     internal CardMovementBatchContext CompleteMovementBatchCaptureShanheSourceZhaoranSuitLosses(CardMovementBatchBuilder batch, CardMovementBatchContext completed)
     {

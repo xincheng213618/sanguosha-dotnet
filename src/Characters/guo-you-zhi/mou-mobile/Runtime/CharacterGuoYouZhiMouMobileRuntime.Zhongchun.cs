@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoYouZhiMouMobileRuntime
 {
     internal bool ExactMouGyzEndingParent(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } c && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is TurnEndingBoundaryFrame p && p.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && p.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && c.SourceSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && c.TargetSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count && p.Items[p.ItemIndex].Candidate is { } candidate && candidate.OwnerSeat == f.OwnerSeat && candidate.SkillId == f.SkillId && candidate.SkillInstanceId == f.SkillInstanceId && candidate.BindingId == f.TriggerId && candidate.GameplayHash == f.GameplayHash;
-    internal IReadOnlyList<int> MouGyzDiscardCards(int actor, int turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.TurnNumber == turn && e.ExecutorSeat == actor).SelectMany(e => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > e.SequenceBefore && m.Sequence <= e.SequenceAfter && m.To == CardLocation.DiscardPile && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is { } from && global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(from) && (m.Reason == e.Reason || m.Reason.Value == e.Reason.Value + "-finished" || m.Reason.Value == e.Reason.Value + "-discard"))).Where(m => _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile).OrderBy(m => m.Sequence).Select(m => m.CardId).Distinct().ToArray();
+    internal IReadOnlyList<int> MouGyzDiscardCards(int actor, int turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.TurnNumber == turn && e.ExecutorSeat == actor).SelectMany(e => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > e.SequenceBefore && m.Sequence <= e.SequenceAfter && m.To == CardLocation.DiscardPile && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is { } from && CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(from) && (m.Reason == e.Reason || m.Reason.Value == e.Reason.Value + "-finished" || m.Reason.Value == e.Reason.Value + "-discard"))).Where(m => _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile).OrderBy(m => m.Sequence).Select(m => m.CardId).Distinct().ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 32401, SkillProgramEffectOp.ResolveMouGuoYouZhiZhongchun)]
     internal bool CanOfferMouGyzEnding(ProgramTriggerLegalityContext gate) => _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat].IsAlive && (gate.WindowContext?.SourceSeat is not { } actor || actor == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat) && MouGyzDiscardCards(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber).Count > 0;
     internal void PayMouGyzObtain(ProgramSkillFrame f, int cardId)
@@ -31,8 +28,8 @@ internal sealed partial class CharacterGuoYouZhiMouMobileRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat];
         if (r.Stage == MouGuoYouZhiStage.GiftChoice)
         {
-            var candidates = p.Choices.Where(c => c.Cards.Count == 1 && !r.Selected.Contains(c.Cards[0])).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), actor)).ToArray();
-            return r.Selected.Count < 3 && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(actor, _coreMatchParticipantsPlayersAccess._players[r.ActorSeat]) && candidates.Length > 0 && global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(candidates[0].Cards[0]), actor) < 5 ? candidates[0] : p.Choices.Single(c => c.Parameters["branch"] == "gift-confirm");
+            var candidates = p.Choices.Where(c => c.Cards.Count == 1 && !r.Selected.Contains(c.Cards[0])).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), actor)).ToArray();
+            return r.Selected.Count < 3 && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(actor, _coreMatchParticipantsPlayersAccess._players[r.ActorSeat]) && candidates.Length > 0 && CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(candidates[0].Cards[0]), actor) < 5 ? candidates[0] : p.Choices.Single(c => c.Parameters["branch"] == "gift-confirm");
         }
 
         if (r.Stage == MouGuoYouZhiStage.AdjustChoice)
@@ -40,11 +37,11 @@ internal sealed partial class CharacterGuoYouZhiMouMobileRuntime
         if (r.Stage == MouGuoYouZhiStage.AdjustDiscard)
         {
             var confirm = p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "discard-confirm");
-            return confirm ?? p.Choices.Where(c => c.Cards.Count == 1 && !r.Selected.Contains(c.Cards[0])).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), actor)).First();
+            return confirm ?? p.Choices.Where(c => c.Cards.Count == 1 && !r.Selected.Contains(c.Cards[0])).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), actor)).First();
         }
 
         if (r.Stage == MouGuoYouZhiStage.DiscardChoice)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(actor, _coreMatchParticipantsPlayersAccess._players[r.ActorSeat]) ? p.Choices.Where(c => c.Cards.Count == 1).OrderByDescending(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[r.ActorSeat])).FirstOrDefault() ?? p.Choices.Last() : p.Choices.Last();
+            return CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(actor, _coreMatchParticipantsPlayersAccess._players[r.ActorSeat]) ? p.Choices.Where(c => c.Cards.Count == 1).OrderByDescending(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[r.ActorSeat])).FirstOrDefault() ?? p.Choices.Last() : p.Choices.Last();
         if (r.Stage == MouGuoYouZhiStage.UseChoice)
         {
             var actions = MouGyzNativeActions(f);
@@ -55,7 +52,7 @@ internal sealed partial class CharacterGuoYouZhiMouMobileRuntime
                 var a = actions[int.Parse(c.Parameters["option"], CultureInfo.InvariantCulture)];
                 var harmful = a.Kind is LegalActionKind.Slash or LegalActionKind.Duel or LegalActionKind.FireAttack or LegalActionKind.Snatch or LegalActionKind.Dismantlement or LegalActionKind.UnexpectedAssault or LegalActionKind.BorrowedSword;
                 if (harmful)
-                    return a.TargetSeats.Any(s => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(actor, _coreMatchParticipantsPlayersAccess._players[s])) ? -20 : 10;
+                    return a.TargetSeats.Any(s => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(actor, _coreMatchParticipantsPlayersAccess._players[s])) ? -20 : 10;
                 return 5;
             }
 

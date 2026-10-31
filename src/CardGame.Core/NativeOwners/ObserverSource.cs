@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ObserverSource(global::System.Func<global::System.Action<global::CardGame.Core.GameSnapshot>?> getAction, global::System.Func<global::System.Action<global::CardGame.Core.GameLogEntry>?> getAction2, global::System.Func<global::System.Action<global::CardGame.Core.AiThoughtRecord>?> getAction3, global::System.Func<global::System.Action<global::CardGame.Core.AiGeneralThought>?> getAction4, global::System.Func<global::System.Action<global::CardGame.Core.CardMovementRecord>?> getAction5, global::System.Func<global::System.Action<global::CardGame.Core.EventEnvelope>?> getAction6, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterSimaYiMouEntries> getCharacterSimaYiMouRuntime, global::CardGame.Core.EngineStates.CoreCommandJournalStorageState commandJournalStorageState) : IObserverSource
+internal sealed class ObserverSource(Func<Action<GameSnapshot>?> getAction, Func<Action<GameLogEntry>?> getAction2, Func<Action<AiThoughtRecord>?> getAction3, Func<Action<AiGeneralThought>?> getAction4, Func<Action<CardMovementRecord>?> getAction5, Func<Action<EventEnvelope>?> getAction6, Func<RuntimeEntries.CharacterSimaYiMouEntries> getCharacterSimaYiMouRuntime, EngineStates.CoreCommandJournalStorageState commandJournalStorageState) : IObserverSource
 {
     public Action<GameSnapshot>? StateChanged => getAction();
     public Action<GameLogEntry>? LogAdded => getAction2();

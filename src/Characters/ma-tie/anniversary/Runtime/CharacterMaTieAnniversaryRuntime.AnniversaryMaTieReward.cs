@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaTieAnniversaryRuntime
@@ -41,7 +37,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
 
     internal bool MaTieCardParent(ProgramSkillFrame f, SkillProgramTriggerWindow window)
     {
-        if (f.ActivationId != f.TriggerId || f.WindowContext is not { } c || MaTieCardWindow(c, window)is null || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) || f.WindowContext != _coreCardActionsOperations.CreateCardActionProgramContext2(parent, parent.Candidates[parent.CandidateIndex]))
+        if (f.ActivationId != f.TriggerId || f.WindowContext is not { } c || MaTieCardWindow(c, window)is null || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) || f.WindowContext != _coreCardActionsOperations.CreateCardActionProgramContext2(parent, parent.Candidates[parent.CandidateIndex]))
             return false;
         return true;
     }
@@ -102,6 +98,6 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         var grants = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaTieDistanceEvent>().Where(e => e.Source.OwnerSeat == source.Seat && e.Target == target.Seat && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Source.SkillId == AnniversaryMaTieComposition.Zhuiji && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.Hash && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(b => b.FrameId == e.FrameId && b.OwnerSeat == e.Source.OwnerSeat && b.SkillId == e.Source.SkillId && b.SkillInstanceId == e.Source.SkillInstanceId && b.BindingId == e.Source.BindingId && b.Window == SkillProgramTriggerWindow.CardUseCompleted) == 1).ToArray();
         if (grants.Length == 0)
             return original;
-        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-anniversary-zhuiji", global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"anniversary-zhuiji:{(g.FrameId)}:{(g.Target)}", SkillRuleOperation.Set, 1)).ToArray());
+        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-anniversary-zhuiji", CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"anniversary-zhuiji:{(g.FrameId)}:{(g.Target)}", SkillRuleOperation.Set, 1)).ToArray());
     }
 }

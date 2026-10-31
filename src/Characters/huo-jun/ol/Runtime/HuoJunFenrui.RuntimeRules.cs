@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_huo_jun_ol_HuoJunFenrui
 {
     internal static string HuoJunSlotName(EquipmentSlot s) => s switch {

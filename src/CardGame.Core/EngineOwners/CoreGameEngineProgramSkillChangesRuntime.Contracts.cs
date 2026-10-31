@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreProgramSkillChangesProgramSkillChangeOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreProgramSkillChangesProgramSkillChangeOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramSkillChangeRuntime Get();
+    ProgramSkillChangeRuntime Get();
 }

@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSourceBeigongChildrenRuntime
 {
     internal bool SourceBeigongFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineSourceBeigongRuntime.HasSourceBeigongState(f))
+        if (!CoreGameEngineSourceBeigongRuntime.HasSourceBeigongState(f))
             return false;
         if (child is CardUseFrame use)
             return _coreSourceDingxiNativeOperations.SourceDingxiUseRidesOn(f, use);
@@ -19,7 +15,7 @@ internal sealed partial class CoreGameEngineSourceBeigongChildrenRuntime
         {
             var before = f.SourceDingxi?.Before ?? f.SourceHuojie?.Before ?? f.SourceXingxia?.Before ?? -1;
             var after = f.SourceDingxi?.After ?? f.SourceHuojie?.After ?? f.SourceXingxia?.After ?? -1;
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && (moved.Batch.ParentFrameId == f.Id && m.Sequence > before && m.Sequence <= after || f.SourceHuojie is { Stage: SourceHuojieStage.JudgmentChildren } h && moved.Batch.ParentFrameId == h.JudgmentId && m.Sequence == h.JudgmentHandoffSequence && m.CardId == h.JudgmentCardId && m.From == CardLocation.Judgment(f.OwnerSeat) && m.To == CardLocation.Processing && m.Reason.Value == "skill-program.judgment.result"));
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && (moved.Batch.ParentFrameId == f.Id && m.Sequence > before && m.Sequence <= after || f.SourceHuojie is { Stage: SourceHuojieStage.JudgmentChildren } h && moved.Batch.ParentFrameId == h.JudgmentId && m.Sequence == h.JudgmentHandoffSequence && m.CardId == h.JudgmentCardId && m.From == CardLocation.Judgment(f.OwnerSeat) && m.To == CardLocation.Processing && m.Reason.Value == "skill-program.judgment.result"));
         }
 
         if (f.AttackAttempt is { } attack && f.AttackReturn is not null && SourceBeigongOwnAttack(f, attack))
@@ -54,7 +50,7 @@ internal sealed partial class CoreGameEngineSourceBeigongChildrenRuntime
     }
 
     internal bool SourceBeigongJudgmentEdge(int i) => i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is JudgmentFrame j && _coreSourceHuojieOperations.IsSourceHuojieLightningJudgment(j) && _resolutionStackOperations._resolutionStack[i] is ProgramJudgmentTriggerWindowFrame window && window.ParentFrameId == j.Id && window.Judgment.JudgmentFrameId == j.Id;
-    internal bool SourceBeigongEdge(int i) => SourceBeigongJudgmentEdge(i) || _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && SourceBeigongFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]);
+    internal bool SourceBeigongEdge(int i) => SourceBeigongJudgmentEdge(i) || _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && SourceBeigongFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]);
     internal bool SourceBeigongSuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => this.SourceBeigongEdge(i), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? SourceBeigongRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.SourceBeigongFirstChild(f, c), (n) => this.SourceBeigongSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 24510)]

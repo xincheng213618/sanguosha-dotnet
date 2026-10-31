@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouYuHappyGodRuntime
 {
     internal const string HappyQinyin = "happy:qinyin";
-    internal static CardConversionSource HappyZySource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource HappyZySource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal (NativeLogicalDiscardInvocationRecordedEvent Invocation, NativeLogicalDiscardMaterialCompletedEvent Material)? HappyZyDiscard(int owner)
     {
         foreach (var invocation in _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.ActualTurnOwnerSeat == owner && e.ExecutorSeat == owner && e.HandCount > 0))
@@ -20,7 +16,7 @@ internal sealed partial class CharacterZhouYuHappyGodRuntime
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 41440, SkillProgramEffectOp.ResolveHappyZhouYuQinyin)]
     internal bool CanOfferHappyZy(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => c.SkillId == HappyQinyin && w.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && c.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Discard && HappyZyDiscard(c.OwnerSeat)is not null;
-    SkillProgramStepOutcome global::CardGame.Core.IHappyZhouYuHost.Begin(ProgramSkillFrame f) => BeginHappyZy(f);
+    SkillProgramStepOutcome IHappyZhouYuHost.Begin(ProgramSkillFrame f) => BeginHappyZy(f);
     internal SkillProgramStepOutcome BeginHappyZy(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -64,7 +60,7 @@ internal sealed partial class CharacterZhouYuHappyGodRuntime
     [ProgramAnswer("happy-qinyin")]
     internal void AnswerHappyZy(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyZhouYu: { Stage: HappyZyStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HappyZyChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyZhouYu: { Stage: HappyZyStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HappyZyChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Happy Qinyin requires its exact original three-way choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var mode = choice.Parameters["mode"];

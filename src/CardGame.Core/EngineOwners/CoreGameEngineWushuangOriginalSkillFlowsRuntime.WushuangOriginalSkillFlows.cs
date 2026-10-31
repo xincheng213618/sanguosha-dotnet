@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangOriginalSkillFlowsRuntime
@@ -77,7 +73,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillFlowsRuntime
             _coreWushuangOriginalSkillsOperations.PublishWushuangOriginalChoice(f, hand.SelectMany(h => top.Select(d => _coreWushuangOriginalSkillsOperations.WushuangOriginalChoice(f, "guanxu-exchange", $"以手牌【{(_coreAdvancedLifecycleOperations.GetAdvancedCard(h).DisplayName)}】交换牌堆【{(_coreAdvancedLifecycleOperations.GetAdvancedCard(d).DisplayName)}】", [h, d], [r.Target]))).Append(_coreWushuangOriginalSkillsOperations.WushuangOriginalChoice(f, "finish", "观看完毕，不交换")).ToArray());
             return;
         }
-        var triples = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.Target]).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(r.Target, c, CardLocation.Hand(r.Target), OwnedCardMoveIntent.Discard)).GroupBy(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[r.Target], c)).SelectMany(group => global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.EnumerateCardCombinations(group.ToArray(), 3));
+        var triples = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.Target]).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(r.Target, c, CardLocation.Hand(r.Target), OwnedCardMoveIntent.Discard)).GroupBy(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[r.Target], c)).SelectMany(group => CoreGameEngineCardConversionsRuntime.EnumerateCardCombinations(group.ToArray(), 3));
         _coreWushuangOriginalSkillsOperations.PublishWushuangOriginalChoice(f, triples.Select(cards => _coreWushuangOriginalSkillsOperations.WushuangOriginalChoice(f, "guanxu-discard", "弃置三张同花色手牌：" + string.Join('、', cards.Select(c => c.DisplayName)), cards.Select(c => c.Id).ToArray(), [r.Target])).ToArray());
     }
 

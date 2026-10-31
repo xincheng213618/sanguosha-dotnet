@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSequentialDeckKindGrowthRuntime
 {
-    internal static CardConversionSource SequentialDeckKindGrowthSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SequentialDeckKindGrowth.SequentialDeckKindGrowthSource(frame);
-    internal static string SequentialDeckKindGrowthReason(long frameId, int step) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SequentialDeckKindGrowth.SequentialDeckKindGrowthReason(frameId, step);
+    internal static CardConversionSource SequentialDeckKindGrowthSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_Core_SequentialDeckKindGrowth.SequentialDeckKindGrowthSource(frame);
+    internal static string SequentialDeckKindGrowthReason(long frameId, int step) => RuntimeSkills.RuntimeRules_Core_SequentialDeckKindGrowth.SequentialDeckKindGrowthReason(frameId, step);
     internal bool HasSequentialDeckKindGrowthParent(ProgramSkillFrame frame)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-        return index > 0 && frame.TriggerId is not null && frame.InstructionIndex == 1 && frame.SelectedCardIds.Count == 0 && frame.SelectedTargetSeats.Count == 0 && frame.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context && context.OwnerSeat == frame.OwnerSeat && context.SourceSeat == frame.OwnerSeat && context.TargetSeat == frame.OwnerSeat && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame parent && parent.Id == context.ParentFrameId && parent.OwnerSeat == frame.OwnerSeat && parent.Window == context.Window && parent.Continuation == ProgramLifecycleContinuation.NormalTurnStart && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]) && AcquireDeckKindSequentiallyAndGrowOnShortfallDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(frame));
+        return index > 0 && frame.TriggerId is not null && frame.InstructionIndex == 1 && frame.SelectedCardIds.Count == 0 && frame.SelectedTargetSeats.Count == 0 && frame.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context && context.OwnerSeat == frame.OwnerSeat && context.SourceSeat == frame.OwnerSeat && context.TargetSeat == frame.OwnerSeat && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame parent && parent.Id == context.ParentFrameId && parent.OwnerSeat == frame.OwnerSeat && parent.Window == context.Window && parent.Continuation == ProgramLifecycleContinuation.NormalTurnStart && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]) && AcquireDeckKindSequentiallyAndGrowOnShortfallDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(frame));
     }
 
     internal SkillProgramStepOutcome AcquireDeckKindSequentiallyAndGrowOnShortfall(ProgramSkillFrame supplied, SkillProgramEffect effect)
@@ -103,7 +99,7 @@ internal sealed partial class CoreGameEngineSequentialDeckKindGrowthRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 1244)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1244)]
     internal bool CanContinueSequentialDeckKindGrowth(ProgramSkillFrame frame) => frame.SequentialDeckKindGrowth is { Steps.Count: > 0 } && ValidSequentialDeckKindGrowth(frame);
-    internal static bool SameSequentialDeckKindGrowthStep(SequentialDeckKindGrowthStepReceipt left, SequentialDeckKindGrowthStepReceipt right) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SequentialDeckKindGrowth.SameSequentialDeckKindGrowthStep(left, right);
+    internal static bool SameSequentialDeckKindGrowthStep(SequentialDeckKindGrowthStepReceipt left, SequentialDeckKindGrowthStepReceipt right) => RuntimeSkills.RuntimeRules_Core_SequentialDeckKindGrowth.SameSequentialDeckKindGrowthStep(left, right);
     internal bool ValidSequentialDeckKindGrowthStep(long frameId, int owner, CardKind kind, SequentialDeckKindGrowthStepReceipt step)
     {
         if (step.Index < 0 || step.BatchId <= 0 || step.SequenceBefore < 0 || step.SequenceAfter < step.SequenceBefore || step.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || step.ActualObtained is < 0 or > 1 || _coreAdvancedLifecycleOperations.GetAdvancedCard(step.CardId).Kind != kind || !step.Movements.SequenceEqual(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > step.SequenceBefore && move.Sequence <= step.SequenceAfter)) || step.Movements.Any(move => move.CardId != step.CardId || move.CardKind != kind || move.From != CardLocation.DrawPile || move.Reason.Value != SequentialDeckKindGrowthReason(frameId, step.Index)) || step.Movements.Count(move => move.To == CardLocation.Hand(owner)) != step.ActualObtained)
@@ -152,7 +148,7 @@ internal sealed partial class CoreGameEngineSequentialDeckKindGrowthRuntime
         return events.Aggregate(0, (sum, item) => checked(sum + item.Amount));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISequentialDeckKindGrowthHost.AcquireDeckKindSequentiallyAndGrowOnShortfall(ProgramSkillFrame frame, SkillProgramEffect effect) => AcquireDeckKindSequentiallyAndGrowOnShortfall(frame, effect);
+    SkillProgramStepOutcome ISequentialDeckKindGrowthHost.AcquireDeckKindSequentiallyAndGrowOnShortfall(ProgramSkillFrame frame, SkillProgramEffect effect) => AcquireDeckKindSequentiallyAndGrowOnShortfall(frame, effect);
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeContributions, 10)]
-    internal void AddSequentialDeckKindGrowthBonusAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{(player.Seat)}:sequential-deck-shortfall:attack-range", SequentialDeckKindGrowthBonus(player.Seat));
+    internal void AddSequentialDeckKindGrowthBonusAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{(player.Seat)}:sequential-deck-shortfall:attack-range", SequentialDeckKindGrowthBonus(player.Seat));
 }

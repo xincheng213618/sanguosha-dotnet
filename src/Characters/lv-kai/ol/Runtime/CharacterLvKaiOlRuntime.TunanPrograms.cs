@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLvKaiOlRuntime
@@ -107,7 +103,7 @@ internal sealed partial class CharacterLvKaiOlRuntime
         var card = ReadTunanRevealedCard(active.CardSetBindings.SingleOrDefault(item => item.Name == effect.SourceBind!)) ?? throw new InvalidOperationException("The Tunan revealed card left the processing zone.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var asSlash = selected.Parameters.GetValueOrDefault("branch") == "slash";
-        var resolutionId = _coreNativeCardUseOperations.BeginCardUse(card, user, [victim], playedCardKind: asSlash ? CardKind.Slash : null, conversionSource: asSlash ? new CardConversionSource(active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), user, active.SkillInstanceId) : null);
+        var resolutionId = _coreNativeCardUseOperations.BeginCardUse(card, user, [victim], playedCardKind: asSlash ? CardKind.Slash : null, conversionSource: asSlash ? new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), user, active.SkillInstanceId) : null);
         _coreNativeCardUseFramesOperations.SetCardUseStep(resolutionId, ResolutionFrameStep.ResolvingEffect);
         var action = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Last(use => use.Id == resolutionId).Action ?? throw new InvalidOperationException("The Tunan slash lost its action context.");
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(resolutionId, user, victim, card: asSlash ? null : card, damageAmount: 1, playedCardKind: CardKind.Slash, physicalCards: asSlash ? null : [card], programSkillCardUseFrameId: frame.Id);

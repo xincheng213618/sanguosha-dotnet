@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuBanOlRuntime
 {
     internal bool HasHuBanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveHuiyunCompletedFireAttack);
 
-    internal static CardConversionSource HuiyunSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hu_ban_ol_HuiyunLedger.HuiyunSource(f);
+    internal static CardConversionSource HuiyunSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_hu_ban_ol_HuiyunLedger.HuiyunSource(f);
     internal void IssueHuiyunUse(long id, CardActionContext? a)
     {
         if (!HasHuBanCapability || a is not { Type: CardActionType.Use, EffectiveKind: CardKind.FireAttack } || a.ConversionChain.SingleOrDefault(s => s.SkillId == "ol:huiyun" && s.BindingId == "huiyun-fire-attack")is not { } source)

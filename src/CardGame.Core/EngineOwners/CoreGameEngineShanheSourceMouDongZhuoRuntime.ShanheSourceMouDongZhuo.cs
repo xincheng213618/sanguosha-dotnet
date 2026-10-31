@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 using CardGame.Core.Campaigns;
 
@@ -14,8 +11,8 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoRuntime
     internal const string SourceMouCost = "skill.shanhe-source-mou.discard", SourceMouGift = "skill.shanhe-source-mou.give";
     internal bool IsSourceMouMode => _coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._modeDefinition.Id == ShanheBattleSetup.BattleModeId && _coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._options.ShanheBattle is not null;
 
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceMouHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => StartSourceMou(frame, operation);
-    internal CardConversionSource SourceMouSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IShanheSourceMouHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => StartSourceMou(frame, operation);
+    internal CardConversionSource SourceMouSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal ShanheSourceMouCard SourceMouCard(int seat, Card card, CardLocation from, bool effective) => new(card.Id, card.Kind, card.Suit, card.Rank, effective ? _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], card) : card.Suit, from);
     internal ShanheSourceMouCard[] SourceMouDiscardable(int seat, bool handOnly = false) => (handOnly ? new[]
     {
@@ -35,9 +32,9 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoRuntime
             return false;
         return _resolutionStackOperations._resolutionStack[index - 1] switch
         {
-            ProgramLifecycleTriggerWindowFrame p => p.Window == w.Window && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]),
-            PlayPhaseStartingBoundaryFrame p => p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count && p.Items[p.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate),
-            ProgramCardTriggerWindowFrame p => w.CardUse is { } use && p.Action.ActionId == use.CardActionId && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(p.Candidates[p.CandidateIndex])),
+            ProgramLifecycleTriggerWindowFrame p => p.Window == w.Window && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]),
+            PlayPhaseStartingBoundaryFrame p => p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count && p.Items[p.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate),
+            ProgramCardTriggerWindowFrame p => w.CardUse is { } use && p.Action.ActionId == use.CardActionId && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(p.Candidates[p.CandidateIndex])),
             _ => false
         };
     }
@@ -255,7 +252,7 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoRuntime
     {
         // A real discard/gain invoice owns its movement continuation. Atomic
         // HP loss/maximum changes without that invoice return to the program.
-        var continuation = global::CardGame.Core.EngineOwners.CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(f) ? PostEventContinuation.AwaitedProgramMovement : PostEventContinuation.Program;
+        var continuation = CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(f) ? PostEventContinuation.AwaitedProgramMovement : PostEventContinuation.Program;
         return _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, continuation) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, continuation) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
     }
 
@@ -379,9 +376,9 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoRuntime
             if (selfDying && finish is not null)
                 return finish;
             var available = SourceMouDiscardPile();
-            return decision.Choices.Where(choice => choice.Cards.Count == 1).OrderByDescending(choice => available.Count(card => card.Suit == available.Single(picked => picked.Id == choice.Cards[0]).Suit)).ThenBy(choice => selfDying ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : -global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? finish ?? decision.Choices.First();
+            return decision.Choices.Where(choice => choice.Cards.Count == 1).OrderByDescending(choice => available.Count(card => card.Suit == available.Single(picked => picked.Id == choice.Cards[0]).Suit)).ThenBy(choice => selfDying ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : -CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? finish ?? decision.Choices.First();
         }
 
-        return decision.Choices.Where(choice => choice.Cards.Count > 0).OrderBy(choice => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat])).FirstOrDefault() ?? decision.Choices.First();
+        return decision.Choices.Where(choice => choice.Cards.Count > 0).OrderBy(choice => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat])).FirstOrDefault() ?? decision.Choices.First();
     }
 }

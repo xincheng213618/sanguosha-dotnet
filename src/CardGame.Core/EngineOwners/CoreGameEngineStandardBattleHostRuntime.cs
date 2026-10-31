@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineStandardBattleHostRuntime
 {
-    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelCreateStandardBattleHostOperations _kernelCoreGameEngineStandardBattleHostOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
-    internal CoreGameEngineStandardBattleHostRuntime(global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.EngineOwners.IKernelCreateStandardBattleHostOperations kernelCoreGameEngineStandardBattleHostOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess)
+    private readonly IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly IKernelCreateStandardBattleHostOperations _kernelCoreGameEngineStandardBattleHostOperations;
+    private readonly EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    internal CoreGameEngineStandardBattleHostRuntime(IKernelContentRegistryAccess contentRegistryOperations, IKernelCreateStandardBattleHostOperations kernelCoreGameEngineStandardBattleHostOperations, EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess)
     {
         this._contentRegistryOperations = contentRegistryOperations;
         this._kernelCoreGameEngineStandardBattleHostOperations = kernelCoreGameEngineStandardBattleHostOperations;

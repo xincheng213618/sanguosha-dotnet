@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeFireAttackRuntime
@@ -136,11 +132,11 @@ internal sealed partial class CoreNativeFireAttackRuntime
         return _cardZonesOperations._cardZones.CardsAt(location).Single(card => card.Id == revealedCardId);
     }
 
-    internal static int GetFireAttackTargetSeat(CardUseFrame pending) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.GetFireAttackTargetSeat(pending);
+    internal static int GetFireAttackTargetSeat(CardUseFrame pending) => RuntimeSkills.RuntimeRules_Core_CommonRules.GetFireAttackTargetSeat(pending);
     internal Card GetFireAttackEffectCard(CardUseFrame pending) => _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(pending.Id, pending.CardId, requireProcessing: true);
     internal CardUseFrame SetFireAttackSelection(long frameId, FireAttackSelectionState? selection)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame cardUse || cardUse.Id != frameId || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(cardUse) != CardKind.FireAttack || (selection is null && cardUse.FireAttackSelection is null) || (selection is not null && cardUse.TargetIndex >= cardUse.TargetSeats.Count))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame cardUse || cardUse.Id != frameId || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(cardUse) != CardKind.FireAttack || (selection is null && cardUse.FireAttackSelection is null) || (selection is not null && cardUse.TargetIndex >= cardUse.TargetSeats.Count))
         {
             throw new InvalidOperationException("FireAttack selection lost its current CardUse frame.");
         }

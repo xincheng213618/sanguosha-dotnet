@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSourceCursesRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CoreGameEngineSourceCursesRuntime
     internal SourceCurseDeposit? SourceCurseAt(int seat) => _coreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses.SingleOrDefault(c => c.TargetSeat == seat && _cardZonesOperations._cardZones.GetLocation(c.CardId) == c.Location);
     internal long SourceCurseMovementSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static bool SameSourceCurse(SourceCurseDeposit a, SourceCurseDeposit b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_SourceCurses.SameSourceCurse(a, b);
+    internal static bool SameSourceCurse(SourceCurseDeposit a, SourceCurseDeposit b) => RuntimeSkills.RuntimeRules_Core_SourceCurses.SameSourceCurse(a, b);
     internal IReadOnlyList<SourceCurseSnapshot>? CreateSourceCurseSnapshots(int seat)
     {
         var cards = _coreGameEngineSourceCursesSourceCurseLossesSourceCursesAccess._sourceCurses.Where(c => c.TargetSeat == seat).Select(c => new SourceCurseSnapshot(c.Source.OwnerSeat, c.ActualDrawCount, _coreSnapshotValueProjectionOperations.ToSnapshot(_cardZonesOperations._cardZones.CardsAt(c.Location).Single(card => card.Id == c.CardId)))).ToArray();
@@ -44,7 +40,7 @@ internal sealed partial class CoreGameEngineSourceCursesRuntime
         return card;
     }
 
-    internal static bool MatchesSourceCurseCard(SourceCurseDeposit curse, CardActionContext action, SkillProgramEffect effect) => effect.SourceCurseMatchSuit == true ? action.EffectiveSuit is { } suit && suit != Suit.None && suit == curse.PrintedSuit : action.EffectiveIsRed is { } color && global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(curse.PrintedSuit) == color;
+    internal static bool MatchesSourceCurseCard(SourceCurseDeposit curse, CardActionContext action, SkillProgramEffect effect) => effect.SourceCurseMatchSuit == true ? action.EffectiveSuit is { } suit && suit != Suit.None && suit == curse.PrintedSuit : action.EffectiveIsRed is { } color && CoreGameEnginePublicPileColorsRuntime.SuitColor(curse.PrintedSuit) == color;
     internal SourceCurseDeposit? EligibleSourceCurseUse(int owner, string skill, string instance, CardActionContext action, SkillProgramEffect effect)
     {
         if (action.Type != CardActionType.Use || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[owner], skill, instance))
@@ -77,7 +73,7 @@ internal sealed partial class CoreGameEngineSourceCursesRuntime
             return false;
         if (trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.DrawForSourceCurseUse))
         {
-            if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.SourceCurseUse is not { } frozen || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.Action.ActionId != frozen.ActionId || parent.Action.ActorSeat != frozen.ActorSeat || parent.Action.EffectiveIsRed != frozen.EffectiveIsRed || parent.Action.Type != CardActionType.Use || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex]) != candidate)
+            if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.SourceCurseUse is not { } frozen || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.Action.ActionId != frozen.ActionId || parent.Action.ActorSeat != frozen.ActorSeat || parent.Action.EffectiveIsRed != frozen.EffectiveIsRed || parent.Action.Type != CardActionType.Use || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex]) != candidate)
                 return false;
             var current = EligibleSourceCurseUse(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, parent.Action, trigger.Effects.Single());
             return current is not null && SameSourceCurse(current, frozen.Deposit) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SourceCurseDrawIssuedEvent>().Any(e => e.Deposit.DepositFrameId == current.DepositFrameId && e.ActionId == frozen.ActionId);
@@ -135,7 +131,7 @@ internal sealed partial class CoreGameEngineSourceCursesRuntime
 
     internal SkillProgramStepOutcome DrawSourceCurse(ProgramSkillFrame f, SkillProgramEffect effect)
     {
-        if (f.WindowContext is not { SourceCurseUse: { } identity } context || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CanRunSourceCurseTrigger(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex]), _coreProgramLifecycleOperations.GetProgramTrigger(f), context) || EligibleSourceCurseUse(f.OwnerSeat, f.SkillId, f.SkillInstanceId, parent.Action, effect)is not { } deposit)
+        if (f.WindowContext is not { SourceCurseUse: { } identity } context || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CanRunSourceCurseTrigger(CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex]), _coreProgramLifecycleOperations.GetProgramTrigger(f), context) || EligibleSourceCurseUse(f.OwnerSeat, f.SkillId, f.SkillInstanceId, parent.Action, effect)is not { } deposit)
             throw new InvalidOperationException("Yingbing lost its original genuine use, exact curse and independent locked source.");
         var before = SourceCurseMovementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SourceCurseReceipt = new() { InstructionIndex = f.InstructionIndex, Stage = SourceCurseStage.DrawChildren, Deposit = deposit, ActionId = identity.ActionId, OriginalParentId = parent.Id, Before = before, After = before, ActualTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -234,5 +230,5 @@ internal sealed partial class CoreGameEngineSourceCursesRuntime
 
     internal SkillProgramEffect? SourceCursePausedEffect(ProgramSkillFrame f) => f.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
     internal bool IsSourceCurseMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => f.SourceCurseReceipt is { Stage: not SourceCurseStage.LossHpChildren } r && r.InstructionIndex == f.InstructionIndex && effect == SourceCursePausedEffect(f) && effect?.Op == (r.Stage == SourceCurseStage.DepositChildren ? SkillProgramEffectOp.DepositSelectedSourceCurse : SkillProgramEffectOp.DrawForSourceCurseUse) && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null;
-    SkillProgramStepOutcome global::CardGame.Core.ISourceCurseProgramHost.ExecuteSourceCurse(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteSourceCurse(effect, frame);
+    SkillProgramStepOutcome ISourceCurseProgramHost.ExecuteSourceCurse(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteSourceCurse(effect, frame);
 }

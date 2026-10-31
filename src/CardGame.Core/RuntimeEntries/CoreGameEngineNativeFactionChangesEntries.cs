@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineNativeFactionChangesRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineNativeFactionChangesRuntime))]
 internal sealed partial class CoreGameEngineNativeFactionChangesEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineNativeFactionChangesRuntime> _resolve;
-    private CoreGameEngineNativeFactionChangesEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineNativeFactionChangesRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineNativeFactionChangesRuntime> _resolve;
+    private CoreGameEngineNativeFactionChangesEntries(Func<EngineOwners.CoreGameEngineNativeFactionChangesRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineNativeFactionChangesEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineNativeFactionChangesRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineNativeFactionChangesEntries Create(Func<EngineOwners.CoreGameEngineNativeFactionChangesRuntime> resolve) => new(resolve);
 }

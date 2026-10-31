@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
-internal sealed partial class CoreProgramCapabilitiesRuntime : global::CardGame.Core.IActionCategoryGiftProgramHost, global::CardGame.Core.IConfiguredConversionProgramHost
+[Core.ProgramRuntimeModule, Core.ProgramCapability]
+internal sealed partial class CoreProgramCapabilitiesRuntime : IActionCategoryGiftProgramHost, IConfiguredConversionProgramHost
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineActionCategoryGiftsEntries _coreActionCategoryGiftsOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineConfiguredConversionsEntries _coreConfiguredConversionsOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramSkillChangesEntries _coreProgramSkillChangesOperations;
-    internal CoreProgramCapabilitiesRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineActionCategoryGiftsEntries coreActionCategoryGiftsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineConfiguredConversionsEntries coreConfiguredConversionsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramSkillChangesEntries coreProgramSkillChangesOperations)
+    private readonly RuntimeEntries.CoreGameEngineActionCategoryGiftsEntries _coreActionCategoryGiftsOperations;
+    private readonly RuntimeEntries.CoreGameEngineConfiguredConversionsEntries _coreConfiguredConversionsOperations;
+    private readonly RuntimeEntries.CoreGameEngineProgramSkillChangesEntries _coreProgramSkillChangesOperations;
+    internal CoreProgramCapabilitiesRuntime(RuntimeEntries.CoreGameEngineActionCategoryGiftsEntries coreActionCategoryGiftsOperations, RuntimeEntries.CoreGameEngineConfiguredConversionsEntries coreConfiguredConversionsOperations, RuntimeEntries.CoreGameEngineProgramSkillChangesEntries coreProgramSkillChangesOperations)
     {
         this._coreActionCategoryGiftsOperations = coreActionCategoryGiftsOperations;
         this._coreConfiguredConversionsOperations = coreConfiguredConversionsOperations;

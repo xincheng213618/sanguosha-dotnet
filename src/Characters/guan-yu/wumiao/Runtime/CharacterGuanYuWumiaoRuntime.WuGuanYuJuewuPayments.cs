@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanYuWumiaoRuntime
@@ -18,7 +14,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
         if (sources is not [var source] || action.ActorSeat != source.OwnerSeat || action.ProviderSeat != source.OwnerSeat || action.PhysicalCards is not [var cost] || use.PhysicalCardIds is not [var id] || id != cost.CardId || use.Juewu is not null || action.EffectiveRank != 2 || _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program is not { } program || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], source.SkillId, source.SkillInstanceId) || _corePlayCardHistoryOperations.ViewAsRule(source)is not { RankTwoDamageUse: true } rule || action.EffectiveKind != rule.OutputKind && !(rule.OutputKind == CardKind.Slash && action.EffectiveKind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat])))
             throw new InvalidOperationException("Juewu lost its original true-use actor, rank, output, source or single physical entity.");
         var card = _cardZonesOperations._cardZones.CardsAt(cost.From).SingleOrDefault(c => c.Id == cost.CardId);
-        if (card is null || cost.From.OwnerSeat != source.OwnerSeat || cost.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.WoodenOxGrain) || _cardZonesOperations._cardZones.GetLocation(card.Id) != cost.From || _coreAlcoholIdentityPoliciesOperations.EffectiveOwnedCardRank(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], card) != 2 || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(source.OwnerSeat, source.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineActualTurnViewAsRuntime.ActualTurnViewAsUsageId(rule), SkillUsageScope.Turn) != 1)
+        if (card is null || cost.From.OwnerSeat != source.OwnerSeat || cost.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.WoodenOxGrain) || _cardZonesOperations._cardZones.GetLocation(card.Id) != cost.From || _coreAlcoholIdentityPoliciesOperations.EffectiveOwnedCardRank(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], card) != 2 || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(source.OwnerSeat, source.SkillId, CoreGameEngineActualTurnViewAsRuntime.ActualTurnViewAsUsageId(rule), SkillUsageScope.Turn) != 1)
             throw new InvalidOperationException("Juewu must retain the exact native rank-two payment and once-paid output allowance.");
         var receipt = new JuewuUseReceipt(use.Id, action.ActionId, source, program.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, rule.OutputKind, action.EffectiveKind, card.Id, card.Kind, card.Rank, cost.From, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, cost.From == CardLocation.Hand(source.OwnerSeat) ? JuewuForeignHandEntry(source.OwnerSeat, card.Id)?.Sequence : null)
         {
@@ -59,7 +55,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             Batch = batch
         };
         var primary = batch.Id == r.PaymentBatchId;
-        if (primary && use.PaymentMovementReceipt is not null && !global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch))
+        if (primary && use.PaymentMovementReceipt is not null && !CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch))
             throw new InvalidOperationException("Juewu cannot overwrite another original native payment invoice.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { PaymentMovementReceipt = primary ? use.PaymentMovementReceipt ?? invoice : use.PaymentMovementReceipt, Juewu = r with { PaymentBatches = r.PaymentBatches.Append(invoice).OrderBy(p => p.SequenceBefore).ToArray() } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JuewuPaymentBatchIssuedEvent(use.Id, r.ActionId, batch.Id, batch.ParentBatchId, batch.Movements.Count, invoice.SequenceBefore, invoice.SequenceAfter, primary));
@@ -78,7 +74,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     internal bool IsJuewuUsePaymentBatch(CardUseFrame use, CardMovementBatchContext batch)
     {
         var issued = use.Juewu?.PaymentBatches.SingleOrDefault(receipt => receipt.Batch.Id == batch.Id);
-        return issued is not null && global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch, issued) && JuewuPaymentMaterialsMatch(use, batch) && _coreProgramEventHistoryOperations.ProgramEventHistory<JuewuPaymentBatchIssuedEvent>().Count(e => e.UseId == use.Id && e.ActionId == issued.ActionId && e.BatchId == batch.Id && e.ParentBatchId == batch.ParentBatchId && e.MaterialCount == batch.Movements.Count && e.SequenceBefore == issued.SequenceBefore && e.SequenceAfter == issued.SequenceAfter && e.Primary == (batch.Id == use.Juewu!.PaymentBatchId)) == 1;
+        return issued is not null && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch, issued) && JuewuPaymentMaterialsMatch(use, batch) && _coreProgramEventHistoryOperations.ProgramEventHistory<JuewuPaymentBatchIssuedEvent>().Count(e => e.UseId == use.Id && e.ActionId == issued.ActionId && e.BatchId == batch.Id && e.ParentBatchId == batch.ParentBatchId && e.MaterialCount == batch.Movements.Count && e.SequenceBefore == issued.SequenceBefore && e.SequenceAfter == issued.SequenceAfter && e.Primary == (batch.Id == use.Juewu!.PaymentBatchId)) == 1;
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.TrailingTail, 70)]
@@ -90,7 +86,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             return false;
         return continuation.Kind switch
         {
-            RecoveryPaidCardUseKind.CommittedSlash => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind),
+            RecoveryPaidCardUseKind.CommittedSlash => CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind),
             RecoveryPaidCardUseKind.Trick => continuation.CardId == use.CardId && continuation.ActionKind is not null && continuation.TargetSeats is { } targets && targets.SequenceEqual(use.TargetSeats) && (continuation.PlayedCardKind ?? use.CardKind) == use.CardKind,
             _ => false
         };

@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreProgramRuntimeHooksEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksRuntime> _resolve;
-    private CoreProgramRuntimeHooksEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksRuntime> resolve)
+    private readonly Func<EngineOwners.CoreProgramRuntimeHooksRuntime> _resolve;
+    private CoreProgramRuntimeHooksEntries(Func<EngineOwners.CoreProgramRuntimeHooksRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreProgramRuntimeHooksEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksRuntime> resolve) => new(resolve);
+    internal static CoreProgramRuntimeHooksEntries Create(Func<EngineOwners.CoreProgramRuntimeHooksRuntime> resolve) => new(resolve);
 }

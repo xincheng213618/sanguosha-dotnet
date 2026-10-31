@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
 {
     internal const string ShiDaTuntian = "mobile:shi-tuntian", ShiDaZaoxian = "mobile:shi-zaoxian", ShiDaJixi = "mobile:shi-jixi";
     internal const string ShiDaHeartReason = "skill.mobile-shi-deng-ai.tuntian.obtain", ShiDaRewardReason = "skill.mobile-shi-deng-ai.zaoxian.obtain", ShiDaCostReason = "skill.mobile-shi-deng-ai.jixi.discard";
-    internal static CardConversionSource ShiDaSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiDaSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal (int Current, int Capacity) ShiDaCharge(int owner)
     {
         var e = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaChargeChangedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner);
@@ -32,7 +29,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
     }
 
     internal static bool ShiDaOwns(CardLocation location, int owner) => location.OwnerSeat == owner && location.Zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment;
-    internal static bool ShiDaDamageCard(CardKind kind) => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(kind) || global::CardGame.Core.EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(kind) || kind == CardKind.Lightning;
+    internal static bool ShiDaDamageCard(CardKind kind) => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(kind) || CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(kind) || kind == CardKind.Lightning;
     internal IReadOnlyList<CardMovementRecord> ShiDaLosses(int owner, CardMovementBatchContext? batch) => batch is null ? [] : batch.Movements.Where(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && ShiDaOwns(m.From, owner) && !ShiDaOwns(m.To, owner) && !ShiDaDamageCard(m.CardKind) && !IsShiDaDeferredEquipmentEntry(batch, m)).GroupBy(m => m.CardId).Select(group => group.OrderBy(m => m.Sequence).First()).ToArray();
     internal IReadOnlyList<int> ShiDaHistoricalTargets(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaTargetRecordedEvent>().Where(e => e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Actor == owner && e.Target != owner).Select(e => e.Target).Distinct().ToArray();
     internal bool ShiDaHasJixiTarget(int owner) => !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Snatch, CardActionType.Use) && ShiDaHistoricalTargets(owner).Any(seat => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.HasTargetCard(_coreMatchParticipantsPlayersAccess._players[seat]) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Snatch, Suit.None, null) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, seat, CardKind.Snatch));
@@ -43,7 +40,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
         CardZoneKind.Equipment,
         CardZoneKind.Judgment
     }.Any(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, payer)).Any(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(candidate.OwnerSeat, card, new(zone, payer), OwnedCardMoveIntent.Discard) && !(zone == CardZoneKind.Equipment && payer == candidate.OwnerSeat && _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(payer, candidate.SkillId, candidate.SkillInstanceId, card))));
-    SkillProgramStepOutcome global::CardGame.Core.IShiDengAiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiDa(f, op);
+    SkillProgramStepOutcome IShiDengAiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiDa(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 50300)]
     internal bool CanOfferShiDa(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -177,7 +174,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
     [ProgramAnswer("mobile-shi-deng-ai")]
     internal void AnswerShiDa(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiDengAi: { } r } f || !ValidShiDa(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiDaChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiDengAi: { } r } f || !ValidShiDa(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiDaChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Shi Deng Ai requires the exact current chooser, original cost slot and unpaid selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -397,7 +394,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
         if (r.Stage == ShiDaStage.Amount)
             return p.Choices.Last();
         if (r.Stage == ShiDaStage.Recipients)
-            return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "target" && !r.Targets.Contains(c.Targets.Single()) && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? p.Choices.Single(c => c.Parameters["branch"] == "spend");
+            return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "target" && !r.Targets.Contains(c.Targets.Single()) && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? p.Choices.Single(c => c.Parameters["branch"] == "spend");
         if (r.Stage == ShiDaStage.Targets)
             return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "target" && !r.Targets.Contains(c.Targets.Single())) ?? p.Choices.Single(c => c.Parameters["branch"] == "snatch");
         return p.Choices[0];

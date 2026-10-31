@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineLianZhuCountsRuntime
 {
-    bool global::CardGame.Core.ILianZhuGiftSelectionQueries.CanDeliver(int ownerSeat, int recipientSeat, int cardId) => CanDeliverLianZhuGift(ownerSeat, recipientSeat, cardId);
+    bool ILianZhuGiftSelectionQueries.CanDeliver(int ownerSeat, int recipientSeat, int cardId) => CanDeliverLianZhuGift(ownerSeat, recipientSeat, cardId);
     internal bool CanDeliverLianZhuGift(int ownerSeat, int recipientSeat, int cardId)
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipientSeat) || ownerSeat == recipientSeat)
@@ -19,12 +15,12 @@ internal sealed partial class CoreGameEngineLianZhuCountsRuntime
             return false;
         var from = _cardZonesOperations._cardZones.GetLocation(cardId);
         var to = CardLocation.Hand(recipientSeat);
-        return !(card.IsGeneralWeapon && from.Zone == CardZoneKind.Equipment) && !global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, from, to) && _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(card, from, to) == to;
+        return !(card.IsGeneralWeapon && from.Zone == CardZoneKind.Equipment) && !CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, from, to) && _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(card, from, to) == to;
     }
 
     internal SkillProgramEffect LianZhuPausedEffect(ProgramSkillFrame frame) => ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
     internal bool UsesRecipientHpLianZhu(ProgramSkillFrame frame) => LianZhuPausedEffect(frame).NumberExpression == SkillProgramNumberExpression.RecipientCurrentHp;
-    internal static int LianZhuChoiceAmount(LianZhuReceipt receipt) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_LianZhuCounts.LianZhuChoiceAmount(receipt);
+    internal static int LianZhuChoiceAmount(LianZhuReceipt receipt) => RuntimeSkills.RuntimeRules_Core_LianZhuCounts.LianZhuChoiceAmount(receipt);
     internal ProgramSkillFrame FreezeLianZhuChoiceAmount(ProgramSkillFrame frame)
     {
         if (!UsesRecipientHpLianZhu(frame))

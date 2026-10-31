@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineObserverSubtreesRuntime
@@ -40,7 +36,7 @@ internal sealed partial class CoreGameEngineObserverSubtreesRuntime
         return true;
     }
 
-    internal ProgramSkillFrame? FindProgramObserverRoot(global::System.Func<global::CardGame.Core.ProgramSkillFrame, global::CardGame.Core.ResolutionFrame, bool> firstChild, global::System.Func<int, bool> suffix, long? requiredRootId = null)
+    internal ProgramSkillFrame? FindProgramObserverRoot(Func<ProgramSkillFrame, ResolutionFrame, bool> firstChild, Func<int, bool> suffix, long? requiredRootId = null)
     {
         for (var index = 0; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
             if (_resolutionStackOperations._resolutionStack[index] is ProgramSkillFrame root && (requiredRootId is null || root.Id == requiredRootId) && firstChild(root, _resolutionStackOperations._resolutionStack[index + 1]) && suffix(index))
@@ -48,7 +44,7 @@ internal sealed partial class CoreGameEngineObserverSubtreesRuntime
         return null;
     }
 
-    internal bool HasObserverSuffix(int rootIndex, global::System.Func<int, bool> edge, global::System.Func<int, global::CardGame.Core.DyingFrame, bool>? completedDyingSuffix)
+    internal bool HasObserverSuffix(int rootIndex, Func<int, bool> edge, Func<int, DyingFrame, bool>? completedDyingSuffix)
     {
         for (var child = rootIndex + 2; child < _resolutionStackOperations._resolutionStack.Count; child++)
         {
@@ -61,7 +57,7 @@ internal sealed partial class CoreGameEngineObserverSubtreesRuntime
         return true;
     }
 
-    internal static bool IsObserverSkillsChangedEdge(ResolutionFrame parent, ResolutionFrame child) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ObserverSubtrees.IsObserverSkillsChangedEdge(parent, child);
+    internal static bool IsObserverSkillsChangedEdge(ResolutionFrame parent, ResolutionFrame child) => RuntimeSkills.RuntimeRules_Core_ObserverSubtrees.IsObserverSkillsChangedEdge(parent, child);
     internal bool IsPaidRescueObserverSuffix(int child, DyingFrame dying) => _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(child, dying) || _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(child, dying) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(child, dying) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(child, dying);
     internal bool IsSuspendedOrPaidRescueObserverSuffix(int child, DyingFrame dying) => _coreDyingSuitsAndHistoricalUseObserversOperations.IsOriginalDyingSuspendedByDyingSuits(dying) || _coreRecipientCategoryMarkContinuationsOperations.IsOriginalDyingSuspendedByRecipientCategoryMark(dying) || _coreOwnedDeathBenefitReturnsOperations.IsOriginalDyingSuspendedByOwnedDeathBenefit(dying) || _characterHeJinOlOperations.IsOriginalDyingSuspendedByHeJinYanhuo(dying) || _characterDiaoChanLeOperations.IsOriginalDyingSuspendedByDiou(dying) || _characterZhangFeiWumiaoOperations.IsOriginalDyingSuspendedByWuZishengMovement(dying) || IsPaidRescueObserverSuffix(child, dying);
     internal bool HasMovementObserverSuffix(int rootIndex) => HasObserverSuffix(rootIndex, (child) => this.IsMovementObserverEdge(child), (child, dying) => this.IsSuspendedOrPaidRescueObserverSuffix(child, dying));

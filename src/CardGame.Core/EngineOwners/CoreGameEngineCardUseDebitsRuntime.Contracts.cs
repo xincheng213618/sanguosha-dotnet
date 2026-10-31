@@ -1,11 +1,7 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-internal interface ICoreCardUseDebitsCoreProgramCardUsePaymentsOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreCardUseDebitsCoreProgramCardUsePaymentsOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramCardUsePayments CardUsePayments { get; }
+    ProgramCardUsePayments CardUsePayments { get; }
 }

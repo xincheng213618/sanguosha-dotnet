@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuSuHappyGodRuntime
 {
     internal const string HappyDingzhouReason = "skill-program.happy-shen-lu-su.";
-    SkillProgramStepOutcome global::CardGame.Core.IHappyLuSuHost.BeginHappyDingzhou(ProgramSkillFrame frame) => BeginHappyDingzhou(frame);
+    SkillProgramStepOutcome IHappyLuSuHost.BeginHappyDingzhou(ProgramSkillFrame frame) => BeginHappyDingzhou(frame);
     internal SkillProgramStepOutcome BeginHappyDingzhou(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (frame.HappyDingzhou is not null || frame.InstructionIndex != 1 || frame.SelectedTargetSeats is not [var target] || target == frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
             throw new InvalidOperationException("Happy Dingzhou requires its original once-per-Play other participant.");
-        var receipt = new HappyDingzhouReceipt(global::CardGame.Core.EngineOwners.CharacterLuSuMobileGodRuntime.ShenLsSource(frame), frame.GameplayHash, target, HappyDingzhouStage.BranchChoice)
+        var receipt = new HappyDingzhouReceipt(CharacterLuSuMobileGodRuntime.ShenLsSource(frame), frame.GameplayHash, target, HappyDingzhouStage.BranchChoice)
         {
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
             After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence

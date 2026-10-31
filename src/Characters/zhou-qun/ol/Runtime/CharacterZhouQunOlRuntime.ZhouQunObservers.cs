@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouQunOlRuntime
@@ -36,7 +32,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
         if (child is JudgmentFrame judgment)
             return IsNingwuJudgment(judgment, f);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => ZhouQunMovementMatches(f, m));
+            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => ZhouQunMovementMatches(f, m));
         if (child is IdentityAppearanceFrame appearance)
             return r.Stage == ZhouQunStage.HpIssuing && r.Cursor < r.Targets.Count && appearance.Receipt.Entry == IdentityAppearanceEntry.ProgramHpLoss && appearance.Receipt.ParentFrameId == f.Id && appearance.Receipt.OwnerSeat == r.Targets[r.Cursor] && appearance.Receipt.RequestedDeduction == 1 && appearance.Receipt.OriginalInstructionIndex == f.InstructionIndex;
         if (child is HpChangedTriggerWindowFrame hp)

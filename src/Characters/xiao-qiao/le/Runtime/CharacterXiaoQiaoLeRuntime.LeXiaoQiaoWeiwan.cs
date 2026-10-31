@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiaoQiaoLeRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     internal const string WeiwanObtainReason = "skill-program.le-xiao-qiao.weiwan.obtain";
     internal bool HasLeXiaoQiaoWeiwanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveWeiwanQinDiscardAndSuitObtain);
 
-    internal static CardConversionSource WeiwanSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xiao_qiao_le_LeXiaoQiaoWeiwan.WeiwanSource(f);
+    internal static CardConversionSource WeiwanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_xiao_qiao_le_LeXiaoQiaoWeiwan.WeiwanSource(f);
     internal ActualDiscardRecoveryPhaseKey? WeiwanPlay(int actor)
     {
         var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
@@ -24,8 +20,8 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
         return from.OwnerSeat == owner && from.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && HasQiqinEntityMark(card.Id) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, card, from, OwnedCardMoveIntent.Discard) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, card, from, OwnedCardMoveIntent.Discard);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeXiaoQiaoWeiwanHost.Resolve(ProgramSkillFrame f) => BeginWeiwan(f);
-    bool global::CardGame.Core.ILeXiaoQiaoWeiwanSelectionQuery.CanDiscard(int owner, Card card) => CanPayWeiwanQin(owner, card);
+    SkillProgramStepOutcome ILeXiaoQiaoWeiwanHost.Resolve(ProgramSkillFrame f) => BeginWeiwan(f);
+    bool ILeXiaoQiaoWeiwanSelectionQuery.CanDiscard(int owner, Card card) => CanPayWeiwanQin(owner, card);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 28620, SkillProgramEffectOp.ResolveWeiwanQinDiscardAndSuitObtain)]
     internal bool CanActivateWeiwan(ProgramActivationLegalityContext gate) => WeiwanPlay(gate.OwnerSeat)is { } phase && !_coreProgramEventHistoryOperations.ProgramEventHistory<WeiwanStartedEvent>().Any(e => e.Source.OwnerSeat == gate.OwnerSeat && e.Phase == phase) && _corePhysicalOwnedCardQueriesOperations.GetHand(gate.Owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(gate.Owner)).Any(c => CanPayWeiwanQin(gate.OwnerSeat, c));
     internal SkillProgramStepOutcome BeginWeiwan(ProgramSkillFrame supplied)
@@ -104,7 +100,7 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
                     CardLocation.Equipment(target.Seat),
                     CardLocation.Judgment(target.Seat)
                 }.SelectMany(location => _cardZonesOperations._cardZones.CardsAt(location).Select(card => (Card: card, From: location, Suit: _coreNativeCardAppearanceOperations.EffectiveSuit(target, card)))).OrderBy(entry => entry.From.Zone).ThenBy(entry => entry.Card.Id).ToArray();
-                foreach (var suit in global::CardGame.Core.EngineOwners.CharacterXiaoQiaoLeDefinitions.WeiwanSuits.Where(suit => suit != r.CostSuit))
+                foreach (var suit in CharacterXiaoQiaoLeDefinitions.WeiwanSuits.Where(suit => suit != r.CostSuit))
                 {
                     var eligible = candidates.Where(entry => entry.Suit == suit).ToArray();
                     var random = _randomOperations._random.State;

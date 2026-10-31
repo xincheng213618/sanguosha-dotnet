@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,13 +8,13 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
     internal const string HappyShenfu = "happy:shenfu", HappyQixian = "happy:qixian", HappyFeifu = "happy:feifu";
     internal bool HasHappyZhenJi => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveHappyZhenJiShenfu) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.StoreHappyZhenJiQixian) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.CollectHappyZhenJiFeifu);
 
-    internal static CardConversionSource HappyZjSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource HappyZjSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal IEnumerable<HappyZjStartedEvent> HappyShenfuUses(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<HappyZjStartedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Op == SkillProgramEffectOp.ResolveHappyZhenJiShenfu && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
     internal bool HappyShenfuTarget(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !HappyShenfuUses(owner).Any(e => e.Target == target);
     internal IEnumerable<PublicPersistentPileSource> HappyZjPiles(int owner) => _corePublicPileSourcesOperations.PublicPileSources(owner).Where(p => p.SkillId is HappyQixian or HappyFeifu);
     internal HappyZjEntity[] HappyZjPileEntities(int owner) => HappyZjPiles(owner).SelectMany(p => _corePublicPileSourcesOperations.PublicPileCards(p).Select(c => new HappyZjEntity(c.Id, c.Kind, p.Location))).ToArray();
-    SkillProgramStepOutcome global::CardGame.Core.IHappyZhenJiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyZj(f, op);
-    bool global::CardGame.Core.IHappyZhenJiQuery.Allows(int owner, int target) => HappyShenfuTarget(owner, target);
+    SkillProgramStepOutcome IHappyZhenJiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyZj(f, op);
+    bool IHappyZhenJiQuery.Allows(int owner, int target) => HappyShenfuTarget(owner, target);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 41240, SkillProgramEffectOp.StoreHappyZhenJiQixian, SkillProgramEffectOp.CollectHappyZhenJiFeifu, SkillProgramEffectOp.ReturnHappyZhenJiQixian)]
     internal bool HappyZjEligible(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => t.Id switch
     {
@@ -151,7 +148,7 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Happy Zhen Ji lost her choice owner.");
         var r = f.HappyZhenJi!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HappyZjChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HappyZjChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
             throw new InvalidOperationException("Happy Zhen Ji requires the exact current dynamic payment or branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

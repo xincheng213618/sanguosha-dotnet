@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuChengMouMobileRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     internal int MouLiuChengPhaseUses(int owner, string skill, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengChuiEarnedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.Phase == phase);
     internal void CaptureMouLiuChengAccrual(CardActionContext action, SkillProgramTriggerWindow window)
     {
-        if (!HasMouLiuChengCapability || window != SkillProgramTriggerWindow.CardUseTargetsFinalized || action.Type != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && !IsMouLiuChengNonDamageOrdinary(action.EffectiveKind) || MouLiuChengAccrualUse(action)is not { } use)
+        if (!HasMouLiuChengCapability || window != SkillProgramTriggerWindow.CardUseTargetsFinalized || action.Type != CardActionType.Use || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && !IsMouLiuChengNonDamageOrdinary(action.EffectiveKind) || MouLiuChengAccrualUse(action)is not { } use)
             return;
         var targets = MouLiuChengPrimaryTargets(action).Where(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive).Except(use.MouLiuChengAnnouncedTargets ?? []).ToArray();
         if (targets.Length == 0)
@@ -51,7 +47,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         };
     }
 
-    internal static bool SameMouLiuChengAccrual(MouLiuChengAccrualClaim? a, MouLiuChengAccrualClaim? b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_cheng_mou_mobile_MouLiuChengAccrual.SameMouLiuChengAccrual(a, b);
+    internal static bool SameMouLiuChengAccrual(MouLiuChengAccrualClaim? a, MouLiuChengAccrualClaim? b) => RuntimeSkills.RuntimeRules_liu_cheng_mou_mobile_MouLiuChengAccrual.SameMouLiuChengAccrual(a, b);
     internal bool MouLiuChengCandidateMatches(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, ProgramCardTriggerWindowFrame window)
     {
         if (window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
@@ -115,14 +111,14 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
             owner.MarkerSourceCounts[source] = count;
         }
 
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(f.Id, f.OwnerSeat, marker, delta, count, f.OwnerSeat, $"skill-program.{(f.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.chui"));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(f.Id, f.OwnerSeat, marker, delta, count, f.OwnerSeat, $"skill-program.{(f.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.chui"));
     }
 
     internal ProgramCardTriggerWindowFrame AppendMouLiuChengAccrual(ProgramCardTriggerWindowFrame frame)
     {
-        if (!HasMouLiuChengCapability || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(frame) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(frame.ParentFrameId)is not { Action: { Type: CardActionType.Use } } use || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
+        if (!HasMouLiuChengCapability || CoreGameEngineCardActionsRuntime.GetCardActionWindow(frame) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(frame.ParentFrameId)is not { Action: { Type: CardActionType.Use } } use || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
             return frame;
-        var action = global::CardGame.Core.EngineOwners.CoreGameEngineActorHandLimitTargetProgramsRuntime.ActorHandLimitTargetCollectionAction(use);
+        var action = CoreGameEngineActorHandLimitTargetProgramsRuntime.ActorHandLimitTargetCollectionAction(use);
         CaptureMouLiuChengAccrual(action, SkillProgramTriggerWindow.CardUseTargetsFinalized);
         var added = _coreCardActionsOperations.CollectSharedCardActionCandidates(action, SkillProgramTriggerWindow.CardUseTargetsFinalized, use.TargetSeats, null, frame.Continuation).Where(c => c.FrozenContext?.MouLiuChengAccrual is not null).Select(c => c with { FrozenContext = c.FrozenContext!with { ParentFrameId = frame.Id, CardUse = c.FrozenContext.CardUse!with { ParentCardUseFrameId = use.Id } } }).ToArray();
         if (added.Length == 0)
@@ -131,13 +127,13 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         return frame;
     }
 
-    internal bool TryBeginMouLiuChengLateSlashTargets(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryBeginMouLiuChengLateSlashTargets(NativeOwners.CardAttackHandle attack)
     {
-        if (!HasMouLiuChengCapability || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ProgramUseAccepted: true, Action: { Type: CardActionType.Use } action } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind || use.CardAttack is not { } current || current.TargetSeat != attack.TargetSeat || !use.TargetSeats.Contains(attack.TargetSeat))
+        if (!HasMouLiuChengCapability || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ProgramUseAccepted: true, Action: { Type: CardActionType.Use } action } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind || use.CardAttack is not { } current || current.TargetSeat != attack.TargetSeat || !use.TargetSeats.Contains(attack.TargetSeat))
             return false;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != use.Id)
             throw new InvalidOperationException("Liu Cheng's late native target must remain on its exact accepted Slash.");
-        var projected = global::CardGame.Core.EngineOwners.CoreGameEngineActorHandLimitTargetProgramsRuntime.ActorHandLimitTargetCollectionAction(use);
+        var projected = CoreGameEngineActorHandLimitTargetProgramsRuntime.ActorHandLimitTargetCollectionAction(use);
         CaptureMouLiuChengAccrual(projected, SkillProgramTriggerWindow.CardUseTargetsFinalized);
         var windowId = _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1;
         var candidates = _coreCardActionsOperations.CollectSharedCardActionCandidates(projected, SkillProgramTriggerWindow.CardUseTargetsFinalized, use.TargetSeats, null, ProgramCardContinuation.Slash).Where(c => c.FrozenContext?.MouLiuChengAccrual is not null).OrderByDescending(c => c.Priority).ThenBy(c => c.OwnerSeat).ThenBy(c => c.SkillId, StringComparer.Ordinal).ThenBy(c => c.SkillInstanceId, StringComparer.Ordinal).ThenBy(c => c.TriggerId, StringComparer.Ordinal).Select(c => c with { FrozenContext = c.FrozenContext!with { ParentFrameId = windowId, CardUse = c.FrozenContext.CardUse!with { ParentCardUseFrameId = use.Id } } }).ToArray();

@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules__shared_OlMoRumo_Proofs
 {
     internal static ProgramTriggerCandidate OlMoRumoCandidate(ProgramSkillFrame frame) =>

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class HuangChengYanProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterHuangChengYanOlEntries> getCharacterHuangChengYanOlRuntime) : IHuangChengYanProgramHost
+internal sealed class HuangChengYanProgramCapability(Func<RuntimeEntries.CharacterHuangChengYanOlEntries> getCharacterHuangChengYanOlRuntime) : IHuangChengYanProgramHost
 {
     public SkillProgramStepOutcome JiezhenReplaceSkills(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterHuangChengYanOlRuntime().JiezhenProgramReplaceSkills(frame, effect);
     public SkillProgramStepOutcome JiezhenRestoreSkills(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterHuangChengYanOlRuntime().JiezhenProgramRestoreSkills(frame, effect);

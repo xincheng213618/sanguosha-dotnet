@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWoLongFengChuOlRuntime
 {
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26101)]
     internal bool CanOfferLuanfeng(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveLuanfengDyingRecovery) || context is { Window: SkillProgramTriggerWindow.DyingEntering, TargetSeat: { } victim } && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.VictimSeat == victim && _coreMatchParticipantsPlayersAccess._players[victim].IsAlive && _coreMatchParticipantsPlayersAccess._players[victim].Hp <= 0 && _coreMatchParticipantsPlayersAccess._players[victim].MaxHp >= _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].MaxHp;
-    SkillProgramStepOutcome global::CardGame.Core.IWoLongFengChuProgramHost.ResolveLuanfeng(ProgramSkillFrame frame) => ResolveLuanfeng(frame);
+    SkillProgramStepOutcome IWoLongFengChuProgramHost.ResolveLuanfeng(ProgramSkillFrame frame) => ResolveLuanfeng(frame);
     internal SkillProgramStepOutcome ResolveLuanfeng(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (frame.Luanfeng is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering, TargetSeat: { } victim } || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.VictimSeat != victim || !_coreMatchParticipantsPlayersAccess._players[victim].IsAlive || _coreMatchParticipantsPlayersAccess._players[victim].Hp > 0 || _coreMatchParticipantsPlayersAccess._players[victim].MaxHp < _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].MaxHp)
             throw new InvalidOperationException("Luanfeng requires the exact current dying victim and its qualifying maximum HP.");
-        var receipt = new LuanfengReceipt(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, dying.FrameId, victim, LuanfengStage.RecoveryChild, Math.Min(3, _coreMatchParticipantsPlayersAccess._players[victim].MaxHp) - _coreMatchParticipantsPlayersAccess._players[victim].Hp);
+        var receipt = new LuanfengReceipt(frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, dying.FrameId, victim, LuanfengStage.RecoveryChild, Math.Min(3, _coreMatchParticipantsPlayersAccess._players[victim].MaxHp) - _coreMatchParticipantsPlayersAccess._players[victim].Hp);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { Luanfeng = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LuanfengIssuedEvent(frame.Id, receipt.Source, dying.FrameId, victim));
         _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(frame.Id, frame.OwnerSeat, victim, 3 - _coreMatchParticipantsPlayersAccess._players[victim].Hp, null, null);

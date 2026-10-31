@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CharacterTianYuMouMobileRuntime
     internal bool HasMouTianYu => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouTianYuYangshi) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouTianYuZhenxi);
     internal int MouTianYuActualTurn => _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count();
 
-    internal static CardConversionSource MouTianYuSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MouTianYuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static bool IsMouTianYuTargetTrigger(SkillProgramTrigger t) => t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouTianYuZhenxi);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 30600, SkillProgramEffectOp.ResolveMouTianYuZhenxi, SkillProgramEffectOp.ResolveMouTianYuYangshi)]
     internal bool CanOfferMouTianYu(ProgramTriggerCandidate candidate, SkillProgramTrigger t, ProgramSkillWindowContext c)
@@ -20,7 +17,7 @@ internal sealed partial class CharacterTianYuMouMobileRuntime
             return false;
         if (t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouTianYuYangshi))
             return c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.TargetSeat == candidate.OwnerSeat;
-        return c.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && c.CardUse is { } a && a.ActorSeat == candidate.OwnerSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && c.TargetSeat is { } target && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouTianYuStartedEvent>().Any(e => e.Source.SkillId == MouTianYuComposition.Zhenxi && e.Source.OwnerSeat == candidate.OwnerSeat && e.TurnOrdinal == MouTianYuActualTurn);
+        return c.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && c.CardUse is { } a && a.ActorSeat == candidate.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && c.TargetSeat is { } target && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouTianYuStartedEvent>().Any(e => e.Source.SkillId == MouTianYuComposition.Zhenxi && e.Source.OwnerSeat == candidate.OwnerSeat && e.TurnOrdinal == MouTianYuActualTurn);
     }
 
     internal SkillProgramStepOutcome BeginMouTianYu(ProgramSkillFrame input, SkillProgramEffectOp op)
@@ -43,7 +40,7 @@ internal sealed partial class CharacterTianYuMouMobileRuntime
 
         if (_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat).All(p => _coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, p.Seat)))
         {
-            var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind));
+            var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouTianYuSlashObtainedEvent(f.Id, f.OwnerSeat, card?.Id));
             if (card is not null)
             {
@@ -118,7 +115,7 @@ internal sealed partial class CharacterTianYuMouMobileRuntime
     [ProgramAnswer("mou-tian-yu")]
     internal void AnswerMouTianYu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouTianYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouTianYuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouTianYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouTianYuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Tian Yu lost its exact published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var verb = choice.Parameters["verb"];
@@ -233,5 +230,5 @@ internal sealed partial class CharacterTianYuMouMobileRuntime
         return p.Choices.First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouTianYuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouTianYu(f, op);
+    SkillProgramStepOutcome IMouTianYuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouTianYu(f, op);
 }

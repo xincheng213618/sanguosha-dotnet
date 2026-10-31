@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDeathProgramsRuntime
@@ -34,7 +30,7 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
         target.MarkerSourceCounts[sourceKey] = target.MarkerSourceCounts.GetValueOrDefault(sourceKey) + amount;
         var count = target.Markers.GetValueOrDefault(marker) + amount;
         target.Markers[marker] = count;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(active.Id, targetSeat, marker, Delta: amount, Count: count, SkillOwnerSeat: active.OwnerSeat, Reason: $"skill-program.{(active.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active))}.marker"));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(active.Id, targetSeat, marker, Delta: amount, Count: count, SkillOwnerSeat: active.OwnerSeat, Reason: $"skill-program.{(active.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active))}.marker"));
     }
 
     internal SkillProgramStepOutcome CauseProgramDeathUnlessBoundCardKind(ProgramSkillFrame frame, string sourceBind, IReadOnlyList<CardKind> excludedCardKinds)
@@ -51,11 +47,11 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
         if (_cardZonesOperations._cardZones.GetLocation(binding.CardIds[0]) != location)
             throw new InvalidOperationException("The bound judgment card left its frozen location.");
         var card = _cardZonesOperations._cardZones.CardsAt(location).Single(item => item.Id == binding.CardIds[0]);
-        _corePhysicalMovementFacadesOperations.MoveCard(card, location, CardLocation.DiscardPile, new CardMoveReason($"skill-program.{(active.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active))}.judgment-finish"));
+        _corePhysicalMovementFacadesOperations.MoveCard(card, location, CardLocation.DiscardPile, new CardMoveReason($"skill-program.{(active.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active))}.judgment-finish"));
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         if (excludedCardKinds.Contains(card.Kind) || !target.IsAlive || _coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winner != Winner.None)
             return SkillProgramStepOutcome.Continue;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillCauseDeathDeclaredEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, targetSeat));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillCauseDeathDeclaredEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, targetSeat));
         _coreMatchLogOperations.AddLog("DirectDeath", $"{(target.Name)} 的判定结果不满足【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】的存活条件，其直接死亡。", active.OwnerSeat, targetSeat);
         _coreNativePlayerDeathOperations.BeginPlayerDeath(active.Id, target, killer: null, attack: null, dying: null, causingProgramSkillFrameId: active.Id);
         return SkillProgramStepOutcome.AwaitChild;
@@ -375,7 +371,7 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
         var claimable = QueryProgramDeathCleanupCards(death, paused.Zones);
         if (claimable.Length == 0)
             return;
-        var reason = new CardMoveReason($"skill-program.{(frame.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active))}.claim-death-cleanup");
+        var reason = new CardMoveReason($"skill-program.{(frame.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active))}.claim-death-cleanup");
         _corePhysicalMovementFacadesOperations.MoveCards(claimable, CardLocation.DiscardPile, CardLocation.Hand(frame.OwnerSeat), reason);
     }
 
@@ -437,7 +433,7 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
                 MoveDiedCards(_cardZonesOperations._cardZones.CardsAt(curse.Location), curse.Location, new("program.source-curse.target-death"));
             var publicPileSources = _corePublicPileSourcesOperations.PublicPileSources(victim.Seat).ToArray();
             if (publicPileSources.Length == 0)
-                MoveDiedCards(_cardZonesOperations._cardZones.CardsAt(global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileSourcesRuntime.PublicPileLocation(victim.Seat)), global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileSourcesRuntime.PublicPileLocation(victim.Seat), new("skill-program.public-pile.owner-death"));
+                MoveDiedCards(_cardZonesOperations._cardZones.CardsAt(CoreGameEnginePublicPileSourcesRuntime.PublicPileLocation(victim.Seat)), CoreGameEnginePublicPileSourcesRuntime.PublicPileLocation(victim.Seat), new("skill-program.public-pile.owner-death"));
             else
                 foreach (var source in publicPileSources)
                     MoveDiedCards(_corePublicPileSourcesOperations.PublicPileCards(source), source.Location, new("skill-program.public-pile.owner-death"));
@@ -454,7 +450,7 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
             deathCleanupCardIds.AddRange(_characterZhouFeiBoundaryMobileOperations.DiscardBoundaryZhouFeiHolderDeathPiles(_resolutionStackOperations._resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
             deathCleanupCardIds.AddRange(_characterSunQuanAnniversaryGodOperations.DiscardAnniversarySunQuanMingOnDeath(_resolutionStackOperations._resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
             UpdateDeathFrame(deathFrameId, frame => frame with { CleanedUpCardIds = deathCleanupCardIds });
-            _coreMatchLogOperations.AddLog("PlayerDied", _coreNativeDamageHandlesOperations.IsNationalWarMode ? $"{(victim.Name)} 阵亡，属于{(global::CardGame.Core.EngineOwners.CoreMatchPresentationRuntime.GetFactionName(victim.NationalFactionId!))}势力。" : $"{(victim.Name)} 阵亡，身份是【{(_coreMatchPresentationOperations.GetRoleName(victim.Role))}】。", killer?.Seat, victim.Seat);
+            _coreMatchLogOperations.AddLog("PlayerDied", _coreNativeDamageHandlesOperations.IsNationalWarMode ? $"{(victim.Name)} 阵亡，属于{(CoreMatchPresentationRuntime.GetFactionName(victim.NationalFactionId!))}势力。" : $"{(victim.Name)} 阵亡，身份是【{(_coreMatchPresentationOperations.GetRoleName(victim.Role))}】。", killer?.Seat, victim.Seat);
             _coreConvertingGiftsOperations.MarkConvertingGiftExactDeath(deathFrameId, victim.Seat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerDiedEvent(victim.Seat, killer?.Seat));
             if (_characterPangTongAnniversaryGodOperations.TryBeginShenPangTongKunyuDeath(GetCurrentDeathFrame(deathFrameId)))

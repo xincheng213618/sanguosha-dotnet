@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,13 +10,13 @@ internal sealed partial class CoreGameEnginePrepDiscardPaymentsRuntime
     internal const string PrepDiscardDrawReason = "program.preparation-discard.ending-draw";
     internal long PrepDiscardSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.Count == 0 ? 0 : _coreCardMovementJournalCardMovementsAccess._cardMovements[^1].Sequence;
 
-    internal CardConversionSource PrepDiscardSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource PrepDiscardSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool IsImmediatePrepDiscard(ProgramSkillFrame f) => _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is [{ Op: SkillProgramEffectOp.ResolvePrepDiscardOrImmediateDraw }];
     internal bool PrepDiscardCanContinue(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || IsImmediatePrepDiscard(f) && f.PrepDiscard?.TargetPayment is { } paid && _corePrepDiscardReceiptsOperations.ValidPrepDiscardPayment(f, paid, false));
     internal IReadOnlyList<PromptChoice> PrepDiscardCards(ProgramSkillFrame f, int payer, IReadOnlyList<int>? selected = null) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, payer, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard, canSelect: (_, c) => !c.IsGeneralWeapon && !(selected ?? []).Contains(c.Id));
     internal bool MatchesActualPrepDiscard(ProgramSkillFrame f)
     {
-        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || context.OwnerSeat != f.OwnerSeat || context.SourceSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, Continuation: ProgramLifecycleContinuation.NormalTurnStart } window || window.OwnerSeat != f.OwnerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]))
+        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || context.OwnerSeat != f.OwnerSeat || context.SourceSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, Continuation: ProgramLifecycleContinuation.NormalTurnStart } window || window.OwnerSeat != f.OwnerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]))
             return false;
         return _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is [{ Op: SkillProgramEffectOp.ResolvePrepDiscardOrEnding or SkillProgramEffectOp.ResolvePrepDiscardOrImmediateDraw }];
     }
@@ -275,10 +272,10 @@ internal sealed partial class CoreGameEnginePrepDiscardPaymentsRuntime
 
         // Only own exposed identities are scored. Opponent opaque hand slots
         // receive a fixed public prior, without hidden lookup or RNG use.
-        return decision.Choices.OrderBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 5d).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+        return decision.Choices.OrderBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 5d).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IPrepDiscardEndingProgramHost.ResolvePrepDiscardOrEnding(ProgramSkillFrame f, string binding) => ResolvePrepDiscardOrEnding(f, binding);
-    SkillProgramStepOutcome global::CardGame.Core.IPrepDiscardEndingProgramHost.ResolvePrepDiscardOrImmediateDraw(ProgramSkillFrame f) => ResolvePrepDiscardOrEnding(f, "");
-    SkillProgramStepOutcome global::CardGame.Core.IPrepDiscardEndingProgramHost.DrawPrepDiscardEnding(ProgramSkillFrame f) => _corePrepDiscardEndingPromisesOperations.DrawPrepDiscardEnding(f);
+    SkillProgramStepOutcome IPrepDiscardEndingProgramHost.ResolvePrepDiscardOrEnding(ProgramSkillFrame f, string binding) => ResolvePrepDiscardOrEnding(f, binding);
+    SkillProgramStepOutcome IPrepDiscardEndingProgramHost.ResolvePrepDiscardOrImmediateDraw(ProgramSkillFrame f) => ResolvePrepDiscardOrEnding(f, "");
+    SkillProgramStepOutcome IPrepDiscardEndingProgramHost.DrawPrepDiscardEnding(ProgramSkillFrame f) => _corePrepDiscardEndingPromisesOperations.DrawPrepDiscardEnding(f);
 }

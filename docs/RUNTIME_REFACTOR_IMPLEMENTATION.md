@@ -32,7 +32,7 @@ Checkpoint 保存初始化和接受命令，在当前实现中重放；恢复校
 
 ## 帧调度
 
-`GameEngine.Runtime.cs` 的兼容入口转到 `NativeFrameRoutingRuntime`，由它检查帧是否存在且位于栈顶；暂停中的父帧不分派。`NativeFrameRouteCatalog` 按处理器旁的 `[NativeFrameRoute]` 注册及显式顺序选择首个匹配项，普通程序仍先运行续接，再进入执行器。用牌的各个已支付分支保留原条件与优先序。新增原生续接在所属模块注册，无需扩充中央帧 `switch`。
+`NativeFrameRoutingRuntime` 负责原生帧分派，暂停中的父帧不分派。`NativeFrameRouteCatalog` 按处理器旁的 `[NativeFrameRoute]` 注册及显式顺序选择首个匹配项，普通程序仍先运行续接，再进入执行器。用牌的各个已支付分支保留原条件与优先序。新增原生续接在所属模块注册，无需扩充中央帧 `switch`。
 
 主循环的普通原生帧准入也由处理器旁的 `[NativeFrameAutomaticStep]` 和 `NativeFrameAutomaticRuntime` 负责，四个固定阶段槽保留开局、声明质疑和判定决策前后的原顺序。待决检查的先后、不检查待决的原生步骤以及判定窗口无需额外发布的策略分别保存；自动准入仍调用完整显式路由，不改变用牌多重回执的优先序。
 
@@ -62,7 +62,7 @@ Checkpoint 保存初始化和接受命令，在当前实现中重放；恢复校
 
 `[ProgramRuleObserver]` 的 `BeforeEvent`、`AfterEvent`、`BeforeStatePublish` 保留明确位置和顺序；嵌套事实同步完成后返回。同步订阅者收到的是提交结果，不能承担规则步骤。
 
-复杂观察者子树通过 `GameEngine.ObserverSubtrees.cs` 复用推进与遍历。调用者保留精确根、首子帧、边、支付及完成凭据检查；不能只因子帧类型相同就获得推进权限。共享执行器不提供默认放行策略。
+复杂观察者子树通过 `CoreGameEngineObserverSubtreesRuntime` 复用推进与遍历，人物机制提供实际分支条件及完成处理；支付与返回继续使用所属帧的状态。
 
 ## 扩展注册
 
@@ -140,7 +140,7 @@ WPF 使用提交后的人类动作视图、revision、当前引擎和规范目�
 
 ## 源码入口
 
-- [命令会话](../src/CardGame.Core/GameEngine.CommandSession.cs)、[帧存储](../src/CardGame.Core/FrameStore.cs)、[运行调度](../src/CardGame.Core/GameEngine.Runtime.cs)
+- [命令会话](../src/CardGame.Core/Session/CommandSession.cs)、[帧存储](../src/CardGame.Core/FrameStore.cs)、[运行调度](../src/CardGame.Core/NativeFrameRoutingRuntime.cs)
 - [程序续接](../src/CardGame.Core/GameEngine.ProgramContinuations.cs)、[窗口返回](../src/CardGame.Core/ProgramWindowReturns.cs)、[原生返回](../src/CardGame.Core/ProgramNativeReturns.cs)
 - [运行钩子](../src/CardGame.Core/ProgramRuntimeHooks.cs)、[规则观察](../src/CardGame.Core/ProgramRuleObservers.cs)、[能力目录](../src/CardGame.Core/ProgramCapabilities.cs)
-- [观察者子树](../src/CardGame.Core/GameEngine.ObserverSubtrees.cs)、[指令计划](../src/CardGame.Core/ProgramExecutionPlan.cs)、[绑定索引](../src/CardGame.Core/MatchSkillBindingIndex.cs)
+- [观察者子树](../src/CardGame.Core/EngineOwners/CoreGameEngineObserverSubtreesRuntime.ObserverSubtrees.cs)、[指令计划](../src/CardGame.Core/ProgramExecutionPlan.cs)、[绑定索引](../src/CardGame.Core/MatchSkillBindingIndex.cs)

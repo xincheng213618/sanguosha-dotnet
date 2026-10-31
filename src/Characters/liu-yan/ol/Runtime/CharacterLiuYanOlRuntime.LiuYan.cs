@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYanOlRuntime
@@ -12,11 +8,11 @@ internal sealed partial class CharacterLiuYanOlRuntime
     internal const string LiuYanDrawReason = "skill-program.liu-yan.tushe.draw";
     internal bool HasLiuYanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.UseLimuSelfIndulgenceAndRecover) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawTusheForActualNonEquipmentTargets);
 
-    internal static CardConversionSource LiuYanSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_yan_ol_LiuYan.LiuYanSource(f);
-    internal static bool LiuYanBasic(CardKind k) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_yan_ol_LiuYan.LiuYanBasic(k);
+    internal static CardConversionSource LiuYanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_liu_yan_ol_LiuYan.LiuYanSource(f);
+    internal static bool LiuYanBasic(CardKind k) => RuntimeSkills.RuntimeRules_liu_yan_ol_LiuYan.LiuYanBasic(k);
     internal bool LiuYanNoBasicHand(CharacterState p) => _corePhysicalOwnedCardQueriesOperations.GetHand(p).All(c => !LiuYanBasic(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(p, c)));
-    SkillProgramStepOutcome global::CardGame.Core.ILiuYanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginLiuYan(f, op);
-    bool global::CardGame.Core.ILiuYanSelectionQuery.CanUse(int owner, Card card, string skill) => LiuYanLimuMaterialLegal(_coreMatchParticipantsPlayersAccess._players[owner], card, skill);
+    SkillProgramStepOutcome ILiuYanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginLiuYan(f, op);
+    bool ILiuYanSelectionQuery.CanUse(int owner, Card card, string skill) => LiuYanLimuMaterialLegal(_coreMatchParticipantsPlayersAccess._players[owner], card, skill);
     internal SkillProgramStepOutcome BeginLiuYan(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

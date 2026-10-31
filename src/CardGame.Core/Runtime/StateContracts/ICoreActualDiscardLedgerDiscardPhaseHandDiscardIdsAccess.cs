@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreActualDiscardLedgerDiscardPhaseHandDiscardIdsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreActualDiscardLedgerDiscardPhaseHandDiscardIdsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<int> _discardPhaseHandDiscardIds { get; }
+    ref readonly List<int> _discardPhaseHandDiscardIds { get; }
 }

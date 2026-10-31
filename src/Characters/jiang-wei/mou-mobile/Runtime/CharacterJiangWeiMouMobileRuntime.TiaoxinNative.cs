@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiMouMobileRuntime
@@ -14,17 +10,17 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 33200)]
     internal bool MouJwRequestedDistance(ProgramSlashDistanceQuery q) => MouJwRequestFrame(q.Actor.Seat)is { } f && q.Target.Seat == f.OwnerSeat;
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 33200)]
-    internal bool MouJwRequestedCardDistance(ProgramCardDistanceQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && MouJwRequestFrame(q.Actor.Seat)is { } f && q.Target.Seat == f.OwnerSeat;
+    internal bool MouJwRequestedCardDistance(ProgramCardDistanceQuery q) => CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && MouJwRequestFrame(q.Actor.Seat)is { } f && q.Target.Seat == f.OwnerSeat;
     // Native requested Slash is a true Use, with the same ordinary-quota treatment as classic Tiaoxin.
     [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaBeforeLimit, 33200)]
     internal bool MouJwRequestedQuota(ProgramSlashQuotaQuery q) => MouJwRequestFrame(q.Actor.Seat)is { } f && q.Target.Seat == f.OwnerSeat;
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.MouJwSlashPlan> MouJwSlashPlans(ProgramSkillFrame f)
+    internal IReadOnlyList<GameEngine.MouJwSlashPlan> MouJwSlashPlans(ProgramSkillFrame f)
     {
         var r = f.MouJiangWei!;
         if (r.Stage != MouJiangWeiStage.Responding || r.Cursor >= r.Targets.Count || !_coreMatchParticipantsPlayersAccess._players[r.Targets[r.Cursor]].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
             return[];
         var actor = _coreMatchParticipantsPlayersAccess._players[r.Targets[r.Cursor]];
-        var result = new List<global::CardGame.Core.GameEngine.MouJwSlashPlan>();
+        var result = new List<GameEngine.MouJwSlashPlan>();
         foreach (var a in _coreNativeLegalActionsOperations.BuildLegalActions(actor, false).Where(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.Count > 0 && a.TargetSeats[0] == f.OwnerSeat && a.MinCardCount == 0))
         {
             var frozen = a with
@@ -70,7 +66,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 33201)]
     internal void BindMouJwSlash(CardUseDeclaredEvent fact)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(fact.ResolutionId)is not { Action: { Type: CardActionType.Use } a } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.MouJiangWei is { Stage: MouJiangWeiStage.Issuing })is not { MouJiangWei: { } r } parent)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(fact.ResolutionId)is not { Action: { Type: CardActionType.Use } a } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.MouJiangWei is { Stage: MouJiangWeiStage.Issuing })is not { MouJiangWei: { } r } parent)
             return;
         if (!ValidMouJw(parent) || r.NativeAction is not { } plan || r.Cursor >= r.Targets.Count || a.ActorSeat != r.Targets[r.Cursor] || a.ProviderSeat != r.ProviderSeat || a.RequesterSeat != (r.ProviderSeat == a.ActorSeat ? (int? )null : a.ActorSeat) || !a.TargetSeats.SequenceEqual(plan.TargetSeats) || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(r.Materials) || a.EffectiveKind != (plan.PlayedCardKind ?? (plan.CardId is> 0 ? _corePlayCardHistoryOperations.ApplyProgramUseAppearance(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(plan.CardId.Value), plan.ConversionSource).Kind : CardKind.Slash)))
             throw new InvalidOperationException("Tiaoxin changed its requested actual actor, source materials or accepted Slash plan.");

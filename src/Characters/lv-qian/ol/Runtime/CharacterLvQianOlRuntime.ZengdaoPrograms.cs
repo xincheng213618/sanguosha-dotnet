@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLvQianOlRuntime
@@ -30,7 +26,7 @@ internal sealed partial class CharacterLvQianOlRuntime
     internal void ResolveZengdaoDamageChoice(PromptChoice choice)
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
-        if (f.LvQian is not { Stage: LvQianStage.DamageChoice } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ZengdaoDamageChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (f.LvQian is not { Stage: LvQianStage.DamageChoice } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ZengdaoDamageChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zengdao payment lost its real recipient chooser.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         PayZengdaoDamage(f, r.Choices[int.Parse(choice.Parameters["choice"])]);

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramCardTargetEffectsRuntime
@@ -22,7 +18,7 @@ internal sealed partial class CoreGameEngineProgramCardTargetEffectsRuntime
             MarkCardEffectIneffective(parent.Id, seat);
         if (newlyNullified.Length == 0)
             return;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSelectedCardEffectsNullifiedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, cardUse.ActorSeat, parent.Id, cardUse.EffectiveKind, newlyNullified));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSelectedCardEffectsNullifiedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, cardUse.ActorSeat, parent.Id, cardUse.EffectiveKind, newlyNullified));
         foreach (var seat in newlyNullified)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardEffectSkippedEvent(parent.Id, cardUse.ActorSeat, seat, cardUse.EffectiveKind, CardEffectSkipReason.SkillNullified));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】，" + $"令【{(CardCatalog.Get(cardUse.EffectiveKind).DisplayName)}】对" + $"{(string.Join("、", newlyNullified.Select(seat => _coreMatchParticipantsPlayersAccess._players[seat].Name)))}无效。", active.OwnerSeat, cardUse.ActorSeat);
@@ -38,7 +34,7 @@ internal sealed partial class CoreGameEngineProgramCardTargetEffectsRuntime
         if (cardUseIndex < 0 || _resolutionStackOperations._resolutionStack[cardUseIndex] is not CardUseFrame parent || parent.Action?.ActionId != cardUse.CardActionId || !parent.TargetSeats.Contains(active.OwnerSeat) || parent.Action.ActorSeat != cardUse.ActorSeat || parent.Action.EffectiveKind != cardUse.EffectiveKind)
             throw new InvalidOperationException("Current card-effect nullification lost its frozen parent card action.");
         MarkCardEffectIneffective(parent.Id, active.OwnerSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardEffectNullifiedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, cardUse.ActorSeat, parent.Id, cardUse.EffectiveKind));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardEffectNullifiedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, cardUse.ActorSeat, parent.Id, cardUse.EffectiveKind));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardEffectSkippedEvent(parent.Id, cardUse.ActorSeat, active.OwnerSeat, cardUse.EffectiveKind, CardEffectSkipReason.SkillNullified));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】，" + $"令【{(CardCatalog.Get(cardUse.EffectiveKind).DisplayName)}】对自己无效。", active.OwnerSeat, cardUse.ActorSeat);
     }

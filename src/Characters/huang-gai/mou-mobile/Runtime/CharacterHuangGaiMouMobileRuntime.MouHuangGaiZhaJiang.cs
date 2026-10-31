@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangGaiMouMobileRuntime
@@ -68,7 +64,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
 
     internal MouZhaJiangAdmission CaptureMouZhaJiangAdmission(CharacterState actor)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is CardDeclarationFrame { Stage: CardDeclarationStage.Applying } declaration && declaration.Return.ActorSeat == actor.Seat && global::CardGame.Core.EngineOwners.CharacterCaiWenJiLeRuntime.BeifenDeclarationIsTrueUse(declaration.Return) && declaration.Payment.MouZhaJiang is { } declared && ValidMouZhaJiangDeclaration(declaration.Payment, declared))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is CardDeclarationFrame { Stage: CardDeclarationStage.Applying } declaration && declaration.Return.ActorSeat == actor.Seat && CharacterCaiWenJiLeRuntime.BeifenDeclarationIsTrueUse(declaration.Return) && declaration.Payment.MouZhaJiang is { } declared && ValidMouZhaJiangDeclaration(declaration.Payment, declared))
             return declared;
         var current = _resolutionStackOperations._resolutionStack.LastOrDefault();
         if (current is ResponseWindowFrame response)
@@ -87,7 +83,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
     {
         if (!HasMouZhaJiangCapability)
             return false;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is CardDeclarationFrame { Stage: CardDeclarationStage.Applying } d && d.Return.ActorSeat == actor.Seat && global::CardGame.Core.EngineOwners.CharacterCaiWenJiLeRuntime.BeifenDeclarationIsTrueUse(d.Return))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is CardDeclarationFrame { Stage: CardDeclarationStage.Applying } d && d.Return.ActorSeat == actor.Seat && CharacterCaiWenJiLeRuntime.BeifenDeclarationIsTrueUse(d.Return))
             return d.Payment.MouZhaJiang is { } q && ValidMouZhaJiangDeclaration(d.Payment, q) && q.Applies;
         var current = _resolutionStackOperations._resolutionStack.LastOrDefault();
         if (current is ResponseWindowFrame response)
@@ -103,7 +99,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
     internal bool HasMouZhaJiangUseDistance(CharacterState actor, long? useId = null) => useId is { } id ? HasIssuedMouZhaJiangUse(id, actor.Seat) : HasMouZhaJiangPreUsePrivilege(actor);
     internal DeclaredCardPayment CaptureMouZhaJiangDeclaration(DeclaredCardPayment payment, CardDeclarationParentReturn parent)
     {
-        if (!HasMouZhaJiangCapability || !global::CardGame.Core.EngineOwners.CharacterCaiWenJiLeRuntime.BeifenDeclarationIsTrueUse(parent) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(parent.ActorSeat) || payment.ActorSeat != parent.ActorSeat || payment.Claimed || payment.MouZhaJiang is not null || _cardZonesOperations._cardZones.GetLocation(payment.Cost.CardId) != payment.Cost.From)
+        if (!HasMouZhaJiangCapability || !CharacterCaiWenJiLeRuntime.BeifenDeclarationIsTrueUse(parent) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(parent.ActorSeat) || payment.ActorSeat != parent.ActorSeat || payment.Claimed || payment.MouZhaJiang is not null || _cardZonesOperations._cardZones.GetLocation(payment.Cost.CardId) != payment.Cost.From)
             return payment;
         var q = CaptureMouZhaJiangAdmission(_coreMatchParticipantsPlayersAccess._players[parent.ActorSeat]);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhaJiangDeclarationAdmittedEvent(payment.DeclarationId, payment.OwnerFrameId, payment.ProviderSeat, payment.Cost.CardId, payment.Cost.CardKind, payment.Cost.From, payment.DeclaredKind, q));
@@ -144,7 +140,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
             return false;
         if (owner is ProgramSkillFrame { CardAttack: { } attack } program)
             return r.ActionId == 0 && r.DeclarationId is null && r.OriginalKind == CardKind.Duel && r.ProgramInstructionIndex == program.InstructionIndex && attack.ProgramUseInstructionIndex == r.ProgramInstructionIndex && attack.CardUserSeat == actorSeat && attack.EffectiveCardKind == CardKind.Duel && attack.CardId is null;
-        return owner is CardUseFrame use && r.ProgramInstructionIndex is null && use.SourceSeat == actorSeat && (use.Action is { Type: CardActionType.Use } a ? a.ActionId == r.ActionId && a.ActorSeat == actorSeat : use.Action is null && r.ActionId == 0 && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 }) && (use.CardKind == r.OriginalKind || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.OriginalKind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use));
+        return owner is CardUseFrame use && r.ProgramInstructionIndex is null && use.SourceSeat == actorSeat && (use.Action is { Type: CardActionType.Use } a ? a.ActionId == r.ActionId && a.ActorSeat == actorSeat : use.Action is null && r.ActionId == 0 && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 }) && (use.CardKind == r.OriginalKind || CoreNativeCardClassificationsRuntime.IsSlashCard(r.OriginalKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use));
     }
 
     internal bool IsMouZhaJiangUnrespondable(long useId) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == useId)?.MouZhaJiangUse?.Admission is { } q && HasIssuedMouZhaJiangUse(useId, q.ActorSeat);
@@ -171,7 +167,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
     {
         if (kind == CardKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } window)
             return window;
-        return kind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge) && attack.TargetSeat == actor && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null ? _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId) : null;
+        return kind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge) && attack.TargetSeat == actor && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null ? _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId) : null;
     }
 
     internal void PrepareMouZhaJiangResponse(CharacterState actor, IReadOnlyList<int> ids, CardKind kind)

@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeDodgeRuntime
 {
-    internal void CompleteSuccessfulDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CompleteSuccessfulDodgeResponse(NativeOwners.CardAttackHandle attack)
     {
         if (_coreRecoveryReplacementOperations.TryPauseRecoveryPaidCardUse(attack.ResolutionId, new(RecoveryPaidCardUseKind.DodgeCompletion, attack.SourceSeat)))
             return;
@@ -19,14 +15,14 @@ internal sealed partial class CoreNativeDodgeRuntime
         FinishSuccessfulDodgeResponse(attack);
     }
 
-    internal void FinishSuccessfulDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void FinishSuccessfulDodgeResponse(NativeOwners.CardAttackHandle attack)
     {
         if (_coreRequiredGroupDodgesOperations.TryFinishRequiredGroupDodge(attack))
             return;
         var completed = attack.RegisterDodgeResponse();
         if (attack.RequiredDodgeResponses > 1)
         {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RequiredResponseProgressEvent(attack.ResolutionId, attack.SourceSeat, attack.TargetSeat, global::CardGame.Core.EngineOwners.CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack), CardKind.Dodge, attack.SuccessfulDodgeResponses, attack.RequiredDodgeResponses));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RequiredResponseProgressEvent(attack.ResolutionId, attack.SourceSeat, attack.TargetSeat, CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack), CardKind.Dodge, attack.SuccessfulDodgeResponses, attack.RequiredDodgeResponses));
         }
 
         if (completed)
@@ -45,7 +41,7 @@ internal sealed partial class CoreNativeDodgeRuntime
         _coreNativeSlashUseOperations.ContinueSlashDefense(attack);
     }
 
-    internal void ContinueSlashAfterDodgePrograms(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void ContinueSlashAfterDodgePrograms(NativeOwners.CardAttackHandle attack)
     {
         if (_coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(attack))
         {
@@ -60,7 +56,7 @@ internal sealed partial class CoreNativeDodgeRuntime
         ContinueSlashAfterDodgeCancellation(attack);
     }
 
-    internal void ContinueSlashAfterDodgeCancellation(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void ContinueSlashAfterDodgeCancellation(NativeOwners.CardAttackHandle attack)
     {
         if (_coreNativeQinglongOperations.TryBeginQinglongCrescentBladeChoice(attack))
         {
@@ -75,10 +71,10 @@ internal sealed partial class CoreNativeDodgeRuntime
         _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
 
-    internal void CompleteFactionDefenseBaguaResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, bool succeeded)
+    internal void CompleteFactionDefenseBaguaResponse(NativeOwners.CardAttackHandle attack, bool succeeded)
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense ?? throw new InvalidOperationException("A FactionDefense Bagua judgment has no FactionDefense continuation.");
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(pending.Attack, attack))
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(pending.Attack, attack))
         {
             throw new InvalidOperationException("The FactionDefense Bagua judgment belongs to another attack.");
         }
@@ -95,7 +91,7 @@ internal sealed partial class CoreNativeDodgeRuntime
         _coreBaguaResponsesOperations.PublishFailedBaguaResponse(attack);
     }
 
-    internal void PublishOwnerDodgeDecision(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void PublishOwnerDodgeDecision(NativeOwners.CardAttackHandle attack)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
         var dodges = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(owner, CardKind.Dodge);
@@ -109,7 +105,7 @@ internal sealed partial class CoreNativeDodgeRuntime
         _coreMatchOutcomeStatusAccess._status = owner.IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
 
-    internal void ResolveDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CharacterState defender, Card responseCard)
+    internal void ResolveDodgeResponse(NativeOwners.CardAttackHandle attack, CharacterState defender, Card responseCard)
     {
         if (_characterLiuQiOlOperations.IsWenjiResponseForbidden2(attack.ResolutionId, defender.Seat))
             throw new InvalidOperationException("Wenji forbids this exact Slash Dodge response.");
@@ -128,9 +124,9 @@ internal sealed partial class CoreNativeDodgeRuntime
         var responseCostIsRed = _coreActionDiscardColorsOperations.CapturePhysicalCardColor(defender.Seat, responseCard);
         var completedResponseUseSuit = _coreResponseUseCompletionOperations.FreezeCompletedResponseUseSuit(defender, [responseCard], responseCardKind);
         _coreAlternativeViewAsCostsOperations.PaySingleCardResponse(responseCard, defender, responseCardKind, responseConversion);
-        var incomingName = CardCatalog.Get(global::CardGame.Core.EngineOwners.CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack)).DisplayName;
+        var incomingName = CardCatalog.Get(CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack)).DisplayName;
         var responseName = CardCatalog.Get(responseCardKind).DisplayName;
-        var responseDescription = _coreCardDeclarationsOperations.PublicDeclarationDescription(responseCard, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(responseCard, CardKind.Dodge) ? $"打出【{(responseName)}】" : $"将【{(responseCard.DisplayName)}】当作【{(responseName)}】");
+        var responseDescription = _coreCardDeclarationsOperations.PublicDeclarationDescription(responseCard, CoreNativeCardClassificationsRuntime.IsNativeResponseCard(responseCard, CardKind.Dodge) ? $"打出【{(responseName)}】" : $"将【{(responseCard.DisplayName)}】当作【{(responseName)}】");
         var completesResponse = attack.SuccessfulDodgeResponses + 1 >= attack.RequiredDodgeResponses;
         _coreMatchLogOperations.AddLog("CardResponded", completesResponse ? _coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(attack) ? $"{(defender.Name)} {(responseDescription)}，响应了【{(incomingName)}】，但此杀不能被抵消。" : $"{(defender.Name)} {(responseDescription)}，抵消了【{(incomingName)}】。" : $"{(defender.Name)} {(responseDescription)}响应【{(incomingName)}】；【无双】仍要求下一张【闪】。", defender.Seat, attack.SourceSeat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(responseCard.Id, defender.Seat, attack.SourceSeat, responseCardKind));
@@ -144,7 +140,7 @@ internal sealed partial class CoreNativeDodgeRuntime
         CompleteSuccessfulDodgeResponse(attack);
     }
 
-    internal void ContinueAcceptedCardResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal void ContinueAcceptedCardResponse(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         var processing = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing);
         var responseCosts = _characterXunXuAnniversaryOperations.TryFinishAnniversaryXunXuAcceptedResponse(action) ? [] : action.PhysicalCards;
@@ -179,7 +175,7 @@ internal sealed partial class CoreNativeDodgeRuntime
         ContinueFinishedCardResponse(attack, action, continuation);
     }
 
-    internal void ContinueFinishedCardResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal void ContinueFinishedCardResponse(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         if (_characterXunYuMobileGodOperations.TryContinueQizhengResponse(attack, action, continuation))
             return;

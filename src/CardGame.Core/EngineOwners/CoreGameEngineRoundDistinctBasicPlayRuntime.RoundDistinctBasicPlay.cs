@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRoundDistinctBasicPlayRuntime
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicPlayRuntime
         {
             var kind = selection.OutputKind;
             var targets = RoundDistinctBasicPlayTargets(owner, selection);
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && targets.Count == 0 || kind == CardKind.Peach && targets.Count == 0 || kind == CardKind.Alcohol && !CanUseRoundDistinctBasicAlcohol(owner, selection.Cards))
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && targets.Count == 0 || kind == CardKind.Peach && targets.Count == 0 || kind == CardKind.Alcohol && !CanUseRoundDistinctBasicAlcohol(owner, selection.Cards))
                 continue;
             var ids = Array.AsReadOnly(selection.Cards.Select(c => c.Id).Order().ToArray());
             var targetCount = kind == CardKind.Alcohol ? 0 : 1;
@@ -39,7 +35,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicPlayRuntime
                 ConversionSource = selection.Source,
                 SelectableCardIds = ids,
                 SelectableTargetSeats = Array.AsReadOnly(targets.ToArray()),
-                ProgramAiHint = new(0, kind == CardKind.Peach ? 1 : 0, 0, 0, 0, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0, false, false)
+                ProgramAiHint = new(0, kind == CardKind.Peach ? 1 : 0, 0, 0, 0, CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0, false, false)
                 {
                     ValueAdjustment = kind == CardKind.Alcohol ? 10 : 0
                 }
@@ -52,7 +48,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicPlayRuntime
         var kind = selection.OutputKind;
         var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, selection.Cards);
         var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, selection.Cards);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return _coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, target, kind, suit, effectiveColor: color, physicalCardIds: selection.Cards.Select(c => c.Id).ToArray())).Select(target => target.Seat).Order().ToArray();
         if (kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(owner) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit))
             return[owner.Seat];
@@ -66,7 +62,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicPlayRuntime
             return error;
         if (action.ConversionSource is not { } source || action.PlayedCardKind is not { } kind || _corePlayCardHistoryOperations.ViewAsRule(source)?.RoundDistinctBasicUse is null || _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(owner, cards, kind, false, source)is not { } selection)
             return new(CommandErrorCode.InvalidCard, "The pair conversion requires its exact currently legal same-color hand-like materials.");
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind == CardKind.Peach)
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind == CardKind.Peach)
         {
             if (targets.Count != 1 || !RoundDistinctBasicPlayTargets(owner, selection).Contains(targets[0]))
                 return new(CommandErrorCode.InvalidTarget, "The pair conversion target is no longer legal.");
@@ -125,7 +121,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicPlayRuntime
             throw new InvalidOperationException(error.Message);
         var kind = action.PlayedCardKind!.Value;
         var selection = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(owner, cards, kind, false, source)!;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             _coreNativeSlashUseOperations.ResolveSlashCore(owner, _coreMatchParticipantsPlayersAccess._players[targets[0]], selection.Cards[0], kind, owner.Seat, physicalCards: selection.Cards, conversionSource: source);
         else if (kind == CardKind.Peach)
             _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(owner, owner, selection.Cards[0], "桃", CardKind.Peach, conversionSource: source, physicalCards: selection.Cards);

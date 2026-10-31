@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.DirectedTurnCardPolicy> _directedTurnCardPolicies { get; }
+    ref readonly List<DirectedTurnCardPolicy> _directedTurnCardPolicies { get; }
 }

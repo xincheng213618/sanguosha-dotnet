@@ -2,9 +2,9 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRequestedDeckBasicOwnershipEntries
 {
-    internal void AssertRequestedDeckBasicFrame(global::CardGame.Core.RequestedDeckBasicFrame view) => _resolve().AssertRequestedDeckBasicFrame(view);
-    internal bool HasValidRequestedDeckBasicMaterial(global::CardGame.Core.ResolutionFrame owner) => _resolve().HasValidRequestedDeckBasicMaterial(owner);
-    internal bool IsRequestedDeckBasicRescueCost(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.DyingFrame dying, global::CardGame.Core.CardActionCost cost) => _resolve().IsRequestedDeckBasicRescueCost(use, dying, cost);
-    internal global::CardGame.Core.CardActionType RequestedDeckBasicActionType(global::CardGame.Core.RequestedDeckBasicIntent intent) => _resolve().RequestedDeckBasicActionType(intent);
-    internal bool RequestedDeckBasicFrameRidesOn(global::CardGame.Core.ResolutionFrame child, global::CardGame.Core.ResolutionFrame parent) => _resolve().RequestedDeckBasicFrameRidesOn(child, parent);
+    internal void AssertRequestedDeckBasicFrame(RequestedDeckBasicFrame view) => _resolve().AssertRequestedDeckBasicFrame(view);
+    internal bool HasValidRequestedDeckBasicMaterial(ResolutionFrame owner) => _resolve().HasValidRequestedDeckBasicMaterial(owner);
+    internal bool IsRequestedDeckBasicRescueCost(CardUseFrame use, DyingFrame dying, CardActionCost cost) => _resolve().IsRequestedDeckBasicRescueCost(use, dying, cost);
+    internal CardActionType RequestedDeckBasicActionType(RequestedDeckBasicIntent intent) => _resolve().RequestedDeckBasicActionType(intent);
+    internal bool RequestedDeckBasicFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => _resolve().RequestedDeckBasicFrameRidesOn(child, parent);
 }

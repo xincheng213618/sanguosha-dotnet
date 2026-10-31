@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_liu_zhang_ol_ZonghuNeeds
 {
     internal const string ZonghuOpen = "zonghu-request";
@@ -14,5 +13,5 @@ internal static class RuntimeRules_liu_zhang_ol_ZonghuNeeds
     internal static bool ZonghuIsPlayed(ZonghuNeed n)=>n.Intent is ZonghuIntent.Duel or ZonghuIntent.Group or ZonghuIntent.FactionDodge or ZonghuIntent.FactionSlashPlayed;
 
     internal static PendingDecision ZonghuNativeDecision(PendingDecision p)
-    { p=CardGame.Core.RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanpeiRequests.HuanpeiNativeDecision(p);return p.Choices.Any(c=>c.Parameters.ContainsKey(ZonghuOpen))?p with{Choices=Array.AsReadOnly(p.Choices.Where(c=>!c.Parameters.ContainsKey(ZonghuOpen)).ToArray())}:p; }
+    { p=RuntimeRules_huan_shu_jun_ol_HuanpeiRequests.HuanpeiNativeDecision(p);return p.Choices.Any(c=>c.Parameters.ContainsKey(ZonghuOpen))?p with{Choices=Array.AsReadOnly(p.Choices.Where(c=>!c.Parameters.ContainsKey(ZonghuOpen)).ToArray())}:p; }
 }

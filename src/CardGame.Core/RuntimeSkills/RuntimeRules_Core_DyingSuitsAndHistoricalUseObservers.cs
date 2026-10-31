@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_DyingSuitsAndHistoricalUseObservers
 {
     internal static string DyingSuitsCursorHash<T>(T value) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangQuanMouRuntime
@@ -51,9 +47,9 @@ internal sealed partial class CharacterHuangQuanMouRuntime
 
     internal bool HasUnstartedMouHqRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouHqRounds: { } r, Action: { } a } u && a.ActionId == r.ActionId && r.Started < r.Grants.Count && _coreMatchOutcomeWinnerAccess._winner == Winner.None && !IsMouHqUseIneffective(u) && !_coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(u) && !_coreProgramCardUseNullificationOperations.IsProgramUseIneffective(u);
     internal bool IsMouHqRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.MouHqRounds is { Active: true };
-    internal void CaptureMouHqAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CaptureMouHqAttack(NativeOwners.CardAttackHandle attack)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouHqRounds: { Started: 0 } r, CardAttack: { } original } u || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || r.Native.OriginalAttacks.Any(s => s.TargetIndex == u.TargetIndex))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouHqRounds: { Started: 0 } r, CardAttack: { } original } u || !CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || r.Native.OriginalAttacks.Any(s => s.TargetIndex == u.TargetIndex))
             return;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(u.Id, current => current with { MouHqRounds = r with { Native = r.Native with { OriginalAttacks = r.Native.OriginalAttacks.Append(new(u.TargetIndex, original)).ToArray(), Fangtian = current.Continuations.FangtianHalberd ?? r.Native.Fangtian } } });
     }
@@ -78,7 +74,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         if (!ValidMouHqEffectGrant(u, grant, true))
             throw new InvalidOperationException("Qiaodui lost the original-use extra-effect grant.");
         // Delayed placement has one actual entity. The extra placement cannot duplicate it after it entered Judgment.
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(u.CardKind))
+        if (CoreNativeCardClassificationsRuntime.IsDelayedCard(u.CardKind))
         {
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, current => current with { MouHqRounds = r with { Started = r.Started + 1 } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHqEffectRoundStartedEvent(id, a.ActionId, grant.FrameId, r.Started + 1));
@@ -103,7 +99,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind))
         {
             var first = native.OriginalAttacks.OrderBy(s => s.TargetIndex).FirstOrDefault(s => _coreMatchParticipantsPlayersAccess._players[s.Attack.TargetSeat].IsAlive && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(id, s.Attack.TargetSeat));
             if (first is null)
@@ -120,7 +116,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
                 _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd = _kernelCoreMainOperations.CreateFangtianHalberdHandle(id);
             }
 
-            _coreCardAttackStateOperations.UpdateCardAttackState(id, _ => global::CardGame.Core.EngineOwners.CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(first.Attack));
+            _coreCardAttackStateOperations.UpdateCardAttackState(id, _ => CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(first.Attack));
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id);
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             _coreNativeSlashUseOperations.ContinueSlashDefense(attack);
@@ -147,7 +143,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         throw new InvalidOperationException("Qiaodui lost its original native card-effect continuation.");
     }
 
-    internal bool ContinueMouHqFangtian(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool ContinueMouHqFangtian(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouHqRounds: { Active: true } r } u)
             return false;
@@ -158,7 +154,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
             return true;
         }
 
-        _coreCardAttackStateOperations.UpdateCardAttackState(u.Id, _ => global::CardGame.Core.EngineOwners.CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(seed.Attack));
+        _coreCardAttackStateOperations.UpdateCardAttackState(u.Id, _ => CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(seed.Attack));
         _coreNativeSlashUseOperations.ContinueSlashDefense(attack);
         return true;
     }

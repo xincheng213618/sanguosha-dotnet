@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime))]
-internal sealed class CharacterJiaXuMouCoreProgramTargetRulesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterJiaXuMouCoreProgramTargetRulesOperations
+[Core.ProgramCapability(typeof(CoreProgramTargetRulesRuntime))]
+internal sealed class CharacterJiaXuMouCoreProgramTargetRulesAdapter(Func<CoreProgramTargetRulesRuntime> targetFactory) : ICharacterJiaXuMouCoreProgramTargetRulesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
+    private readonly Func<CoreProgramTargetRulesRuntime> _targetFactory = targetFactory;
+    public ProgramTargetRules TargetRules { get => this._targetFactory().TargetRules; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MouJiaXuRuntime))]
-internal sealed class CharacterJiaXuMouMouJiaXuAdapter(global::System.Func<global::CardGame.Core.MouJiaXuRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterJiaXuMouMouJiaXuOperations
+[Core.ProgramCapability(typeof(MouJiaXuRuntime))]
+internal sealed class CharacterJiaXuMouMouJiaXuAdapter(Func<MouJiaXuRuntime> targetFactory) : ICharacterJiaXuMouMouJiaXuOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MouJiaXuRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MouJiaXuRuntime Get() => this._targetFactory();
+    private readonly Func<MouJiaXuRuntime> _targetFactory = targetFactory;
+    public MouJiaXuRuntime Get() => this._targetFactory();
 }

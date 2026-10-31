@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeGuoLeRuntime
 {
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedBeforeActivity, 20)]
-    internal bool LeZhugeGuoFinalizedBeforeActivityTargetWindow(ProgramTargetCardWindowQuery query) => HasLeZhugeGuoCapability && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(query.Kind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind));
+    internal bool LeZhugeGuoFinalizedBeforeActivityTargetWindow(ProgramTargetCardWindowQuery query) => HasLeZhugeGuoCapability && (CoreNativeCardClassificationsRuntime.IsSlashCard(query.Kind) || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind));
     internal const string LeXidi = "le:xidi", LeChengyan = "le:chengyan", LeChengyanDrawReason = "skill-program.le:chengyan.draw";
     internal bool HasLeZhugeGuoCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveLeZhugeGuoChengyan) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeLeZhugeGuoXidi);
 
-    internal static CardConversionSource LeZhugeGuoSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhuge_guo_le_LeZhugeGuoXidi.LeZhugeGuoSource(f);
+    internal static CardConversionSource LeZhugeGuoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhuge_guo_le_LeZhugeGuoXidi.LeZhugeGuoSource(f);
     // Registration only; the query still belongs to legacy GameEngine.LeZhugeGuoXidi.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 150)]
     internal void ProjectLeXidiCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
@@ -59,7 +55,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
         return _coreProgramTopReorderOperations.BeginProgramTopReorder(f, Math.Max(1, count), null);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeZhugeGuoHost.Initialize(ProgramSkillFrame f) => InitializeLeXidi(f);
-    SkillProgramStepOutcome global::CardGame.Core.ILeZhugeGuoHost.Reorder(ProgramSkillFrame f) => ReorderLeXidi(f);
-    SkillProgramStepOutcome global::CardGame.Core.ILeZhugeGuoHost.Chengyan(ProgramSkillFrame f) => StartLeChengyan(f);
+    SkillProgramStepOutcome ILeZhugeGuoHost.Initialize(ProgramSkillFrame f) => InitializeLeXidi(f);
+    SkillProgramStepOutcome ILeZhugeGuoHost.Reorder(ProgramSkillFrame f) => ReorderLeXidi(f);
+    SkillProgramStepOutcome ILeZhugeGuoHost.Chengyan(ProgramSkillFrame f) => StartLeChengyan(f);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeNullificationRuntime
@@ -21,9 +17,9 @@ internal sealed partial class CoreNativeNullificationRuntime
 
         if (_coreCardUseLifecycleOperations.TryBeginCommittedCardUse(resolutionId, ProgramCardContinuation.CommittedTrick, trick: new(effectCard.Id, actionKind, targetCardId, requiredCardKind)))
             return;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(effectiveCardKind) && _coreDelayedPlacementTargetProgramsOperations.TryBeginFinalizedDelayedPlacementPrograms(resolutionId, effectCard, actionKind))
+        if (CoreNativeCardClassificationsRuntime.IsDelayedCard(effectiveCardKind) && _coreDelayedPlacementTargetProgramsOperations.TryBeginFinalizedDelayedPlacementPrograms(resolutionId, effectCard, actionKind))
             return;
-        var pending = new global::CardGame.Core.NativeOwners.JizhiResolution(sourceSeat, resolutionId, effectCard, effectiveCardKind, targetSeats, actionKind, targetCardId, requiredCardKind);
+        var pending = new NativeOwners.JizhiResolution(sourceSeat, resolutionId, effectCard, effectiveCardKind, targetSeats, actionKind, targetCardId, requiredCardKind);
         if (_coreCardActionsOperations.TryBeginFinalizedTrickPrograms(pending))
             return;
         if (_coreCardActionsOperations.TryBeginProgramCardUseBeforeTargetEffects2(pending))
@@ -34,11 +30,11 @@ internal sealed partial class CoreNativeNullificationRuntime
         ContinueJizhiOrNullificationAfterTargetTriggers(pending);
     }
 
-    internal void ContinueJizhiOrNullificationAfterTargetTriggers(global::CardGame.Core.NativeOwners.JizhiResolution pending)
+    internal void ContinueJizhiOrNullificationAfterTargetTriggers(NativeOwners.JizhiResolution pending)
     {
         // Placement is the completed use. The delayed effect has its own
         // counterspell window when its holder reaches the Judgment phase.
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(pending.EffectiveCardKind))
+        if (CoreNativeCardClassificationsRuntime.IsDelayedCard(pending.EffectiveCardKind))
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(pending.ResolutionId, ResolutionFrameStep.ResolvingEffect);
             ResolveNullifiableEffect(new NullificationWindowFrame(0, pending.ResolutionId, pending.PlayerSeat, _characterCuiLieAnniversaryOperations.AnniversaryCuiLieDelayedPlacementTargets(pending, _coreOriginalUseLightningOperations.OriginalUseLightningPlacementTargets(pending)), pending.Card.Id, pending.EffectiveCardKind, pending.ActionKind, pending.TargetCardId, pending.RequiredCardKind, []));
@@ -53,7 +49,7 @@ internal sealed partial class CoreNativeNullificationRuntime
         if (actionKind == LegalActionKind.MantianGuohai)
             _coreMantianGuohaiOperations.PrepareMantianGuohaiEffectRound(resolutionId);
         targetSeats = _coreSequentialTrickTargetsOperations.FreezeSequentialTrickTarget(resolutionId, targetSeats, actionKind, targetCardId, requiredCardKind);
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineGroupTargetNullificationRuntime.UsesGroupTargetNullification(actionKind))
+        if (CoreGameEngineGroupTargetNullificationRuntime.UsesGroupTargetNullification(actionKind))
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(resolutionId, ResolutionFrameStep.ResolvingEffect);
             ResolveNullifiableEffect(new NullificationWindowFrame(0, resolutionId, sourceSeat, Array.AsReadOnly(targetSeats.ToArray()), effectCard.Id, playedCardKind ?? effectCard.Kind, actionKind, targetCardId, requiredCardKind, []));
@@ -127,10 +123,10 @@ internal sealed partial class CoreNativeNullificationRuntime
             {
                 PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
                 Choices = CreateNullificationChoices(pending, responder, cards),
-                TargetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending),
+                TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending),
                 RequiredCardKind = CardKind.Nullification
             };
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRequestedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, pending.SourceSeat, responder.Seat, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRequestedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, pending.SourceSeat, responder.Seat, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
             _coreMatchLogOperations.AddLog("NullificationRequested", pending.EffectNullified ? $"{(responder.Name)} 可以继续使用【无懈可击】恢复{(effectDescription)}。" : $"{(responder.Name)} 可以使用【无懈可击】响应{(effectDescription)}。", pending.SourceSeat, responder.Seat);
             pending = _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { Step = ResolutionFrameStep.AwaitingResponse });
             _coreMatchOutcomeStatusAccess._status = responder.IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
@@ -154,12 +150,12 @@ internal sealed partial class CoreNativeNullificationRuntime
     internal IReadOnlyList<Card> GetNullificationCards(CharacterState responder) => _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(responder).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(responder)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileResponseCards(responder, CardKind.Nullification)).Where(card => !_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(responder.Seat, CardKind.Nullification, [card.Id]) && _coreProgramCardLegalityOperations.IsProgramNativeResponseAllowed(responder, CardKind.Nullification, [card.Id]) && !_coreCardUseModulesOperations.IsCardUseForbidden(responder.Seat, CardKind.Nullification, CardActionType.Use) && !_characterCuiYanOlOperations.IsCuiYanNativeResponseForbidden(responder, CardKind.Nullification, [card]) && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(responder, card) && (!_coreCardConversionsOperations.HasProgramCardIdentity(responder, card) || _characterGuanYuWumiaoOperations.IsWuyouIdentityKind(responder, card, CardKind.Nullification)) && (_characterGuanYuWumiaoOperations.IsWuyouIdentityKind(responder, card, CardKind.Nullification) || card.Kind == CardKind.Nullification || _coreActionQueriesOperations.GetProgramViewAsConversions(responder, card, CardKind.Nullification, forResponse: true).Count != 0)).Concat(_coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(responder, CardKind.Nullification, true).Select(selection => selection.Cards[0])).DistinctBy(card => card.Id).ToArray();
     internal static CardConversionSource? ReadPublishedNullificationSource(PromptChoice choice)
     {
-        if (choice.Parameters.ContainsKey("conversion-skill-id") && !global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source))
+        if (choice.Parameters.ContainsKey("conversion-skill-id") && !CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source))
         {
             throw new InvalidOperationException("The Nullification choice has an invalid conversion source.");
         }
 
-        _ = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var selected);
+        _ = CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var selected);
         return selected;
     }
 
@@ -239,12 +235,12 @@ internal sealed partial class CoreNativeNullificationRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(card.Id, responder.Seat, pending.SourceSeat, CardKind.Nullification));
         if (pending.NamedAmbushResponse is null)
         {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, responder.Seat, card.Id, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, responder.Seat, card.Id, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
             _coreMatchLogOperations.AddLog("NullificationResponded", pending.EffectNullified ? $"{(responder.Name)} 使用【无懈可击】，使{(_coreGroupTargetNullificationOperations.NullificationEffectDescription(pending))}失效。" : $"{(responder.Name)} 使用【无懈可击】，使{(_coreGroupTargetNullificationOperations.NullificationEffectDescription(pending))}恢复。", responder.Seat, pending.SourceSeat);
         }
 
         var parentActionId = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(frame => frame.Id == pending.ParentFrameId)?.Action?.ActionId;
-        var responseAction = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, parentActionId, CardActionType.Response, responder.Seat, responder.Seat, null, responder.Seat, pending.SourceSeat, CardKind.Nullification, [], [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)], selectedConversionSource is null ? [] : [selectedConversionSource], effectiveSuit: completedResponseUseSuit, effectiveRank: _characterGuanYuWumiaoOperations.CaptureJuewuResponseRank(responder, [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)]) ?? _characterLuXunWumiaoOperations.CaptureWuLuXunResponseRank(responder, CardKind.Nullification, [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)], selectedConversionSource) ?? _characterZhangFeiWumiaoOperations.CaptureWuZhangFeiResponseRank(responder, CardKind.Nullification, [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)], selectedConversionSource) ?? (_characterMiHengLeOperations.IsSiruiSource(selectedConversionSource) || _characterLiFengOlOperations.HasLiFengCapability && responseFrom.Zone == CardZoneKind.PublicPersistentPile ? card.Rank : (int? )null), effectiveIsRed: (_characterRuanYuOlOperations.HasRuanYuCapability || _characterMaMiDiOlOperations.HasMaMiDiCapability || _coreActionDiscardColorsOperations.TracksActionDiscardColor || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferPairedColorCardDisposition)) ? global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(completedResponseUseSuit) ?? responseCostIsRed : null));
+        var responseAction = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, parentActionId, CardActionType.Response, responder.Seat, responder.Seat, null, responder.Seat, pending.SourceSeat, CardKind.Nullification, [], [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)], selectedConversionSource is null ? [] : [selectedConversionSource], effectiveSuit: completedResponseUseSuit, effectiveRank: _characterGuanYuWumiaoOperations.CaptureJuewuResponseRank(responder, [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)]) ?? _characterLuXunWumiaoOperations.CaptureWuLuXunResponseRank(responder, CardKind.Nullification, [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)], selectedConversionSource) ?? _characterZhangFeiWumiaoOperations.CaptureWuZhangFeiResponseRank(responder, CardKind.Nullification, [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)], selectedConversionSource) ?? (_characterMiHengLeOperations.IsSiruiSource(selectedConversionSource) || _characterLiFengOlOperations.HasLiFengCapability && responseFrom.Zone == CardZoneKind.PublicPersistentPile ? card.Rank : (int? )null), effectiveIsRed: (_characterRuanYuOlOperations.HasRuanYuCapability || _characterMaMiDiOlOperations.HasMaMiDiCapability || _coreActionDiscardColorsOperations.TracksActionDiscardColor || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferPairedColorCardDisposition)) ? CoreGameEnginePublicPileColorsRuntime.SuitColor(completedResponseUseSuit) ?? responseCostIsRed : null));
         _characterZhangFeiWumiaoOperations.BindWuZhangFeiResponseRanks(responseAction);
         _characterMiHengLeOperations.BindSiruiResponseAction(pending, responseAction);
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == pending.Id);
@@ -284,7 +280,7 @@ internal sealed partial class CoreNativeNullificationRuntime
         frame = _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().Single(item => item.Id == frame.Id);
         pending = _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(frame with { Step = ResolutionFrameStep.Completed });
         _coreRuntimeOperations.PopResolutionFrame(pending.Id, ResolutionFrameKind.NullificationWindow);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationResolvedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationResolvedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (pending.DelayedReturn is { } delayed)
         {

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class LeXiaoQiaoQiqinCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterXiaoQiaoLeEntries> getCharacterXiaoQiaoLeRuntime) : ILeXiaoQiaoQiqinHost
+internal sealed class LeXiaoQiaoQiqinCapability(Func<RuntimeEntries.CharacterXiaoQiaoLeEntries> getCharacterXiaoQiaoLeRuntime) : ILeXiaoQiaoQiqinHost
 {
     public SkillProgramStepOutcome Initialize(ProgramSkillFrame f) => getCharacterXiaoQiaoLeRuntime().InitializeQiqin(f);
     public SkillProgramStepOutcome Collect(ProgramSkillFrame f) => getCharacterXiaoQiaoLeRuntime().BeginQiqinCollect(f);

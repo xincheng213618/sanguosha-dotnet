@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunQuanHappyGodRuntime
 {
     internal const string HappyShehuReason = "skill-program.happy-shehu.discard", HappyDingliDraw = "skill-program.happy-dingli.draw";
-    internal static CardConversionSource HappySunQuanSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IHappySunQuanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappySunQuan(f, op);
+    internal static CardConversionSource HappySunQuanSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IHappySunQuanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappySunQuan(f, op);
     internal ProgramLifecycleTriggerWindowFrame? HappyLearningParent(long id) => _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(p => p.Id == id && p.HappyLearningStart is not null);
     internal ProgramCardTriggerWindowFrame? HappyShehuParent(long id) => _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(p => p.Id == id);
     internal bool HappyDingliQualified(int owner, int holder) => owner != holder && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[holder].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && _coreMatchParticipantsPlayersAccess._players[holder].HasHpValue && (_coreMatchParticipantsPlayersAccess._players[holder].Hp < _coreMatchParticipantsPlayersAccess._players[owner].Hp || _coreMatchParticipantsPlayersAccess._players[owner].Hp < _coreMatchParticipantsPlayersAccess._players[owner].MaxHp);
@@ -22,7 +19,7 @@ internal sealed partial class CharacterSunQuanHappyGodRuntime
         if (c.SkillId == HappySunQuanComposition.Learning)
             return IsIssuedHappyLearning(c, w);
         if (c.SkillId == HappySunQuanComposition.Shehu)
-            return HappyShehuParent(w.ParentFrameId)is { } p && p.Action.Type == CardActionType.Use && p.Action.ActorSeat == c.OwnerSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.Action.EffectiveKind) && p.Action.EffectiveDesignatedTargetSeats.Any(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive && HappyXue(s) > 0 && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Count > 0) && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappySunQuanStartedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.Operation == SkillProgramEffectOp.ResolveHappySunQuanShehu && e.ActionId == p.Action.ActionId);
+            return HappyShehuParent(w.ParentFrameId)is { } p && p.Action.Type == CardActionType.Use && p.Action.ActorSeat == c.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(p.Action.EffectiveKind) && p.Action.EffectiveDesignatedTargetSeats.Any(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive && HappyXue(s) > 0 && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Count > 0) && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappySunQuanStartedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.Operation == SkillProgramEffectOp.ResolveHappySunQuanShehu && e.ActionId == p.Action.ActionId);
         return HappyLearningParent(w.ParentFrameId)is { } start && IsHappyLearningStart(start) && start.CandidateIndex > 0 && start.CandidateIndex < start.Candidates.Count && start.Candidates[start.CandidateIndex] == c && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyLearningChoiceEvent>().Count(e => e.WindowId == start.Id) == 1 && HappyDingliQualified(c.OwnerSeat, start.OwnerSeat);
     }
 
@@ -175,7 +172,7 @@ internal sealed partial class CharacterSunQuanHappyGodRuntime
     internal void AnswerHappySunQuan(PromptChoice chosen)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Happy Sun Quan lost his choice parent.");
-        if (!HappySunQuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
+        if (!HappySunQuanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
             throw new InvalidOperationException("Happy Sun Quan requires his exact current choice.");
         var r = f.HappySunQuan!;
         var option = chosen.Parameters["option"];

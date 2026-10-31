@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramArmorOperationsRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CoreProgramArmorOperationsRuntime
         if (!_modeRulesOperations._modeRules.AllowsArmorGain)
             return;
         var payments = targets.Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive).Select(seat => (Seat: seat, Before: _coreMatchParticipantsPlayersAccess._players[seat].Armor, After: checked(_coreMatchParticipantsPlayersAccess._players[seat].Armor + effect.Amount))).ToArray();
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(active);
+        var source = CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(active);
         foreach (var payment in payments)
         {
             _coreMatchParticipantsPlayersAccess._players[payment.Seat].Armor = payment.After;
@@ -35,5 +31,5 @@ internal sealed partial class CoreProgramArmorOperationsRuntime
         }
     }
 
-    void global::CardGame.Core.IArmorProgramHost.GrantArmor(ProgramSkillFrame frame) => GrantProgramArmor(frame);
+    void IArmorProgramHost.GrantArmor(ProgramSkillFrame frame) => GrantProgramArmor(frame);
 }

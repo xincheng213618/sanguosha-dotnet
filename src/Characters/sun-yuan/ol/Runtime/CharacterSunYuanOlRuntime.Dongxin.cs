@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunYuanOlRuntime
@@ -22,7 +17,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
     internal void ReclaimDongxin(ProgramSkillFrame f)
     {
         var r = f.SunYuan!;
-        var eligible = r.Materials.Where(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.EffectiveKind) && _cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, c.CardId) && _coreProgramEventHistoryOperations.ProgramEventHistory<SunYuanEntityMovedEvent>().SingleOrDefault(e => e.FrameId == f.Id && e.Stage == SunYuanStage.DiscardChildren && e.CardId == c.CardId)is { } paid && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == c.CardId).Sequence == paid.Sequence).Select(c => c.CardId).ToArray();
+        var eligible = r.Materials.Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.EffectiveKind) && _cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, c.CardId) && _coreProgramEventHistoryOperations.ProgramEventHistory<SunYuanEntityMovedEvent>().SingleOrDefault(e => e.FrameId == f.Id && e.Stage == SunYuanStage.DiscardChildren && e.CardId == c.CardId)is { } paid && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == c.CardId).Sequence == paid.Sequence).Select(c => c.CardId).ToArray();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || eligible.Length == 0)
         {
             FinishSunYuan(f, true);

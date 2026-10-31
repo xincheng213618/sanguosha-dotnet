@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuJingOlRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CharacterWuJingOlRuntime
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is { CardKind: CardKind.Duel, Continuations.Duel: { Active: true } } completedDuel)
         {
             var parentIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-            if (parentIndex < 2 || !ReferenceEquals(_resolutionStackOperations._resolutionStack[parentIndex - 2], completedDuel) || completedDuel.Step != ResolutionFrameStep.Completed || completedDuel.Action?.ActionId != r.ActionId || !completedDuel.TargetSeats.SequenceEqual([r.TargetSeat]) || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } completed } || completed.ParentCardUseFrameId != completedDuel.Id || completed.CardActionId != r.ActionId || _resolutionStackOperations._resolutionStack[parentIndex - 1] is not ProgramCardTriggerWindowFrame window || window.Id != r.WindowId || window.ParentFrameId != completedDuel.Id || window.AttackOwnerFrameId != completedDuel.Id || window.Action.ActionId != r.ActionId || window.Continuation != ProgramCardContinuation.CompletedSlash || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == completedDuel.Id && e.CardId == completedDuel.CardId && e.CardKind == CardKind.Duel) != 1)
+            if (parentIndex < 2 || !ReferenceEquals(_resolutionStackOperations._resolutionStack[parentIndex - 2], completedDuel) || completedDuel.Step != ResolutionFrameStep.Completed || completedDuel.Action?.ActionId != r.ActionId || !completedDuel.TargetSeats.SequenceEqual([r.TargetSeat]) || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } completed } || completed.ParentCardUseFrameId != completedDuel.Id || completed.CardActionId != r.ActionId || _resolutionStackOperations._resolutionStack[parentIndex - 1] is not ProgramCardTriggerWindowFrame window || window.Id != r.WindowId || window.ParentFrameId != completedDuel.Id || window.AttackOwnerFrameId != completedDuel.Id || window.Action.ActionId != r.ActionId || window.Continuation != ProgramCardContinuation.CompletedSlash || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == completedDuel.Id && e.CardId == completedDuel.CardId && e.CardKind == CardKind.Duel) != 1)
                 throw new InvalidOperationException("Heji may retire only its exact already-finished Duel response continuation.");
             _coreCardAttackStateOperations.UpdateCardContinuations(completedDuel.Id, state => state with { Duel = state.Duel!with { Active = false } });
         }
@@ -70,7 +66,7 @@ internal sealed partial class CharacterWuJingOlRuntime
         var a = current;
         if (use.CurrentSlashFirePolicy is { } fire)
         {
-            if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind) || fire.OriginalKind != r.Kind || fire.OriginalAction.ActionId != r.ActionId)
+            if (!CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind) || fire.OriginalKind != r.Kind || fire.OriginalAction.ActionId != r.ActionId)
                 return false;
             _coreCurrentSlashFireOffersOperations.AssertCurrentSlashFirePolicy(use);
             a = fire.OriginalAction;
@@ -107,7 +103,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 27130)]
-    internal bool ReturnWuJingAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnWuJingAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuJing: { Stage: WuJingStage.NativeUse, NativeCompleted: true, NativeOrigin: { } origin } r } f || completion.ResolutionId != origin.UseId)
             return false;
@@ -132,7 +128,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     {
         if (_coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.RewardHejiUnconvertedUse }] || WuJingCompletedUse(context)is not { WuJingHeji: { Rewarded: false, Origin: { RewardEligible: true } r }, Action.ConversionChain.Count: 0 } use || !IsWuJingHejiUse(use) || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || r.Source.OwnerSeat != c.OwnerSeat || r.Source.SkillId != c.SkillId || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash)
             return false;
-        return context.ParentFrameId == 0 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is ProgramCardTriggerWindowFrame w && w.ParentFrameId == r.UseId && w.Action.ActionId == r.ActionId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) == c;
+        return context.ParentFrameId == 0 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is ProgramCardTriggerWindowFrame w && w.ParentFrameId == r.UseId && w.Action.ActionId == r.ActionId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) == c;
     }
 
     internal bool WuJingHejiTrickMaterialsMatch(CardUseFrame use, CardMovementBatchContext batch)
@@ -152,7 +148,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MatchBatch, 50)]
-    internal bool IsWuJingHejiTrickPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => WuJingHejiTrickMaterialsMatch(use, batch) && global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch);
+    internal bool IsWuJingHejiTrickPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => WuJingHejiTrickMaterialsMatch(use, batch) && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch);
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.TrailingTail, 40)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.HpObserverTail, 40)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SharedProcessingTail, 40)]

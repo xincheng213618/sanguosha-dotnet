@@ -1,8 +1,7 @@
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_GameStartingNativeMovementInvoices
 {
     internal static bool SameGameStartingNativeMovementOrigin(GameStartingNativeMovementOrigin? left, GameStartingNativeMovementOrigin? right) =>
@@ -14,5 +13,5 @@ internal static class RuntimeRules_Core_GameStartingNativeMovementInvoices
 
     internal static bool SameGameStartingMovementDrawOrigin(GameStartingMovementDrawOrigin? left, GameStartingMovementDrawOrigin? right) =>
         ReferenceEquals(left, right) || left is not null && right is not null && left.DrawChild == right.DrawChild &&
-        CardGame.Core.RuntimeSkills.RuntimeRules_Core_GameStartingNativeMovementInvoices.SameGameStartingNativeMovementOrigin(left.MovementRoot, right.MovementRoot);
+        RuntimeRules_Core_GameStartingNativeMovementInvoices.SameGameStartingNativeMovementOrigin(left.MovementRoot, right.MovementRoot);
 }

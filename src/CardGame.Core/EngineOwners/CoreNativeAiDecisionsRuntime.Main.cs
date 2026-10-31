@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeAiDecisionsRuntime
@@ -108,7 +104,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade ?? throw new InvalidOperationException("AI Qinglong Crescent Blade response has no active resolution.");
         var attack = pending.Attack;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.QinglongCrescentBlade } decision || decision.PlayerSeat != attack.SourceSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.QinglongCrescentBlade } decision || decision.PlayerSeat != attack.SourceSeat)
         {
             throw new InvalidOperationException("The pending AI Qinglong Crescent Blade prompt is inconsistent.");
         }
@@ -124,7 +120,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveIceSword ?? throw new InvalidOperationException("AI Ice Sword response has no active resolution.");
         var attack = pending.Attack;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.IceSword } decision || decision.PlayerSeat != attack.SourceSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.IceSword } decision || decision.PlayerSeat != attack.SourceSeat)
         {
             throw new InvalidOperationException("The pending AI Ice Sword prompt is inconsistent.");
         }
@@ -140,7 +136,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveQilinBow ?? throw new InvalidOperationException("AI Qilin Bow response has no active resolution.");
         var attack = pending.Attack;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.QilinBow } decision || decision.PlayerSeat != attack.SourceSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.QilinBow } decision || decision.PlayerSeat != attack.SourceSeat)
         {
             throw new InvalidOperationException("The pending AI Qilin Bow prompt is inconsistent.");
         }
@@ -157,7 +153,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords ?? throw new InvalidOperationException("AI Cixiong Double Swords response has no active resolution.");
         var attack = pending.Attack;
         var responderSeat = pending.Stage == CixiongDoubleSwordsStage.SourceActivation ? attack.SourceSeat : attack.TargetSeat;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.CixiongDoubleSwords } decision || decision.PlayerSeat != responderSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.CixiongDoubleSwords } decision || decision.PlayerSeat != responderSeat)
         {
             throw new InvalidOperationException("The pending AI Cixiong Double Swords prompt is inconsistent.");
         }
@@ -173,7 +169,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveStoneAxe ?? throw new InvalidOperationException("AI Stone Axe response has no active resolution.");
         var attack = pending.Attack;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.StoneAxe } decision || decision.PlayerSeat != attack.SourceSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.StoneAxe } decision || decision.PlayerSeat != attack.SourceSeat)
         {
             throw new InvalidOperationException("The pending AI Stone Axe prompt is inconsistent.");
         }
@@ -365,7 +361,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
         if (_coreTieredRoundZeroResponsesOperations.TryResolveTieredRoundZeroAiCounterspell())
             return;
         var view = _corePlayerViewProjectionOperations.CreateSnapshot(responder.Seat);
-        var(cardId, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[responder.Seat].ChooseNullification(view, pending.DelayedReturn is not null ? pending.EffectCardKind : _coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending).Kind, pending.SourceSeat, global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending), pending.EffectNullified, pending.ChainDepth, decision.ValidCardIds, ++_coreAiDiagnosticsAiGeneralThoughtsAiThoughtsThoughtSequenceAccess._thoughtSequence, pending.TargetSeats, includeEquipment: _coreProgramCardPoliciesOperations.HasCardPolicy(responder, SkillProgramCardPolicyKind.UnrespondableNullification, CardKind.Nullification) || _coreProvenanceCardPoliciesOperations.HasProvenanceCounterspellMaterials(responder, decision.ValidCardIds), includeGrain: _coreProvenanceCardPoliciesOperations.HasProvenanceGrainCounterspellMaterials(responder, decision.ValidCardIds), originalPublicPileCardIds: view.PendingDecision?.Choices.Where(choice => choice.Parameters.GetValueOrDefault("native-original-public-pile") == "true").SelectMany(choice => choice.Cards).Distinct().ToArray());
+        var(cardId, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[responder.Seat].ChooseNullification(view, pending.DelayedReturn is not null ? pending.EffectCardKind : _coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending).Kind, pending.SourceSeat, CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending), pending.EffectNullified, pending.ChainDepth, decision.ValidCardIds, ++_coreAiDiagnosticsAiGeneralThoughtsAiThoughtsThoughtSequenceAccess._thoughtSequence, pending.TargetSeats, includeEquipment: _coreProgramCardPoliciesOperations.HasCardPolicy(responder, SkillProgramCardPolicyKind.UnrespondableNullification, CardKind.Nullification) || _coreProvenanceCardPoliciesOperations.HasProvenanceCounterspellMaterials(responder, decision.ValidCardIds), includeGrain: _coreProvenanceCardPoliciesOperations.HasProvenanceGrainCounterspellMaterials(responder, decision.ValidCardIds), originalPublicPileCardIds: view.PendingDecision?.Choices.Where(choice => choice.Parameters.GetValueOrDefault("native-original-public-pile") == "true").SelectMany(choice => choice.Cards).Distinct().ToArray());
         AddThought(thought);
         var selected = cardId is { } selectedCardId ? _coreNativeNullificationOperations.GetNullificationCards(responder).Single(card => card.Id == selectedCardId) : null;
         if (selected is not null && decision.Choices.FirstOrDefault(candidate => candidate.Cards.Contains(selected.Id) && candidate.Parameters.GetValueOrDefault("response") == "extended-view-as")is { } extendedChoice && !decision.Choices.Any(candidate => candidate.Cards is [var singleId] && singleId == selected.Id))
@@ -375,7 +371,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
         }
 
         var choice = selected is null ? null : decision.Choices.FirstOrDefault(candidate => candidate.Cards is [var publishedCardId] && publishedCardId == selected.Id && candidate.Parameters.GetValueOrDefault("response") == "nullification") ?? throw new InvalidOperationException("The AI Nullification response has no published source choice.");
-        var selectedConversionSource = choice is null ? null : global::CardGame.Core.EngineOwners.CoreNativeNullificationRuntime.ReadPublishedNullificationSource(choice);
+        var selectedConversionSource = choice is null ? null : CoreNativeNullificationRuntime.ReadPublishedNullificationSource(choice);
         if (selected is not null)
             _coreNativeNullificationOperations.ValidateNullificationConversion(responder, selected, selectedConversionSource);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -457,7 +453,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
         else
         {
             var revealed = _coreNativeFireAttackOperations.GetFireAttackRevealedCard(pending);
-            var(cardId, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseFireAttackDiscard(view, global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending), revealed.Suit, decision.ValidCardIds, ++_coreAiDiagnosticsAiGeneralThoughtsAiThoughtsThoughtSequenceAccess._thoughtSequence);
+            var(cardId, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseFireAttackDiscard(view, CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending), revealed.Suit, decision.ValidCardIds, ++_coreAiDiagnosticsAiGeneralThoughtsAiThoughtsThoughtSequenceAccess._thoughtSequence);
             AddThought(thought);
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreNativeFireAttackOperations.ResolveFireAttackDiscard(pending, cardId);
@@ -641,7 +637,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = null;
         var dodges = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(target, CardKind.Dodge);
         if (_coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(attack)is { } requireRed)
-            dodges = dodges.Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(target, card)) == requireRed).ToList();
+            dodges = dodges.Where(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(target, card)) == requireRed).ToList();
         var dodge = dodges.FirstOrDefault();
         var hasBagua = !attack.IgnoresArmor && _coreNativeEquipmentAndFactionQueriesOperations.HasBagua(target) && responseDecision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("response") == "bagua");
         if (!target.IsAlive || (dodge is null && !hasBagua))

@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterAHuiNanOlRuntime
 {
     internal const string AHuiNanDrawReason = "skill-program.a-hui-nan.jueman.draw";
-    internal static bool AHuiNanBasicKind(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_a_hui_nan_ol_AHuiNan.AHuiNanBasicKind(kind);
+    internal static bool AHuiNanBasicKind(CardKind kind) => RuntimeSkills.RuntimeRules_a_hui_nan_ol_AHuiNan.AHuiNanBasicKind(kind);
     internal bool HasAHuiNanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJuemanFirstBasicTurnEnd);
 
-    internal static CardConversionSource AHuiNanSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_a_hui_nan_ol_AHuiNan.AHuiNanSource(f);
+    internal static CardConversionSource AHuiNanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_a_hui_nan_ol_AHuiNan.AHuiNanSource(f);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27200)]
     internal void ObserveAHuiNanBasicUses(IGameEvent payload)
     {
@@ -41,7 +38,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         if (payload is not CardActionAcceptedEvent { Action: { Type: CardActionType.Response, EffectiveKind: CardKind.Dodge } response } || response.ActorSeat != response.ProviderSeat || response.ResponderSeat != response.ActorSeat || response.RequesterSeat is not null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(response.ActorSeat) || recorded.Any(e => e.ActionId == response.ActionId))
             return;
         var defending = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == response.ParentActionId && u.CardAttack?.TargetSeat == response.ActorSeat);
-        if (defending?.CardAttack is not { EffectiveCardKind: { } incoming } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) || response.OpponentSeat != attack.SourceSeat || !_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[response.ActorSeat], CardKind.Dodge))
+        if (defending?.CardAttack is not { EffectiveCardKind: { } incoming } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) || response.OpponentSeat != attack.SourceSeat || !_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[response.ActorSeat], CardKind.Dodge))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AHuiNanBasicUseRecordedEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, defending.Id, response.ActionId, response.ActorSeat, CardKind.Dodge, recorded.Length + 1));
     }
@@ -61,7 +58,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         return _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(d => d.Id == context.ParentFrameId)is { } dying && dying.VictimSeat == use.SourceSeat && dying.ResponderIndex >= 0 && dying.ResponderIndex < dying.ResponderSeats.Count && dying.ResponderSeats[dying.ResponderIndex] == use.SourceSeat;
     }
 
-    internal AHuiNanBasicUseSnapshot[] AHuiNanHistory(int turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<AHuiNanBasicUseRecordedEvent>().Where(e => e.ActualTurn == turn).OrderBy(e => e.Index).Select(e => new AHuiNanBasicUseSnapshot(e, _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCurrentSlashFireChangedEvent>().LastOrDefault(c => c.CardUseFrameId == e.OriginFrameId && c.ActionId == e.ActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.Kind))?.FinalKind ?? e.Kind)).ToArray();
+    internal AHuiNanBasicUseSnapshot[] AHuiNanHistory(int turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<AHuiNanBasicUseRecordedEvent>().Where(e => e.ActualTurn == turn).OrderBy(e => e.Index).Select(e => new AHuiNanBasicUseSnapshot(e, _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCurrentSlashFireChangedEvent>().LastOrDefault(c => c.CardUseFrameId == e.OriginFrameId && c.ActionId == e.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(e.Kind))?.FinalKind ?? e.Kind)).ToArray();
     internal bool AHuiNanEndingParent(ProgramTriggerCandidate c, ProgramSkillWindowContext context, out DeferredTurnEndFrame? parent)
     {
         parent = _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId);
@@ -74,10 +71,10 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         if (f.SkillId != "ol:jueman" || f.TriggerId is null || f.ActivationId != f.TriggerId || f.WindowContext is not { } context)
             return false;
         var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
-        return AHuiNanEndingParent(c, context, out var parent) && parent!.AfterTurnEnded?.CurrentChild?.FrameId == f.Id && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.OwnerSeat == f.OwnerSeat && e.Window == SkillProgramTriggerWindow.AfterTurnEnded) == 1;
+        return AHuiNanEndingParent(c, context, out var parent) && parent!.AfterTurnEnded?.CurrentChild?.FrameId == f.Id && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.OwnerSeat == f.OwnerSeat && e.Window == SkillProgramTriggerWindow.AfterTurnEnded) == 1;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IAHuiNanHost.Resolve(ProgramSkillFrame f) => BeginAHuiNan(f);
+    SkillProgramStepOutcome IAHuiNanHost.Resolve(ProgramSkillFrame f) => BeginAHuiNan(f);
     internal SkillProgramStepOutcome BeginAHuiNan(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -137,7 +134,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     [ProgramAnswer("a-hui-nan-jueman")]
     internal void AnswerAHuiNan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AHuiNanJueman: { Stage: AHuiNanJuemanStage.UseChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !AHuiNanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AHuiNanJueman: { Stage: AHuiNanJuemanStage.UseChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !AHuiNanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Jueman changed its genuine private chooser or current legal basic use.");
         var targets = AHuiNanUseTargets(f)[int.Parse(choice.Parameters["option-index"], CultureInfo.InvariantCulture)];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

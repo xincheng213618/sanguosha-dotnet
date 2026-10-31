@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAppliedDamageReflectionRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IAppliedDamageReflectionHost.ReflectAppliedDamage(ProgramSkillFrame frame) => BeginAppliedDamageReflection(frame);
+    SkillProgramStepOutcome IAppliedDamageReflectionHost.ReflectAppliedDamage(ProgramSkillFrame frame) => BeginAppliedDamageReflection(frame);
     internal SkillProgramStepOutcome BeginAppliedDamageReflection(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == active.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || active.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || context.ParentFrameId != window.Id || context.DamageFrameId != window.ParentFrameId || context.OwnerSeat != active.OwnerSeat || context.TargetSeat != active.OwnerSeat || window.TargetSeat != active.OwnerSeat || window.TriggerWindow != context.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
+        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || active.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || context.ParentFrameId != window.Id || context.DamageFrameId != window.ParentFrameId || context.OwnerSeat != active.OwnerSeat || context.TargetSeat != active.OwnerSeat || window.TargetSeat != active.OwnerSeat || window.TriggerWindow != context.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("Applied-damage reflection lost its exact owner window and current candidate.");
         var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
         var original = _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(item => item.Id == window.ParentFrameId);

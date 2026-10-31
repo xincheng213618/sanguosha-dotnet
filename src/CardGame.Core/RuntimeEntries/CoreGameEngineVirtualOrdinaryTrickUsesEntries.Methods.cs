@@ -2,20 +2,20 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesEntries
 {
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginProgramVirtualOrdinaryTrick(global::CardGame.Core.ProgramSkillFrame input, global::CardGame.Core.SkillProgramEffect supplied) => _resolve().BeginProgramVirtualOrdinaryTrick(input, supplied);
-    internal bool FinishProgramVirtualOrdinaryAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishProgramVirtualOrdinaryAttack(attack, out paused);
-    internal bool IsExactOwnPlayEndingProgram(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsExactOwnPlayEndingProgram(frame);
-    internal bool IsExactOwnVirtualOrdinaryTrickProgram(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsExactOwnVirtualOrdinaryTrickProgram(frame);
-    internal bool IsExactOwnVirtualTrickTurnBoundary(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().IsExactOwnVirtualTrickTurnBoundary(frame);
+    internal SkillProgramStepOutcome BeginProgramVirtualOrdinaryTrick(ProgramSkillFrame input, SkillProgramEffect supplied) => _resolve().BeginProgramVirtualOrdinaryTrick(input, supplied);
+    internal bool FinishProgramVirtualOrdinaryAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishProgramVirtualOrdinaryAttack(attack, out paused);
+    internal bool IsExactOwnPlayEndingProgram(ProgramSkillFrame frame) => _resolve().IsExactOwnPlayEndingProgram(frame);
+    internal bool IsExactOwnVirtualOrdinaryTrickProgram(ProgramSkillFrame frame) => _resolve().IsExactOwnVirtualOrdinaryTrickProgram(frame);
+    internal bool IsExactOwnVirtualTrickTurnBoundary(ProgramSkillFrame frame) => _resolve().IsExactOwnVirtualTrickTurnBoundary(frame);
     internal bool IsProgramVirtualOrdinaryTrickUse(long frameId) => _resolve().IsProgramVirtualOrdinaryTrickUse(frameId);
-    internal void IssueProgramVirtualOrdinaryTrick(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption option) => _resolve().IssueProgramVirtualOrdinaryTrick(frame, effect, option);
-    internal bool MatchesVirtualOrdinaryTrickUseAction(long frameId, global::CardGame.Core.CardActionContext action, int cardId) => _resolve().MatchesVirtualOrdinaryTrickUseAction(frameId, action, cardId);
-    internal global::CardGame.Core.Card ReadVirtualOrdinaryTrickUseAppearance(long ownerId, global::CardGame.Core.CardAppearanceReference appearance) => _resolve().ReadVirtualOrdinaryTrickUseAppearance(ownerId, appearance);
-    internal void ResolveProgramVirtualOrdinaryTrickChoice(global::CardGame.Core.PromptChoice selected) => _resolve().ResolveProgramVirtualOrdinaryTrickChoice(selected);
+    internal void IssueProgramVirtualOrdinaryTrick(ProgramSkillFrame frame, SkillProgramEffect effect, GameEngine.ProgramOrdinaryTrickUseOption option) => _resolve().IssueProgramVirtualOrdinaryTrick(frame, effect, option);
+    internal bool MatchesVirtualOrdinaryTrickUseAction(long frameId, CardActionContext action, int cardId) => _resolve().MatchesVirtualOrdinaryTrickUseAction(frameId, action, cardId);
+    internal Card ReadVirtualOrdinaryTrickUseAppearance(long ownerId, CardAppearanceReference appearance) => _resolve().ReadVirtualOrdinaryTrickUseAppearance(ownerId, appearance);
+    internal void ResolveProgramVirtualOrdinaryTrickChoice(PromptChoice selected) => _resolve().ResolveProgramVirtualOrdinaryTrickChoice(selected);
     internal bool ResumeProgramVirtualOrdinaryAttack() => _resolve().ResumeProgramVirtualOrdinaryAttack();
-    internal void ReturnProgramVirtualOrdinaryTrick(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnProgramVirtualOrdinaryTrick(use);
-    internal bool ValidProgramVirtualOrdinaryTrickUse(global::CardGame.Core.CardUseFrame use) => _resolve().ValidProgramVirtualOrdinaryTrickUse(use);
-    internal global::CardGame.Core.SkillProgramEffect ValidateVirtualOrdinaryTrickInstruction(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ValidateVirtualOrdinaryTrickInstruction(frame);
-    internal void ValidateVirtualOrdinaryTrickReturn(global::CardGame.Core.CardUseFrame use) => _resolve().ValidateVirtualOrdinaryTrickReturn(use);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> VirtualOrdinaryTrickOptions(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().VirtualOrdinaryTrickOptions(frame, effect);
+    internal void ReturnProgramVirtualOrdinaryTrick(CardUseFrame use) => _resolve().ReturnProgramVirtualOrdinaryTrick(use);
+    internal bool ValidProgramVirtualOrdinaryTrickUse(CardUseFrame use) => _resolve().ValidProgramVirtualOrdinaryTrickUse(use);
+    internal SkillProgramEffect ValidateVirtualOrdinaryTrickInstruction(ProgramSkillFrame frame) => _resolve().ValidateVirtualOrdinaryTrickInstruction(frame);
+    internal void ValidateVirtualOrdinaryTrickReturn(CardUseFrame use) => _resolve().ValidateVirtualOrdinaryTrickReturn(use);
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> VirtualOrdinaryTrickOptions(ProgramSkillFrame frame, SkillProgramEffect effect) => _resolve().VirtualOrdinaryTrickOptions(frame, effect);
 }

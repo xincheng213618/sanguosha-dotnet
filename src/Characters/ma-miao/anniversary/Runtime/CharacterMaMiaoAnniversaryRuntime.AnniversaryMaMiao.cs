@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaMiaoAnniversaryRuntime
 {
-    internal static CardConversionSource MaMiaoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MaMiaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardMoveReason MaMiaoDrawReason => new("skill-program.anniversary:zhangguan.adjust-draw");
     internal static CardMoveReason MaMiaoDiscardReason => new("skill-program.anniversary:zhangguan.adjust-discard");
 
@@ -23,7 +20,7 @@ internal sealed partial class CharacterMaMiaoAnniversaryRuntime
         return w.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && w.OwnerSeat == c.OwnerSeat && w.SourceSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].HasHpValue;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryMaMiaoHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMaMiao(f, op);
+    SkillProgramStepOutcome IAnniversaryMaMiaoHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMaMiao(f, op);
     internal SkillProgramStepOutcome BeginMaMiao(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -88,7 +85,7 @@ internal sealed partial class CharacterMaMiaoAnniversaryRuntime
     [ProgramAnswer("anniversary-ma-miao")]
     internal void AnswerMaMiao(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryMaMiao: { } r } f || !ValidMaMiao(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MaMiaoChooser(f) || !MaMiaoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryMaMiao: { } r } f || !ValidMaMiao(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MaMiaoChooser(f) || !MaMiaoChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Ma Miao rejects another recipient's choice or a changed original card slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

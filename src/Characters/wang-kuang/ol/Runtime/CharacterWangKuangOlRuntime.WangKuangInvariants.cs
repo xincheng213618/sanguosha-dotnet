@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangKuangOlRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterWangKuangOlRuntime
         if (r.Ending)
         {
             var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-            if (r.ObligationId is not { } obligation || i < 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayEnding } context || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramLifecycleTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != f.OwnerSeat || parent.WangKuangRenxiaEndingPhase != r.Phase || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || _coreProgramEventHistoryOperations.ProgramEventHistory<WangKuangRenxiaObligationIssuedEvent>().SingleOrDefault(e => e.ActiveFrameId == obligation)is not { } promise || !ValidWangKuangObligation(promise) || promise.Phase != r.Phase || promise.Source.OwnerSeat != f.OwnerSeat || promise.Source.SkillInstanceId != f.SkillInstanceId || promise.GameplayHash != r.GameplayHash || r.Branch == promise.FirstBranch || _coreProgramEventHistoryOperations.ProgramEventHistory<WangKuangRenxiaEndingConsumedEvent>().Count(e => e.ActiveFrameId == obligation && e.EndingFrameId == f.Id && e.WindowId == parent.Id && e.Phase == r.Phase) != 1)
+            if (r.ObligationId is not { } obligation || i < 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayEnding } context || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramLifecycleTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != f.OwnerSeat || parent.WangKuangRenxiaEndingPhase != r.Phase || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || _coreProgramEventHistoryOperations.ProgramEventHistory<WangKuangRenxiaObligationIssuedEvent>().SingleOrDefault(e => e.ActiveFrameId == obligation)is not { } promise || !ValidWangKuangObligation(promise) || promise.Phase != r.Phase || promise.Source.OwnerSeat != f.OwnerSeat || promise.Source.SkillInstanceId != f.SkillInstanceId || promise.GameplayHash != r.GameplayHash || r.Branch == promise.FirstBranch || _coreProgramEventHistoryOperations.ProgramEventHistory<WangKuangRenxiaEndingConsumedEvent>().Count(e => e.ActiveFrameId == obligation && e.EndingFrameId == f.Id && e.WindowId == parent.Id && e.Phase == r.Phase) != 1)
                 return false;
         }
         else if (f.WindowContext is not null || f.TriggerId is not null || r.ObligationId is not null || f.ActivationId != "choose-first-branch")

@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuFengBoundaryRuntime
 {
     internal const string BoundaryLiuFengAction = "boundary-liu-feng";
-    internal static CardConversionSource BoundaryLiuFengSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryLiuFengHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginBoundaryLiuFeng(f, op);
+    internal static CardConversionSource BoundaryLiuFengSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IBoundaryLiuFengHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginBoundaryLiuFeng(f, op);
     internal bool BoundaryLiuFengPaidThisTurn(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiuFengCostPaidEvent>().Any(e => e.Source.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
     internal int[] BoundaryLiuFengTargets(int actor) => _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[actor], p, CardKind.Slash, Suit.None, null, 0, [], conversionSource: null)).Select(p => p.Seat).ToArray();
     internal int[] BoundaryLiuFengCurrentTargets(ProgramSkillFrame f) => f.BoundaryLiuFeng?.Need is { } n ? n.Targets.Where(t => BoundaryLiuFengRequestTarget(n, t)).ToArray() : BoundaryLiuFengTargets(f.OwnerSeat);
@@ -162,7 +159,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
     internal void AnswerBoundaryLiuFeng(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Liu Feng lost its owning frame.");
-        if (f.BoundaryLiuFeng is not { } r || !ValidBoundaryLiuFeng(f) || !BoundaryLiuFengChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (f.BoundaryLiuFeng is not { } r || !ValidBoundaryLiuFeng(f) || !BoundaryLiuFengChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Liu Feng changed its published real card slots or original target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

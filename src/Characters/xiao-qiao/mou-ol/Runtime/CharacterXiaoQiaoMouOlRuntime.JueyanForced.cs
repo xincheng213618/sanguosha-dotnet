@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiaoQiaoMouOlRuntime
 {
-    internal bool HasProspectiveMouXqQinglong(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _coreNativeDamageHandlesOperations.UsesFormalQinglongCrescentBlade && attack.SourceSeat == actor.Seat && attack.TargetSeat == target.Seat && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Any(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card)) && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && MouXiaoQiaoOl.JueyanAvailable(actor.Seat, card.Id) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, effectiveKind: _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card), effectiveColor: null, allowAnyColor: false, physicalSuit: Suit.None, effectiveRank: 0, physicalCardIds: [])) && _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(actor, SkillProgramTriggerWindow.PublicHandRevealed).Any(c => c.SkillId == MouXiaoQiaoOlRuntime.Jueyan);
+    internal bool HasProspectiveMouXqQinglong(CharacterState actor, CharacterState target, NativeOwners.CardAttackHandle attack) => _coreNativeDamageHandlesOperations.UsesFormalQinglongCrescentBlade && attack.SourceSeat == actor.Seat && attack.TargetSeat == target.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Any(card => CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card)) && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && MouXiaoQiaoOl.JueyanAvailable(actor.Seat, card.Id) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, effectiveKind: _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card), effectiveColor: null, allowAnyColor: false, physicalSuit: Suit.None, effectiveRank: 0, physicalCardIds: [])) && _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(actor, SkillProgramTriggerWindow.PublicHandRevealed).Any(c => c.SkillId == MouXiaoQiaoOlRuntime.Jueyan);
     internal PendingDecision? AddMouXqJueyanRequestChoices(PendingDecision? p)
     {
         if (p is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(p.PlayerSeat) || !_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat].IsAlive)
@@ -29,13 +26,13 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
 
     internal IReadOnlyList<PromptChoice> MouXqForcedSlashChoices(CharacterState actor, CharacterState target, long parentId, bool qinglong)
     {
-        if (qinglong ? _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != parentId || blade.Attack.SourceSeat != actor.Seat || blade.Attack.TargetSeat != target.Seat || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack) : _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not { } borrowed || borrowed.ResolutionId != parentId || borrowed.WeaponOwnerSeat != actor.Seat || borrowed.SlashTargetSeat != target.Seat || borrowed.ActiveAttack is not null || _coreNativeBorrowedSwordOperations.GetWeapon(actor)is null)
+        if (qinglong ? _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != parentId || blade.Attack.SourceSeat != actor.Seat || blade.Attack.TargetSeat != target.Seat || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack) : _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not { } borrowed || borrowed.ResolutionId != parentId || borrowed.WeaponOwnerSeat != actor.Seat || borrowed.SlashTargetSeat != target.Seat || borrowed.ActiveAttack is not null || _coreNativeBorrowedSwordOperations.GetWeapon(actor)is null)
             return[];
         var c = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(actor, SkillProgramTriggerWindow.PublicHandRevealed).FirstOrDefault(c => c.SkillId == MouXiaoQiaoOlRuntime.Jueyan);
         if (c is null)
             return[];
         var source = new CardConversionSource(c.SkillId, "retained-hand-use", actor.Seat, c.SkillInstanceId);
-        return Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(actor).Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card)) && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && MouXiaoQiaoOl.JueyanAvailable(actor.Seat, card.Id)).Where(card => qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, effectiveKind: _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card), effectiveColor: null, allowAnyColor: false, physicalSuit: Suit.None, effectiveRank: 0, physicalCardIds: []) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card), Suit.None, false, null, 0, [])).Select(card =>
+        return Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(actor).Where(card => CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card)) && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && MouXiaoQiaoOl.JueyanAvailable(actor.Seat, card.Id)).Where(card => qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, effectiveKind: _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card), effectiveColor: null, allowAnyColor: false, physicalSuit: Suit.None, effectiveRank: 0, physicalCardIds: []) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card), Suit.None, false, null, 0, [])).Select(card =>
         {
             var kind = _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card);
             var p = new Dictionary<string, string>
@@ -45,7 +42,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
                 ["original-frame-id"] = parentId.ToString(CultureInfo.InvariantCulture),
                 ["forced-use"] = qinglong ? "qinglong" : "borrowed-sword"
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, source);
             return new PromptChoice(new($"jueyan.forced.{(parentId)}.{(actor.Seat)}.{(card.Id)}.{(kind)}"), $"绝颜：展示并保留【{(card.DisplayName)}】，视为使用之。", [card.Id], [target.Seat], p);
         }).ToArray());
     }
@@ -56,9 +53,9 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             throw new InvalidOperationException("Jueyan lost its native forced Slash choice.");
         var qinglong = choice.Parameters.GetValueOrDefault("forced-use") == "qinglong";
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
-        if (prompt.Kind != (qinglong ? DecisionKind.QinglongCrescentBlade : DecisionKind.RespondSlash) || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || !MouXqForcedSlashChoices(actor, _coreMatchParticipantsPlayersAccess._players[target], parent, qinglong).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (prompt.Kind != (qinglong ? DecisionKind.QinglongCrescentBlade : DecisionKind.RespondSlash) || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || !MouXqForcedSlashChoices(actor, _coreMatchParticipantsPlayersAccess._players[target], parent, qinglong).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Jueyan cannot replace another native target or a pure Played response.");
-        StartMouXqRequestedReveal(prompt, global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice), cardId, new(parent, prompt.Kind, kind, actor.Seat, target, _resolutionStackOperations._resolutionStack[^1].Id));
+        StartMouXqRequestedReveal(prompt, CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice), cardId, new(parent, prompt.Kind, kind, actor.Seat, target, _resolutionStackOperations._resolutionStack[^1].Id));
         return true;
     }
 
@@ -89,7 +86,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         var r = grant.Request;
         var actor = _coreMatchParticipantsPlayersAccess._players[r.ActorSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[r.TargetSeat];
-        global::CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowed = null;
+        NativeOwners.BorrowedSwordHandle? borrowed = null;
         if (r.DecisionKind == DecisionKind.RespondSlash)
         {
             borrowed = _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword ?? throw new InvalidOperationException("Jueyan lost its original borrowed weapon request.");

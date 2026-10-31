@@ -1,10 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhaoOlRuntime
@@ -50,7 +46,7 @@ internal sealed partial class CharacterDongZhaoOlRuntime
         PromptChoice Choice(string suffix, string label, IReadOnlyList<int> cards, IReadOnlyList<int> targets, string value) => new(new ChoiceId($"xianlue.{(f.Id)}.{(suffix)}"), label, cards, targets, new Dictionary<string, string> { ["program-action"] = "xianlue", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["value"] = value });
         if (pending.Stage == XianlueStage.Record)
         {
-            foreach (var kind in Enum.GetValues<CardKind>().Where(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick).Distinct())
+            foreach (var kind in Enum.GetValues<CardKind>().Where(CoreNativeCardClassificationsRuntime.IsOrdinaryTrick).Distinct())
                 choices.Add(Choice(kind.ToString(), $"记录【{(CardCatalog.Get(kind).DisplayName)}】", [], [], kind.ToString()));
         }
         else
@@ -82,7 +78,7 @@ internal sealed partial class CharacterDongZhaoOlRuntime
         if (r.Stage == XianlueStage.Record)
         {
             var kind = Enum.Parse<CardKind>(choice.Parameters["value"]);
-            if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+            if (!CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
                 throw new InvalidOperationException("Xianlue can only record an ordinary trick.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XianlueRecordedEvent(f.Id, f.OwnerSeat, f.SkillInstanceId, kind));
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { XianluePending = null });
@@ -147,7 +143,7 @@ internal sealed partial class CharacterDongZhaoOlRuntime
         if (facts is not [var fact] || fact.SkillId != r.SkillId || fact.SkillInstanceId != r.SkillInstanceId || fact.GameplayHash != r.GameplayHash || fact.WindowId != r.WindowId || fact.CardUseId != r.UseId || fact.CardActionId != r.ActionId)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame window || window.Id != r.WindowId || window.ParentFrameId != r.UseId || window.Action.ActionId != r.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { Step: ResolutionFrameStep.Completed, Action: { } action } || action.ActionId != r.ActionId || action.ActorSeat != u.ActorSeat)
+        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame window || window.Id != r.WindowId || window.ParentFrameId != r.UseId || window.Action.ActionId != r.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { Step: ResolutionFrameStep.Completed, Action: { } action } || action.ActionId != r.ActionId || action.ActorSeat != u.ActorSeat)
             return false;
         var b = f.CardSetBindings.SingleOrDefault(b => b.Name == XianlueDrawBind);
         if (b is null || r.CardIndex > b.CardIds.Count || b.CardIds.Any(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.DrawBefore && m.Sequence <= r.DrawAfter && m.CardId == id && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == "program.xianlue.draw") != 1))
@@ -163,7 +159,7 @@ internal sealed partial class CharacterDongZhaoOlRuntime
         return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && (r.Stage == XianlueStage.DrawChildren ? m.Sequence > r.DrawBefore && m.Sequence <= r.DrawAfter && m.Reason.Value == "program.xianlue.draw" : r.Stage == XianlueStage.GiftChildren && m.Sequence > r.GiftBefore && m.Sequence <= r.GiftAfter && m.CardId == r.GiftCardId && m.Reason.Value == "program.xianlue.gift"));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDongZhaoProgramHost.XianlueRecord(ProgramSkillFrame f) => BeginXianlueRecord(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDongZhaoProgramHost.XianlueRedistribute(ProgramSkillFrame f) => BeginXianlueRedistribute(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDongZhaoProgramHost.ZaowangResolve(ProgramSkillFrame f) => ArmZaowang(f);
+    SkillProgramStepOutcome IDongZhaoProgramHost.XianlueRecord(ProgramSkillFrame f) => BeginXianlueRecord(f);
+    SkillProgramStepOutcome IDongZhaoProgramHost.XianlueRedistribute(ProgramSkillFrame f) => BeginXianlueRedistribute(f);
+    SkillProgramStepOutcome IDongZhaoProgramHost.ZaowangResolve(ProgramSkillFrame f) => ArmZaowang(f);
 }

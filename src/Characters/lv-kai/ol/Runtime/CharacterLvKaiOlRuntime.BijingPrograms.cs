@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLvKaiOlRuntime
@@ -22,7 +18,7 @@ internal sealed partial class CharacterLvKaiOlRuntime
             if (_cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(active.OwnerSeat))
                 _characterLvKaiOlBijingMarkedCardIdsAccess._bijingMarkedCardIds[cardId] = active.OwnerSeat;
         if (binding.CardIds.Count > 0)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramBijingMarkedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, binding.CardIds));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramBijingMarkedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, binding.CardIds));
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return SkillProgramStepOutcome.Continue;
     }

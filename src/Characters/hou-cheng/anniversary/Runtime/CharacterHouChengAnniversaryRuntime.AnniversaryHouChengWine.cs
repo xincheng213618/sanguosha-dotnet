@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHouChengAnniversaryRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterHouChengAnniversaryRuntime
         return moves.Length is >= 1 and <= 2 && moves.Select(m => m.CardId).Distinct().Count() == moves.Length && moves.All(m => m.TurnNumber == e.Turn && m.From.OwnerSeat == e.CardOwner && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && (m.To == CardLocation.Hand(e.Recipient) || m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon || _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(m) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Any(d => d.CardId == m.CardId && d.MovementSequence == m.Sequence && d.ParentFrameId == e.FrameId)) || _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(m, CardLocation.Hand(e.Recipient)))) && moves.Count(m => m.To == CardLocation.Hand(e.Recipient) && m.From != m.To) == e.ActualCount;
     }
 
-    internal AnniversaryHouChengMovementEvent? HouChengWineMark(int cardId) => !HasHouChengContent || cardId <= 0 || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(cardId).Kind, SkillProgramCardCategory.Basic) ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHouChengMovementEvent>().LastOrDefault(e => ValidHouChengMovement(e) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence > e.Before && m.Sequence <= e.After && m.To == CardLocation.Hand(e.Recipient) && m.From != m.To && m.Reason.Value == (e.Giving ? HouChengGiveReason : HouChengObtainReason)));
+    internal AnniversaryHouChengMovementEvent? HouChengWineMark(int cardId) => !HasHouChengContent || cardId <= 0 || !CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(cardId).Kind, SkillProgramCardCategory.Basic) ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHouChengMovementEvent>().LastOrDefault(e => ValidHouChengMovement(e) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence > e.Before && m.Sequence <= e.After && m.To == CardLocation.Hand(e.Recipient) && m.From != m.To && m.Reason.Value == (e.Giving ? HouChengGiveReason : HouChengObtainReason)));
     internal bool IsAnniversaryHouChengWineCard(int cardId) => HouChengWineMark(cardId)is not null;
     internal IReadOnlyList<CardConversionSource> AnniversaryHouChengWineSources(CharacterState owner, Card card, CardKind kind, bool forResponse, bool dyingUse)
     {
@@ -24,7 +20,7 @@ internal sealed partial class CharacterHouChengAnniversaryRuntime
         return[mark.Source];
     }
 
-    internal bool HouChengUseBanned(int actor, CardKind kind, IEnumerable<int> ids, bool response, bool dying = false) => kind != CardKind.Alcohol && (!response || dying || kind == CardKind.Nullification || _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[actor], kind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && (_characterGuanYuWumiaoOperations.IsJuewuTrueSlashUse(_coreMatchParticipantsPlayersAccess._players[actor]) || _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { AwaitingProviders: true } request && request.CurrentCandidateSeat == actor && global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(request))) && ids.Any(IsAnniversaryHouChengWineCard);
+    internal bool HouChengUseBanned(int actor, CardKind kind, IEnumerable<int> ids, bool response, bool dying = false) => kind != CardKind.Alcohol && (!response || dying || kind == CardKind.Nullification || _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[actor], kind) || CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && (_characterGuanYuWumiaoOperations.IsJuewuTrueSlashUse(_coreMatchParticipantsPlayersAccess._players[actor]) || _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { AwaitingProviders: true } request && request.CurrentCandidateSeat == actor && CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(request))) && ids.Any(IsAnniversaryHouChengWineCard);
     // IronChain conversion enumeration also supplies native Recast. Let that
     // enumeration proceed; the final action and submitted-Use guards below still
     // reject every real non-Wine Use, including converted IronChain.

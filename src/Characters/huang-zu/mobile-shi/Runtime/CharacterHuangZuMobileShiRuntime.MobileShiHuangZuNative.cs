@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangZuMobileShiRuntime
@@ -14,10 +10,10 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPhysicalSlash, 47900)]
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPaidWeaponSlash, 47900)]
     [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 47900)]
-    internal bool ShiHzSlashDistance(ProgramSlashDistanceQuery q) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && _coreProgramCardPoliciesOperations.CardPolicies(q.Actor, SkillProgramCardPolicyKind.IgnoreUseDistance, q.Kind).Any(p => p.Source.SkillId == ShiHzChizhang);
+    internal bool ShiHzSlashDistance(ProgramSlashDistanceQuery q) => CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && _coreProgramCardPoliciesOperations.CardPolicies(q.Actor, SkillProgramCardPolicyKind.IgnoreUseDistance, q.Kind).Any(p => p.Source.SkillId == ShiHzChizhang);
     internal bool IsShiHzOriginalUseChoice(CharacterState owner, Card card, CardKind kind)
     {
-        if (!owner.IsAlive || card.Kind != kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiHuangZu: { Stage: ShiHzStage.IssuingUse } r, WindowContext: { Window: SkillProgramTriggerWindow.ActualPhaseEnded, ActualPhaseEnd: { } due } } f || f.OwnerSeat != owner.Seat || f.SkillId != ShiHzDuanyang || f.GameplayHash != r.GameplayHash || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || ShiHzGrant(r.GrantId)is not { } g)
+        if (!owner.IsAlive || card.Kind != kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiHuangZu: { Stage: ShiHzStage.IssuingUse } r, WindowContext: { Window: SkillProgramTriggerWindow.ActualPhaseEnded, ActualPhaseEnd: { } due } } f || f.OwnerSeat != owner.Seat || f.SkillId != ShiHzDuanyang || f.GameplayHash != r.GameplayHash || r.ActualTurn != _coreActualTurnProgressTurnNumberAccess._turnNumber || ShiHzGrant(r.GrantId)is not { } g)
             return false;
         return r.CardId == card.Id && g.CardId == card.Id && r.Source == g.Source && r.GameplayHash == g.GameplayHash && due.EntitlementId == g.GrantId && due.Phase == g.Phase && g.Phase.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && g.Source.OwnerSeat == owner.Seat && _cardZonesOperations._cardZones.GetLocation(card.Id) == g.Pile.Location && _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.GetValueOrDefault((g.Pile.OwnerSeat, g.Pile.SkillId, g.Pile.SkillInstanceId)) == g.Pile && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHzGrantConsumedEvent>().Count(e => e.GrantId == g.GrantId && e.FrameId == f.Id) == 1;
     }
@@ -27,7 +23,7 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
         var n = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == use.Id);
         if (use.Action is not { Type: CardActionType.Use, PhysicalCards: [var cost], ConversionChain.Count: 0 } action || action.ProviderSeat != action.ActorSeat || n < 1 || _resolutionStackOperations._resolutionStack[n - 1] is not ProgramSkillFrame { ShiHuangZu: { Stage: ShiHzStage.IssuingUse } r } f || ShiHzGrant(r.GrantId)is not { } g)
             return false;
-        return action.ActorSeat == f.OwnerSeat && use.SourceSeat == f.OwnerSeat && use.CardId == r.CardId && cost.CardId == r.CardId && cost.From == g.Pile.Location && cost.CardKind == _coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId).Kind && use.CardKind == cost.CardKind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.SequenceEqual([r.Target]) && use.PhysicalCardIds is [var id] && id == r.CardId && r.Source == g.Source && r.GameplayHash == g.GameplayHash && r.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHzGrantConsumedEvent>().Count(e => e.GrantId == g.GrantId && e.FrameId == f.Id) == 1;
+        return action.ActorSeat == f.OwnerSeat && use.SourceSeat == f.OwnerSeat && use.CardId == r.CardId && cost.CardId == r.CardId && cost.From == g.Pile.Location && cost.CardKind == _coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId).Kind && use.CardKind == cost.CardKind && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.SequenceEqual([r.Target]) && use.PhysicalCardIds is [var id] && id == r.CardId && r.Source == g.Source && r.GameplayHash == g.GameplayHash && r.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHzGrantConsumedEvent>().Count(e => e.GrantId == g.GrantId && e.FrameId == f.Id) == 1;
     }
 
     internal void IssueShiHzNativeUse(ProgramSkillFrame f)
@@ -64,7 +60,7 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
     internal bool ShiHzUseRidesOn(CardUseFrame use, ProgramSkillFrame f) => use.ShiHuangZuUse is { } n && f.ShiHuangZu is { } r && n.ParentId == f.Id && n.Source == r.Source && n.GameplayHash == f.GameplayHash && n.GrantId == r.GrantId && n.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && n.UseId == use.Id && n.UseId == r.UseId && n.ActionId == use.Action?.ActionId && n.ActionId == r.ActionId && n.CardId == r.CardId && n.Target == r.Target && use.CardKind == n.Kind && use.SourceSeat == f.OwnerSeat && use.CardId == n.CardId && use.PhysicalCardIds is [var id] && id == n.CardId && use.Action is { Type: CardActionType.Use, PhysicalCards: [var cost], ConversionChain.Count: 0 } a && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, f.OwnerSeat, f.OwnerSeat) && cost.CardId == n.CardId && cost.From == n.From && cost.CardKind == n.Kind && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHzNativeIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == use.Id && e.ActionId == a.ActionId && e.CardId == id) == 1;
     internal bool IsShiHzOriginalActionCost(CardActionContext action, CardActionCost cost)
     {
-        if (!HasShiHz || action is not { Type: CardActionType.Use, PhysicalCards: [var only], ConversionChain.Count: 0 } || only != cost || action.ActorSeat != action.ProviderSeat || action.RequesterSeat is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHzNativeIssuedEvent>().SingleOrDefault(e => e.ActionId == action.ActionId && e.CardId == cost.CardId)is not { } issued || ShiHzGrant(issued.GrantId)is not { } g || g.Source.OwnerSeat != action.ActorSeat || cost.From != g.Pile.Location || action.EffectiveKind != cost.CardKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(cost.CardKind))
+        if (!HasShiHz || action is not { Type: CardActionType.Use, PhysicalCards: [var only], ConversionChain.Count: 0 } || only != cost || action.ActorSeat != action.ProviderSeat || action.RequesterSeat is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHzNativeIssuedEvent>().SingleOrDefault(e => e.ActionId == action.ActionId && e.CardId == cost.CardId)is not { } issued || ShiHzGrant(issued.GrantId)is not { } g || g.Source.OwnerSeat != action.ActorSeat || cost.From != g.Pile.Location || action.EffectiveKind != cost.CardKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(cost.CardKind))
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHzGrantConsumedEvent>().Count(e => e.GrantId == g.GrantId && e.FrameId == issued.FrameId) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == cost.CardId && m.From == cost.From && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use && m.Sequence > g.DiscardSequence && m.TurnNumber == g.Phase.TurnNumber) == 1;
     }
@@ -121,7 +117,7 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
         if (material.Length == 1)
         {
             var appeared = _corePlayCardHistoryOperations.ApplyProgramUseAppearance(owner, material[0], source);
-            return global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, appeared));
+            return CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, appeared));
         }
 
         return _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, material);

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLeiBoAnniversaryRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
         {
             if (f.TriggerId != "marked-victim-reply" || f.ActivationId != f.TriggerId || !LeiBoDamageParent(f) || f.WindowContext is not { } c || c.TargetSeat != r.Marked || c.SourceSeat != r.DamageSource || c.ParentFrameId != r.ParentId || c.DamageFrameId != r.DamageId || f.InstructionIndex is < 1 or > 2 || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLeiBoReplyStartedEvent>().Count(e => e == new AnniversaryLeiBoReplyStartedEvent(f.Id, r.Source, r.Hash, r.ParentId, r.DamageId, r.Marked, r.DamageSource, r.Turn, r.TurnOwner)) != 1)
                 return false;
-            if ((r.UseId == 0) != (r.ActionId == 0) || r.UseId != 0 && (r.DamageSource is not { } target || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLeiBoSlashUsedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.ActionId == r.ActionId && e.Target == target) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == r.UseId && e.SourceSeat == f.OwnerSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind)) != 1))
+            if ((r.UseId == 0) != (r.ActionId == 0) || r.UseId != 0 && (r.DamageSource is not { } target || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLeiBoSlashUsedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.ActionId == r.ActionId && e.Target == target) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == r.UseId && e.SourceSeat == f.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind)) != 1))
                 return false;
             if (r.Stage == AnniversaryLeiBoStage.SlashRequest)
                 return r.Selected.Count == 0 && r.Moves.Count == 0 && r.Gain is null && f.PendingMovementContinuation is null;
@@ -66,7 +62,7 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
         if (f.AnniversaryLeiBo is not { Stage: AnniversaryLeiBoStage.MovementChildren } r || !ValidLeiBo(f))
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } p && LeiBoMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(r.Moves.Contains);
+            return f.PendingMovementContinuation is { } p && LeiBoMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(r.Moves.Contains);
         if (child is RecoveryReplacementFrame recovery)
             return recovery.ParentFrameId == f.Id && recovery.Return.ResumeFrameId == f.Id && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f);
         if (child is HpChangedTriggerWindowFrame hp)
@@ -74,7 +70,7 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && state.CharacterStateContinuation == CharacterStateContinuation.Program);
     }
 
-    internal bool LeiBoObserverEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && LeiBoFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
+    internal bool LeiBoObserverEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && LeiBoFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal ProgramSkillFrame? LeiBoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.LeiBoFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => this.LeiBoObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49800)]
     internal bool LeiBoDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LeiBoObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

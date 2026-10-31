@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangGuanOlRuntime
@@ -90,21 +86,21 @@ internal sealed partial class CharacterWangGuanOlRuntime
 
     internal bool IsMiuyanShandaoMovementReveal(IGameEvent fact)
     {
-        if (fact is not CardsRevealedEvent { Cards: [var card] } e || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.ResolutionId)is not { SkillId: "ol:shandao", ActivationId: "top-and-two-tricks", TriggerId: null, InstructionIndex: 1, TianChouShandao: { Stage: TianChouShandaoStage.TopChildren, TargetsFrozen: true } r } f || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveShandaoTopAndGlobalTricks || r.Source != global::CardGame.Core.EngineOwners.CharacterTianChouOlRuntime.TianChouSource(f) || r.Cursor < 0 || r.Cursor >= r.Targets.Count)
+        if (fact is not CardsRevealedEvent { Cards: [var card] } e || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.ResolutionId)is not { SkillId: "ol:shandao", ActivationId: "top-and-two-tricks", TriggerId: null, InstructionIndex: 1, TianChouShandao: { Stage: TianChouShandaoStage.TopChildren, TargetsFrozen: true } r } f || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveShandaoTopAndGlobalTricks || r.Source != CharacterTianChouOlRuntime.TianChouSource(f) || r.Cursor < 0 || r.Cursor >= r.Targets.Count)
             return false;
         return _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Hand(r.Targets[r.Cursor]);
     }
 
     internal bool IsMiuyanCategoryGiftMovementReveal(IGameEvent fact)
     {
-        if (fact is not ProgramCardsRevealedEvent { SkillId: "ol:zhaosong", BindingId: "give-hand-category-mark", Bind: "category-mark-gift", Cards: [var card] } e || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.FrameId)is not { SkillId: "ol:zhaosong", TriggerId: "give-hand-category-mark", InstructionIndex: 1, RecipientCategoryMark: { Operation: SkillProgramEffectOp.GiveHandAndGrantCategoryMark, Stage: RecipientCategoryMarkStage.ChoosingGift } r } f || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Operation || r.Source != global::CardGame.Core.EngineOwners.CoreGameEngineRecipientCategoryMarksRuntime.RecipientMarkSource(f) || r.HolderSeat != e.OwnerSeat)
+        if (fact is not ProgramCardsRevealedEvent { SkillId: "ol:zhaosong", BindingId: "give-hand-category-mark", Bind: "category-mark-gift", Cards: [var card] } e || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.FrameId)is not { SkillId: "ol:zhaosong", TriggerId: "give-hand-category-mark", InstructionIndex: 1, RecipientCategoryMark: { Operation: SkillProgramEffectOp.GiveHandAndGrantCategoryMark, Stage: RecipientCategoryMarkStage.ChoosingGift } r } f || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Operation || r.Source != CoreGameEngineRecipientCategoryMarksRuntime.RecipientMarkSource(f) || r.HolderSeat != e.OwnerSeat)
             return false;
         return r.Materials.Any(m => m.CardId == card.Id && m.From == CardLocation.Hand(r.HolderSeat)) && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Hand(r.HolderSeat);
     }
 
     internal IEnumerable<int> MiuyanQingliangHandIds(ProgramQingliangRevealEvent e)
     {
-        if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.FrameId)is not { } f || f.SkillId != e.SkillId || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != e.BindingId || f.OwnerSeat != e.OwnerSeat || f.CardSetBindings.SingleOrDefault(b => b.Name == "qingliang-reveal")is not { Visibility: SkillProgramCardSetVisibility.Public } set || set.CardIds.Count != e.CardCount)
+        if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.FrameId)is not { } f || f.SkillId != e.SkillId || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != e.BindingId || f.OwnerSeat != e.OwnerSeat || f.CardSetBindings.SingleOrDefault(b => b.Name == "qingliang-reveal")is not { Visibility: SkillProgramCardSetVisibility.Public } set || set.CardIds.Count != e.CardCount)
             throw new InvalidOperationException("Miuyan lost Qingliang's exact original public Hand binding.");
         return set.CardIds;
     }
@@ -118,7 +114,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
 
     internal IEnumerable<int> MiuyanJuanxiaHandIds(ProgramJuanxiaTrickUsedEvent e)
     {
-        if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.FrameId)is not { JuanxiaLaunch: { Stage: JuanxiaStage.Fire, PendingKind: "FireAttack" } state } f || f.OwnerSeat != e.OwnerSeat || f.SkillId != e.SkillId || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != e.BindingId || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.JuanxiaDeclareTricks || state.TargetSeat != e.TargetSeat || state.RevealedCardId != e.CardId || !f.SelectedTargetSeats.SequenceEqual([state.TargetSeat]))
+        if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.FrameId)is not { JuanxiaLaunch: { Stage: JuanxiaStage.Fire, PendingKind: "FireAttack" } state } f || f.OwnerSeat != e.OwnerSeat || f.SkillId != e.SkillId || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != e.BindingId || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.JuanxiaDeclareTricks || state.TargetSeat != e.TargetSeat || state.RevealedCardId != e.CardId || !f.SelectedTargetSeats.SequenceEqual([state.TargetSeat]))
             throw new InvalidOperationException("Miuyan lost Juanxia's actual original public fire-reveal entity.");
         return[e.CardId];
     }

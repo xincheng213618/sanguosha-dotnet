@@ -2,20 +2,20 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterQuanCongBoundaryMobileEntries
 {
-    internal bool AllowsBoundaryYaoming(global::CardGame.Core.ProgramActivationLegalityContext gate) => _resolve().AllowsBoundaryYaoming(gate);
-    internal void AnswerBoundaryYaoming(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerBoundaryYaoming(answer);
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryYaoming(supplied);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.ProgramPublicRuleStateSnapshot> BoundaryQuanCongPublicStates(global::CardGame.Core.CharacterState owner, string skillId) => _resolve().BoundaryQuanCongPublicStates(owner, skillId);
-    internal global::CardGame.Core.PromptChoice BoundaryYaomingAi(global::CardGame.Core.PendingDecision pending, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryYaomingAi(pending, frame);
-    internal global::CardGame.Core.PromptChoice BoundaryYaomingChoice(global::CardGame.Core.ProgramSkillFrame frame, string option, int target, string label) => _resolve().BoundaryYaomingChoice(frame, option, target, label);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> BoundaryYaomingChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().BoundaryYaomingChoices(frame);
+    internal bool AllowsBoundaryYaoming(ProgramActivationLegalityContext gate) => _resolve().AllowsBoundaryYaoming(gate);
+    internal void AnswerBoundaryYaoming(PromptChoice answer) => _resolve().AnswerBoundaryYaoming(answer);
+    internal SkillProgramStepOutcome BeginBoundaryYaoming(ProgramSkillFrame supplied) => _resolve().BeginBoundaryYaoming(supplied);
+    internal IReadOnlyList<ProgramPublicRuleStateSnapshot> BoundaryQuanCongPublicStates(CharacterState owner, string skillId) => _resolve().BoundaryQuanCongPublicStates(owner, skillId);
+    internal PromptChoice BoundaryYaomingAi(PendingDecision pending, ProgramSkillFrame frame) => _resolve().BoundaryYaomingAi(pending, frame);
+    internal PromptChoice BoundaryYaomingChoice(ProgramSkillFrame frame, string option, int target, string label) => _resolve().BoundaryYaomingChoice(frame, option, target, label);
+    internal IReadOnlyList<PromptChoice> BoundaryYaomingChoices(ProgramSkillFrame frame) => _resolve().BoundaryYaomingChoices(frame);
     internal (int Remaining, string? Pending) BoundaryYaomingState(int owner, string instance) => _resolve().BoundaryYaomingState(owner, instance);
-    internal void CompleteBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().CompleteBoundaryYaoming(frame);
+    internal void CompleteBoundaryYaoming(ProgramSkillFrame frame) => _resolve().CompleteBoundaryYaoming(frame);
     internal bool ContinueBoundaryYaoming(long id) => _resolve().ContinueBoundaryYaoming(id);
-    internal bool KeepPaidBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().KeepPaidBoundaryYaoming(frame);
-    internal bool OriginalBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().OriginalBoundaryYaoming(frame);
-    internal void PublishBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishBoundaryYaoming(frame);
-    internal void ReturnBoundaryYaomingDraw(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnBoundaryYaomingDraw(supplied, outcome);
-    internal bool ReturnBoundaryYaomingMovement(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ReturnBoundaryYaomingMovement(frame);
-    internal bool ValidBoundaryYaoming(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ValidBoundaryYaoming(frame);
+    internal bool KeepPaidBoundaryYaoming(ProgramSkillFrame frame) => _resolve().KeepPaidBoundaryYaoming(frame);
+    internal bool OriginalBoundaryYaoming(ProgramSkillFrame frame) => _resolve().OriginalBoundaryYaoming(frame);
+    internal void PublishBoundaryYaoming(ProgramSkillFrame frame) => _resolve().PublishBoundaryYaoming(frame);
+    internal void ReturnBoundaryYaomingDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome) => _resolve().ReturnBoundaryYaomingDraw(supplied, outcome);
+    internal bool ReturnBoundaryYaomingMovement(ProgramSkillFrame frame) => _resolve().ReturnBoundaryYaomingMovement(frame);
+    internal bool ValidBoundaryYaoming(ProgramSkillFrame frame) => _resolve().ValidBoundaryYaoming(frame);
 }

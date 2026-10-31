@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterHuaTuoBoundaryMobileEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterHuaTuoBoundaryMobileRuntime> _resolve;
-    private CharacterHuaTuoBoundaryMobileEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterHuaTuoBoundaryMobileRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterHuaTuoBoundaryMobileRuntime> _resolve;
+    private CharacterHuaTuoBoundaryMobileEntries(Func<EngineOwners.CharacterHuaTuoBoundaryMobileRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterHuaTuoBoundaryMobileEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterHuaTuoBoundaryMobileRuntime> resolve) => new(resolve);
+    internal static CharacterHuaTuoBoundaryMobileEntries Create(Func<EngineOwners.CharacterHuaTuoBoundaryMobileRuntime> resolve) => new(resolve);
 }

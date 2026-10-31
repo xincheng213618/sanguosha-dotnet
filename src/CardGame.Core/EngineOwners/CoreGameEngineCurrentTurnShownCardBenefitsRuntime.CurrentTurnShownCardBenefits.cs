@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCurrentTurnShownCardBenefitsRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CoreGameEngineCurrentTurnShownCardBenefitsRuntime
         var card = _cardZonesOperations._cardZones.CardsAt(source).Single(c => c.Id == id);
         var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card);
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { CardSetBindings = Array.AsReadOnly(active.CardSetBindings.Select(b => b.Name == bind ? b with { Visibility = SkillProgramCardSetVisibility.Public, FrozenRevealedSuit = suit } : b).ToArray()) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner, bind, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner, bind, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
     }
 
     internal void GrantCurrentTurnDirectedHeartSlashBonus(ProgramSkillFrame frame, int targetSeat)
@@ -34,7 +30,7 @@ internal sealed partial class CoreGameEngineCurrentTurnShownCardBenefitsRuntime
         _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(frame);
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || targetSeat == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive)
             throw new InvalidOperationException("Directed Heart Slash benefit requires a living other target.");
-        var fact = new CurrentTurnDirectedHeartSlashBonus(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), targetSeat);
+        var fact = new CurrentTurnDirectedHeartSlashBonus(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), targetSeat);
         var prior = _coreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess._currentTurnHeartSlashBonuses.SingleOrDefault(b => b.ParentFrameId == fact.ParentFrameId && b.EffectIndex == fact.EffectIndex);
         if (prior is not null)
         {
@@ -48,9 +44,9 @@ internal sealed partial class CoreGameEngineCurrentTurnShownCardBenefitsRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.FactModifiers, 20)]
-    internal IEnumerable<(CardUseEffectSource Source, int Amount)> GetCurrentTurnHeartSlashBonuses(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal IEnumerable<(CardUseEffectSource Source, int Amount)> GetCurrentTurnHeartSlashBonuses(GameEngine.IDamageAttempt attack)
     {
-        if (attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return[];
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == attack.ResolutionId);
         if (use?.Action is not { Type: CardActionType.Use, EffectiveSuit: Suit.Heart } action)
@@ -58,10 +54,10 @@ internal sealed partial class CoreGameEngineCurrentTurnShownCardBenefitsRuntime
         return _coreGameEngineCurrentTurnShownCardBenefitsCurrentTurnHeartSlashBonusesAccess._currentTurnHeartSlashBonuses.Where(b => b.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && b.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && b.Source.OwnerSeat == action.ActorSeat && b.Source.OwnerSeat == attack.CardUserSeat && b.TargetSeat == attack.TargetSeat).GroupBy(b => (b.Source.OwnerSeat, b.Source.SkillId, b.TargetSeat)).Select(group => (group.First().Source, 1));
     }
 
-    internal bool HasSlashUseDistanceBySuit(CharacterState owner, CardKind kind, Suit? suit) => suit is { } value && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetCardPolicies(SkillProgramCardPolicyKind.IgnoreSlashUseDistanceBySuit).Any(item => item.Policy.InputSuit == value && ProgramCardKindMatch.Contains(item.Policy.CardKinds, kind) && item.Policy.Condition.Evaluate(_coreNativeSkillContextQueriesOperations.CreateSkillContext(owner)));
-    void global::CardGame.Core.ICurrentTurnShownCardProgramHost.RevealOwnedBoundCardAppearance(ProgramSkillFrame f, string bind) => RevealOwnedBoundCardAppearance(f, bind);
-    void global::CardGame.Core.ICurrentTurnShownCardProgramHost.IssueCurrentTurnNonLockedSkillSuppression(ProgramSkillFrame f, int seat) => _coreCurrentTurnSkillSuppressionsOperations.IssueCurrentTurnNonLockedSkillSuppression(f, seat);
-    void global::CardGame.Core.ICurrentTurnShownCardProgramHost.GrantCurrentTurnDirectedHeartSlashBonus(ProgramSkillFrame f, int seat) => GrantCurrentTurnDirectedHeartSlashBonus(f, seat);
+    internal bool HasSlashUseDistanceBySuit(CharacterState owner, CardKind kind, Suit? suit) => suit is { } value && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetCardPolicies(SkillProgramCardPolicyKind.IgnoreSlashUseDistanceBySuit).Any(item => item.Policy.InputSuit == value && ProgramCardKindMatch.Contains(item.Policy.CardKinds, kind) && item.Policy.Condition.Evaluate(_coreNativeSkillContextQueriesOperations.CreateSkillContext(owner)));
+    void ICurrentTurnShownCardProgramHost.RevealOwnedBoundCardAppearance(ProgramSkillFrame f, string bind) => RevealOwnedBoundCardAppearance(f, bind);
+    void ICurrentTurnShownCardProgramHost.IssueCurrentTurnNonLockedSkillSuppression(ProgramSkillFrame f, int seat) => _coreCurrentTurnSkillSuppressionsOperations.IssueCurrentTurnNonLockedSkillSuppression(f, seat);
+    void ICurrentTurnShownCardProgramHost.GrantCurrentTurnDirectedHeartSlashBonus(ProgramSkillFrame f, int seat) => GrantCurrentTurnDirectedHeartSlashBonus(f, seat);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 170)]
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPhysicalSlash, 60)]
     internal bool DistancePhysicalSlash170HasSlashUseDistanceBySuit(ProgramSlashDistanceQuery q) => HasSlashUseDistanceBySuit(q.Actor, q.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(q.Actor, q.PhysicalCard!));

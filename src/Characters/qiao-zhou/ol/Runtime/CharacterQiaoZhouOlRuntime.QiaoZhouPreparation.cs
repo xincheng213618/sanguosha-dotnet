@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQiaoZhouOlRuntime
@@ -71,7 +67,7 @@ internal sealed partial class CharacterQiaoZhouOlRuntime
     [ProgramAnswer("qiao-zhou-preparation")]
     internal void AnswerQiaoZhouPreparation(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not QiaoZhouPreparationFrame { Stage: QiaoZhouPreparationStage.Selecting } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], QiaoZhouPreparationChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not QiaoZhouPreparationFrame { Stage: QiaoZhouPreparationStage.Selecting } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], QiaoZhouPreparationChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xingbu preparation lost its recipient's exact private hand choice.");
         AssertQiaoZhouPreparation(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

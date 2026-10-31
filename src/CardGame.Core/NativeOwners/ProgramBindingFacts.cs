@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramBindingFacts(global::System.Func<global::CardGame.Core.ContentRegistry> getContentRegistry, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineActualPlayPhaseCardUsesEntries> getCoreGameEngineActualPlayPhaseCardUsesRuntime) : IProgramBindingFacts
+internal sealed class ProgramBindingFacts(Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineActualPlayPhaseCardUsesEntries> getCoreGameEngineActualPlayPhaseCardUsesRuntime) : IProgramBindingFacts
 {
     public ContentSkillDefinition Skill(string skillId) => getContentRegistry().GetSkill(skillId);
     public SkillProgramTrigger Trigger(ProgramTriggerCandidate candidate) => getCoreGameEngineProgramLifecycleRuntime().GetProgramTrigger2(candidate);

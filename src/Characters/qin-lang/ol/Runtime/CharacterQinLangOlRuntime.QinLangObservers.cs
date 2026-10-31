@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQinLangOlRuntime
@@ -57,11 +53,11 @@ internal sealed partial class CharacterQinLangOlRuntime
             return scored.Choice is not null && scored.Score >= 0 ? scored.Choice : p.Choices.Last();
         }
 
-        var group = r.Cards.GroupBy(c => c.EffectiveName ?? QinLangName(c.Kind)).Where(g => QinLangImitable(g.Key)).SelectMany(g => Enumerable.Range(1, g.Count()).Where(n => !QinLangCountUsed(f.OwnerSeat, r.RoundNumber, n)).Select(n => g.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Take(n).ToArray())).OrderBy(g => g.Sum(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])) - 3).ThenBy(g => g.Length).FirstOrDefault();
+        var group = r.Cards.GroupBy(c => c.EffectiveName ?? QinLangName(c.Kind)).Where(g => QinLangImitable(g.Key)).SelectMany(g => Enumerable.Range(1, g.Count()).Where(n => !QinLangCountUsed(f.OwnerSeat, r.RoundNumber, n)).Select(n => g.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Take(n).ToArray())).OrderBy(g => g.Sum(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])) - 3).ThenBy(g => g.Length).FirstOrDefault();
         if (group is null)
         {
             var count = Enumerable.Range(0, r.Cards.Count + 1).First(n => !QinLangCountUsed(f.OwnerSeat, r.RoundNumber, n));
-            group = r.Cards.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Take(count).ToArray();
+            group = r.Cards.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Take(count).ToArray();
         }
 
         var remove = r.Selected.FirstOrDefault(c => !group.Contains(c));

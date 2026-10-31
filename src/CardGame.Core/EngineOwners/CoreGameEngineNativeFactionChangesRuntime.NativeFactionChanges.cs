@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNativeFactionChangesRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreGameEngineNativeFactionChangesRuntime
 
     internal IReadOnlyList<string> AvailableEffectiveFactionIds() => _coreModeAllegianceOperations.ModeAllegiancePolicy.NativeFactionChoices;
     internal bool HasNativeEffectiveFactionDeclaration(CharacterState player) => TracksNativeEffectiveFactionChanges && player.NativeEffectiveFactionWasDeclared;
-    internal global::CardGame.Core.GameEngine.NativeFactionAvatar? CaptureNativeFactionAvatar(CharacterState player) => player.GeneralSelected && _coreModeAllegianceOperations.ModeAllegiancePolicy.AllowsAvatarFactionChanges && _corePrivateGeneralLibrariesOperations.EffectiveGeneralLibrary(player)is { } library ? new(library.Source, library.RevealedGeneralId!, library.DeclaredSkillId, library.SelectedFactionId) : null;
+    internal GameEngine.NativeFactionAvatar? CaptureNativeFactionAvatar(CharacterState player) => player.GeneralSelected && _coreModeAllegianceOperations.ModeAllegiancePolicy.AllowsAvatarFactionChanges && _corePrivateGeneralLibrariesOperations.EffectiveGeneralLibrary(player)is { } library ? new(library.Source, library.RevealedGeneralId!, library.DeclaredSkillId, library.SelectedFactionId) : null;
     internal string? CaptureNativeAvatarFactionBeforeDeclaration(CharacterState player) => TracksNativeEffectiveFactionChanges ? _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(player) : null;
     internal void CompleteNativeAvatarFactionDeclaration(ProgramSkillFrame frame, CharacterState player, string? previous)
     {
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineNativeFactionChangesRuntime
         if (!_coreMatchSetupSetupCompleteAccess._setupComplete || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber < 1)
             return;
         player.NativeEffectiveFactionWasDeclared = true;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeEffectiveFactionChangedEvent(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, player.Seat, previous, current, frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), "avatar-state"));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeEffectiveFactionChangedEvent(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, player.Seat, previous, current, frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), "avatar-state"));
     }
 
     internal void ChangeNativeEffectiveFaction(ProgramSkillFrame frame, string faction)
@@ -45,8 +41,8 @@ internal sealed partial class CoreGameEngineNativeFactionChangesRuntime
         player.NativeEffectiveFactionWasDeclared = true;
         _coreGameEngineNativeFactionChangesFieldsAccess._nativeFactionObservations[player.Seat] = new(faction, previousAvatar);
         _coreGameEngineNativeFactionChangesFieldsAccess._nativeFactionRevision++;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeEffectiveFactionChangedEvent(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, player.Seat, previous, faction, frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), "program"));
-        _coreMatchLogOperations.AddLog("FactionChanged", $"{(player.Name)} 将势力变更为{(global::CardGame.Core.EngineOwners.CoreMatchPresentationRuntime.GetFactionName(faction))}。", player.Seat);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeEffectiveFactionChangedEvent(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, player.Seat, previous, faction, frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), "program"));
+        _coreMatchLogOperations.AddLog("FactionChanged", $"{(player.Name)} 将势力变更为{(CoreMatchPresentationRuntime.GetFactionName(faction))}。", player.Seat);
     }
 
     internal void ApplyCaoTengFactionChange(ProgramSkillFrame frame, string faction)
@@ -64,8 +60,8 @@ internal sealed partial class CoreGameEngineNativeFactionChangesRuntime
         _coreGameEngineNativeFactionChangesFieldsAccess._nativeFactionRevision++;
         // A setup declaration is visible, but is not an actual-turn mutation.
         if (_coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber > 0)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeEffectiveFactionChangedEvent(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, player.Seat, previous, faction, frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), "qingliu"));
-        _coreMatchLogOperations.AddLog("FactionChanged", $"{(player.Name)} 将势力变更为{(global::CardGame.Core.EngineOwners.CoreMatchPresentationRuntime.GetFactionName(faction))}。", player.Seat);
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeEffectiveFactionChangedEvent(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, player.Seat, previous, faction, frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), "qingliu"));
+        _coreMatchLogOperations.AddLog("FactionChanged", $"{(player.Name)} 将势力变更为{(CoreMatchPresentationRuntime.GetFactionName(faction))}。", player.Seat);
     }
 
     // This observes completed native mutations. The cache contains no pending

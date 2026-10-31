@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_ExtraCardEffectRounds
 {
     internal static CardAttackState ResetExtraCardEffectAttack(CardAttackState original) => original with {

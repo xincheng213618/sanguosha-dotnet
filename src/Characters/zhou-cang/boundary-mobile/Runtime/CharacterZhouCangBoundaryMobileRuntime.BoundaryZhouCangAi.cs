@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
@@ -28,7 +24,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
             // extra attack remains a potential benefit of our own visible hand.
             if (support <= 0)
                 return support - 1;
-            return support * choice.Cards.Count + (branch == "give-dodge" && self.Hand.Any(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)) ? 8 : 0);
+            return support * choice.Cards.Count + (branch == "give-dodge" && self.Hand.Any(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)) ? 8 : 0);
         }
 
         return decision.Choices.OrderByDescending(Value).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();

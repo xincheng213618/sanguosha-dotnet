@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5YimieRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CoreGameEngineShanheS5YimieRuntime
         {
             if (f.InstructionIndex != 1 || f.ShanheS5YimieCost is not null || window.Prevented || window.Amount <= 0 || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].HasHpValue || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp <= 0 || _coreHealthQueriesOperations.UnambiguousHp(_coreMatchParticipantsPlayersAccess._players[window.TargetSeat])is not { } hp || _resolutionStackOperations._resolutionStack.Single(frame => frame.Id == attack.ResolutionId).ShanheS5YimieDamage is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5YimieFrozenEvent>().Any(e => e.Origin.Source.OwnerSeat == f.OwnerSeat && e.Origin.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber))
                 throw new InvalidOperationException("Yimie cannot duplicate its unpaid original damage opportunity.");
-            var r = new ShanheS5YimieOrigin(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, window.Id, attack.ResolutionId, attack is global::CardGame.Core.NativeOwners.CardAttackHandle, window.TargetSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, window.Amount, hp, Math.Max(0, hp - window.Amount), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp, _coreNativeCardClassificationsOperations.GetDamageNature(attack));
+            var r = new ShanheS5YimieOrigin(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, window.Id, attack.ResolutionId, attack is NativeOwners.CardAttackHandle, window.TargetSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, window.Amount, hp, Math.Max(0, hp - window.Amount), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp, _coreNativeCardClassificationsOperations.GetDamageNature(attack));
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheS5YimieCost = r });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5YimieFrozenEvent(r));
             return SkillProgramStepOutcome.Continue;
@@ -45,7 +41,7 @@ internal sealed partial class CoreGameEngineShanheS5YimieRuntime
             // window and paid cost prove this segment. DamageWasApplied belongs to
             // the entire attack and may already be true for an earlier chain victim.
             var after = checked(before + origin.X);
-            if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+            if (attack is NativeOwners.ProgramAttackHandle)
                 _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, state => state with { DamageAmount = after });
             else
                 _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, state => state!with { DamageAmount = after });
@@ -72,13 +68,13 @@ internal sealed partial class CoreGameEngineShanheS5YimieRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AttackCompletionPrelude, 5)]
-    internal bool CompleteShanheS5YimieCardDamage(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool CompleteShanheS5YimieCardDamage(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = TryBeginShanheS5YimieRecovery(attack);
         return paused;
     }
 
-    internal bool TryBeginShanheS5YimieRecovery(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool TryBeginShanheS5YimieRecovery(GameEngine.IDamageAttempt attack)
     {
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == attack.ResolutionId)is not { ShanheS5YimieDamage: { } receipt } owner)
             return false;
@@ -144,5 +140,5 @@ internal sealed partial class CoreGameEngineShanheS5YimieRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5795)]
     internal bool ContinuePaidShanheS5Yimie(ProgramSkillFrame f) => HasShanheS5YimieCostPaid(f);
 
-    SkillProgramStepOutcome global::CardGame.Core.IShanheS5YimieHost.ResolveShanheS5Yimie(ProgramSkillFrame f, string stage) => ResolveShanheS5Yimie(f, stage);
+    SkillProgramStepOutcome IShanheS5YimieHost.ResolveShanheS5Yimie(ProgramSkillFrame f, string stage) => ResolveShanheS5Yimie(f, stage);
 }

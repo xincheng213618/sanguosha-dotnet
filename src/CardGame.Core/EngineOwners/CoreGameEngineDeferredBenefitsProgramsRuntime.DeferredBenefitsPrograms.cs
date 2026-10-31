@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDeferredBenefitsProgramsRuntime
 {
-    internal bool TryBeginFactionRecoveryDebts(global::CardGame.Core.GameEngine.DyingCompletionReceipt dying, bool survived)
+    internal bool TryBeginFactionRecoveryDebts(GameEngine.DyingCompletionReceipt dying, bool survived)
     {
         var debts = _coreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess._programFactionRecoveryDebts.Where(item => item.DyingFrameId == dying.FrameId).ToArray();
         if (debts.Length == 0)
@@ -40,7 +36,7 @@ internal sealed partial class CoreGameEngineDeferredBenefitsProgramsRuntime
                 throw new InvalidOperationException("Settled faction damage retained an unfinished child resolution.");
             if (_coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId != continuation.ParentAttackOwnerFrameId || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id != continuation.ParentDamageWindowFrameId)
                 throw new InvalidOperationException("Settled faction damage lost its outer damage frame.");
-            _coreNativeDyingOperations.ContinueDyingAfterFactionRecoveryDebts(new global::CardGame.Core.GameEngine.DyingCompletionReceipt(continuation.DyingFrameId, continuation.DyingParentFrameId, continuation.DyingVictimSeat, continuation.DyingContinuation), continuation.Survived);
+            _coreNativeDyingOperations.ContinueDyingAfterFactionRecoveryDebts(new GameEngine.DyingCompletionReceipt(continuation.DyingFrameId, continuation.DyingParentFrameId, continuation.DyingVictimSeat, continuation.DyingContinuation), continuation.Survived);
             return true;
         }
 
@@ -51,16 +47,16 @@ internal sealed partial class CoreGameEngineDeferredBenefitsProgramsRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDeferredBenefitsProgramHost.RequestFactionRecovery(ProgramSkillFrame frame, string factionId) => RequestProgramFactionRecovery(frame, factionId);
-    void global::CardGame.Core.IDeferredBenefitsProgramHost.SetNextTurnRuleModifier(ProgramSkillFrame frame, int targetSeat, SkillRuleQuery query, int amount) => QueueProgramNextTurnRuleModifier(frame, targetSeat, query, amount);
-    SkillProgramStepOutcome global::CardGame.Core.IDeferredBenefitsProgramHost.WeaponDiscardOrDamageBonus(ProgramSkillFrame frame, int amount) => BeginProgramWeaponDamageChoice(frame, amount);
-    void global::CardGame.Core.IDeferredBenefitsProgramHost.ResolveJudgmentColorBenefit(ProgramSkillFrame frame, int targetSeat, string sourceBind, int recovery) => ResolveProgramJudgmentColorBenefit(frame, targetSeat, sourceBind, recovery);
+    SkillProgramStepOutcome IDeferredBenefitsProgramHost.RequestFactionRecovery(ProgramSkillFrame frame, string factionId) => RequestProgramFactionRecovery(frame, factionId);
+    void IDeferredBenefitsProgramHost.SetNextTurnRuleModifier(ProgramSkillFrame frame, int targetSeat, SkillRuleQuery query, int amount) => QueueProgramNextTurnRuleModifier(frame, targetSeat, query, amount);
+    SkillProgramStepOutcome IDeferredBenefitsProgramHost.WeaponDiscardOrDamageBonus(ProgramSkillFrame frame, int amount) => BeginProgramWeaponDamageChoice(frame, amount);
+    void IDeferredBenefitsProgramHost.ResolveJudgmentColorBenefit(ProgramSkillFrame frame, int targetSeat, string sourceBind, int recovery) => ResolveProgramJudgmentColorBenefit(frame, targetSeat, sourceBind, recovery);
     internal int CountPlayPhaseDamageTakenByAny() => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play ? 0 : _corePlayCardHistoryOperations.EventsSinceLastBoundary(item => item is TurnStartedEvent or PhaseChangedEvent { Phase: TurnPhase.Play }).OfType<DamageAppliedEvent>().Count();
     internal void QueueProgramNextTurnRuleModifier(ProgramSkillFrame frame, int targetSeat, SkillRuleQuery query, int amount)
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || targetSeat == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || query is not (SkillRuleQuery.HandLimit or SkillRuleQuery.SlashLimit or SkillRuleQuery.DrawCount) || amount is < 1 or > 20)
             throw new InvalidOperationException("A next-turn grant needs a living other target and a bounded hand or Slash allowance.");
-        var grant = new ProgramNextTurnRuleModifier(frame.Id, frame.InstructionIndex - 1, targetSeat, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), query, amount);
+        var grant = new ProgramNextTurnRuleModifier(frame.Id, frame.InstructionIndex - 1, targetSeat, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), query, amount);
         if (_coreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess._programNextTurnRuleModifiers.Any(item => item.ParentFrameId == grant.ParentFrameId && item.EffectIndex == grant.EffectIndex))
             throw new InvalidOperationException("A next-turn grant cannot be scheduled twice.");
         _coreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess._programNextTurnRuleModifiers.Add(grant);
@@ -135,7 +131,7 @@ internal sealed partial class CoreGameEngineDeferredBenefitsProgramsRuntime
         if (accepted && _coreMatchParticipantsPlayersAccess._players[chooser].IsAlive && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
         {
             _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(frame.Id, chooser, frame.OwnerSeat, 1, null, null);
-            _coreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess._programFactionRecoveryDebts.Add(new(draft.DyingFrameId, frame.OwnerSeat, chooser, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId));
+            _coreGameEngineDeferredBenefitsProgramsProgramFactionRecoveryDebtsProgramNextTurnRuleModifiersAccess._programFactionRecoveryDebts.Add(new(draft.DyingFrameId, frame.OwnerSeat, chooser, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId));
         }
 
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramFactionRecoveryChoiceEvent(frame.Id, frame.SkillId, frame.OwnerSeat, chooser, accepted, draft.DyingFrameId));

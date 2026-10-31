@@ -1,11 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunYuanOlRuntime
@@ -28,7 +21,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
         projection.Append(HasSunYuanCapability && _coreProgramEventHistoryOperations.ProgramEventHistory<DongxinEntityAcquiredEvent>().Any(grant => grant.CardId == cardId && _cardZonesOperations._cardZones.Contains(CardLocation.Hand(grant.RecipientSeat), cardId)) ? "恫心" : null);
     }
 
-    internal bool HasDongxinEntitySlashQuota(CharacterState actor, CardKind kind, IReadOnlyList<int> ids) => HasSunYuanCapability && actor.IsAlive && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && ids is [var id] && id > 0 && _cardZonesOperations._cardZones.Contains(CardLocation.Hand(actor.Seat), id) && _coreProgramEventHistoryOperations.ProgramEventHistory<DongxinEntityAcquiredEvent>().Any(e => e.RecipientSeat == actor.Seat && e.CardId == id && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.EffectiveKind));
+    internal bool HasDongxinEntitySlashQuota(CharacterState actor, CardKind kind, IReadOnlyList<int> ids) => HasSunYuanCapability && actor.IsAlive && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && ids is [var id] && id > 0 && _cardZonesOperations._cardZones.Contains(CardLocation.Hand(actor.Seat), id) && _coreProgramEventHistoryOperations.ProgramEventHistory<DongxinEntityAcquiredEvent>().Any(e => e.RecipientSeat == actor.Seat && e.CardId == id && CoreNativeCardClassificationsRuntime.IsSlashCard(e.EffectiveKind));
     internal void BindDongxinEntityUse(CardUseFrame supplied)
     {
         if (!HasSunYuanCapability || supplied.DongxinUse is not null || supplied.Action is not { Type: CardActionType.Use } a || a.ActorSeat != a.ProviderSeat || !HasDongxinEntitySlashQuota(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat], a.EffectiveKind, a.PhysicalCards.Select(c => c.CardId).ToArray()))
@@ -40,7 +33,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DongxinEntityUseBoundEvent(receipt));
     }
 
-    internal bool HasIssuedDongxinEntitySlashQuota(long? useId, int actor) => useId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { DongxinUse: { } r, Action: { } a } u && r.UseId == u.Id && r.ActionId == a.ActionId && u.SourceSeat == actor && a.ActorSeat == actor && a.ProviderSeat == r.Provider && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, r.OriginalActor, r.Provider) && a.PhysicalCards is [var cost] && cost.CardId == r.CardId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && _coreProgramEventHistoryOperations.ProgramEventHistory<DongxinEntityUseBoundEvent>().Count(e => e.Receipt == r) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<DongxinEntityAcquiredEvent>().Count(e => e.FrameId == r.GrantFrameId && e.CardId == r.CardId && e.RecipientSeat == r.OriginalActor && e.AcquiredSequence == r.AcquiredSequence) == 1;
+    internal bool HasIssuedDongxinEntitySlashQuota(long? useId, int actor) => useId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { DongxinUse: { } r, Action: { } a } u && r.UseId == u.Id && r.ActionId == a.ActionId && u.SourceSeat == actor && a.ActorSeat == actor && a.ProviderSeat == r.Provider && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, r.OriginalActor, r.Provider) && a.PhysicalCards is [var cost] && cost.CardId == r.CardId && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && _coreProgramEventHistoryOperations.ProgramEventHistory<DongxinEntityUseBoundEvent>().Count(e => e.Receipt == r) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<DongxinEntityAcquiredEvent>().Count(e => e.FrameId == r.GrantFrameId && e.CardId == r.CardId && e.RecipientSeat == r.OriginalActor && e.AcquiredSequence == r.AcquiredSequence) == 1;
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 27491)]
     internal void RecordDongxinEntityDeparture(CardMovedEvent e)
     {

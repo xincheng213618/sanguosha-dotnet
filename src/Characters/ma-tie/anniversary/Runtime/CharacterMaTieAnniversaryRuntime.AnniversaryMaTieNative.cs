@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaTieAnniversaryRuntime
@@ -25,13 +21,13 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
     internal int[] AnniversaryMaTieRequestTargets(ProgramSkillFrame f, int actor) => AnniversaryMaTieRequestActor(f, actor) ? [f.AnniversaryMaTie!.Target] : [];
     [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaBeforeLimit, 46700)]
     internal bool MaTieSlashQuota(ProgramSlashQuotaQuery q) => IsAnniversaryMaTieSlashQuery(q.Actor);
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.MaTieSlashPlan> MaTieSlashPlans(ProgramSkillFrame f)
+    internal IReadOnlyList<GameEngine.MaTieSlashPlan> MaTieSlashPlans(ProgramSkillFrame f)
     {
         var r = f.AnniversaryMaTie!;
         if (r.Stage != AnniversaryMaTieStage.SlashChoice || MaTieQueryFrame(r.Actors[r.Cursor])?.Id != f.Id)
             return[];
         var actor = _coreMatchParticipantsPlayersAccess._players[r.Actors[r.Cursor]];
-        var plans = new List<global::CardGame.Core.GameEngine.MaTieSlashPlan>();
+        var plans = new List<GameEngine.MaTieSlashPlan>();
         foreach (var action in _coreNativeLegalActionsOperations.BuildLegalActions(actor, false).Where(a => a.Kind == LegalActionKind.Slash && a.MinCardCount == 0 && a.TargetSeats.Contains(r.Target)))
             plans.Add(new(AnniversaryMaTieComposition.Freeze(action), action.CardId is> 0 ? [action.CardId.Value] : []));
         var view = f with
@@ -88,7 +84,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(p => p.Id == supplied.Id);
         if (f.AnniversaryMaTie is not { } r || f.SkillId != AnniversaryMaTieComposition.Quxian)
             return false;
-        if (!AnniversaryMaTieRequestActor(f, actor) || r.Stage is not (AnniversaryMaTieStage.SlashChoice or AnniversaryMaTieStage.Issuing) || r.Target != target || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || r.UseId != 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(provider))
+        if (!AnniversaryMaTieRequestActor(f, actor) || r.Stage is not (AnniversaryMaTieStage.SlashChoice or AnniversaryMaTieStage.Issuing) || r.Target != target || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || r.UseId != 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(provider))
             throw new InvalidOperationException("Quxian supplied Slash lost its exact actor, target or unissued original frame.");
         var action = new LegalAction(LegalActionKind.Slash, cards.Count > 0 ? cards[0].Id : 0, target, "驱险：使用杀", kind)
         {
@@ -125,7 +121,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 46700)]
     internal void BindAnniversaryMaTieSlash(CardUseDeclaredEvent fact)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(fact.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(fact.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
             return;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
         var f = index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramSkillFrame { AnniversaryMaTie: { } } direct ? direct : _characterLiuFengBoundaryOperations.BoundaryLiuFengNativeParent(use);

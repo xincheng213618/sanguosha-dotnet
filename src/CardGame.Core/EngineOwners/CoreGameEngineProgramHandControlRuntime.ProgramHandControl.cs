@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramHandControlRuntime
@@ -18,7 +14,7 @@ internal sealed partial class CoreGameEngineProgramHandControlRuntime
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 60)]
     internal bool CanOfferProgramHandControl(CharacterState owner, SkillProgramTrigger trigger) => !trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ChooseHandCountIntervention) || _coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(player).Count != _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count);
-    SkillProgramStepOutcome global::CardGame.Core.IHandControlProgramHost.ExecuteHandControl(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteProgramHandControl(effect, frame);
+    SkillProgramStepOutcome IHandControlProgramHost.ExecuteHandControl(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteProgramHandControl(effect, frame);
     internal SkillProgramStepOutcome ExecuteProgramHandControl(SkillProgramEffect effect, ProgramSkillFrame frame)
     {
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -39,7 +35,7 @@ internal sealed partial class CoreGameEngineProgramHandControlRuntime
                 return SkillProgramStepOutcome.Continue;
             if (stage == "color")
             {
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), owner.Seat, "hand-color-cost", hand.Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray()));
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), owner.Seat, "hand-color-cost", hand.Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray()));
                 frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             }
 

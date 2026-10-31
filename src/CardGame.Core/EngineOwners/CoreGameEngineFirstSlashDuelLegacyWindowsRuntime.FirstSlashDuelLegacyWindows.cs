@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFirstSlashDuelLegacyWindowsRuntime
 {
     internal ProgramCardTriggerWindowFrame DeferFirstSlashDuelCandidates(ProgramCardTriggerWindowFrame frame)
     {
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(frame) != SkillProgramTriggerWindow.CardUseTargetsFinalized || frame.CandidateIndex >= frame.Candidates.Count)
+        if (CoreGameEngineCardActionsRuntime.GetCardActionWindow(frame) != SkillProgramTriggerWindow.CardUseTargetsFinalized || frame.CandidateIndex >= frame.Candidates.Count)
             return frame;
-        bool IsBenefit(ProgramCardTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger2(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(c)).Effects.Any(e => e.Op == SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit);
+        bool IsBenefit(ProgramCardTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger2(CoreGameEngineCardActionsRuntime.ToSharedCandidate(c)).Effects.Any(e => e.Op == SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit);
         if (!IsBenefit(frame.Candidates[frame.CandidateIndex]) || !frame.Candidates.Skip(frame.CandidateIndex + 1).Any(c => !IsBenefit(c)))
             return frame;
         // Only this newly opted-in candidate moves. Preserve every historical
@@ -39,7 +35,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelLegacyWindowsRuntime
     }
 
     internal bool IsFirstLegacySlashUse(CardUseFrame use, long producer, bool requireSingle = true) => use.Action is null && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && use.CardKind == CardKind.Slash && use.TargetSeats.Count > 0 && (!requireSingle || use.TargetSeats.Count == 1) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(use.TargetSeats[0]) && _coreCurrentTurnUseKindsOperations.HasOngoingActualUseTurn && use.SourceSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && FirstSlashDuelLegacyProducer(use) == producer && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FirstSlashDuelUseRecordedEvent>().Any(e => e.CardUseFrameId == use.Id && e.ActionId is null && e.Ordinal == 1 && e.ActorSeat == use.SourceSeat && e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
-    internal bool TryBeginFirstSlashDuelLegacyWindow(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryBeginFirstSlashDuelLegacyWindow(NativeOwners.CardAttackHandle attack)
     {
         if (!_coreFirstSlashDuelBenefitsOperations.HasFirstSlashDuelBenefitCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || use.Action is not null || FirstSlashDuelLegacyProducer(use)is not { } producer || !use.TargetSeats.Contains(attack.TargetSeat) || !IsFirstLegacySlashUse(use, producer) || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive)
             return false;

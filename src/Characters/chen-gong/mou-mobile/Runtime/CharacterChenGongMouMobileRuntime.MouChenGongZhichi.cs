@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenGongMouMobileRuntime
@@ -94,7 +90,7 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
 
     internal bool ExactMouChenGongBeforeFrame(ProgramSkillFrame f, bool allowPrevented)
     {
-        if (f.TriggerId != "prevent-later-damage" || f.ActivationId != f.TriggerId || f.SkillId != MouChenGongComposition.Zhichi || f.InstructionIndex is < 0 or > 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, MouChenGongProtection: { } p } context || CurrentMouChenGongProtection(f.OwnerSeat) != p || !ValidMouChenGongProtection(p) || p.Source.OwnerSeat != f.OwnerSeat || p.Source.SkillInstanceId != f.SkillInstanceId || p.GameplayHash != f.GameplayHash || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not BeforeDamageProgramWindowFrame w || w.TargetSeat != f.OwnerSeat || w.Amount <= 0 || w.RedirectedTargetSeat is not null || w.Prevented && !allowPrevented || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].Candidate) || _coreDamagePreventionProgramsOperations.CreateBeforeDamageProgramContext(w, w.Candidates[w.CandidateIndex]) != context)
+        if (f.TriggerId != "prevent-later-damage" || f.ActivationId != f.TriggerId || f.SkillId != MouChenGongComposition.Zhichi || f.InstructionIndex is < 0 or > 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, MouChenGongProtection: { } p } context || CurrentMouChenGongProtection(f.OwnerSeat) != p || !ValidMouChenGongProtection(p) || p.Source.OwnerSeat != f.OwnerSeat || p.Source.SkillInstanceId != f.SkillInstanceId || p.GameplayHash != f.GameplayHash || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not BeforeDamageProgramWindowFrame w || w.TargetSeat != f.OwnerSeat || w.Amount <= 0 || w.RedirectedTargetSeat is not null || w.Prevented && !allowPrevented || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].Candidate) || _coreDamagePreventionProgramsOperations.CreateBeforeDamageProgramContext(w, w.Candidates[w.CandidateIndex]) != context)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == w.Id;

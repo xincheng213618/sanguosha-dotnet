@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYanOlRuntime
@@ -13,7 +8,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
         if (!HasLiuYanCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { CardId: 0, CardKind: CardKind.Alcohol, PhysicalCardIds.Count: 0, LiuYanLegacyAlcohol: { } r, Action: { Type: CardActionType.Use } a } u || r.UseId != id || a.ActionId != r.ActionId || !Enum.IsDefined(r.Stage) || !_coreActualTurnLegacyCompletionOperations.IsExactLegacyActualUseCompletion(u) || !u.TargetSeats.SequenceEqual([u.SourceSeat]) || a.EffectiveSuit != Suit.None || a.EffectiveRank != 0)
             return false;
         var i = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id);
-        if (i < 1 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramSkillFrame p || p.Id != r.ProgramParentId || p.InstructionIndex != r.InstructionIndex || p.GameplayHash != r.ProducerHash || p.WindowContext?.ParentFrameId != r.DyingId || p.OwnerSeat != u.SourceSeat || r.ProducerSource != new CardConversionSource(p.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(p), p.OwnerSeat, p.SkillInstanceId) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(p)?.Op != SkillProgramEffectOp.UseVirtualDyingAlcohol || _coreProgramEventHistoryOperations.ProgramEventHistory<LiuYanLegacyAlcoholWindowIssuedEvent>().Count(e => e == new LiuYanLegacyAlcoholWindowIssuedEvent(id, r.ProgramParentId, r.DyingId, r.InstructionIndex, r.ProducerSource, r.ProducerHash, r.ActionId)) != 1)
+        if (i < 1 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramSkillFrame p || p.Id != r.ProgramParentId || p.InstructionIndex != r.InstructionIndex || p.GameplayHash != r.ProducerHash || p.WindowContext?.ParentFrameId != r.DyingId || p.OwnerSeat != u.SourceSeat || r.ProducerSource != new CardConversionSource(p.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(p), p.OwnerSeat, p.SkillInstanceId) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(p)?.Op != SkillProgramEffectOp.UseVirtualDyingAlcohol || _coreProgramEventHistoryOperations.ProgramEventHistory<LiuYanLegacyAlcoholWindowIssuedEvent>().Count(e => e == new LiuYanLegacyAlcoholWindowIssuedEvent(id, r.ProgramParentId, r.DyingId, r.InstructionIndex, r.ProducerSource, r.ProducerHash, r.ActionId)) != 1)
             return false;
         return true;
     }
@@ -33,7 +28,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
         if (i < 1 || i != _resolutionStackOperations._resolutionStack.Count - 1 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramSkillFrame p || p.Id != parentId || p.OwnerSeat != u.SourceSeat || p.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.ParentFrameId != dyingId || _coreDyingCursorRuntimeOperations.ActiveDying?.FrameId != dyingId || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(u))
             throw new InvalidOperationException("Tushe's legacy Wine requires its genuine accepted self-rescue producer.");
         u = _coreActualTurnLegacyCompletionOperations.NormalizeActualTurnLegacyCompletedUse(u, parentId);
-        var r = new LiuYanLegacyAlcoholReturn(id, parentId, dyingId, p.InstructionIndex, new(p.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(p), p.OwnerSeat, p.SkillInstanceId), p.GameplayHash, u.Action!.ActionId, LiuYanLegacyAlcoholStage.Targets);
+        var r = new LiuYanLegacyAlcoholReturn(id, parentId, dyingId, p.InstructionIndex, new(p.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(p), p.OwnerSeat, p.SkillInstanceId), p.GameplayHash, u.Action!.ActionId, LiuYanLegacyAlcoholStage.Targets);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, use => use with { LiuYanLegacyAlcohol = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LiuYanLegacyAlcoholWindowIssuedEvent(id, parentId, dyingId, p.InstructionIndex, r.ProducerSource, r.ProducerHash, r.ActionId));
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(null, u.Action, SkillProgramTriggerWindow.CardUseTargetsFinalized, [u.SourceSeat], ProgramCardContinuation.FinalizedSimpleCard))

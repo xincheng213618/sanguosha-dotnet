@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
@@ -70,7 +67,7 @@ internal sealed partial class CoreGameEngineShanheSourceYanyuRuntime
         {
             var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(item => item.Id == cardId);
             var to = receipt.Red ? CardLocation.Hand(frame.OwnerSeat) : CardLocation.DiscardPile;
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, to, receipt.Red ? global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceYanyuDefinitions.ShanheSourceYanyuClaimReason : global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceYanyuDefinitions.ShanheSourceYanyuBlackReason, move =>
+            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, to, receipt.Red ? CoreGameEngineShanheSourceYanyuDefinitions.ShanheSourceYanyuClaimReason : CoreGameEngineShanheSourceYanyuDefinitions.ShanheSourceYanyuBlackReason, move =>
             {
                 var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
                 _coreRuntimeOperations.ReplaceRuntimeTop(active with { ShanheSourceYanyu = active.ShanheSourceYanyu!with { MovementSequence = move.Sequence, Destination = to } });
@@ -96,5 +93,5 @@ internal sealed partial class CoreGameEngineShanheSourceYanyuRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceYanyuHost.ResolveSourceYanyu(ProgramSkillFrame frame, SkillProgramEffect effect) => ResolveShanheSourceYanyu(frame, effect);
+    SkillProgramStepOutcome IShanheSourceYanyuHost.ResolveSourceYanyu(ProgramSkillFrame frame, SkillProgramEffect effect) => ResolveShanheSourceYanyu(frame, effect);
 }

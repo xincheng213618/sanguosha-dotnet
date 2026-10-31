@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterRuanYuOlRuntime
@@ -10,13 +6,13 @@ internal sealed partial class CharacterRuanYuOlRuntime
     internal const string RuanYuExchangeReason = "skill-program.ruan-yu.xingzuo.exchange", MiaoxianDrawReason = "skill-program.ruan-yu.miaoxian.draw";
     internal bool HasRuanYuCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveXingzuoPrivateBottomExchange) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMiaoxianUniqueRedUseDraw);
 
-    internal static CardConversionSource RuanYuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ruan_yu_ol_RuanYu.RuanYuSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IRuanYuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginRuanYu(f, op);
+    internal static CardConversionSource RuanYuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_ruan_yu_ol_RuanYu.RuanYuSource(f);
+    SkillProgramStepOutcome IRuanYuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginRuanYu(f, op);
     internal SkillProgramStepOutcome BeginRuanYu(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var context = f.WindowContext ?? throw new InvalidOperationException("Ruan Yu requires a genuine native trigger.");
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
+        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
         if (!CanOfferRuanYu(candidate, _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Ruan Yu lost his original source, actual phase or prepayment true-use qualification.");
         var stage = op == SkillProgramEffectOp.ResolveXingzuoPrivateBottomExchange ? RuanYuStage.Hand : op == SkillProgramEffectOp.ResolveXingzuoIssuedEndingExchange ? RuanYuStage.EndingTarget : RuanYuStage.RedChildren;
@@ -112,7 +108,7 @@ internal sealed partial class CharacterRuanYuOlRuntime
     [ProgramAnswer("ruan-yu")]
     internal void AnswerRuanYu(PromptChoice supplied)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !RuanYuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [supplied])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RuanYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !RuanYuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [supplied])))
             throw new InvalidOperationException("Xingzuo requires the exact private current entity choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

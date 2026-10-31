@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangShiPingOlRuntime
 {
     internal bool HasHongjiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmHongjiNextPhase);
 
-    internal static CardConversionSource ZhangShiPingSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhang_shi_ping_ol_ZhangShiPingHongji.ZhangShiPingSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IZhangShiPingProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    internal static CardConversionSource ZhangShiPingSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhang_shi_ping_ol_ZhangShiPingHongji.ZhangShiPingSource(f);
+    SkillProgramStepOutcome IZhangShiPingProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.ArmHongjiNextPhase => BeginHongjiPromise(f),
         SkillProgramEffectOp.ResolveHongjiGrantedPhase => BeginHongjiExtraPhase(f),
@@ -142,7 +138,7 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
     [ProgramAnswer("zhang-shi-ping-hongji")]
     internal void AnswerHongji(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangShiPingHongji: { Stage: HongjiStage.Choose } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HongjiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangShiPingHongji: { Stage: HongjiStage.Choose } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HongjiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Hongji lost its exact frozen preparation choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var phase = Enum.Parse<TurnPhase>(choice.Parameters["phase"]);
@@ -154,7 +150,7 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
     internal SkillProgramStepOutcome BeginHongjiExtraPhase(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.ZhangShiPingHongji is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || !HasIssuedHongjiCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), context))
+        if (f.ZhangShiPingHongji is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || !HasIssuedHongjiCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), context))
             throw new InvalidOperationException("Hongji requires its exact unconsumed issued actual-phase candidate.");
         var p = OutstandingHongjiPromises(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat, context.Window).Single(p => p.Source.OwnerSeat == f.OwnerSeat && p.Source.SkillId == f.SkillId && p.Source.SkillInstanceId == f.SkillInstanceId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZhangShiPingHongji = new(p.Source, f.GameplayHash, f.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, p.RecipientSeat, HongjiStage.ExtraPhase, Phase: p.Phase, ReturnPhase: _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase, ReturnActualPhase: _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase(), Promise: p) { SuspendedSchedule = _programPhaseScheduleOperations._programPhaseSchedule } });

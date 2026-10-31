@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoPiBoundaryMobileRuntime
 {
     internal const string BoundaryFangzhuDiscard = "skill-program.boundary-cao-pi.fangzhu.discard", BoundaryFangzhuDraw = "skill-program.boundary-cao-pi.fangzhu.draw";
-    internal static CardConversionSource BoundaryCaoPiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryCaoPiHost.Resolve(ProgramSkillFrame f, SkillProgramEffect e) => e.Op == SkillProgramEffectOp.ChooseBoundaryCaoPiXingshang ? BeginBoundaryXingshang(f, e) : BeginBoundaryFangzhu(f, e);
+    internal static CardConversionSource BoundaryCaoPiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IBoundaryCaoPiHost.Resolve(ProgramSkillFrame f, SkillProgramEffect e) => e.Op == SkillProgramEffectOp.ChooseBoundaryCaoPiXingshang ? BeginBoundaryXingshang(f, e) : BeginBoundaryFangzhu(f, e);
     internal DeathFrame? BoundaryCaoPiDeath(ProgramSkillWindowContext context)
     {
         if (context.Window != SkillProgramTriggerWindow.CharacterDied || _resolutionStackOperations._resolutionStack.OfType<ProgramKillTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window)

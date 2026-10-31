@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
@@ -17,10 +13,10 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
         return TryGetRandomSkillDirectSlashUse(_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window), out _);
     }
 
-    internal bool TryGetRandomSkillDirectSlashUse(global::CardGame.Core.GameEngine.IDamageAttempt attack, out CardUseFrame use)
+    internal bool TryGetRandomSkillDirectSlashUse(GameEngine.IDamageAttempt attack, out CardUseFrame use)
     {
         use = null !;
-        if (attack.IsSourceLess || attack.IsChainPropagation || !attack.DamageWasApplied || attack.DamageAmount <= 0 || attack.SourceSeat == attack.TargetSeat || attack.SourceSeat != attack.CardUserSeat || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } original || original.SourceSeat != attack.SourceSeat || action.ActorSeat != attack.SourceSeat || original.CardKind != kind || action.EffectiveKind != kind || !original.TargetSeats.Contains(attack.TargetSeat))
+        if (attack.IsSourceLess || attack.IsChainPropagation || !attack.DamageWasApplied || attack.DamageAmount <= 0 || attack.SourceSeat == attack.TargetSeat || attack.SourceSeat != attack.CardUserSeat || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } original || original.SourceSeat != attack.SourceSeat || action.ActorSeat != attack.SourceSeat || original.CardKind != kind || action.EffectiveKind != kind || !original.TargetSeats.Contains(attack.TargetSeat))
             return false;
         use = original;
         return true;
@@ -66,7 +62,7 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
         {
             ProgramFrameId = f.Id,
             InstructionIndex = f.InstructionIndex,
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             DamageWindowId = window.Id,
             DamageFrameId = damage.Id,
@@ -93,10 +89,10 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal static string RandomDamageTargetSkillGrantSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RandomDamageTargetSkills.RandomDamageTargetSkillGrantSource(f);
+    internal static string RandomDamageTargetSkillGrantSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_RandomDamageTargetSkills.RandomDamageTargetSkillGrantSource(f);
     internal bool ValidRandomDamageTargetSkillReceipt(ProgramSkillFrame f)
     {
-        if (f.RandomDamageTargetSkill is not { } r || r.ProgramFrameId != f.Id || r.InstructionIndex != 1 || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.PendingMovementContinuation is not null || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || !AcquireRandomDamageTargetSkillDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f)) || !_coreOrderedPrintedSkillLossObserversOperations.ExactOrderedPrintedSkillLossParent(f, out var window, out var damage, out var attack) || attack.SourceSeat != f.OwnerSeat || !TryGetRandomSkillDirectSlashUse(attack, out var use) || r.DamageWindowId != window.Id || r.DamageFrameId != damage.Id || r.CardUseFrameId != use.Id || r.CardActionId != use.Action!.ActionId || r.TargetSeat != damage.TargetSeat || r.DamageAmount != damage.Amount || r.Nature != damage.Nature || r.Candidates.Count == 0 || !r.Candidates.SequenceEqual(r.Candidates.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)) || r.Candidates.Any(id => !_contentRegistryOperations._contentRegistry.Skills.TryGetValue(id, out var skill) || skill.Tags.HasFlag(SkillTag.Locked)))
+        if (f.RandomDamageTargetSkill is not { } r || r.ProgramFrameId != f.Id || r.InstructionIndex != 1 || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.PendingMovementContinuation is not null || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || !AcquireRandomDamageTargetSkillDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f)) || !_coreOrderedPrintedSkillLossObserversOperations.ExactOrderedPrintedSkillLossParent(f, out var window, out var damage, out var attack) || attack.SourceSeat != f.OwnerSeat || !TryGetRandomSkillDirectSlashUse(attack, out var use) || r.DamageWindowId != window.Id || r.DamageFrameId != damage.Id || r.CardUseFrameId != use.Id || r.CardActionId != use.Action!.ActionId || r.TargetSeat != damage.TargetSeat || r.DamageAmount != damage.Amount || r.Nature != damage.Nature || r.Candidates.Count == 0 || !r.Candidates.SequenceEqual(r.Candidates.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal)) || r.Candidates.Any(id => !_contentRegistryOperations._contentRegistry.Skills.TryGetValue(id, out var skill) || skill.Tags.HasFlag(SkillTag.Locked)))
             return false;
         var replay = new DeterministicRandom(unchecked((int)r.RandomBefore));
         var selected = r.Candidates[replay.Next(r.Candidates.Count)];
@@ -105,7 +101,7 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
         return r.RandomBefore != 0 && r.SelectedSkillId == selected && r.RandomAfter == replay.State && r.GrantedGrant == new SkillGrant(grantId, selected, grantId, source) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramRandomDamageTargetSkillAcquiredEvent>().Where(e => e.Receipt.ProgramFrameId == f.Id).ToArray()is [var issued] && SameRandomDamageTargetSkillReceipt(r, issued.Receipt) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == SkillProgramTriggerWindow.AfterDamageApplied) == 1;
     }
 
-    internal static bool SameRandomDamageTargetSkillReceipt(ProgramRandomDamageTargetSkillReceipt a, ProgramRandomDamageTargetSkillReceipt b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RandomDamageTargetSkills.SameRandomDamageTargetSkillReceipt(a, b);
+    internal static bool SameRandomDamageTargetSkillReceipt(ProgramRandomDamageTargetSkillReceipt a, ProgramRandomDamageTargetSkillReceipt b) => RuntimeSkills.RuntimeRules_Core_RandomDamageTargetSkills.SameRandomDamageTargetSkillReceipt(a, b);
     [ProgramContinuation(ProgramContinuationKind.Resume, 1242)]
     internal bool ResumeRandomDamageTargetSkill(long id)
     {
@@ -122,5 +118,5 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1242)]
     internal bool CanContinueRandomDamageTargetSkill(ProgramSkillFrame f) => f.RandomDamageTargetSkill is not null && ValidRandomDamageTargetSkillReceipt(f);
 
-    SkillProgramStepOutcome global::CardGame.Core.IRandomDamageTargetSkillHost.AcquireRandomDamageTargetSkill(ProgramSkillFrame frame) => AcquireRandomDamageTargetSkill(frame);
+    SkillProgramStepOutcome IRandomDamageTargetSkillHost.AcquireRandomDamageTargetSkill(ProgramSkillFrame frame) => AcquireRandomDamageTargetSkill(frame);
 }

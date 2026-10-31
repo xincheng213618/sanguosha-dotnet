@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreIdentityConcealmentCoreModeAllegianceOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreIdentityConcealmentCoreModeAllegianceOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.IMatchModeAllegiancePolicy ModeAllegiancePolicy { get; }
+    IMatchModeAllegiancePolicy ModeAllegiancePolicy { get; }
 }

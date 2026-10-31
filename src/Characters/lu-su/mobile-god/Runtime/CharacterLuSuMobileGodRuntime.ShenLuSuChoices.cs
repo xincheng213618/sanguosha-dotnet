@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -110,7 +107,7 @@ internal sealed partial class CharacterLuSuMobileGodRuntime
 
     internal static int[] ShenLsRotate(IReadOnlyList<int> order, int first)
     {
-        var index = global::CardGame.Core.EngineOwners.CoreGameEngineTableOrderRuntime.IndexOfTableSeat(order, first);
+        var index = CoreGameEngineTableOrderRuntime.IndexOfTableSeat(order, first);
         return order.Skip(index).Concat(order.Take(index)).ToArray();
     }
 

@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineRoundFirstSlashTargetsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRoundFirstSlashTargetsRuntime> _resolve;
-    private CoreGameEngineRoundFirstSlashTargetsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRoundFirstSlashTargetsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineRoundFirstSlashTargetsRuntime> _resolve;
+    private CoreGameEngineRoundFirstSlashTargetsEntries(Func<EngineOwners.CoreGameEngineRoundFirstSlashTargetsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineRoundFirstSlashTargetsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRoundFirstSlashTargetsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineRoundFirstSlashTargetsEntries Create(Func<EngineOwners.CoreGameEngineRoundFirstSlashTargetsRuntime> resolve) => new(resolve);
 }

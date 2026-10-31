@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
     {
         var action = window.Action;
         var targets = action.EffectiveDesignatedTargetSeats;
-        if (targets.Count != 0 || action.Type != CardActionType.Use || action.EffectiveKind is not (CardKind.DrawTwo or CardKind.Alcohol) && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Equipment || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { } original } use || original.ActionId != action.ActionId || use.SourceSeat != action.ActorSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(declared => declared.ResolutionId == use.Id && declared.SourceSeat == action.ActorSeat && declared.CardKind == action.EffectiveKind))
+        if (targets.Count != 0 || action.Type != CardActionType.Use || action.EffectiveKind is not (CardKind.DrawTwo or CardKind.Alcohol) && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Equipment || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { } original } use || original.ActionId != action.ActionId || use.SourceSeat != action.ActorSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(declared => declared.ResolutionId == use.Id && declared.SourceSeat == action.ActorSeat && declared.CardKind == action.EffectiveKind))
             return targets;
         // These native producers encode a self target as empty command targets.
         // Name the real effect recipient locally, retaining the accepted action.
@@ -33,7 +29,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
     internal bool TryBoundarySidiWindow(ProgramSkillWindowContext? context, out ProgramCardTriggerWindowFrame window)
     {
         window = null !;
-        if (context?.CardUse is not { } identity || context.Window is not (SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardUseCompleted) || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame current || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(current) != context.Window || current.Action.ActionId != identity.CardActionId || !_coreFriendTrioOperations.IsFriendActualCardUse(current.Action) || !BoundarySidiNonDelayed(current.Action))
+        if (context?.CardUse is not { } identity || context.Window is not (SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardUseCompleted) || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame current || CoreGameEngineCardActionsRuntime.GetCardActionWindow(current) != context.Window || current.Action.ActionId != identity.CardActionId || !_coreFriendTrioOperations.IsFriendActualCardUse(current.Action) || !BoundarySidiNonDelayed(current.Action))
             return false;
         if (current.Action.Type == CardActionType.Use)
         {
@@ -75,7 +71,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
         return trigger.Id == "prepare-forecast" ? window.Action.ActorSeat == candidate.OwnerSeat && BoundarySidiEligibleHolders(candidate.OwnerSeat, candidate.SkillInstanceId).Length > 0 : BoundarySidiRecords(candidate.OwnerSeat, candidate.SkillInstanceId).Any(record => record.HolderSeat == window.Action.ActorSeat) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.OwnerSeat == candidate.OwnerSeat && frame.SkillInstanceId == candidate.SkillInstanceId && frame.BoundarySidi?.WindowId == window.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryCaoZhenHost.Execute(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginBoundarySidi(frame, effect);
+    SkillProgramStepOutcome IBoundaryCaoZhenHost.Execute(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginBoundarySidi(frame, effect);
     internal SkillProgramStepOutcome BeginBoundarySidi(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -137,7 +133,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
     [ProgramAnswer(BoundarySidiAction)]
     internal void AnswerBoundarySidi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundarySidi: { } draft } frame || !TryBoundarySidiWindow(frame.WindowContext, out var window) || window.Id != draft.WindowId || window.Action.ActionId != draft.ActionId || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], BoundarySidiChoices(frame).Where(current => current.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundarySidi: { } draft } frame || !TryBoundarySidiWindow(frame.WindowContext, out var window) || window.Id != draft.WindowId || window.Action.ActionId != draft.ActionId || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], BoundarySidiChoices(frame).Where(current => current.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Sidi lost its original private forecast chooser or current native use.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (draft.Stage == BoundarySidiStage.Holder)

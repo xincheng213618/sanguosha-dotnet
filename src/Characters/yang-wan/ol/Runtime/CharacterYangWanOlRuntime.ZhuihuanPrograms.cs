@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYangWanOlRuntime
@@ -40,7 +36,7 @@ internal sealed partial class CharacterYangWanOlRuntime
             throw new InvalidOperationException("The Zhuihuan arm choice lost its chooser or candidate.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _characterYangWanOlZhuihuanArmChoicesAccess._zhuihuanArmChoices[active.Id] = chosen;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZhuihuanArmedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZhuihuanArmedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】，秘密选择了一名角色。", active.OwnerSeat);
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
@@ -112,7 +108,7 @@ internal sealed partial class CharacterYangWanOlRuntime
 
         var pendingArms = PendingZhuihuanArmFrameIds(owner.Seat, chosenSeat);
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { ZhuihuanRetaliate = null, ReexecuteParticipantInstruction = false });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZhuihuanResolvedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, chosenSeat, pendingArms, state.DamagedSeats, state.DiscardedSeats, state.DiscardedCardCount));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZhuihuanResolvedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, chosenSeat, pendingArms, state.DamagedSeats, state.DiscardedSeats, state.DiscardedCardCount));
         foreach (var armFrameId in pendingArms)
             _characterYangWanOlZhuihuanArmChoicesAccess._zhuihuanArmChoices.Remove(armFrameId);
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class NativeFrameAutomaticFacts(global::System.Func<global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries> getCorePendingDecisionPolicyPipelineRuntime, global::CardGame.Core.NativeOwners.NativeStepCountQuery readStepCount, global::CardGame.Core.NativeOwners.NativeStepAtQuery readStepAt, global::CardGame.Core.NativeOwners.GetNativeMatchesTarget getMatchesTarget) : INativeFrameAutomaticFacts
+internal sealed class NativeFrameAutomaticFacts(Func<RuntimeEntries.CorePendingDecisionPolicyPipelineEntries> getCorePendingDecisionPolicyPipelineRuntime, NativeStepCountQuery readStepCount, NativeStepAtQuery readStepAt, GetNativeMatchesTarget getMatchesTarget) : INativeFrameAutomaticFacts
 {
     public bool HasPendingDecision => getCorePendingDecisionPolicyPipelineRuntime()._pendingDecision is not null;
 

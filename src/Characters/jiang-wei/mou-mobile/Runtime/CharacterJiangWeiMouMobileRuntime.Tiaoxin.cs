@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiMouMobileRuntime
 {
     internal const string MouJwGiftReason = "skill-program.mou-mobile:tiaoxin.give";
-    internal static CardConversionSource MouJwSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MouJwSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int MouJwCharge(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(PlayerMarkerKind.MouJiangWeiCharge);
     internal int MouJwAvailableCharge(int owner) => MouJwCharge(owner) - _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OwnerSeat == owner && f.MouJiangWei is { Op: SkillProgramEffectOp.ResolveMouJiangWeiTiaoxin, Accepted: true }).Sum(f => f.MouJiangWei!.Targets.Count);
     internal int MouJwSelectedCount(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiSelectionClosedEvent>().Where(e => e.OwnerSeat == owner).Sum(e => e.Count);
@@ -36,13 +33,13 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiangWeiChargeChangedEvent(frameId, owner, invocation, before, after));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouJiangWeiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouJw(f, op);
+    SkillProgramStepOutcome IMouJiangWeiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouJw(f, op);
     internal SkillProgramStepOutcome BeginMouJw(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (op == SkillProgramEffectOp.InitializeMouJiangWei)
         {
-            if (f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } context || context.OwnerSeat != f.OwnerSeat || f.SkillId != MouJiangWeiComposition.Tiaoxin || f.TriggerId != "initial-charge" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting } window || context.SourceSeat != window.OwnerSeat || context.TargetSeat != window.OwnerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]) || window.ParticipantFacts?.GetValueOrDefault(f.OwnerSeat)is not { } ownerFacts || System.Text.Json.JsonSerializer.Serialize(context.Facts) != System.Text.Json.JsonSerializer.Serialize(ownerFacts) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.OwnerSeat == f.OwnerSeat && e.Window == SkillProgramTriggerWindow.GameStarting) != 1)
+            if (f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } context || context.OwnerSeat != f.OwnerSeat || f.SkillId != MouJiangWeiComposition.Tiaoxin || f.TriggerId != "initial-charge" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting } window || context.SourceSeat != window.OwnerSeat || context.TargetSeat != window.OwnerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]) || window.ParticipantFacts?.GetValueOrDefault(f.OwnerSeat)is not { } ownerFacts || System.Text.Json.JsonSerializer.Serialize(context.Facts) != System.Text.Json.JsonSerializer.Serialize(ownerFacts) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.OwnerSeat == f.OwnerSeat && e.Window == SkillProgramTriggerWindow.GameStarting) != 1)
                 throw new InvalidOperationException("Jiang Wei's initial charge needs its exact game-start owner, participant facts and current original candidate; the shared window source is not the skill owner.");
             if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiInitializedEvent>().Any(e => e.OwnerSeat == f.OwnerSeat))
             {
@@ -141,7 +138,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     [ProgramAnswer("mou-jiang-wei")]
     internal void AnswerMouJw(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouJiangWei: { } r } f || !ValidMouJw(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouJiangWeiStage.Responding ? r.Targets[r.Cursor] : f.OwnerSeat) || !MouJwChoices(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouJiangWei: { } r } f || !ValidMouJw(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouJiangWeiStage.Responding ? r.Targets[r.Cursor] : f.OwnerSeat) || !MouJwChoices(f).Any(x => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
             throw new InvalidOperationException("Jiang Wei's response changed its original private chooser or legal plan.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -281,15 +278,15 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         var r = f.MouJiangWei!;
         if (r.Stage is MouJiangWeiStage.Targets or MouJiangWeiStage.MarkTargets)
         {
-            var target = p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "target" && !r.Targets.Contains(c.Targets.Single()) && c.Targets.Single() != f.OwnerSeat && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]));
+            var target = p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "target" && !r.Targets.Contains(c.Targets.Single()) && c.Targets.Single() != f.OwnerSeat && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]));
             return target ?? p.Choices.Single(c => c.Parameters["branch"] == "confirm");
         }
 
         var actor = _coreMatchParticipantsPlayersAccess._players[r.Targets[r.Cursor]];
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(actor, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "faction")is { } faction)
+        if (!CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(actor, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "faction")is { } faction)
             return faction;
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(actor, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "slash")is { } slash)
+        if (!CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(actor, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "slash")is { } slash)
             return slash;
-        return p.Choices.Where(c => c.Parameters["branch"] == "give").OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), actor)).FirstOrDefault() ?? p.Choices.First();
+        return p.Choices.Where(c => c.Parameters["branch"] == "give").OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), actor)).FirstOrDefault() ?? p.Choices.First();
     }
 }

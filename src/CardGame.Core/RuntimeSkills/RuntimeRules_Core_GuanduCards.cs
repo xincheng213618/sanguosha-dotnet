@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_GuanduCards
 {
     internal static LegalActionKind GuanduCardAction(CardKind kind) => kind switch

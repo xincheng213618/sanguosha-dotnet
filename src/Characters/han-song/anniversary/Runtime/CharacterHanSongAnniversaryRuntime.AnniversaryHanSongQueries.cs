@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHanSongAnniversaryRuntime
@@ -18,7 +14,7 @@ internal sealed partial class CharacterHanSongAnniversaryRuntime
     {
         if (!owner.IsAlive || !_contentRegistryOperations._contentRegistry.Skills.ContainsKey(AnniversaryHanSongComposition.Yinbi) || !_coreNationalSkillsOperations.HasRuntimeSkill(owner, AnniversaryHanSongComposition.Yinbi))
             return ordinary;
-        var highest = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateHandLimit(p, suppressHanSongYinbi: true))).DefaultIfEmpty(global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(ordinary)).Max();
+        var highest = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateHandLimit(p, suppressHanSongYinbi: true))).DefaultIfEmpty(CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(ordinary)).Max();
         var set = new FiniteRuleQueryContribution($"skill:{(owner.Seat)}:anniversary:yinbi:highest-hand-limit", SkillRuleOperation.Set, highest, 45900);
         var terms = Array.AsReadOnly(ordinary.Value.Contributions.Append(set).OrderBy(c => c.SourceId, StringComparer.Ordinal).ToArray());
         var stage = new RuleQueryStageSnapshot("yinbi-highest-hand-limit", ordinary.Value is FiniteRuleQueryValue n ? n.Value : 0, false, highest, Array.AsReadOnly<RuleQueryContribution>([set]));

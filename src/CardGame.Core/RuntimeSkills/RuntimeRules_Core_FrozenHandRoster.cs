@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_FrozenHandRoster
 {
     internal static Dictionary<string,string> FrozenHandParameters(ProgramSkillFrame f,string branch)=>new()

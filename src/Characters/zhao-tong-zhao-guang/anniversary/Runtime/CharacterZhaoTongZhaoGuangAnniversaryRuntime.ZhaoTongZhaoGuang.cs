@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
 {
     internal const string AnniversaryQingrenDrawReason = "skill-program.anniversary:qingren.draw";
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryZhaoTongZhaoGuangHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryZhaoTongZhaoGuang(f, op);
-    internal CardConversionSource AnniversaryZtgSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryZhaoTongZhaoGuangHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryZhaoTongZhaoGuang(f, op);
+    internal CardConversionSource AnniversaryZtgSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int AnniversaryYizanCount(int owner, int? actualTurn = null, long cutoff = long.MaxValue) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYizanInvokedEvent>().Count(e => e.Source.OwnerSeat == owner && e.ActionId <= cutoff && (actualTurn is null || e.ActualTurn == actualTurn) && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.Collection, 44600, SkillProgramEffectOp.AwakenAnniversaryZhaoTongZhaoGuangLongyuan)]
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 44600, SkillProgramEffectOp.AwakenAnniversaryZhaoTongZhaoGuangLongyuan)]

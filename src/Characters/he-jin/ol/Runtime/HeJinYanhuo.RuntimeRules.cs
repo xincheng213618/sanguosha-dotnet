@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_he_jin_ol_HeJinYanhuo
 {
     internal static string HeJinDeathReturnHash(HeJinYanhuoReceipt r) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(

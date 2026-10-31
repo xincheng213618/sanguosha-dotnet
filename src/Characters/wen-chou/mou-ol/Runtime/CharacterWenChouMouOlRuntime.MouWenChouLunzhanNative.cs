@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWenChouMouOlRuntime
 {
-    internal void IssueMouWenChouDuel(ProgramSkillFrame f, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption option)
+    internal void IssueMouWenChouDuel(ProgramSkillFrame f, GameEngine.ProgramOrdinaryTrickUseOption option)
     {
         var r = f.MouWenChouOl!;
         var cards = MouWenChouMaterials(f);
@@ -106,7 +102,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 33100)]
-    internal bool ReturnMouWenChouDuelAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt c)
+    internal bool ReturnMouWenChouDuelAttack(GameEngine.AttackCompletionReceipt c)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouWenChouOl: { Stage: MouWenChouOlStage.NativeUse, NativeReturned: true, AttackReturned: false } r } f || r.UseId != c.ResolutionId)
             return false;

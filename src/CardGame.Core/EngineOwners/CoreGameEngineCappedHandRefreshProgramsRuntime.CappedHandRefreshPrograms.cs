@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCappedHandRefreshProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.ICappedHandRefreshProgramHost.DrawThenDiscardHandToMaximumHp(ProgramSkillFrame frame, int targetSeat, int cap) => BeginCappedHandRefresh(frame, targetSeat, cap);
+    SkillProgramStepOutcome ICappedHandRefreshProgramHost.DrawThenDiscardHandToMaximumHp(ProgramSkillFrame frame, int targetSeat, int cap) => BeginCappedHandRefresh(frame, targetSeat, cap);
     internal bool CappedHandRefreshSourceCurrent(ProgramSkillFrame frame)
     {
         if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))

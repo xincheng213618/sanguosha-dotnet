@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeLiangWumiaoRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
         return !accepted && ids.Any(id => IsWuZglCopyBlocked(actor, id));
     }
 
-    internal static bool WuZglNativeInputReason(CardMoveReason r) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhuge_liang_wumiao_WuZhugeLiang_Copies.WuZglNativeInputReason(r);
+    internal static bool WuZglNativeInputReason(CardMoveReason r) => RuntimeSkills.RuntimeRules_zhuge_liang_wumiao_WuZhugeLiang_Copies.WuZglNativeInputReason(r);
     internal CardMovementRecord? WuZglCopyReturnEntry(Card card, CardLocation from, CardMoveReason reason)
     {
         if (WuZglCopyFact(card.Id)is not { } copy || !_coreMatchParticipantsPlayersAccess._players[copy.Source.OwnerSeat].IsAlive)

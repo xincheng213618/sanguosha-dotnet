@@ -1,9 +1,9 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreGameEngineNativeFactionChangesState : global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesNativeFactionObservationsNativeFactionRevisionAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess
+internal sealed class CoreGameEngineNativeFactionChangesState : Contracts.ICoreGameEngineNativeFactionChangesNativeFactionObservationsNativeFactionRevisionAccess, Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess
 {
-    private global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.GameEngine.NativeFactionObservation> _nativeFactionObservations = [];
-    internal ref readonly global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.GameEngine.NativeFactionObservation> ReferenceToNativeFactionObservations => ref _nativeFactionObservations;
+    private Dictionary<int, GameEngine.NativeFactionObservation> _nativeFactionObservations = [];
+    internal ref readonly Dictionary<int, GameEngine.NativeFactionObservation> ReferenceToNativeFactionObservations => ref _nativeFactionObservations;
 
     private (long Base, long Revision) _nativeFactionQualificationDependencies = default !;
     internal ref (long Base, long Revision) ReferenceToNativeFactionQualificationDependencies => ref _nativeFactionQualificationDependencies;
@@ -17,17 +17,17 @@ internal sealed class CoreGameEngineNativeFactionChangesState : global::CardGame
     private bool _synchronizingNativeFactions = default !;
     internal ref bool ReferenceToSynchronizingNativeFactions => ref _synchronizingNativeFactions;
 
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.GameEngine.NativeFactionObservation> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesNativeFactionObservationsNativeFactionRevisionAccess._nativeFactionObservations => ref _nativeFactionObservations;
+    ref readonly Dictionary<int, GameEngine.NativeFactionObservation> Contracts.ICoreGameEngineNativeFactionChangesNativeFactionObservationsNativeFactionRevisionAccess._nativeFactionObservations => ref _nativeFactionObservations;
 
-    ref long global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesNativeFactionObservationsNativeFactionRevisionAccess._nativeFactionRevision => ref _nativeFactionRevision;
+    ref long Contracts.ICoreGameEngineNativeFactionChangesNativeFactionObservationsNativeFactionRevisionAccess._nativeFactionRevision => ref _nativeFactionRevision;
 
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::CardGame.Core.GameEngine.NativeFactionObservation> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess._nativeFactionObservations => ref _nativeFactionObservations;
+    ref readonly Dictionary<int, GameEngine.NativeFactionObservation> Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess._nativeFactionObservations => ref _nativeFactionObservations;
 
-    ref long global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess._nativeFactionRevision => ref _nativeFactionRevision;
+    ref long Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess._nativeFactionRevision => ref _nativeFactionRevision;
 
-    ref bool global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess._synchronizingNativeFactions => ref _synchronizingNativeFactions;
+    ref bool Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess._synchronizingNativeFactions => ref _synchronizingNativeFactions;
 
-    ref long global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess._nativeFactionQualificationStamp => ref _nativeFactionQualificationStamp;
+    ref long Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess._nativeFactionQualificationStamp => ref _nativeFactionQualificationStamp;
 
-    ref (long Base, long Revision) global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess._nativeFactionQualificationDependencies => ref _nativeFactionQualificationDependencies;
+    ref (long Base, long Revision) Contracts.ICoreGameEngineNativeFactionChangesFieldsAccess._nativeFactionQualificationDependencies => ref _nativeFactionQualificationDependencies;
 }

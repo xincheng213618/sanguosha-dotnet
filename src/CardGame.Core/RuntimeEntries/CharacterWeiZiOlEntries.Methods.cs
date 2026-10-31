@@ -2,10 +2,10 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterWeiZiOlEntries
 {
-    internal global::CardGame.Core.SkillProgramStepOutcome LiejieProgramSourceDiscard(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().LiejieProgramSourceDiscard(frame, effect);
-    internal void ResolveWeiZiProgramChoice(global::CardGame.Core.PromptChoice selected) => _resolve().ResolveWeiZiProgramChoice(selected);
-    internal void ResolveYuanziDrawChoice(global::CardGame.Core.PromptChoice selected) => _resolve().ResolveYuanziDrawChoice(selected);
-    internal global::CardGame.Core.PromptChoice SelectAiLiejieSourceDiscardChoice(global::CardGame.Core.PendingDecision decision) => _resolve().SelectAiLiejieSourceDiscardChoice(decision);
-    internal global::CardGame.Core.SkillProgramStepOutcome YuanziProgramDamageDraw(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().YuanziProgramDamageDraw(frame, effect);
-    internal global::CardGame.Core.SkillProgramStepOutcome YuanziProgramResolve(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().YuanziProgramResolve(frame, effect);
+    internal SkillProgramStepOutcome LiejieProgramSourceDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => _resolve().LiejieProgramSourceDiscard(frame, effect);
+    internal void ResolveWeiZiProgramChoice(PromptChoice selected) => _resolve().ResolveWeiZiProgramChoice(selected);
+    internal void ResolveYuanziDrawChoice(PromptChoice selected) => _resolve().ResolveYuanziDrawChoice(selected);
+    internal PromptChoice SelectAiLiejieSourceDiscardChoice(PendingDecision decision) => _resolve().SelectAiLiejieSourceDiscardChoice(decision);
+    internal SkillProgramStepOutcome YuanziProgramDamageDraw(ProgramSkillFrame frame, SkillProgramEffect effect) => _resolve().YuanziProgramDamageDraw(frame, effect);
+    internal SkillProgramStepOutcome YuanziProgramResolve(ProgramSkillFrame frame, SkillProgramEffect effect) => _resolve().YuanziProgramResolve(frame, effect);
 }

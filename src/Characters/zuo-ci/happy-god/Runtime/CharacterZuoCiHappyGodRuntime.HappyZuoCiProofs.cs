@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZuoCiHappyGodRuntime
@@ -15,10 +11,10 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
             return false;
         return _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == context.ParentFrameId) switch
         {
-            ProgramLifecycleTriggerWindowFrame w => w.Window == context.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]),
-            PlayPhaseStartingBoundaryFrame w => context.Window == SkillProgramTriggerWindow.PlayPhaseStarting && f.TriggerId == "refresh-phantoms" && w.OwnerSeat == f.OwnerSeat && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && context == _programPhaseBoundaryOperations.Get().CreatePlayPhaseStartingProgramContext(w, candidate, w.Items[w.ItemIndex].Facts),
-            DamageTriggerWindowFrame w => context.Window == SkillProgramTriggerWindow.AfterDamageApplied && w.TriggerWindow == context.Window && w.TargetSeat == f.OwnerSeat && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()),
-            CardsMovedTriggerWindowFrame w => context.Window == SkillProgramTriggerWindow.CardsMoved && f.TriggerId == "foreign-phantom" && context.MovementBatch == w.Batch && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && context.MovementIndex == w.Candidates[w.CandidateIndex].OccurrenceIndex && context.MovementIndex is { } index && index >= 0 && index < w.Batch.Movements.Count && HappyZcForeignGain(w.Batch.Movements[index]) == f.OwnerSeat,
+            ProgramLifecycleTriggerWindowFrame w => w.Window == context.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]),
+            PlayPhaseStartingBoundaryFrame w => context.Window == SkillProgramTriggerWindow.PlayPhaseStarting && f.TriggerId == "refresh-phantoms" && w.OwnerSeat == f.OwnerSeat && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && context == _programPhaseBoundaryOperations.Get().CreatePlayPhaseStartingProgramContext(w, candidate, w.Items[w.ItemIndex].Facts),
+            DamageTriggerWindowFrame w => context.Window == SkillProgramTriggerWindow.AfterDamageApplied && w.TriggerWindow == context.Window && w.TargetSeat == f.OwnerSeat && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()),
+            CardsMovedTriggerWindowFrame w => context.Window == SkillProgramTriggerWindow.CardsMoved && f.TriggerId == "foreign-phantom" && context.MovementBatch == w.Batch && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && context.MovementIndex == w.Candidates[w.CandidateIndex].OccurrenceIndex && context.MovementIndex is { } index && index >= 0 && index < w.Batch.Movements.Count && HappyZcForeignGain(w.Batch.Movements[index]) == f.OwnerSeat,
             _ => false
         };
     }

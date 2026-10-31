@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineShanheGuanpingMoyanEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheGuanpingMoyanRuntime> _resolve;
-    private CoreGameEngineShanheGuanpingMoyanEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheGuanpingMoyanRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineShanheGuanpingMoyanRuntime> _resolve;
+    private CoreGameEngineShanheGuanpingMoyanEntries(Func<EngineOwners.CoreGameEngineShanheGuanpingMoyanRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineShanheGuanpingMoyanEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheGuanpingMoyanRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineShanheGuanpingMoyanEntries Create(Func<EngineOwners.CoreGameEngineShanheGuanpingMoyanRuntime> resolve) => new(resolve);
 }

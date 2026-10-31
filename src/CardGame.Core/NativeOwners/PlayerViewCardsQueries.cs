@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal readonly struct PlayerViewCardsQueries(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterCaoZhiLeEntries> getCharacterCaoZhiLeRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEnginePublicPileSourcesEntries> getCoreGameEnginePublicPileSourcesRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeFireAttackEntries> getCoreNativeFireAttackRuntime) : IPlayerViewCardsQueries
+internal readonly struct PlayerViewCardsQueries(Func<RuntimeEntries.CharacterCaoZhiLeEntries> getCharacterCaoZhiLeRuntime, Func<RuntimeEntries.CoreGameEnginePublicPileSourcesEntries> getCoreGameEnginePublicPileSourcesRuntime, Func<RuntimeEntries.CoreNativeFireAttackEntries> getCoreNativeFireAttackRuntime) : IPlayerViewCardsQueries
 {
     public CardSnapshot ProjectFuleHandCard(CharacterState player, Card card, CardSnapshot snapshot) => getCharacterCaoZhiLeRuntime().ProjectFuleHandCard(player, card, snapshot);
     public PublicPersistentPileSource? SinglePublicPileSource(int seat) => getCoreGameEnginePublicPileSourcesRuntime().SinglePublicPileSource(seat);

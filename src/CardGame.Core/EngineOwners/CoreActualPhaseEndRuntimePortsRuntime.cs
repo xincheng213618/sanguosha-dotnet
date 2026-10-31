@@ -1,28 +1,24 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule, global::CardGame.Core.ProgramCapability]
-internal sealed partial class CoreActualPhaseEndRuntimePortsRuntime : global::CardGame.Core.IActualPhaseEndFacts, global::CardGame.Core.IActualPhaseEndIssuedItems, global::CardGame.Core.IActualPhaseEndNativeReturns
+[Core.ProgramRuntimeModule, Core.ProgramCapability]
+internal sealed partial class CoreActualPhaseEndRuntimePortsRuntime : IActualPhaseEndFacts, IActualPhaseEndIssuedItems, IActualPhaseEndNativeReturns
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterHuCheErMouEntries _characterHuCheErMouOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterHuangZuMobileShiEntries _characterHuangZuMobileShiOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterLuShiOlEntries _characterLuShiOlOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterLuYuShengMobileShiEntries _characterLuYuShengMobileShiOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterSimaShiMouEntries _characterSimaShiMouOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterYaDanOlEntries _characterYaDanOlOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterZhongHuiAnniversaryGodEntries _characterZhongHuiAnniversaryGodOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess _modeRulesOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreActualTurnsEntries _coreActualTurnsOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelAdvanceRulesAndPublishStateOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly RuntimeEntries.CharacterHuCheErMouEntries _characterHuCheErMouOperations;
+    private readonly RuntimeEntries.CharacterHuangZuMobileShiEntries _characterHuangZuMobileShiOperations;
+    private readonly RuntimeEntries.CharacterLuShiOlEntries _characterLuShiOlOperations;
+    private readonly RuntimeEntries.CharacterLuYuShengMobileShiEntries _characterLuYuShengMobileShiOperations;
+    private readonly RuntimeEntries.CharacterSimaShiMouEntries _characterSimaShiMouOperations;
+    private readonly RuntimeEntries.CharacterYaDanOlEntries _characterYaDanOlOperations;
+    private readonly RuntimeEntries.CharacterZhongHuiAnniversaryGodEntries _characterZhongHuiAnniversaryGodOperations;
+    private readonly IKernelMatchModeRulesAccess _modeRulesOperations;
+    private readonly RuntimeEntries.CoreActualTurnsEntries _coreActualTurnsOperations;
+    private readonly RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations;
+    private readonly IKernelAdvanceRulesAndPublishStateOperations _kernelCoreGameEngineRuleProgressionOperations;
     private readonly ICoreActualPhaseEndRuntimePortsProgramPhaseSchedulingOperations _programPhaseSchedulingOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreActualPhaseEndRuntimePortsRuntime(global::CardGame.Core.RuntimeEntries.CharacterHuCheErMouEntries characterHuCheErMouOperations, global::CardGame.Core.RuntimeEntries.CharacterHuangZuMobileShiEntries characterHuangZuMobileShiOperations, global::CardGame.Core.RuntimeEntries.CharacterLuShiOlEntries characterLuShiOlOperations, global::CardGame.Core.RuntimeEntries.CharacterLuYuShengMobileShiEntries characterLuYuShengMobileShiOperations, global::CardGame.Core.RuntimeEntries.CharacterSimaShiMouEntries characterSimaShiMouOperations, global::CardGame.Core.RuntimeEntries.CharacterYaDanOlEntries characterYaDanOlOperations, global::CardGame.Core.RuntimeEntries.CharacterZhongHuiAnniversaryGodEntries characterZhongHuiAnniversaryGodOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess modeRulesOperations, global::CardGame.Core.RuntimeEntries.CoreActualTurnsEntries coreActualTurnsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, global::CardGame.Core.EngineOwners.IKernelAdvanceRulesAndPublishStateOperations kernelCoreGameEngineRuleProgressionOperations, ICoreActualPhaseEndRuntimePortsProgramPhaseSchedulingOperations programPhaseSchedulingOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    private readonly EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreActualPhaseEndRuntimePortsRuntime(RuntimeEntries.CharacterHuCheErMouEntries characterHuCheErMouOperations, RuntimeEntries.CharacterHuangZuMobileShiEntries characterHuangZuMobileShiOperations, RuntimeEntries.CharacterLuShiOlEntries characterLuShiOlOperations, RuntimeEntries.CharacterLuYuShengMobileShiEntries characterLuYuShengMobileShiOperations, RuntimeEntries.CharacterSimaShiMouEntries characterSimaShiMouOperations, RuntimeEntries.CharacterYaDanOlEntries characterYaDanOlOperations, RuntimeEntries.CharacterZhongHuiAnniversaryGodEntries characterZhongHuiAnniversaryGodOperations, IKernelMatchModeRulesAccess modeRulesOperations, RuntimeEntries.CoreActualTurnsEntries coreActualTurnsOperations, RuntimeEntries.CoreGameEngineProgramLifecycleEntries coreProgramLifecycleOperations, IKernelAdvanceRulesAndPublishStateOperations kernelCoreGameEngineRuleProgressionOperations, ICoreActualPhaseEndRuntimePortsProgramPhaseSchedulingOperations programPhaseSchedulingOperations, EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._characterHuCheErMouOperations = characterHuCheErMouOperations;
         this._characterHuangZuMobileShiOperations = characterHuangZuMobileShiOperations;

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterYangWanOlZhuihuanArmChoicesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterYangWanOlZhuihuanArmChoicesAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.Dictionary<long, int> _zhuihuanArmChoices { get; }
+    ref readonly Dictionary<long, int> _zhuihuanArmChoices { get; }
 }

@@ -1,8 +1,7 @@
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_zhuge_guo_le_LeChengyanEffects
 {
     // CardKind and Action remain the paid declaration. This query is used only

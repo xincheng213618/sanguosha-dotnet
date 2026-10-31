@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhongYaoMobileRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterZhongYaoMobileRuntime
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 77700, SkillProgramEffectOp.SelectTarget)]
     internal bool CanOfferMobileZhongYaoZuoding(ProgramTriggerLegalityContext gate) => gate.SkillId != "mobile:zuoding" || MobileZhongYaoZuodingTargets(gate.OwnerSeat, gate.Context).Count > 0;
-    IReadOnlyList<int> global::CardGame.Core.IMobileZhongYaoSelectionQueries.EligibleTargets(int ownerSeat) => MobileZhongYaoZuodingTargets(ownerSeat, _resolutionStackOperations._resolutionStack.LastOrDefault() switch
+    IReadOnlyList<int> IMobileZhongYaoSelectionQueries.EligibleTargets(int ownerSeat) => MobileZhongYaoZuodingTargets(ownerSeat, _resolutionStackOperations._resolutionStack.LastOrDefault() switch
     {
         ProgramSkillFrame frame => frame.WindowContext,
         ProgramCardTriggerWindowFrame window when window.CandidateIndex < window.Candidates.Count => _coreCardActionsOperations.CreateCardActionProgramContext2(window, window.Candidates[window.CandidateIndex]),

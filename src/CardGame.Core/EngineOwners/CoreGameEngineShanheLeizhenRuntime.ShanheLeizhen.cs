@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheLeizhenRuntime
@@ -19,7 +15,7 @@ internal sealed partial class CoreGameEngineShanheLeizhenRuntime
         return earned.SingleOrDefault();
     }
 
-    internal int ShanheLeizhenPublicActionBonus(int actorSeat, CardKind? effectiveKind) => HasShanheLeizhenCapability && _coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) && _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && effectiveKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && PendingShanheLeizhenCharge(actorSeat)is not null ? 1 : 0;
+    internal int ShanheLeizhenPublicActionBonus(int actorSeat, CardKind? effectiveKind) => HasShanheLeizhenCapability && _coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) && _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && effectiveKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && PendingShanheLeizhenCharge(actorSeat)is not null ? 1 : 0;
     internal void RecordShanheLeizhenCommittedUse(CardActionContext action)
     {
         if (!HasShanheLeizhenCapability || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat) || action.Type == CardActionType.Response && (action.EffectiveKind is not (CardKind.Dodge or CardKind.Nullification) || action.ProviderSeat != action.ActorSeat || action.RequesterSeat is not null))
@@ -60,7 +56,7 @@ internal sealed partial class CoreGameEngineShanheLeizhenRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 59402)]
     internal void IssueShanheLeizhenSlash(CardUseDeclaredEvent declared)
     {
-        if (!HasShanheLeizhenCapability || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(declared.CardKind) || _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is not { } use || use.SourceSeat != declared.SourceSeat || use.CardKind != declared.CardKind || use.ShanheLeizhen is not null || PendingShanheLeizhenCharge(use.SourceSeat)is not { } charge)
+        if (!HasShanheLeizhenCapability || !CoreNativeCardClassificationsRuntime.IsSlashCard(declared.CardKind) || _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is not { } use || use.SourceSeat != declared.SourceSeat || use.CardKind != declared.CardKind || use.ShanheLeizhen is not null || PendingShanheLeizhenCharge(use.SourceSeat)is not { } charge)
             return;
         var receipt = new ShanheLeizhenSlashReceipt(charge.ActionId, use.SourceSeat, charge.WeaponCardId, use.Id);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { ShanheLeizhen = receipt });
@@ -70,7 +66,7 @@ internal sealed partial class CoreGameEngineShanheLeizhenRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 59403)]
     internal void ApplyShanheLeizhenNativeBase(CardUsedEvent fact)
     {
-        if (!HasShanheLeizhenCapability || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(fact.CardKind) || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ShanheLeizhen: { BaseApplied: false } receipt } use || fact.SourceSeat != use.SourceSeat || fact.TargetSeat != attack.TargetSeat || receipt.OwnerSeat != use.SourceSeat)
+        if (!HasShanheLeizhenCapability || !CoreNativeCardClassificationsRuntime.IsSlashCard(fact.CardKind) || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ShanheLeizhen: { BaseApplied: false } receipt } use || fact.SourceSeat != use.SourceSeat || fact.TargetSeat != attack.TargetSeat || receipt.OwnerSeat != use.SourceSeat)
             return;
         var state = _coreCardAttackStateOperations.GetCardAttackState(use.Id);
         if (state.DamageAmountFinalized || state.DamageWasApplied || state.IsChainPropagation)

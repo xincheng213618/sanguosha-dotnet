@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDuFuRenOlRuntime
 {
     internal const string DuFuRenGiftReason = "skill-program.du-fu-ren.shunshi.gift";
-    internal static CardConversionSource DuFuRenSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_du_fu_ren_ol_DuFuRen.DuFuRenSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDuFuRenHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginDuFuRen(f, op);
+    internal static CardConversionSource DuFuRenSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_du_fu_ren_ol_DuFuRen.DuFuRenSource(f);
+    SkillProgramStepOutcome IDuFuRenHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginDuFuRen(f, op);
     internal SkillProgramStepOutcome BeginDuFuRen(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -34,7 +31,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
         {
             if (gains.Any(g => g.Suit is Suit.Spade or Suit.Club))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuFuRenBlackIssuedEvent(f.Id, r.Source, r.BatchId!.Value, r.RecipientSeat!.Value));
-            if (!gains.Any(g => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(g.Suit)) || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat!.Value].IsAlive || _coreMatchParticipantsPlayersAccess._players[r.RecipientSeat.Value].Hp >= _coreMatchParticipantsPlayersAccess._players[r.RecipientSeat.Value].MaxHp)
+            if (!gains.Any(g => CoreNativeCardClassificationsRuntime.IsRedSuit(g.Suit)) || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat!.Value].IsAlive || _coreMatchParticipantsPlayersAccess._players[r.RecipientSeat.Value].Hp >= _coreMatchParticipantsPlayersAccess._players[r.RecipientSeat.Value].MaxHp)
             {
                 CompleteDuFuRen(f, true);
                 return SkillProgramStepOutcome.AwaitChild;
@@ -84,7 +81,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     [ProgramAnswer("du-fu-ren")]
     internal void AnswerDuFuRen(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuFuRen: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DuFuRenChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuFuRen: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DuFuRenChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Du Fu Ren lost its exact private chooser, physical card or legal recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
@@ -179,5 +176,5 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26520)]
     internal bool ContinuePaidDuFuRen(ProgramSkillFrame f) => f.DuFuRen is { } r && (r.Stage == DuFuRenStage.RecoveryChildren || r.Stage == DuFuRenStage.GiftChildren && r.GiftSequence > 0) && _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveYiseOwnedGain, SkillProgramEffectOp.GiveForNextActualPhases)]
-    internal PromptChoice AiDuFuRen(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters["option"] == "recover") ?? p.Choices.OrderBy(c => c.Cards.Count == 0 ? 0 : global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    internal PromptChoice AiDuFuRen(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters["option"] == "recover") ?? p.Choices.OrderBy(c => c.Cards.Count == 0 ? 0 : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 }

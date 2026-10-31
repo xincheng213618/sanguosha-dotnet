@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreHellKingProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IHellKingProgramHost.ExecuteHellKing(ProgramSkillFrame frame, SkillProgramEffect effect) => ExecuteHellKing(frame, effect);
+    SkillProgramStepOutcome IHellKingProgramHost.ExecuteHellKing(ProgramSkillFrame frame, SkillProgramEffect effect) => ExecuteHellKing(frame, effect);
     internal SkillProgramStepOutcome ExecuteHellKing(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -207,7 +204,7 @@ internal sealed partial class CoreHellKingProgramsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal bool HasExactHellPreparationParent(ProgramSkillFrame frame) => frame.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, TargetSeat: { } actor } context && actor != frame.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && frame.SelectedTargetSeats.SequenceEqual([actor]) && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Any(parent => parent.Id == context.ParentFrameId && parent.OwnerSeat == actor && parent.Window == context.Window && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]));
+    internal bool HasExactHellPreparationParent(ProgramSkillFrame frame) => frame.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, TargetSeat: { } actor } context && actor != frame.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && frame.SelectedTargetSeats.SequenceEqual([actor]) && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Any(parent => parent.Id == context.ParentFrameId && parent.OwnerSeat == actor && parent.Window == context.Window && parent.CandidateIndex < parent.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]));
     internal SkillProgramStepOutcome BeginHellPreparationAlcohol(ProgramSkillFrame frame)
     {
         if (!HasExactHellPreparationParent(frame) || frame.VirtualBasicDraft is not null)
@@ -266,7 +263,7 @@ internal sealed partial class CoreHellKingProgramsRuntime
         if (directDepth >= _coreMatchDefinitionPlayerCountAccess._playerCount || root.WindowContext is not { Window: SkillProgramTriggerWindow.OwnerDied } context || context.OwnerSeat != root.OwnerSeat || context.TargetSeat != root.OwnerSeat || root.TriggerId != root.ActivationId || _coreMatchParticipantsPlayersAccess._players[root.OwnerSeat].IsAlive)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-        if (index < 3 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramDeathTriggerWindowFrame window || window.Id != context.ParentFrameId || window.OwnerSeat != root.OwnerSeat || window.KillerSeat != context.SourceSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, window.Candidates[window.CandidateIndex]) || _coreProgramLifecycleOperations.GetProgramTrigger2(window.Candidates[window.CandidateIndex]).Window != context.Window || _resolutionStackOperations._resolutionStack[index - 2] is not DeathFrame death || death.Id != window.DeathFrameId || death.VictimSeat != root.OwnerSeat || death.KillerSeat != window.KillerSeat)
+        if (index < 3 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramDeathTriggerWindowFrame window || window.Id != context.ParentFrameId || window.OwnerSeat != root.OwnerSeat || window.KillerSeat != context.SourceSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, window.Candidates[window.CandidateIndex]) || _coreProgramLifecycleOperations.GetProgramTrigger2(window.Candidates[window.CandidateIndex]).Window != context.Window || _resolutionStackOperations._resolutionStack[index - 2] is not DeathFrame death || death.Id != window.DeathFrameId || death.VictimSeat != root.OwnerSeat || death.KillerSeat != window.KillerSeat)
             return false;
         if (death.ReturnKind == DeathReturnKind.ProgramSkill)
             return _resolutionStackOperations._resolutionStack[index - 3] is ProgramSkillFrame causer && HasExactHellWuhunDirectDeath(causer, death) && HasExactHellDeathOriginalCursor(causer, out originalDying, out originalAttack, directDepth + 1);

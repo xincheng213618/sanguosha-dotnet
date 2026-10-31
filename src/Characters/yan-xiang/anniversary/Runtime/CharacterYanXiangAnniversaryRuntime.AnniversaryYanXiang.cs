@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanXiangAnniversaryRuntime
 {
     internal const string YanXiangAction = "anniversary-yan-xiang", YanXiangDiscardReason = "skill-program.anniversary:yuzheng.discard", YanXiangDrawReason = "skill-program.anniversary:yuzheng.draw";
-    internal static CardConversionSource YanXiangSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryYanXiangHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYanXiang(f, op);
+    internal static CardConversionSource YanXiangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryYanXiangHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYanXiang(f, op);
     internal int[] YanXiangAvailableOptions(int owner, string instance) => new[]
     {
         1,
@@ -111,7 +108,7 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
     [ProgramAnswer(YanXiangAction)]
     internal void AnswerYanXiang(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryYanXiang: { } r } f || !ValidYanXiang(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != YanXiangChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], YanXiangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryYanXiang: { } r } f || !ValidYanXiang(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != YanXiangChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], YanXiangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Yan Xiang rejects another payer, phase option, private material or current native plan.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

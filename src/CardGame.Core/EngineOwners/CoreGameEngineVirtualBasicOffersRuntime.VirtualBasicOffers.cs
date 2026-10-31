@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineVirtualBasicOffersRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CoreGameEngineVirtualBasicOffersRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[owner];
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat != owner || _characterZhouYuOlMouOperations.MouGuquPhysicalUseForbidden(owner, []))
             yield break;
-        foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => kind != CardKind.ColdSlash || anyRegisteredBasic && _contentRegistryOperations._contentRegistry.Cards.Values.Any(card => card.LegacyKind == CardKind.ColdSlash)))
+        foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => kind != CardKind.ColdSlash || anyRegisteredBasic && _contentRegistryOperations._contentRegistry.Cards.Values.Any(card => card.LegacyKind == CardKind.ColdSlash)))
             foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, t.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, kind, Suit.None)))
                 yield return (kind, target.Seat);
         if (_coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Peach, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, owner, CardKind.Peach))
@@ -78,7 +74,7 @@ internal sealed partial class CoreGameEngineVirtualBasicOffersRuntime
         _characterLuMengMouOperations.RecordYingboCardUse(id, actor.Seat, chosen.Kind);
         _coreAlternativeViewAsCostsOperations.RecordProgramUsedBasicCard(actor.Seat, chosen.Kind);
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(chosen.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(chosen.Kind))
         {
             if (!(_coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse == true))
                 _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);

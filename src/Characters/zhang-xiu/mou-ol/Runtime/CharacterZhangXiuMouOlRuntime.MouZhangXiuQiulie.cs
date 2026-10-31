@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangXiuMouOlRuntime
 {
     internal const string MouZhangXiuOlCostReason = "skill-program.mou-ol:qiulie.cost", MouZhangXiuOlDefenseReason = "skill-program.mou-ol:qiulie.defense", MouZhangXiuOlDrawReason = "skill-program.mou-ol:zhuijiao.draw", MouZhangXiuOlPenaltyReason = "skill-program.mou-ol:zhuijiao.discard";
-    internal static CardConversionSource MouZhangXiuOlSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MouZhangXiuOlSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasMouZhangXiuOl => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouZhangXiuZhuijiao);
 
     internal MouZhangXiuOlHuntChosenEvent? MouZhangXiuOlHunt(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlHuntChosenEvent>().SingleOrDefault(e => e.Source.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
@@ -17,8 +14,8 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
     internal ActualDiscardRecoveryPhaseKey? MouZhangXiuOlCurrentPhase(int owner, SkillProgramTriggerWindow window) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { } p && p.ActorSeat == owner && p.ActualTurnOwnerSeat == owner && p.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && p.Kind == MouZhangXiuOlComposition.Phase(window) ? p : null;
     internal bool MouZhangXiuOlPhaseAlreadyOffered(int owner, ActualDiscardRecoveryPhaseKey p) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlPhaseOfferedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Phase.Token == p.Token);
     internal bool CanUseMouZhangXiuOlHunt(int owner, int target) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && owner != target && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: []) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, target, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None, null);
-    internal Card[] MouZhangXiuOlDiscardable(int owner, bool defense = false) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(owner)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && (!defense || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[owner], c)) == SkillProgramCardCategory.Basic || _coreEquipmentContentOperations.EquipmentRules.IsEquipment(c.Kind) && _coreEquipmentContentOperations.EquipmentRules.Get(c.Kind).Slot == EquipmentSlot.Weapon)).ToArray();
-    SkillProgramStepOutcome global::CardGame.Core.IMouZhangXiuOlHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    internal Card[] MouZhangXiuOlDiscardable(int owner, bool defense = false) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(owner)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && (!defense || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[owner], c)) == SkillProgramCardCategory.Basic || _coreEquipmentContentOperations.EquipmentRules.IsEquipment(c.Kind) && _coreEquipmentContentOperations.EquipmentRules.Get(c.Kind).Slot == EquipmentSlot.Weapon)).ToArray();
+    SkillProgramStepOutcome IMouZhangXiuOlHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.ResolveMouZhangXiuQiulie or SkillProgramEffectOp.UseMouZhangXiuQiulieSlash => BeginMouZhangXiuOlQiulie(f, op),
         SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash => BeginMouZhangXiuOlDefense(f),
@@ -112,7 +109,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
     [ProgramAnswer("mou-zhang-xiu-ol")]
     internal void AnswerMouZhangXiuOl(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouZhangXiuOl: { } r } f || !ValidMouZhangXiuOl(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MouZhangXiuOlChooser(f) || !MouZhangXiuOlChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouZhangXiuOl: { } r } f || !ValidMouZhangXiuOl(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MouZhangXiuOlChooser(f) || !MouZhangXiuOlChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Mou Zhang Xiu accepts only the original current chooser and live published cost.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -219,9 +216,9 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
     internal PromptChoice AiMouZhangXiuOl(PendingDecision p, ProgramSkillFrame f)
     {
         if (f.MouZhangXiuOl!.Stage == MouZhangXiuOlStage.Target)
-            return p.Choices.FirstOrDefault(c => c.Targets is [var target] && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? p.Choices.Single(c => c.Parameters["branch"] == "decline");
-        if (f.MouZhangXiuOl.Stage == MouZhangXiuOlStage.Cost && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.MouZhangXiuOl.TargetSeat]))
+            return p.Choices.FirstOrDefault(c => c.Targets is [var target] && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? p.Choices.Single(c => c.Parameters["branch"] == "decline");
+        if (f.MouZhangXiuOl.Stage == MouZhangXiuOlStage.Cost && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.MouZhangXiuOl.TargetSeat]))
             return p.Choices.Single(c => c.Parameters["branch"] == "decline");
-        return p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).FirstOrDefault() ?? p.Choices.Single();
+        return p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).FirstOrDefault() ?? p.Choices.Single();
     }
 }

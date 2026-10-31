@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangLiaoHappyGodRuntime
 {
-    internal bool HappyZlCannotRespond(CardActionContext action, int responderSeat) => HasHappyZl && (action.Type == CardActionType.Use || action.Type == CardActionType.Response && action.EffectiveKind == CardKind.Nullification) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(responderSeat) && _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[responderSeat].IsAlive && HappyZlColor(action.ActorSeat, responderSeat, action.EffectiveIsRed ?? global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(action.EffectiveSuit))is not null;
+    internal bool HappyZlCannotRespond(CardActionContext action, int responderSeat) => HasHappyZl && (action.Type == CardActionType.Use || action.Type == CardActionType.Response && action.EffectiveKind == CardKind.Nullification) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(responderSeat) && _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[responderSeat].IsAlive && HappyZlColor(action.ActorSeat, responderSeat, action.EffectiveIsRed ?? CoreGameEnginePublicPileColorsRuntime.SuitColor(action.EffectiveSuit))is not null;
     internal bool HappyZlCannotRespond(long useId, int responderSeat) => HasHappyZl && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { } action } use && action.Type == CardActionType.Use && action.ActorSeat == use.SourceSeat && action.EffectiveKind == use.CardKind && HappyZlCannotRespond(action, responderSeat);
     internal bool HappyZlNullificationForbidden(NullificationWindowFrame window, int responderSeat)
     {
@@ -45,7 +41,7 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
             return false;
         var moves = r.Payments.Last().Moves;
         if (child is CardsMovedTriggerWindowFrame m)
-            return m.Batch.ParentFrameId == f.Id && m.Batch.OriginOwnerSeat == f.OwnerSeat && m.Batch.OriginSkillId == f.SkillId && m.Batch.OriginSkillInstanceId == f.SkillInstanceId && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, m) && m.Batch.Movements.All(x => moves.Contains(x));
+            return m.Batch.ParentFrameId == f.Id && m.Batch.OriginOwnerSeat == f.OwnerSeat && m.Batch.OriginSkillId == f.SkillId && m.Batch.OriginSkillInstanceId == f.SkillInstanceId && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, m) && m.Batch.Movements.All(x => moves.Contains(x));
         if (child is RecoveryReplacementFrame recovery)
             return moves.Any(m => m.From.Zone == CardZoneKind.Equipment && m.CardKind == CardKind.SilverLion && m.From.OwnerSeat == recovery.Attempt.TargetSeat) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion;
         if (child is HpChangedTriggerWindowFrame hp)

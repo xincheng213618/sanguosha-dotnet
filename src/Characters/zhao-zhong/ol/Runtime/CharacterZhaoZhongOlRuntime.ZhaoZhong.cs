@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,7 +9,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     internal const string DiciGiveReason = "skill-program.zhao-zhong.dici.give";
     internal const string DiciNextGiveReason = "skill-program.zhao-zhong.dici.next-give";
     internal const string BiriDrawReason = "skill-program.zhao-zhong.biri.draw";
-    SkillProgramStepOutcome global::CardGame.Core.IZhaoZhongHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhaoZhong(f, op);
+    SkillProgramStepOutcome IZhaoZhongHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhaoZhong(f, op);
     internal SkillProgramStepOutcome BeginZhaoZhong(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -156,7 +153,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     [ProgramAnswer("zhao-zhong")]
     internal void AnswerZhaoZhong(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhaoZhong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ZhaoZhongChooser(f) || !ZhaoZhongChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhaoZhong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ZhaoZhongChooser(f) || !ZhaoZhongChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zhao Zhong requires the actual chooser's exact published private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

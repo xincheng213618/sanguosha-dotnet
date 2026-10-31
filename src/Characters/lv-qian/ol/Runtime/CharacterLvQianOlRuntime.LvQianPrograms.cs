@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLvQianOlRuntime
@@ -35,7 +31,7 @@ internal sealed partial class CharacterLvQianOlRuntime
             var key = (recipient, source.SkillId, pileInstance);
             if (_coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.ContainsKey(key))
                 throw new InvalidOperationException("Zengdao cannot pay its limited deposit twice.");
-            var pileId = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(source.SkillId, pileInstance);
+            var pileId = CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(source.SkillId, pileInstance);
             var pile = new PublicPersistentPileSource(recipient, source.SkillId, pileInstance, int.MaxValue, pileId);
             _cardZonesOperations._cardZones.EnsurePublicPersistentPile(pile.Location);
             _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.Add(key, pile);
@@ -151,5 +147,5 @@ internal sealed partial class CharacterLvQianOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILvQianProgramHost.ExecuteLvQian(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteLvQian(f, op);
+    SkillProgramStepOutcome ILvQianProgramHost.ExecuteLvQian(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteLvQian(f, op);
 }

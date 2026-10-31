@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CharacterQuanCongBoundaryMobileRuntime
 {
     internal const string BoundaryYaomingAction = "boundary-quan-cong-yaoming";
     internal const string BoundaryYaomingDiscardReason = "skill-program.boundary:yaoming-mobile.discard";
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryQuanCongProgramHost.Resolve(ProgramSkillFrame frame) => BeginBoundaryYaoming(frame);
-    internal static CardConversionSource BoundaryYaomingSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    SkillProgramStepOutcome IBoundaryQuanCongProgramHost.Resolve(ProgramSkillFrame frame) => BeginBoundaryYaoming(frame);
+    internal static CardConversionSource BoundaryYaomingSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     internal (int Remaining, string? Pending) BoundaryYaomingState(int owner, string instance)
     {
         var last = _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryQuanCongYaomingStateEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillInstanceId == instance);
@@ -100,7 +97,7 @@ internal sealed partial class CharacterQuanCongBoundaryMobileRuntime
     [ProgramAnswer(BoundaryYaomingAction)]
     internal void AnswerBoundaryYaoming(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryQuanCongYaoming: { } receipt } frame || !ValidBoundaryYaoming(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], BoundaryYaomingChoices(frame).Where(c => c.Id == answer.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryQuanCongYaoming: { } receipt } frame || !ValidBoundaryYaoming(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], BoundaryYaomingChoices(frame).Where(c => c.Id == answer.Id).ToArray()))
             throw new InvalidOperationException("Yaoming requires its owning participant's current option, target or anonymous card slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanOlMagicRuntime
@@ -32,7 +28,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
     // Runs before Wenlan's own direct-Duel completion. Return routes through the
     // same native phase again after signing Settled, so other real producers keep their order.
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 29080)]
-    internal bool ReturnMoDcLegacyDuel(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnMoDcLegacyDuel(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.ProgramFrameId is not { } parentId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoDiaoChanLegacyDuel: { Settled: false } r } parent || parent.Id != parentId)
             return false;

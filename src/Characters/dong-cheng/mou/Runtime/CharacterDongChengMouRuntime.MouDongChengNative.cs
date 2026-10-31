@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongChengMouRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CharacterDongChengMouRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var represented = new Card(0, kind, Suit.None, 0);
         var candidates = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(p.Seat, f.OwnerSeat) && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(f.OwnerSeat, SkillProgramCardTargetRestriction.SelfOnly) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, p.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, Suit.None, null) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(actor.Seat, p.Seat, kind) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, Suit.None)).ToArray();
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return Array.AsReadOnly(candidates.Where(t => _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, t, represented, r.Source, kind, ignoreDistance: true, noEffectiveRank: true, physicalCardIds: []) && _coreRuleQueriesOperations.CanSpendSlashUse(actor, t, false, kind, physicalCardIds: [])).Select(p => p.Seat).ToArray());
         if (kind == CardKind.Lightning)
             return Array.AsReadOnly(candidates.Where(t => !t.JudgmentAreaAbolished && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(t, kind) && !_coreProgramCardPoliciesOperations.HasCardPolicy(t, SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget)).Select(t => t.Seat).ToArray());
@@ -52,7 +48,7 @@ internal sealed partial class CharacterDongChengMouRuntime
             return;
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind))
         {
             var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, f.OwnerSeat, use.TargetSeats[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: r.Kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[use.TargetSeats[0]], r.Kind), programSkillCardUseFrameId: f.Id);
@@ -113,9 +109,9 @@ internal sealed partial class CharacterDongChengMouRuntime
         return new(0, kind, Suit.None, 0);
     }
 
-    internal bool ContinueMouDcSlash(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool ContinueMouDcSlash(NativeOwners.CardAttackHandle attack)
     {
-        if (!IsMouDcZeroUse(attack.ResolutionId) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } u)
+        if (!IsMouDcZeroUse(attack.ResolutionId) || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } u)
             return false;
         var next = u.TargetIndex + 1;
         while (next < u.TargetSeats.Count && !_coreMatchParticipantsPlayersAccess._players[u.TargetSeats[next]].IsAlive)
@@ -135,7 +131,7 @@ internal sealed partial class CharacterDongChengMouRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 37400)]
-    internal bool FinishMouDcZeroAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishMouDcZeroAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (!IsMouDcZeroUse(attack.ResolutionId) || attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } u || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard?.ResolutionId == u.Id)

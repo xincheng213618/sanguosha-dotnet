@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuBanOlRuntime
 {
 
-    internal static CardMoveReason HuiyunNativePaymentReason(HuiyunNativeInvoice n) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hu_ban_ol_HuiyunObservers.HuiyunNativePaymentReason(n);
+    internal static CardMoveReason HuiyunNativePaymentReason(HuiyunNativeInvoice n) => RuntimeSkills.RuntimeRules_hu_ban_ol_HuiyunObservers.HuiyunNativePaymentReason(n);
     internal bool IsHuBanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => f.Huiyun is { Stage: HuiyunStage.NativeChildren or HuiyunStage.RecastCostChildren or HuiyunStage.RecastDrawChildren or HuiyunStage.DrawChildren } r && e?.Op == SkillProgramEffectOp.ResolveHuiyunCompletedFireAttack && p == f.PendingMovementContinuation && p.SubjectSeat == HuiyunCurrent(r).TargetSeat && p.BeforeCount == 0 && p.CoverageResultBind is null;
     internal bool IsHuiyunNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch)
     {
@@ -29,7 +25,7 @@ internal sealed partial class CharacterHuBanOlRuntime
             return false;
         if (r.Stage == HuiyunStage.NativeChildren)
             return moved.ResumeProgramFrameId == f.Id && IsHuiyunNativeSettlementBatch(f, moved.Batch);
-        if (!global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved))
+        if (!CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved))
             return false;
         if (r.Stage == HuiyunStage.RecastCostChildren)
             return moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.ProgramEventHistory<HuiyunRecastCardEvent>().Any(p => p.FrameId == f.Id && p.Index == r.Index && p.CardId == m.CardId && p.Sequence == m.Sequence));

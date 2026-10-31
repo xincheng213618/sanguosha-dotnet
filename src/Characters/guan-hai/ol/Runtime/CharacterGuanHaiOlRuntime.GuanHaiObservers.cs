@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanHaiOlRuntime
@@ -50,7 +46,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         if (child is CardUseFrame use)
             return r.Stage == GuanHaiStage.NativeSlash && use.YouqueSlash?.ProgramFrameId == f.Id && IsIssuedYouqueUse(use);
         if (r.Stage == GuanHaiStage.RewardDraw && f.NativeDraw is not null)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
+            return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
@@ -59,10 +55,10 @@ internal sealed partial class CharacterGuanHaiOlRuntime
             return r.Stage is GuanHaiStage.XieweiChildren or GuanHaiStage.DiscardChildren or GuanHaiStage.RewardChildren && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is not CardsMovedTriggerWindowFrame moved || moved.Batch.Movements.Count == 0 || !moved.Batch.Movements.All(m => GuanHaiMovementMatches(f, m)))
             return false;
-        return r.Stage == GuanHaiStage.XieweiChildren ? moved.Batch.ParentFrameId == r.NativeUseId && (moved.Batch.AwaitingProgramFrameId == f.Id || moved.ResumeProgramFrameId == f.Id) : global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && (r.Stage == GuanHaiStage.Pindian ? moved.Batch.ParentFrameId == r.PindianId : moved.Batch.ParentFrameId == f.Id);
+        return r.Stage == GuanHaiStage.XieweiChildren ? moved.Batch.ParentFrameId == r.NativeUseId && (moved.Batch.AwaitingProgramFrameId == f.Id || moved.ResumeProgramFrameId == f.Id) : CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && (r.Stage == GuanHaiStage.Pindian ? moved.Batch.ParentFrameId == r.PindianId : moved.Batch.ParentFrameId == f.Id);
     }
 
-    internal ProgramSkillFrame? GuanHaiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.GuanHaiFirstChild(f, child), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
+    internal ProgramSkillFrame? GuanHaiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.GuanHaiFirstChild(f, child), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 270)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 260)]
     internal bool IsGuanHaiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

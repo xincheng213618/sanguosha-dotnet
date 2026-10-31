@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuBuOlMagicRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 70)]
-    internal int MoLuBuKuangDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int MoLuBuKuangDamage(GameEngine.IDamageAttempt attack)
     {
         if (!HasMoLuBu || attack.IsSourceLess || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat) || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive || _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent).OfType<DamageAppliedEvent>().Any(e => !e.SourceLess && e.SourceSeat == attack.SourceSeat && e.TargetSeat == attack.TargetSeat))
             return 0;

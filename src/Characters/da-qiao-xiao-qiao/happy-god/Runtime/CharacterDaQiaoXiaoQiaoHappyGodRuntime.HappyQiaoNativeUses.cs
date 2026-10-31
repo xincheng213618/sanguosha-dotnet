@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Text.Json;
 
 namespace CardGame.Core.EngineOwners;
@@ -32,7 +29,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
             {
                 actor.HappyQiaoPoolQuery = _ => pool;
                 var previous = _coreGameEngineActionQueriesActionQueryAccess._actionQuery;
-                _coreGameEngineActionQueriesActionQueryAccess._actionQuery = new global::CardGame.Core.NativeOwners.ActionQuery(_coreMatchParticipantsPlayersAccess._players.Count);
+                _coreGameEngineActionQueriesActionQueryAccess._actionQuery = new NativeOwners.ActionQuery(_coreMatchParticipantsPlayersAccess._players.Count);
                 using var scope = _kernelCoreGameEngineActionQueriesOperations.CreateActionQueryScope(previous);
                 foreach (var action in _coreNativeLegalActionsOperations.BuildLegalActions(actor, includeProgramActions: false).Where(a => a.MinCardCount <= 1 && a.MaxCardCount <= 1 && (a.ConversionSource is null || _corePlayCardHistoryOperations.ViewAsRule(a.ConversionSource)is not { } rule || rule.InputCount is 0 or 1) && a.Kind is not (LegalActionKind.EndPlay or LegalActionKind.Recast or LegalActionKind.UseProgramSkill or LegalActionKind.UseEquipmentEffect or LegalActionKind.RevealGeneral)))
                 {
@@ -61,13 +58,13 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
                             plans.Add(new("zhangba", FreezeHappyQiaoAction(action), CardKind.Slash) { Cards = ids, Targets = [target.Seat] });
                         }
 
-                foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Concat(new[] { CardKind.Peach, CardKind.Alcohol }))
+                foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Concat(new[] { CardKind.Peach, CardKind.Alcohol }))
                     foreach (var selection in _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(actor, kind, false).Where(s => s.Cards.Count > 1 && s.Cards.All(c => IsHappyQiaoShutuCardQuery(actor, c.Id))))
                     {
                         var ids = selection.Cards.Select(c => c.Id).ToArray();
                         var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, selection.Cards);
                         var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, selection.Cards);
-                        IEnumerable<IReadOnlyList<int>> targets = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, p, kind, suit, color, physicalCardIds: ids)).Select(p => (IReadOnlyList<int>)new[] { p.Seat }) : kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, suit) ? new IReadOnlyList<int>[]
+                        IEnumerable<IReadOnlyList<int>> targets = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, p, kind, suit, color, physicalCardIds: ids)).Select(p => (IReadOnlyList<int>)new[] { p.Seat }) : kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, suit) ? new IReadOnlyList<int>[]
                         {
                             [actor.Seat]
                         }
@@ -80,7 +77,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
                         : [];
                         foreach (var seats in targets)
                         {
-                            var action = new LegalAction(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? LegalActionKind.Slash : kind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol, ids[0], seats.Count > 0 ? seats[0] : null, "殊途：将实体牌当【" + CardCatalog.Get(kind).DisplayName + "】使用", PlayedCardKind: kind)
+                            var action = new LegalAction(CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? LegalActionKind.Slash : kind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol, ids[0], seats.Count > 0 ? seats[0] : null, "殊途：将实体牌当【" + CardCatalog.Get(kind).DisplayName + "】使用", PlayedCardKind: kind)
                             {
                                 ConversionSource = selection.Source,
                                 TargetSeats = seats
@@ -147,7 +144,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         var conversion = plan.Action.ConversionSource ?? throw new InvalidOperationException("A multi-material Shutu Use lost its real conversion.");
         if (_coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(actor, plan.Cards, plan.Kind, false, conversion)is null)
             throw new InvalidOperationException("Shutu's accepted multi-material conversion expired.");
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(plan.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(plan.Kind))
         {
             _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[plan.Targets.Single()], cards[0], plan.Kind, actor.Seat, physicalCards: cards, conversionSource: conversion);
             return;
@@ -178,7 +175,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
             return _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(plan.Kind, actor.Seat, plan.Targets);
         var card = _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, _coreAdvancedLifecycleOperations.GetAdvancedCard(plan.Cards.Single()), action.ConversionSource);
         if (action.ConversionSource is { } source && _corePlayCardHistoryOperations.ViewAsRule(source)is { SingleCardTrickUse: true } rule)
-            return _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, rule.OutputKind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, _coreAdvancedLifecycleOperations.GetAdvancedCard(plan.Cards.Single())), rule.ExcludeOwnerEffects, enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), actualEffectiveColor: global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)), hasActualColor: true, physicalCardIds: plan.Cards).Where(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && (o.TargetSeats.SequenceEqual(plan.Targets) || action.ProgramActivationId == "red-additional-targets" && o.TargetSeats.SequenceEqual(plan.Targets.Take(o.TargetSeats.Count)))).OrderByDescending(o => o.TargetSeats.Count).Select(o => o.TargetSeats).First();
+            return _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, rule.OutputKind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, _coreAdvancedLifecycleOperations.GetAdvancedCard(plan.Cards.Single())), rule.ExcludeOwnerEffects, enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), actualEffectiveColor: CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)), hasActualColor: true, physicalCardIds: plan.Cards).Where(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && (o.TargetSeats.SequenceEqual(plan.Targets) || action.ProgramActivationId == "red-additional-targets" && o.TargetSeats.SequenceEqual(plan.Targets.Take(o.TargetSeats.Count)))).OrderByDescending(o => o.TargetSeats.Count).Select(o => o.TargetSeats).First();
         if (_coreGuanduCardsOperations.GuanduExpectedNativeTargets(actor, card, action)is { } guandu)
             return guandu;
         if (_coreDragonBoatCardsOperations.DragonBoatExpectedNativeTargets(actor, card, action)is { } dragon)
@@ -188,7 +185,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         if (action.Kind is not (LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage or LegalActionKind.PeachGarden or LegalActionKind.FiveGrains))
             return _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(plan.Kind, actor.Seat, plan.Targets);
         var offensive = action.Kind is LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage;
-        var targets = Enumerable.Range(offensive ? 1 : 0, _coreMatchDefinitionPlayerCountAccess._playerCount - (offensive ? 1 : 0)).Select(i => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(actor.Seat, i)]).Where(p => p.IsAlive && (!offensive || !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, plan.Kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, plan.Kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(actor.Seat, p.Seat, plan.Kind))).Select(p => p.Seat).ToArray();
+        var targets = Enumerable.Range(offensive ? 1 : 0, _coreMatchDefinitionPlayerCountAccess._playerCount - (offensive ? 1 : 0)).Select(i => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(actor.Seat, i)]).Where(p => p.IsAlive && (!offensive || !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, plan.Kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, plan.Kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(actor.Seat, p.Seat, plan.Kind))).Select(p => p.Seat).ToArray();
         if (!offensive)
             targets = _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(actor, targets).ToArray();
         if (action.Kind == LegalActionKind.FiveGrains)

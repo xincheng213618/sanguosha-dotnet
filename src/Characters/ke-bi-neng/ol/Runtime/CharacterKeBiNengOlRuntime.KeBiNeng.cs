@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -31,8 +28,8 @@ internal sealed partial class CharacterKeBiNengOlRuntime
             ExpireKeBiNengPingduanAlcohol(ended.TurnNumber, ended.ActorSeat);
     }
 
-    internal static CardConversionSource KeBiNengSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ke_bi_neng_ol_KeBiNeng.KeBiNengSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IKeBiNengProgramHost.Resolve(ProgramSkillFrame frame) => BeginKeBiNeng(frame);
+    internal static CardConversionSource KeBiNengSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_ke_bi_neng_ol_KeBiNeng.KeBiNengSource(f);
+    SkillProgramStepOutcome IKeBiNengProgramHost.Resolve(ProgramSkillFrame frame) => BeginKeBiNeng(frame);
     internal SkillProgramStepOutcome BeginKeBiNeng(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -58,8 +55,8 @@ internal sealed partial class CharacterKeBiNengOlRuntime
 
     internal IReadOnlyList<KeBiNengPingduanCard> KeBiNengRecastCards(ProgramSkillFrame f) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.KeBiNengPingduan!.ActorSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(f.KeBiNengPingduan.ActorSeat)).Select(c => new KeBiNengPingduanCard(c.Id, _cardZonesOperations._cardZones.GetLocation(c.Id), _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[f.KeBiNengPingduan.ActorSeat], c))).Where(c => CardCatalog.Get(c.EffectiveKind).CategoryName == "锦囊牌" && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(f.OwnerSeat, f.SkillId, f.SkillInstanceId, _coreCardAttackStateOperations.GetAttackCard(c.CardId))).OrderBy(c => c.CardId).ToArray());
     internal IReadOnlyList<KeBiNengPingduanCard> KeBiNengEquipmentCards(ProgramSkillFrame f) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(f.KeBiNengPingduan!.ActorSeat).Where(c => !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(f.OwnerSeat, f.SkillId, f.SkillInstanceId, c)).OrderBy(c => c.Id).Select(c => new KeBiNengPingduanCard(c.Id, _cardZonesOperations._cardZones.GetLocation(c.Id), c.Kind)).ToArray());
-    internal static Dictionary<string, string> KeBiNengArgs(string option) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ke_bi_neng_ol_KeBiNeng.KeBiNengArgs(option);
-    internal static IReadOnlyList<int> KeBiNengMaterials(LegalAction a) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ke_bi_neng_ol_KeBiNeng.KeBiNengMaterials(a);
+    internal static Dictionary<string, string> KeBiNengArgs(string option) => RuntimeSkills.RuntimeRules_ke_bi_neng_ol_KeBiNeng.KeBiNengArgs(option);
+    internal static IReadOnlyList<int> KeBiNengMaterials(LegalAction a) => RuntimeSkills.RuntimeRules_ke_bi_neng_ol_KeBiNeng.KeBiNengMaterials(a);
     internal IReadOnlyList<PromptChoice> KeBiNengChoices(ProgramSkillFrame f)
     {
         var r = f.KeBiNengPingduan!;
@@ -104,7 +101,7 @@ internal sealed partial class CharacterKeBiNengOlRuntime
     [ProgramAnswer("ke-bi-neng-pingduan")]
     internal void AnswerKeBiNeng(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { KeBiNengPingduan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.ActorSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], KeBiNengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { KeBiNengPingduan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.ActorSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], KeBiNengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Pingduan requires its original recipient's exact published private choice.");
         var option = choice.Parameters["option"];
         if (option == "decline")
@@ -278,6 +275,6 @@ internal sealed partial class CharacterKeBiNengOlRuntime
             return p.Choices.Last();
         if (r.Stage == KeBiNengPingduanStage.BasicChoice)
             return executable.OrderByDescending(c => c.Parameters.TryGetValue("option", out var basicIndex) && r.BasicActions[int.Parse(basicIndex, CultureInfo.InvariantCulture)].Kind == LegalActionKind.Peach ? 5 : c.Targets.Any(t => t != r.ActorSeat && Hostility(t) > 1.5) ? 3 : 1).First();
-        return executable.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[r.ActorSeat])).First();
+        return executable.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[r.ActorSeat])).First();
     }
 }

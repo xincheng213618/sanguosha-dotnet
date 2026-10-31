@@ -1,21 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeGuoLeRuntime
 {
-    internal static CardKind LeChengyanNativeEffectKind(CardUseFrame use) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhuge_guo_le_LeChengyanEffects.LeChengyanNativeEffectKind(use);
-    internal static IReadOnlyList<int> LeChengyanNativeTargets(CardUseFrame use) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhuge_guo_le_LeChengyanEffects.LeChengyanNativeTargets(use);
+    internal static CardKind LeChengyanNativeEffectKind(CardUseFrame use) => RuntimeSkills.RuntimeRules_zhuge_guo_le_LeChengyanEffects.LeChengyanNativeEffectKind(use);
+    internal static IReadOnlyList<int> LeChengyanNativeTargets(CardUseFrame use) => RuntimeSkills.RuntimeRules_zhuge_guo_le_LeChengyanEffects.LeChengyanNativeTargets(use);
     internal bool IsLeChengyanEffectUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { LeChengyanEffect: { Started: true, Finished: false } } u && ValidLeChengyanEffect(u);
-    internal bool ValidLeChengyanEffect(CardUseFrame u) => u.LeChengyanEffect is { } p && u.Action is { Type: CardActionType.Use } a && a.ActionId == p.ActionId && a.ActorSeat == p.Source.OwnerSeat && u.SourceSeat == a.ActorSeat && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind)) && p.EffectKind != CardKind.Nullification && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectKind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(p.EffectKind)) && _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash == p.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<LeChengyanEffectIssuedEvent>().Count(e => e == new LeChengyanEffectIssuedEvent(p.ProgramFrameId, u.Id, p.ActionId, p.Source, p.ShownCardId, p.EffectKind)) == 1;
+    internal bool ValidLeChengyanEffect(CardUseFrame u) => u.LeChengyanEffect is { } p && u.Action is { Type: CardActionType.Use } a && a.ActionId == p.ActionId && a.ActorSeat == p.Source.OwnerSeat && u.SourceSeat == a.ActorSeat && (CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind)) && p.EffectKind != CardKind.Nullification && (CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectKind) || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(p.EffectKind)) && _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash == p.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<LeChengyanEffectIssuedEvent>().Count(e => e == new LeChengyanEffectIssuedEvent(p.ProgramFrameId, u.Id, p.ActionId, p.Source, p.ShownCardId, p.EffectKind)) == 1;
 
     internal bool TryStartLeChengyanEffect(ProgramCardTriggerWindowFrame window)
     {
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { LeChengyanEffect: { Started: false } p } u)
+        if (CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { LeChengyanEffect: { Started: false } p } u)
             return false;
         if (!ValidLeChengyanEffect(u) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != u.Id)
             throw new InvalidOperationException("Chengyan must return to its paid original native Use.");
@@ -43,7 +38,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
             return;
         }
 
-        var action = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? LegalActionKind.Slash : Enum.Parse<LegalActionKind>(kind.ToString());
+        var action = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? LegalActionKind.Slash : Enum.Parse<LegalActionKind>(kind.ToString());
         CardKind? required = kind == CardKind.BarbarianAssault ? CardKind.Slash : kind == CardKind.ArrowBarrage ? CardKind.Dodge : null;
         _coreNativeNullificationOperations.BeginNullificationWindow(u.Id, LeChengyanOriginalCard(u), u.SourceSeat, p.Targets, action, requiredCardKind: required, playedCardKind: u.CardKind);
     }
@@ -51,7 +46,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
     internal Card LeChengyanOriginalCard(CardUseFrame u) => _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(u.Id, u.CardId);
     internal bool TryBypassLeChengyanNullification(long id, Card card, IReadOnlyList<int> targets, LegalActionKind action, int? targetCard, CardKind? required)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { LeChengyanEffect.Started: true } u || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || !ValidLeChengyanEffect(u))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { LeChengyanEffect.Started: true } u || !CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || !ValidLeChengyanEffect(u))
             return false;
         _coreNativeNullificationOperations.ResolveNullifiableEffect(new NullificationWindowFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, id, u.SourceSeat, Array.AsReadOnly(targets.ToArray()), card.Id, u.CardKind, action, targetCard, required, []));
         return true;
@@ -64,7 +59,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
         if (pending.EffectCardKind != u.CardKind || pending.SourceSeat != u.SourceSeat || pending.EffectCardId != u.CardId)
             throw new InvalidOperationException("Chengyan effect must retain its paid card, actor and original counterspell eligibility.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(u.Id, u = u with { LeChengyanEffect = p with { TranslatedWindowId = pending.Id, TranslatedTargetIndex = u.TargetIndex } });
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectKind))
         {
             BeginLeChengyanSlash(u);
             return true;
@@ -90,18 +85,18 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
         _coreRuntimeOperations.ReplaceRuntimeFrame(u.Id, u = u with { TargetIndex = index, LeChengyanEffect = p with { SlashCursor = index } });
         var target = p.Targets[index];
         var card = LeChengyanOriginalCard(u);
-        var attack = _kernelCoreMainOperations.CreateCardAttackHandle(u.Id, u.SourceSeat, target, card.Id == 0 ? null : card, damageAmount: 1 + (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) ? u.ConsumedAlcoholBonus ?? (u.ConsumedAlcoholBoost ? 1 : 0) : 0), playedCardKind: p.EffectKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(_coreMatchParticipantsPlayersAccess._players[u.SourceSeat], _coreMatchParticipantsPlayersAccess._players[target], u.CardKind), physicalCards: _coreNativeTrickUseOperations.GetCardUsePhysicalCards(u.Id));
+        var attack = _kernelCoreMainOperations.CreateCardAttackHandle(u.Id, u.SourceSeat, target, card.Id == 0 ? null : card, damageAmount: 1 + (CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) ? u.ConsumedAlcoholBonus ?? (u.ConsumedAlcoholBoost ? 1 : 0) : 0), playedCardKind: p.EffectKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(_coreMatchParticipantsPlayersAccess._players[u.SourceSeat], _coreMatchParticipantsPlayersAccess._players[target], u.CardKind), physicalCards: _coreNativeTrickUseOperations.GetCardUsePhysicalCards(u.Id));
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreNativeSlashUseOperations.ContinueSlashAfterProgramTargetEffects(attack);
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AttackCompletionPrelude, 10)]
-    internal bool FinishLeChengyanAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishLeChengyanAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { LeChengyanEffect: { Started: true, Finished: false } p } u || !ValidLeChengyanEffect(u))
             return false;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectKind))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(p.EffectKind))
         {
             if (attack.EffectiveCardKind != p.EffectKind || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is not null)
                 return false;

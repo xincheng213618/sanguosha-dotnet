@@ -1,8 +1,7 @@
 #nullable enable
-using System.Globalization;
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class ShiCaoShuangCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterCaoShuangMobileShiEntries> getCharacterCaoShuangMobileShiRuntime) : IShiCaoShuangHost
+internal sealed class ShiCaoShuangCapability(Func<RuntimeEntries.CharacterCaoShuangMobileShiEntries> getCharacterCaoShuangMobileShiRuntime) : IShiCaoShuangHost
 {
     public SkillProgramStepOutcome ResolveSheQuan(ProgramSkillFrame frame) => getCharacterCaoShuangMobileShiRuntime().BeginShiCaoShuang(frame);
     public SkillProgramStepOutcome ResolveDianYi(ProgramSkillFrame frame) => getCharacterCaoShuangMobileShiRuntime().BeginShiCaoShuang(frame);

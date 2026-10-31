@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineHalfHandPhaseDebtProgramsRuntime
 {
     internal long HalfHandDebtSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count == 0 ? 0 : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements[^1].Sequence;
 
-    internal CardConversionSource HalfHandDebtSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource HalfHandDebtSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HalfHandDebtSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Any(p => p.Id == f.SkillId && p.GameplayHash == f.GameplayHash);
     internal bool HalfHandDebtLifecycleMatches(ProgramSkillFrame f, SkillProgramTriggerWindow window)
     {
-        if (f.WindowContext is not { } context || context.Window != window || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _resolutionStackOperations._resolutionStack.FirstOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame parent || parent.OwnerSeat != f.OwnerSeat || parent.Window != window || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
+        if (f.WindowContext is not { } context || context.Window != window || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _resolutionStackOperations._resolutionStack.FirstOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame parent || parent.OwnerSeat != f.OwnerSeat || parent.Window != window || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
             return false;
         return _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber > 0;
     }
@@ -161,9 +157,9 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtProgramsRuntime
         return new(SkillProgramEffectOp.SelectOwnedCards, SkillProgramEffectTarget.Owner, paid.RequiredPaymentCount, effect.Condition, zones: [CardZoneKind.Hand, CardZoneKind.Equipment], resultBind: effect.ResultBind);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHalfHandPhaseDebtProgramHost.DrawExtraAndArmHalfHandSupport(ProgramSkillFrame f, SkillProgramEffect e) => DrawExtraHalfHandSupport(f, e);
-    SkillProgramStepOutcome global::CardGame.Core.IHalfHandPhaseDebtProgramHost.GiveHalfHandAndIssueTargetSupport(ProgramSkillFrame f, SkillProgramEffect e) => GiveHalfHandSupport(f, e);
-    SkillProgramStepOutcome global::CardGame.Core.IHalfHandPhaseDebtProgramHost.ExchangeHandsAndArmPhaseDebt(ProgramSkillFrame f, SkillProgramEffect e) => ExchangeAndArmPhaseHandDebt(f, e);
-    SkillProgramStepOutcome global::CardGame.Core.IHalfHandPhaseDebtProgramHost.SelectFrozenHandExchangeDebtPayment(ProgramSkillFrame f, SkillProgramEffect e) => SelectPhaseHandDebtPayment(f, e);
-    SkillProgramStepOutcome global::CardGame.Core.IHalfHandPhaseDebtProgramHost.OfferHalfHandRecipientSupport(ProgramSkillFrame f, SkillProgramEffect e) => _coreHalfHandTargetSupportOperations.OfferHalfHandSupport(f, e);
+    SkillProgramStepOutcome IHalfHandPhaseDebtProgramHost.DrawExtraAndArmHalfHandSupport(ProgramSkillFrame f, SkillProgramEffect e) => DrawExtraHalfHandSupport(f, e);
+    SkillProgramStepOutcome IHalfHandPhaseDebtProgramHost.GiveHalfHandAndIssueTargetSupport(ProgramSkillFrame f, SkillProgramEffect e) => GiveHalfHandSupport(f, e);
+    SkillProgramStepOutcome IHalfHandPhaseDebtProgramHost.ExchangeHandsAndArmPhaseDebt(ProgramSkillFrame f, SkillProgramEffect e) => ExchangeAndArmPhaseHandDebt(f, e);
+    SkillProgramStepOutcome IHalfHandPhaseDebtProgramHost.SelectFrozenHandExchangeDebtPayment(ProgramSkillFrame f, SkillProgramEffect e) => SelectPhaseHandDebtPayment(f, e);
+    SkillProgramStepOutcome IHalfHandPhaseDebtProgramHost.OfferHalfHandRecipientSupport(ProgramSkillFrame f, SkillProgramEffect e) => _coreHalfHandTargetSupportOperations.OfferHalfHandSupport(f, e);
 }

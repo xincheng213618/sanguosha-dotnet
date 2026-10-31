@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiYiOlRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.ILiYiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginChanshuang(f, op);
+    SkillProgramStepOutcome ILiYiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginChanshuang(f, op);
     internal SkillProgramStepOutcome BeginChanshuang(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -88,7 +85,7 @@ internal sealed partial class CharacterLiYiOlRuntime
     [ProgramAnswer("li-yi-chanshuang")]
     internal void AnswerChanshuang(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Chanshuang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ChanshuangChooser(f) || !ChanshuangChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Chanshuang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ChanshuangChooser(f) || !ChanshuangChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Chanshuang requires its real participant's exact private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

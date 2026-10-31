@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreDamageColorDuelProgramsCoreProgramTargetRulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreDamageColorDuelProgramsCoreProgramTargetRulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTargetRules TargetRules { get; }
+    ProgramTargetRules TargetRules { get; }
 }

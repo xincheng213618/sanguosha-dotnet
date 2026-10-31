@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreTrustedMovementDiagnosticsRuntime))]
-internal sealed class CharacterZhangLiaoMobileGodCoreTrustedMovementDiagnosticsAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreTrustedMovementDiagnosticsRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterZhangLiaoMobileGodCoreTrustedMovementDiagnosticsOperations
+[Core.ProgramCapability(typeof(CoreTrustedMovementDiagnosticsRuntime))]
+internal sealed class CharacterZhangLiaoMobileGodCoreTrustedMovementDiagnosticsAdapter(Func<CoreTrustedMovementDiagnosticsRuntime> targetFactory) : ICharacterZhangLiaoMobileGodCoreTrustedMovementDiagnosticsOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreTrustedMovementDiagnosticsRuntime> _targetFactory = targetFactory;
-    public global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardMovementRecord> CardMovements { get => this._targetFactory().CardMovements; }
+    private readonly Func<CoreTrustedMovementDiagnosticsRuntime> _targetFactory = targetFactory;
+    public IReadOnlyList<CardMovementRecord> CardMovements { get => this._targetFactory().CardMovements; }
 }

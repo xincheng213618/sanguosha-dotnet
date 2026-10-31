@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -15,7 +12,7 @@ internal sealed partial class CharacterDuXiOlRuntime
     internal DuXiQuxiMarkerMovedEvent[] DuXiCurrentMarkers() => !HasDuXiCapability ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<DuXiQuxiMarkerMovedEvent>().GroupBy(e => (e.Source, e.Marker)).Select(g => g.Last()).ToArray();
     internal int? DuXiHolder(CardConversionSource source, PlayerMarkerKind marker) => _coreProgramEventHistoryOperations.ProgramEventHistory<DuXiQuxiMarkerMovedEvent>().LastOrDefault(e => e.Source == source && e.Marker == marker)?.Holder;
     internal bool DuXiHasPair(int owner) => _coreMatchParticipantsPlayersAccess._players.Any(a => a.IsAlive && a.Seat != owner && _coreMatchParticipantsPlayersAccess._players.Any(b => b.IsAlive && b.Seat != owner && _corePhysicalOwnedCardQueriesOperations.GetHand(a).Count < _corePhysicalOwnedCardQueriesOperations.GetHand(b).Count));
-    SkillProgramStepOutcome global::CardGame.Core.IDuXiProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginDuXi(f, op);
+    SkillProgramStepOutcome IDuXiProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginDuXi(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26300)]
     internal bool CanOfferDuXi(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -48,7 +45,7 @@ internal sealed partial class CharacterDuXiOlRuntime
             return SkillProgramStepOutcome.Continue;
         }
 
-        if (f.DuXiQuxi is not null || f.WindowContext is not { } context || f.InstructionIndex != 1 || f.SkillId != "ol:quxi" || !CanOfferDuXi(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
+        if (f.DuXiQuxi is not null || f.WindowContext is not { } context || f.InstructionIndex != 1 || f.SkillId != "ol:quxi" || !CanOfferDuXi(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Quxi requires its actual unpaid play ending, new round or marked holder death.");
         var initial = operation == SkillProgramEffectOp.ResolveQuxiAtPlayEnding;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DuXiQuxi = new(DuXiIssuer(f), f.GameplayHash, f.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, initial ? DuXiQuxiStage.FaceDownChildren : DuXiQuxiStage.TransferFeng, initial) });
@@ -117,7 +114,7 @@ internal sealed partial class CharacterDuXiOlRuntime
     [ProgramAnswer("du-xi-quxi")]
     internal void AnswerDuXi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuXiQuxi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == DuXiQuxiStage.Obtain ? r.LessHandSeat : f.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DuXiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuXiQuxi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == DuXiQuxiStage.Obtain ? r.LessHandSeat : f.OwnerSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DuXiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Quxi lost its exact current pair, private opaque card slot or source-owned transfer choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYiJiOlRuntime
@@ -24,5 +20,5 @@ internal sealed partial class CharacterYiJiOlRuntime
             _coreRuntimeOperations.ReturnRuntimeProgramMovement(frame.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }
-    SkillProgramStepOutcome global::CardGame.Core.IYiJiProgramHost.GiveDrawPileBottomCard(ProgramSkillFrame frame) => BeginGiveDrawPileBottomCard(frame);
+    SkillProgramStepOutcome IYiJiProgramHost.GiveDrawPileBottomCard(ProgramSkillFrame frame) => BeginGiveDrawPileBottomCard(frame);
 }

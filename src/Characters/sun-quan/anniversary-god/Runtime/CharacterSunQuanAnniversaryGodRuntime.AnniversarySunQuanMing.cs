@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
     internal int AnniversaryMingBatchColors(CardMovementBatchContext batch)
     {
         var locations = AnniversaryMingPiles().Select(p => p.Location).ToHashSet();
-        return batch.Movements.Where(m => m.From != m.To && locations.Contains(m.To) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)).Select(m => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).Suit)).Distinct().Count();
+        return batch.Movements.Where(m => m.From != m.To && locations.Contains(m.To) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)).Select(m => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).Suit)).Distinct().Count();
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 4700)]
@@ -82,7 +78,7 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
         if (candidate.SkillId != AnniversarySunQuanComposition.Cangming || candidate.BindingId is not ("return-start" or "return-damage") || candidate.SkillInstanceId != AnniversaryMingHolderInstance(candidate.OwnerSeat) || candidate.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program!.GameplayHash || context.OwnerSeat != candidate.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive)
             return false;
         // The exact paid frame remains authorized after its last card has left the pile.
-        if (!AnniversaryMingHolderHasCards(candidate.OwnerSeat) && !_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.AnniversarySunQuan is { Operation: SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingReturn, Movements.Count: > 0 } && f.WindowContext == context && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate)))
+        if (!AnniversaryMingHolderHasCards(candidate.OwnerSeat) && !_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.AnniversarySunQuan is { Operation: SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingReturn, Movements.Count: > 0 } && f.WindowContext == context && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate)))
             return false;
         if (candidate.BindingId == "return-start")
             return context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && candidate.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is { } start && start.OwnerSeat == candidate.OwnerSeat && start.CandidateIndex >= 0 && start.CandidateIndex < start.Candidates.Count && start.Candidates[start.CandidateIndex] == candidate;
@@ -107,9 +103,9 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
             var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
             if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != r.ParentId || _resolutionStackOperations._resolutionStack[index - 1] switch
             {
-                ProgramLifecycleTriggerWindowFrame p => p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]),
-                DamageTriggerWindowFrame p => p.TargetSeat != f.OwnerSeat || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex].ToProgramCandidate()),
-                CardsMovedTriggerWindowFrame p => p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]) || p.Batch.Id != f.WindowContext?.MovementBatch?.Id,
+                ProgramLifecycleTriggerWindowFrame p => p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]),
+                DamageTriggerWindowFrame p => p.TargetSeat != f.OwnerSeat || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex].ToProgramCandidate()),
+                CardsMovedTriggerWindowFrame p => p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]) || p.Batch.Id != f.WindowContext?.MovementBatch?.Id,
                 _ => true
             })
                 return false;
@@ -129,7 +125,7 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
         var locations = AnniversaryMingPiles().Select(p => p.Location).ToHashSet();
         if (r.Operation == SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingReturn)
             return records.Length > 0 && records.All(m => locations.Contains(m.From) && m.From.OwnerSeat == f.OwnerSeat && m.To == CardLocation.Hand(f.OwnerSeat));
-        return records.Length > 0 && records.All(m => m.From.OwnerSeat is not null && (r.Operation != SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingSetup || m.From.Zone == CardZoneKind.Hand) && (r.Operation != SkillProgramEffectOp.ResolveAnniversarySunQuanJichao || m.From.OwnerSeat != f.OwnerSeat && (r.Branch == 2 || m.From.OwnerSeat == r.Target)) && (m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId), m.From, m.To)) || locations.Contains(m.To) && m.To.OwnerSeat == m.From.OwnerSeat));
+        return records.Length > 0 && records.All(m => m.From.OwnerSeat is not null && (r.Operation != SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingSetup || m.From.Zone == CardZoneKind.Hand) && (r.Operation != SkillProgramEffectOp.ResolveAnniversarySunQuanJichao || m.From.OwnerSeat != f.OwnerSeat && (r.Branch == 2 || m.From.OwnerSeat == r.Target)) && (m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId), m.From, m.To)) || locations.Contains(m.To) && m.To.OwnerSeat == m.From.OwnerSeat));
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 40500)]

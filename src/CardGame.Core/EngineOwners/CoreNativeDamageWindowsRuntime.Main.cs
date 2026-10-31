@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeDamageWindowsRuntime
 {
-    internal bool TryBeginDamageTriggerWindow(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageFrameId, SkillProgramTriggerWindow window)
+    internal bool TryBeginDamageTriggerWindow(GameEngine.IDamageAttempt attack, long damageFrameId, SkillProgramTriggerWindow window)
     {
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var triggerCandidates = DamageTriggerOrdering.Order(CollectDamageTriggerCandidates(attack, window), source.Seat, _coreMatchDefinitionPlayerCountAccess._playerCount, _coreTableOrderOperations.CurrentTableOrder());
@@ -24,7 +20,7 @@ internal sealed partial class CoreNativeDamageWindowsRuntime
         return true;
     }
 
-    internal void BeginDamageTriggerWindow(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageFrameId, SkillProgramTriggerWindow window, IReadOnlyList<DamageTriggerCandidate> candidates)
+    internal void BeginDamageTriggerWindow(GameEngine.IDamageAttempt attack, long damageFrameId, SkillProgramTriggerWindow window, IReadOnlyList<DamageTriggerCandidate> candidates)
     {
         if (_coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not null)
         {
@@ -80,7 +76,7 @@ internal sealed partial class CoreNativeDamageWindowsRuntime
 
     internal void AdvanceDamageTriggerCandidate(DamageTriggerWindowFrame window) => _coreDamageAdjacencyServicesOperations.DamageAdjacency.AdvanceDamageTriggerCandidate(window);
     internal void CompleteDamageTriggerWindow(DamageTriggerWindowFrame window) => _coreDamageAdjacencyServicesOperations.DamageAdjacency.CompleteDamageTriggerWindow(window);
-    internal IReadOnlyList<DamageTriggerCandidate> CollectDamageTriggerCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window)
+    internal IReadOnlyList<DamageTriggerCandidate> CollectDamageTriggerCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window)
     {
         var candidates = new List<DamageTriggerCandidate>();
         foreach (var programOwnerSeat in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive).Select(player => player.Seat))
@@ -124,5 +120,5 @@ internal sealed partial class CoreNativeDamageWindowsRuntime
         return candidates;
     }
 
-    internal static bool MatchesAfterDamageProgramSource(global::CardGame.Core.GameEngine.IDamageAttempt attack, SkillProgramTrigger trigger) => attack.ConversionSource is { } source && string.Equals(source.SkillId, trigger.SourceSkillId, StringComparison.Ordinal) && (trigger.SourceViewAsId is null || string.Equals(source.BindingId, trigger.SourceViewAsId, StringComparison.Ordinal));
+    internal static bool MatchesAfterDamageProgramSource(GameEngine.IDamageAttempt attack, SkillProgramTrigger trigger) => attack.ConversionSource is { } source && string.Equals(source.SkillId, trigger.SourceSkillId, StringComparison.Ordinal) && (trigger.SourceViewAsId is null || string.Equals(source.BindingId, trigger.SourceViewAsId, StringComparison.Ordinal));
 }

@@ -2,5 +2,5 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineNextActualUsePindianAiEntries
 {
-    internal bool HasNextActualUsePindianStructure(global::CardGame.Core.SkillProgramActivation activation) => _resolve().HasNextActualUsePindianStructure(activation);
+    internal bool HasNextActualUsePindianStructure(SkillProgramActivation activation) => _resolve().HasNextActualUsePindianStructure(activation);
 }

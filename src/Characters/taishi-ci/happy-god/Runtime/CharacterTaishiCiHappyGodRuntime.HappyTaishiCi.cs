@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTaishiCiHappyGodRuntime
@@ -39,10 +35,10 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
     {
         if (fact.Marker != PlayerMarkerKind.ShenTaishiCiWei || fact.Delta >= 0 || !_coreMatchParticipantsPlayersAccess._players.Any(p => _coreNativeSkillContextQueriesOperations.HasProgramSkill(p, HappyTscPowei)) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TriggerId: "damage-removes-wei" } f || !IsShenTscPoweiFamily(f.SkillId) || f.Id != fact.ResolutionId || fact.SkillOwnerSeat != f.OwnerSeat || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, TargetSeat: { } target } || target != fact.PlayerSeat)
             return;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyTaishiCiWeiRemovedEvent(f.Id, global::CardGame.Core.EngineOwners.CharacterTaishiCiMobileGodRuntime.ShenTscSource(f), target, -fact.Delta, _coreActualRoundProgressRoundNumberAccess._roundNumber));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyTaishiCiWeiRemovedEvent(f.Id, CharacterTaishiCiMobileGodRuntime.ShenTscSource(f), target, -fact.Delta, _coreActualRoundProgressRoundNumberAccess._roundNumber));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHappyTaishiCiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    SkillProgramStepOutcome IHappyTaishiCiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.ResolveHappyTaishiCiChongwei => _characterTaishiCiMobileGodOperations.ResolveShenTscPowei(f),
         SkillProgramEffectOp.RecoverHappyTaishiCiDulie => RecoverHappyTsc(f),
@@ -69,7 +65,7 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
         if (awake ? f.SkillId != HappyTscPowei || context.Window != SkillProgramTriggerWindow.AfterTurnEnded || HappyTscAwakened(f.OwnerSeat) || HappyTscFieldWei() != 0 : op != SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash || f.SkillId != HappyTscShenzhu || context.Window != SkillProgramTriggerWindow.TurnBeforeStart)
             throw new InvalidOperationException("Happy Taishi Ci lost its actual awakening or own-turn start.");
         var count = awake ? _coreProgramEventHistoryOperations.ProgramEventHistory<HappyTaishiCiWeiRemovedEvent>().Where(e => e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber).Sum(e => e.Count) : 1;
-        var r = new HappyTaishiCiReceipt(global::CardGame.Core.EngineOwners.CharacterTaishiCiMobileGodRuntime.ShenTscSource(f), f.GameplayHash, context.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreActualRoundProgressRoundNumberAccess._roundNumber, op, count, awake ? HappyTaishiCiStage.GrantChildren : HappyTaishiCiStage.MovementChildren, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
+        var r = new HappyTaishiCiReceipt(CharacterTaishiCiMobileGodRuntime.ShenTscSource(f), f.GameplayHash, context.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreActualRoundProgressRoundNumberAccess._roundNumber, op, count, awake ? HappyTaishiCiStage.GrantChildren : HappyTaishiCiStage.MovementChildren, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyTaishiCi = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyTaishiCiStartedEvent(f.Id, r.Source, r.Hash, r.Parent, r.Turn, r.Round, r.Op, r.Count));
         if (awake)
@@ -81,7 +77,7 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
         {
             // The draw pile's first printed Slash is a real existing entity;
             // hand identity conversions do not change cards in this public source.
-            var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind));
+            var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind));
             if (card is not null)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyTaishiCi = r with { CardId = card.Id } });

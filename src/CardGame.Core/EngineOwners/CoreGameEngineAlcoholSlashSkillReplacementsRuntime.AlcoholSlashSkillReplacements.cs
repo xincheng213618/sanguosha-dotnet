@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
 {
-    internal static bool IsAlcoholSlashSkillReplacementTrigger(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_AlcoholSlashSkillReplacements.IsAlcoholSlashSkillReplacementTrigger(trigger);
-    internal static string AlcoholSlashReplacementGrantSource(int owner, string skill, string instance) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_AlcoholSlashSkillReplacements.AlcoholSlashReplacementGrantSource(owner, skill, instance);
+    internal static bool IsAlcoholSlashSkillReplacementTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_AlcoholSlashSkillReplacements.IsAlcoholSlashSkillReplacementTrigger(trigger);
+    internal static string AlcoholSlashReplacementGrantSource(int owner, string skill, string instance) => RuntimeSkills.RuntimeRules_Core_AlcoholSlashSkillReplacements.AlcoholSlashReplacementGrantSource(owner, skill, instance);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 941)]
     internal bool CanOfferAlcoholSlashSkillReplacement(SkillProgramTrigger trigger, ProgramSkillWindowContext context, int ownerSeat)
     {
@@ -20,10 +16,10 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
         return TryGetPermanentAlcoholSlashUse(attack, out _);
     }
 
-    internal bool TryGetPermanentAlcoholSlashUse(global::CardGame.Core.GameEngine.IDamageAttempt attack, out CardUseFrame use)
+    internal bool TryGetPermanentAlcoholSlashUse(GameEngine.IDamageAttempt attack, out CardUseFrame use)
     {
         use = null !;
-        if (attack.IsSourceLess || !attack.DamageWasApplied || attack.DamageAmount <= 0 || attack.SourceSeat != attack.CardUserSeat || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ConsumedAlcoholBoost: true, ConsumedAlcoholBonus: > 0, Action: { Type: CardActionType.Use } action } original || action.ActorSeat != attack.SourceSeat || original.SourceSeat != attack.SourceSeat || original.CardKind != kind || action.EffectiveKind != kind)
+        if (attack.IsSourceLess || !attack.DamageWasApplied || attack.DamageAmount <= 0 || attack.SourceSeat != attack.CardUserSeat || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ConsumedAlcoholBoost: true, ConsumedAlcoholBonus: > 0, Action: { Type: CardActionType.Use } action } original || action.ActorSeat != attack.SourceSeat || original.SourceSeat != attack.SourceSeat || original.CardKind != kind || action.EffectiveKind != kind)
             return false;
         if (_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseAlcoholConsumptionCapturedEvent>().Where(e => e.CardUseFrameId == original.Id).ToArray()is not [var fact] || fact.ActionId != action.ActionId || fact.ActorSeat != attack.SourceSeat || fact.AlcoholBonus != original.ConsumedAlcoholBonus)
             return false;
@@ -58,7 +54,7 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
         {
             ProgramFrameId = f.Id,
             InstructionIndex = f.InstructionIndex,
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             DamageWindowId = window.Id,
             DamageFrameId = damage.Id,
@@ -96,7 +92,7 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
 
     internal bool ValidAlcoholSlashSkillReplacementReceipt(ProgramSkillFrame f)
     {
-        if (f.AlcoholSlashSkillReplacement is not { } r || f.InstructionIndex != 1 || r.InstructionIndex != 1 || r.ProgramFrameId != f.Id || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.PendingMovementContinuation is not null || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || !IsAlcoholSlashSkillReplacementTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f)) || !_coreOrderedPrintedSkillLossObserversOperations.ExactOrderedPrintedSkillLossParent(f, out var window, out var damage, out var attack) || attack.SourceSeat != f.OwnerSeat || !TryGetPermanentAlcoholSlashUse(attack, out var use) || r.DamageWindowId != window.Id || r.DamageFrameId != damage.Id || r.CardUseFrameId != use.Id || r.CardActionId != use.Action!.ActionId || r.TargetSeat != damage.TargetSeat || r.DamageAmount != damage.Amount || r.Nature != damage.Nature || r.AlcoholBonus != use.ConsumedAlcoholBonus)
+        if (f.AlcoholSlashSkillReplacement is not { } r || f.InstructionIndex != 1 || r.InstructionIndex != 1 || r.ProgramFrameId != f.Id || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.PendingMovementContinuation is not null || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || !IsAlcoholSlashSkillReplacementTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f)) || !_coreOrderedPrintedSkillLossObserversOperations.ExactOrderedPrintedSkillLossParent(f, out var window, out var damage, out var attack) || attack.SourceSeat != f.OwnerSeat || !TryGetPermanentAlcoholSlashUse(attack, out var use) || r.DamageWindowId != window.Id || r.DamageFrameId != damage.Id || r.CardUseFrameId != use.Id || r.CardActionId != use.Action!.ActionId || r.TargetSeat != damage.TargetSeat || r.DamageAmount != damage.Amount || r.Nature != damage.Nature || r.AlcoholBonus != use.ConsumedAlcoholBonus)
             return false;
         var effect = _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects.Single();
         var source = AlcoholSlashReplacementGrantSource(f.OwnerSeat, f.SkillId, f.SkillInstanceId);
@@ -112,15 +108,15 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
         ) == new SkillGrant(expectedGrantId, effect.SourceBind!, expectedInstance, source) && (!r.GrantAdded || r.GrantedGrant.IsEnabled) && facts is [var issued] && SameAlcoholSlashReplacementReceipt(r, issued.Receipt) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == SkillProgramTriggerWindow.AfterDamageApplied) == 1;
     }
 
-    internal static bool SamePermanentGrantIdentity(SkillGrant left, SkillGrant right) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_AlcoholSlashSkillReplacements.SamePermanentGrantIdentity(left, right);
-    internal static bool SameAlcoholSlashReplacementReceipt(AlcoholSlashSkillReplacementReceipt left, AlcoholSlashSkillReplacementReceipt right) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_AlcoholSlashSkillReplacements.SameAlcoholSlashReplacementReceipt(left, right);
+    internal static bool SamePermanentGrantIdentity(SkillGrant left, SkillGrant right) => RuntimeSkills.RuntimeRules_Core_AlcoholSlashSkillReplacements.SamePermanentGrantIdentity(left, right);
+    internal static bool SameAlcoholSlashReplacementReceipt(AlcoholSlashSkillReplacementReceipt left, AlcoholSlashSkillReplacementReceipt right) => RuntimeSkills.RuntimeRules_Core_AlcoholSlashSkillReplacements.SameAlcoholSlashReplacementReceipt(left, right);
     internal bool WasGrantPermanentlyRevokedAfterLoss(int ownerSeat, SkillGrant grant, IGameEvent originalLoss)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ReplaceOwnSkillsAfterAlcoholSlashDamage) && !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolvePrepPoisonOutcomeByRound) && !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveShenHuaTuoHuandao) && !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.TeachMobileShenHuaTuoWuling) && !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMobileShenLuBuWuqian))
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var lossIndex = Array.FindIndex(history, e => ReferenceEquals(e, originalLoss));
-        return history.Skip(lossIndex + 1).OfType<ProgramAlcoholSlashSkillsReplacedEvent>().Any(e => e.Receipt.Source.OwnerSeat == ownerSeat && e.Receipt.RevokedGrants.Any(revoked => SamePermanentGrantIdentity(grant, revoked))) || history.Skip(lossIndex + 1).OfType<PrepPoisonGrantRevokedEvent>().Any(e => e.OwnerSeat == ownerSeat && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime.SameRoundSkillIdentity(grant, e.Grant)) || history.Skip(lossIndex + 1).OfType<ShenHuaTuoSkillRevokedEvent>().Any(e => e.TargetSeat == ownerSeat && e.GrantId == grant.GrantId && e.SkillId == grant.SkillId && e.SkillInstanceId == grant.SkillInstanceId && e.SourceId == grant.SourceId) || history.Skip(lossIndex + 1).OfType<MobileWulingGrantRevokedEvent>().Any(e => e.TargetSeat == ownerSeat && e.GrantId == grant.GrantId && e.SkillId == grant.SkillId && e.SkillInstanceId == grant.SkillInstanceId && e.SourceId == grant.SourceId) || history.Skip(lossIndex + 1).OfType<MobileLuBuWushuangRevokedEvent>().Any(e => e.TargetSeat == ownerSeat && e.GrantId == grant.GrantId && e.SkillId == grant.SkillId && e.SkillInstanceId == grant.SkillInstanceId && e.SourceId == grant.SourceId);
+        return history.Skip(lossIndex + 1).OfType<ProgramAlcoholSlashSkillsReplacedEvent>().Any(e => e.Receipt.Source.OwnerSeat == ownerSeat && e.Receipt.RevokedGrants.Any(revoked => SamePermanentGrantIdentity(grant, revoked))) || history.Skip(lossIndex + 1).OfType<PrepPoisonGrantRevokedEvent>().Any(e => e.OwnerSeat == ownerSeat && CoreGameEngineDamageTargetSkillRoundDrawRuntime.SameRoundSkillIdentity(grant, e.Grant)) || history.Skip(lossIndex + 1).OfType<ShenHuaTuoSkillRevokedEvent>().Any(e => e.TargetSeat == ownerSeat && e.GrantId == grant.GrantId && e.SkillId == grant.SkillId && e.SkillInstanceId == grant.SkillInstanceId && e.SourceId == grant.SourceId) || history.Skip(lossIndex + 1).OfType<MobileWulingGrantRevokedEvent>().Any(e => e.TargetSeat == ownerSeat && e.GrantId == grant.GrantId && e.SkillId == grant.SkillId && e.SkillInstanceId == grant.SkillInstanceId && e.SourceId == grant.SourceId) || history.Skip(lossIndex + 1).OfType<MobileLuBuWushuangRevokedEvent>().Any(e => e.TargetSeat == ownerSeat && e.GrantId == grant.GrantId && e.SkillId == grant.SkillId && e.SkillInstanceId == grant.SkillInstanceId && e.SourceId == grant.SourceId);
     }
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 3902)]
@@ -139,5 +135,5 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 3902)]
     internal bool CanContinueAlcoholSlashSkillReplacement(ProgramSkillFrame f) => f.AlcoholSlashSkillReplacement is not null && ValidAlcoholSlashSkillReplacementReceipt(f);
 
-    SkillProgramStepOutcome global::CardGame.Core.IAlcoholSlashSkillReplacementProgramHost.ReplaceOwnSkillsAfterAlcoholSlashDamage(ProgramSkillFrame frame) => ReplaceOwnSkillsAfterAlcoholSlashDamage(frame);
+    SkillProgramStepOutcome IAlcoholSlashSkillReplacementProgramHost.ReplaceOwnSkillsAfterAlcoholSlashDamage(ProgramSkillFrame frame) => ReplaceOwnSkillsAfterAlcoholSlashDamage(frame);
 }

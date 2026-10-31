@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterZhugeGuoOlHasIssuedZhugeGuoStateAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterZhugeGuoOlHasIssuedZhugeGuoStateAccess : IProgramRuntimeOperations
 {
     ref bool _hasIssuedZhugeGuoState { get; }
 }

@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineTurnEndDamageMarkerRuntime
 {
-    void global::CardGame.Core.ITurnEndDamageMarkerProgramHost.AddEndingTurnDamageMarker(ProgramSkillFrame frame, PlayerMarkerKind marker) => AddProgramEndingTurnDamageMarker(frame, marker);
+    void ITurnEndDamageMarkerProgramHost.AddEndingTurnDamageMarker(ProgramSkillFrame frame, PlayerMarkerKind marker) => AddProgramEndingTurnDamageMarker(frame, marker);
     internal void AddProgramEndingTurnDamageMarker(ProgramSkillFrame supplied, PlayerMarkerKind marker)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, Facts: { TurnOwnerDamageDealtThisTurn: { } damage } facts } context || frame.TriggerId is null || frame.ActivationId != frame.TriggerId || frame.InstructionIndex != 1 || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || context.OwnerSeat != frame.OwnerSeat || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || damage < 0 || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not TurnEndingBoundaryFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != frame.OwnerSeat || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber <= 0 || context.SourceSeat != frame.OwnerSeat || context.TargetSeat != frame.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex || facts != (parent.Items[parent.ItemIndex].Facts ?? parent.Facts) || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program is not { } program || program.GameplayHash != frame.GameplayHash)
+        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, Facts: { TurnOwnerDamageDealtThisTurn: { } damage } facts } context || frame.TriggerId is null || frame.ActivationId != frame.TriggerId || frame.InstructionIndex != 1 || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || context.OwnerSeat != frame.OwnerSeat || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || damage < 0 || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not TurnEndingBoundaryFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != frame.OwnerSeat || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber <= 0 || context.SourceSeat != frame.OwnerSeat || context.TargetSeat != frame.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex || facts != (parent.Items[parent.ItemIndex].Facts ?? parent.Facts) || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program is not { } program || program.GameplayHash != frame.GameplayHash)
             throw new InvalidOperationException("Ending-turn damage marker lost its exact owner, ending parent, frozen facts or source.");
         var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(frame);
         TurnEndDamageMarkerContract.ValidateTrigger(frame.SkillId, trigger);
@@ -33,7 +29,7 @@ internal sealed partial class CoreGameEngineTurnEndDamageMarkerRuntime
             var sourceCount = checked(owner.MarkerSourceCounts.GetValueOrDefault(key) + damage);
             owner.MarkerSourceCounts[key] = sourceCount;
             owner.Markers[marker] = countAfter;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(frame.Id, owner.Seat, marker, damage, countAfter, owner.Seat, $"skill-program.{(frame.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame))}.marker"));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(frame.Id, owner.Seat, marker, damage, countAfter, owner.Seat, $"skill-program.{(frame.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame))}.marker"));
         }
 
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramEndingTurnDamageMarkerAddedEvent(frame.Id, source, frame.GameplayHash, parent.Id, parent.TurnNumber, marker, damage, countBefore, countAfter));

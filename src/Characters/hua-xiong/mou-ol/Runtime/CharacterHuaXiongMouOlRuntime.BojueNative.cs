@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaXiongMouOlRuntime
@@ -46,13 +42,13 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
 
     internal bool IsMouHxBojueUse(CardUseFrame use)
     {
-        if (use.MouHxBojueSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { MouHxBojue: { Stage: MouHxBojueStage.NativeUse } r } f || !ValidMouHxBojue(f) || o.Source != r.Source || o.GameplayHash != f.GameplayHash || o.Cursor != r.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || o.Actor != MouHxBojueActor(f) || o.Target != MouHxBojueOther(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHxBojueSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (use.MouHxBojueSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { MouHxBojue: { Stage: MouHxBojueStage.NativeUse } r } f || !ValidMouHxBojue(f) || o.Source != r.Source || o.GameplayHash != f.GameplayHash || o.Cursor != r.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || o.Actor != MouHxBojueActor(f) || o.Target != MouHxBojueOther(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHxBojueSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor);
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 33300)]
-    internal bool FinishMouHxBojueAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishMouHxBojueAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouHxBojueSlash: not null } use || !IsMouHxBojueUse(use))
@@ -92,7 +88,7 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 33300)]
-    internal bool ReturnMouHxBojueAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt receipt)
+    internal bool ReturnMouHxBojueAttack(GameEngine.AttackCompletionReceipt receipt)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouHxBojue: { Stage: MouHxBojueStage.NativeUse, Returned: true } r } f || r.UseId != receipt.ResolutionId)
             return false;

@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanOlMagicRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IMoDiaoChanHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginMoDc(frame, op);
+    SkillProgramStepOutcome IMoDiaoChanHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginMoDc(frame, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 31400)]
     internal bool CanOfferMoDc(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)
     {
@@ -34,7 +31,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var c = f.WindowContext ?? throw new InvalidOperationException("Magic Diao Chan requires her native trigger window.");
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
+        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
         if (f.MoDiaoChan is not null || f.InstructionIndex != 1 || !CanOfferMoDc(candidate, _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
             throw new InvalidOperationException("Magic Diao Chan lost her exact unissued trigger.");
         var stage = op switch
@@ -142,7 +139,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
     [ProgramAnswer("mo-diao-chan")]
     internal void AnswerMoDc(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoDiaoChan: { } r } f || !ValidMoDc(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MoDcChoices(f).Any(c => c.Id == choice.Id && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MoDiaoChan: { } r } f || !ValidMoDc(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MoDcChoices(f).Any(c => c.Id == choice.Id && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Magic Diao Chan choice changed its original private frame.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -327,11 +324,11 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         if (r.Stage == MoDiaoChanStage.DiscardChoice)
         {
             var max = r.Op == SkillProgramEffectOp.ResolveMoDiaoChanHuanhuoRound ? Math.Min(2, _coreMatchParticipantsPlayersAccess._players.Count(x => x.IsAlive && x.Seat != f.OwnerSeat)) : 1;
-            return r.Cards.Count < max ? p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? p.Choices.Single(c => c.Parameters["branch"] == "confirm") : p.Choices.Single(c => c.Parameters["branch"] == "confirm");
+            return r.Cards.Count < max ? p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? p.Choices.Single(c => c.Parameters["branch"] == "confirm") : p.Choices.Single(c => c.Parameters["branch"] == "confirm");
         }
 
         if (r.Stage == MoDiaoChanStage.TargetChoice || r.Stage == MoDiaoChanStage.RedirectChoice)
-            return p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]) ? 1 : 0).ThenBy(c => c.Targets.Single()).First();
+            return p.Choices.OrderBy(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]) ? 1 : 0).ThenBy(c => c.Targets.Single()).First();
         return p.Choices.First(c => c.Parameters["branch"] == "enter");
     }
 }

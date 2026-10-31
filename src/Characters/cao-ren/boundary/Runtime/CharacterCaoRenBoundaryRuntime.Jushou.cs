@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoRenBoundaryRuntime
@@ -31,7 +27,7 @@ internal sealed partial class CharacterCaoRenBoundaryRuntime
         if (_coreEquipmentContentOperations.EquipmentRules.IsEquipment(card.Kind))
         {
             var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-            var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+            var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
             var useId = _coreNativeCardUseOperations.BeginCardUse(card, owner.Seat, [], conversionSource: source);
             _corePhysicalMovementFacadesOperations.MoveCard(card, location, CardLocation.Processing, CardMoveReasons.EquipmentUse);
             if (!_coreFinalizedCardTargetsOperations.TryBeginEquipmentTargetPrograms(owner, card, useId))

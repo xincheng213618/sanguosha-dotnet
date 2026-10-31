@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramPhaseScheduleState(global::CardGame.Core.EngineStates.ProgramPhaseScheduleStorage phaseScheduleStorage, global::CardGame.Core.EngineStates.CoreActualTurnProgressState actualTurnProgressState) : IProgramPhaseScheduleState
+internal sealed class ProgramPhaseScheduleState(EngineStates.ProgramPhaseScheduleStorage phaseScheduleStorage, EngineStates.CoreActualTurnProgressState actualTurnProgressState) : IProgramPhaseScheduleState
 {
     public ProgramPhaseSchedule? Current { get => phaseScheduleStorage.Current; set => phaseScheduleStorage.Current = value; }
 

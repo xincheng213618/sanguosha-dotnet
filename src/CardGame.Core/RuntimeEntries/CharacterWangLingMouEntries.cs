@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterWangLingMouEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterWangLingMouRuntime> _resolve;
-    private CharacterWangLingMouEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterWangLingMouRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterWangLingMouRuntime> _resolve;
+    private CharacterWangLingMouEntries(Func<EngineOwners.CharacterWangLingMouRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterWangLingMouEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterWangLingMouRuntime> resolve) => new(resolve);
+    internal static CharacterWangLingMouEntries Create(Func<EngineOwners.CharacterWangLingMouRuntime> resolve) => new(resolve);
 }

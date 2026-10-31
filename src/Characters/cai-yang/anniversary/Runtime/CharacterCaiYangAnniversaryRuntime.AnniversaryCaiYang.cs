@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiYangAnniversaryRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryCaiYangHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCaiYang(f, op);
+    SkillProgramStepOutcome IAnniversaryCaiYangHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCaiYang(f, op);
     internal SkillProgramStepOutcome BeginCaiYang(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -28,7 +24,7 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
             var first = CaiYangFirstWitness(CaiYangCandidate(f), w) ?? throw new InvalidOperationException("Jiaofeng requires its exact first unfinalized source damage.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryCaiYang = new(CaiYangSource(f), f.GameplayHash, w.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, AnniversaryCaiYangStage.Drawing, FirstDamage: first) });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaiYangJiaofengStartedEvent(f.Id, first));
-            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, 1, global::CardGame.Core.EngineOwners.CharacterCaiYangAnniversaryDefinitions.CaiYangJiaofengDrawReason);
+            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, 1, CharacterCaiYangAnniversaryDefinitions.CaiYangJiaofengDrawReason);
             return SkillProgramStepOutcome.AwaitChild;
         }
 
@@ -146,7 +142,7 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     [ProgramContinuation(ProgramContinuationKind.Movement, 45600)]
     internal bool ReturnCaiYangMovement(ProgramSkillFrame f) => f.AnniversaryCaiYang is not null && ResumeCaiYang(f.Id);
     [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 45600)]
-    internal bool ReturnCaiYangDuel(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnCaiYangDuel(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryCaiYang: { Stage: AnniversaryCaiYangStage.Duel, Duel: { } o } } f || completion.ResolutionId != o.UseId)
             return false;

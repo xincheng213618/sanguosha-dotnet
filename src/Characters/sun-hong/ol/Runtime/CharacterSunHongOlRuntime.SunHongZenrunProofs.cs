@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunHongOlRuntime
 {
-    internal static bool ZenrunChildren(ZenrunStage stage) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_hong_ol_SunHongZenrunProofs.ZenrunChildren(stage);
+    internal static bool ZenrunChildren(ZenrunStage stage) => RuntimeSkills.RuntimeRules_sun_hong_ol_SunHongZenrunProofs.ZenrunChildren(stage);
     internal bool ValidZenrun(ProgramSkillFrame f)
     {
-        if (f.Zenrun is not { } r || f.InstructionIndex != 1 || f.SkillId != "ol:zenrun" || f.TriggerId != "replace-native-draw" || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "replace-native-draw" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != ZenrunSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveZenrunNativeDrawReplacement || f.WindowContext is not { NativeDraw: { } draw } context || draw != r.Draw || context.ParentFrameId != r.WindowId || _coreNativeDrawAttemptsOperations.ExactNativeDrawAttempt(context)is not { } attempt || draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount <= 0 || draw.ActualPhase is null || draw.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || draw.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.SourceSeat) || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Revision < 0 || r.Step < 0 || r.Choice is < 0 or > 2 || r.Selected.Select(s => (s.Zone, s.Index)).Distinct().Count() != r.Selected.Count || r.Selected.Select(s => s.CardId).Distinct().Count() != r.Selected.Count || r.Selected.Count > draw.RequestedCount || r.Selected.Any(s => s.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || s.Index < 0) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZenrunStartedEvent>().Count(e => e == new ZenrunStartedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, draw)) != 1)
+        if (f.Zenrun is not { } r || f.InstructionIndex != 1 || f.SkillId != "ol:zenrun" || f.TriggerId != "replace-native-draw" || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "replace-native-draw" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != ZenrunSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveZenrunNativeDrawReplacement || f.WindowContext is not { NativeDraw: { } draw } context || draw != r.Draw || context.ParentFrameId != r.WindowId || _coreNativeDrawAttemptsOperations.ExactNativeDrawAttempt(context)is not { } attempt || draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount <= 0 || draw.ActualPhase is null || draw.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || draw.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.SourceSeat) || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Revision < 0 || r.Step < 0 || r.Choice is < 0 or > 2 || r.Selected.Select(s => (s.Zone, s.Index)).Distinct().Count() != r.Selected.Count || r.Selected.Select(s => s.CardId).Distinct().Count() != r.Selected.Count || r.Selected.Count > draw.RequestedCount || r.Selected.Any(s => s.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || s.Index < 0) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZenrunStartedEvent>().Count(e => e == new ZenrunStartedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, draw)) != 1)
             return false;
         var window = _resolutionStackOperations._resolutionStack.FirstOrDefault(x => x.Id == r.WindowId) as ProgramLifecycleTriggerWindowFrame;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (window is null || index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != window.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]))
+        if (window is null || index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != window.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]))
             return false;
         var targets = _coreProgramEventHistoryOperations.ProgramEventHistory<ZenrunSourceSelectedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (r.Stage == ZenrunStage.Target)
@@ -91,13 +87,13 @@ internal sealed partial class CharacterSunHongOlRuntime
         if (f.Zenrun is not { Paid: true } r || !ValidZenrun(f))
             return false;
         if (r.Stage == ZenrunStage.CompensationRequest)
-            return f.NativeDraw is not null && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
+            return f.NativeDraw is not null && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (!ZenrunChildren(r.Stage))
             return false;
         if (child is RecoveryReplacementFrame recovery)
             return IsSunHongRecoveryParent(f, recovery);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => ZenrunMovementMatches(f, m));
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => ZenrunMovementMatches(f, m));
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange);

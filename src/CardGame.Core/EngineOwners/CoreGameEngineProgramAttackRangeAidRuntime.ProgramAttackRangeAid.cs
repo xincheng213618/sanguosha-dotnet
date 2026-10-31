@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive)
             throw new InvalidOperationException("The attack-range aid target is no longer alive.");
         var responders = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != targetSeat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(player.Seat, targetSeat)).OrderBy(player => _coreTableOrderOperations.RelativeTableOrder(active.OwnerSeat, player.Seat)).Select(player => player.Seat).ToArray();
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidStartedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, targetSeat, Array.AsReadOnly(responders)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidStartedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, targetSeat, Array.AsReadOnly(responders)));
         _coreMatchLogOperations.AddLog("ActiveSkill", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】，" + $"共有 {(responders.Length)} 名角色依次响应。", active.OwnerSeat, targetSeat);
         if (responders.Length == 0)
             return SkillProgramStepOutcome.Continue;
@@ -79,7 +75,7 @@ internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
         _coreMatchOutcomeStatusAccess._status = responder.IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
 
-    internal static Dictionary<string, string> AttackRangeAidParameters(ProgramSkillFrame frame, ProgramAttackRangeAid aid, CardMoveReason reason, string action) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramAttackRangeAid.AttackRangeAidParameters(frame, aid, reason, action);
+    internal static Dictionary<string, string> AttackRangeAidParameters(ProgramSkillFrame frame, ProgramAttackRangeAid aid, CardMoveReason reason, string action) => RuntimeSkills.RuntimeRules_Core_ProgramAttackRangeAid.AttackRangeAidParameters(frame, aid, reason, action);
     internal void ResolveProgramAttackRangeAid(ProgramSkillFrame frame, SkillProgramEffect effect, PromptChoice selected)
     {
         var aid = frame.AttackRangeAid ?? throw new InvalidOperationException("Missing attack-range aid state.");
@@ -89,7 +85,7 @@ internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
         var responderSeat = aid.ResponderSeats[aid.ResponderIndex];
         var responder = _coreMatchParticipantsPlayersAccess._players[responderSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[aid.TargetSeat];
-        if (aid.Payment is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != responderSeat || !_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices.Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (aid.Payment is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != responderSeat || !_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices.Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Attack-range aid must pay the current original responder exactly once.");
         var before = _coreCardMovementJournalMovementSequenceAccess._movementSequence;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -106,7 +102,7 @@ internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
                 _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(discardInvocation);
                 frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { AttackRangeAid = frame.AttackRangeAid!with { Payment = frame.AttackRangeAid!.Payment!with { After = _coreCardMovementJournalMovementSequenceAccess._movementSequence } } });
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidChoiceResolvedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, responderSeat, aid.TargetSeat, weapon.Id, Array.AsReadOnly(Array.Empty<int>())));
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidChoiceResolvedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, responderSeat, aid.TargetSeat, weapon.Id, Array.AsReadOnly(Array.Empty<int>())));
                 _characterHanDangBoundaryMobileOperations.ContinueProgramAttackRangeAidPayment(frame.Id);
                 return;
             }

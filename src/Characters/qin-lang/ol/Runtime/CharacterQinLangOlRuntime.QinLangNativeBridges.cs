@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQinLangOlRuntime
 {
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.QinLangUseOption> QinLangUseOptions(ProgramSkillFrame f, QinLangXianyingGrantedEvent grant)
+    internal IReadOnlyList<GameEngine.QinLangUseOption> QinLangUseOptions(ProgramSkillFrame f, QinLangXianyingGrantedEvent grant)
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var kind = grant.Name;
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !QinLangImitable(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
             return[];
-        var result = new List<global::CardGame.Core.GameEngine.QinLangUseOption>();
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        var result = new List<GameEngine.QinLangUseOption>();
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, p, new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: []) && !_coreHandComparisonOperations.IsSelfTargetForbiddenAction(actor, kind, [p.Seat]) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, Suit.None, null) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, Suit.None)))
                 result.Add(new(LegalActionKind.Slash, [target.Seat], null, CardKind.Dodge, $"视为对{(target.Name)}使用【杀】"));
@@ -26,11 +22,11 @@ internal sealed partial class CharacterQinLangOlRuntime
         }
         else
         {
-            IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> options;
+            IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> options;
             if (kind == CardKind.FiveGrains)
             {
                 var targets = Enumerable.Range(0, _coreMatchParticipantsPlayersAccess._players.Count).Select(i => _coreTableOrderOperations.TableStepSeat(actor.Seat, i)).Where(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive && (!_coreCardUseModulesOperations.HasTurnCardTargetRestriction(actor.Seat, SkillProgramCardTargetRestriction.SelfOnly) || s == actor.Seat) && !_coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[s], SkillProgramCardPolicyKind.ExcludeGlobalTarget, kind) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, s, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[s], kind, Suit.None, null) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, s, Suit.None)).ToArray();
-                options = targets.Length == 0 || _coreHandComparisonOperations.IsSelfTargetForbiddenAction(actor, kind, targets) || _coreIssuedPlayUsePoliciesOperations.HasIssuedPlayPhaseUseBan(actor.Seat) || _coreNextActualUseTargetAdjustmentsOperations.IsNextActualUseTrickForbidden(actor.Seat, kind) ? [] : _coreNextActualUseTargetAdjustmentsOperations.NextActualUseOrdinaryTrickOptions(actor, Array.AsReadOnly(new[] { new global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption(new("xianying.five-grains"), kind, LegalActionKind.FiveGrains, Array.AsReadOnly(targets), null, null, "视为使用【五谷丰登】") }), Suit.None, null, Suit.None, false);
+                options = targets.Length == 0 || _coreHandComparisonOperations.IsSelfTargetForbiddenAction(actor, kind, targets) || _coreIssuedPlayUsePoliciesOperations.HasIssuedPlayPhaseUseBan(actor.Seat) || _coreNextActualUseTargetAdjustmentsOperations.IsNextActualUseTrickForbidden(actor.Seat, kind) ? [] : _coreNextActualUseTargetAdjustmentsOperations.NextActualUseOrdinaryTrickOptions(actor, Array.AsReadOnly(new[] { new GameEngine.ProgramOrdinaryTrickUseOption(new("xianying.five-grains"), kind, LegalActionKind.FiveGrains, Array.AsReadOnly(targets), null, null, "视为使用【五谷丰登】") }), Suit.None, null, Suit.None, false);
             }
             else
                 options = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: true);
@@ -64,7 +60,7 @@ internal sealed partial class CharacterQinLangOlRuntime
             return;
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var currentTargets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, currentTargets[0], null, 1 + actor.AlcoholDamageBonus, kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[currentTargets[0]], kind));
@@ -91,7 +87,7 @@ internal sealed partial class CharacterQinLangOlRuntime
         var a = current;
         if (use.CurrentSlashFirePolicy is { } fire)
         {
-            if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(o.CardKind) || fire.OriginalKind != o.CardKind || fire.OriginalAction.ActionId != current.ActionId)
+            if (!CoreNativeCardClassificationsRuntime.IsSlashCard(o.CardKind) || fire.OriginalKind != o.CardKind || fire.OriginalAction.ActionId != current.ActionId)
                 return false;
             _coreCurrentSlashFireOffersOperations.AssertCurrentSlashFirePolicy(use);
             a = fire.OriginalAction;
@@ -107,10 +103,10 @@ internal sealed partial class CharacterQinLangOlRuntime
     internal bool HasIssuedQinLangXianyingUse(long id) => IsQinLangXianyingUse(id);
     internal bool MatchesQinLangXianyingUseAction(long id, CardActionContext a, int cardId) => cardId == 0 && IsQinLangXianyingUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action is { } issued && a.ActionId == issued.ActionId && a.Type == CardActionType.Use && a.EffectiveKind == issued.EffectiveKind && a.ActorSeat == issued.ActorSeat && a.ProviderSeat == issued.ProviderSeat && a.PhysicalCards.Count == 0 && a.ConversionChain.SequenceEqual(issued.ConversionChain) && a.TargetSeats.SequenceEqual(issued.TargetSeats) && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed == false;
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 140)]
-    internal bool FinishQinLangXianyingAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishQinLangXianyingAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (!IsQinLangXianyingUse(attack.ResolutionId) || attack.Card is not null || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && kind is not (CardKind.Duel or CardKind.FireAttack))
+        if (!IsQinLangXianyingUse(attack.ResolutionId) || attack.Card is not null || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && kind is not (CardKind.Duel or CardKind.FireAttack))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);

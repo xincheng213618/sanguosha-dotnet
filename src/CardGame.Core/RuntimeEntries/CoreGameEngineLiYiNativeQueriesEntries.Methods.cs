@@ -2,7 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineLiYiNativeQueriesEntries
 {
-    internal bool HasLiYiProspectiveWeaponSlashTarget(global::CardGame.Core.CharacterState actor, global::CardGame.Core.CharacterState target) => _resolve().HasLiYiProspectiveWeaponSlashTarget(actor, target);
-    internal bool HasLiYiWeaponPaymentRange(global::CardGame.Core.CharacterState actor, int targetSeat, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.Card> cards) => _resolve().HasLiYiWeaponPaymentRange(actor, targetSeat, cards);
-    internal int? LiYiPaidSlashWeapon(global::CardGame.Core.CharacterState actor, global::System.Collections.Generic.IReadOnlyList<int> materialIds) => _resolve().LiYiPaidSlashWeapon(actor, materialIds);
+    internal bool HasLiYiProspectiveWeaponSlashTarget(CharacterState actor, CharacterState target) => _resolve().HasLiYiProspectiveWeaponSlashTarget(actor, target);
+    internal bool HasLiYiWeaponPaymentRange(CharacterState actor, int targetSeat, IReadOnlyList<Card> cards) => _resolve().HasLiYiWeaponPaymentRange(actor, targetSeat, cards);
+    internal int? LiYiPaidSlashWeapon(CharacterState actor, IReadOnlyList<int> materialIds) => _resolve().LiYiPaidSlashWeapon(actor, materialIds);
 }

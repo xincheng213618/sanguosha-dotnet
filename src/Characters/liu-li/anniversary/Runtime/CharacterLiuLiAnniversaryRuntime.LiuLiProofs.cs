@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuLiAnniversaryRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     {
         if (f.SkillId == AnniversaryLiuLiComposition.Fuli)
             return f.TriggerId is null && f.ActivationId == "reveal-discard-draw" && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.ActivationId == f.ActivationId) == 1;
-        return f.SkillId == AnniversaryLiuLiComposition.Dehua && f.ActivationId == f.TriggerId && f.TriggerId == "round-damage-name" && f.WindowContext is { Window: SkillProgramTriggerWindow.RoundStarting } c && c.OwnerSeat == f.OwnerSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == c.ParentFrameId)is ProgramLifecycleTriggerWindowFrame w && w.Window == c.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.SkillInstanceId == f.SkillInstanceId && e.BindingId == f.TriggerId && e.Window == c.Window) == 1;
+        return f.SkillId == AnniversaryLiuLiComposition.Dehua && f.ActivationId == f.TriggerId && f.TriggerId == "round-damage-name" && f.WindowContext is { Window: SkillProgramTriggerWindow.RoundStarting } c && c.OwnerSeat == f.OwnerSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == c.ParentFrameId)is ProgramLifecycleTriggerWindowFrame w && w.Window == c.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.SkillInstanceId == f.SkillInstanceId && e.BindingId == f.TriggerId && e.Window == c.Window) == 1;
     }
 
     internal bool LiuLiDiscardProof(ProgramSkillFrame f)
@@ -24,7 +20,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
         // the not-yet-moved state as a completed payment invoice.
         if (r.Stage == AnniversaryLiuLiStage.CostChildren && r.After == r.Before && materials.All(rows => rows.Length == 0))
             return r.Cards.All(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(f.OwnerSeat));
-        return materials.All(rows => rows.Length == 1) && materials.Sum(rows => LiuLiNameLength(_coreAdvancedLifecycleOperations.GetAdvancedCard(rows[0].CardId))) == r.NameSum && materials.Any(rows => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(rows[0].CardKind)) == r.DamageDiscarded && materials.All(rows => (int)global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(rows[0].CardKind) == r.Category) && (r.Stage != AnniversaryLiuLiStage.CostChildren || materials.All(rows => rows[0].Sequence <= r.After));
+        return materials.All(rows => rows.Length == 1) && materials.Sum(rows => LiuLiNameLength(_coreAdvancedLifecycleOperations.GetAdvancedCard(rows[0].CardId))) == r.NameSum && materials.Any(rows => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(rows[0].CardKind)) == r.DamageDiscarded && materials.All(rows => (int)CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(rows[0].CardKind) == r.Category) && (r.Stage != AnniversaryLiuLiStage.CostChildren || materials.All(rows => rows[0].Sequence <= r.After));
     }
 
     internal bool ValidLiuLi(ProgramSkillFrame f)
@@ -39,7 +35,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
                 return r.Plan is null && r.UseId == 0 && r.ActionId == 0;
             if (r.Stage == AnniversaryLiuLiStage.Completed && r.Plan is null)
                 return r.UseId == 0;
-            if (r.Plan is not { } p || !global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(p.Kind) || p.Targets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t)) || p.Targets.Distinct().Count() != p.Targets.Count)
+            if (r.Plan is not { } p || !CoreGameEngineMouLuMengRuntime.IsDamageCardKind(p.Kind) || p.Targets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t)) || p.Targets.Distinct().Count() != p.Targets.Count)
                 return false;
             if (r.Stage == AnniversaryLiuLiStage.IssuingUse)
                 return r.UseId == 0 && r.ActionId == 0;

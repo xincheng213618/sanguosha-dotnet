@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGroupTargetNullificationRuntime
@@ -16,13 +11,13 @@ internal sealed partial class CoreGameEngineGroupTargetNullificationRuntime
         CardKind.FiveGrains => LegalActionKind.FiveGrains,
         CardKind.PeachGarden => LegalActionKind.PeachGarden,
         _ => throw new InvalidOperationException("Unknown group counterspell effect.")};
-    internal CardKind GroupNullificationCardKind(global::CardGame.Core.NativeOwners.GroupCardHandle group) => _characterZhugeGuoLeOperations.IsLeChengyanEffectUse(group.ResolutionId) ? _coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)!.CardKind : group.Card.Kind;
+    internal CardKind GroupNullificationCardKind(NativeOwners.GroupCardHandle group) => _characterZhugeGuoLeOperations.IsLeChengyanEffectUse(group.ResolutionId) ? _coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)!.CardKind : group.Card.Kind;
     internal bool IsGroupTargetNullification(NullificationWindowFrame window) => window.GroupTargetReturn is { } target && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { } group && group.ResolutionId == window.ParentFrameId && group.Card.Id == window.EffectCardId && GroupNullificationCardKind(group) == window.EffectCardKind && group.SourceSeat == window.SourceSeat && group.TargetIndex == target.TargetIndex && target.TargetIndex >= 0 && target.TargetIndex < group.TargetSeats.Count && group.TargetSeats[target.TargetIndex] == target.TargetSeat && window.TargetSeats.SequenceEqual([target.TargetSeat]) && group.CurrentAttack is null && group.NullificationCompletedTargetIndex != target.TargetIndex && window.ActionKind == GroupNullificationAction(group.Card.Kind) && window.RequiredCardKind == group.RequiredCardKind;
-    internal bool TryBeginGroupTargetNullification(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal bool TryBeginGroupTargetNullification(NativeOwners.GroupCardHandle group)
     {
         if (group.NullificationCompletedTargetIndex == group.TargetIndex)
             return false;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(GroupNullificationCardKind(group)) || _coreUnnullifiableOrdinaryTricksOperations.IsOriginalOrdinaryTrickCannotNullify(group.ResolutionId) || _coreOrderedSelectedActorDuelsOperations.IsOrderedSelectedActorDuelCannotNullify(group.ResolutionId) || _characterLuMengMouOperations.IsYingboUnrespondable(group.ResolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(group.ResolutionId))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(GroupNullificationCardKind(group)) || _coreUnnullifiableOrdinaryTricksOperations.IsOriginalOrdinaryTrickCannotNullify(group.ResolutionId) || _coreOrderedSelectedActorDuelsOperations.IsOrderedSelectedActorDuelCannotNullify(group.ResolutionId) || _characterLuMengMouOperations.IsYingboUnrespondable(group.ResolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(group.ResolutionId))
         {
             group.NullificationCompletedTargetIndex = group.TargetIndex;
             return false;
@@ -43,7 +38,7 @@ internal sealed partial class CoreGameEngineGroupTargetNullificationRuntime
         _coreNativeNullificationOperations.ContinueNullificationWindow(window);
         // A recovery step with no responders can apply its current target now.
         // A canceled target or a live response window has already consumed this step.
-        return !recovery || _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not null || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.TargetIndex != targetIndex;
+        return !recovery || _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not null || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.TargetIndex != targetIndex;
     }
 
     internal void CompleteGroupTargetNullification(NullificationWindowFrame window)

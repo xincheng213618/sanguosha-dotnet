@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangCombatTacticsRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CoreGameEngineWushuangCombatTacticsRuntime
             return;
         var action = _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)?.Action;
         var kind = action?.EffectiveKind ?? e.CardKind;
-        var ordinal = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 + _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().Count(f => f.OwnerSeat == e.SourceSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(f.Kind)) : 0;
+        var ordinal = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 + _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().Count(f => f.OwnerSeat == e.SourceSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(f.Kind)) : 0;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangCombatUseFactEvent(e.ResolutionId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualRoundProgressRoundNumberAccess._roundNumber, e.SourceSeat, kind, action?.EffectiveSuit ?? e.PublicCard?.Suit ?? Suit.None, ordinal, _coreMatchParticipantsPlayersAccess._players[e.SourceSeat].HasAlcoholEffect));
     }
 
@@ -60,7 +56,7 @@ internal sealed partial class CoreGameEngineWushuangCombatTacticsRuntime
         }
 
         if (id is 2120 or 2121 or 2122)
-            return _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != gate.OwnerSeat && c.CardUse is { } use && use.ActorSeat != gate.OwnerSeat && use.DesignatedTargetSeats is [var only] && only == gate.OwnerSeat && (id == 2120 || id == 2121 && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.EffectiveKind) == SkillProgramCardCategory.Basic || id == 2122 && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.EffectiveKind) == SkillProgramCardCategory.Trick);
+            return _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != gate.OwnerSeat && c.CardUse is { } use && use.ActorSeat != gate.OwnerSeat && use.DesignatedTargetSeats is [var only] && only == gate.OwnerSeat && (id == 2120 || id == 2121 && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.EffectiveKind) == SkillProgramCardCategory.Basic || id == 2122 && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.EffectiveKind) == SkillProgramCardCategory.Trick);
         if (id == 2116)
             return c.SourceSeat is { } source && source != gate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[source].IsAlive;
         if (id is 2174 or 2175)
@@ -83,14 +79,14 @@ internal sealed partial class CoreGameEngineWushuangCombatTacticsRuntime
             return null;
         if (q.Kind == CardKind.IronChain && _coreWushuangTacticRulesOperations.HasWushuangTactic(q.Actor.Seat, 2007))
             return new FiniteRuleQueryContribution("wushuang:iron-chain-all", SkillRuleOperation.Add, Math.Max(0, _coreMatchDefinitionPlayerCountAccess._playerCount - 2));
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().Any(f => f.OwnerSeat == q.Actor.Seat && f.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(f.Kind)))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().Any(f => f.OwnerSeat == q.Actor.Seat && f.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && CoreNativeCardClassificationsRuntime.IsSlashCard(f.Kind)))
             return null;
         var amount = (_coreWushuangTacticRulesOperations.HasWushuangTactic(q.Actor.Seat, 2033) ? 1 : 0) + (_coreWushuangTacticRulesOperations.HasWushuangTactic(q.Actor.Seat, 2034) ? 2 : 0);
         return amount == 0 ? null : new FiniteRuleQueryContribution("wushuang:first-round-slash-targets", SkillRuleOperation.Add, amount);
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 61400)]
-    internal int WushuangCombatDamageAmount(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int WushuangCombatDamageAmount(GameEngine.IDamageAttempt attack)
     {
         if (!_coreWushuangModeProjectionOperations.IsWushuangMode)
             return 0;
@@ -102,7 +98,7 @@ internal sealed partial class CoreGameEngineWushuangCombatTacticsRuntime
         {
             if (attack.EffectiveCardKind is null)
                 bonus += (_coreWushuangTacticRulesOperations.HasWushuangTactic(source, 2171) ? 1 : 0) + (_coreWushuangTacticRulesOperations.HasWushuangTactic(source, 2172) ? 2 : 0);
-            if (!attack.IsChainPropagation && attack.EffectiveCardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            if (!attack.IsChainPropagation && attack.EffectiveCardKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             {
                 var use = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().LastOrDefault(f => f.CardUseFrameId == attack.ResolutionId);
                 if (use?.SlashOrdinal % 3 == 0)
@@ -112,7 +108,7 @@ internal sealed partial class CoreGameEngineWushuangCombatTacticsRuntime
                 if (_coreWushuangTacticRulesOperations.HasWushuangTactic(source, 2115) && source == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
                 {
                     var previous = _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().LastOrDefault(t => t.ActorSeat == source && t.TurnNumber < _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
-                    if (previous is not null && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().Any(f => f.OwnerSeat == source && f.Turn == previous.TurnNumber && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(f.Kind)))
+                    if (previous is not null && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().Any(f => f.OwnerSeat == source && f.Turn == previous.TurnNumber && CoreNativeCardClassificationsRuntime.IsSlashCard(f.Kind)))
                         bonus++;
                 }
 
@@ -137,7 +133,7 @@ internal sealed partial class CoreGameEngineWushuangCombatTacticsRuntime
 
             if (source == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && !facts.Any(f => f.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && f.SourceSeat == source && !f.SourceLess))
                 bonus += (_coreWushuangTacticRulesOperations.HasWushuangTactic(source, 2333) ? 1 : 0) + (_coreWushuangTacticRulesOperations.HasWushuangTactic(source, 2334) ? 2 : 0);
-            if (attack.EffectiveCardKind is null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(attack.EffectiveCardKind.Value) == SkillProgramCardCategory.Trick)
+            if (attack.EffectiveCardKind is null || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(attack.EffectiveCardKind.Value) == SkillProgramCardCategory.Trick)
                 bonus += (_coreWushuangTacticRulesOperations.HasWushuangTactic(source, 2357) && _coreActualRoundProgressRoundNumberAccess._roundNumber >= 2 ? 2 : 0) + (_coreWushuangTacticRulesOperations.HasWushuangTactic(source, 2358) && _coreActualRoundProgressRoundNumberAccess._roundNumber >= 4 ? 1 : 0) + (_coreWushuangTacticRulesOperations.HasWushuangTactic(source, 2359) && _coreActualRoundProgressRoundNumberAccess._roundNumber >= 3 ? 1 : 0);
         }
 
@@ -153,9 +149,9 @@ internal sealed partial class CoreGameEngineWushuangCombatTacticsRuntime
         return bonus;
     }
 
-    internal bool WushuangFixedDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && _coreWushuangTacticRulesOperations.HasWushuangTactic(attack.SourceSeat, 2210);
+    internal bool WushuangFixedDamage(GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && _coreWushuangTacticRulesOperations.HasWushuangTactic(attack.SourceSeat, 2210);
     [ProgramDamageHook(ProgramDamagePhase.AfterEquipmentChoices, 61400)]
-    internal ProgramDamageInterception WushuangNormalizeFixedDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, DamageNature nature)
+    internal ProgramDamageInterception WushuangNormalizeFixedDamage(GameEngine.IDamageAttempt attack, int amount, DamageNature nature)
     {
         if (!WushuangFixedDamage(attack))
             return ProgramDamageInterception.Continue;
@@ -166,9 +162,9 @@ internal sealed partial class CoreGameEngineWushuangCombatTacticsRuntime
         return ProgramDamageInterception.Continue;
     }
 
-    internal bool WushuangArmorBypass(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && _coreWushuangTacticRulesOperations.HasWushuangTactic(attack.SourceSeat, 2177);
-    internal int WushuangArmorDamageMultiplier(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && _coreWushuangTacticRulesOperations.HasWushuangTactic(attack.SourceSeat, 2193) ? 2 : 1;
-    internal bool WushuangDrunkenSlashUnrespondable(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _coreWushuangTacticRulesOperations.HasWushuangTactic(attack.CardUserSeat, 2001) && (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.ConsumedAlcoholBoost == true || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().LastOrDefault(e => e.CardUseFrameId == attack.ResolutionId)is { Drunken: true });
+    internal bool WushuangArmorBypass(GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && _coreWushuangTacticRulesOperations.HasWushuangTactic(attack.SourceSeat, 2177);
+    internal int WushuangArmorDamageMultiplier(GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && _coreWushuangTacticRulesOperations.HasWushuangTactic(attack.SourceSeat, 2193) ? 2 : 1;
+    internal bool WushuangDrunkenSlashUnrespondable(NativeOwners.CardAttackHandle attack) => _coreWushuangTacticRulesOperations.HasWushuangTactic(attack.CardUserSeat, 2001) && (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.ConsumedAlcoholBoost == true || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().LastOrDefault(e => e.CardUseFrameId == attack.ResolutionId)is { Drunken: true });
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 61400)]
     internal void WushuangExtraAlcoholQuota(JianjiOrdinaryAlcoholPaidEvent e)
     {

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -23,7 +20,7 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
         return last is null || AnniversaryDamageTotal(owner) - last.DamageTotal >= 3;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversarySunQuanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginAnniversarySunQuan(f, operation);
+    SkillProgramStepOutcome IAnniversarySunQuanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginAnniversarySunQuan(f, operation);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 40500, SkillProgramEffectOp.ResolveAnniversarySunQuanJichao)]
     internal bool CanActivateAnniversaryJichao(ProgramActivationLegalityContext q) => AnniversaryJichaoPeers(q.OwnerSeat).Length > 0 || AnniversaryJichaoUnlocked(q.OwnerSeat, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(q.Owner, q.SkillId)) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != q.OwnerSeat && _corePhysicalOwnedCardQueriesOperations.GetJudgment(p).Count > 0);
     internal SkillProgramStepOutcome BeginAnniversarySunQuan(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
@@ -128,7 +125,7 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
     [ProgramAnswer("anniversary-surge")]
     internal void AnswerAnniversarySunQuan(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversarySunQuan: { } r } f || !AnniversarySunQuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversarySunQuan: { } r } f || !AnniversarySunQuanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Jichao requires its exact current branch or other living participant.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

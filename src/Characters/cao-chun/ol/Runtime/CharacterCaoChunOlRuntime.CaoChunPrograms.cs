@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoChunOlRuntime
 {
     internal const string ShanjiaDrawReason = "skill-program.shanjia.draw", ShanjiaDiscardReason = "skill-program.shanjia.discard";
-    internal static CardConversionSource CaoChunSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cao_chun_ol_CaoChunPrograms.CaoChunSource(f);
+    internal static CardConversionSource CaoChunSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cao_chun_ol_CaoChunPrograms.CaoChunSource(f);
     internal bool CaoChunSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     internal SkillProgramStepOutcome ExecuteCaoChun(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
@@ -122,13 +118,13 @@ internal sealed partial class CharacterCaoChunOlRuntime
                         var args = CaoChunArgs("slash");
                         args["effective-kind"] = CardKind.Slash.ToString();
                         args["round-once-cardless"] = "true";
-                        global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
+                        CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
                         result.Add(new(new($"shanjia.{(f.Id)}.cardless.{(source.SkillInstanceId)}.{(source.BindingId)}.{(target.Seat)}"), "使用独立卫境额度视为使用杀", [], [target.Seat], args));
                     }
 
             bool Legal(Card c, CardKind k, CardConversionSource? source = null, IReadOnlyList<int>? ids = null) => _coreNativeTargetLegalityOperations.CanUseSlashTarget(owner, target, c, source, k, physicalCardIds: ids) && _coreAssistedPhysicalCardsOperations.AssistedSlashPaymentHasRange(owner, target.Seat, ids?.Select(_coreCardAttackStateOperations.GetAttackCard).ToArray() ?? [c]);
             foreach (var card in _coreActionQueriesOperations.GetSlashUseCards(owner))
-                foreach (var kind in _coreNativeTargetLegalityOperations.GetSlashUseKinds(owner, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) ? card.Kind : CardKind.Slash))
+                foreach (var kind in _coreNativeTargetLegalityOperations.GetSlashUseKinds(owner, CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) ? card.Kind : CardKind.Slash))
                 {
                     if (!Legal(card, kind) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, [card.Id]))
                         continue;
@@ -138,14 +134,14 @@ internal sealed partial class CharacterCaoChunOlRuntime
                 }
 
             foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).DistinctBy(c => c.Id))
-                foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(k => k != CardKind.Slash))
+                foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(k => k != CardKind.Slash))
                     foreach (var conversion in _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, false))
                     {
                         if (_coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, card) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, [card.Id]) || !Legal(card, kind, conversion))
                             continue;
                         var args = CaoChunArgs("slash");
                         args["effective-kind"] = kind.ToString();
-                        global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, conversion);
+                        CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, conversion);
                         result.Add(new(new($"shanjia.{(f.Id)}.typed.{(kind)}.{(conversion.SkillInstanceId)}.{(conversion.BindingId)}.{(card.Id)}.{(target.Seat)}"), $"将真实材料当{(CardCatalog.Get(kind).DisplayName)}使用", [card.Id], [target.Seat], args));
                     }
 
@@ -167,7 +163,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
                 result.Add(new(new($"shanjia.{(f.Id)}.pair.{(string.Join('-', ids))}.{(target.Seat)}"), "丈八蛇矛使用杀", ids, [target.Seat], args));
             }
 
-            foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+            foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
                 foreach (var selection in _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(owner, kind, false))
                 {
                     var ids = selection.Cards.Select(c => c.Id).ToArray();
@@ -175,7 +171,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
                         continue;
                     var args = CaoChunArgs("slash");
                     args["effective-kind"] = kind.ToString();
-                    global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, selection.Source);
+                    CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, selection.Source);
                     result.Add(new(new($"shanjia.{(f.Id)}.multi.{(selection.Source.SkillInstanceId)}.{(selection.Source.BindingId)}.{(string.Join('-', ids))}.{(target.Seat)}"), "将真实材料当杀使用", ids, [target.Seat], args));
                 }
         }
@@ -214,7 +210,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         RequireCaoChun(f);
         var r = f.CaoChun!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoChunChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoChunChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Shanjia choice changed actual actor, owned payment or target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -292,7 +288,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
         {
             if (choice.Cards.Count == 0)
             {
-                if (choice.Parameters.GetValueOrDefault("round-once-cardless") != "true" || !global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out conversion) || conversion is null)
+                if (choice.Parameters.GetValueOrDefault("round-once-cardless") != "true" || !CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out conversion) || conversion is null)
                     throw new InvalidOperationException("Shanjia cardless request lacks its exact independent source.");
                 independent = _coreRoundOnceCardlessBasicOperations.ConsumeRoundOnceCardlessBasic(conversion, false);
             }
@@ -418,5 +414,5 @@ internal sealed partial class CharacterCaoChunOlRuntime
             throw new InvalidOperationException("Shanjia native Slash lost its issued receipt.");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ICaoChunProgramHost.ExecuteCaoChun(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteCaoChun(f, op);
+    SkillProgramStepOutcome ICaoChunProgramHost.ExecuteCaoChun(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteCaoChun(f, op);
 }

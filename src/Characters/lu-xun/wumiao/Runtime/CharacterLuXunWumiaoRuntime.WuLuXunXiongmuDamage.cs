@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuXunWumiaoRuntime
 {
     internal bool HasWuXiongmuFirstDamageCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveWuLuXunXiongmuFirstDamage);
 
-    internal int WuXiongmuChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation ? -1 : attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
+    internal int WuXiongmuChainCursor(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation ? -1 : attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
     internal XiongmuDamageReceipt? WuXiongmuDamageState(long id) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id) switch
     {
         CardUseFrame c => c.XiongmuDamage,
@@ -62,24 +58,24 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
     }
 
     internal bool ValidWuXiongmuDamage(XiongmuDamageReceipt r) => r.Source.SkillId == WuXiongmuSkill && r.Source.BindingId == "first-damage" && r.Source.OwnerSeat == r.TargetSeat && r.AmountBefore > 0 && r.AmountAfter == Math.Max(0, r.AmountBefore - 1) && r.AttackId > 0 && r.WindowId > 0 && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TurnOwner) && r.ChainCursor >= -1 && _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash == r.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<XiongmuFirstDamageReducedEvent>().Count(e => e.Receipt.ProgramFrameId == r.ProgramFrameId && e.Receipt == (r with { TransferredTargetSeat = null, TransferWindowId = null }) && e.HandCount <= e.Hp) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<XiongmuFirstDamageReducedEvent>().Count(e => e.Receipt.ActualTurn == r.ActualTurn && e.Receipt.TurnOwner == r.TurnOwner && e.Receipt.TargetSeat == r.TargetSeat) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageReducedEvent>().Count(e => e.FrameId == r.ProgramFrameId && e.SkillId == WuXiongmuSkill && e.OwnerSeat == r.TargetSeat && e.TargetSeat == r.TargetSeat && e.AmountBefore == r.AmountBefore && e.AmountAfter == r.AmountAfter) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == r.ProgramFrameId && e.SkillId == r.Source.SkillId && e.BindingId == r.Source.BindingId && e.SkillInstanceId == r.Source.SkillInstanceId && e.OwnerSeat == r.TargetSeat && e.Window == SkillProgramTriggerWindow.BeforeDamageApplied) == 1;
-    internal void SetWuXiongmuChainAmount(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount)
+    internal void SetWuXiongmuChainAmount(GameEngine.IDamageAttempt attack, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || amount < 0)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || amount < 0)
             throw new InvalidOperationException("Xiongmu cannot rebase a foreign native attack.");
-        if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (attack is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, s => s with { DamageAmount = amount });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, s => s!with { DamageAmount = amount });
     }
 
-    internal void PrepareWuXiongmuChainAdvance(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void PrepareWuXiongmuChainAdvance(GameEngine.IDamageAttempt attack)
     {
         if (WuXiongmuDamageState(attack.ResolutionId)is not { } r)
             return;
         if (!ValidWuXiongmuDamage(r))
             throw new InvalidOperationException("Xiongmu lost its exact first-damage invoice before native chain advance.");
-        var remaining = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
-        var cursor = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
+        var remaining = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
+        var cursor = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
         if (remaining is null || !remaining.Skip(cursor).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive))
         {
             ValidateWuXiongmuCurrentAttempt(attack, r);
@@ -116,7 +112,7 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 10)]
-    internal void PrepareWuXiongmuCangxinChainAdvance(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void PrepareWuXiongmuCangxinChainAdvance(GameEngine.IDamageAttempt attack)
     {
         var xiongmu = WuXiongmuDamageState(attack.ResolutionId);
         var cangxin = _characterLuYuShengOlOperations.LuYuShengDamageState(attack.ResolutionId);
@@ -128,8 +124,8 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
         }
 
         var cursor = WuXiongmuChainCursor(attack);
-        var remaining = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
-        var nextIndex = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
+        var remaining = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
+        var nextIndex = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
         if (!attack.IsChainPropagation || xiongmu.AttackId != attack.ResolutionId || cangxin.AttackId != attack.ResolutionId || xiongmu.ChainCursor != cursor || cangxin.ChainCursor != cursor || (xiongmu.TransferredTargetSeat ?? xiongmu.TargetSeat) != attack.TargetSeat || (cangxin.TransferredTargetSeat ?? cangxin.TargetSeat) != attack.TargetSeat || remaining is null || !remaining.Skip(nextIndex).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive))
         {
             _characterLuYuShengOlOperations.PrepareLuYuShengChainAdvance(attack);
@@ -137,7 +133,7 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
             return;
         }
 
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !ValidWuXiongmuDamage(xiongmu) || !ValidWuXiongmuCangxinReduction(cangxin, out var cangxinFact))
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !ValidWuXiongmuDamage(xiongmu) || !ValidWuXiongmuCangxinReduction(cangxin, out var cangxinFact))
             throw new InvalidOperationException("The combined first-damage rebase lost one of its exact paid native recipient invoices.");
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var xIndex = Array.FindIndex(history, e => e is XiongmuFirstDamageReducedEvent fact && fact.Receipt.ProgramFrameId == xiongmu.ProgramFrameId && fact.Receipt == (xiongmu with { TransferredTargetSeat = null, TransferWindowId = null }));
@@ -165,24 +161,24 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiongmuDamageTransferredEvent(r.AttackId, r.WindowId, r.TargetSeat, attack.TargetSeat, r.ChainCursor, w.Id));
     }
 
-    internal void ValidateWuXiongmuCurrentAttempt(global::CardGame.Core.GameEngine.IDamageAttempt attack, XiongmuDamageReceipt receipt)
+    internal void ValidateWuXiongmuCurrentAttempt(GameEngine.IDamageAttempt attack, XiongmuDamageReceipt receipt)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || receipt.AttackId != attack.ResolutionId || (receipt.TransferredTargetSeat ?? receipt.TargetSeat) != attack.TargetSeat || receipt.ChainCursor != WuXiongmuChainCursor(attack) || !ValidWuXiongmuDamage(receipt))
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || receipt.AttackId != attack.ResolutionId || (receipt.TransferredTargetSeat ?? receipt.TargetSeat) != attack.TargetSeat || receipt.ChainCursor != WuXiongmuChainCursor(attack) || !ValidWuXiongmuDamage(receipt))
             throw new InvalidOperationException("Xiongmu cannot retire a different native damage attempt's reduction invoice.");
     }
 
-    internal void ValidateWuXiongmuCangxinCurrentAttempt(global::CardGame.Core.GameEngine.IDamageAttempt attack, LuYuShengDamageReceipt receipt, out LuYuShengDamageAdjustedEvent adjusted)
+    internal void ValidateWuXiongmuCangxinCurrentAttempt(GameEngine.IDamageAttempt attack, LuYuShengDamageReceipt receipt, out LuYuShengDamageAdjustedEvent adjusted)
     {
         adjusted = null !;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || receipt.AttackId != attack.ResolutionId || (receipt.TransferredTargetSeat ?? receipt.TargetSeat) != attack.TargetSeat || receipt.ChainCursor != WuXiongmuChainCursor(attack) || !ValidWuXiongmuCangxinReduction(receipt, out adjusted))
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || receipt.AttackId != attack.ResolutionId || (receipt.TransferredTargetSeat ?? receipt.TargetSeat) != attack.TargetSeat || receipt.ChainCursor != WuXiongmuChainCursor(attack) || !ValidWuXiongmuCangxinReduction(receipt, out adjusted))
             throw new InvalidOperationException("The composed native damage return lost Cangxin's exact completed attempt.");
     }
 
-    internal ProgramSkillFrame CaptureWuXiongmuProgramDamageCompleted(ProgramSkillFrame frame, global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal ProgramSkillFrame CaptureWuXiongmuProgramDamageCompleted(ProgramSkillFrame frame, GameEngine.IDamageAttempt attack)
     {
         if (frame.XiongmuDamage is null && (!HasWuXiongmuFirstDamageCapability || frame.LuYuShengDamage is null))
             return frame;
-        if (attack is not global::CardGame.Core.NativeOwners.ProgramAttackHandle || frame.Id != attack.ResolutionId || frame.AttackAttempt is null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt))
+        if (attack is not NativeOwners.ProgramAttackHandle || frame.Id != attack.ResolutionId || frame.AttackAttempt is null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || !CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt))
             throw new InvalidOperationException("Xiongmu's native program damage return lost its actual completed producer.");
         if (frame.XiongmuDamage is { } xiongmu)
         {
@@ -206,13 +202,13 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
         };
     }
 
-    internal void RetireWuXiongmuCardDamageCompleted(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void RetireWuXiongmuCardDamageCompleted(GameEngine.IDamageAttempt attack)
     {
         var xiongmu = WuXiongmuDamageState(attack.ResolutionId);
         var cangxin = HasWuXiongmuFirstDamageCapability ? _characterLuYuShengOlOperations.LuYuShengDamageState(attack.ResolutionId) : null;
         if (xiongmu is null && cangxin is null)
             return;
-        if (attack is not global::CardGame.Core.NativeOwners.CardAttackHandle || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt))
+        if (attack is not NativeOwners.CardAttackHandle || !CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt))
             throw new InvalidOperationException("Xiongmu cannot clear another native card attack's completed damage state.");
         if (xiongmu is not null)
         {

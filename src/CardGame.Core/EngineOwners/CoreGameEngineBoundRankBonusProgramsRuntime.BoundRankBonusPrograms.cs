@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineBoundRankBonusProgramsRuntime
@@ -60,7 +56,7 @@ internal sealed partial class CoreGameEngineBoundRankBonusProgramsRuntime
         _coreProgramLifecycleOperations.RecoverProgramTargetTo(frame.Id, frame.OwnerSeat, dying.VictimSeat, SkillProgramNumberExpression.IntegerConstant, hp, true);
     }
 
-    void global::CardGame.Core.IBoundRankBonusProgramHost.RevealTopCardsWithNextBooleanBonus(ProgramSkillFrame f, SkillProgramEffect e) => RevealWithNextBooleanBonus(f, e);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundRankBonusProgramHost.ObtainBoundCardsAndArmNextRevealBonus(ProgramSkillFrame f, SkillProgramEffect e) => ObtainAndArmNextRevealBonus(f, e);
-    void global::CardGame.Core.IBoundRankBonusProgramHost.RecoverOtherDyingVictimTo(ProgramSkillFrame f, int hp) => RecoverOtherDyingVictim(f, hp);
+    void IBoundRankBonusProgramHost.RevealTopCardsWithNextBooleanBonus(ProgramSkillFrame f, SkillProgramEffect e) => RevealWithNextBooleanBonus(f, e);
+    SkillProgramStepOutcome IBoundRankBonusProgramHost.ObtainBoundCardsAndArmNextRevealBonus(ProgramSkillFrame f, SkillProgramEffect e) => ObtainAndArmNextRevealBonus(f, e);
+    void IBoundRankBonusProgramHost.RecoverOtherDyingVictimTo(ProgramSkillFrame f, int hp) => RecoverOtherDyingVictim(f, hp);
 }

@@ -1,20 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePrivateCardOffersRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IPrivateOfferProgramHost.DepositPrivateCardOffer(ProgramSkillFrame f, string bind, string resolver) => DepositPrivateCardOffer(f, bind, resolver);
-    SkillProgramStepOutcome global::CardGame.Core.IPrivateOfferProgramHost.ResolvePrivateCardOffer(ProgramSkillFrame f) => BeginDeferredPrivateOffer(f);
-    SkillProgramStepOutcome global::CardGame.Core.IPrivateOfferProgramHost.ResolveGameTargetHandHp(ProgramSkillFrame f, string state) => _coreGameTargetHandHpChoicesOperations.BeginGameTargetHandHp(f, state);
+    SkillProgramStepOutcome IPrivateOfferProgramHost.DepositPrivateCardOffer(ProgramSkillFrame f, string bind, string resolver) => DepositPrivateCardOffer(f, bind, resolver);
+    SkillProgramStepOutcome IPrivateOfferProgramHost.ResolvePrivateCardOffer(ProgramSkillFrame f) => BeginDeferredPrivateOffer(f);
+    SkillProgramStepOutcome IPrivateOfferProgramHost.ResolveGameTargetHandHp(ProgramSkillFrame f, string state) => _coreGameTargetHandHpChoicesOperations.BeginGameTargetHandHp(f, state);
     internal long PrivateOfferSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static string PrivateOfferReason(ProgramSkillFrame f, string segment) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PrivateCardOffers.PrivateOfferReason(f, segment);
-    internal static CardConversionSource PrivateOfferSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PrivateCardOffers.PrivateOfferSource(f);
+    internal static string PrivateOfferReason(ProgramSkillFrame f, string segment) => RuntimeSkills.RuntimeRules_Core_PrivateCardOffers.PrivateOfferReason(f, segment);
+    internal static CardConversionSource PrivateOfferSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_PrivateCardOffers.PrivateOfferSource(f);
     internal SkillProgramStepOutcome DepositPrivateCardOffer(ProgramSkillFrame supplied, string bind, string resolver)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -23,7 +20,7 @@ internal sealed partial class CoreGameEnginePrivateCardOffersRuntime
         if (f.PrivateOffer is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || context.OwnerSeat != f.OwnerSeat || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || set.CardIds is not [var id] || !set.SourceLocations.SequenceEqual([CardLocation.Hand(f.OwnerSeat)]) || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(f.OwnerSeat) || program.Triggers.SingleOrDefault(t => t.Id == resolver)is not { Optional: false, Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } trigger || trigger.Effects is not [{ Op: SkillProgramEffectOp.ResolveDeferredPrivateCardOffer }])
             throw new InvalidOperationException("A deferred private offer requires one exact ending Hand entity, living other and mandatory resolver.");
         var grant = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].SkillGrants.Grants.Single(g => g.SkillId == f.SkillId && g.SkillInstanceId == f.SkillInstanceId);
-        var offer = new DeferredPrivateOfferIdentity(f.Id, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), resolver, f.GameplayHash, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
+        var offer = new DeferredPrivateOfferIdentity(f.Id, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), resolver, f.GameplayHash, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
         var identity = new PrivateTurnHoldIdentity(f.Id, f.SkillId, f.SkillInstanceId, grant.SourceId, int.MaxValue)
         {
             DeferredOffer = offer
@@ -120,8 +117,8 @@ internal sealed partial class CoreGameEnginePrivateCardOffersRuntime
         var r = f.PrivateOffer!;
         var actor = r.Location.PrivateTurnHold!.DeferredOffer!.TargetSeat;
         var card = _cardZonesOperations._cardZones.CardsAt(r.Location).Single(c => c.Id == r.CardId);
-        var category = global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind);
-        var choices = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[actor]).Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == category).Select(c => new PromptChoice(new($"private-offer.{(f.Id)}.give-{(c.Id)}"), $"交给来源【{(c.DisplayName)}】，获得暗置的【{(card.DisplayName)}】", [c.Id], [actor], new Dictionary<string, string> { ["program-action"] = "deferred-private-offer", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = "exchange" })).ToList();
+        var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind);
+        var choices = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[actor]).Where(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == category).Select(c => new PromptChoice(new($"private-offer.{(f.Id)}.give-{(c.Id)}"), $"交给来源【{(c.DisplayName)}】，获得暗置的【{(card.DisplayName)}】", [c.Id], [actor], new Dictionary<string, string> { ["program-action"] = "deferred-private-offer", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = "exchange" })).ToList();
         choices.Add(new(new($"private-offer.{(f.Id)}.remove"), $"移去暗置的【{(card.DisplayName)}】并失去1点体力", [], [actor], new Dictionary<string, string> { ["program-action"] = "deferred-private-offer", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = "remove" }));
         return Array.AsReadOnly(choices.ToArray());
     }
@@ -146,7 +143,7 @@ internal sealed partial class CoreGameEnginePrivateCardOffersRuntime
     internal void ResolveDeferredPrivateOfferChoice(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("No owning private offer.");
-        if (f.PrivateOffer is not { Stage: PrivateOfferStage.ChoosingExchange } r || !_corePrivateOfferReturnsOperations.ValidPrivateOfferReceipt(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } decision || decision.PlayerSeat != r.Location.PrivateTurnHold!.DeferredOffer!.TargetSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], PrivateOfferChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (f.PrivateOffer is not { Stage: PrivateOfferStage.ChoosingExchange } r || !_corePrivateOfferReturnsOperations.ValidPrivateOfferReceipt(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } decision || decision.PlayerSeat != r.Location.PrivateTurnHold!.DeferredOffer!.TargetSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], PrivateOfferChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The private offer choice changed its exact target or material.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var target = decision.PlayerSeat;

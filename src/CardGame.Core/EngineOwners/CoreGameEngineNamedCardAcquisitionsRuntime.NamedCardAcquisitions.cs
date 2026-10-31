@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNamedCardAcquisitionsRuntime
 {
-    internal static string NamedAcquisitionReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NamedCardAcquisitions.NamedAcquisitionReason(f);
+    internal static string NamedAcquisitionReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_NamedCardAcquisitions.NamedAcquisitionReason(f);
     internal IEnumerable<(Card Card, CardLocation From)> PublicNamedCardCandidates(CardKind kind)
     {
         foreach (var p in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive))

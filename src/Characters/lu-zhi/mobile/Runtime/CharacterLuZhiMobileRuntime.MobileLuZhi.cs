@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuZhiMobileRuntime
 {
     internal const string HpDifferencePileDiscard = "skill-program.public-pile.hp-difference-payment";
-    internal bool? HpDifferencePileCardColor(int owner, Card card) => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card));
+    internal bool? HpDifferencePileCardColor(int owner, Card card) => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card));
     internal int HpDifferencePileX(int owner, int target) => _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && _coreMatchParticipantsPlayersAccess._players[target].HasHpValue ? Math.Max(1, Math.Abs(_coreMatchParticipantsPlayersAccess._players[owner].Hp - _coreMatchParticipantsPlayersAccess._players[target].Hp)) : int.MaxValue;
     internal Card[] HpDifferencePileCosts(int owner, string skill, string instance, bool red) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner])).Where(c => HpDifferencePileCardColor(owner, c) == red && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, skill, instance, c) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard)).OrderBy(c => c.Id).ToArray();
     internal IReadOnlyList<int> HpDifferencePileDamageTargets(int owner, string skill, string instance, SkillProgramEffect effect) => _coreProgramLifecycleOperations.GetProgramTargetSeats(owner, SkillProgramTargetKind.OtherLivingInAttackRange).Where(target => _corePublicPileColorsOperations.SameGrantColorPiles(owner, effect.SkillIds.Single(), instance).Any(p => HpDifferencePileCardColor(owner, _corePublicPileSourcesOperations.PublicPileCards(p).Single())is { } red && HpDifferencePileCosts(owner, skill, instance, red).Length >= HpDifferencePileX(owner, target))).ToArray();
@@ -114,15 +111,15 @@ internal sealed partial class CharacterLuZhiMobileRuntime
     internal bool ReturnHpDifferencePileDamage(ProgramSkillFrame f) => f.HpDifferencePileDamage is { Stage: HpDifferencePileDamageStage.Movement } && ResumeHpDifferencePileDamage(f.Id);
     internal bool MobileLuZhiCompletion(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, bool committed = false)
     {
-        if (candidate.SkillId != MobileLuZhiComposition.Zhenliang || context.CardUse is not { } card || _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat == candidate.OwnerSeat || _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber < 1 || !committed && _coreProgramConversionPolarityOperations.GetProgramConversionPolarity(candidate.OwnerSeat, candidate.SkillId) != SkillPolarity.Yin || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != context.Window || window.Action.ActionId != card.CardActionId)
+        if (candidate.SkillId != MobileLuZhiComposition.Zhenliang || context.CardUse is not { } card || _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat == candidate.OwnerSeat || _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber < 1 || !committed && _coreProgramConversionPolarityOperations.GetProgramConversionPolarity(candidate.OwnerSeat, candidate.SkillId) != SkillPolarity.Yin || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != context.Window || window.Action.ActionId != card.CardActionId)
             return false;
-        var action = context.Window == SkillProgramTriggerWindow.CardResponseCompleted ? global::CardGame.Core.EngineOwners.CoreGameEngineResponseCompletionRuntime.ResponseCompletionActorAction(window) : window.Action;
-        if (action.ActorSeat != candidate.OwnerSeat || !_corePublicPileColorsOperations.SameGrantColorPiles(candidate.OwnerSeat, MobileLuZhiComposition.Mingren, candidate.SkillInstanceId).Any(p => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_corePublicPileSourcesOperations.PublicPileCards(p).Single().Kind) == global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind)))
+        var action = context.Window == SkillProgramTriggerWindow.CardResponseCompleted ? CoreGameEngineResponseCompletionRuntime.ResponseCompletionActorAction(window) : window.Action;
+        if (action.ActorSeat != candidate.OwnerSeat || !_corePublicPileColorsOperations.SameGrantColorPiles(candidate.OwnerSeat, MobileLuZhiComposition.Mingren, candidate.SkillInstanceId).Any(p => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_corePublicPileSourcesOperations.PublicPileCards(p).Single().Kind) == CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind)))
             return false;
         return context.Window == SkillProgramTriggerWindow.CardUseCompleted ? action.Type == CardActionType.Use || window.CompletedResponseReturn is { IsCommitted: false } && _coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window) : context.Window == SkillProgramTriggerWindow.CardResponseCompleted && window.ResponseCompletion is { CostsDrained: true } && _coreResponseCompletionOperations.ValidResponseCompletionWindow(window) && !IsMobileLuZhiTrueResponseUse(action);
     }
 
-    internal bool IsMobileLuZhiTrueResponseUse(CardActionContext action) => _coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Nullification) || _coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } kind } attack } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat == action.ActorSeat;
+    internal bool IsMobileLuZhiTrueResponseUse(CardActionContext action) => _coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Nullification) || _coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } kind } attack } && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat == action.ActorSeat;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 81400, SkillProgramEffectOp.CommitConversionPolarity)]
     internal bool CanOfferMobileLuZhiCompletion(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => candidate.SkillId != MobileLuZhiComposition.Zhenliang || MobileLuZhiCompletion(candidate, context);
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 81400)]
@@ -136,7 +133,7 @@ internal sealed partial class CharacterLuZhiMobileRuntime
             throw new InvalidOperationException("Mobile Zhenliang Yin cannot commit without its actual matching-category completion.");
         var ren = _corePublicPileColorsOperations.SameGrantColorPiles(f.OwnerSeat, MobileLuZhiComposition.Mingren, f.SkillInstanceId).Single();
         var renCard = _corePublicPileSourcesOperations.PublicPileCards(ren).Single();
-        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MobileLuZhiYin = new(context.CardUse!.CardActionId, context.ParentFrameId, context.Window, renCard.Id, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(renCard.Kind), _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat) });
+        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MobileLuZhiYin = new(context.CardUse!.CardActionId, context.ParentFrameId, context.Window, renCard.Id, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(renCard.Kind), _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat) });
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 81400)]

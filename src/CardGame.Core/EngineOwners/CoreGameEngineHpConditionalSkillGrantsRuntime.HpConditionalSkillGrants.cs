@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineHpConditionalSkillGrantsRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CoreGameEngineHpConditionalSkillGrantsRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 500)]
     internal bool CanContinueHpConditionalProgram(ProgramSkillFrame frame) => frame.HpConditionalSourceReceipt is { } receipt && receipt.FrameId == frame.Id && receipt.OwnerSeat == frame.OwnerSeat && receipt.SkillId == frame.SkillId && receipt.SkillInstanceId == frame.SkillInstanceId && receipt.GameplayHash == frame.GameplayHash && receipt.GrantId == HpConditionalGrantId(frame.OwnerSeat, receipt.Source) && _contentRegistryOperations._contentRegistry.GetSkill(receipt.Source.CapabilitySkillId).Program?.HpSkillGrants.Any(rule => rule.Id == receipt.Source.RuleId && rule.SkillId == frame.SkillId) == true;
-    internal static string HpConditionalGrantId(int ownerSeat, HpConditionalSkillGrantSource source) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_HpConditionalSkillGrants.HpConditionalGrantId(ownerSeat, source);
+    internal static string HpConditionalGrantId(int ownerSeat, HpConditionalSkillGrantSource source) => RuntimeSkills.RuntimeRules_Core_HpConditionalSkillGrants.HpConditionalGrantId(ownerSeat, source);
     internal bool IsHpConditionalGrantQualified(CharacterState owner, SkillGrant grant)
     {
         if (grant.HpConditionalSource is not { } relation)

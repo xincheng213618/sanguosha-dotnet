@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
@@ -148,7 +144,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
                 MovementAfter = before + 1
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimultaneousPindian = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Processing, global::CardGame.Core.EngineOwners.CoreGameEngineSimultaneousPindianSelectionsDefinitions.SimultaneousTopReservationReason, _ => _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SimultaneousPindianTopCommittedEvent(f.Id, seat, source)), emitCardMovedEvents: false);
+            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Processing, CoreGameEngineSimultaneousPindianSelectionsDefinitions.SimultaneousTopReservationReason, _ => _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SimultaneousPindianTopCommittedEvent(f.Id, seat, source)), emitCardMovedEvents: false);
             if (!_coreSimultaneousPindianOperations.DrainSimultaneousChildren(f))
                 _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
             return;

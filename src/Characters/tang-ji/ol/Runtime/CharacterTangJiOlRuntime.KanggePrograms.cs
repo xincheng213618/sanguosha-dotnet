@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTangJiOlRuntime
@@ -45,7 +41,7 @@ internal sealed partial class CharacterTangJiOlRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreParticipantAndReserveProgramsOperations.SetAttributedNatureMarker(active.OwnerSeat, chosen, PlayerMarkerKind.Kangge, 1, active.Id);
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 的【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】：选择 {(_coreMatchParticipantsPlayersAccess._players[chosen].Name)} 作为“抗歌”对象。", active.OwnerSeat, chosen);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramKanggeChosenEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, chosen));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramKanggeChosenEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, chosen));
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
 
@@ -61,7 +57,7 @@ internal sealed partial class CharacterTangJiOlRuntime
             return SkillProgramStepOutcome.Continue;
         _coreProgramLifecycleOperations.DrawProgramCards(active.Id, owner.Seat, drawn, null, null, SkillProgramCardSetVisibility.Private, new($"skill-program.{(active.SkillId)}.kangge-gain-draw"));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 的【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】:{(_coreMatchParticipantsPlayersAccess._players[gainer].Name)} 于回合外获得手牌，{(owner.Name)} 摸 {(drawn)} 张牌。", active.OwnerSeat, gainer);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramKanggeGainedDrawEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, gainer, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, drawn));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramKanggeGainedDrawEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, gainer, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, drawn));
         return SkillProgramStepOutcome.Continue;
     }
 
@@ -121,7 +117,7 @@ internal sealed partial class CharacterTangJiOlRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame resumed || resumed.Id != frame.Id)
             return;
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 的【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】：令 {(_coreMatchParticipantsPlayersAccess._players[victim].Name)} 回复体力至1点。", active.OwnerSeat, victim);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramKanggeHealedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, victim, _coreActualRoundProgressRoundNumberAccess._roundNumber));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramKanggeHealedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, victim, _coreActualRoundProgressRoundNumberAccess._roundNumber));
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
 
@@ -149,7 +145,7 @@ internal sealed partial class CharacterTangJiOlRuntime
         owner.Hp = Math.Max(0, before - 1);
         _coreHpChangeProgramsOperations.RecordHpChange(active.Id, null, owner.Seat, before, owner.Hp, HpChangeKind.Loss);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillHpLostEvent(active.Id, active.SkillId, owner.Seat, Math.Min(before, 1), owner.Hp));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramKanggeDeathPriceEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, victim, discarded));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramKanggeDeathPriceEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, victim, discarded));
         if (owner.Hp == 0)
         {
             _coreSkillProgramsOperations.BeginProgramSkillDying(active.Id, owner);

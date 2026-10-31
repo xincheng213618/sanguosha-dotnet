@@ -2,5 +2,5 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreProgramPipelineHooksEntries
 {
-    internal global::CardGame.Core.CardKind? ProgramVirtualEquipment(int seat, global::CardGame.Core.EquipmentSlot slot) => _resolve().ProgramVirtualEquipment(seat, slot);
+    internal CardKind? ProgramVirtualEquipment(int seat, EquipmentSlot slot) => _resolve().ProgramVirtualEquipment(seat, slot);
 }

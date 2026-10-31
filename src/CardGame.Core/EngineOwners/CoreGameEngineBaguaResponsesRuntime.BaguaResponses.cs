@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineBaguaResponsesRuntime
 {
-    internal static PromptChoice BaguaSkipChoice(bool factionDefense = false) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_BaguaResponses.BaguaSkipChoice(factionDefense);
+    internal static PromptChoice BaguaSkipChoice(bool factionDefense = false) => RuntimeSkills.RuntimeRules_Core_BaguaResponses.BaguaSkipChoice(factionDefense);
     internal void SkipBaguaResponseCore()
     {
         _coreNativePromptBoundaryOperations.RequireHumanDecision(DecisionKind.RespondDodge);
@@ -23,13 +19,13 @@ internal sealed partial class CoreGameEngineBaguaResponsesRuntime
             _kernelCoreGameEngineRuntimeOperations.AdvanceToHumanBoundary();
     }
 
-    internal void PublishFailedBaguaResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void PublishFailedBaguaResponse(NativeOwners.CardAttackHandle attack)
     {
         var defense = _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense;
         var responder = _coreMatchParticipantsPlayersAccess._players[defense?.CurrentCandidateSeat ?? attack.TargetSeat];
         var cards = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(responder, CardKind.Dodge);
         if (defense is null && _coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(attack)is { } requireRed)
-            cards = cards.Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(responder, card)) == requireRed).ToList();
+            cards = cards.Where(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(responder, card)) == requireRed).ToList();
         if (defense is null)
             _coreNativeResponseWindowsOperations.PushResponseWindow(attack.ResolutionId, attack.SourceSeat, responder.Seat, attack.EffectiveCardKind ?? CardKind.Slash, CardKind.Dodge);
         var choices = defense is not null ? _coreNativeFactionDefenseOperations.CreateFactionDefenseResponseChoices(responder, defense, cards, includeBagua: false) : _coreNativePromptBoundaryOperations.CreateResponseChoices(cards, CardKind.Dodge, attack.EffectiveCardKind, card => _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(responder, card, CardKind.Dodge), includeBagua: false, includeFactionDefense: _coreNativeEquipmentAndFactionQueriesOperations.CanRequestFactionDefense(responder, attack), responder: responder);

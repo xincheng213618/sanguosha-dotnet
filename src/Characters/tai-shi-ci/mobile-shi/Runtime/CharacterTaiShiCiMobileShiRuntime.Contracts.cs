@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICharacterTaiShiCiMobileShiShiTaiShiCiOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterTaiShiCiMobileShiShiTaiShiCiOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ShiTaiShiCiRuntime Get();
+    ShiTaiShiCiRuntime Get();
 }
 
-internal interface ICharacterTaiShiCiMobileShiCoreNativeRuleQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterTaiShiCiMobileShiCoreNativeRuleQueriesOperations : IProgramRuntimeOperations
 {
     int GetAttackRange(int sourceSeat);
 }

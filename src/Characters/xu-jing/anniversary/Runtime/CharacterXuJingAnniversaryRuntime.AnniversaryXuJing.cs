@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXuJingAnniversaryRuntime
 {
-    internal static CardConversionSource AnniversaryXuJingSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource AnniversaryXuJingSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasAnniversaryXuJing => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryXuJingShangyu) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryXuJingCaixia);
 
     internal AnniversaryXuJingMarkedEvent? AnniversaryXuJingMark(int owner, string? instance = null) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXuJingMarkedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner && (instance is null || e.Source.SkillInstanceId == instance));
@@ -24,7 +20,7 @@ internal sealed partial class CharacterXuJingAnniversaryRuntime
     internal int[] AnniversaryXuJingDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => AnniversaryXuJingMark(candidate.OwnerSeat, candidate.SkillInstanceId)is not { } mark ? [] : batch.Movements.Select((movement, index) => (movement, index)).Where(x => x.movement.CardId == mark.CardId && x.movement.To == CardLocation.DiscardPile && x.movement.From != x.movement.To).Select(x => x.index).ToArray();
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 43100)]
     internal int[]? SelectAnniversaryXuJingDiscards(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, ProgramInstructionFeatures features) => features.HasOperation(SkillProgramEffectOp.ResolveAnniversaryXuJingShangyu) ? AnniversaryXuJingDiscardIndexes(batch, candidate) : null;
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? AnniversaryXuJingDamage(ProgramSkillWindowContext context) => _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId && w.ParentFrameId == context.DamageFrameId)is { } window ? _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window) : null;
+    internal GameEngine.IDamageAttempt? AnniversaryXuJingDamage(ProgramSkillWindowContext context) => _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId && w.ParentFrameId == context.DamageFrameId)is { } window ? _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window) : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 43100, SkillProgramEffectOp.ResolveAnniversaryXuJingShangyu, SkillProgramEffectOp.ResolveAnniversaryXuJingCaixia)]
     internal bool CanOfferAnniversaryXuJing(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -36,11 +32,11 @@ internal sealed partial class CharacterXuJingAnniversaryRuntime
             return false;
         if (trigger.Id == "marked-slash-discard")
             return context.MovementBatch is { } batch && context.MovementIndex is { } index && AnniversaryXuJingDiscardIndexes(batch, candidate).Contains(index) && _cardZonesOperations._cardZones.GetLocation(mark.CardId) == CardLocation.DiscardPile && AnniversaryXuJingRecipients(candidate.OwnerSeat, mark.CardId).Length > 0;
-        return AnniversaryXuJingDamage(context)is { IsSourceLess: false, DamageWasApplied: true, EffectiveCardKind: { } kind } damage && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && damage.PhysicalCards.Any(c => c.Id == mark.CardId);
+        return AnniversaryXuJingDamage(context)is { IsSourceLess: false, DamageWasApplied: true, EffectiveCardKind: { } kind } damage && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && damage.PhysicalCards.Any(c => c.Id == mark.CardId);
     }
 
     internal int[] AnniversaryXuJingRecipients(int owner, int card) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXuJingGiftIssuedEvent>().Any(e => e.Source.OwnerSeat == owner && e.CardId == card && e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && e.TargetSeat == p.Seat)).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(owner, p.Seat)).Select(p => p.Seat).ToArray();
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryXuJingHost.Begin(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginAnniversaryXuJing(frame, operation);
+    SkillProgramStepOutcome IAnniversaryXuJingHost.Begin(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginAnniversaryXuJing(frame, operation);
     internal SkillProgramStepOutcome BeginAnniversaryXuJing(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -57,7 +53,7 @@ internal sealed partial class CharacterXuJingAnniversaryRuntime
         var r = new AnniversaryXuJingReceipt(AnniversaryXuJingSource(f), f.GameplayHash, context.ParentFrameId, mode, mode == "caixia" ? AnniversaryXuJingStage.CountChoice : mode == "damage" ? AnniversaryXuJingStage.DrawReady : AnniversaryXuJingStage.GiftChoice, card, user, context.DamageFrameId ?? 0);
         if (mode == "opening")
         {
-            var candidates = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)).ToArray();
+            var candidates = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)).ToArray();
             if (candidates.Length > 0)
                 r = r with
                 {
@@ -141,7 +137,7 @@ internal sealed partial class CharacterXuJingAnniversaryRuntime
     [ProgramAnswer("anniversary-xujing")]
     internal void AnswerAnniversaryXuJing(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryXuJing: { } r } f || !AnniversaryXuJingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryXuJing: { } r } f || !AnniversaryXuJingChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xu Jing rejects a stale gift recipient or draw count.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

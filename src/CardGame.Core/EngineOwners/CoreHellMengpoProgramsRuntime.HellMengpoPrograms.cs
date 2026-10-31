@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreHellMengpoProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IHellMengpoProgramHost.Forget(ProgramSkillFrame frame) => BeginHellWanghun(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IHellMengpoProgramHost.BanCategory(ProgramSkillFrame frame) => IssueHellWangshiBan(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IHellMengpoProgramHost.Restore(ProgramSkillFrame frame) => _coreHellSoulCardsOperations.BeginHellSoulRestoration(frame);
+    SkillProgramStepOutcome IHellMengpoProgramHost.Forget(ProgramSkillFrame frame) => BeginHellWanghun(frame);
+    SkillProgramStepOutcome IHellMengpoProgramHost.BanCategory(ProgramSkillFrame frame) => IssueHellWangshiBan(frame);
+    SkillProgramStepOutcome IHellMengpoProgramHost.Restore(ProgramSkillFrame frame) => _coreHellSoulCardsOperations.BeginHellSoulRestoration(frame);
     internal bool HellEnemies(int first, int second) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(first) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(second) && _coreMatchParticipantsPlayersAccess._players[first].TeamId is { } team && _coreMatchParticipantsPlayersAccess._players[second].TeamId is { } other && team != other;
     internal IReadOnlyList<SkillGrant> HellWanghunEligibleGrants(CharacterState player) => Array.AsReadOnly(_coreNationalSkillsOperations.GetSkillBindingShard(player).ActiveGrants.Where(grant => grant.IsEnabled && !grant.IsModeRule && grant.SkillId is not ("hell:player-tier" or "hell:boss-tier" or "hell:return-soul-resolution") && !grant.SourceId.StartsWith("equipment:", StringComparison.Ordinal) && grant.LordProjection is null && grant.GeneralLibraryProjection is null && !_contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Awakening)).OrderBy(grant => grant.SkillId, StringComparer.Ordinal).ThenBy(grant => grant.GrantId, StringComparer.Ordinal).ToArray());
     internal SkillProgramStepOutcome BeginHellWanghun(ProgramSkillFrame supplied)
@@ -146,12 +141,12 @@ internal sealed partial class CoreHellMengpoProgramsRuntime
     {
         if (transfer.To != CardLocation.DiscardPile)
             return null;
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(transfer.From))
-            return global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(reason) ? transfer.From : null;
+        if (CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(transfer.From))
+            return CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(reason) ? transfer.From : null;
         if (transfer.From != CardLocation.Processing)
             return null;
         var entry = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault(m => m.CardId == transfer.CardId);
-        if (entry is null || entry.To != CardLocation.Processing || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(entry.From) || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(entry.Reason))
+        if (entry is null || entry.To != CardLocation.Processing || !CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(entry.From) || !CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(entry.Reason))
             return null;
         return reason == entry.Reason || reason.Value == entry.Reason.Value + "-finished" || reason.Value == entry.Reason.Value + "-discard" ? entry.From : null;
     }

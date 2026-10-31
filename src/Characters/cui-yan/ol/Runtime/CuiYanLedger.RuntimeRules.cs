@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_cui_yan_ol_CuiYanLedger
 {
     // This is a skill-local semantic projection. Older consumers retain the

@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreHellDizangProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IHellDizangProgramHost.ExecuteHellDizang(ProgramSkillFrame frame, SkillProgramEffectOp operation) => ExecuteHellDizang(frame, operation);
-    internal static CardConversionSource HellDizangSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    SkillProgramStepOutcome IHellDizangProgramHost.ExecuteHellDizang(ProgramSkillFrame frame, SkillProgramEffectOp operation) => ExecuteHellDizang(frame, operation);
+    internal static CardConversionSource HellDizangSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 40080)]
     internal bool AllowsHellDizangTrigger(ProgramTriggerLegalityContext gate)
     {
@@ -116,7 +112,7 @@ internal sealed partial class CoreHellDizangProgramsRuntime
     [ProgramAnswer("hell-dayuan")]
     internal void AnswerHellDayuan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HellDayuan: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HellDayuanChoices(frame).Where(candidate => candidate.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HellDayuan: { } receipt } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HellDayuanChoices(frame).Where(candidate => candidate.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Dayuan lost its exact native chooser and current answer domain.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (receipt.SelectedSuit is null)

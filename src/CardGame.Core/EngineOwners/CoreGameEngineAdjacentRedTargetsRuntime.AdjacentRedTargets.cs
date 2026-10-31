@@ -1,22 +1,19 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAdjacentRedTargetsRuntime
 {
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedAfterCategory, 120)]
-    internal bool AdjacentRedTargetFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.JoinAdjacentRedCardTarget) && (query.Category == SkillProgramCardCategory.Basic || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind));
+    internal bool AdjacentRedTargetFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.JoinAdjacentRedCardTarget) && (query.Category == SkillProgramCardCategory.Basic || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind));
     internal bool HasAdjacentRedTargetCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.JoinAdjacentRedCardTarget);
 
     internal bool TryGetAdjacentRedTargetUse(int owner, ProgramSkillWindowContext context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window)
     {
         use = null !;
         window = null !;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } w || w.ParentFrameId != identity.ParentCardUseFrameId || w.CompletedResponseReturn is not null || w.Continuation is not (ProgramCardContinuation.Slash or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.FinalizedSimpleCard) || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } u || a.ActionId != identity.CardActionId || w.Action.ActionId != a.ActionId || w.Action.ActorSeat != a.ActorSeat || u.SourceSeat != a.ActorSeat || a.EffectiveKind != u.CardKind || !w.Action.TargetSeats.SequenceEqual(u.TargetSeats) || !a.TargetSeats.SequenceEqual(u.TargetSeats) || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(u.CardKind) != SkillProgramCardCategory.Basic && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(u.CardKind))
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } w || w.ParentFrameId != identity.ParentCardUseFrameId || w.CompletedResponseReturn is not null || w.Continuation is not (ProgramCardContinuation.Slash or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.FinalizedSimpleCard) || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } u || a.ActionId != identity.CardActionId || w.Action.ActionId != a.ActionId || w.Action.ActorSeat != a.ActorSeat || u.SourceSeat != a.ActorSeat || a.EffectiveKind != u.CardKind || !w.Action.TargetSeats.SequenceEqual(u.TargetSeats) || !a.TargetSeats.SequenceEqual(u.TargetSeats) || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(u.CardKind) != SkillProgramCardCategory.Basic && !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(u.CardKind))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == w.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != u.Id || u.CardKind == CardKind.BorrowedSword && (u.TargetSeats.Count < 2 || u.TargetSeats.Count % 2 != 0 || u.TargetSeats.Where((_, i) => i % 2 == 0).Distinct().Count() != u.TargetSeats.Count / 2))
@@ -35,7 +32,7 @@ internal sealed partial class CoreGameEngineAdjacentRedTargetsRuntime
     {
         var a = use.Action!;
         var target = _coreMatchParticipantsPlayersAccess._players[owner];
-        if (!target.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || a.ActorSeat == owner || use.TargetSeats.Contains(owner) || !(a.EffectiveIsRed ?? a.EffectiveSuit is Suit.Heart or Suit.Diamond) || !AdjacentRedOriginalPrimaryTargets(use).Any(s => s != owner && _coreMatchParticipantsPlayersAccess._players[s].IsAlive && _coreNativeRuleQueriesOperations.GetCombatDistance(s, owner) == 1) || _coreCardUseModulesOperations.HasTurnCardTargetRestriction(a.ActorSeat, SkillProgramCardTargetRestriction.SelfOnly) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(a.ActorSeat, owner, use.CardKind, use.Id) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, a.EffectiveSuit ?? Suit.None, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(a)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(a.ActorSeat, owner, a.EffectiveSuit))
+        if (!target.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || a.ActorSeat == owner || use.TargetSeats.Contains(owner) || !(a.EffectiveIsRed ?? a.EffectiveSuit is Suit.Heart or Suit.Diamond) || !AdjacentRedOriginalPrimaryTargets(use).Any(s => s != owner && _coreMatchParticipantsPlayersAccess._players[s].IsAlive && _coreNativeRuleQueriesOperations.GetCombatDistance(s, owner) == 1) || _coreCardUseModulesOperations.HasTurnCardTargetRestriction(a.ActorSeat, SkillProgramCardTargetRestriction.SelfOnly) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(a.ActorSeat, owner, use.CardKind, use.Id) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, a.EffectiveSuit ?? Suit.None, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(a)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(a.ActorSeat, owner, a.EffectiveSuit))
             return false;
         // Mandatory target addition ignores use distance and permits a full-HP
         // Peach target (its native recovery may be zero). Public card conditions
@@ -49,7 +46,7 @@ internal sealed partial class CoreGameEngineAdjacentRedTargetsRuntime
             CardKind.Snatch or CardKind.Dismantlement => _corePhysicalOwnedCardQueriesOperations.HasTargetCard(target),
             CardKind.BorrowedSword => _coreNativeBorrowedSwordOperations.GetWeapon(target)is not null && _coreMatchParticipantsPlayersAccess._players.Any(p => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(target, p)),
             CardKind.BarbarianAssault or CardKind.ArrowBarrage or CardKind.PeachGarden or CardKind.FiveGrains => !_coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ExcludeGlobalTarget, use.CardKind),
-            _ => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardKind is CardKind.Peach or CardKind.Alcohol or CardKind.DrawTwo or CardKind.Duel or CardKind.IronChain
+            _ => CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardKind is CardKind.Peach or CardKind.Alcohol or CardKind.DrawTwo or CardKind.Duel or CardKind.IronChain
         };
     }
 
@@ -99,7 +96,7 @@ internal sealed partial class CoreGameEngineAdjacentRedTargetsRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Adjacent red choice lost its owner.");
         var draft = f.AdjacentRedTarget!;
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], draft.Choices.Where(c => c.Id == selected.Id).ToArray()))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], draft.Choices.Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Adjacent red choice must retain its whole published BorrowedSword pair.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         ApplyAdjacentRedTarget(f, selected.Targets);

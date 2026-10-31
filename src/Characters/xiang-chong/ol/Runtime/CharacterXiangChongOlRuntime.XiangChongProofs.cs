@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiangChongOlRuntime
@@ -62,7 +58,7 @@ internal sealed partial class CharacterXiangChongOlRuntime
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 880)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 820)]
     internal bool IsXiangChongRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.XiangChong is { } r && ValidXiang(f) && XiangSilverLionSeats(r).Contains(recovery.Attempt.TargetSeat) && recovery.ParentFrameId == f.Id && recovery.Return == new RecoveryReplacementReturn(PostEventContinuation.Program, f.Id) && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == recovery.Attempt.TargetSeat && recovery.Attempt.Amount == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardKind == CardKind.SilverLion && m.From == CardLocation.Equipment(recovery.Attempt.TargetSeat) && m.Reason == recovery.Attempt.Completion.MoveReason);
-    internal static IEnumerable<int> XiangSilverLionSeats(XiangChongReceipt r) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xiang_chong_ol_XiangChongProofs.XiangSilverLionSeats(r);
+    internal static IEnumerable<int> XiangSilverLionSeats(XiangChongReceipt r) => RuntimeSkills.RuntimeRules_xiang_chong_ol_XiangChongProofs.XiangSilverLionSeats(r);
     internal bool XiangFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.XiangChong is not { Paid: true } r || !ValidXiang(f))
@@ -92,7 +88,7 @@ internal sealed partial class CharacterXiangChongOlRuntime
         var parent = _resolutionStackOperations._resolutionStack[child - 1];
         if (parent is CardUseFrame { XiangChongGuyingEquipment: { } o, Action: { } a } use && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == o.ProgramFrameId)is { } root && MatchesXiangChongEquipment(root, o))
             return current is ProgramCardTriggerWindowFrame w && w.ParentFrameId == use.Id && w.Action.Type == CardActionType.Use && w.Action.ActionId == a.ActionId && w.Action.PhysicalCards.SequenceEqual(a.PhysicalCards);
-        return parent is ProgramCardTriggerWindowFrame window && current is ProgramSkillFrame p && p.WindowContext?.ParentFrameId == window.Id && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { XiangChongGuyingEquipment: { } origin } && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == origin.ProgramFrameId)is { } owner && MatchesXiangChongEquipment(owner, origin) && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(p, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) && _coreCardActionsOperations.CreateCardActionProgramContext2(window, window.Candidates[window.CandidateIndex]) == p.WindowContext;
+        return parent is ProgramCardTriggerWindowFrame window && current is ProgramSkillFrame p && p.WindowContext?.ParentFrameId == window.Id && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { XiangChongGuyingEquipment: { } origin } && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == origin.ProgramFrameId)is { } owner && MatchesXiangChongEquipment(owner, origin) && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(p, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) && _coreCardActionsOperations.CreateCardActionProgramContext2(window, window.Candidates[window.CandidateIndex]) == p.WindowContext;
     }
 
     internal ProgramSkillFrame? XiangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.XiangFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => this.XiangEquipmentObserverEdge(n) || _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRoundOnceCardlessReturnsRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessReturnsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoundOnceCardlessRequestedOwnerDamagedEvent(parent.Id, use.Id, receipt.NativeActionId, damage.SourceSeat, damage.TargetSeat, damage.Amount));
     }
 
-    internal bool RoundOnceCardlessRequestedOwnerWasDamaged(ProgramSkillFrame parent, global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool RoundOnceCardlessRequestedOwnerWasDamaged(ProgramSkillFrame parent, GameEngine.AttackCompletionReceipt completion)
     {
         if (parent.RoundOnceCardlessProgramRequest is not { NativeReturned: true, Receipt: { } receipt } || receipt.NativeUseId != completion.ResolutionId || receipt.RequestOp != SkillProgramEffectOp.RequestSlashByTarget || !_coreRoundOnceCardlessProgramRequestsOperations.CanContinueIssuedRoundOnceCardlessProgramRequest(parent))
             return false;
@@ -23,10 +19,10 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessReturnsRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 100)]
-    internal bool FinishRoundOnceCardlessAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishRoundOnceCardlessAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (attack.Card is not null || !_coreRoundOnceCardlessNativeUsesOperations.IsRoundOnceCardlessBasicUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (attack.Card is not null || !_coreRoundOnceCardlessNativeUsesOperations.IsRoundOnceCardlessBasicUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);

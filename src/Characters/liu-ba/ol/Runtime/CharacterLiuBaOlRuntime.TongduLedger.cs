@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBaOlRuntime
@@ -36,5 +32,5 @@ internal sealed partial class CharacterLiuBaOlRuntime
     }
 
     [ProgramIssuedTrigger(380)]
-    internal bool IsIssuedTongduCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && CurrentTongduDebt(c, context)is { } d && (!TongduConsumed(d.FrameId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.LiuBa is { DebtId: { } id } && id == d.FrameId && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && f.WindowContext == context));
+    internal bool IsIssuedTongduCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && CurrentTongduDebt(c, context)is { } d && (!TongduConsumed(d.FrameId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.LiuBa is { DebtId: { } id } && id == d.FrameId && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && f.WindowContext == context));
 }

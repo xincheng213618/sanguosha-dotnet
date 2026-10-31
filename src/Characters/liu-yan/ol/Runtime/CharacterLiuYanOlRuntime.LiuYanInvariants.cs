@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYanOlRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
             return false;
         if (r.Operation == SkillProgramEffectOp.DrawTusheForActualNonEquipmentTargets)
         {
-            if (r.Stage != LiuYanStage.TusheDrawChildren || f.SkillId != "ol:tushe" || f.TriggerId != "actual-targets" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Use is not null || r.PaymentSequence is not null || r.RecoveryIssued || f.WindowContext is not { } context || context.ParentFrameId != r.ParentWindowId || context.CardUse?.ParentCardUseFrameId != r.OriginalUseId || context.CardUse.CardActionId != r.ActionId || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == r.ParentWindowId)is not { } parent || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(parent) != SkillProgramTriggerWindow.CardUseTargetsFinalized || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.OriginalUseId)is not { Action: { Type: CardActionType.Use } a } || a.ActionId != r.ActionId || a.ActorSeat != f.OwnerSeat || CardCatalog.Get(a.EffectiveKind).CategoryName == "装备牌")
+            if (r.Stage != LiuYanStage.TusheDrawChildren || f.SkillId != "ol:tushe" || f.TriggerId != "actual-targets" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Use is not null || r.PaymentSequence is not null || r.RecoveryIssued || f.WindowContext is not { } context || context.ParentFrameId != r.ParentWindowId || context.CardUse?.ParentCardUseFrameId != r.OriginalUseId || context.CardUse.CardActionId != r.ActionId || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == r.ParentWindowId)is not { } parent || CoreGameEngineCardActionsRuntime.GetCardActionWindow(parent) != SkillProgramTriggerWindow.CardUseTargetsFinalized || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.OriginalUseId)is not { Action: { Type: CardActionType.Use } a } || a.ActionId != r.ActionId || a.ActorSeat != f.OwnerSeat || CardCatalog.Get(a.EffectiveKind).CategoryName == "装备牌")
                 return false;
             var draws = _coreProgramEventHistoryOperations.ProgramEventHistory<LiuYanTusheDrawnEvent>().Where(e => e.FrameId == f.Id).ToArray();
             return draws is [var d] && d.OwnerSeat == f.OwnerSeat && d.Requested == r.Targets.Count && d.Count == r.DrawCount && d.Before == r.Before && d.After == r.After && r.DrawCount >= 0 && r.DrawCount <= r.Targets.Count && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == LiuYanDrawReason) == r.DrawCount;

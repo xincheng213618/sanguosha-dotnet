@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoCaoOlMagicRuntime
@@ -48,7 +44,7 @@ internal sealed partial class CharacterCaoCaoOlMagicRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeAlcoholDebit, 33800)]
     internal bool MoCaoCaoIssuedHandUse(long id, int actor) => MoCaoCaoEquipment.HasUsePrivilege(id, actor);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 33800)]
-    internal int MoCaoCaoQiBaoDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => global::CardGame.Core.EngineOwners.CoreGameEngineQibaoDaoRuntime.QiBaoDaoDamageBonus(attack.EffectiveCardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.CardUserSeat == attack.SourceSeat, attack.IsSourceLess, attack.IsChainPropagation, _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], CardKind.QiBaoDao), _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].HasHpValue, _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].Hp, _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].MaxHp);
+    internal int MoCaoCaoQiBaoDamage(GameEngine.IDamageAttempt attack) => CoreGameEngineQibaoDaoRuntime.QiBaoDaoDamageBonus(attack.EffectiveCardKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.CardUserSeat == attack.SourceSeat, attack.IsSourceLess, attack.IsChainPropagation, _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], CardKind.QiBaoDao), _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].HasHpValue, _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].Hp, _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].MaxHp);
     internal string? MoCaoCaoEquipmentDescription(int seat) => MoCaoCaoEquipment.VirtualKind(seat, EquipmentSlot.Weapon)is { } weapon && MoCaoCaoEquipment.VirtualKind(seat, EquipmentSlot.Armor)is { } armor ? $"视为装备【{(_coreEquipmentContentOperations.EquipmentRules.Get(weapon).DisplayName)}】、【{(_coreEquipmentContentOperations.EquipmentRules.Get(armor).DisplayName)}】。真实装备区非空时暂停；体力变化重新签发。" : null;
     internal bool MoCaoCaoHasHandPrivilege(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Any(c => MoCaoCaoEquipment.HasHandPrivilege(seat, [c.Id]));
 }

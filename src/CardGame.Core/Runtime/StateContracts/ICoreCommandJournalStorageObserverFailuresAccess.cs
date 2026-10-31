@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreCommandJournalStorageObserverFailuresAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreCommandJournalStorageObserverFailuresAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.ObserverFailure> _observerFailures { get; }
+    ref readonly List<ObserverFailure> _observerFailures { get; }
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYanOlRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 27231, SkillProgramEffectOp.UseLimuSelfIndulgenceAndRecover)]
     internal bool CanActivateLiuYanLimu(CharacterState owner, string skillId) => _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Any(c => LiuYanLimuMaterialLegal(owner, c, skillId));
-    internal bool HasLiuYanLimuTargetAllowance(CharacterState actor, CharacterState target, int? excludedEquipmentId = null, EquipmentSlot? excludedEquipmentSlot = null) => HasLiuYanCapability && actor.IsAlive && target.IsAlive && actor.Seat != target.Seat && _coreNationalSkillsOperations.HasRuntimeSkill(actor, "ol:limu") && _corePhysicalOwnedCardQueriesOperations.GetJudgment(actor).Count > 0 && (_coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(actor.Seat, target.Seat) || global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(actor, target, excludedEquipmentId, excludedEquipmentSlot)) <= global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(actor, excludedEquipmentId, excludedEquipmentSlot)));
+    internal bool HasLiuYanLimuTargetAllowance(CharacterState actor, CharacterState target, int? excludedEquipmentId = null, EquipmentSlot? excludedEquipmentSlot = null) => HasLiuYanCapability && actor.IsAlive && target.IsAlive && actor.Seat != target.Seat && _coreNationalSkillsOperations.HasRuntimeSkill(actor, "ol:limu") && _corePhysicalOwnedCardQueriesOperations.GetJudgment(actor).Count > 0 && (_coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(actor.Seat, target.Seat) || CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(actor, target, excludedEquipmentId, excludedEquipmentSlot)) <= CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(actor, excludedEquipmentId, excludedEquipmentSlot)));
     internal bool HasLiuYanLimuQuotaAllowance(CharacterState actor, CharacterState target, Card? physical, IReadOnlyList<int>? ids, int? excludedId, EquipmentSlot? excludedSlot)
     {
         if (!HasLiuYanCapability)
@@ -29,7 +25,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 80)]
-    internal bool DistanceCardUseExemption80HasLiuYanLimuTargetAllowance(ProgramCardDistanceQuery q) => !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && HasLiuYanLimuTargetAllowance(q.Actor, q.Target, q.ExcludedEquipmentId, q.ExcludedEquipmentSlot);
+    internal bool DistanceCardUseExemption80HasLiuYanLimuTargetAllowance(ProgramCardDistanceQuery q) => !CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) && HasLiuYanLimuTargetAllowance(q.Actor, q.Target, q.ExcludedEquipmentId, q.ExcludedEquipmentSlot);
     [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaBeforeLimit, 80)]
     internal bool LiuYanLimuSlashQuotaBeforeLimit(ProgramSlashQuotaQuery query) => HasLiuYanLimuQuotaAllowance(query.Actor, query.Target, query.PhysicalCard, query.PhysicalCardIds, query.ExcludedEquipmentId, query.ExcludedEquipmentSlot);
 }

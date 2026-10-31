@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,7 +9,7 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
 
     internal bool HasOffTurnUsedCardGiftSource(CharacterState owner) => owner.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetInstanceTriggers(SkillProgramTriggerWindow.DiscardPileReceived).Any(b => b.Trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.GiveOffTurnUsedCards));
     internal int? OffTurnGiftActualTurnOwner() => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreTableSeatQueriesOperations.IsValidPlayerSeat(_coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) ? _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat : null;
-    internal static bool IsOffTurnNativeCompletion(CardMovementRecord m, OffTurnUsedCardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OffTurnUsedCards.IsOffTurnNativeCompletion(m, kind);
+    internal static bool IsOffTurnNativeCompletion(CardMovementRecord m, OffTurnUsedCardKind kind) => RuntimeSkills.RuntimeRules_Core_OffTurnUsedCards.IsOffTurnNativeCompletion(m, kind);
     internal void CaptureOffTurnUsedCards(long batchId, int turnNumber, IReadOnlyList<CardMovementRecord> movements)
     {
         if (!TracksOffTurnUsedCards || !_coreMatchParticipantsPlayersAccess._players.Any(HasOffTurnUsedCardGiftSource) || turnNumber != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || OffTurnGiftActualTurnOwner()is null)
@@ -49,7 +46,7 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
         if (!TracksOffTurnUsedCards || action.Type != CardActionType.Response || action.ActorSeat != action.ProviderSeat && !_characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(action) || action.RequesterSeat is not null || action.ResponderSeat != action.ActorSeat || action.ParentActionId is not null || action.OpponentSeat is not { } opponent || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat) || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == owningUseId)is not { Action: null } parent)
             return;
         OffTurnUsedCardKind kind;
-        if (action.EffectiveKind == CardKind.Dodge && parent.CardAttack is { } attack && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? parent.CardKind) && attack.TargetSeat == action.ActorSeat && attack.SourceSeat == opponent)
+        if (action.EffectiveKind == CardKind.Dodge && parent.CardAttack is { } attack && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? parent.CardKind) && attack.TargetSeat == action.ActorSeat && attack.SourceSeat == opponent)
             kind = OffTurnUsedCardKind.DodgeUse;
         else if (action.EffectiveKind == CardKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } pending && pending.ParentFrameId == parent.Id && pending.SourceSeat == opponent)
             kind = OffTurnUsedCardKind.NullificationUse;
@@ -77,7 +74,7 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
         var parent = action.ParentActionId is { } parentActionId ? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == parentActionId) : legacy is null ? null : _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == legacy.CardUseFrameId && u.CardKind == legacy.ParentKind);
         if (parent is null)
             return false;
-        if (action.EffectiveKind == CardKind.Dodge && parent.CardAttack is { } attack && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? parent.CardKind) && attack.TargetSeat == action.ActorSeat && attack.SourceSeat == action.OpponentSeat)
+        if (action.EffectiveKind == CardKind.Dodge && parent.CardAttack is { } attack && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? parent.CardKind) && attack.TargetSeat == action.ActorSeat && attack.SourceSeat == action.OpponentSeat)
             kind = OffTurnUsedCardKind.DodgeUse;
         else if (action.EffectiveKind == CardKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } pending && pending.ParentFrameId == parent.Id && pending.SourceSeat == action.OpponentSeat)
             kind = OffTurnUsedCardKind.NullificationUse;
@@ -138,9 +135,9 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
 
     internal SkillProgramStepOutcome BeginOffTurnUsedCardGift(ProgramSkillFrame f)
     {
-        if (f.OffTurnUsedCardGift is not null || f.WindowContext is not { MovementBatch: { } batch } context || !CanOfferOffTurnUsedCards(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), context))
+        if (f.OffTurnUsedCardGift is not null || f.WindowContext is not { MovementBatch: { } batch } context || !CanOfferOffTurnUsedCards(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), context))
             throw new InvalidOperationException("An off-turn used-card gift requires its unpaid native discard opportunity.");
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var facts = OffTurnUsedFacts(batch.Id, source, f.GameplayHash);
         var first = facts[0];
         var receipt = new ProgramOffTurnUsedCardGiftReceipt(f.InstructionIndex, context.ParentFrameId, batch.Id, first.CardUseFrameId, first.ActionId, first.EffectiveKind, first.Kind, first.ActualTurnNumber, first.ActualTurnOwnerSeat, source, f.GameplayHash, facts.Select(e => e.Entity).ToArray(), OffTurnGiftRecipients(f.OwnerSeat), OffTurnUsedCardGiftStage.ChoosingRecipient);
@@ -218,7 +215,7 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IOffTurnUsedCardsProgramHost.GiveOffTurnUsedCards(ProgramSkillFrame f) => BeginOffTurnUsedCardGift(f);
+    SkillProgramStepOutcome IOffTurnUsedCardsProgramHost.GiveOffTurnUsedCards(ProgramSkillFrame f) => BeginOffTurnUsedCardGift(f);
     [ProgramPipelineHook(ProgramPipelinePhase.SelectLegacyDiscardIndexes, 300)]
     internal int[]? SelectWindowIndexes_MatchingOffTurnUsedCardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger)
     {

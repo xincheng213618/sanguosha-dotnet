@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengJiChengCuiOlRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
     [ProgramAnswer("xuming-issued-use")]
     internal void AnswerXumingUse(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XumingEnding: { Stage: XumingStage.Choosing } r } f || r.PromiseIndex >= r.Promises.Count || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.Promises[r.PromiseIndex].ActorSeat || !XumingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XumingEnding: { Stage: XumingStage.Choosing } r } f || r.PromiseIndex >= r.Promises.Count || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.Promises[r.PromiseIndex].ActorSeat || !XumingChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Xuming requires the actual counterparty's current complete-material native Use choice.");
         var p = r.Promises[r.PromiseIndex];
         var plan = XumingPlans(f)[int.Parse(selected.Parameters["plan"], System.Globalization.CultureInfo.InvariantCulture)];

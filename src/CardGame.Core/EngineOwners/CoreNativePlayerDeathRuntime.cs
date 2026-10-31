@@ -1,31 +1,27 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreNativePlayerDeathRuntime
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterCaoYuOlEntries _characterCaoYuOlOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries _characterDaQiaoXiaoQiaoHappyGodOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterDongZhaoOlEntries _characterDongZhaoOlOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterHeJinOlEntries _characterHeJinOlOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterYuanYinAnniversaryEntries _characterYuanYinAnniversaryOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries _coreCardAttackStateOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardDamageMaximumHpReplacementEntries _coreCardDamageMaximumHpReplacementOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseModulesEntries _coreCardUseModulesOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineDeathProgramsEntries _coreDeathProgramsOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreNationalGeneralRevealEntries _coreNationalGeneralRevealOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeDamageHandlesEntries _coreNativeDamageHandlesOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreNativeDeathFramesEntries _coreNativeDeathFramesOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
-    internal CoreNativePlayerDeathRuntime(global::CardGame.Core.RuntimeEntries.CharacterCaoYuOlEntries characterCaoYuOlOperations, global::CardGame.Core.RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries characterDaQiaoXiaoQiaoHappyGodOperations, global::CardGame.Core.RuntimeEntries.CharacterDongZhaoOlEntries characterDongZhaoOlOperations, global::CardGame.Core.RuntimeEntries.CharacterHeJinOlEntries characterHeJinOlOperations, global::CardGame.Core.RuntimeEntries.CharacterYuanYinAnniversaryEntries characterYuanYinAnniversaryOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRuntimeAccess modeRuntimeOperations, global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries coreCardAttackStateOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardDamageMaximumHpReplacementEntries coreCardDamageMaximumHpReplacementOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseModulesEntries coreCardUseModulesOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineDeathProgramsEntries coreDeathProgramsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, global::CardGame.Core.RuntimeEntries.CoreNationalGeneralRevealEntries coreNationalGeneralRevealOperations, global::CardGame.Core.RuntimeEntries.CoreNativeDamageHandlesEntries coreNativeDamageHandlesOperations, global::CardGame.Core.RuntimeEntries.CoreNativeDeathFramesEntries coreNativeDeathFramesOperations, global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
+    private readonly RuntimeEntries.CharacterCaoYuOlEntries _characterCaoYuOlOperations;
+    private readonly RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries _characterDaQiaoXiaoQiaoHappyGodOperations;
+    private readonly RuntimeEntries.CharacterDongZhaoOlEntries _characterDongZhaoOlOperations;
+    private readonly RuntimeEntries.CharacterHeJinOlEntries _characterHeJinOlOperations;
+    private readonly RuntimeEntries.CharacterYuanYinAnniversaryEntries _characterYuanYinAnniversaryOperations;
+    private readonly IKernelMatchModeRuntimeAccess _modeRuntimeOperations;
+    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly RuntimeEntries.CoreGameEngineCardAttackStateEntries _coreCardAttackStateOperations;
+    private readonly RuntimeEntries.CoreGameEngineCardDamageMaximumHpReplacementEntries _coreCardDamageMaximumHpReplacementOperations;
+    private readonly RuntimeEntries.CoreGameEngineCardUseModulesEntries _coreCardUseModulesOperations;
+    private readonly RuntimeEntries.CoreGameEngineDeathProgramsEntries _coreDeathProgramsOperations;
+    private readonly RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations;
+    private readonly RuntimeEntries.CoreNationalGeneralRevealEntries _coreNationalGeneralRevealOperations;
+    private readonly RuntimeEntries.CoreNativeDamageHandlesEntries _coreNativeDamageHandlesOperations;
+    private readonly RuntimeEntries.CoreNativeDeathFramesEntries _coreNativeDeathFramesOperations;
+    private readonly IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess;
+    internal CoreNativePlayerDeathRuntime(RuntimeEntries.CharacterCaoYuOlEntries characterCaoYuOlOperations, RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries characterDaQiaoXiaoQiaoHappyGodOperations, RuntimeEntries.CharacterDongZhaoOlEntries characterDongZhaoOlOperations, RuntimeEntries.CharacterHeJinOlEntries characterHeJinOlOperations, RuntimeEntries.CharacterYuanYinAnniversaryEntries characterYuanYinAnniversaryOperations, IKernelMatchModeRuntimeAccess modeRuntimeOperations, IKernelFrameStoreAccess resolutionStackOperations, RuntimeEntries.CoreGameEngineCardAttackStateEntries coreCardAttackStateOperations, RuntimeEntries.CoreGameEngineCardDamageMaximumHpReplacementEntries coreCardDamageMaximumHpReplacementOperations, RuntimeEntries.CoreGameEngineCardUseModulesEntries coreCardUseModulesOperations, RuntimeEntries.CoreGameEngineDeathProgramsEntries coreDeathProgramsOperations, RuntimeEntries.CoreGameEngineRuntimeEntries coreRuntimeOperations, RuntimeEntries.CoreNationalGeneralRevealEntries coreNationalGeneralRevealOperations, RuntimeEntries.CoreNativeDamageHandlesEntries coreNativeDamageHandlesOperations, RuntimeEntries.CoreNativeDeathFramesEntries coreNativeDeathFramesOperations, IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations, EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess coreMatchParticipantsPlayersAccess)
     {
         this._characterCaoYuOlOperations = characterCaoYuOlOperations;
         this._characterDaQiaoXiaoQiaoHappyGodOperations = characterDaQiaoXiaoQiaoHappyGodOperations;

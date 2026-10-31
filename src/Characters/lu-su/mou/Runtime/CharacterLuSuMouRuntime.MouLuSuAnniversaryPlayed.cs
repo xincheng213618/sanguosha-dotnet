@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuSuMouRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         {
             var kind = _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(actor, card, CardKind.Slash);
             var identity = _coreCardConversionsOperations.HasProgramCardIdentity(actor, card);
-            if (!identity && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Slash) && (!_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(actor, card) || _coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(actor, card, kind, true)))
+            if (!identity && CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Slash) && (!_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(actor, card) || _coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(actor, card, kind, true)))
                 plans.Add(new(kind, null, false) { Cards = [card.Id] });
             foreach (var source in identity ? _coreCardConversionsOperations.GetProgramCardIdentitySources(actor, card, kind, true) : _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, true))
                 plans.Add(new(kind, source, false) { Cards = [card.Id] });
@@ -38,7 +34,7 @@ internal sealed partial class CharacterLuSuMouRuntime
 
     internal bool MatchesMouLuSuPlayedDeclaration(ProgramSkillFrame f, CardDeclarationFrame d)
     {
-        if (!MouLuSuAnniversary.Valid(f) || f.MouLuSuAnniversary is not { Stage: MouLuSuAnniversaryStage.PlayedDeclaration, Played: { Source: { } source, Cards: [var cardId] } plan, Response: null, ActionId: 0 } r || d.OwnerSeat != r.Other || d.TurnNumber != r.Turn || d.Return is not { Purpose: CardDeclarationPurpose.MouLuSuAnniversaryPlayed, UseAction: null } ret || ret.ParentFrameId != f.Id || ret.ParentKind != f.Kind || ret.ParentStep != f.Step || ret.ActorSeat != r.Other || ret.TargetSeat != f.OwnerSeat || ret.FinalEffectiveKind != plan.Kind || d.TargetSeats.Count != 0 || d.Payment is not { Claimed: false } p || p.DeclarationId != d.Id || p.OwnerFrameId != d.Id || p.ProviderSeat != r.Other || p.ActorSeat != r.Other || p.Cost.CardId != cardId || p.Cost.From != CardLocation.Hand(r.Other) || p.Source != source || source.OwnerSeat != r.Other || _corePlayCardHistoryOperations.ViewAsRule(source)is not { DeclarationValidation: not null } rule || rule.OutputKind != p.DeclaredKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(p.DeclaredKind, plan.Kind))
+        if (!MouLuSuAnniversary.Valid(f) || f.MouLuSuAnniversary is not { Stage: MouLuSuAnniversaryStage.PlayedDeclaration, Played: { Source: { } source, Cards: [var cardId] } plan, Response: null, ActionId: 0 } r || d.OwnerSeat != r.Other || d.TurnNumber != r.Turn || d.Return is not { Purpose: CardDeclarationPurpose.MouLuSuAnniversaryPlayed, UseAction: null } ret || ret.ParentFrameId != f.Id || ret.ParentKind != f.Kind || ret.ParentStep != f.Step || ret.ActorSeat != r.Other || ret.TargetSeat != f.OwnerSeat || ret.FinalEffectiveKind != plan.Kind || d.TargetSeats.Count != 0 || d.Payment is not { Claimed: false } p || p.DeclarationId != d.Id || p.OwnerFrameId != d.Id || p.ProviderSeat != r.Other || p.ActorSeat != r.Other || p.Cost.CardId != cardId || p.Cost.From != CardLocation.Hand(r.Other) || p.Source != source || source.OwnerSeat != r.Other || _corePlayCardHistoryOperations.ViewAsRule(source)is not { DeclarationValidation: not null } rule || rule.OutputKind != p.DeclaredKind || !CoreNativeCardClassificationsRuntime.MatchesRequiredCard(p.DeclaredKind, plan.Kind))
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<CardDeclarationCommittedEvent>().Count(e => e.DeclarationId == d.Id && e.OwnerSeat == r.Other && e.ActorSeat == r.Other && e.DeclaredKind == p.DeclaredKind && e.TargetSeats.Count == 0) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.CardId == cardId && m.From == p.Cost.From && m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay") == 1;
     }
@@ -121,7 +117,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         if (!_coreCardActionsOperations.TryBeginProgramCardWindow(null, action, SkillProgramTriggerWindow.CardResponseAccepted, [f.OwnerSeat], null))
             FinishMouLuSuPlayedAccepted(f);
     }
-    internal bool IsMouLuSuPlayedWindow(CardActionContext action, SkillProgramTriggerWindow window) => window is SkillProgramTriggerWindow.CardResponseAccepted or SkillProgramTriggerWindow.CardResponseCompleted && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MouLuSuAnniversary: { Response: { } accepted } r } f && MouLuSuAnniversary.Valid(f) && action.ActionId == accepted.ActionId && action.Type == CardActionType.Response && action.ActorSeat == r.Other && action.ProviderSeat == r.Other && action.RequesterSeat is null && action.TargetSeats.Count == 0 && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && r.ActionId == action.ActionId && r.Stage == (window == SkillProgramTriggerWindow.CardResponseAccepted ? MouLuSuAnniversaryStage.PlayedAccepted : MouLuSuAnniversaryStage.PlayedCompleted);
+    internal bool IsMouLuSuPlayedWindow(CardActionContext action, SkillProgramTriggerWindow window) => window is SkillProgramTriggerWindow.CardResponseAccepted or SkillProgramTriggerWindow.CardResponseCompleted && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MouLuSuAnniversary: { Response: { } accepted } r } f && MouLuSuAnniversary.Valid(f) && action.ActionId == accepted.ActionId && action.Type == CardActionType.Response && action.ActorSeat == r.Other && action.ProviderSeat == r.Other && action.RequesterSeat is null && action.TargetSeats.Count == 0 && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && r.ActionId == action.ActionId && r.Stage == (window == SkillProgramTriggerWindow.CardResponseAccepted ? MouLuSuAnniversaryStage.PlayedAccepted : MouLuSuAnniversaryStage.PlayedCompleted);
     internal MouLuSuAnniversaryPlayedReturn? MouLuSuPlayedWindowReturn(CardActionContext action, SkillProgramTriggerWindow window) => IsMouLuSuPlayedWindow(action, window) ? new(_resolutionStackOperations._resolutionStack[^1].Id, action.ActionId, window) : null;
     internal bool TryReturnMouLuSuPlayedWindow(ProgramCardTriggerWindowFrame window)
     {

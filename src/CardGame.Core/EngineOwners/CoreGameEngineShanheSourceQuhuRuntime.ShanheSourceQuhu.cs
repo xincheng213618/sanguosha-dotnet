@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CoreGameEngineShanheSourceQuhuRuntime
     internal const string ShanheSourceQuhuSkill = "shanhe:source-quhu-14190";
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 62050, SkillProgramEffectOp.DamageShanheQuhuOpponentMaximumHp)]
     internal bool AllowsShanheSourceQuhu(ProgramActivationLegalityContext gate) => _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id == ShanheBattleSetup.BattleModeId && _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is not null;
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceQuhuHost.DamageOpponentMaximumHp(ProgramSkillFrame frame, int targetSeat) => DamageShanheQuhuOpponentMaximumHp(frame, targetSeat);
+    SkillProgramStepOutcome IShanheSourceQuhuHost.DamageOpponentMaximumHp(ProgramSkillFrame frame, int targetSeat) => DamageShanheQuhuOpponentMaximumHp(frame, targetSeat);
     internal SkillProgramStepOutcome DamageShanheQuhuOpponentMaximumHp(ProgramSkillFrame supplied, int targetSeat)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

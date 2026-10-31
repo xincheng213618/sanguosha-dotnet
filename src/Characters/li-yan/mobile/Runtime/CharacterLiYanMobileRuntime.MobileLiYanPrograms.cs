@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiYanMobileRuntime
 {
-    void global::CardGame.Core.IMobileLiYanNextDrawHost.Issue(ProgramSkillFrame frame, int targetSeat, int amount) => IssueMobileLiYanNextDrawBonus(frame, targetSeat, amount);
+    void IMobileLiYanNextDrawHost.Issue(ProgramSkillFrame frame, int targetSeat, int amount) => IssueMobileLiYanNextDrawBonus(frame, targetSeat, amount);
     internal void IssueMobileLiYanNextDrawBonus(ProgramSkillFrame supplied, int targetSeat, int amount)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -15,7 +11,7 @@ internal sealed partial class CharacterLiYanMobileRuntime
             throw new InvalidOperationException("Mobile Duliang lost its original one-time selected-target future Draw instruction.");
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive)
             return;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileLiYanNextDrawBonusIssuedEvent(f.Id, f.InstructionIndex, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, targetSeat, amount));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileLiYanNextDrawBonusIssuedEvent(f.Id, f.InstructionIndex, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, targetSeat, amount));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 77900)]

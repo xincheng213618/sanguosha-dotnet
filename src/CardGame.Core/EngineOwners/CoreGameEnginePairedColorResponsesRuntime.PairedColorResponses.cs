@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
 {
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedAfterCategory, 150)]
     internal bool PairedColorResponseFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferPairedColorCardDisposition) && query.Category == SkillProgramCardCategory.Trick;
-    internal const string PairedColorDiscardReason = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardOrigins.PairedColorDiscardReason;
+    internal const string PairedColorDiscardReason = RuntimeSkills.RuntimeRules_Core_ProgramDiscardOrigins.PairedColorDiscardReason;
     internal const string PairedColorObtainReason = "skill-program.paired-color-response.obtain";
     internal long PairedColorSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
@@ -118,7 +113,7 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
         if (!CanOfferPairedColorDisposition(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0), trigger, f.WindowContext!))
             return SkillProgramStepOutcome.Continue;
         var obtain = _coreDamageCounterpartAcquisitionOperations.HasDamageCounterpartAcquisition(f.OwnerSeat, f.SkillId, stateId, counterpart);
-        var receipt = new ProgramPairedColorDispositionReceipt(1, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, stateId, pair, counterpart, obtain);
+        var receipt = new ProgramPairedColorDispositionReceipt(1, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, stateId, pair, counterpart, obtain);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PairedColorDisposition = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PairedColorDispositionStartedEvent(f.Id, receipt.Source, f.GameplayHash, stateId, pair.ResponseActionId, pair.PairedActionId, counterpart, obtain));
         PublishPairedColorDisposition(f);
@@ -141,7 +136,7 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
     internal void ResolvePairedColorDisposition(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The paired-color chooser lost its owning frame.");
-        if (f.PairedColorDisposition is not { Stage: PairedColorDispositionStage.ChoosingCard } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_corePairedColorResponseObserversOperations.IsPairedColorDispositionChoice(f, prompt) || !PairedColorDispositionChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, selected)) || !Enum.TryParse<CardZoneKind>(selected.Parameters.GetValueOrDefault("source-zone"), out var zone) || zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !int.TryParse(selected.Parameters.GetValueOrDefault("slot-index"), out var slot))
+        if (f.PairedColorDisposition is not { Stage: PairedColorDispositionStage.ChoosingCard } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_corePairedColorResponseObserversOperations.IsPairedColorDispositionChoice(f, prompt) || !PairedColorDispositionChoices(f).Any(c => CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, selected)) || !Enum.TryParse<CardZoneKind>(selected.Parameters.GetValueOrDefault("source-zone"), out var zone) || zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !int.TryParse(selected.Parameters.GetValueOrDefault("slot-index"), out var slot))
             throw new InvalidOperationException("Paired-color disposition requires its current exact owner-only published card slot.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.CounterpartSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
         {
@@ -223,6 +218,6 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 530)]
     internal bool CanContinuePairedColorDisposition(ProgramSkillFrame f) => f.PairedColorDisposition is { Stage: PairedColorDispositionStage.MovementChildren } && _corePairedColorResponseObserversOperations.ValidPairedColorDispositionReceipt(f);
     [ProgramAiChoice(SkillProgramEffectOp.OfferPairedColorCardDisposition)]
-    internal PromptChoice SelectAiPairedColorDisposition(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderByDescending(c => c.Parameters.GetValueOrDefault("source-zone") == "Equipment" && c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.PairedColorDisposition!.CounterpartSeat]) : 3).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
-    SkillProgramStepOutcome global::CardGame.Core.IPairedColorResponseHost.OfferPairedColorCardDisposition(ProgramSkillFrame frame, string stateId) => OfferPairedColorCardDisposition(frame, stateId);
+    internal PromptChoice SelectAiPairedColorDisposition(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderByDescending(c => c.Parameters.GetValueOrDefault("source-zone") == "Equipment" && c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.PairedColorDisposition!.CounterpartSeat]) : 3).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    SkillProgramStepOutcome IPairedColorResponseHost.OfferPairedColorCardDisposition(ProgramSkillFrame frame, string stateId) => OfferPairedColorCardDisposition(frame, stateId);
 }

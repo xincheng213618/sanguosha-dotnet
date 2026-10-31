@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAlternativeViewAsCostsRuntime
 {
-    internal static CardKind ProgramBasicCardName(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_AlternativeViewAsCosts.ProgramBasicCardName(kind);
+    internal static CardKind ProgramBasicCardName(CardKind kind) => RuntimeSkills.RuntimeRules_Core_AlternativeViewAsCosts.ProgramBasicCardName(kind);
     internal void RecordProgramUsedBasicCard(int actorSeat, CardKind effectiveKind)
     {
         if (CardCatalog.Get(effectiveKind).CategoryName != "基本牌")
@@ -19,7 +15,7 @@ internal sealed partial class CoreGameEngineAlternativeViewAsCostsRuntime
 
     internal bool HasProgramUsedBasicCardThisTurn(int actorSeat, CardKind kind) => _coreGameEngineAlternativeViewAsCostsUsedProgramBasicCardNamesAccess._usedProgramBasicCardNames.TryGetValue(actorSeat, out var row) && row.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && row.Kinds.Contains(ProgramBasicCardName(kind));
     internal bool IsProgramAlternativeCost(CardActionContext? action, int cardId) => _coreWushuangJinzhiOperations.IsWushuangJinzhiPaidMaterial(action, cardId) || action is not null && (action.Type == CardActionType.Use || action.Type == CardActionType.Response && action.EffectiveKind == CardKind.Dodge && (action.ActorSeat == action.ProviderSeat || _characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(action)) && action.RequesterSeat is null) && action.PhysicalCards.Any(cost => cost.CardId == cardId) && action.ConversionChain.Any(source => _corePlayCardHistoryOperations.ViewAsRule(source)?.CostDestination is SkillProgramCardDestination.DrawPileTop or SkillProgramCardDestination.DrawPileBottom);
-    internal bool IsProgramResponseCardUse(CharacterState responder, CardKind effectiveKind) => !_characterSimaYiMouOperations.IsMouSmPlayedActor(responder) && effectiveKind == CardKind.Dodge && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { EffectiveCardKind: { } incomingKind } attack && attack.TargetSeat == responder.Seat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind);
+    internal bool IsProgramResponseCardUse(CharacterState responder, CardKind effectiveKind) => !_characterSimaYiMouOperations.IsMouSmPlayedActor(responder) && effectiveKind == CardKind.Dodge && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { EffectiveCardKind: { } incomingKind } attack && attack.TargetSeat == responder.Seat && CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind);
     internal bool IsProgramTopDeckDodgeSource(CardConversionSource? source) => source is not null && _corePlayCardHistoryOperations.ViewAsRule(source)is { UseOnly: true, OutputKind: CardKind.Dodge, CostDestination: SkillProgramCardDestination.DrawPileTop };
     internal CardMovementRecord? DestroyedAlternativeResponsePayment(CardActionContext action, long parentFrameId, CardActionCost cost, ProgramCardContinuation continuation)
     {

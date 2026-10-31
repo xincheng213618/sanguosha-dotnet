@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTaoQianOlRuntime
@@ -59,7 +55,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
 
     internal bool IsIssuedZongluanUse(CardUseFrame use)
     {
-        if (use.ZongluanSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || o.UseId != use.Id || o.ActionId != a.ActionId || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<ZongluanSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { TaoQian: { Paid: true, Stage: TaoQianStage.NativeSlash, NativeReturned: false } r } || r.UseId != use.Id || r.ActionId != a.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.ActorSeat != o.ActorSeat || r.ActualTurn != o.ActualTurn || r.TurnOwner != o.TurnOwner)
+        if (use.ZongluanSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || o.UseId != use.Id || o.ActionId != a.ActionId || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<ZongluanSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { TaoQian: { Paid: true, Stage: TaoQianStage.NativeSlash, NativeReturned: false } r } || r.UseId != use.Id || r.ActionId != a.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.ActorSeat != o.ActorSeat || r.ActualTurn != o.ActualTurn || r.TurnOwner != o.TurnOwner)
             return false;
         var original = a;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -77,7 +73,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
     internal bool IsZongluanUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedZongluanUse(use);
     internal Card ZongluanRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedZongluanUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Zongluan requires its exact issued native zero-entity Slash.");
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 80)]
-    internal bool FinishZongluanAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishZongluanAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || !IsZongluanUse(attack.ResolutionId))
@@ -99,7 +95,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 28120)]
     internal void CaptureZongluanDirectDamage(IGameEvent payload)
     {
-        if (payload is not DamageAppliedEvent { Amount: > 0 } e || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame d || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not global::CardGame.Core.NativeOwners.CardAttackHandle a || a.ResolutionId != d.ParentFrameId || a.IsChainPropagation || a.DamageRedirected || a.IsProgramSkillDamage || a.IsProgramJudgmentDamage || d.SourceSeat != e.SourceSeat || d.TargetSeat != e.TargetSeat || d.Amount != e.Amount || _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { ZongluanSlash: { } o } use || !IsIssuedZongluanUse(use))
+        if (payload is not DamageAppliedEvent { Amount: > 0 } e || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame d || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not NativeOwners.CardAttackHandle a || a.ResolutionId != d.ParentFrameId || a.IsChainPropagation || a.DamageRedirected || a.IsProgramSkillDamage || a.IsProgramJudgmentDamage || d.SourceSeat != e.SourceSeat || d.TargetSeat != e.TargetSeat || d.Amount != e.Amount || _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { ZongluanSlash: { } o } use || !IsIssuedZongluanUse(use))
             return;
         if (_coreProgramEventHistoryOperations.ProgramEventHistory<ZongluanDirectDamageEvent>().Any(x => x.DamageFrameId == d.Id))
             throw new InvalidOperationException("Zongluan cannot account for one actual Slash damage occurrence twice.");
@@ -128,7 +124,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 28120)]
-    internal bool ReturnZongluanAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt c)
+    internal bool ReturnZongluanAttack(GameEngine.AttackCompletionReceipt c)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TaoQian: { Stage: TaoQianStage.NativeSlash, NativeReturned: true } r } f || c.ResolutionId != r.UseId)
             return false;

@@ -1,18 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuSuMobileShiRuntime
 {
     internal const string ShiLsHaoshi = "mobile:shi-haoshi", ShiLsDimeng = "mobile:shi-dimeng";
-    internal static CardConversionSource ShiLsSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiLsSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardMoveReason ShiLsDiscardReason => new("skill.mobile-shi-lu-su.dimeng.discard");
 
-    SkillProgramStepOutcome global::CardGame.Core.IShiLuSuHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiLs(f, op);
+    SkillProgramStepOutcome IShiLuSuHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiLs(f, op);
     internal IEnumerable<ShiLsHandGrantEvent> UnexpiredShiLsGrants() => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsHandGrantEvent>().Where(g => _coreTableSeatQueriesOperations.IsValidPlayerSeat(g.Source.OwnerSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(g.Beneficiary) && g.Source.OwnerSeat != g.Beneficiary && _contentRegistryOperations._contentRegistry.Skills.TryGetValue(ShiLsHaoshi, out var skill) && skill.Program?.GameplayHash == g.Hash && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsStartedEvent>().Count(e => e.FrameId == g.GrantId && e.Source == g.Source && e.Hash == g.Hash && e.Turn == g.Turn) == 1 && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsHandGrantExpiredEvent>().Any(e => e.GrantId == g.GrantId));
     internal IEnumerable<ShiLsHandGrantEvent> LiveShiLsGrants() => UnexpiredShiLsGrants().Where(g => _coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[g.Beneficiary].IsAlive);
     internal bool HasShiLsHandView(int actor, int provider) => LiveShiLsGrants().Any(g => g.Source.OwnerSeat == provider && g.Beneficiary == actor);
@@ -44,7 +39,7 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
     }
 
     internal bool IsShiLsAutonomousResponse(CardActionContext a) => a.Type == CardActionType.Response && a.ActorSeat == a.ResponderSeat && a.RequesterSeat is null && a.PhysicalCards.Any(c => c.From.OwnerSeat != a.ActorSeat && IsShiLsAuthorizedResponseMaterial(a, c)) && a.PhysicalCards.All(c => c.From.OwnerSeat == a.ActorSeat || IsShiLsAuthorizedResponseMaterial(a, c));
-    internal bool IsShiLsAuthorizedResponseMaterial(CardActionContext action, CardActionCost cost) => cost.From.Zone == CardZoneKind.Hand && cost.From.OwnerSeat is { } provider && (HasShiLsHandView(action.ActorSeat, provider) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, action)) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsMaterialAuthorizedEvent>().Any(e => e.ActionId == action.ActionId && e.Actor == action.ActorSeat && e.CardId == cost.CardId && e.From == cost.From && e.PaidSequence > 0 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.PaidSequence && m.CardId == cost.CardId && m.From == cost.From && m.To.Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile && (m.Reason == CardMoveReasons.Respond || m.Reason == CardMoveReasons.Nullification))));
+    internal bool IsShiLsAuthorizedResponseMaterial(CardActionContext action, CardActionCost cost) => cost.From.Zone == CardZoneKind.Hand && cost.From.OwnerSeat is { } provider && (HasShiLsHandView(action.ActorSeat, provider) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, action)) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsMaterialAuthorizedEvent>().Any(e => e.ActionId == action.ActionId && e.Actor == action.ActorSeat && e.CardId == cost.CardId && e.From == cost.From && e.PaidSequence > 0 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.PaidSequence && m.CardId == cost.CardId && m.From == cost.From && m.To.Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile && (m.Reason == CardMoveReasons.Respond || m.Reason == CardMoveReasons.Nullification))));
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 48900)]
     internal void CaptureShiLsAuthorizedAction(IGameEvent fact)
     {
@@ -183,7 +178,7 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
     [ProgramAnswer("shi-lu-su")]
     internal void AnswerShiLs(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiLuSu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiLsChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiLuSu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiLsChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shi Lu Su rejects an unpublished participant, material or benefit.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -317,7 +312,7 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
 
     internal PendingDecision? ProjectShiLsCardSelection(PendingDecision decision, ProgramSkillFrame f) => f.ShiLuSu is { Stage: ShiLsStage.Discard } r && decision.PlayerSeat == f.OwnerSeat ? _corePlayerViewNativeCardSelectionsOperations.NativeOwnedSelection(decision, f, "shi-lu-su:discard", "branch", ["add"], ["pay"], r.Cards, r.Required - r.Cards.Count, r.Required - r.Cards.Count, resetValues: ["reset"]) : null;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiLuSuHaoshi, SkillProgramEffectOp.ResolveMobileShiLuSuDimeng, SkillProgramEffectOp.ResolveMobileShiLuSuHaoshiRefill)]
-    internal PromptChoice ChooseShiLs(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch")is "pay" or "draw") ?? p.Choices.Where(c => c.Parameters.GetValueOrDefault("branch")is not ("reset" or "remove")).OrderBy(c => c.Cards is [var id] ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).First();
+    internal PromptChoice ChooseShiLs(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch")is "pay" or "draw") ?? p.Choices.Where(c => c.Parameters.GetValueOrDefault("branch")is not ("reset" or "remove")).OrderBy(c => c.Cards is [var id] ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).First();
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 4300)]
     internal void CollectWindow_CollectShiLsIssuedMovementCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result) => result.AddRange(CollectShiLsIssuedMovementCandidates(batch));
 }

@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime
 {
     internal const string ShanheS5TieqiDiscardReason = "skill-program.shanhe-tieqi.discard";
-    SkillProgramStepOutcome global::CardGame.Core.IShanheS5TieqiProgramHost.SuppressAndJudgeAllColor(ProgramSkillFrame frame, SkillProgramEffect effect) => _coreSlashSuitDiscardOperations.BeginProgramSlashSuitDiscard(frame, effect);
+    SkillProgramStepOutcome IShanheS5TieqiProgramHost.SuppressAndJudgeAllColor(ProgramSkillFrame frame, SkillProgramEffect effect) => _coreSlashSuitDiscardOperations.BeginProgramSlashSuitDiscard(frame, effect);
     internal bool IsShanheS5Tieqi(ProgramSkillFrame frame) => frame.TriggerId is not null && ProgramInstructionResolver.Default.Features(_coreProgramLifecycleOperations.GetProgramTrigger(frame)).HasOperation(SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeColorAllDiscard);
     internal Card[] ShanheS5TieqiColorCards(ProgramSkillFrame frame)
     {
         var draft = frame.SlashSuitDiscard!;
         if (draft.FinalSuit is null or Suit.None)
             return[];
-        return _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat])).Where(card => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat], card)is var suit && suit != Suit.None && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(suit) == global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(draft.FinalSuit.Value)).ToArray();
+        return _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat])).Where(card => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat], card)is var suit && suit != Suit.None && CoreNativeCardClassificationsRuntime.IsRedSuit(suit) == CoreNativeCardClassificationsRuntime.IsRedSuit(draft.FinalSuit.Value)).ToArray();
     }
 
     internal bool CanPayShanheS5Tieqi(ProgramSkillFrame frame, Card[] cards) => cards.Length > 0 && cards.All(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(frame.SlashSuitDiscard!.TargetSeat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard));
@@ -24,7 +20,7 @@ internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime
         var cards = ShanheS5TieqiColorCards(frame);
         var choices = new List<PromptChoice>();
         if (CanPayShanheS5Tieqi(frame, cards))
-            choices.Add(new(new($"shanhe-tieqi.{(frame.Id)}.pay"), $"弃置全部{((global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(frame.SlashSuitDiscard!.FinalSuit!.Value) ? "红" : "黑"))}色手牌及装备牌（{(cards.Length)}张），使此杀可被抵消。", cards.Select(card => card.Id).ToArray(), [], new Dictionary<string, string> { ["program-action"] = "shanhe-tieqi-color" }));
+            choices.Add(new(new($"shanhe-tieqi.{(frame.Id)}.pay"), $"弃置全部{((CoreNativeCardClassificationsRuntime.IsRedSuit(frame.SlashSuitDiscard!.FinalSuit!.Value) ? "红" : "黑"))}色手牌及装备牌（{(cards.Length)}张），使此杀可被抵消。", cards.Select(card => card.Id).ToArray(), [], new Dictionary<string, string> { ["program-action"] = "shanhe-tieqi-color" }));
         choices.Add(new(new($"shanhe-tieqi.{(frame.Id)}.decline"), "不弃置，不能抵消此杀。", [], [], new Dictionary<string, string> { ["program-action"] = "shanhe-tieqi-skip" }));
         return Array.AsReadOnly(choices.ToArray());
     }
@@ -76,7 +72,7 @@ internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime
     internal void ResolveShanheS5TieqiChoice(PromptChoice choice)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
-        if (!IsShanheS5Tieqi(frame) || frame.SlashSuitDiscard is not { Stage: ProgramSlashSuitDiscardStage.Choosing } draft || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.TargetSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheS5TieqiChoices(frame).Where(c => c.Id == choice.Id).ToArray()))
+        if (!IsShanheS5Tieqi(frame) || frame.SlashSuitDiscard is not { Stage: ProgramSlashSuitDiscardStage.Choosing } draft || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.TargetSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheS5TieqiChoices(frame).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Whole-color Tieqi requires its exact published target-private cohort.");
         _ = _coreSlashSuitDiscardOperations.SlashSuitDiscardAttack(frame);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -131,6 +127,6 @@ internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime
         var pay = decision.Choices.FirstOrDefault(choice => choice.Cards.Count > 0);
         // Only the payer's own cards enter this estimate; hidden deck order is irrelevant.
         var hasRemainingDodge = _corePhysicalOwnedCardQueriesOperations.GetHand(player).Any(card => card.Kind == CardKind.Dodge && !cards.Any(cost => cost.Id == card.Id));
-        return pay is not null && hasRemainingDodge && cards.Sum(card => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(card, player)) <= 8d ? pay : decision.Choices.Last();
+        return pay is not null && hasRemainingDodge && cards.Sum(card => CoreNativeAiDecisionsRuntime.GetKeepValue(card, player)) <= 8d ? pay : decision.Choices.Last();
     }
 }

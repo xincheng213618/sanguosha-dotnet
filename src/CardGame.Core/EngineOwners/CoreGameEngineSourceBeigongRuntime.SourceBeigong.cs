@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSourceBeigongRuntime
@@ -13,7 +8,7 @@ internal sealed partial class CoreGameEngineSourceBeigongRuntime
     internal static bool IsSourceBeigongOp(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveSourceDingxiUsedCard or SkillProgramEffectOp.DrawSourceDingxiPile or SkillProgramEffectOp.ResolveSourceHuojie or SkillProgramEffectOp.ResolveSourceXingxia;
     internal static bool HasSourceBeigongState(ProgramSkillFrame f) => f.SourceDingxi is not null || f.SourceHuojie is not null || f.SourceXingxia is not null;
     internal bool DrainSourceBeigong(long id) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id);
-    SkillProgramStepOutcome global::CardGame.Core.ISourceBeigongHost.Run(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    SkillProgramStepOutcome ISourceBeigongHost.Run(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.ResolveSourceDingxiUsedCard => _coreSourceDingxiOperations.StartSourceDingxi(f),
         SkillProgramEffectOp.DrawSourceDingxiPile => DrawSourceDingxi(f),

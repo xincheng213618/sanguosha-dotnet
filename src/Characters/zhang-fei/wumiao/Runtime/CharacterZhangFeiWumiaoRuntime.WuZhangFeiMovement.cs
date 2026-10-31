@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangFeiWumiaoRuntime
 {
     internal const string WuZishengSkill = "wumiao:zisheng";
-    internal const string WuZishengMovementBinding = global::CardGame.Core.RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiMovement.WuZishengMovementBinding;
+    internal const string WuZishengMovementBinding = RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiMovement.WuZishengMovementBinding;
     internal bool HasWuZishengMovementCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveWuZhangFeiMovementDamage);
 
-    internal static bool IsWuZishengMovementTrigger(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiMovement.IsWuZishengMovementTrigger(t);
+    internal static bool IsWuZishengMovementTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiMovement.IsWuZishengMovementTrigger(t);
     internal WuZishengMovementSource[] CaptureWuZishengMovementSources() => !HasWuZishengMovementCapability || !_coreMatchSetupSetupCompleteAccess._setupComplete ? [] : _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).SelectMany(p => _coreNationalSkillsOperations.GetSkillBindingShard(p).ProgramInstances.Where(i => i.SkillId == WuZishengSkill && i.Program.Triggers.Any(IsWuZishengMovementTrigger)).Select(i => new WuZishengMovementSource(new(i.SkillId, WuZishengMovementBinding, p.Seat, i.SkillInstanceId), i.Program.GameplayHash))).OrderBy(s => s.Source.OwnerSeat).ThenBy(s => s.Source.SkillInstanceId, StringComparer.Ordinal).ToArray();
     internal bool ValidWuZishengMovementSource(WuZishengMovementSource s) => s.Source.SkillId == WuZishengSkill && s.Source.BindingId == WuZishengMovementBinding && _coreTableSeatQueriesOperations.IsValidPlayerSeat(s.Source.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(WuZishengSkill).Program is { } p && p.GameplayHash == s.GameplayHash && p.Triggers.Any(IsWuZishengMovementTrigger);
     internal NativeLogicalDiscardInvocationDraft? AdmitWuZishengNativeDiscard(NativeLogicalDiscardInvocationDraft? draft)
@@ -67,7 +63,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
             var closed = _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardClosedEvent>().SingleOrDefault(e => e.InvocationId == admission.InvocationId);
             foreach (var material in _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardMaterialAdmittedEvent>().Where(e => e.InvocationId == admission.InvocationId))
             {
-                if (material.From.OwnerSeat is not { } victim || victim == admission.ExecutorSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(material.From))
+                if (material.From.OwnerSeat is not { } victim || victim == admission.ExecutorSeat || !CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(material.From))
                     continue;
                 foreach (var move in batch.Movements.Where(m => m.CardId == material.CardId && m.CardKind == material.PrintedKind && m.Sequence > admission.SequenceBefore && (closed is null || m.Sequence <= closed.SequenceAfter)))
                 {
@@ -167,7 +163,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal bool ExactWuZishengMovementParent(ProgramSkillFrame f, out WuZishengMovementQualification q)
     {
         q = null !;
-        if (f.SkillId != WuZishengSkill || f.TriggerId != WuZishengMovementBinding || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not CardsMovedTriggerWindowFrame parent || parent.Batch.Id != batch.Id || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
+        if (f.SkillId != WuZishengSkill || f.TriggerId != WuZishengMovementBinding || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not CardsMovedTriggerWindowFrame parent || parent.Batch.Id != batch.Id || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
             return false;
         var i = parent.Candidates[parent.CandidateIndex].OccurrenceIndex;
         if (i < 0 || i >= (batch.WuZisheng?.Count ?? 0))
@@ -176,7 +172,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
         return ValidWuZishengQualification(q, batch) && q.Source.Source == new CardConversionSource(f.SkillId, f.TriggerId, f.OwnerSeat, f.SkillInstanceId) && q.Source.GameplayHash == f.GameplayHash && c.SourceSeat == f.OwnerSeat && c.TargetSeat == q.VictimSeat && c.Amount == q.Materials.Count;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IWuZhangFeiMovementHost.ResolveMovementDamage(ProgramSkillFrame frame) => ResolveWuZishengMovement(frame);
+    SkillProgramStepOutcome IWuZhangFeiMovementHost.ResolveMovementDamage(ProgramSkillFrame frame) => ResolveWuZishengMovement(frame);
     internal SkillProgramStepOutcome ResolveWuZishengMovement(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -235,14 +231,14 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29062)]
     internal bool ContinueIssuedWuZishengMovement(ProgramSkillFrame f) => f.InstructionIndex is 0 or 1 && ExactWuZishengMovementParent(f with { InstructionIndex = 1 }, out _);
     internal bool WuZishengMovementFirstChild(ProgramSkillFrame f, ResolutionFrame child) => f.WuZishengMovement is { Issued: true } && ExactWuZishengMovementParent(f, out _) && f.AttackAttempt is not null && _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(f, child);
-    internal bool WuZhangFeiMovementObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame parent && (this.WuZishengMovementFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child]) || this.WuHaoxianFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child])) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
+    internal bool WuZhangFeiMovementObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame parent && (this.WuZishengMovementFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child]) || this.WuHaoxianFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child])) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? WuZhangFeiMovementObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.WuZishengMovementFirstChild(f, child) || this.WuHaoxianFirstChild(f, child), (index) => this.WuZhangFeiMovementObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 770)]
     internal bool IsWuZhangFeiMovementDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WuZhangFeiMovementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 29062)]
     internal bool AdvanceWuZhangFeiObserverChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuZhangFeiMovementObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 
-    internal static string WuZishengCursorHash(ResolutionFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiMovement.WuZishengCursorHash(frame);
+    internal static string WuZishengCursorHash(ResolutionFrame frame) => RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiMovement.WuZishengCursorHash(frame);
     internal WuZishengSuspendedDying? CaptureWuZishengAncestorDying(ProgramSkillFrame f)
     {
         if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying)
@@ -268,7 +264,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
         return true;
     }
 
-    internal bool WuZishengSuspensionEdge(ResolutionFrame parent, ResolutionFrame child) => _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent);
+    internal bool WuZishengSuspensionEdge(ResolutionFrame parent, ResolutionFrame child) => _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent);
     internal bool WuZishengSuspendsDying(ProgramSkillFrame f, WuZishengSuspendedDying s)
     {
         if (f.WuZishengMovement is not { Issued: true, SuspendedDying: { } claimed } r || claimed != s || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == s.DyingFrameId)is not DyingFrame dying || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == s.ParentFrameId)is not { } parent || parent.Id != dying.ParentFrameId || !WuZishengDyingPrefix(f, dying) || WuZishengCursorHash(dying) != s.DyingHash || WuZishengCursorHash(parent) != s.ParentHash || s.AttackOwnerFrameId is { } owner && (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == owner)is not { } attackOwner || WuZishengCursorHash(attackOwner) != s.AttackOwnerHash) || _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengSuspendedDyingIssuedEvent>().Count(e => e.FrameId == f.Id && e.Suspension == s) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengMovementDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.ParentWindowId == r.ParentWindowId && e.BatchId == r.Qualification.BatchId && e.Source == r.Qualification.Source.Source && e.RequestedDamage == r.RequestedDamage) != 1)

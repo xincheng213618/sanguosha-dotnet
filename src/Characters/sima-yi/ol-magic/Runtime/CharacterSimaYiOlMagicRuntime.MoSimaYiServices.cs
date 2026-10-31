@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaYiOlMagicRuntime
@@ -10,19 +6,19 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     internal MoSimaYiRuntime MoSimaYi => _moSimaYiOperations.Get();
     internal bool HasMoSimaYi => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AcquireMoSimaYiGuifuDodge);
 
-    int global::CardGame.Core.IMoSimaYiFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
+    int IMoSimaYiFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
 
-    int global::CardGame.Core.IMoSimaYiFacts.Turn => _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber;
+    int IMoSimaYiFacts.Turn => _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber;
 
-    bool global::CardGame.Core.IMoSimaYiFacts.IsAlive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
-    bool global::CardGame.Core.IMoSimaYiFacts.IsHuman(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
-    bool global::CardGame.Core.IMoSimaYiFacts.IsGameOver => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMoSimaYiFacts.IsAlive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
+    bool IMoSimaYiFacts.IsHuman(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
+    bool IMoSimaYiFacts.IsGameOver => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    IReadOnlyList<T> global::CardGame.Core.IMoSimaYiFacts.History<T>() => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<T>().ToArray());
-    IReadOnlyList<CardConversionSource> global::CardGame.Core.IMoSimaYiFacts.GuiFuOwners() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(p, MoSimaYiComposition.Guifu)).Select(p => new CardConversionSource(MoSimaYiComposition.Guifu, "acquire-round", p.Seat, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(p, MoSimaYiComposition.Guifu))).ToArray());
-    IReadOnlyList<string> global::CardGame.Core.IMoSimaYiFacts.EffectiveSkills(int owner) => Array.AsReadOnly(_coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[owner]).ActiveGrants.Select(g => g.SkillId).Distinct(StringComparer.Ordinal).ToArray());
-    IReadOnlyList<int> global::CardGame.Core.IMoSimaYiFacts.RetaliationActors(int owner, int round) => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiDamageCauseEvent>().Where(e => e.Cause.Round == round && e.Cause.SourceSeat == owner).Select(e => e.Cause.TargetSeat).Where(((global::CardGame.Core.IMoSimaYiFacts)this).IsAlive).Distinct().OrderBy(seat => (seat - owner + _coreMatchParticipantsPlayersAccess._players.Count) % _coreMatchParticipantsPlayersAccess._players.Count).ToArray());
-    MoSimaYiDodge? global::CardGame.Core.IMoSimaYiFacts.FindDodge()
+    IReadOnlyList<T> IMoSimaYiFacts.History<T>() => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<T>().ToArray());
+    IReadOnlyList<CardConversionSource> IMoSimaYiFacts.GuiFuOwners() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(p, MoSimaYiComposition.Guifu)).Select(p => new CardConversionSource(MoSimaYiComposition.Guifu, "acquire-round", p.Seat, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(p, MoSimaYiComposition.Guifu))).ToArray());
+    IReadOnlyList<string> IMoSimaYiFacts.EffectiveSkills(int owner) => Array.AsReadOnly(_coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[owner]).ActiveGrants.Select(g => g.SkillId).Distinct(StringComparer.Ordinal).ToArray());
+    IReadOnlyList<int> IMoSimaYiFacts.RetaliationActors(int owner, int round) => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiDamageCauseEvent>().Where(e => e.Cause.Round == round && e.Cause.SourceSeat == owner).Select(e => e.Cause.TargetSeat).Where(((IMoSimaYiFacts)this).IsAlive).Distinct().OrderBy(seat => (seat - owner + _coreMatchParticipantsPlayersAccess._players.Count) % _coreMatchParticipantsPlayersAccess._players.Count).ToArray());
+    MoSimaYiDodge? IMoSimaYiFacts.FindDodge()
     {
         foreach (var location in new[]
         {
@@ -36,17 +32,17 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
         return null;
     }
 
-    string global::CardGame.Core.IMoSimaYiFacts.SkillName(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Name;
-    bool global::CardGame.Core.IMoSimaYiFacts.HasJudgmentArea(int actor) => !_coreMatchParticipantsPlayersAccess._players[actor].JudgmentAreaAbolished;
-    void global::CardGame.Core.IMoSimaYiNative.ObtainDodge(ProgramSkillFrame f, MoSimaYiDodge entity)
+    string IMoSimaYiFacts.SkillName(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Name;
+    bool IMoSimaYiFacts.HasJudgmentArea(int actor) => !_coreMatchParticipantsPlayersAccess._players[actor].JudgmentAreaAbolished;
+    void IMoSimaYiNative.ObtainDodge(ProgramSkillFrame f, MoSimaYiDodge entity)
     {
         if (entity.CardId <= 0 || _cardZonesOperations._cardZones.GetLocation(entity.CardId) != entity.From || _coreAdvancedLifecycleOperations.GetAdvancedCard(entity.CardId).Kind != CardKind.Dodge)
             throw new InvalidOperationException("Guifu needs the actual stock Dodge frozen for this obtain.");
         _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(entity.CardId), entity.From, CardLocation.Hand(f.OwnerSeat), new("skill-program.ol:mo-guifu.obtain"), m => _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoSimaYiDodgeMarkedEvent(f.Id, f.OwnerSeat, m.CardId, m.From, m.Sequence)), disclosure: entity.From == CardLocation.DrawPile ? CardMovementDisclosure.FaceDown : CardMovementDisclosure.FaceUp);
     }
 
-    bool global::CardGame.Core.IMoSimaYiNative.DrainChildren(long id) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id);
-    void global::CardGame.Core.IMoSimaYiNative.GrantSkill(ProgramSkillFrame f, string skill, bool temporary)
+    bool IMoSimaYiNative.DrainChildren(long id) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id);
+    void IMoSimaYiNative.GrantSkill(ProgramSkillFrame f, string skill, bool temporary)
     {
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
             return;
@@ -58,12 +54,12 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
         var old = _coreNationalSkillsOperations.GetSkillBindingShard(player).ActiveGrants.FirstOrDefault(g => g.SkillId == skill);
         var expiry = temporary ? new SkillGrantNextActualTurnStartExpiry(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, player.Seat) : null;
         player.SkillGrants.Grant(new SkillGrant($"{(source)}:{(skill)}", skill, old?.SkillInstanceId ?? $"mo-sima-yi-shared:{(player.Seat)}:{(skill)}", source) { NextActualTurnStartExpiry = expiry });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnSkillsGrantedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, Array.AsReadOnly(new[] { skill })) { RecipientSeat = player.Seat, GrantSourceId = source, NextActualTurnStartExpiry = expiry });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnSkillsGrantedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, Array.AsReadOnly(new[] { skill })) { RecipientSeat = player.Seat, GrantSourceId = source, NextActualTurnStartExpiry = expiry });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoSimaYiSkillGrantedEvent(f.Id, skill, source, temporary));
     }
 
-    void global::CardGame.Core.IMoSimaYiNative.EnterRumo(ProgramSkillFrame f) => _characterSharedGameEngineOlMoRumoOperations.EnterOlMoRumo(f);
-    IReadOnlyList<string> global::CardGame.Core.IMoSimaYiNative.Sample(IReadOnlyList<string> skills, int count, long frameId)
+    void IMoSimaYiNative.EnterRumo(ProgramSkillFrame f) => _characterSharedGameEngineOlMoRumoOperations.EnterOlMoRumo(f);
+    IReadOnlyList<string> IMoSimaYiNative.Sample(IReadOnlyList<string> skills, int count, long frameId)
     {
         var pool = skills.ToList();
         var result = new List<string>(count);
@@ -79,7 +75,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
         return Array.AsReadOnly(result.ToArray());
     }
 
-    bool global::CardGame.Core.IMoSimaYiNative.BeginSlash(ProgramSkillFrame f, int actor, int target)
+    bool IMoSimaYiNative.BeginSlash(ProgramSkillFrame f, int actor, int target)
     {
         if (!CanMoSimaYiRetaliationSlash(actor, target))
             return false;
@@ -87,7 +83,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
         return true;
     }
 
-    void global::CardGame.Core.IMoSimaYiNative.ApplyLieshi(ProgramSkillFrame f, int actor, int option)
+    void IMoSimaYiNative.ApplyLieshi(ProgramSkillFrame f, int actor, int option)
     {
         if (option == 0)
         {
@@ -102,14 +98,14 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
 
         var kind = option == 1 ? CardKind.Dodge : CardKind.Slash;
         var playerHand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[actor]);
-        var cards = playerHand.Where(c => kind == CardKind.Slash ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) : c.Kind == kind).ToArray();
+        var cards = playerHand.Where(c => kind == CardKind.Slash ? CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) : c.Kind == kind).ToArray();
         var reason = new CardMoveReason("skill-program.ol:mo-lieshi.discard");
         var logical = _coreNativeLogicalDiscardsOperations.CaptureNativeLogicalDiscardInvocation(actor, actor, cards.Select(c => c.Id).ToArray(), reason, f.Id);
         _corePhysicalMovementFacadesOperations.MoveCards(cards, CardLocation.Hand(actor), CardLocation.DiscardPile, reason);
         _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(logical);
     }
 
-    bool global::CardGame.Core.IMoSimaYiNative.FinishDamage(ProgramSkillFrame f)
+    bool IMoSimaYiNative.FinishDamage(ProgramSkillFrame f)
     {
         if (f.AttackAttempt is not null)
         {
@@ -122,13 +118,13 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
         return false;
     }
 
-    void global::CardGame.Core.IMoSimaYiNative.Complete(ProgramSkillFrame f)
+    void IMoSimaYiNative.Complete(ProgramSkillFrame f)
     {
         _coreRuntimeOperations.ReplaceRuntimeTop(f);
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    void global::CardGame.Core.IMoSimaYiNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    void IMoSimaYiNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.Collection, 33900, SkillProgramEffectOp.ResolveMoSimaYiMoubian, SkillProgramEffectOp.ResolveMoSimaYiRetaliation)]
     internal bool CanOfferMoSimaYi(ProgramTriggerLegalityContext c) => c.Candidate.SkillId switch
     {
@@ -141,7 +137,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.RumoOrigin, 33900)]
     internal bool IsMoSimaYiRumoOrigin(long id, CardConversionSource source, string hash) => _coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiStartedEvent>().Count(e => e.FrameId == id && e.Source == source && e.GameplayHash == hash && e.Operation == SkillProgramEffectOp.ResolveMoSimaYiMoubian) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiSkillFrozenEvent>().Any(e => e.FrameId == id && e.SkillId == MoSimaYiComposition.Zhouxi);
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 33900)]
-    internal bool RecordMoSimaYiDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageFrameId)
+    internal bool RecordMoSimaYiDamage(GameEngine.IDamageAttempt attack, long damageFrameId)
     {
         if (!HasMoSimaYi || !attack.DamageWasApplied)
             return false;

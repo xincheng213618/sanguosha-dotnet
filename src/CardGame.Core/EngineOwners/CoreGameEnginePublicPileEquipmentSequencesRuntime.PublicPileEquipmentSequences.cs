@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePublicPileEquipmentSequencesRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IGameDomainProgramHost.ExecuteGameDomain(SkillProgramEffect e, ProgramSkillFrame f) => ExecuteGameDomain(e, f);
+    SkillProgramStepOutcome IGameDomainProgramHost.ExecuteGameDomain(SkillProgramEffect e, ProgramSkillFrame f) => ExecuteGameDomain(e, f);
     internal IEnumerable<Card> DomainOwnedCards(ProgramSkillFrame f, int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat])).Where(c => seat != f.OwnerSeat || !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(seat, f.SkillId, f.SkillInstanceId, c));
     internal (string? Instance, CardLocation? Location) SelectDomainReference(ProgramSkillFrame f, string skill)
     {
@@ -184,7 +180,7 @@ internal sealed partial class CoreGameEnginePublicPileEquipmentSequencesRuntime
             var card = _cardZonesOperations._cardZones.CardsAt(p.PileLocation).Single(c => c.Id == id);
             var actor = _coreMatchParticipantsPlayersAccess._players[p.RecipientSeat!.Value];
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PileEquipment = p with { Stage = "equipment-use", ActiveCardId = id }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-            var use = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [], conversionSource: new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId));
+            var use = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [], conversionSource: new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId));
             f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(x => x.Id == f.Id);
             _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { PileEquipment = f.PileEquipment!with { ActiveUseFrameId = use } });
             _corePhysicalMovementFacadesOperations.MoveCard(card, p.PileLocation, CardLocation.Processing, CardMoveReasons.EquipmentUse);
@@ -337,7 +333,7 @@ internal sealed partial class CoreGameEnginePublicPileEquipmentSequencesRuntime
             _coreRuntimeOperations.ReturnRuntimeProgramMovement(f.Id);
     }
 
-    internal bool PileEquipmentFrameRidesOn(ResolutionFrame ride, ResolutionFrame beneath) => ride is CardUseFrame { Action: { } action } use && beneath is ProgramSkillFrame { PileEquipment: { Stage: "equipment-use", ActiveUseFrameId: { } id, ActiveCardId: { } card, RecipientSeat: { } recipient } } parent && use.Id == id && use.CardId == card && action.ActorSeat == recipient && _coreEquipmentContentOperations.EquipmentRules.IsEquipment(action.EffectiveKind) && action.PhysicalCards is [var cost] && cost.CardId == card && cost.From == parent.PileEquipment.PileLocation && action.ConversionChain.Any(s => s.OwnerSeat == parent.OwnerSeat && s.SkillId == parent.SkillId && s.SkillInstanceId == parent.SkillInstanceId && s.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent));
+    internal bool PileEquipmentFrameRidesOn(ResolutionFrame ride, ResolutionFrame beneath) => ride is CardUseFrame { Action: { } action } use && beneath is ProgramSkillFrame { PileEquipment: { Stage: "equipment-use", ActiveUseFrameId: { } id, ActiveCardId: { } card, RecipientSeat: { } recipient } } parent && use.Id == id && use.CardId == card && action.ActorSeat == recipient && _coreEquipmentContentOperations.EquipmentRules.IsEquipment(action.EffectiveKind) && action.PhysicalCards is [var cost] && cost.CardId == card && cost.From == parent.PileEquipment.PileLocation && action.ConversionChain.Any(s => s.OwnerSeat == parent.OwnerSeat && s.SkillId == parent.SkillId && s.SkillInstanceId == parent.SkillInstanceId && s.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent));
     [ProgramAiChoice(SkillProgramEffectOp.ResolveFirstGameDomainCrossing, SkillProgramEffectOp.StoreArbitraryOwnedPublicPile, SkillProgramEffectOp.UsePublicPileEquipmentSequence)]
-    internal PromptChoice SelectAiDomainChoice(PendingDecision pending, ProgramSkillFrame f) => pending.Choices.OrderByDescending(c => c.Targets.Count == 1 && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[pending.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).ThenBy(c => c.Parameters.GetValueOrDefault("domain-action") == "store-finish" ? (f.PileEquipment?.SelectedIds.Count >= 3 ? 0 : 2) : 1).ThenBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(x => x.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[pending.PlayerSeat]) : 0).First();
+    internal PromptChoice SelectAiDomainChoice(PendingDecision pending, ProgramSkillFrame f) => pending.Choices.OrderByDescending(c => c.Targets.Count == 1 && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[pending.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).ThenBy(c => c.Parameters.GetValueOrDefault("domain-action") == "store-finish" ? (f.PileEquipment?.SelectedIds.Count >= 3 ? 0 : 2) : 1).ThenBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(x => x.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[pending.PlayerSeat]) : 0).First();
 }

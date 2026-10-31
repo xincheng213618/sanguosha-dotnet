@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRecoveryAmountBonusesRuntime
@@ -11,7 +6,7 @@ internal sealed partial class CoreGameEngineRecoveryAmountBonusesRuntime
     internal bool TracksRecoveryAmountBonuses => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.OwnRecoveryAmountBonus);
 
     internal bool HasOwnRecoveryAmountSupport(int targetSeat) => TracksRecoveryAmountBonuses && _coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) && _coreMatchParticipantsPlayersAccess._players[targetSeat] is { IsAlive: true, HasHpValue: true } target && target.Hp < target.MaxHp && _coreProgramCardPoliciesOperations.CardPolicies(target, SkillProgramCardPolicyKind.OwnRecoveryAmountBonus).Any();
-    internal static int? RecoveryOrdinalAt(IReadOnlyList<IGameEvent> history, int endExclusive, int targetSeat, int turnNumber, int turnOwnerSeat) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecoveryAmountBonuses.RecoveryOrdinalAt(history, endExclusive, targetSeat, turnNumber, turnOwnerSeat);
+    internal static int? RecoveryOrdinalAt(IReadOnlyList<IGameEvent> history, int endExclusive, int targetSeat, int turnNumber, int turnOwnerSeat) => RuntimeSkills.RuntimeRules_Core_RecoveryAmountBonuses.RecoveryOrdinalAt(history, endExclusive, targetSeat, turnNumber, turnOwnerSeat);
     internal RecoveryAmountBonusReceipt? PrepareOwnRecoveryAmountBonus(PreparedRecoveryApplication application)
     {
         if (!HasOwnRecoveryAmountSupport(application.TargetSeat) || application.RequestedAmount <= 0 || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
@@ -86,5 +81,5 @@ internal sealed partial class CoreGameEngineRecoveryAmountBonusesRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ActualTurnRecoveryRecordedEvent(recovery.Id, recovery.ParentFrameId, recovery.SourceSeat, recovery.TargetSeat, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, ordinal.Value, recovery.Amount, actual, recovery.HpBefore, applied.RemainingHp));
     }
 
-    internal static bool RecoveryAmountBonusEquals(RecoveryAmountBonusReceipt a, RecoveryAmountBonusReceipt b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecoveryAmountBonuses.RecoveryAmountBonusEquals(a, b);
+    internal static bool RecoveryAmountBonusEquals(RecoveryAmountBonusReceipt a, RecoveryAmountBonusReceipt b) => RuntimeSkills.RuntimeRules_Core_RecoveryAmountBonuses.RecoveryAmountBonusEquals(a, b);
 }

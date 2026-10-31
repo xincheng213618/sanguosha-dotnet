@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_ProgramDiscardTopPlacement
 {
     internal const string FanChouDiscardReason = "skill-program.xingluan.recipient.discard";
@@ -17,7 +17,7 @@ internal static class RuntimeRules_Core_ProgramDiscardTopPlacement
 
     internal const string MouHanDangDiscardReason = "skill-program.mou-mobile:han-dang.discard";
 
-    private const string PairedColorDiscardReason = CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardOrigins.PairedColorDiscardReason;
+    private const string PairedColorDiscardReason = RuntimeRules_Core_ProgramDiscardOrigins.PairedColorDiscardReason;
 
     internal const string QingyaDiscardReason = "skill-program.ya-dan.qingya.discard";
 

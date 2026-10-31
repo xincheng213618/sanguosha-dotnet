@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class LvKaiProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterLvKaiOlEntries> getCharacterLvKaiOlRuntime) : ILvKaiProgramHost
+internal sealed class LvKaiProgramCapability(Func<RuntimeEntries.CharacterLvKaiOlEntries> getCharacterLvKaiOlRuntime) : ILvKaiProgramHost
 {
     public SkillProgramStepOutcome TunanUseRevealedCard(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterLvKaiOlRuntime().TunanProgramUseRevealedCard(frame, effect);
     public SkillProgramStepOutcome BijingMarkHandCards(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterLvKaiOlRuntime().BijingProgramMarkHandCards(frame, effect);

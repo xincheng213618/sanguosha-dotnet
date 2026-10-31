@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterXuShuMobileEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterXuShuMobileRuntime> _resolve;
-    private CharacterXuShuMobileEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterXuShuMobileRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterXuShuMobileRuntime> _resolve;
+    private CharacterXuShuMobileEntries(Func<EngineOwners.CharacterXuShuMobileRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterXuShuMobileEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterXuShuMobileRuntime> resolve) => new(resolve);
+    internal static CharacterXuShuMobileEntries Create(Func<EngineOwners.CharacterXuShuMobileRuntime> resolve) => new(resolve);
 }

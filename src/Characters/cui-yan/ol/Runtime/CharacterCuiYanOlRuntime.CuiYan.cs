@@ -1,19 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCuiYanOlRuntime
 {
     internal const string CuiYanDrawReason = "skill-program.cui-yan.shutong.draw";
-    internal static CardConversionSource CuiYanSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cui_yan_ol_CuiYan.CuiYanSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.ICuiYanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCuiYan(f, op);
+    internal static CardConversionSource CuiYanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cui_yan_ol_CuiYan.CuiYanSource(f);
+    SkillProgramStepOutcome ICuiYanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCuiYan(f, op);
     internal ProgramCardTriggerWindowFrame? CurrentCuiYanUseWindow(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (context.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || context.OwnerSeat != c.OwnerSeat || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]) != c || window.ParentFrameId != identity.ParentCardUseFrameId || window.Action.ActionId != identity.CardActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } use || a.ActorSeat != c.OwnerSeat || use.SourceSeat != c.OwnerSeat || a.ActionId != window.Action.ActionId)
+        if (context.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || context.OwnerSeat != c.OwnerSeat || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]) != c || window.ParentFrameId != identity.ParentCardUseFrameId || window.Action.ActionId != identity.CardActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } use || a.ActorSeat != c.OwnerSeat || use.SourceSeat != c.OwnerSeat || a.ActionId != window.Action.ActionId)
             return null;
         return window;
     }
@@ -38,7 +35,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var context = f.WindowContext ?? throw new InvalidOperationException("Cui Yan requires its exact native trigger.");
-        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
+        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
         if (f.CuiYan is not null || f.InstructionIndex != 1 || f.TriggerId is null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CanOfferCuiYan(c, _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Cui Yan lost its unpaid current source or actual boundary.");
         var r = new CuiYanReceipt(CuiYanSource(f), f.GameplayHash, op, context.ParentFrameId, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, op == SkillProgramEffectOp.ResolveShutongFinalizedUse ? CuiYanStage.DrawChildren : CuiYanStage.DamageChoice);
@@ -48,7 +45,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
             var use = _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)!;
             var a = use.Action!;
             var targets = a.EffectiveDesignatedTargetSeats.Distinct().ToArray();
-            if (targets.Length == 0 && !use.TargetsAdjusted && (global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Equipment || use.CardKind is CardKind.DrawTwo or CardKind.Peach or CardKind.Alcohol))
+            if (targets.Length == 0 && !use.TargetsAdjusted && (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Equipment || use.CardKind is CardKind.DrawTwo or CardKind.Peach or CardKind.Alcohol))
                 targets = [use.SourceSeat];
             var same = targets.Length > 0 && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].HasHpValue && targets.All(s => _coreMatchParticipantsPlayersAccess._players[s].HasHpValue && _coreMatchParticipantsPlayersAccess._players[s].Hp == _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp);
             r = r with
@@ -110,7 +107,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
     [ProgramAnswer("cui-yan-damage")]
     internal void AnswerCuiYanDamage(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CuiYan: { Stage: CuiYanStage.DamageChoice } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CuiYanDamageChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CuiYan: { Stage: CuiYanStage.DamageChoice } } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CuiYanDamageChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zhijie lost its actual native range/target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var target = choice.Targets.Single();
@@ -172,5 +169,5 @@ internal sealed partial class CharacterCuiYanOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveZhijieActualTurnEnd)]
-    internal PromptChoice AiCuiYanDamage(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? p.Choices.First();
+    internal PromptChoice AiCuiYanDamage(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? p.Choices.First();
 }

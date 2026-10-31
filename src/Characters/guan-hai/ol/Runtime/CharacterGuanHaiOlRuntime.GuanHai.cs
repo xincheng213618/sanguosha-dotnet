@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanHaiOlRuntime
 {
     internal const string YouqueDiscardReason = "skill-program.guan-hai.youque.discard", YouqueDrawReason = "skill-program.guan-hai.youque.draw";
-    internal static CardConversionSource GuanHaiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guan_hai_ol_GuanHai.GuanHaiSource(f);
+    internal static CardConversionSource GuanHaiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_guan_hai_ol_GuanHai.GuanHaiSource(f);
     internal IEnumerable<PublicPersistentPileSource> XieweiPiles(int owner) => _corePublicPileSourcesOperations.PublicPileSources(owner).Where(s => s.SkillId == "ol:xiewei");
-    SkillProgramStepOutcome global::CardGame.Core.IGuanHaiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginGuanHai(f, op);
+    SkillProgramStepOutcome IGuanHaiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginGuanHai(f, op);
     internal SkillProgramStepOutcome BeginGuanHai(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -80,7 +76,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     [ProgramAnswer("guan-hai")]
     internal void AnswerGuanHai(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuanHai: { Stage: GuanHaiStage.ChooseBait } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !YouqueBaitChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuanHai: { Stage: GuanHaiStage.ChooseBait } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !YouqueBaitChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Youque requires the actual current public bait choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

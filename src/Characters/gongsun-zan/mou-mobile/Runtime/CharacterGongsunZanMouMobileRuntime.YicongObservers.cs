@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGongsunZanMouMobileRuntime
@@ -13,12 +9,12 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
             return false;
         if (r.Op == SkillProgramEffectOp.ResolveMouGongsunZanYicong)
         {
-            if (f.SkillId != MouGongsunZanMobileComposition.Yicong || f.TriggerId != "round-charge-and-hu" || f.WindowContext?.Window != SkillProgramTriggerWindow.RoundStarting || r.TargetSeat != -1 || r.DamageFrameId != 0 || r.Charge is < 0 or > 4 || !_resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Any(w => w.Id == r.WindowId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex])))
+            if (f.SkillId != MouGongsunZanMobileComposition.Yicong || f.TriggerId != "round-charge-and-hu" || f.WindowContext?.Window != SkillProgramTriggerWindow.RoundStarting || r.TargetSeat != -1 || r.DamageFrameId != 0 || r.Charge is < 0 or > 4 || !_resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Any(w => w.Id == r.WindowId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex])))
                 return false;
             if (r.Accepted && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanMobileDistanceEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Round == r.Round && e.Charge == r.Charge && e.Offensive == r.Offensive) != 1)
                 return false;
         }
-        else if (r.Op != SkillProgramEffectOp.ResolveMouGongsunZanQiaomeng || f.SkillId != MouGongsunZanMobileComposition.Qiaomeng || f.TriggerId != "slash-damage-reward" || f.WindowContext is not { } c || MouGszMobileDamage(c, f.OwnerSeat)is not { } damage || damage.Id != r.DamageFrameId || damage.TargetSeat != r.TargetSeat || !_resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Any(w => w.Id == r.WindowId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate())))
+        else if (r.Op != SkillProgramEffectOp.ResolveMouGongsunZanQiaomeng || f.SkillId != MouGongsunZanMobileComposition.Qiaomeng || f.TriggerId != "slash-damage-reward" || f.WindowContext is not { } c || MouGszMobileDamage(c, f.OwnerSeat)is not { } damage || damage.Id != r.DamageFrameId || damage.TargetSeat != r.TargetSeat || !_resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Any(w => w.Id == r.WindowId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate())))
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanMobileStoredEvent>().Where(e => e.FrameId == f.Id).All(e => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.Sequence && m.CardId == e.CardId && m.CardKind == e.Kind && m.From == e.From && m.To == e.To)) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanMobileDiscardedEvent>().Where(e => e.FrameId == f.Id).All(e => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.Sequence && m.CardId == e.CardId && m.CardKind == e.Kind && m.From == e.From && m.To == e.To));
     }
@@ -39,20 +35,20 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
         if (!ValidMouGszMobile(f))
             return false;
         var r = f.MouGongsunZanMobile!;
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
+        if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
             return r.Stage == MouGongsunZanMobileStage.Drawing && f.NativeDraw is not null;
         if (MouGszMobileLion(f, child))
             return true;
         if (child is RecoveryReplacementFrame recovery)
             return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
         if (child is HpChangedTriggerWindowFrame hp)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
+            return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
+            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
-    internal bool MouGszMobileSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _resolutionStackOperations2._resolutionStack()[i - 1] is ProgramSkillFrame f && this.MouGszMobileChild(f, _resolutionStackOperations2._resolutionStack()[i]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
+    internal bool MouGszMobileSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _resolutionStackOperations2._resolutionStack()[i - 1] is ProgramSkillFrame f && this.MouGszMobileChild(f, _resolutionStackOperations2._resolutionStack()[i]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? MouGszMobileRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.MouGszMobileChild(f, c), (n) => this.MouGszMobileSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33600)]
     internal bool MouGszMobileDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouGszMobileRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);

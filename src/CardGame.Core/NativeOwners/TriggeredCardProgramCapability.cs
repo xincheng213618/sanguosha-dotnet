@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class TriggeredCardProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineTriggeredCardProgramsEntries> getCoreGameEngineTriggeredCardProgramsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramPhaseColorRestrictionsEntries> getCoreGameEngineProgramPhaseColorRestrictionsRuntime) : ITriggeredCardProgramHost
+internal sealed class TriggeredCardProgramCapability(Func<RuntimeEntries.CoreGameEngineTriggeredCardProgramsEntries> getCoreGameEngineTriggeredCardProgramsRuntime, Func<RuntimeEntries.CoreGameEngineProgramPhaseColorRestrictionsEntries> getCoreGameEngineProgramPhaseColorRestrictionsRuntime) : ITriggeredCardProgramHost
 {
     public SkillProgramStepOutcome UseTriggeredVirtualSlash(ProgramSkillFrame frame, int targetSeat) => getCoreGameEngineTriggeredCardProgramsRuntime().UseTriggeredProgramVirtualSlash(frame, targetSeat);
     public SkillProgramStepOutcome UseDiscardedCardAsDelayedTrick(ProgramSkillFrame frame, int targetSeat, CardKind kind) => getCoreGameEngineTriggeredCardProgramsRuntime().UseProgramDiscardedCardAsDelayedTrick(frame, targetSeat, kind);

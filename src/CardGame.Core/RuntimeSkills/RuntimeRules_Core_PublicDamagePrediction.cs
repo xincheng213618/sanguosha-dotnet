@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_PublicDamagePrediction
 {
     internal static HashSet<string> VisiblePredictionSkillIds(PlayerSnapshot player) =>

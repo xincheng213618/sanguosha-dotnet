@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAlternatingSuitAndCompletedTopRuntime
@@ -20,16 +16,16 @@ internal sealed partial class CoreGameEngineAlternatingSuitAndCompletedTopRuntim
         }
 
         foreach (var skillId in _contentRegistryOperations._contentRegistry.ProgramDependencies.GetTriggerOperationSkillIds(SkillProgramEffectOp.FirstCategoryCompletedTop))
-            _coreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess._firstTurnCategoryUses.TryAdd((_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, declared.SourceSeat, skillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(declared.CardKind)), -declared.ResolutionId);
+            _coreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess._firstTurnCategoryUses.TryAdd((_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, declared.SourceSeat, skillId, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(declared.CardKind)), -declared.ResolutionId);
     }
 
     internal void RecordFirstTurnCategoryUse(CardActionContext action)
     {
         foreach (var skillId in _contentRegistryOperations._contentRegistry.ProgramDependencies.GetTriggerOperationSkillIds(SkillProgramEffectOp.FirstCategoryCompletedTop))
-            _coreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess._firstTurnCategoryUses.TryAdd((_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, action.ActorSeat, skillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind)), action.ActionId);
+            _coreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess._firstTurnCategoryUses.TryAdd((_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, action.ActorSeat, skillId, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind)), action.ActionId);
     }
 
-    internal bool IsFirstCategoryUse(int owner, string skill, CardActionContext action) => action.ActorSeat == owner && _coreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess._firstTurnCategoryUses.GetValueOrDefault((_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, owner, skill, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind)), -1) == action.ActionId;
+    internal bool IsFirstCategoryUse(int owner, string skill, CardActionContext action) => action.ActorSeat == owner && _coreGameEngineAlternatingSuitAndCompletedTopFirstTurnCategoryUsesAccess._firstTurnCategoryUses.GetValueOrDefault((_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, owner, skill, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind)), -1) == action.ActionId;
     internal int[] AvailableCompletedTopCosts(CardActionContext a, long parentFrameId) => a.PhysicalCards.Count != 1 ? [] : a.PhysicalCards.Where(c =>
     {
         var at = _cardZonesOperations._cardZones.GetLocation(c.CardId);
@@ -50,8 +46,8 @@ internal sealed partial class CoreGameEngineAlternatingSuitAndCompletedTopRuntim
     }
 
     internal bool HasPhaseSuitAllowance(CharacterState owner, Card card) => HasPhaseSuitAllowance(owner.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card));
-    SkillProgramStepOutcome global::CardGame.Core.IAlternatingSuitAndCompletedTopHost.BeginAlternatingSuitDrawDiscard(ProgramSkillFrame f) => BeginAlternatingSuitDrawDiscard(f);
-    SkillProgramStepOutcome global::CardGame.Core.IAlternatingSuitAndCompletedTopHost.BeginFirstCategoryCompletedTop(ProgramSkillFrame f) => BeginFirstCategoryCompletedTop(f);
+    SkillProgramStepOutcome IAlternatingSuitAndCompletedTopHost.BeginAlternatingSuitDrawDiscard(ProgramSkillFrame f) => BeginAlternatingSuitDrawDiscard(f);
+    SkillProgramStepOutcome IAlternatingSuitAndCompletedTopHost.BeginFirstCategoryCompletedTop(ProgramSkillFrame f) => BeginFirstCategoryCompletedTop(f);
     internal SkillProgramStepOutcome BeginAlternatingSuitDrawDiscard(ProgramSkillFrame f)
     {
         if (f.ActivationId is null || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || f.AlternatingSuitTop is not null)
@@ -163,7 +159,7 @@ internal sealed partial class CoreGameEngineAlternatingSuitAndCompletedTopRuntim
         var choices = d.CardIds.Except(d.SelectedIds).Select(id =>
         {
             var c = _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(c => c.Id == id);
-            return new PromptChoice(new($"suit-top.{(f.Id)}.{(d.Stage)}.{(id)}"), $"{((d.Mode == "alternating" ? "弃置" : "置顶次序"))}【{(c.DisplayName)}】{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(c.Suit))}{(c.RankText)}", [id], [], new Dictionary<string, string> { { "program-action", "alternating-suit-top" }, { "frame-id", f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) } });
+            return new PromptChoice(new($"suit-top.{(f.Id)}.{(d.Stage)}.{(id)}"), $"{((d.Mode == "alternating" ? "弃置" : "置顶次序"))}【{(c.DisplayName)}】{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(c.Suit))}{(c.RankText)}", [id], [], new Dictionary<string, string> { { "program-action", "alternating-suit-top" }, { "frame-id", f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) } });
         }).ToArray();
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, d.Mode == "alternating" ? "选择要弃置的手牌" : "依次选择牌堆顶顺序（先选为顶牌）", choices.SelectMany(c => c.Cards).ToArray(), [], f.OwnerSeat)

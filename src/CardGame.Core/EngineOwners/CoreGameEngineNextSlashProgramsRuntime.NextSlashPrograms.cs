@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNextSlashProgramsRuntime
 {
     internal bool HasNextSlashDamageCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ReserveNextSlashDamage);
 
-    void global::CardGame.Core.INextSlashProgramHost.RecoverToMaximum(ProgramSkillFrame frame) => RecoverProgramToMaximum(frame);
-    void global::CardGame.Core.INextSlashProgramHost.DrawRecoveryReceipt(ProgramSkillFrame frame) => DrawProgramRecoveryReceipt(frame);
-    void global::CardGame.Core.INextSlashProgramHost.ReserveNextSlashDamage(ProgramSkillFrame frame) => ReserveProgramNextSlashDamage(frame);
+    void INextSlashProgramHost.RecoverToMaximum(ProgramSkillFrame frame) => RecoverProgramToMaximum(frame);
+    void INextSlashProgramHost.DrawRecoveryReceipt(ProgramSkillFrame frame) => DrawProgramRecoveryReceipt(frame);
+    void INextSlashProgramHost.ReserveNextSlashDamage(ProgramSkillFrame frame) => ReserveProgramNextSlashDamage(frame);
     internal void RecoverProgramToMaximum(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -69,7 +65,7 @@ internal sealed partial class CoreGameEngineNextSlashProgramsRuntime
     internal void FreezeNextSlashDamage(long frameId)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(frameId) ?? throw new InvalidOperationException("Next Slash damage lost its card owner.");
-        if (use.NextSlashDamage is not null || use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
+        if (use.NextSlashDamage is not null || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
             return;
         var matching = _coreGameEngineNextSlashProgramsNamedNextSlashReservesAccess._namedNextSlashReserves.Where(item => item.OwnerSeat == action.ActorSeat && item.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && item.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat).ToArray();
         var amount = matching.Sum(item => item.Amount);
@@ -85,7 +81,7 @@ internal sealed partial class CoreGameEngineNextSlashProgramsRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 50)]
-    internal int FrozenNextSlashDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack.EffectiveCardKind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash ? _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.NextSlashDamage ?? 0 : 0;
+    internal int FrozenNextSlashDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack.EffectiveCardKind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash ? _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.NextSlashDamage ?? 0 : 0;
     internal void ExpireNextSlashDamage(int turnNumber, int turnSeat)
     {
         foreach (var item in _coreGameEngineNextSlashProgramsNamedNextSlashReservesAccess._namedNextSlashReserves.Where(item => item.TurnNumber == turnNumber && item.TurnSeat == turnSeat).ToArray())

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterNiuJinOlRuntime
@@ -16,8 +12,8 @@ internal sealed partial class CharacterNiuJinOlRuntime
         var debts = _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates.Where(pair => pair.Value && pair.Key.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && pair.Key.SkillId == "ol:cuorui" && pair.Key.StateId == "skip-next-judgment").Select(pair => pair.Key).ToArray();
         foreach (var debt in debts)
         {
-            var alreadySkipped = _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipJudgmentPhase);
-            _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipJudgmentPhase;
+            var alreadySkipped = _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipJudgmentPhase);
+            _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= GameEngine.DelayedTurnEffects.SkipJudgmentPhase;
             _coreProgramPersistentStateOperations.SetProgramBooleanState(debt.OwnerSeat, debt.SkillId, debt.SkillInstanceId, debt.StateId, false);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NiuJinJudgmentSkipConsumedEvent(debt.OwnerSeat, debt.SkillInstanceId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, alreadySkipped));
         }

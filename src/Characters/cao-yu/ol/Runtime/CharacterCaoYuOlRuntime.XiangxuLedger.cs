@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoYuOlRuntime
 {
     internal bool IsXiangxuMinimumTrigger(SkillProgramTrigger t) => t.Effects is [{ Op: SkillProgramEffectOp.ResolveXiangxuMinimumTransition }];
     internal bool IsXiangxuEndingTrigger(SkillProgramTrigger t) => t.Effects is [{ Op: SkillProgramEffectOp.ResolveXiangxuIssuedTurnEndAdjustment }];
-    internal global::CardGame.Core.GameEngine.CaoYuDeathMinimumCapture? CaptureCaoYuDeathMinimumSources(int victimSeat)
+    internal GameEngine.CaoYuDeathMinimumCapture? CaptureCaoYuDeathMinimumSources(int victimSeat)
     {
         if (!HasCaoYuCapability || !_coreMatchSetupSetupCompleteAccess._setupComplete || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(victimSeat) || !_coreMatchParticipantsPlayersAccess._players[victimSeat].IsAlive || !CaoYuActualTurnOpen(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DeathFrame { ReturnKind: { } kind } death || death.VictimSeat != victimSeat)
             return null;
@@ -26,7 +22,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
         return sources.Length == 0 ? null : new(death.Id, death.ParentFrameId, victimSeat, death.KillerSeat, kind, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, sources, counts, alive);
     }
 
-    internal void RecordCaoYuDeathMinimumTransitions(long deathFrameId, int victimSeat, global::CardGame.Core.GameEngine.CaoYuDeathMinimumCapture? capture)
+    internal void RecordCaoYuDeathMinimumTransitions(long deathFrameId, int victimSeat, GameEngine.CaoYuDeathMinimumCapture? capture)
     {
         if (capture is not { } r)
             return;

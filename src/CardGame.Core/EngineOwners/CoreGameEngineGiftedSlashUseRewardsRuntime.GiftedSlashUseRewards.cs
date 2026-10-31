@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
 {
     internal long GiftedSlashSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static string GiftedSlashGiftReason(string skill) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GiftedSlashUseRewards.GiftedSlashGiftReason(skill);
-    internal static string GiftedSlashDrawReason(string skill) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GiftedSlashUseRewards.GiftedSlashDrawReason(skill);
+    internal static string GiftedSlashGiftReason(string skill) => RuntimeSkills.RuntimeRules_Core_GiftedSlashUseRewards.GiftedSlashGiftReason(skill);
+    internal static string GiftedSlashDrawReason(string skill) => RuntimeSkills.RuntimeRules_Core_GiftedSlashUseRewards.GiftedSlashDrawReason(skill);
     internal bool TracksGiftedSlash => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RewardGiftedSlashUse);
 
     internal bool ExactGiftedSlashGiftActivation(ProgramSkillFrame frame)
@@ -83,7 +79,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
         return policy;
     }
 
-    internal global::CardGame.Core.GameEngine.ProgramCardIdentityMatch? GetGiftedSlashIdentityMatch(CharacterState owner, Card card)
+    internal GameEngine.ProgramCardIdentityMatch? GetGiftedSlashIdentityMatch(CharacterState owner, Card card)
     {
         if (ActiveGiftedSlashPolicy(owner.Seat, card.Id)is not { } policy)
             return null;
@@ -93,7 +89,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
 
     internal void IssueGiftedSlashUseBenefit(long useId, CardActionContext? action)
     {
-        if (!TracksGiftedSlash || action is not { Type: CardActionType.Use } || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != action.ProviderSeat || action.PhysicalCards is not [var material] || material.From != CardLocation.Hand(action.ActorSeat) || ActiveGiftedSlashPolicy(action.ActorSeat, material.CardId)is not { } policy || !action.ConversionChain.Contains(policy.Source))
+        if (!TracksGiftedSlash || action is not { Type: CardActionType.Use } || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != action.ProviderSeat || action.PhysicalCards is not [var material] || material.From != CardLocation.Hand(action.ActorSeat) || ActiveGiftedSlashPolicy(action.ActorSeat, material.CardId)is not { } policy || !action.ConversionChain.Contains(policy.Source))
             return;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(useId) ?? throw new InvalidOperationException("A gifted Slash benefit requires its real owning use.");
         if (use.GiftedSlashUseBenefit is not null || use.Action?.ActionId != action.ActionId || use.SourceSeat != action.ActorSeat || use.CardId != material.CardId || use.CardKind != action.EffectiveKind || use.PhysicalCardIds is not [var id] || id != material.CardId || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GiftedSlashUseBenefitIssuedEvent>().Any(e => e.Benefit.CardUseFrameId == useId))
@@ -132,7 +128,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
             return;
         }
 
-        if (!TracksGiftedSlash || use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.EffectiveKind != use.CardKind || benefit.CardUseFrameId != use.Id || benefit.ActionId != action.ActionId || benefit.OriginalActorSeat != benefit.Policy.RecipientSeat || benefit.ProviderSeat != benefit.OriginalActorSeat || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, benefit.OriginalActorSeat, benefit.ProviderSeat) || action.PhysicalCards is not [var material] || material != benefit.Material || use.CardId != material.CardId || use.PhysicalCardIds is not [var id] || id != material.CardId || material.CardId != benefit.Policy.CardId || material.From != CardLocation.Hand(benefit.Policy.RecipientSeat) || !action.ConversionChain.Contains(benefit.Policy.Source) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GiftedSlashUseBenefitIssuedEvent>().Count(e => e.Benefit == benefit) != 1)
+        if (!TracksGiftedSlash || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.EffectiveKind != use.CardKind || benefit.CardUseFrameId != use.Id || benefit.ActionId != action.ActionId || benefit.OriginalActorSeat != benefit.Policy.RecipientSeat || benefit.ProviderSeat != benefit.OriginalActorSeat || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, benefit.OriginalActorSeat, benefit.ProviderSeat) || action.PhysicalCards is not [var material] || material != benefit.Material || use.CardId != material.CardId || use.PhysicalCardIds is not [var id] || id != material.CardId || material.CardId != benefit.Policy.CardId || material.From != CardLocation.Hand(benefit.Policy.RecipientSeat) || !action.ConversionChain.Contains(benefit.Policy.Source) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GiftedSlashUseBenefitIssuedEvent>().Count(e => e.Benefit == benefit) != 1)
             throw new InvalidOperationException("A gifted Slash use lost its accepted recipient/provider, original material or frozen policy.");
         AssertGiftedSlashPolicyOrigin(benefit.Policy);
     }
@@ -287,6 +283,6 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
     internal ProgramSkillFrame? GiftedSlashObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.GiftedSlashFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 270)]
     internal bool IsGiftedSlashProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && GiftedSlashObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    SkillProgramStepOutcome global::CardGame.Core.IGiftedSlashUseRewardHost.BeginGiftedSlashGift(SkillProgramEffect effect, ProgramSkillFrame frame, int recipientSeat) => BeginGiftedSlashGift(effect, frame, recipientSeat);
-    SkillProgramStepOutcome global::CardGame.Core.IGiftedSlashUseRewardHost.BeginGiftedSlashUseReward(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginGiftedSlashUseReward(effect, frame);
+    SkillProgramStepOutcome IGiftedSlashUseRewardHost.BeginGiftedSlashGift(SkillProgramEffect effect, ProgramSkillFrame frame, int recipientSeat) => BeginGiftedSlashGift(effect, frame, recipientSeat);
+    SkillProgramStepOutcome IGiftedSlashUseRewardHost.BeginGiftedSlashUseReward(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginGiftedSlashUseReward(effect, frame);
 }

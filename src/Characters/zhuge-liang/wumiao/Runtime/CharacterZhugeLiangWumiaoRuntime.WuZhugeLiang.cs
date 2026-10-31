@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
     internal const string WuZglDraw = "skill-program.wumiao:zhuge-liang.draw", WuZglCopy = "skill-program.wumiao:zhizhe.copy";
     internal bool HasWuZhugeLiangCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeWuZhugeLiangJincui) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveWuZhugeLiangQingshi) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveWuZhugeLiangZhizhe);
 
-    internal static CardConversionSource WuZglSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhuge_liang_wumiao_WuZhugeLiang.WuZglSource(f);
+    internal static CardConversionSource WuZglSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhuge_liang_wumiao_WuZhugeLiang.WuZglSource(f);
     internal bool WuZglTurnOpen(int turn, int owner) => turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && owner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == turn && e.OwnerSeat == owner);
     internal CardActionContext? WuZglAction(ProgramSkillWindowContext c) => c.CardUse is { } id ? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Select(f => f.Action).FirstOrDefault(a => a?.ActionId == id.CardActionId) ?? _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().LastOrDefault(e => e.Action.ActionId == id.CardActionId)?.Action : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 30300, SkillProgramEffectOp.InitializeWuZhugeLiangJincui, SkillProgramEffectOp.ResolveWuZhugeLiangJincui, SkillProgramEffectOp.ResolveWuZhugeLiangQingshi)]
@@ -20,7 +17,7 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
         SkillProgramEffectOp.InitializeWuZhugeLiangJincui => c.Window == SkillProgramTriggerWindow.GameStarting && !_coreProgramEventHistoryOperations.ProgramEventHistory<WuZhugeLiangStartedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Operation == SkillProgramEffectOp.InitializeWuZhugeLiangJincui),
         SkillProgramEffectOp.ResolveWuZhugeLiangJincui => c.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Preparation } p && p.ActorSeat == candidate.OwnerSeat,
         _ => CanWuZglQingshi(candidate.OwnerSeat, c)};
-    SkillProgramStepOutcome global::CardGame.Core.IWuZhugeLiangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWuZgl(f, op);
+    SkillProgramStepOutcome IWuZhugeLiangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWuZgl(f, op);
     internal SkillProgramStepOutcome BeginWuZgl(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -65,8 +62,8 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
                 return SkillProgramStepOutcome.AwaitChild;
             }
 
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuZhugeLiang = r with { Paid = true, Name = global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind), Stage = WuZhugeLiangStage.Choice } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuZhugeLiangQingshiAcceptedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, r.ActionId, global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind)));
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuZhugeLiang = r with { Paid = true, Name = CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind), Stage = WuZhugeLiangStage.Choice } });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuZhugeLiangQingshiAcceptedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, r.ActionId, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind)));
             PublishWuZgl(f);
             return SkillProgramStepOutcome.AwaitChoice;
         }
@@ -129,7 +126,7 @@ internal sealed partial class CharacterZhugeLiangWumiaoRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.WuZhugeLiang!;
-        if (!ValidWuZgl(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuZglChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidWuZgl(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuZglChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Qingshi requires its exact published owning choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)

@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongBaiOlRuntime
 {
-    internal static CardConversionSource LianZhuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_dong_bai_ol_DongBaiPrograms.LianZhuSource(f);
-    internal static string LianZhuReason(LianZhuStage stage) => global::CardGame.Core.RuntimeSkills.RuntimeRules_dong_bai_ol_DongBaiPrograms.LianZhuReason(stage);
+    internal static CardConversionSource LianZhuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_dong_bai_ol_DongBaiPrograms.LianZhuSource(f);
+    internal static string LianZhuReason(LianZhuStage stage) => RuntimeSkills.RuntimeRules_dong_bai_ol_DongBaiPrograms.LianZhuReason(stage);
     internal SkillProgramStepOutcome BeginLianZhu(ProgramSkillFrame supplied, int recipient)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -43,7 +39,7 @@ internal sealed partial class CharacterDongBaiOlRuntime
     {
         if (f.LianZhu!.Stage == LianZhuStage.SelectingDiscard)
             return Array.AsReadOnly(LianZhuDiscardOptions(f).Select(c => LianZhuChoice(f, "card-" + c.Cards.Single(), c.Label, c.Cards)).ToArray());
-        var amount = global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(f.LianZhu!);
+        var amount = CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(f.LianZhu!);
         var choices = new List<PromptChoice>
         {
             LianZhuChoice(f, "draw", f.LianZhu!.CountPolicy is null ? "令连诛拥有者摸两张牌" : $"令连诛拥有者摸{(amount)}张牌")
@@ -79,7 +75,7 @@ internal sealed partial class CharacterDongBaiOlRuntime
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         RequireLianZhu(f);
         var r = f.LianZhu!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.RecipientSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LianZhuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.RecipientSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LianZhuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("LianZhu lost recipient authority.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
@@ -107,7 +103,7 @@ internal sealed partial class CharacterDongBaiOlRuntime
             Selected = selected
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LianZhu = r });
-        if (selected.Length < global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r))
+        if (selected.Length < CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r))
         {
             PublishLianZhuChoice(f);
             return;
@@ -119,7 +115,7 @@ internal sealed partial class CharacterDongBaiOlRuntime
             Locations = selected.Select(_cardZonesOperations._cardZones.GetLocation).ToArray(),
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
             After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
-            Count = global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r)
+            Count = CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r)
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { LianZhu = r, PendingMovementContinuation = new(r.RecipientSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
         _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, r.RecipientSeat, selected, new(LianZhuReason(r.Stage)), (_, records) =>
@@ -145,7 +141,7 @@ internal sealed partial class CharacterDongBaiOlRuntime
             Count = 0
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { LianZhu = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
-        var count = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive ? _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r), true, new(LianZhuReason(r.Stage))).Count : 0;
+        var count = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive ? _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r), true, new(LianZhuReason(r.Stage))).Count : 0;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         r = r with
         {
@@ -198,7 +194,7 @@ internal sealed partial class CharacterDongBaiOlRuntime
     {
         if (f.LianZhu is { Stage: LianZhuStage.GiftChildren } revealing && _characterXiaoQiaoMouOlOperations.IsPublicHandRevealProducerSuspended(f.Id, "lianzhu-gift-hand") && revealing.Source == LianZhuSource(f) && revealing.GameplayHash == f.GameplayHash && revealing.InstructionIndex == f.InstructionIndex && f.SelectedCardIds.SequenceEqual([revealing.GiftCardId]) && f.SelectedTargetSeats.SequenceEqual([revealing.RecipientSeat]) && revealing.GiftBefore == revealing.GiftAfter && revealing.Before == revealing.After && _coreProgramEventHistoryOperations.ProgramEventHistory<CardsRevealedEvent>().Any(e => e.ResolutionId == f.Id && e.Cards.Select(c => c.Id).SequenceEqual([revealing.GiftCardId])) && !_coreProgramEventHistoryOperations.ProgramEventHistory<LianZhuSegmentPaidEvent>().Any(e => e.FrameId == f.Id))
             return;
-        if (f.LianZhu is not { } r || r.Source != LianZhuSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.TurnOwnerSeat != f.OwnerSeat || f.SelectedCardIds is not [var id] || id != r.GiftCardId || f.SelectedTargetSeats is not [var seat] || seat != r.RecipientSeat || r.GiftAfter <= r.GiftBefore || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Count > global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r))
+        if (f.LianZhu is not { } r || r.Source != LianZhuSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.TurnOwnerSeat != f.OwnerSeat || f.SelectedCardIds is not [var id] || id != r.GiftCardId || f.SelectedTargetSeats is not [var seat] || seat != r.RecipientSeat || r.GiftAfter <= r.GiftBefore || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Count > CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r))
             throw new InvalidOperationException("LianZhu lost its frozen source, recipient or exact gift invoice.");
         _coreLianZhuCountsOperations.RequireLianZhuChoiceAmount(f, r);
         if (_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.GiftBefore && m.Sequence <= r.GiftAfter && m.CardId == r.GiftCardId && m.From == (r.GiftFrom ?? CardLocation.Hand(f.OwnerSeat)) && m.To == CardLocation.Hand(r.RecipientSeat) && m.Reason.Value == LianZhuReason(LianZhuStage.GiftChildren)) != 1)
@@ -207,9 +203,9 @@ internal sealed partial class CharacterDongBaiOlRuntime
             throw new InvalidOperationException("LianZhu requires its once-issued original gift fact in every continuation stage.");
         if (r.Stage is LianZhuStage.RecipientChoice or LianZhuStage.SelectingDiscard)
         {
-            if (f.PendingMovementContinuation is not null || r.Stage == LianZhuStage.RecipientChoice && r.Selected.Count != 0 || r.Stage == LianZhuStage.SelectingDiscard && r.Selected.Count >= global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r))
+            if (f.PendingMovementContinuation is not null || r.Stage == LianZhuStage.RecipientChoice && r.Selected.Count != 0 || r.Stage == LianZhuStage.SelectingDiscard && r.Selected.Count >= CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r))
                 throw new InvalidOperationException("LianZhu choice cannot masquerade as a paid movement.");
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } decision && (decision.PlayerSeat != r.RecipientSeat || !decision.IsPrivate || decision.SkillPrompt?.SkillId != f.SkillId || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(decision.Choices, LianZhuChoices(f))))
+            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } decision && (decision.PlayerSeat != r.RecipientSeat || !decision.IsPrivate || decision.SkillPrompt?.SkillId != f.SkillId || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(decision.Choices, LianZhuChoices(f))))
                 throw new InvalidOperationException("LianZhu paid continuation lost its exact recipient prompt.");
             return;
         }
@@ -217,13 +213,13 @@ internal sealed partial class CharacterDongBaiOlRuntime
         var actor = r.Stage == LianZhuStage.DiscardChildren ? r.RecipientSeat : f.OwnerSeat;
         if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LianZhuSegmentPaidEvent>().Count(e => e == new LianZhuSegmentPaidEvent(f.Id, r.Source, r.GameplayHash, r.Stage, actor, r.Before, r.After, r.Count)) != 1 || f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } p || p.SubjectSeat != actor)
             throw new InvalidOperationException("LianZhu cannot resume an unissued payment.");
-        if (r.Stage == LianZhuStage.DrawChildren && (r.Count < 0 || r.Count > global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == LianZhuReason(r.Stage)) != r.Count))
+        if (r.Stage == LianZhuStage.DrawChildren && (r.Count < 0 || r.Count > CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r) || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == LianZhuReason(r.Stage)) != r.Count))
             throw new InvalidOperationException("LianZhu draw invoice changed.");
-        if (r.Stage == LianZhuStage.DiscardChildren && (r.Selected.Count != global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r) || r.Locations.Count != global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r) || r.Count != global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r) || r.Selected.Select((card, n) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == card && m.From == r.Locations[n] && m.Reason.Value == LianZhuReason(r.Stage) && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(card).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m))))).Any(count => count != 1)))
+        if (r.Stage == LianZhuStage.DiscardChildren && (r.Selected.Count != CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r) || r.Locations.Count != CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r) || r.Count != CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(r) || r.Selected.Select((card, n) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == card && m.From == r.Locations[n] && m.Reason.Value == LianZhuReason(r.Stage) && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(card).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m))))).Any(count => count != 1)))
             throw new InvalidOperationException("LianZhu discard invoice changed.");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDongBaiProgramHost.BeginLianZhu(ProgramSkillFrame f, int recipient) => BeginLianZhu(f, recipient);
+    SkillProgramStepOutcome IDongBaiProgramHost.BeginLianZhu(ProgramSkillFrame f, int recipient) => BeginLianZhu(f, recipient);
     [PublicHandRevealReturn("lianzhu-gift-hand")]
     internal void ContinueLianzhuAfterPublicReveal(ProgramSkillFrame f)
     {

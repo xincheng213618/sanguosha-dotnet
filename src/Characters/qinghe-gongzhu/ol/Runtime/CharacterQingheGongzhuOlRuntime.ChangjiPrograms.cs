@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQingheGongzhuOlRuntime
@@ -54,7 +50,7 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
         {
             _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[endingSeat], 2, true, new($"skill-program.{(active.SkillId)}.changji-draw"));
             _coreMatchLogOperations.AddLog("SkillEffect", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【长姬】：令 {(_coreMatchParticipantsPlayersAccess._players[endingSeat].Name)} 摸两张牌。", active.OwnerSeat, endingSeat);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramChangjiEndingEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, endingSeat, "draw", [], 2));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramChangjiEndingEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, endingSeat, "draw", [], 2));
             if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
                 _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
             return;
@@ -117,7 +113,7 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
         active = _coreNativeLogicalDiscardsOperations.CompleteFrameNativeLogicalDiscard(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { ChangjiDiscard = null });
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【长姬】：{(_coreMatchParticipantsPlayersAccess._players[state.EndingSeat].Name)} 弃置 {(discarded.Length)} 张手牌。", active.OwnerSeat, state.EndingSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramChangjiEndingEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.EndingSeat, "discard", Array.AsReadOnly(discarded), 0));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramChangjiEndingEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, state.EndingSeat, "discard", Array.AsReadOnly(discarded), 0));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }

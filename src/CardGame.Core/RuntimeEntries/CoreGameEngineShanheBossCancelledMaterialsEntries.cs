@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineShanheBossCancelledMaterialsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineShanheBossCancelledMaterialsRuntime))]
 internal sealed partial class CoreGameEngineShanheBossCancelledMaterialsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheBossCancelledMaterialsRuntime> _resolve;
-    private CoreGameEngineShanheBossCancelledMaterialsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheBossCancelledMaterialsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineShanheBossCancelledMaterialsRuntime> _resolve;
+    private CoreGameEngineShanheBossCancelledMaterialsEntries(Func<EngineOwners.CoreGameEngineShanheBossCancelledMaterialsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineShanheBossCancelledMaterialsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheBossCancelledMaterialsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineShanheBossCancelledMaterialsEntries Create(Func<EngineOwners.CoreGameEngineShanheBossCancelledMaterialsRuntime> resolve) => new(resolve);
 }

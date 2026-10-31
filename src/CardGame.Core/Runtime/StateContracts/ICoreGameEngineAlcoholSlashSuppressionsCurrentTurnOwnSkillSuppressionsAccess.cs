@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineAlcoholSlashSuppressionsCurrentTurnOwnSkillSuppressionsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.CurrentTurnOwnSkillSuppression> _currentTurnOwnSkillSuppressions { get; }
+    ref readonly List<CurrentTurnOwnSkillSuppression> _currentTurnOwnSkillSuppressions { get; }
 }

@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.PhysicalCardDrawRuntime))]
-internal sealed class CorePhysicalCardDrawPhysicalCardDrawAdapter(global::System.Func<global::CardGame.Core.PhysicalCardDrawRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICorePhysicalCardDrawPhysicalCardDrawOperations
+[Core.ProgramCapability(typeof(PhysicalCardDrawRuntime))]
+internal sealed class CorePhysicalCardDrawPhysicalCardDrawAdapter(Func<PhysicalCardDrawRuntime> targetFactory) : ICorePhysicalCardDrawPhysicalCardDrawOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.PhysicalCardDrawRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.PhysicalCardDrawRuntime Get() => this._targetFactory();
+    private readonly Func<PhysicalCardDrawRuntime> _targetFactory = targetFactory;
+    public PhysicalCardDrawRuntime Get() => this._targetFactory();
 }

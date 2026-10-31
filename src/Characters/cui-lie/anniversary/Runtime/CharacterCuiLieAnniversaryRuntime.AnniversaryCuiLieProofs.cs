@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCuiLieAnniversaryRuntime
@@ -19,8 +15,8 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         if (index < 1)
             return false;
         if (op == SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw)
-            return f.SkillId == AnniversaryCuiLieComposition.Zijue && f.TriggerId == "paid-pindian-draw" && w.Window == SkillProgramTriggerWindow.PindianCardsRevealed && _resolutionStackOperations._resolutionStack[index - 1] is PindianRevealWindowFrame p && p.Id == w.ParentFrameId && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]) && p.Cards.Any(c => c.Seat == f.OwnerSeat);
-        return op == SkillProgramEffectOp.ResolveAnniversaryCuiLieChibi && f.SkillId == AnniversaryCuiLieComposition.Chibi && f.TriggerId == "far-target-contest" && CuiLieUse(w)is { } u && _resolutionStackOperations._resolutionStack[index - 1] is ProgramCardTriggerWindowFrame window && window.Id == w.ParentFrameId && window.ParentFrameId == u.Id && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]));
+            return f.SkillId == AnniversaryCuiLieComposition.Zijue && f.TriggerId == "paid-pindian-draw" && w.Window == SkillProgramTriggerWindow.PindianCardsRevealed && _resolutionStackOperations._resolutionStack[index - 1] is PindianRevealWindowFrame p && p.Id == w.ParentFrameId && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]) && p.Cards.Any(c => c.Seat == f.OwnerSeat);
+        return op == SkillProgramEffectOp.ResolveAnniversaryCuiLieChibi && f.SkillId == AnniversaryCuiLieComposition.Chibi && f.TriggerId == "far-target-contest" && CuiLieUse(w)is { } u && _resolutionStackOperations._resolutionStack[index - 1] is ProgramCardTriggerWindowFrame window && window.Id == w.ParentFrameId && window.ParentFrameId == u.Id && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]));
     }
 
     internal bool ValidCuiLie(ProgramSkillFrame f)
@@ -68,9 +64,9 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         if (child is PindianFrame pair)
             return r.Stage == AnniversaryCuiLieStage.Pindian && pair.Id == r.PindianId && pair.ParentFrameId == f.Id && pair.SourceSeat == f.OwnerSeat && pair.OpponentSeat == r.Actor && pair.SkillId == f.SkillId && pair.ProgramResultBind == CuiLieContest;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryCuiLieStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == r.Number && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryCuiLieStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == r.Number && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } p && CuiLieMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && (IsAnniversaryCuiLiePindianSettlementBatch(f, moved.Batch) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved)) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+            return f.PendingMovementContinuation is { } p && CuiLieMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && (IsAnniversaryCuiLiePindianSettlementBatch(f, moved.Batch) || CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved)) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame recovery)
             return r.Stage == AnniversaryCuiLieStage.RecoveryChildren && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.ResumeFrameId == f.Id && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is HpChangedTriggerWindowFrame hp)
@@ -85,7 +81,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         if (child is PindianRevealWindowFrame reveal && parent is PindianFrame pair)
             return _corePindianRevealWindowsOperations.ExactPairRevealParent(pair, reveal);
         if (child is ProgramSkillFrame p && parent is PindianRevealWindowFrame w)
-            return w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && p.WindowContext?.ParentFrameId == w.Id && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(p, w.Candidates[w.CandidateIndex]);
+            return w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && p.WindowContext?.ParentFrameId == w.Id && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(p, w.Candidates[w.CandidateIndex]);
         return parent is ProgramSkillFrame f && CuiLieFirstChild(f, child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i);
     }
 

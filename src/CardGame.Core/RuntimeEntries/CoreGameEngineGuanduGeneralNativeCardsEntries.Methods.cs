@@ -2,16 +2,16 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineGuanduGeneralNativeCardsEntries
 {
-    internal void CaptureGuanduDamagingCards(global::CardGame.Core.IGameEvent payload) => _resolve().CaptureGuanduDamagingCards(payload);
-    internal void ContinueGuanduChoulue(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueGuanduChoulue(f);
-    internal void ContinueGuanduMoushi(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueGuanduMoushi(f);
-    internal void ContinueGuanduYuanlve(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinueGuanduYuanlve(f);
-    internal bool FinishGuanduYuanlveUse(global::CardGame.Core.ProgramSkillFrame f) => _resolve().FinishGuanduYuanlveUse(f);
-    internal global::CardGame.Core.CardKind? GuanduChoulueFrozenBasicKind(global::CardGame.Core.ProgramSkillFrame f) => _resolve().GuanduChoulueFrozenBasicKind(f);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> GuanduGiftChoices(global::CardGame.Core.ProgramSkillFrame f, bool nonEquipment) => _resolve().GuanduGiftChoices(f, nonEquipment);
-    internal global::CardGame.Core.CardKind? GuanduLastDamageCard(int seat) => _resolve().GuanduLastDamageCard(seat);
-    internal global::CardGame.Core.GuanduMoushiGiftedEvent? GuanduMoushiOccurrence(int owner, string instance, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().GuanduMoushiOccurrence(owner, instance, c);
-    internal bool GuanduMoushiQualifies(int owner, string instance, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().GuanduMoushiQualifies(owner, instance, c);
-    internal bool IsGuanduChoulueVirtualOrdinaryProgram(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect effect) => _resolve().IsGuanduChoulueVirtualOrdinaryProgram(f, effect);
-    internal bool ValidGuanduYuanlveOffer(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidGuanduYuanlveOffer(f);
+    internal void CaptureGuanduDamagingCards(IGameEvent payload) => _resolve().CaptureGuanduDamagingCards(payload);
+    internal void ContinueGuanduChoulue(ProgramSkillFrame f) => _resolve().ContinueGuanduChoulue(f);
+    internal void ContinueGuanduMoushi(ProgramSkillFrame f) => _resolve().ContinueGuanduMoushi(f);
+    internal void ContinueGuanduYuanlve(ProgramSkillFrame f) => _resolve().ContinueGuanduYuanlve(f);
+    internal bool FinishGuanduYuanlveUse(ProgramSkillFrame f) => _resolve().FinishGuanduYuanlveUse(f);
+    internal CardKind? GuanduChoulueFrozenBasicKind(ProgramSkillFrame f) => _resolve().GuanduChoulueFrozenBasicKind(f);
+    internal IReadOnlyList<PromptChoice> GuanduGiftChoices(ProgramSkillFrame f, bool nonEquipment) => _resolve().GuanduGiftChoices(f, nonEquipment);
+    internal CardKind? GuanduLastDamageCard(int seat) => _resolve().GuanduLastDamageCard(seat);
+    internal GuanduMoushiGiftedEvent? GuanduMoushiOccurrence(int owner, string instance, ProgramSkillWindowContext c) => _resolve().GuanduMoushiOccurrence(owner, instance, c);
+    internal bool GuanduMoushiQualifies(int owner, string instance, ProgramSkillWindowContext c) => _resolve().GuanduMoushiQualifies(owner, instance, c);
+    internal bool IsGuanduChoulueVirtualOrdinaryProgram(ProgramSkillFrame f, SkillProgramEffect effect) => _resolve().IsGuanduChoulueVirtualOrdinaryProgram(f, effect);
+    internal bool ValidGuanduYuanlveOffer(ProgramSkillFrame f) => _resolve().ValidGuanduYuanlveOffer(f);
 }

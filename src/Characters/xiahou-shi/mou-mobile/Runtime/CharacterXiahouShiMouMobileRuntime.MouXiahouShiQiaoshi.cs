@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -44,7 +41,7 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouXiahouShiQiaoshi!;
-        if (!ValidMouXiahouShiQiaoshi(f) || r.Stage != MouXiahouShiQiaoshiStage.SourceChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.DamageSourceSeat || !_coreMatchParticipantsPlayersAccess._players[r.DamageSourceSeat].IsAlive || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXiahouShiQiaoshiChoices(f).Where(c => c.Id == selected.Id).ToArray()) || MouXiahouShiQiaoshiSpent(f.OwnerSeat, r.Turn))
+        if (!ValidMouXiahouShiQiaoshi(f) || r.Stage != MouXiahouShiQiaoshiStage.SourceChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.DamageSourceSeat || !_coreMatchParticipantsPlayersAccess._players[r.DamageSourceSeat].IsAlive || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXiahouShiQiaoshiChoices(f).Where(c => c.Id == selected.Id).ToArray()) || MouXiahouShiQiaoshiSpent(f.OwnerSeat, r.Turn))
             throw new InvalidOperationException("Qiaoshi requires its actual damage source's current unused private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = selected.Parameters["branch"];

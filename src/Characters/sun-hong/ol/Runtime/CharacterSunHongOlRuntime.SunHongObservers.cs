@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunHongOlRuntime
 {
-    internal static bool XianbiChildren(XianbiStage stage) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_hong_ol_SunHongObservers.XianbiChildren(stage);
+    internal static bool XianbiChildren(XianbiStage stage) => RuntimeSkills.RuntimeRules_sun_hong_ol_SunHongObservers.XianbiChildren(stage);
     internal bool ValidXianbi(ProgramSkillFrame f)
     {
-        if (f.Xianbi is not { } r || f.InstructionIndex != 1 || f.SkillId != "ol:xianbi" || f.TriggerId is not null || f.WindowContext is not null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "adjust-and-return" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != XianbiSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveXianbiHandAdjustmentAndRandomReturns || !Enum.IsDefined(r.Stage) || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Cursor < 0 || r.Cursor > r.Primary.Count || r.Hand.Select(c => c.CardId).Distinct().Count() != r.Hand.Count || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Any(id => !r.Hand.Any(c => c.CardId == id)) || r.Primary.Select(c => c.CardId).Distinct().Count() != r.Primary.Count || r.Primary.Any(c => !r.Hand.Contains(c)) || _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner && e.PlayPhase == r.PlayPhase) != 1)
+        if (f.Xianbi is not { } r || f.InstructionIndex != 1 || f.SkillId != "ol:xianbi" || f.TriggerId is not null || f.WindowContext is not null || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "adjust-and-return" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != XianbiSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveXianbiHandAdjustmentAndRandomReturns || !Enum.IsDefined(r.Stage) || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Cursor < 0 || r.Cursor > r.Primary.Count || r.Hand.Select(c => c.CardId).Distinct().Count() != r.Hand.Count || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Any(id => !r.Hand.Any(c => c.CardId == id)) || r.Primary.Select(c => c.CardId).Distinct().Count() != r.Primary.Count || r.Primary.Any(c => !r.Hand.Contains(c)) || _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner && e.PlayPhase == r.PlayPhase) != 1)
             return false;
         var target = _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiTargetFrozenEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (!r.Issued)
@@ -99,11 +95,11 @@ internal sealed partial class CharacterSunHongOlRuntime
         if (f.Zenrun is not null)
             return ZenrunFirstChild(f, child);
         if (f.Xianbi is { Issued: true, Stage: XianbiStage.DrawRequest } && f.NativeDraw is not null)
-            return ValidXianbi(f) && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
+            return ValidXianbi(f) && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (f.Xianbi is not { Issued: true } r || !XianbiChildren(r.Stage) || !ValidXianbi(f))
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => XianbiMovementMatches(f, m));
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => XianbiMovementMatches(f, m));
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } changed)
@@ -111,7 +107,7 @@ internal sealed partial class CharacterSunHongOlRuntime
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange;
     }
 
-    internal ProgramSkillFrame? SunHongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => this.SunHongFirstChild(frame, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (at) => _coreObserverSubtreesOperations.IsMovementObserverEdge(at) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(at) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[at], _resolutionStackOperations2._resolutionStack()[at - 1]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[at], _resolutionStackOperations2._resolutionStack()[at - 1]), (at, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(at, dying)));
+    internal ProgramSkillFrame? SunHongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => this.SunHongFirstChild(frame, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (at) => _coreObserverSubtreesOperations.IsMovementObserverEdge(at) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(at) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[at], _resolutionStackOperations2._resolutionStack()[at - 1]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[at], _resolutionStackOperations2._resolutionStack()[at - 1]), (at, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(at, dying)));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 27570)]
     internal bool AdvanceSunHongChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && SunHongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CharacterMangYaChangAnniversaryRuntime
 {
     internal const string JiedaoDiscardReason = "skill-program.anniversary:jiedao.discard";
     internal static ProgramTriggerCandidate JiedaoCandidate(ProgramSkillFrame f) => new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryJiedaoHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginAnniversaryJiedao(frame, operation);
+    SkillProgramStepOutcome IAnniversaryJiedaoHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginAnniversaryJiedao(frame, operation);
     internal SkillProgramStepOutcome BeginAnniversaryJiedao(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -65,7 +62,7 @@ internal sealed partial class CharacterMangYaChangAnniversaryRuntime
     [ProgramAnswer("anniversary-jiedao")]
     internal void AnswerAnniversaryJiedao(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryJiedao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], JiedaoChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryJiedao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], JiedaoChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Jiedao lost its original private chooser or current exact choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == AnniversaryJiedaoStage.BonusChoice)

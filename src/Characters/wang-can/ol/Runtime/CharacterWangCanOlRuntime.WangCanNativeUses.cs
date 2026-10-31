@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangCanOlRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CharacterWangCanOlRuntime
         foreach (var id in r.Remaining.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == lease))
         {
             var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
-            if (global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) != SkillProgramCardCategory.Basic || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, [id]))
+            if (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) != SkillProgramCardCategory.Basic || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, [id]))
                 continue;
             var variants = new List<(CardKind Kind, CardConversionSource? Source)>
             {
@@ -39,10 +35,10 @@ internal sealed partial class CharacterWangCanOlRuntime
             {
                 var appearance = _characterWuJingOlOperations.WuJingLiubingUseCard(actor, card, kind, conversion, [id]);
                 var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, appearance);
-                var color = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
+                var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
                 if (_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
                     continue;
-                if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+                if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
                 {
                     var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, suit, color, card.Rank, [id], conversionSource: conversion, actualUnconvertedPhysical: conversion is null) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, t.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, t.Seat, suit)).ToArray();
                     foreach (var target in targets)
@@ -181,7 +177,7 @@ internal sealed partial class CharacterWangCanOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 120)]
-    internal bool ReturnRegisteredCompleteDenglouNativeAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnRegisteredCompleteDenglouNativeAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.DenglouNative is null)
             return false;
@@ -189,7 +185,7 @@ internal sealed partial class CharacterWangCanOlRuntime
         return true;
     }
 
-    internal void CompleteDenglouNativeAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => FinishDenglouNativeReturn(completion.DenglouNative!);
+    internal void CompleteDenglouNativeAttack(GameEngine.AttackCompletionReceipt completion) => FinishDenglouNativeReturn(completion.DenglouNative!);
     internal void FinishDenglouNativeReturn(WangCanNativeReceipt n)
     {
         var parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(n.ProgramFrameId);

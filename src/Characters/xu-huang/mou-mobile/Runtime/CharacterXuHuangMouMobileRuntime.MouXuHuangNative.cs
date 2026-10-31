@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXuHuangMouMobileRuntime
 {
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> MouXuHuangDuelOptions(ProgramSkillFrame f) => Array.AsReadOnly(_coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], CardKind.Duel, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: true, conversionSource: f.MouXuHuangDuanliang!.Source).Where(o => o.ActionKind == LegalActionKind.Duel && o.TargetSeats.Count > 0 && o.TargetSeats[0] == f.MouXuHuangDuanliang.TargetSeat).ToArray());
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> MouXuHuangDuelOptions(ProgramSkillFrame f) => Array.AsReadOnly(_coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], CardKind.Duel, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: true, conversionSource: f.MouXuHuangDuanliang!.Source).Where(o => o.ActionKind == LegalActionKind.Duel && o.TargetSeats.Count > 0 && o.TargetSeats[0] == f.MouXuHuangDuanliang.TargetSeat).ToArray());
     internal IReadOnlyList<PromptChoice> MouXuHuangDuelChoices(ProgramSkillFrame f) => Array.AsReadOnly(MouXuHuangDuelOptions(f).Select(o => new PromptChoice(new($"mou-xu-huang.{(f.Id)}.duel.{(o.Id.Value)}"), o.Description, [], o.TargetSeats, new Dictionary<string, string> { ["program-action"] = "mou-xu-huang-duel-targets", ["frame-id"] = f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["option-id"] = o.Id.Value })).ToArray());
     internal void BeginMouXuHuangDuelTargets(ProgramSkillFrame f)
     {
@@ -32,14 +28,14 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     internal void AnswerMouXuHuangDuelTargets(PromptChoice selected)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
-        if (!MouXuHuangDuanliangRoot(f) || f.MouXuHuangDuanliang!.Stage != MouXuHuangDuanliangStage.DuelTargets || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXuHuangDuelChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!MouXuHuangDuanliangRoot(f) || f.MouXuHuangDuanliang!.Stage != MouXuHuangDuanliangStage.DuelTargets || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXuHuangDuelChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Duanliang's optional native target adjustment lost its exact current producer.");
         var option = MouXuHuangDuelOptions(f).Single(o => o.Id.Value == selected.Parameters["option-id"]);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         AcceptMouXuHuangDuelTargets(f, option);
     }
 
-    internal void AcceptMouXuHuangDuelTargets(ProgramSkillFrame f, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption option)
+    internal void AcceptMouXuHuangDuelTargets(ProgramSkillFrame f, GameEngine.ProgramOrdinaryTrickUseOption option)
     {
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouXuHuangDuanliang = f.MouXuHuangDuanliang!with { NativeTargets = option.TargetSeats } });
         foreach (var pair in option.TargetSeats.Select((seat, index) => (seat, index)))
@@ -172,7 +168,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 29500)]
-    internal bool ReturnMouXuHuangNativeAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnMouXuHuangNativeAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouXuHuangDuanliang: { NativeReturned: true, AttackReturned: false, Native: { } o } r } f || completion.ResolutionId != o.UseId)
             return false;

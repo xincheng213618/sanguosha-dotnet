@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangYanOlRuntime
@@ -40,7 +36,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
 
     internal bool IsZhangYanSujiUse(CardUseFrame use)
     {
-        if (use.ZhangYanSuji is not { } r || use.Action is not { Type: CardActionType.Use } a || r.UseId != use.Id || r.ActionId != a.ActionId || r.CardId != use.CardId || use.PhysicalCardIds is not [var material] || material != r.CardId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.PhysicalCards is not [var cost] || cost.CardId != r.CardId || cost.CardKind != r.PrintedKind || cost.From != r.From || !a.ConversionChain.Contains(r.Source) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.Source.OwnerSeat, r.Source.OwnerSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanSujiIssuedEvent>().Count(e => e.Return == r) != 1)
+        if (use.ZhangYanSuji is not { } r || use.Action is not { Type: CardActionType.Use } a || r.UseId != use.Id || r.ActionId != a.ActionId || r.CardId != use.CardId || use.PhysicalCardIds is not [var material] || material != r.CardId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.PhysicalCards is not [var cost] || cost.CardId != r.CardId || cost.CardKind != r.PrintedKind || cost.From != r.From || !a.ConversionChain.Contains(r.Source) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.Source.OwnerSeat, r.Source.OwnerSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanSujiIssuedEvent>().Count(e => e.Return == r) != 1)
             return false;
         var at = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
         return at > 0 && _resolutionStackOperations._resolutionStack[at - 1] is ProgramSkillFrame { ZhangYan: { Stage: ZhangYanStage.NativeUse, NativeCompleted: false } p } parent && parent.Id == r.ProgramFrameId && p.NativeReturn == r && p.Source == r.Source && p.GameplayHash == r.GameplayHash;
@@ -66,7 +62,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 27000)]
-    internal bool ReturnZhangYanSujiAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnZhangYanSujiAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangYan: { Stage: ZhangYanStage.NativeUse, NativeCompleted: true, NativeReturn: { } ret } r } f || ret.UseId != completion.ResolutionId)
             return false;
@@ -84,7 +80,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
         return use;
     }
 
-    internal void AppendZhangYanSujiDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> candidates)
+    internal void AppendZhangYanSujiDamageCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> candidates)
     {
         if (window != SkillProgramTriggerWindow.AfterDamageApplied || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ZhangYanSuji: { } r } use || r.PhaseOwner != attack.TargetSeat || !IsZhangYanSujiUse(use) || !ZhangYanRewardChoicesAvailable(r.Source.OwnerSeat, r.PhaseOwner))
             return;

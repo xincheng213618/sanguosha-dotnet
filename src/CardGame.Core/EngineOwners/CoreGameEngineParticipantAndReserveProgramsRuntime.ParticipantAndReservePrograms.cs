@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineParticipantAndReserveProgramsRuntime
@@ -45,7 +41,7 @@ internal sealed partial class CoreGameEngineParticipantAndReserveProgramsRuntime
                     _corePhysicalDrawFacadesOperations.DrawCards(owner, effect.Amount, log: true, new CardMoveReason("program.dying-transition.draw"));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IParticipantReserveProgramHost.ExecuteParticipantReserve(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteParticipantReserve(effect, frame);
+    SkillProgramStepOutcome IParticipantReserveProgramHost.ExecuteParticipantReserve(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecuteParticipantReserve(effect, frame);
     internal SkillProgramStepOutcome ExecuteParticipantReserve(SkillProgramEffect effect, ProgramSkillFrame frame)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
@@ -65,7 +61,7 @@ internal sealed partial class CoreGameEngineParticipantAndReserveProgramsRuntime
 
         if (effect.Op == SkillProgramEffectOp.RecoverAllLiving)
         {
-            global::CardGame.Core.NativeOwners.ProgramSkillHost host = _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost();
+            NativeOwners.ProgramSkillHost host = _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost();
             foreach (var player in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive))
                 host.Recover(frame.Id, owner.Seat, player.Seat, effect.Amount, null, null);
             return SkillProgramStepOutcome.Continue;

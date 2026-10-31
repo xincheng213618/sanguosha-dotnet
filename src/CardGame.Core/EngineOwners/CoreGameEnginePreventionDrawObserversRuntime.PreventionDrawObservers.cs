@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePreventionDrawObserversRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CoreGameEnginePreventionDrawObserversRuntime
     internal bool IsValidPreventionDrawReceipt(ProgramSkillFrame root, BeforeDamageProgramWindowFrame parent)
     {
         var participant = _coreParticipantPreventionOperations.IsParticipantPreventionDraw(root);
-        if (root.PreventionDrawReceipt is not { } receipt || root.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || context.ParentFrameId != parent.Id || !participant && context.TargetSeat != root.OwnerSeat || context.Amount != parent.Amount || receipt.BeforeDamageFrameId != parent.Id || receipt.TargetSeat != parent.TargetSeat || !participant && parent.TargetSeat != root.OwnerSeat || participant && (parent.SourceSeat == parent.TargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(parent.SourceSeat) || root.OwnerSeat != parent.SourceSeat && root.OwnerSeat != parent.TargetSeat) || receipt.SourceSeat != parent.SourceSeat || receipt.PreventedAmount != parent.Amount || !parent.Prevented || parent.Amount <= 0 || receipt.InstructionIndex != root.InstructionIndex - 1 || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, parent.Candidates[parent.CandidateIndex].Candidate))
+        if (root.PreventionDrawReceipt is not { } receipt || root.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || context.ParentFrameId != parent.Id || !participant && context.TargetSeat != root.OwnerSeat || context.Amount != parent.Amount || receipt.BeforeDamageFrameId != parent.Id || receipt.TargetSeat != parent.TargetSeat || !participant && parent.TargetSeat != root.OwnerSeat || participant && (parent.SourceSeat == parent.TargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(parent.SourceSeat) || root.OwnerSeat != parent.SourceSeat && root.OwnerSeat != parent.TargetSeat) || receipt.SourceSeat != parent.SourceSeat || receipt.PreventedAmount != parent.Amount || !parent.Prevented || parent.Amount <= 0 || receipt.InstructionIndex != root.InstructionIndex - 1 || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, parent.Candidates[parent.CandidateIndex].Candidate))
             return false;
         var instructions = ProgramInstructionResolver.Default.Resolve(root, _contentRegistryOperations._contentRegistry.GetSkill(root.SkillId).Program!).Instructions;
         if (receipt.InstructionIndex < 0 || receipt.InstructionIndex >= instructions.Count || instructions[receipt.InstructionIndex] is not { } effect || effect.Op != (participant ? SkillProgramEffectOp.PreventParticipantDamageDrawActualSource : SkillProgramEffectOp.PreventCurrentDamageAndDrawMultiple) || receipt.Multiplier != (participant ? 2 : effect.Amount) || receipt.ActualDrawCount < 0 || receipt.ActualDrawCount > (participant ? 2 : checked(parent.Amount * effect.Amount)) || receipt.MovementSequenceBefore < 0 || receipt.MovementSequenceAfter < receipt.MovementSequenceBefore)

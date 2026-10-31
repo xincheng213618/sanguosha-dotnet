@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoTuOlRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
             _ => throw new InvalidOperationException("Weijie response lost its typed incoming native owner.")});
     }
 
-    internal static WeijiePaidOrigin? WeijieResponseOrigin(ResolutionFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieResponses.WeijieResponseOrigin(f);
+    internal static WeijiePaidOrigin? WeijieResponseOrigin(ResolutionFrame f) => RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieResponses.WeijieResponseOrigin(f);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27462)]
     internal void ObserveWeijieResponse(CardActionAcceptedEvent accepted)
     {
@@ -54,7 +50,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         var attack = n.Intent == WeijieIntent.Duel ? _coreNativeCardContinuationCursorsOperations.ActiveDuel!.Attack : n.Intent == WeijieIntent.Group ? _coreNativeCardContinuationCursorsOperations.ActiveGroupCard!.CurrentAttack! : n.Intent == WeijieIntent.FactionSlashPlayed ? _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.ResponseAttack! : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack!;
         var continuation = WeijieResponseContinuation(p);
         var faction = _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest;
-        global::CardGame.Core.GameEngine.FactionProviderRewardReceipt? reward = null;
+        GameEngine.FactionProviderRewardReceipt? reward = null;
         if (n.Intent == WeijieIntent.FactionSlashPlayed)
         {
             reward = _coreFactionRequestPaymentsOperations.CaptureFactionProviderReward(faction!);
@@ -74,7 +70,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GroupResponseEvent(g.ResolutionId, g.Card.Kind, g.RequiredCardKind!.Value, n.ActorSeat, true, 0, p.OutputKind));
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind))
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(n.ActorSeat, p.OutputKind);
         if (reward is not null)
             _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(reward, n.ProviderSeat);
@@ -137,7 +133,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(reward, n.ProviderSeat);
     }
 
-    internal bool IsWeijieZeroSupply(CardUseFrame use, global::CardGame.Core.NativeOwners.FactionCardRequestHandle request) => use.WeijieOrigin is { } p && p.Need.Intent == WeijieIntent.FactionSlashUse && IsIssuedWeijieUse(use) && p.Need.OwnerFrameId == request.OwnerFrameId && p.Need.ActorSeat == request.OwnerSeat && p.Need.ProviderSeat == request.CurrentCandidateSeat && p.Need.RequesterSeat == request.OwnerSeat && p.Need.Cursor == request.CandidateIndex && request.TargetSeat == p.TargetSeat && request.ActiveAttack?.ResolutionId == use.Id;
+    internal bool IsWeijieZeroSupply(CardUseFrame use, NativeOwners.FactionCardRequestHandle request) => use.WeijieOrigin is { } p && p.Need.Intent == WeijieIntent.FactionSlashUse && IsIssuedWeijieUse(use) && p.Need.OwnerFrameId == request.OwnerFrameId && p.Need.ActorSeat == request.OwnerSeat && p.Need.ProviderSeat == request.CurrentCandidateSeat && p.Need.RequesterSeat == request.OwnerSeat && p.Need.Cursor == request.CandidateIndex && request.TargetSeat == p.TargetSeat && request.ActiveAttack?.ResolutionId == use.Id;
     internal void RepublishWeijieNative(WeijieReceipt r)
     {
         var n = r.Need;
@@ -189,7 +185,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         {
             if (!actor.IsAlive)
             {
-                if (r.Paid is not { } paid || !ValidWeijiePayment(paid) || !WeijieNativeNeedCurrent(r) || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != n.OwnerFrameId || blade.Attack.SourceSeat != n.ActorSeat || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack))
+                if (r.Paid is not { } paid || !ValidWeijiePayment(paid) || !WeijieNativeNeedCurrent(r) || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is not { } blade || blade.Attack.ResolutionId != n.OwnerFrameId || blade.Attack.SourceSeat != n.ActorSeat || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, blade.Attack))
                     throw new InvalidOperationException("A dead Weijie payer lost its exact still-unconsumed Qinglong parent.");
                 // This is the native no-follow-up return: no card or dead-player menu is issued.
                 var attack = blade.Attack;

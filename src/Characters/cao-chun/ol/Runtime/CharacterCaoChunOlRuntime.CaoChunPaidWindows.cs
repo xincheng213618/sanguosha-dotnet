@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoChunOlRuntime
@@ -41,14 +37,14 @@ internal sealed partial class CharacterCaoChunOlRuntime
         return _coreCardActionsOperations.TryBeginProgramCardWindow(null, a, SkillProgramTriggerWindow.CardUseBeforeTargetEffects, a.TargetSeats, ProgramCardContinuation.CommittedSimpleCard, simpleContinuation: continuation, caoChunPayment: p, caoChunDebtOnly: true);
     }
 
-    internal bool CaoChunResponseParentMatches(global::CardGame.Core.NativeOwners.CardAttackHandle? attack, CardActionContext action, ProgramCompletedResponseKind kind)
+    internal bool CaoChunResponseParentMatches(NativeOwners.CardAttackHandle? attack, CardActionContext action, ProgramCompletedResponseKind kind)
     {
         if (kind == ProgramCompletedResponseKind.Nullification)
             return _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } n && action.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(n) && action.OpponentSeat == n.SourceSeat;
-        return attack is not null && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) && attack.TargetSeat == action.ActorSeat && attack.SourceSeat == action.OpponentSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId == action.ParentActionId;
+        return attack is not null && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) && attack.TargetSeat == action.ActorSeat && attack.SourceSeat == action.OpponentSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId == action.ParentActionId;
     }
 
-    internal bool TryBeginCaoChunPaidResponseDebt(global::CardGame.Core.NativeOwners.CardAttackHandle? attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal bool TryBeginCaoChunPaidResponseDebt(NativeOwners.CardAttackHandle? attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         if ((!HasCaoChunCapability) || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(action, continuation) || action.PhysicalCards.Count == 0)
             return false;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHaoPuOlRuntime
@@ -25,7 +21,7 @@ internal sealed partial class CharacterHaoPuOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 26500)]
-    internal bool ReturnZhenyingDuelAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnZhenyingDuelAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.ZhenyingDuel is not { } origin)
             return false;

@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangQiYingOlRuntime
 {
-    internal int FaluTokenCount(int owner) => global::CardGame.Core.EngineOwners.CharacterZhangQiYingOlDefinitions.FaluTokens.Count(m => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(m) > 0);
+    internal int FaluTokenCount(int owner) => CharacterZhangQiYingOlDefinitions.FaluTokens.Count(m => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(m) > 0);
     internal CardLocation? FaluDiscardOwnedSource(CardMovementRecord movement)
     {
         if (movement.To != CardLocation.DiscardPile)
@@ -15,7 +11,7 @@ internal sealed partial class CharacterZhangQiYingOlRuntime
         var origin = _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement);
         if (origin is { OwnerSeat: not null, Zone: CardZoneKind.Hand or CardZoneKind.Equipment })
             return origin;
-        return movement.From is { OwnerSeat: not null, Zone: CardZoneKind.WoodenOxGrain } && global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardTopPlacementRuntime.IsDiscardMovementReason(movement.Reason) ? movement.From : null;
+        return movement.From is { OwnerSeat: not null, Zone: CardZoneKind.WoodenOxGrain } && CoreGameEngineProgramDiscardTopPlacementRuntime.IsDiscardMovementReason(movement.Reason) ? movement.From : null;
     }
 
     internal void SetFaluToken(ProgramSkillFrame f, PlayerMarkerKind marker, int value, string reason)

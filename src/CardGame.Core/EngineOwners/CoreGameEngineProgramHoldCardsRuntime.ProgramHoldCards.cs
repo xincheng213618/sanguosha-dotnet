@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramHoldCardsRuntime
@@ -118,7 +114,7 @@ internal sealed partial class CoreGameEngineProgramHoldCardsRuntime
                 _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.PojunHold(draft.HolderSeat), CardMoveReasons.PojunHold);
             _coreProgramLifecycleOperations.SetProgramCardSet(frame.Id, draft.ResultBind, ids, SkillProgramCardSetVisibility.Private, moves.Select(_ => CardLocation.PojunHold(draft.HolderSeat)).ToArray());
             _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Name)} 将 {(ids.Length)} 张牌扣置于 {(_coreMatchParticipantsPlayersAccess._players[draft.HolderSeat].Name)} 的武将牌旁。", frame.OwnerSeat, draft.HolderSeat);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramHoldCardsPlacedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, draft.HolderSeat, draft.ResultBind, Array.AsReadOnly(ids)));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramHoldCardsPlacedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, draft.HolderSeat, draft.ResultBind, Array.AsReadOnly(ids)));
         }
 
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);

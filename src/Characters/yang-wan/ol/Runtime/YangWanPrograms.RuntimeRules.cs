@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_yang_wan_ol_YangWanPrograms
 {
     internal static int SuitMask(Suit suit) => suit switch

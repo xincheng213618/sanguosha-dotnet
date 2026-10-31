@@ -2,7 +2,7 @@
 
 namespace CardGame.Core.NativeOwners;
 
-internal sealed class NativeFrameAutomaticRules(global::CardGame.Core.NativeOwners.KernelAdvanceRulesAndPublishStateCall advanceRulesAndPublishState) : INativeFrameAutomaticRules
+internal sealed class NativeFrameAutomaticRules(KernelAdvanceRulesAndPublishStateCall advanceRulesAndPublishState) : INativeFrameAutomaticRules
     {
         public void AdvanceRulesAndPublishState() => advanceRulesAndPublishState();
     }

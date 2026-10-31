@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreNativeStoneAxeRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreNativeStoneAxeRuntime))]
 internal sealed partial class CoreNativeStoneAxeEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeStoneAxeRuntime> _resolve;
-    private CoreNativeStoneAxeEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeStoneAxeRuntime> resolve)
+    private readonly Func<EngineOwners.CoreNativeStoneAxeRuntime> _resolve;
+    private CoreNativeStoneAxeEntries(Func<EngineOwners.CoreNativeStoneAxeRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreNativeStoneAxeEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeStoneAxeRuntime> resolve) => new(resolve);
+    internal static CoreNativeStoneAxeEntries Create(Func<EngineOwners.CoreNativeStoneAxeRuntime> resolve) => new(resolve);
 }

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ExpressionNumberCaptureHost(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, global::CardGame.Core.NativeOwners.ProgramExpressionWorldFactory createProgramExpressionWorld, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramExpressionsEntries> getCoreGameEngineProgramExpressionsRuntime) : IProgramExpressionCaptureHost
+internal sealed class ExpressionNumberCaptureHost(Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, ProgramExpressionWorldFactory createProgramExpressionWorld, Func<RuntimeEntries.CoreGameEngineProgramExpressionsEntries> getCoreGameEngineProgramExpressionsRuntime) : IProgramExpressionCaptureHost
 {
     public void Capture(ProgramSkillFrame frame, string name, ProgramExpression expression)
     {

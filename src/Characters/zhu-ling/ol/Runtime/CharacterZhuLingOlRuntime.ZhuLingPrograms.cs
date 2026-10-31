@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuLingOlRuntime
 {
-    internal static string ZhanyiCategoryName(SkillProgramCardCategory category) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhu_ling_ol_ZhuLingPrograms.ZhanyiCategoryName(category);
-    internal IReadOnlyList<Card> ZhanyiOwnedCategoryCards(int ownerSeat, SkillProgramCardCategory category) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.Equipment(ownerSeat))).Where(card => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) == category).OrderBy(card => card.Id).ToArray();
+    internal static string ZhanyiCategoryName(SkillProgramCardCategory category) => RuntimeSkills.RuntimeRules_zhu_ling_ol_ZhuLingPrograms.ZhanyiCategoryName(category);
+    internal IReadOnlyList<Card> ZhanyiOwnedCategoryCards(int ownerSeat, SkillProgramCardCategory category) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.Equipment(ownerSeat))).Where(card => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) == category).OrderBy(card => card.Id).ToArray();
     internal SkillProgramStepOutcome ZhanyiProgramChooseCategory(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -71,21 +67,21 @@ internal sealed partial class CharacterZhuLingOlRuntime
         _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(logicalDiscard);
         if (category != SkillProgramCardCategory.Basic)
         {
-            _coreCardUseModulesOperations.GrantProgramTurnCardDamageModifier(active, global::CardGame.Core.EngineOwners.CharacterZhuLingOlDefinitions.ZhanyiBasicDamageKinds, 1, SkillProgramDamageModifierExpiration.NextOwnerTurnStart, SkillProgramDamageModifierSourceScope.OwnerUsed);
-            _coreCardUseModulesOperations.GrantProgramTurnRuleModifier(active, SkillRuleQuery.CardUseDistanceLimit, SkillRuleOperation.Unlimited, 0, global::CardGame.Core.EngineOwners.CharacterZhuLingOlDefinitions.ZhanyiBasicDamageKinds, expiration: paused.Effect.CardUseBenefitPolicy?.Expiration ?? SkillProgramDamageModifierExpiration.CurrentTurnEnd);
+            _coreCardUseModulesOperations.GrantProgramTurnCardDamageModifier(active, CharacterZhuLingOlDefinitions.ZhanyiBasicDamageKinds, 1, SkillProgramDamageModifierExpiration.NextOwnerTurnStart, SkillProgramDamageModifierSourceScope.OwnerUsed);
+            _coreCardUseModulesOperations.GrantProgramTurnRuleModifier(active, SkillRuleQuery.CardUseDistanceLimit, SkillRuleOperation.Unlimited, 0, CharacterZhuLingOlDefinitions.ZhanyiBasicDamageKinds, expiration: paused.Effect.CardUseBenefitPolicy?.Expiration ?? SkillProgramDamageModifierExpiration.CurrentTurnEnd);
             if (paused.Effect.CardUseBenefitPolicy is { RecoveryBonus: > 0 } policy)
                 _coreCardRecoveryModifiersOperations.GrantProgramCardRecoveryModifier(active, [CardKind.Peach, CardKind.Alcohol], policy.RecoveryBonus, policy.Expiration);
         }
 
         if (category != SkillProgramCardCategory.Trick)
-            _coreTurnHandLimitKindExemptionsOperations.GrantProgramTurnHandLimitCardKindExemption(active, global::CardGame.Core.EngineOwners.CharacterZhuLingOlDefinitions.ZhanyiTrickKinds, paused.Effect.CardUseBenefitPolicy?.Expiration ?? SkillProgramDamageModifierExpiration.CurrentTurnEnd);
+            _coreTurnHandLimitKindExemptionsOperations.GrantProgramTurnHandLimitCardKindExemption(active, CharacterZhuLingOlDefinitions.ZhanyiTrickKinds, paused.Effect.CardUseBenefitPolicy?.Expiration ?? SkillProgramDamageModifierExpiration.CurrentTurnEnd);
         _coreProgramSkillChangesOperations.SetProgramBooleanState(active, "zhanyi-basic", category != SkillProgramCardCategory.Basic);
         _coreProgramSkillChangesOperations.SetProgramBooleanState(active, "zhanyi-trick", category != SkillProgramCardCategory.Trick);
         _coreProgramSkillChangesOperations.SetProgramBooleanState(active, "zhanyi-equipment", category != SkillProgramCardCategory.Equipment);
         if (paused.Effect.CardUseBenefitPolicy?.ExpireBooleanStatesAtOwnerTurnStart == true)
             _coreProgramBooleanStateExpirationOperations.ScheduleProgramBooleanStateExpiration(active, ["zhanyi-basic", "zhanyi-trick", "zhanyi-equipment"], SkillProgramDamageModifierExpiration.NextOwnerTurnStart);
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 战意：弃置 {(discarded.Count)} 张【{(ZhanyiCategoryName(category))}】，另外两种类别的牌直到下个回合开始获得加成。", active.OwnerSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZhanyiCategoryChosenEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, category.ToString(), Array.AsReadOnly(discarded.Select(card => card.Id).ToArray())));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZhanyiCategoryChosenEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, category.ToString(), Array.AsReadOnly(discarded.Select(card => card.Id).ToArray())));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
@@ -212,11 +208,11 @@ internal sealed partial class CharacterZhuLingOlRuntime
         _corePhysicalMovementFacadesOperations.MoveCards([card], _cardZonesOperations._cardZones.GetLocation(card.Id), CardLocation.DiscardPile, reason, movement => _characterBianFuRenOlOperations.RecordBianFuRenForeignDiscardProducer(movement, active.OwnerSeat, active.Id));
         _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(logicalDiscard);
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】，弃置 {(_coreMatchParticipantsPlayersAccess._players[target].Name)} 的【{(card.DisplayName)}】。", active.OwnerSeat, target);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZhanyiEquipmentPunishEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, target, card.Id, fromHand));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramZhanyiEquipmentPunishEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, target, card.Id, fromHand));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IZhuLingProgramHost.ZhuLingZhanyiChooseCategory(ProgramSkillFrame frame, SkillProgramEffect effect) => ZhanyiProgramChooseCategory(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IZhuLingProgramHost.ZhuLingZhanyiEquipmentPunish(ProgramSkillFrame frame, SkillProgramEffect effect) => ZhanyiProgramEquipmentPunish(frame, effect);
+    SkillProgramStepOutcome IZhuLingProgramHost.ZhuLingZhanyiChooseCategory(ProgramSkillFrame frame, SkillProgramEffect effect) => ZhanyiProgramChooseCategory(frame, effect);
+    SkillProgramStepOutcome IZhuLingProgramHost.ZhuLingZhanyiEquipmentPunish(ProgramSkillFrame frame, SkillProgramEffect effect) => ZhanyiProgramEquipmentPunish(frame, effect);
 }

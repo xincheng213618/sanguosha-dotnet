@@ -1,22 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreNativeBorrowedSwordCoreProgramDistanceRulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeBorrowedSwordCoreProgramDistanceRulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramDistanceRules DistanceRules { get; }
+    ProgramDistanceRules DistanceRules { get; }
 }
 
-internal interface ICoreNativeBorrowedSwordCoreProgramTargetRulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeBorrowedSwordCoreProgramTargetRulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTargetRules TargetRules { get; }
+    ProgramTargetRules TargetRules { get; }
 }
 
-internal interface ICoreNativeBorrowedSwordCoreProgramCardLegalityOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeBorrowedSwordCoreProgramCardLegalityOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramCardLegality CardLegality { get; }
+    ProgramCardLegality CardLegality { get; }
 }

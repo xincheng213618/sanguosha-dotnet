@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeJinMouRuntime
@@ -13,35 +9,35 @@ internal sealed partial class CharacterZhugeJinMouRuntime
     internal bool HasMouZhugeJinZijin(int seat) => _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[seat]).Any(p => p.Id == MouZhugeJinComposition.Zijin);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 35600, SkillProgramEffectOp.ResolveMouZhugeJinTaozhou)]
     internal bool MouZhugeJinCanActivate(ProgramActivationLegalityContext c) => c.SkillId == MouZhugeJinComposition.Taozhou && c.Owner.IsAlive && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == c.OwnerSeat && !MouZhugeJinCooling(c.OwnerSeat) && _characterZhugeJinMouOperations.CreateMouZhugeJinFacts().Targets(c.OwnerSeat).Count > 0;
-    int global::CardGame.Core.IMouZhugeJinFacts.Turn => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber;
+    int IMouZhugeJinFacts.Turn => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber;
 
-    int global::CardGame.Core.IMouZhugeJinFacts.TurnOwner => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
+    int IMouZhugeJinFacts.TurnOwner => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
 
-    int global::CardGame.Core.IMouZhugeJinFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
+    int IMouZhugeJinFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
 
-    long global::CardGame.Core.IMouZhugeJinFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+    long IMouZhugeJinFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
-    bool global::CardGame.Core.IMouZhugeJinFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouZhugeJinFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    bool global::CardGame.Core.IMouZhugeJinFacts.Alive(int s) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive;
-    bool global::CardGame.Core.IMouZhugeJinFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
-    bool global::CardGame.Core.IMouZhugeJinFacts.Friendly(int owner, int other) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), other, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
-    int global::CardGame.Core.IMouZhugeJinFacts.Hp(int s) => _coreMatchParticipantsPlayersAccess._players[s].Hp;
-    string global::CardGame.Core.IMouZhugeJinFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
-    SkillProgram? global::CardGame.Core.IMouZhugeJinFacts.Program(string s) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(s)?.Program;
-    IEnumerable<T> global::CardGame.Core.IMouZhugeJinFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    IReadOnlyList<int> global::CardGame.Core.IMouZhugeJinFacts.Targets(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0 && !HasMouZhugeJinZijin(p.Seat)).Select(p => p.Seat).Order().ToArray();
-    IReadOnlyList<MouZhugeJinCard> global::CardGame.Core.IMouZhugeJinFacts.Hand(int s) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Select(c => new MouZhugeJinCard(c.Id, CardLocation.Hand(s), c.DisplayName)).ToArray());
-    IReadOnlyList<MouZhugeJinCard> global::CardGame.Core.IMouZhugeJinFacts.Costs(int chooser, int holder) => !((global::CardGame.Core.IMouZhugeJinFacts)this).Alive(chooser) || !((global::CardGame.Core.IMouZhugeJinFacts)this).Alive(holder) ? [] : Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, holder)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, c, new(zone, holder), OwnedCardMoveIntent.Discard) && (chooser != holder || !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(chooser, c, new(zone, holder), OwnedCardMoveIntent.Discard))).Select(c => new MouZhugeJinCard(c.Id, new(zone, holder), c.DisplayName))).ToArray());
-    MouZhugeJinUse? global::CardGame.Core.IMouZhugeJinFacts.Use(ProgramTriggerCandidate c, ProgramSkillWindowContext w, SkillProgramEffectOp op)
+    bool IMouZhugeJinFacts.Alive(int s) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive;
+    bool IMouZhugeJinFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
+    bool IMouZhugeJinFacts.Friendly(int owner, int other) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), other, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
+    int IMouZhugeJinFacts.Hp(int s) => _coreMatchParticipantsPlayersAccess._players[s].Hp;
+    string IMouZhugeJinFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
+    SkillProgram? IMouZhugeJinFacts.Program(string s) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(s)?.Program;
+    IEnumerable<T> IMouZhugeJinFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IReadOnlyList<int> IMouZhugeJinFacts.Targets(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0 && !HasMouZhugeJinZijin(p.Seat)).Select(p => p.Seat).Order().ToArray();
+    IReadOnlyList<MouZhugeJinCard> IMouZhugeJinFacts.Hand(int s) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Select(c => new MouZhugeJinCard(c.Id, CardLocation.Hand(s), c.DisplayName)).ToArray());
+    IReadOnlyList<MouZhugeJinCard> IMouZhugeJinFacts.Costs(int chooser, int holder) => !((IMouZhugeJinFacts)this).Alive(chooser) || !((IMouZhugeJinFacts)this).Alive(holder) ? [] : Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, holder)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, c, new(zone, holder), OwnedCardMoveIntent.Discard) && (chooser != holder || !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(chooser, c, new(zone, holder), OwnedCardMoveIntent.Discard))).Select(c => new MouZhugeJinCard(c.Id, new(zone, holder), c.DisplayName))).ToArray());
+    MouZhugeJinUse? IMouZhugeJinFacts.Use(ProgramTriggerCandidate c, ProgramSkillWindowContext w, SkillProgramEffectOp op)
     {
         var result = MouZhugeJinFacts_NativeUse(c, w);
         if (result is null)
             return null;
         var action = result.Action;
         if (op == SkillProgramEffectOp.ResolveMouZhugeJinZijin)
-            return w.Window == SkillProgramTriggerWindow.CardUseCompleted && action.ActorSeat == c.OwnerSeat && w.Facts?.CardUseCausedDamage == false && ((global::CardGame.Core.IMouZhugeJinFacts)this).History<CurrentTurnCardUseKindsRecordedEvent>().Any(p => p.CardActionId == action.ActionId && p.ActorSeat == c.OwnerSeat && p.WholeActualTurnUseSequence is> 0) ? result : null;
-        if (op != SkillProgramEffectOp.ResolveMouZhugeJinHoude || w.Window != SkillProgramTriggerWindow.CardUseBeforeTargetEffects || result.UseId == 0 || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == c.OwnerSeat || action.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || !action.TargetSeats.Contains(c.OwnerSeat) || !global::CardGame.Core.NativeOwners.MouZhugeJinFacts.HoudeKind(action, result.Red))
+            return w.Window == SkillProgramTriggerWindow.CardUseCompleted && action.ActorSeat == c.OwnerSeat && w.Facts?.CardUseCausedDamage == false && ((IMouZhugeJinFacts)this).History<CurrentTurnCardUseKindsRecordedEvent>().Any(p => p.CardActionId == action.ActionId && p.ActorSeat == c.OwnerSeat && p.WholeActualTurnUseSequence is> 0) ? result : null;
+        if (op != SkillProgramEffectOp.ResolveMouZhugeJinHoude || w.Window != SkillProgramTriggerWindow.CardUseBeforeTargetEffects || result.UseId == 0 || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == c.OwnerSeat || action.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || !action.TargetSeats.Contains(c.OwnerSeat) || !NativeOwners.MouZhugeJinFacts.HoudeKind(action, result.Red))
             return null;
         var history = _corePlayCardHistoryOperations.EventsSinceLastBoundary(p => p is PhaseChangedEvent or TurnStartedEvent or TurnEndedEvent);
         var first = history.Select(p => p switch
@@ -49,14 +45,14 @@ internal sealed partial class CharacterZhugeJinMouRuntime
             CardUseAppearanceCapturedEvent appearance => appearance.Action,
             CardActionAcceptedEvent accepted => accepted.Action,
             _ => null
-        }).OfType<CardActionContext>().Append(action).Where(a => a.ActorSeat == action.ActorSeat && a.TargetSeats.Contains(c.OwnerSeat) && global::CardGame.Core.NativeOwners.MouZhugeJinFacts.HoudeKind(a, result.Red)).DistinctBy(a => a.ActionId).MinBy(a => a.ActionId);
+        }).OfType<CardActionContext>().Append(action).Where(a => a.ActorSeat == action.ActorSeat && a.TargetSeats.Contains(c.OwnerSeat) && NativeOwners.MouZhugeJinFacts.HoudeKind(a, result.Red)).DistinctBy(a => a.ActionId).MinBy(a => a.ActionId);
         return first?.ActionId == action.ActionId ? result : null;
     }
 
-    bool global::CardGame.Core.IMouZhugeJinFacts.Parent(ProgramSkillFrame f, SkillProgramEffectOp op)
+    bool IMouZhugeJinFacts.Parent(ProgramSkillFrame f, SkillProgramEffectOp op)
     {
         if (op == SkillProgramEffectOp.ResolveMouZhugeJinTaozhou)
-            return f.SkillId == MouZhugeJinComposition.Taozhou && f.ActivationId == "secret-number-and-give" && f.TriggerId is null && f.WindowContext is null && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats.Count == 0 && ((global::CardGame.Core.IMouZhugeJinFacts)this).History<ProgramSkillStartedEvent>().Count(p => p.FrameId == f.Id && p.SkillId == f.SkillId && p.OwnerSeat == f.OwnerSeat && p.ActivationId == f.ActivationId) == 1;
+            return f.SkillId == MouZhugeJinComposition.Taozhou && f.ActivationId == "secret-number-and-give" && f.TriggerId is null && f.WindowContext is null && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats.Count == 0 && ((IMouZhugeJinFacts)this).History<ProgramSkillStartedEvent>().Count(p => p.FrameId == f.Id && p.SkillId == f.SkillId && p.OwnerSeat == f.OwnerSeat && p.ActivationId == f.ActivationId) == 1;
         if (f.WindowContext is not { } w || f.TriggerId != f.ActivationId || f.SkillId != (op == SkillProgramEffectOp.ResolveMouZhugeJinHoude ? MouZhugeJinComposition.Houde : MouZhugeJinComposition.Zijin) || w.Window != (op == SkillProgramEffectOp.ResolveMouZhugeJinHoude ? SkillProgramTriggerWindow.CardUseBeforeTargetEffects : SkillProgramTriggerWindow.CardUseCompleted))
             return false;
         var n = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
@@ -71,11 +67,11 @@ internal sealed partial class CharacterZhugeJinMouRuntime
         return new(window.Id, use?.Id ?? 0, window.Action, window.Action.EffectiveIsRed == true);
     }
 
-    internal static bool MouZhugeJinFacts_HoudeKind(CardActionContext a, bool red) => a.EffectiveIsRed == red && (red ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) : global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind));
-    void global::CardGame.Core.IMouZhugeJinNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
-    void global::CardGame.Core.IMouZhugeJinNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
-    bool global::CardGame.Core.IMouZhugeJinNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    void global::CardGame.Core.IMouZhugeJinNative.Give(ProgramSkillFrame f)
+    internal static bool MouZhugeJinFacts_HoudeKind(CardActionContext a, bool red) => a.EffectiveIsRed == red && (red ? CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) : CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind));
+    void IMouZhugeJinNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+    void IMouZhugeJinNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    bool IMouZhugeJinNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
+    void IMouZhugeJinNative.Give(ProgramSkillFrame f)
     {
         if (!MouZhugeJin.Valid(f) || f.MouZhugeJin is not { Stage: MouZhugeJinStage.GiveChildren, Committed: true } r || r.Cards.Count == 0 || r.Cards.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(r.Target)))
             throw new InvalidOperationException("Taozhou requires the giver's committed current Hand entities.");
@@ -91,7 +87,7 @@ internal sealed partial class CharacterZhugeJinMouRuntime
         }));
     }
 
-    void global::CardGame.Core.IMouZhugeJinNative.Discard(ProgramSkillFrame f)
+    void IMouZhugeJinNative.Discard(ProgramSkillFrame f)
     {
         if (!MouZhugeJin.Valid(f) || f.MouZhugeJin is not { Stage: MouZhugeJinStage.CostChildren, Paying: { } card } r || !_characterZhugeJinMouOperations.CreateMouZhugeJinFacts().Costs(f.OwnerSeat, card.From.OwnerSeat!.Value).Contains(card))
             throw new InvalidOperationException("Houde/Zijin requires its currently payable actual HE cost.");
@@ -106,21 +102,21 @@ internal sealed partial class CharacterZhugeJinMouRuntime
         });
     }
 
-    void global::CardGame.Core.IMouZhugeJinNative.Lose(ProgramSkillFrame f)
+    void IMouZhugeJinNative.Lose(ProgramSkillFrame f)
     {
         if (!MouZhugeJin.Valid(f) || f.MouZhugeJin is not { Operation: SkillProgramEffectOp.ResolveMouZhugeJinZijin, Stage: MouZhugeJinStage.LossChildren })
             throw new InvalidOperationException("Zijin requires the accepted native undamaging-use loss branch.");
         _corePrepPoisonOutcomesOperations.ApplyProgramHpLoss(f.Id, f.SkillId, f.OwnerSeat, 1);
     }
 
-    void global::CardGame.Core.IMouZhugeJinNative.Nullify(ProgramSkillFrame f)
+    void IMouZhugeJinNative.Nullify(ProgramSkillFrame f)
     {
         if (!MouZhugeJin.Valid(f) || f.MouZhugeJin is not { Operation: SkillProgramEffectOp.ResolveMouZhugeJinHoude, CostPaid: true })
             throw new InvalidOperationException("Houde cannot nullify before paying its true discard.");
         _coreProgramCardTargetEffectsOperations.NullifyCurrentProgramCardEffect(f);
     }
 
-    void global::CardGame.Core.IMouZhugeJinNative.Grant(ProgramSkillFrame f)
+    void IMouZhugeJinNative.Grant(ProgramSkillFrame f)
     {
         if (!MouZhugeJin.Valid(f) || f.MouZhugeJin is not { Stage: MouZhugeJinStage.GrantChildren } r || r.SecretNumber - r.Given < 2 || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhugeJinZijinGrantedEvent>().Any(p => p.FrameId == f.Id))
             throw new InvalidOperationException("Taozhou grants derived Zijin only after its exact committed actual-gift shortfall.");
@@ -128,7 +124,7 @@ internal sealed partial class CharacterZhugeJinMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhugeJinZijinGrantedEvent(f.Id, r.Target));
     }
 
-    MouZhugeJinCard global::CardGame.Core.IMouZhugeJinNative.RandomHand(ProgramSkillFrame f, IReadOnlyList<MouZhugeJinCard> cards)
+    MouZhugeJinCard IMouZhugeJinNative.RandomHand(ProgramSkillFrame f, IReadOnlyList<MouZhugeJinCard> cards)
     {
         if (!MouZhugeJin.Valid(f) || f.MouZhugeJin is not { Operation: SkillProgramEffectOp.ResolveMouZhugeJinHoude, Red: false } r || cards.Count == 0 || cards.Any(c => c.From != CardLocation.Hand(r.Target)))
             throw new InvalidOperationException("Houde's hidden Hand choice requires the original other actor's actual Hand.");
@@ -140,9 +136,9 @@ internal sealed partial class CharacterZhugeJinMouRuntime
 
     internal IEnumerable<MouZhugeJinBudgetIssuedEvent> MouZhugeJinBudgets(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhugeJinBudgetIssuedEvent>().Where(e => e.Target == target && e.Count > 0 && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhugeJinBudgetHitEvent>().Count(hit => hit.FrameId == e.FrameId) < e.Count);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 35600)]
-    internal int MouZhugeJinDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt a) => MouZhugeJinBudgets(a.TargetSeat).Count();
+    internal int MouZhugeJinDamageBonus(GameEngine.IDamageAttempt a) => MouZhugeJinBudgets(a.TargetSeat).Count();
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 35600)]
-    internal bool MouZhugeJinDamageApplied(global::CardGame.Core.GameEngine.IDamageAttempt a, long id)
+    internal bool MouZhugeJinDamageApplied(GameEngine.IDamageAttempt a, long id)
     {
         if (!a.DamageWasApplied || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == id)is not DamageFrame { Amount: > 0 } damage || damage.TargetSeat != a.TargetSeat)
             return false;

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ModeNationalRevealHost(global::System.Func<global::CardGame.Core.RuntimeEntries.CorePendingDecisionPolicyPipelineEntries> getCorePendingDecisionPolicyPipelineRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativePromptBoundaryEntries> getCoreNativePromptBoundaryRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNationalGeneralRevealEntries> getCoreNationalGeneralRevealRuntime, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState, global::CardGame.Core.NativeOwners.KernelAcceptCall accept, global::CardGame.Core.NativeOwners.KernelRejectCall reject, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreHumanNativeCommandsEntries> getCoreHumanNativeCommandsRuntime) : IModeNationalRevealHost
+internal sealed class ModeNationalRevealHost(Func<RuntimeEntries.CorePendingDecisionPolicyPipelineEntries> getCorePendingDecisionPolicyPipelineRuntime, Func<RuntimeEntries.CoreNativePromptBoundaryEntries> getCoreNativePromptBoundaryRuntime, Func<RuntimeEntries.CoreNationalGeneralRevealEntries> getCoreNationalGeneralRevealRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, KernelAcceptCall accept, KernelRejectCall reject, Func<RuntimeEntries.CoreHumanNativeCommandsEntries> getCoreHumanNativeCommandsRuntime) : IModeNationalRevealHost
 {
     public DecisionKind? PendingKind => getCorePendingDecisionPolicyPipelineRuntime()._pendingDecision?.Kind;
 

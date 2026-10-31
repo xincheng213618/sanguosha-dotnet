@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLvKuangLvXiangOlRuntime
@@ -42,7 +38,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
         if (_coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(actor, CardKind.Slash)is { } policy && _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is null && _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actor.Seat, policy.FactionId).Count > 0 && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[r.Target], new(0, CardKind.Slash, Suit.None, 0), effectiveKind: CardKind.Slash, ignoreDistance: true, noEffectiveRank: true, physicalCardIds: []))
             choices.Add(LvChoice(f, "faction", "faction", "请求势力角色提供杀", targets: [r.Target]));
         foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetHand(actor))
-            foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+            foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
                 foreach (var source in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, false).Where(s => _corePlayCardHistoryOperations.ViewAsRule(s)?.DeclarationValidation is not null))
                 {
                     if (!_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[r.Target], card, source, kind, ignoreDistance: true, physicalCardIds: [card.Id]) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, [card.Id]))
@@ -54,7 +50,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
                             kind.ToString()
                         }
                     };
-                    global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
+                    CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
                     choices.Add(LvChoice(f, "declaration", $"declare-{(card.Id)}-{(source.SkillInstanceId)}-{(source.BindingId)}", "以真实手牌声明杀", [card.Id], [r.Target], args));
                 }
     }
@@ -82,7 +78,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
         return true;
     }
 
-    internal bool ValidateQigongFactionSlashParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
+    internal bool ValidateQigongFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
     {
         if (f.LvKuangLvXiang?.Faction is not { } r)
             return false;
@@ -91,7 +87,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
         return true;
     }
 
-    internal bool PrepareQigongFactionNative(ProgramSkillFrame f, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind)
+    internal bool PrepareQigongFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind)
     {
         if (!ValidateQigongFactionSlashParent(pending, f))
             return false;
@@ -101,7 +97,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
         return true;
     }
 
-    internal bool FinishQigongFactionDeclined(long id, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending)
+    internal bool FinishQigongFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LvKuangLvXiang: { Faction: not null } } f || f.Id != id)
             return false;

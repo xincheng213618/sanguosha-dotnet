@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -23,7 +20,7 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
 
     internal bool ValidMouZhenJiLuoshen(ProgramSkillFrame f)
     {
-        if (f.MouZhenJiLuoshen is not { } r || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || f.InstructionIndex != 1 || f.WindowContext?.ParentFrameId != r.WindowId || !Enum.IsDefined(r.Stage) || r.Cursor < 0 || r.Cursor > r.Seats.Count || r.Seats.Distinct().Count() != r.Seats.Count || r.Seats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == f.OwnerSeat) || r.Before < 0 || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
+        if (f.MouZhenJiLuoshen is not { } r || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || f.InstructionIndex != 1 || f.WindowContext?.ParentFrameId != r.WindowId || !Enum.IsDefined(r.Stage) || r.Cursor < 0 || r.Cursor > r.Seats.Count || r.Seats.Distinct().Count() != r.Seats.Count || r.Seats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == f.OwnerSeat) || r.Before < 0 || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             return false;
         if (r.StartingSeat is null)
             return r.Stage == MouZhenJiLuoshenStage.StartingSeat && r.Seats.Count == 0 && r.Cursor == 0;
@@ -63,7 +60,7 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouZhenJiLuoshen!;
         var chooser = r.Stage == MouZhenJiLuoshenStage.StartingSeat ? f.OwnerSeat : r.Seats[r.Cursor];
-        if (!ValidMouZhenJiLuoshen(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouZhenJiLuoshenChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidMouZhenJiLuoshen(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouZhenJiLuoshenChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Luoshen requires the current actual participant's published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == MouZhenJiLuoshenStage.StartingSeat)
@@ -84,7 +81,7 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
         if (_cardZonesOperations._cardZones.GetLocation(card.Id) != from)
             throw new InvalidOperationException("Luoshen cannot show a departed hand entity.");
         var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[chooser], card);
-        var red = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
+        var red = CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouZhenJiLuoshen = r with { RevealedCardId = card.Id, RevealedSuit = suit, Stage = MouZhenJiLuoshenStage.MovementChildren, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, f.TriggerId!, f.OwnerSeat, "luoshen-reveal", [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
@@ -139,8 +136,8 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouZhenJiLuoshen)]
-    internal PromptChoice AiMouZhenJiLuoshen(PendingDecision p, ProgramSkillFrame f) => f.MouZhenJiLuoshen!.Stage == MouZhenJiLuoshenStage.StartingSeat ? p.Choices.OrderBy(c => (c.Targets.Single() - f.OwnerSeat + _coreMatchParticipantsPlayersAccess._players.Count) % _coreMatchParticipantsPlayersAccess._players.Count).First() : p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).ThenBy(c => c.Cards.Single()).First();
-    SkillProgramStepOutcome global::CardGame.Core.IMouZhenJiLuoshenHost.Start(ProgramSkillFrame f) => StartMouZhenJiLuoshen(f);
+    internal PromptChoice AiMouZhenJiLuoshen(PendingDecision p, ProgramSkillFrame f) => f.MouZhenJiLuoshen!.Stage == MouZhenJiLuoshenStage.StartingSeat ? p.Choices.OrderBy(c => (c.Targets.Single() - f.OwnerSeat + _coreMatchParticipantsPlayersAccess._players.Count) % _coreMatchParticipantsPlayersAccess._players.Count).First() : p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).ThenBy(c => c.Cards.Single()).First();
+    SkillProgramStepOutcome IMouZhenJiLuoshenHost.Start(ProgramSkillFrame f) => StartMouZhenJiLuoshen(f);
     [PublicHandRevealReturn("luoshen-selected-hand")]
     internal void ContinueLuoshenAfterPublicReveal(ProgramSkillFrame f)
     {
@@ -148,7 +145,7 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
         var chooser = r.Seats[r.Cursor];
         var from = CardLocation.Hand(chooser);
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(r.RevealedCardId!.Value);
-        var red = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(r.RevealedSuit!.Value);
+        var red = CoreGameEnginePublicPileColorsRuntime.SuitColor(r.RevealedSuit!.Value);
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         if (_cardZonesOperations._cardZones.GetLocation(card.Id) == from && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[chooser].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None)
         {
@@ -162,7 +159,7 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhenJiLuoshenMovedEvent(f.Id, r.Cursor, card.Id, from, m.To, m.Sequence, red == false));
                 if (red == false && m.To == CardLocation.Hand(f.OwnerSeat) && !_turnCardUseEffectsOperations._turnCardUseEffects.GetHandLimitExemptCardIds(r.TurnNumber, r.TurnOwnerSeat, f.OwnerSeat).Contains(card.Id))
                 {
-                    var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandLimitExemptCard(r.TurnNumber, r.TurnOwnerSeat, f.Id, f.InstructionIndex - 1, 0, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), f.OwnerSeat, card.Id, m.Sequence);
+                    var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandLimitExemptCard(r.TurnNumber, r.TurnOwnerSeat, f.Id, f.InstructionIndex - 1, 0, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), f.OwnerSeat, card.Id, m.Sequence);
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnHandLimitExemptCardGrantedEvent(grant));
                 }
             }

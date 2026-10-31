@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaYuanYiOlRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CharacterMaYuanYiOlRuntime
         if (child is HpChangedTriggerWindowFrame hp)
             return r.Stage == MaYuanYiStage.MaximumChildren && hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.MaximumHp && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Amount == 1;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return r.Stage is MaYuanYiStage.StoreChildren or MaYuanYiStage.OpponentDrawChildren or MaYuanYiStage.JudgmentChildren && f.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && (r.Stage == MaYuanYiStage.JudgmentChildren ? IsBinghuoHandoffMovement(r, m) || m.Sequence > r.Before && m.Sequence <= r.After && IsBinghuoCleanupMovement(r, m) : m.Sequence > r.Before && m.Sequence <= r.After && (m.Reason.Value == (r.Stage == MaYuanYiStage.StoreChildren ? JibingStoreReason : WangjingDrawReason) || m.Reason == CardMoveReasons.Reshuffle && m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile)));
+            return r.Stage is MaYuanYiStage.StoreChildren or MaYuanYiStage.OpponentDrawChildren or MaYuanYiStage.JudgmentChildren && f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && (r.Stage == MaYuanYiStage.JudgmentChildren ? IsBinghuoHandoffMovement(r, m) || m.Sequence > r.Before && m.Sequence <= r.After && IsBinghuoCleanupMovement(r, m) : m.Sequence > r.Before && m.Sequence <= r.After && (m.Reason.Value == (r.Stage == MaYuanYiStage.StoreChildren ? JibingStoreReason : WangjingDrawReason) || m.Reason == CardMoveReasons.Reshuffle && m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile)));
         return r.Stage == MaYuanYiStage.DamageChildren && f.AttackAttempt is { SourceSeat: var source, TargetSeat: var target, DamageAmount: 1, SourceLess: false, Nature: DamageNature.Thunder } && source == f.OwnerSeat && target == r.TargetSeat && f.AttackReturn is not null && _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(f, child);
     }
 

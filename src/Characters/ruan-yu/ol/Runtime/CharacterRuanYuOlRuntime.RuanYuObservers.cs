@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterRuanYuOlRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterRuanYuOlRuntime
             return false;
         if (r.Op == SkillProgramEffectOp.ResolveXingzuoIssuedEndingExchange)
         {
-            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
+            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
             if (CurrentRuanYuEndingDebt(c, context)is not { } debt || r.DebtId != debt.DebtId || _coreProgramEventHistoryOperations.ProgramEventHistory<XingzuoEndingConsumedEvent>().Count(e => e.DebtId == debt.DebtId && e.FrameId == f.Id && e.ParentId == r.ParentId) != 1)
                 return false;
         }
@@ -27,7 +23,7 @@ internal sealed partial class CharacterRuanYuOlRuntime
         else
         {
             var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
-            if (context.Window != SkillProgramTriggerWindow.PlayPhaseStarting || context.SourceSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not PlayPhaseStartingBoundaryFrame start || start.Id != r.ParentId || start.OwnerSeat != f.OwnerSeat || start.ItemIndex < 0 || start.ItemIndex >= start.Items.Count || start.Items[start.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex)
+            if (context.Window != SkillProgramTriggerWindow.PlayPhaseStarting || context.SourceSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not PlayPhaseStartingBoundaryFrame start || start.Id != r.ParentId || start.OwnerSeat != f.OwnerSeat || start.ItemIndex < 0 || start.ItemIndex >= start.Items.Count || start.Items[start.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex)
                 return false;
         }
 
@@ -62,7 +58,7 @@ internal sealed partial class CharacterRuanYuOlRuntime
         if (f.RuanYu is not { Paid: true } r || !ValidRuanYu(f))
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && (r.Stage == RuanYuStage.RedChildren ? m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MiaoxianDrawReason || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle : _coreProgramEventHistoryOperations.ProgramEventHistory<RuanYuEntityMovedEvent>().Any(e => e.FrameId == f.Id && e.Step == r.Step && e.Sequence == m.Sequence && e.CardId == m.CardId && e.From == m.From && e.To == m.To)));
+            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && (r.Stage == RuanYuStage.RedChildren ? m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MiaoxianDrawReason || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle : _coreProgramEventHistoryOperations.ProgramEventHistory<RuanYuEntityMovedEvent>().Any(e => e.FrameId == f.Id && e.Step == r.Step && e.Sequence == m.Sequence && e.CardId == m.CardId && e.From == m.From && e.To == m.To)));
         if (child is HpChangedTriggerWindowFrame hp)
             return r.Stage == RuanYuStage.LoseHpChildren && hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.SourceSeat is null && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Kind == HpChangeKind.Loss && hp.Change.Amount == 1;
         if (child is DyingFrame dying)

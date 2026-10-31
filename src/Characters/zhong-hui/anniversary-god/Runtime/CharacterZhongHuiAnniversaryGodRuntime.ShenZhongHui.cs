@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
 {
-    internal static CardConversionSource ShenZhSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShenZhSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int LinCold(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Markers.GetValueOrDefault(PlayerMarkerKind.LinCold);
     internal bool HasLishiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseLishiPunishments);
 
-    SkillProgramStepOutcome global::CardGame.Core.IShenZhongHuiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenZh(f, op);
+    SkillProgramStepOutcome IShenZhongHuiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenZh(f, op);
     internal CardActionContext? DuzhangAction(ProgramSkillWindowContext? c) => c is null ? null : _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)?.Action;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.Collection, 39300, SkillProgramEffectOp.ResolveLinjieRound, SkillProgramEffectOp.AwakenJianghuo)]
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 39300, SkillProgramEffectOp.ResolveLinjieRound, SkillProgramEffectOp.ResolveLinjieDamage, SkillProgramEffectOp.ResolveDuzhang, SkillProgramEffectOp.AwakenJianghuo, SkillProgramEffectOp.ResolveLishiPhase)]

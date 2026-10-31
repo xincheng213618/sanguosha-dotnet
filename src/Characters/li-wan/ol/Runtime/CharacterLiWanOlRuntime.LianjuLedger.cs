@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiWanOlRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CharacterLiWanOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LianjuEntityUsedEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, actor, action, nativeUse, card));
     }
 
-    internal IReadOnlyList<int> LianjuEligibleCards(int actor, bool red) => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<LianjuEntityUsedEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && LianjuFinalUseActor(e) == actor).Select(e => e.CardId).Distinct().Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile && global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Suit) == red).Order().ToArray());
+    internal IReadOnlyList<int> LianjuEligibleCards(int actor, bool red) => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<LianjuEntityUsedEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && LianjuFinalUseActor(e) == actor).Select(e => e.CardId).Distinct().Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile && CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Suit) == red).Order().ToArray());
     internal LianjuPromiseGrantedEvent[] LianjuDuePromises()
     {
         var endings = _coreProgramEventHistoryOperations.ProgramEventHistory<LianjuEndingReachedEvent>().ToArray();

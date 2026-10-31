@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramFactionActionRewardRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CoreProgramFactionActionRewardRuntime
             action = _characterLuSuMobileShiOperations.NormalizeShiLsResponseAction(action);
         action = _coreWushuangJinzhiOperations.CaptureWushuangJinzhiAppearance(action);
         action = _coreGouXiangArmorOperations.CaptureGouXiangActionAppearance(action);
-        if (!TracksFactionActionOrigin || action.FactionOrigin is not null || !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.EffectiveKind == CardKind.Dodge && _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RewardOutOfTurnFactionDodge)) || action.ActionId == 0)
+        if (!TracksFactionActionOrigin || action.FactionOrigin is not null || !(CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.EffectiveKind == CardKind.Dodge && _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RewardOutOfTurnFactionDodge)) || action.ActionId == 0)
             return action;
         return new(action.ActionId, action.ParentActionId, action.Type, action.ActorSeat, action.ProviderSeat, action.RequesterSeat, action.ResponderSeat, action.OpponentSeat, action.EffectiveKind, action.TargetSeats, action.PhysicalCards, action.ConversionChain, action.DesignatedTargetSeats, action.EffectiveSuit, action.EffectiveRank, action.EffectiveIsRed, new(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat]), _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[action.ProviderSeat])));
     }
@@ -31,7 +27,7 @@ internal sealed partial class CoreProgramFactionActionRewardRuntime
     internal int? FactionActionRewardChooser(int owner, SkillProgramTrigger trigger, CardActionContext action)
     {
         var effect = trigger.Effects.SingleOrDefault(IsFactionActionReward);
-        if (effect is null || action.FactionOrigin is not { } origin || origin.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || (effect.Op == SkillProgramEffectOp.RewardOutOfTurnFactionDodge ? action.EffectiveKind != CardKind.Dodge : !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind)))
+        if (effect is null || action.FactionOrigin is not { } origin || origin.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || (effect.Op == SkillProgramEffectOp.RewardOutOfTurnFactionDodge ? action.EffectiveKind != CardKind.Dodge : !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind)))
             return null;
         var actualSeat = action.ActorSeat == owner ? action.ProviderSeat : action.ActorSeat;
         var faction = action.ActorSeat == owner ? origin.ProviderFactionId : origin.ActorFactionId;

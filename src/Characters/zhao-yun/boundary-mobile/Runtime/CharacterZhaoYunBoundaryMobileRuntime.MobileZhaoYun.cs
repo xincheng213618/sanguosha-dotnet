@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoYunBoundaryMobileRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IMobileZhaoYunProgramHost.GiveRevealedCard(ProgramSkillFrame frame, string sourceBind) => GiveMobileZhaoYunRevealedCard(frame, sourceBind);
+    SkillProgramStepOutcome IMobileZhaoYunProgramHost.GiveRevealedCard(ProgramSkillFrame frame, string sourceBind) => GiveMobileZhaoYunRevealedCard(frame, sourceBind);
     internal SkillProgramStepOutcome GiveMobileZhaoYunRevealedCard(ProgramSkillFrame supplied, string sourceBind)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

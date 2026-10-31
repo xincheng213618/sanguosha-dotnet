@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterRuiJiOlRuntime
@@ -39,7 +35,7 @@ internal sealed partial class CharacterRuiJiOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IssuedCardNoResponseEvent(issued));
     }
 
-    internal static int QiaoliWeaponRange(IReadOnlyList<Card> physicalCards) => global::CardGame.Core.RuntimeSkills.RuntimeRules_rui_ji_ol_Qiaoli_Programs.QiaoliWeaponRange(physicalCards);
+    internal static int QiaoliWeaponRange(IReadOnlyList<Card> physicalCards) => RuntimeSkills.RuntimeRules_rui_ji_ol_Qiaoli_Programs.QiaoliWeaponRange(physicalCards);
     internal SkillProgramStepOutcome QiaoliProgramWeaponDamageDraw(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -51,7 +47,7 @@ internal sealed partial class CharacterRuiJiOlRuntime
             return SkillProgramStepOutcome.Continue;
         var range = QiaoliWeaponRange(attempt.PhysicalCards);
         var drawn = _corePhysicalDrawFacadesOperations.DrawCards(owner, range, true, new($"skill-program.{(active.SkillId)}.{(QiaoliWeaponBinding)}-draw"));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQiaoliWeaponDrawEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, range, drawn.Count, _coreActualTurnProgressTurnNumberAccess._turnNumber));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQiaoliWeaponDrawEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, range, drawn.Count, _coreActualTurnProgressTurnNumberAccess._turnNumber));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 巧力：决斗对目标造成伤害，摸 {(drawn.Count)} 张牌（攻击范围 {(range)}）。", owner.Seat);
         var recipients = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != active.OwnerSeat).Select(player => player.Seat).ToArray();
         if (drawn.Count == 0 || recipients.Length == 0)
@@ -120,7 +116,7 @@ internal sealed partial class CharacterRuiJiOlRuntime
             _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 巧力：将【{(card.DisplayName)}】交给 {(_coreMatchParticipantsPlayersAccess._players[recipient].Name)}。", state.OwnerSeat, recipient);
         }
 
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQiaoliDistributionEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), state.OwnerSeat, cardId, hasRecipient ? recipient : null));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQiaoliDistributionEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), state.OwnerSeat, cardId, hasRecipient ? recipient : null));
         var next = state.Cursor + 1;
         if (next < state.CardIds.Count)
         {
@@ -160,7 +156,7 @@ internal sealed partial class CharacterRuiJiOlRuntime
 
             var card = candidates[_randomOperations._random.Next(candidates.Length)];
             _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Hand(owner.Seat), new($"skill-program.{(active.SkillId)}.{(QiaoliArmorBinding)}-gain"));
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQiaoliEndingGainEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, card.Id, _coreActualTurnProgressTurnNumberAccess._turnNumber));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQiaoliEndingGainEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, card.Id, _coreActualTurnProgressTurnNumberAccess._turnNumber));
             _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 巧力：随机获得【{(card.DisplayName)}】。", owner.Seat);
             gainedAny = true;
         }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouYuOlMouRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
             return false;
         if (use.GuquAdmission is not { } admitted || admitted.UseId != use.Id || admitted.ActionId != a.ActionId || admitted.ProviderSeat != a.ProviderSeat || admitted.MaterialCount != ids.Count || admitted.EffectiveKind != kind || _coreProgramEventHistoryOperations.ProgramEventHistory<GuquUseAcceptedEvent>().Count(e => e.Admission == admitted) != 1 || !MouGuquActorLineageMatches(use.Id, a.ActionId, admitted.ActorSeat, actor, a.ProviderSeat, a.Type))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == id && e.SourceSeat == admitted.ActorSeat && e.CardId == use.CardId && (e.CardKind == kind || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))) == 1;
+        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == id && e.SourceSeat == admitted.ActorSeat && e.CardId == use.CardId && (e.CardKind == kind || CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(kind))) == 1;
     }
 
     internal bool MouGuquActorLineageMatches(long useId, long actionId, int originalActor, int currentActor, int provider, CardActionType type)
@@ -35,7 +31,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
 
     internal bool MouGuquPrepaidUse(int actor, CardKind kind, IReadOnlyList<int> ids, CardConversionSource? source)
     {
-        if (ids is not [var id] || _coreCardDeclarationsOperations.LiveDeclarationPayment(id)is not { GuquPermit: { } permit } paid || !ValidMouGuquDeclaration(paid) || permit.ActorSeat != actor || permit.Conversion != source || permit.OutputKind != kind && !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(permit.OutputKind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind)))
+        if (ids is not [var id] || _coreCardDeclarationsOperations.LiveDeclarationPayment(id)is not { GuquPermit: { } permit } paid || !ValidMouGuquDeclaration(paid) || permit.ActorSeat != actor || permit.Conversion != source || permit.OutputKind != kind && !(CoreNativeCardClassificationsRuntime.IsSlashCard(permit.OutputKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(kind)))
             return false;
         return _resolutionStackOperations._resolutionStack.Any(f => f.AcceptedDeclarationPayment == paid) || _resolutionStackOperations._resolutionStack.LastOrDefault()is CardDeclarationFrame { Stage: CardDeclarationStage.Applying } d && d.Payment == paid;
     }
@@ -108,7 +104,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     internal bool IsMouGuquViewAsAllowed(CharacterState owner, CardKind kind, IReadOnlyList<int> ids, CardConversionSource source, bool forResponse, bool dyingUse = false, int? requestedUseTarget = null) => requestedUseTarget is not null || dyingUse || !forResponse ? IsMouGuquUseAllowed(owner.Seat, kind, ids, source) : IsMouGuquResponseAllowed(owner, kind, ids, source);
     internal DeclaredCardPayment CaptureMouGuquDeclaration(DeclaredCardPayment paid, CardDeclarationParentReturn parent)
     {
-        if (!HasMouGuquCapability || !global::CardGame.Core.EngineOwners.CharacterXiaoQiaoLeRuntime.WeiwanDeclarationIsTrueUse(parent))
+        if (!HasMouGuquCapability || !CharacterXiaoQiaoLeRuntime.WeiwanDeclarationIsTrueUse(parent))
             return paid;
         if (paid.GuquPermit is not null || !IsMouGuquUseAllowed(parent.ActorSeat, paid.DeclaredKind, [paid.Cost.CardId], paid.Source))
             throw new InvalidOperationException("Guqu cannot accept a forbidden or previously paid declaration conversion.");

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ForeignActualTurnWindowReturns(global::CardGame.Core.NativeOwners.KernelCompleteGameCall completeGame, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreActualTurnsEntries> getCoreActualTurnsRuntime, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState) : IForeignActualTurnWindowReturns
+internal sealed class ForeignActualTurnWindowReturns(KernelCompleteGameCall completeGame, Func<RuntimeEntries.CoreActualTurnsEntries> getCoreActualTurnsRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState) : IForeignActualTurnWindowReturns
 {
     public void CompleteGame() => completeGame();
     public void EndTurn() => getCoreActualTurnsRuntime().EndTurn();

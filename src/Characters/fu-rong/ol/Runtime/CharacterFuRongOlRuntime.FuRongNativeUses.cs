@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -118,7 +115,7 @@ internal sealed partial class CharacterFuRongOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 26310)]
-    internal bool ReturnFuRongNativeAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnFuRongNativeAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FuRongPair: { Stage: FuRongPairStage.NativeUse, NativeCompleted: true, NativeReturn: { } ret } } || ret.CardUseFrameId != completion.ResolutionId)
             return false;

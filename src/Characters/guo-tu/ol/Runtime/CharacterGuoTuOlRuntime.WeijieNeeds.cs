@@ -1,14 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoTuOlRuntime
 {
-    internal const string WeijieOpen = global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieNeeds.WeijieOpen, WeijieChoice = "weijie-choice", WeijieDiscardReason = "skill-program.guo-tu.weijie.discard";
+    internal const string WeijieOpen = RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieNeeds.WeijieOpen, WeijieChoice = "weijie-choice", WeijieDiscardReason = "skill-program.guo-tu.weijie.discard";
     internal bool HasWeijieCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveWeijieRequiredBasicRequest);
     internal bool WeijieTurnOpen(int seat) => _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.TurnNumber && seat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
     internal bool WeijieSpent(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieCostPaidEvent>().Any(e => e.Source.OwnerSeat == seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.ActualTurnOwner == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
@@ -34,11 +29,11 @@ internal sealed partial class CharacterGuoTuOlRuntime
             return N(WeijieIntent.Dying, provider, [d.VictimSeat], d.ResponderIndex, ownerId: d.Id);
         if (kind == DecisionKind.RespondDodge)
         {
-            if (_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } fd && fd.CurrentCandidateSeat == provider && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(fd.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack))
+            if (_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } fd && fd.CurrentCandidateSeat == provider && CoreNativeDamageHandlesRuntime.SameAttackOwner(fd.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack))
                 return N(WeijieIntent.FactionDodge, fd.OwnerSeat, [], fd.CandidateIndex, fd.OwnerSeat, fd.Attack.SourceSeat, ownerId: fd.Attack.ResolutionId);
             if (_coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack, CurrentAttack: { } ga } g && ga.TargetSeat == provider && g.RequiredCardKind == CardKind.Dodge)
                 return N(WeijieIntent.Group, provider, [], ga.SuccessfulDodgeResponses, opponent: g.SourceSeat, index: g.TargetIndex, ownerId: g.ResolutionId);
-            if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } a && a.TargetSeat == provider && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveCardKind ?? CardKind.Dodge))
+            if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } a && a.TargetSeat == provider && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveCardKind ?? CardKind.Dodge))
                 return N(WeijieIntent.Dodge, provider, [], a.SuccessfulDodgeResponses, opponent: a.SourceSeat, ownerId: a.ResolutionId);
         }
 
@@ -46,7 +41,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         {
             if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { AwaitingProviders: true } f && f.CurrentCandidateSeat == provider)
             {
-                var played = !global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(f);
+                var played = !CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(f);
                 var opponent = f.Purpose == FactionCardRequestPurpose.DuelResponse ? _coreNativeCardContinuationCursorsOperations.ActiveDuel?.OpponentSeat : f.ResponseAttack?.SourceSeat;
                 var program = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == f.ProgramSkillFrameId);
                 return N(played ? WeijieIntent.FactionSlashPlayed : WeijieIntent.FactionSlashUse, f.OwnerSeat, f.TargetSeat is { } t ? [t] : [], f.CandidateIndex, f.OwnerSeat, opponent, op: program is null ? null : _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(program)?.Op, instruction: program?.InstructionIndex ?? 0, ownerId: f.OwnerFrameId);
@@ -60,7 +55,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
                 return N(WeijieIntent.Group, provider, [], opponent: g.SourceSeat, index: g.TargetIndex, ownerId: g.ResolutionId);
         }
 
-        if (kind == DecisionKind.QinglongCrescentBlade && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.SourceSeat == provider && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack))
+        if (kind == DecisionKind.QinglongCrescentBlade && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.SourceSeat == provider && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack))
             return N(WeijieIntent.Qinglong, provider, [q.Attack.TargetSeat], opponent: q.Attack.TargetSeat, ownerId: q.Attack.ResolutionId);
         if (kind != DecisionKind.ProgramTrigger || top is not ProgramSkillFrame p || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(p)is not { } effect)
             return null;
@@ -93,8 +88,8 @@ internal sealed partial class CharacterGuoTuOlRuntime
         }, provider, targets, op: effect.Op, instruction: p.InstructionIndex);
     }
 
-    internal static bool WeijieIsDying(WeijieNeed n) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieNeeds.WeijieIsDying(n);
-    internal static bool WeijieIsPlayed(WeijieNeed n) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieNeeds.WeijieIsPlayed(n);
+    internal static bool WeijieIsDying(WeijieNeed n) => RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieNeeds.WeijieIsDying(n);
+    internal static bool WeijieIsPlayed(WeijieNeed n) => RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieNeeds.WeijieIsPlayed(n);
     internal IEnumerable<(CardKind Kind, int Target)> WeijieOutputs(WeijieNeed n)
     {
         var kinds = n.Intent == WeijieIntent.WenyiPeach ? new[]
@@ -156,7 +151,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         var action = WeijieIsPlayed(n) || n.Intent == WeijieIntent.Dodge ? CardActionType.Response : CardActionType.Use;
         if (!WeijieIsPlayed(n) && !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(n.ActorSeat, kind, [])))
             return false;
-        if (_coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, kind, action) || n.ProviderSeat != n.ActorSeat && _coreCardUseModulesOperations.IsCardUseForbidden(n.ProviderSeat, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? CardKind.Slash : kind, action) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action == CardActionType.Response && _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, CardKind.Slash, action))
+        if (_coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, kind, action) || n.ProviderSeat != n.ActorSeat && _coreCardUseModulesOperations.IsCardUseForbidden(n.ProviderSeat, CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? CardKind.Slash : kind, action) || CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action == CardActionType.Response && _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, CardKind.Slash, action))
             return false;
         if (n.Intent == WeijieIntent.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) && _coreIssuedPlayUsePoliciesOperations.HasIssuedPlayPhaseUseBan(actor.Seat))
             return false;
@@ -169,7 +164,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
                 return false;
             if (kind == CardKind.Dodge && (_coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(attack)is not null || !_coreRecordedSuitSlashOperations.IsRecordedSuitResponseAllowed(provider, [], kind)))
                 return false;
-            return n.Intent == WeijieIntent.Dodge ? kind == CardKind.Dodge && attack.TargetSeat == n.ActorSeat && attack.SuccessfulDodgeResponses == n.Cursor : n.Intent == WeijieIntent.Duel ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreNativeCardContinuationCursorsOperations.ActiveDuel?.ResponderSeat == n.ActorSeat && _coreNativeCardContinuationCursorsOperations.ActiveDuel.SuccessfulSlashResponses == n.Cursor : n.Intent == WeijieIntent.Group ? _coreNativeCardContinuationCursorsOperations.ActiveGroupCard?.TargetIndex == n.TargetIndex && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(kind, _coreNativeCardContinuationCursorsOperations.ActiveGroupCard.RequiredCardKind!.Value) : n.Intent == WeijieIntent.FactionDodge ? kind == CardKind.Dodge && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.CurrentCandidateSeat == n.ProviderSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense.CandidateIndex == n.Cursor : _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest?.CurrentCandidateSeat == n.ProviderSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.CandidateIndex == n.Cursor && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
+            return n.Intent == WeijieIntent.Dodge ? kind == CardKind.Dodge && attack.TargetSeat == n.ActorSeat && attack.SuccessfulDodgeResponses == n.Cursor : n.Intent == WeijieIntent.Duel ? CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreNativeCardContinuationCursorsOperations.ActiveDuel?.ResponderSeat == n.ActorSeat && _coreNativeCardContinuationCursorsOperations.ActiveDuel.SuccessfulSlashResponses == n.Cursor : n.Intent == WeijieIntent.Group ? _coreNativeCardContinuationCursorsOperations.ActiveGroupCard?.TargetIndex == n.TargetIndex && CoreNativeCardClassificationsRuntime.MatchesRequiredCard(kind, _coreNativeCardContinuationCursorsOperations.ActiveGroupCard.RequiredCardKind!.Value) : n.Intent == WeijieIntent.FactionDodge ? kind == CardKind.Dodge && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.CurrentCandidateSeat == n.ProviderSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense.CandidateIndex == n.Cursor : _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest?.CurrentCandidateSeat == n.ProviderSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.CandidateIndex == n.Cursor && CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
         }
 
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(n.ActorSeat, target, Suit.None) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(n.ActorSeat, target, kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None))
@@ -178,7 +173,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
             return n.Intent == WeijieIntent.WenyiPeach ? _coreWenyiPeachSuppliesOperations.WenyiWeijiePeachLegal(n, target) : n.Intent == WeijieIntent.GenericBasic && target == n.ActorSeat && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(n.ActorSeat);
         if (kind == CardKind.Alcohol)
             return n.Intent == WeijieIntent.GenericBasic && target == n.ActorSeat && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(n.ActorSeat) && _characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null);
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || target == n.ActorSeat || !n.Targets.Contains(target))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || target == n.ActorSeat || !n.Targets.Contains(target))
             return false;
         if (n.Intent == WeijieIntent.BorrowedSword)
             return _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true, ActiveAttack: null } b && b.ResolutionId == n.OwnerFrameId && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None, false, null, 0, []);
@@ -197,13 +192,13 @@ internal sealed partial class CharacterGuoTuOlRuntime
             return false;
         var kind = _coreDyingCursorRuntimeOperations.ActiveDying?.ResponderSeat == actor.Seat ? DecisionKind.RescueDying : required == CardKind.Dodge ? DecisionKind.RespondDodge : DecisionKind.RespondSlash;
         var n = WeijieCurrentNeed(actor.Seat, kind, _resolutionStackOperations._resolutionStack.LastOrDefault());
-        return n is not null && WeijieOutputs(n).Any(o => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(o.Kind, required) || WeijieIsDying(n) && required == CardKind.Peach);
+        return n is not null && WeijieOutputs(n).Any(o => CoreNativeCardClassificationsRuntime.MatchesRequiredCard(o.Kind, required) || WeijieIsDying(n) && required == CardKind.Peach);
     }
 
     internal bool HasWeijieForcedSlash(CharacterState actor, CharacterState target, bool qinglong) => WeijieSources(actor).Any() && WeijieVictims(actor.Seat).Any() && WeijieCurrentNeed(actor.Seat, qinglong ? DecisionKind.QinglongCrescentBlade : DecisionKind.RespondSlash, _resolutionStackOperations._resolutionStack.LastOrDefault())is { } n && n.Targets.Contains(target.Seat) && WeijieOutputs(n).Any();
-    internal bool HasWeijieForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending) => HasWeijieCapability && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.ActiveAttack is null && pending.WeaponOwnerSeat == actor.Seat && pending.SlashTargetSeat == target.Seat && actor.IsAlive && target.IsAlive && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && WeijieSources(actor).Any() && WeijieVictims(actor.Seat).Any() && global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, Suit.None) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) && _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, kind, Suit.None, false, null, 0, []));
-    internal bool HasWeijieForcedSlash(CharacterState actor, CharacterState target, global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending) => HasWeijieCapability && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.Attack.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && actor.IsAlive && target.IsAlive && WeijieSources(actor).Any() && WeijieVictims(actor.Seat).Any() && global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, Suit.None) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, kind, null, false, Suit.None, 0, []));
-    internal bool HasWeijieProgramSlash(CharacterState actor, IEnumerable<int> targets) => WeijieSources(actor).Any() && WeijieVictims(actor.Seat).Any() && WeijieCurrentNeed(actor.Seat, DecisionKind.ProgramTrigger, _resolutionStackOperations._resolutionStack.LastOrDefault())is { } n && WeijieOutputs(n).Any(o => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(o.Kind) && targets.Contains(o.Target));
+    internal bool HasWeijieForcedSlash(CharacterState actor, CharacterState target, NativeOwners.BorrowedSwordHandle pending) => HasWeijieCapability && CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.ActiveAttack is null && pending.WeaponOwnerSeat == actor.Seat && pending.SlashTargetSeat == target.Seat && actor.IsAlive && target.IsAlive && _coreNativeBorrowedSwordOperations.GetWeapon(actor)is not null && WeijieSources(actor).Any() && WeijieVictims(actor.Seat).Any() && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, Suit.None) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) && _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, kind, Suit.None, false, null, 0, []));
+    internal bool HasWeijieForcedSlash(CharacterState actor, CharacterState target, NativeOwners.QinglongCrescentBladeHandle pending) => HasWeijieCapability && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) && _coreCardUseLifecycleOperations.LifecycleCardUse(pending.Attack.ResolutionId)is { } use && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && pending.Attack.SourceSeat == actor.Seat && pending.Attack.TargetSeat == target.Seat && actor.IsAlive && target.IsAlive && WeijieSources(actor).Any() && WeijieVictims(actor.Seat).Any() && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, Suit.None) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, kind, null, false, Suit.None, 0, []));
+    internal bool HasWeijieProgramSlash(CharacterState actor, IEnumerable<int> targets) => WeijieSources(actor).Any() && WeijieVictims(actor.Seat).Any() && WeijieCurrentNeed(actor.Seat, DecisionKind.ProgramTrigger, _resolutionStackOperations._resolutionStack.LastOrDefault())is { } n && WeijieOutputs(n).Any(o => CoreNativeCardClassificationsRuntime.IsSlashCard(o.Kind) && targets.Contains(o.Target));
     internal bool HasWeijieGenericBasic(ProgramSkillFrame f) => f.KeBiNengPingduan is { } r && WeijieSources(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat]).Any() && WeijieVictims(r.ActorSeat).Any() && WeijieCurrentNeed(r.ActorSeat, DecisionKind.ProgramTrigger, f)is { } n && WeijieOutputs(n).Any();
     internal PendingDecision? AddWeijieRequestChoices(PendingDecision? p)
     {
@@ -224,7 +219,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
                     "open"
                 }
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
             choices.Add(new(new($"weijie.{(n.RequestFrameId)}.{(source.SkillInstanceId)}"), "发动【诿解】：弃置距离1的他人一张暗手牌尝试提供基本牌", [], [], args));
         }
 
@@ -234,5 +229,5 @@ internal sealed partial class CharacterGuoTuOlRuntime
         };
     }
 
-    internal static PendingDecision WeijieNativeDecision(PendingDecision p) => global::CardGame.Core.EngineOwners.CharacterLiuFengBoundaryRuntime.BoundaryLiuFengNativeDecision(global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieNeeds.WeijieNativeDecision(p));
+    internal static PendingDecision WeijieNativeDecision(PendingDecision p) => CharacterLiuFengBoundaryRuntime.BoundaryLiuFengNativeDecision(RuntimeSkills.RuntimeRules_guo_tu_ol_WeijieNeeds.WeijieNativeDecision(p));
 }

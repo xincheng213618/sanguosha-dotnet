@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheMarketApplicationRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheMarketPurchaseHost.ApplyShanheMarketPurchase(ProgramSkillFrame frame) => BeginShanheMarketApplication(frame);
+    SkillProgramStepOutcome IShanheMarketPurchaseHost.ApplyShanheMarketPurchase(ProgramSkillFrame frame) => BeginShanheMarketApplication(frame);
     internal ShanheMarketPurchaseFrame RequireShanheMarketProgram(ProgramSkillFrame program)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == program.Id);
@@ -162,7 +159,7 @@ internal sealed partial class CoreGameEngineShanheMarketApplicationRuntime
         }
 
         if (cards.Count > 0)
-            _corePhysicalMovementFacadesOperations.MoveCards(Array.AsReadOnly(cards.ToArray()), CardLocation.OutsideGame, CardLocation.Hand(program.OwnerSeat), global::CardGame.Core.EngineOwners.CoreGameEngineShanheMarketDefinitions.ShanheMarketCardGain);
+            _corePhysicalMovementFacadesOperations.MoveCards(Array.AsReadOnly(cards.ToArray()), CardLocation.OutsideGame, CardLocation.Hand(program.OwnerSeat), CoreGameEngineShanheMarketDefinitions.ShanheMarketCardGain);
     }
 
     internal bool IsShanheMarketResource(int id)

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanLeRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         projection.Append(IsDiouCarrier(cardId) ? "低讴·虚拟" : null);
     }
 
-    internal bool IsDiouCarrier(int id) => id > 0 && HasDiouCapability && _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess._generatedPhysicalCardIds.Contains(id) && _coreProgramEventHistoryOperations.ProgramEventHistory<DiouCarrierCreatedEvent>().Where(e => e.CardId == id).ToArray()is [var fact] && fact.Source.SkillId == DiouSkill && fact.Source.BindingId == DiouBinding && _coreTableSeatQueriesOperations.IsValidPlayerSeat(fact.Source.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program?.GameplayHash == fact.GameplayHash && (_coreEquipmentContentOperations.EquipmentRules.IsEquipment(fact.Kind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(fact.Kind)) && _coreAdvancedLifecycleOperations.GetAdvancedCard(id)is { Suit: Suit.None, Rank: 0 } card && card.Kind == fact.Kind;
+    internal bool IsDiouCarrier(int id) => id > 0 && HasDiouCapability && _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess._generatedPhysicalCardIds.Contains(id) && _coreProgramEventHistoryOperations.ProgramEventHistory<DiouCarrierCreatedEvent>().Where(e => e.CardId == id).ToArray()is [var fact] && fact.Source.SkillId == DiouSkill && fact.Source.BindingId == DiouBinding && _coreTableSeatQueriesOperations.IsValidPlayerSeat(fact.Source.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program?.GameplayHash == fact.GameplayHash && (_coreEquipmentContentOperations.EquipmentRules.IsEquipment(fact.Kind) || CoreNativeCardClassificationsRuntime.IsDelayedCard(fact.Kind)) && _coreAdvancedLifecycleOperations.GetAdvancedCard(id)is { Suit: Suit.None, Rank: 0 } card && card.Kind == fact.Kind;
     internal CardLocation NormalizeDiouCarrierDestination(Card card, CardLocation from, CardLocation to)
     {
         if (!IsDiouCarrier(card.Id) || from == to || to == CardLocation.OutsideGame)

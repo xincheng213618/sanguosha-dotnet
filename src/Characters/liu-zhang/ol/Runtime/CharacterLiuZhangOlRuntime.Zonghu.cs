@@ -1,21 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuZhangOlRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.ILiuZhangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveZonghuRequiredUseRequest ? ResolveZonghu(f) : ResolveFengwei(f, op);
+    SkillProgramStepOutcome ILiuZhangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveZonghuRequiredUseRequest ? ResolveZonghu(f) : ResolveFengwei(f, op);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 27512, SkillProgramEffectOp.ResolveZonghuRequiredUseRequest)]
     internal bool IsZonghuOrdinaryActivation(ProgramActivationLegalityContext c) => c.Activation.Id == "native-use-request" && c.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && ZonghuSources(c.Owner).Any() && ZonghuVictims(c.OwnerSeat).Any() && ZonghuOutputs(ZonghuPlayNeed(c.OwnerSeat)).Any();
-    internal static string ZonghuDecisionHash(PendingDecision p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_zhang_ol_Zonghu.ZonghuDecisionHash(p);
-    internal static bool SameZonghuNeed(ZonghuNeed a, ZonghuNeed b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_zhang_ol_Zonghu.SameZonghuNeed(a, b);
+    internal static string ZonghuDecisionHash(PendingDecision p) => RuntimeSkills.RuntimeRules_liu_zhang_ol_Zonghu.ZonghuDecisionHash(p);
+    internal static bool SameZonghuNeed(ZonghuNeed a, ZonghuNeed b) => RuntimeSkills.RuntimeRules_liu_zhang_ol_Zonghu.SameZonghuNeed(a, b);
     internal bool IsZonghuAnswer(ChoiceId id) => _corePendingDecisionPolicyPipelineOperations._pendingDecision?.Choices.Any(c => c.Id == id && (c.Parameters.ContainsKey(ZonghuOpen) || c.Parameters.ContainsKey(ZonghuChoice))) == true;
     internal CommandResult SubmitZonghuAnswer(int actor, PromptId prompt, ChoiceId id)
     {
@@ -39,8 +33,8 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         var p = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("Zonghu has no real native request.");
         var n = CaptureZonghuNeed(p) ?? throw new InvalidOperationException("Zonghu lost its exact native requester.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(c);
-        if (!p.Choices.Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])) || !ZonghuSources(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]).Any(s => s.Source == source) || !ZonghuVictims(p.PlayerSeat).Any() || !ZonghuOutputs(n).Any())
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(c);
+        if (!p.Choices.Any(x => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])) || !ZonghuSources(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]).Any(s => s.Source == source) || !ZonghuVictims(p.PlayerSeat).Any() || !ZonghuOutputs(n).Any())
             throw new InvalidOperationException("Zonghu cannot replace an unavailable native request or source.");
         var hash = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.GameplayHash;
         var f = new ProgramSkillFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, p.PlayerSeat, source.SkillId, source.BindingId, hash, 0, [], [])
@@ -153,7 +147,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             return;
         }
 
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zonghu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ZonghuChoices(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zonghu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ZonghuChoices(f).Any(x => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
             throw new InvalidOperationException("Zonghu changed its exact private declaration or opaque native slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXunXuAnniversaryRuntime
 {
-    internal static CardConversionSource XunXuSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource XunXuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasAnniversaryXunXu => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryXunXuDiyin);
     internal static CardMoveReason XunXuDrawReason => new("skill.anniversary.xun-xu.draw");
     internal static CardMoveReason XunXuGainReason => new("skill.anniversary.diyin.claim");
@@ -46,7 +42,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
         return trigger.Id == "same-hp" ? context.TargetSeat == c.OwnerSeat && context.Amount > 0 && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].HasHpValue : context.MovementBatch is { } b && XunXuDiscardIndexes(b, c).Length > 0;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryXunXuHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginXunXu(f, op);
+    SkillProgramStepOutcome IAnniversaryXunXuHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginXunXu(f, op);
     internal SkillProgramStepOutcome BeginXunXu(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -113,7 +109,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     [ProgramAnswer("anniversary-xun-xu")]
     internal void AnswerXunXu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryXunXu: { } r } f || !XunXuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryXunXu: { } r } f || !XunXuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xun Xu rejects a stale participant or private card choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

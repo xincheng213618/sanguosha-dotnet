@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenDaoMobileShiRuntime
 {
     internal const string ShiCdWanglie = "mobile:shi-wanglie", ShiCdHongyi = "mobile:shi-hongyi";
-    internal static CardConversionSource ShiCdSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiCdSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int ShiCdMarks(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiHongyiMarksChangedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner)?.After ?? 0;
     internal void ChangeShiCdMarks(ProgramSkillFrame f, int amount)
     {
@@ -19,7 +16,7 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
     }
 
     internal MobileShiHongyiPreparedEvent? ShiCdPendingEnding(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiHongyiPreparedEvent>().SingleOrDefault(e => e.Source.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiHongyiEndingEvent>().Any(x => x.PreparationId == e.FrameId));
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiChenDaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveShiCd(f, op);
+    SkillProgramStepOutcome IMobileShiChenDaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveShiCd(f, op);
     internal SkillProgramStepOutcome ResolveShiCd(ProgramSkillFrame input, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -107,7 +104,7 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
     [ProgramAnswer("shi-chen-dao")]
     internal void AnswerShiCdChoice(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiChenDao: { Finished: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiCdChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiChenDao: { Finished: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiCdChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shi Chen Dao rejects a stale preparation or physical hand-card choice.");
         RequireShiCdChoice(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -169,7 +166,7 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
             // only its original completed-response candidate, not a fresh use
             // or a later replacement instance of Wanglie.
             var responseIndex = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-            return f.TriggerId == "wanglie-response-complete" && f.ActivationId == f.TriggerId && f.InstructionIndex is 0 or 1 && f.MobileShiChenDao is null && f.WindowContext is { } responseContext && responseIndex > 0 && _resolutionStackOperations._resolutionStack[responseIndex - 1] is ProgramCardTriggerWindowFrame window && window.Id == responseContext.ParentFrameId && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) && IsIssuedShiCdResponse(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]), responseContext);
+            return f.TriggerId == "wanglie-response-complete" && f.ActivationId == f.TriggerId && f.InstructionIndex is 0 or 1 && f.MobileShiChenDao is null && f.WindowContext is { } responseContext && responseIndex > 0 && _resolutionStackOperations._resolutionStack[responseIndex - 1] is ProgramCardTriggerWindowFrame window && window.Id == responseContext.ParentFrameId && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) && IsIssuedShiCdResponse(CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex]), responseContext);
         }
 
         if (f.SkillId != ShiCdHongyi)
@@ -185,5 +182,5 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiWanglie, SkillProgramEffectOp.ResolveMobileShiHongyi)]
-    internal PromptChoice ChooseShiCdAi(PendingDecision p, ProgramSkillFrame f) => f.SkillId == ShiCdHongyi ? p.Choices.First(c => c.Parameters["branch"] == "draw") : p.Choices.FirstOrDefault(c => c.Cards.Any(id => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind))) ?? p.Choices.Last();
+    internal PromptChoice ChooseShiCdAi(PendingDecision p, ProgramSkillFrame f) => f.SkillId == ShiCdHongyi ? p.Choices.First(c => c.Parameters["branch"] == "draw") : p.Choices.FirstOrDefault(c => c.Cards.Any(id => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind))) ?? p.Choices.Last();
 }

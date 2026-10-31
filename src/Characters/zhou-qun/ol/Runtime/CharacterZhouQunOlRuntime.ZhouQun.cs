@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouQunOlRuntime
@@ -10,8 +6,8 @@ internal sealed partial class CharacterZhouQunOlRuntime
     internal const string ChenshuoRevealReason = "skill-program.zhou-qun.chenshuo.reveal", ChenshuoGainReason = "skill-program.zhou-qun.chenshuo.gain", TianhouExchangeReason = "skill-program.zhou-qun.tianhou.exchange", ZhouQunCleanupReason = "skill-program.zhou-qun.cleanup";
     internal bool HasZhouQunCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveChenshuoRepeatedReveal) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveTianhouTopExchangeAndGrant) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveLieshuEndingLoss) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveNingwuSingletonSlashJudgment) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZhouyuThunderNeighbors) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveYanshuangEndingLoss);
 
-    internal static CardConversionSource ZhouQunSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_qun_ol_ZhouQun.ZhouQunSource(f);
-    internal static int ZhouQunNameLength(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_qun_ol_ZhouQun.ZhouQunNameLength(kind);
+    internal static CardConversionSource ZhouQunSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhou_qun_ol_ZhouQun.ZhouQunSource(f);
+    internal static int ZhouQunNameLength(CardKind kind) => RuntimeSkills.RuntimeRules_zhou_qun_ol_ZhouQun.ZhouQunNameLength(kind);
     internal int[] ZhouQunNeighbors(int seat)
     {
         // A just-dead damaged participant still anchors the two directions;
@@ -63,7 +59,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
         return hp.Length > 0 && _coreMatchParticipantsPlayersAccess._players[seat].HasHpValue && _coreMatchParticipantsPlayersAccess._players[seat].Hp == (effect.Op == SkillProgramEffectOp.ResolveLieshuEndingLoss ? hp.Max() : hp.Min());
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IZhouQunHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginZhouQun(frame, op);
+    SkillProgramStepOutcome IZhouQunHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginZhouQun(frame, op);
     internal SkillProgramStepOutcome BeginZhouQun(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -180,7 +176,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
     [ProgramAnswer("zhou-qun")]
     internal void AnswerZhouQun(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhouQun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ZhouQunChooser(f) || !ZhouQunChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhouQun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ZhouQunChooser(f) || !ZhouQunChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Weather choices require the real current private chooser and exact entities.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

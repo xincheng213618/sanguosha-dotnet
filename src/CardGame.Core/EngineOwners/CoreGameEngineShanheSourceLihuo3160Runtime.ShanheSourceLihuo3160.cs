@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceLihuo3160Runtime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceJiangdongTrioHost.LihuoFirstDamage(ProgramSkillFrame f) => BeginShanheSourceLihuoCost(f);
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceJiangdongTrioHost.ChunlaoStorage(ProgramSkillFrame f) => _coreShanheSourceChunlao3161Operations.BeginShanheSourceChunlaoStorage(f);
+    SkillProgramStepOutcome IShanheSourceJiangdongTrioHost.LihuoFirstDamage(ProgramSkillFrame f) => BeginShanheSourceLihuoCost(f);
+    SkillProgramStepOutcome IShanheSourceJiangdongTrioHost.ChunlaoStorage(ProgramSkillFrame f) => _coreShanheSourceChunlao3161Operations.BeginShanheSourceChunlaoStorage(f);
     internal static bool IsShanheSourceLihuoConversion(CardConversionSource source) => source.SkillId == ShanheSourceJiangdongTrioIds.Lihuo && source.BindingId is "ordinary-slash-to-fire" or "committed-fire-target";
     internal int ShanheSourceLihuoProspectiveTargetBonus(CardUseFrame use) => use.CardKind == CardKind.Slash && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame f && f.SkillId == ShanheSourceJiangdongTrioIds.Lihuo && f.WindowContext?.CardUse?.ParentCardUseFrameId == use.Id && !_coreProgramPersistentStateOperations.GetProgramBooleanState2(f.OwnerSeat, f.SkillId, f.SkillInstanceId, ShanheSourceJiangdongTrioIds.FireTargetState) ? 1 : 0;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 24920)]
@@ -40,7 +37,7 @@ internal sealed partial class CoreGameEngineShanheSourceLihuo3160Runtime
     internal SkillProgramStepOutcome BeginShanheSourceLihuoCost(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
+        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
         if (f.ShanheSourceLihuoCost is not null || f.WindowContext is not { } w || ShanheSourceLihuoDamageUse(c, w)is not { } use || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceLihuoCostStartedEvent>().Any(e => e.UseId == use.Id && e.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Source3160 cost requires its original first converted-Use damage.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheSourceLihuoCost = new(use.Id, w.ParentFrameId, w.DamageFrameId!.Value) });
@@ -84,7 +81,7 @@ internal sealed partial class CoreGameEngineShanheSourceLihuo3160Runtime
     [ProgramAnswer("shanhe-source-lihuo-cost")]
     internal void AnswerShanheSourceLihuoCost(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceLihuoCost: { Paid: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShanheSourceLihuoCostChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceLihuoCost: { Paid: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShanheSourceLihuoCostChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Source3160 cost lost its exact private material choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["branch"] == "discard" && r.FirstCardId is null)

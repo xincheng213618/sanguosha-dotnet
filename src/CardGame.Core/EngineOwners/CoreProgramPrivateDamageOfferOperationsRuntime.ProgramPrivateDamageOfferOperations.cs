@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramPrivateDamageOfferOperationsRuntime
@@ -80,7 +76,7 @@ internal sealed partial class CoreProgramPrivateDamageOfferOperationsRuntime
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Missing participant discard frame.");
         var draft = frame.SelectedParticipantDiscard ?? throw new InvalidOperationException("Missing participant discard draft.");
         var paused = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (paused.Op != SkillProgramEffectOp.DiscardSelectedParticipantCards || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [SelectedParticipantDiscardChoices(frame).Single(c => c.Id == choice.Id)]))
+        if (paused.Op != SkillProgramEffectOp.DiscardSelectedParticipantCards || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [SelectedParticipantDiscardChoices(frame).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Participant discard choice changed.");
         var zone = Enum.Parse<CardZoneKind>(choice.Parameters["zone"]);
         var slot = int.Parse(choice.Parameters["slot"]);
@@ -157,7 +153,7 @@ internal sealed partial class CoreProgramPrivateDamageOfferOperationsRuntime
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Missing private offer frame.");
         var draft = frame.DamageCardOffer ?? throw new InvalidOperationException("Missing private offer draft.");
         var paused = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (paused.Op != SkillProgramEffectOp.OfferBoundCardsForDamagePrevention || paused.SourceBind != draft.SourceBind || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.SourceSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [DamageCardOfferChoices(frame).Single(c => c.Id == choice.Id)]))
+        if (paused.Op != SkillProgramEffectOp.OfferBoundCardsForDamagePrevention || paused.SourceBind != draft.SourceBind || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.SourceSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [DamageCardOfferChoices(frame).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Private offer answer changed.");
         var set = _coreProgramLifecycleOperations.GetProgramCardSet(frame, draft.SourceBind);
         var option = choice.Parameters["option"];
@@ -247,6 +243,6 @@ internal sealed partial class CoreProgramPrivateDamageOfferOperationsRuntime
         return set.CardIds.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(c => c.Id == id))).ToArray();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IPrivateOfferProgramEffectHost.DiscardSelectedParticipantCards(ProgramSkillFrame frame) => DiscardProgramSelectedParticipantCards(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IPrivateOfferProgramEffectHost.OfferBoundCardsForDamagePrevention(ProgramSkillFrame frame, string bind) => OfferProgramBoundCardsForDamagePrevention(frame, bind);
+    SkillProgramStepOutcome IPrivateOfferProgramEffectHost.DiscardSelectedParticipantCards(ProgramSkillFrame frame) => DiscardProgramSelectedParticipantCards(frame);
+    SkillProgramStepOutcome IPrivateOfferProgramEffectHost.OfferBoundCardsForDamagePrevention(ProgramSkillFrame frame, string bind) => OfferProgramBoundCardsForDamagePrevention(frame, bind);
 }

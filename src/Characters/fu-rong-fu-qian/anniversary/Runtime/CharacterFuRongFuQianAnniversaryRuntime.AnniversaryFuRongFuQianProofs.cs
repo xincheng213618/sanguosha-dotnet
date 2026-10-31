@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
     {
         if (f.AnniversaryFuRongFuQian is not { } r)
             return false;
-        if (r.Stage == AnniversaryFuRongFuQianStage.Drawing && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
+        if (r.Stage == AnniversaryFuRongFuQianStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
             return true;
         if (child is DyingFrame dying)
             return r.Operation == SkillProgramEffectOp.ResolveAnniversaryFuRongFuQianXuewei && r.HpPaid && r.HpAfter <= 0 && r.Stage == AnniversaryFuRongFuQianStage.HpChildren && dying.ParentFrameId == f.Id && dying.VictimSeat == f.OwnerSeat && dying.KillerSeat is null && dying.ResumesProgramSkill;

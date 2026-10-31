@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramAttackHandle(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries> getCoreGameEngineProgramAttackAttemptRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime, long ownerFrameId) : global::CardGame.Core.GameEngine.IDamageAttempt
+internal sealed class ProgramAttackHandle(Func<RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries> getCoreGameEngineProgramAttackAttemptRuntime, Func<RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime, long ownerFrameId) : GameEngine.IDamageAttempt
 {
     private AttackAttemptState State => getCoreGameEngineProgramAttackAttemptRuntime().GetProgramAttackState(ownerFrameId);
 
@@ -71,7 +71,7 @@ internal sealed class ProgramAttackHandle(global::System.Func<global::CardGame.C
     public void CaptureDamageDistance(int distance) => Update(state => state with { SourceToTargetDistanceAtDamage = distance });
     public void MarkDyingResolvedForDamage(long damageFrameId) => Update(state => state with { ResolvedDyingDamageFrameId = damageFrameId });
     public bool HasResolvedDyingForDamage(long damageFrameId) => State.ResolvedDyingDamageFrameId == damageFrameId;
-    public void RedirectFinalizedDamageTarget(int targetSeat, global::CardGame.Core.GameEngine.ProgramDamageTransferFollowup followup) => Update(state =>
+    public void RedirectFinalizedDamageTarget(int targetSeat, GameEngine.ProgramDamageTransferFollowup followup) => Update(state =>
     {
         if (!state.DamageAmountFinalized || state.DamageRedirected || state.TargetSeat == targetSeat)
             throw new InvalidOperationException("Damage redirection requires a new recipient and a finalized amount.");
@@ -85,7 +85,7 @@ internal sealed class ProgramAttackHandle(global::System.Func<global::CardGame.C
             TransferDrawLostHp = followup.DrawLostHp
         };
     });
-    public bool TryConsumeProgramDamageTransferFollowup(out global::CardGame.Core.GameEngine.ProgramDamageTransferFollowup followup)
+    public bool TryConsumeProgramDamageTransferFollowup(out GameEngine.ProgramDamageTransferFollowup followup)
     {
         var state = State;
         if (state.TransferSkillId is null || state.TransferOwnerSeat is null || state.TransferTargetSeat is null)

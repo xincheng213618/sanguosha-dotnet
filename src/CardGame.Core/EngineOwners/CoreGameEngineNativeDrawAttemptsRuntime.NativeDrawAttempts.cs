@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNativeDrawAttemptsRuntime
@@ -18,5 +14,5 @@ internal sealed partial class CoreGameEngineNativeDrawAttemptsRuntime
     internal void ReturnNativeDrawStartingProgram(ProgramSkillFrame frame, bool completed) => NativeDrawAttempts.ReturnNativeDrawStartingProgram(frame, completed);
     internal void ReturnNativeDrawAttemptWindow(ProgramLifecycleTriggerWindowFrame window) => NativeDrawAttempts.ReturnNativeDrawAttemptWindow(window);
     internal void ContinueNativeDrawAttempt(long id) => NativeDrawAttempts.ContinueNativeDrawAttempt(id);
-    internal static bool NativeDrawAttemptRidesOn(ResolutionFrame child, ResolutionFrame parent) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.NativeDrawAttemptRidesOn(child, parent);
+    internal static bool NativeDrawAttemptRidesOn(ResolutionFrame child, ResolutionFrame parent) => RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.NativeDrawAttemptRidesOn(child, parent);
 }

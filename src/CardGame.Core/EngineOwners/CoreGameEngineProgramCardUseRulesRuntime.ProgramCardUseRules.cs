@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramCardUseRulesRuntime
@@ -24,7 +20,7 @@ internal sealed partial class CoreGameEngineProgramCardUseRulesRuntime
     internal IReadOnlyList<SlashUseVariant> GetSlashUseVariants(CharacterState actor, Card physicalCard, CardKind baseEffectiveKind, CardConversionSource? primaryConversionSource)
     {
         // Rank-two aliases enter the generic Slash family with their exact selected output.
-        if (_characterGuanYuWumiaoOperations.IsJuewuSource(primaryConversionSource) && _corePlayCardHistoryOperations.ViewAsRule(primaryConversionSource!)is { } juewuRule && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(juewuRule.OutputKind))
+        if (_characterGuanYuWumiaoOperations.IsJuewuSource(primaryConversionSource) && _corePlayCardHistoryOperations.ViewAsRule(primaryConversionSource!)is { } juewuRule && CoreNativeCardClassificationsRuntime.IsSlashCard(juewuRule.OutputKind))
             baseEffectiveKind = juewuRule.OutputKind;
         var variants = GetSlashUseVariants(actor, baseEffectiveKind).ToList();
         if (primaryConversionSource is null || baseEffectiveKind != CardKind.Slash)
@@ -51,7 +47,7 @@ internal sealed partial class CoreGameEngineProgramCardUseRulesRuntime
         if (bindings.ViewAsPrograms.Count == 0)
             return[];
         PlayerSkillContext? context = null;
-        return bindings.ProgramInstances.Where(instance => instance.Program.ViewAs.Count != 0).SelectMany(instance => instance.Program.ViewAs.Where(rule => rule.AllowChainedInput && rule.InputCount == 1 && rule.OutputKind == outputKind && rule.SourceZones.Contains(zone.Value) && (forResponse ? rule.ForResponse : rule.ForPlay) && rule.Condition.Evaluate(context ??= _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner)) && (rule.InputKinds.Count == 0 || ProgramCardKindMatch.Contains(rule.InputKinds, inputKind)) && (rule.InputCategories.Count == 0 || rule.InputCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(inputKind, category))) && (rule.InputSuits.Count == 0 || rule.InputSuits.Contains(physicalCard.Suit))).Select(rule => new CardConversionSource(instance.SkillId, rule.Id, owner.Seat, instance.SkillInstanceId))).Where(source => source != primaryConversionSource).Distinct().OrderBy(source => source.SkillId, StringComparer.Ordinal).ThenBy(source => source.BindingId, StringComparer.Ordinal).ThenBy(source => source.SkillInstanceId, StringComparer.Ordinal).ToArray();
+        return bindings.ProgramInstances.Where(instance => instance.Program.ViewAs.Count != 0).SelectMany(instance => instance.Program.ViewAs.Where(rule => rule.AllowChainedInput && rule.InputCount == 1 && rule.OutputKind == outputKind && rule.SourceZones.Contains(zone.Value) && (forResponse ? rule.ForResponse : rule.ForPlay) && rule.Condition.Evaluate(context ??= _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner)) && (rule.InputKinds.Count == 0 || ProgramCardKindMatch.Contains(rule.InputKinds, inputKind)) && (rule.InputCategories.Count == 0 || rule.InputCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(inputKind, category))) && (rule.InputSuits.Count == 0 || rule.InputSuits.Contains(physicalCard.Suit))).Select(rule => new CardConversionSource(instance.SkillId, rule.Id, owner.Seat, instance.SkillInstanceId))).Where(source => source != primaryConversionSource).Distinct().OrderBy(source => source.SkillId, StringComparer.Ordinal).ThenBy(source => source.BindingId, StringComparer.Ordinal).ThenBy(source => source.SkillInstanceId, StringComparer.Ordinal).ToArray();
     }
 
     internal string DescribeAdditionalConversion(CardConversionSource source) => _contentRegistryOperations._contentRegistry.Skills.TryGetValue(source.SkillId, out var skill) ? skill.Name : source.SkillId;

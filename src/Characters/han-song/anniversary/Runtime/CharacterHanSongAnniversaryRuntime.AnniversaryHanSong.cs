@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHanSongAnniversaryRuntime
 {
     internal const string HanSongDiscardReason = "anniversary.shuaiyan.discard", HanSongDrawReason = "anniversary.shuaiyan.draw";
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryHanSongHost.Resolve(ProgramSkillFrame frame) => BeginAnniversaryHanSong(frame);
-    internal static CardConversionSource HanSongSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryHanSongHost.Resolve(ProgramSkillFrame frame) => BeginAnniversaryHanSong(frame);
+    internal static CardConversionSource HanSongSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillProgramStepOutcome BeginAnniversaryHanSong(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -77,7 +74,7 @@ internal sealed partial class CharacterHanSongAnniversaryRuntime
             return HanSongDiscardOptions(f).Any() ? [HanSongChoice(f, "draw", "one", "摸一张牌"), HanSongChoice(f, "discard", "one", $"弃置{(_coreMatchParticipantsPlayersAccess._players[r.SubjectSeat].Name)}的一张牌")] : [HanSongChoice(f, "draw", "one", "摸一张牌")];
         if (r.Stage != AnniversaryHanSongStage.CardChoice)
             return[];
-        return Array.AsReadOnly(HanSongDiscardOptions(f).Select(m => HanSongChoice(f, "card", $"{(m.From.Zone)}.{(m.Slot)}", m.Hidden ? $"第{(m.Slot + 1)}张手牌" : global::CardGame.Core.EngineOwners.CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(m.Card), m.Hidden ? [] : [m.Card.Id], new Dictionary<string, string> { { "source-zone", m.From.Zone.ToString() }, { "slot-index", m.Slot.ToString(CultureInfo.InvariantCulture) }, { "card-owner-seat", r.SubjectSeat.ToString(CultureInfo.InvariantCulture) } })).ToArray());
+        return Array.AsReadOnly(HanSongDiscardOptions(f).Select(m => HanSongChoice(f, "card", $"{(m.From.Zone)}.{(m.Slot)}", m.Hidden ? $"第{(m.Slot + 1)}张手牌" : CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(m.Card), m.Hidden ? [] : [m.Card.Id], new Dictionary<string, string> { { "source-zone", m.From.Zone.ToString() }, { "slot-index", m.Slot.ToString(CultureInfo.InvariantCulture) }, { "card-owner-seat", r.SubjectSeat.ToString(CultureInfo.InvariantCulture) } })).ToArray());
     }
 
     internal void PublishHanSong(ProgramSkillFrame f)
@@ -108,7 +105,7 @@ internal sealed partial class CharacterHanSongAnniversaryRuntime
     [ProgramAnswer("anniversary-han-song")]
     internal void AnswerHanSong(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHanSong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ValidHanSong(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HanSongChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHanSong: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ValidHanSong(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HanSongChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Shuaiyan's chooser, original phase subject or current owned card changed.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

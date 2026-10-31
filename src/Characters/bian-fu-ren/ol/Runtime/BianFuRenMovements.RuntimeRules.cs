@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_bian_fu_ren_ol_BianFuRenMovements
 {
     internal static bool IsBianFuRenOwnedZone(CardLocation from) => from.OwnerSeat is not null &&

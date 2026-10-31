@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDyingOwnerSkillReplacementRuntime
@@ -68,7 +64,7 @@ internal sealed partial class CoreGameEngineDyingOwnerSkillReplacementRuntime
             return null;
         if (paid.ReplacedPaidHpContinuation is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSkillHpLostEvent>().Count(fact => fact.FrameId == paid.Id && fact.SkillId == paid.SkillId && fact.TargetSeat == paid.OwnerSeat && fact.Amount == 1 && fact.RemainingHp == 0) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlayerDyingEvent>().Count(fact => fact.ResolutionId == dying.Id && fact.VictimSeat == paid.OwnerSeat && fact.KillerSeat is null) != 1)
             throw new InvalidOperationException("The removed owner program has no exact once-paid HP-loss dying fact.");
-        return new(paid.Id, paid.OwnerSeat, paid.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(paid), paid.SkillInstanceId, paid.GameplayHash, paid.InstructionIndex, ((FixedProgramAmount)((DrawProgramInstruction)plan.Instructions[1].CompiledInstruction!).Amount).Value, dying.Id, entry.Id, replacement.Id, replacement.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(replacement), replacement.SkillInstanceId, replacement.GameplayHash, replacement.InstructionIndex, effect.SourceBind!, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
+        return new(paid.Id, paid.OwnerSeat, paid.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(paid), paid.SkillInstanceId, paid.GameplayHash, paid.InstructionIndex, ((FixedProgramAmount)((DrawProgramInstruction)plan.Instructions[1].CompiledInstruction!).Amount).Value, dying.Id, entry.Id, replacement.Id, replacement.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(replacement), replacement.SkillInstanceId, replacement.GameplayHash, replacement.InstructionIndex, effect.SourceBind!, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
     }
 
     internal void IssueReplacedPaidHpContinuation(ProgramReplacedPaidHpContinuation continuation)
@@ -82,7 +78,7 @@ internal sealed partial class CoreGameEngineDyingOwnerSkillReplacementRuntime
 
     internal bool HasValidReplacedPaidHpContinuation(ProgramSkillFrame frame, ProgramExecutionPlan plan)
     {
-        if (frame.ReplacedPaidHpContinuation is not { } receipt || !DyingOwnerSkillReplacementContract.IsPaidOwnerDrawTail(plan.Instructions) || receipt.ProgramFrameId != frame.Id || receipt.OwnerSeat != frame.OwnerSeat || receipt.SkillId != frame.SkillId || receipt.BindingId != global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || receipt.SkillInstanceId != frame.SkillInstanceId || receipt.GameplayHash != frame.GameplayHash || receipt.PaidInstructionIndex != 1 || frame.InstructionIndex is < 1 or > 2 || frame.ReexecuteParticipantInstruction || receipt.DrawAmount != ((FixedProgramAmount)((DrawProgramInstruction)plan.Instructions[1].CompiledInstruction!).Amount).Value || receipt.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || receipt.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || receipt.DyingFrameId <= frame.Id || receipt.EntryWindowFrameId <= receipt.DyingFrameId || receipt.ReplacementFrameId <= receipt.EntryWindowFrameId)
+        if (frame.ReplacedPaidHpContinuation is not { } receipt || !DyingOwnerSkillReplacementContract.IsPaidOwnerDrawTail(plan.Instructions) || receipt.ProgramFrameId != frame.Id || receipt.OwnerSeat != frame.OwnerSeat || receipt.SkillId != frame.SkillId || receipt.BindingId != CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || receipt.SkillInstanceId != frame.SkillInstanceId || receipt.GameplayHash != frame.GameplayHash || receipt.PaidInstructionIndex != 1 || frame.InstructionIndex is < 1 or > 2 || frame.ReexecuteParticipantInstruction || receipt.DrawAmount != ((FixedProgramAmount)((DrawProgramInstruction)plan.Instructions[1].CompiledInstruction!).Amount).Value || receipt.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || receipt.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || receipt.DyingFrameId <= frame.Id || receipt.EntryWindowFrameId <= receipt.DyingFrameId || receipt.ReplacementFrameId <= receipt.EntryWindowFrameId)
             return false;
         var replacementProgram = _contentRegistryOperations._contentRegistry.GetSkill(receipt.ReplacementSkillId).Program;
         var trigger = replacementProgram?.Triggers.SingleOrDefault(item => item.Id == receipt.ReplacementBindingId);

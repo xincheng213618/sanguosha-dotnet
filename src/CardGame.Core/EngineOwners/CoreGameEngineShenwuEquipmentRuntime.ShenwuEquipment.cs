@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShenwuEquipmentRuntime
@@ -13,8 +9,8 @@ internal sealed partial class CoreGameEngineShenwuEquipmentRuntime
     internal string? ShenwuEquipmentSkillId(CardKind kind) => _coreEquipmentContentOperations.EquipmentRules.GetSkillBinding(kind)is { } binding && binding.SkillId.StartsWith("shenwu:", StringComparison.Ordinal) ? binding.SkillId : null;
     internal string? ShenwuEquipmentSkillGrantId(Card card) => ShenwuEquipmentSkillId(card.Kind)is null ? null : _coreEquipmentSkillsOperations.EquipmentSkillGrantId(card);
     internal bool HasShenwuArmor(CharacterState player, CardKind kind) => player.IsAlive && !_coreExtendedViewAsOperations.IsArmorIneffectiveForTurn(player) && _characterHuCheErMouOperations.KongwuEffectiveEquipment(player).Any(card => card.Kind == kind);
-    internal bool IsShenwuRobeTargetProhibited(int actorSeat, int targetSeat, CardKind kind) => actorSeat != targetSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && HasShenwuArmor(_coreMatchParticipantsPlayersAccess._players[targetSeat], CardKind.NationalStyleRobe);
-    internal bool TryApplyShenwuQimen(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool IsShenwuRobeTargetProhibited(int actorSeat, int targetSeat, CardKind kind) => actorSeat != targetSeat && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && HasShenwuArmor(_coreMatchParticipantsPlayersAccess._players[targetSeat], CardKind.NationalStyleRobe);
+    internal bool TryApplyShenwuQimen(NativeOwners.CardAttackHandle attack)
     {
         if (attack.CardUserSeat == attack.TargetSeat || attack.IgnoresArmor || _coreDirectedCardPolicyQueriesOperations.HasDirectedCardArmorBypass(attack.ResolutionId, attack.TargetSeat) || !HasShenwuArmor(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat], CardKind.QimenEightTrigrams))
             return false;
@@ -24,16 +20,16 @@ internal sealed partial class CoreGameEngineShenwuEquipmentRuntime
         return true;
     }
 
-    internal DamageNature ShenwuDamageNature(global::CardGame.Core.GameEngine.IDamageAttempt attack, DamageNature original) => !attack.IsSourceLess && (_coreShenwuNpcProgramsOperations.ShenwuEnabled(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], "shenwu:zhaohuo") || _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], CardKind.CrimsonSoulZither)) ? DamageNature.Fire : original;
+    internal DamageNature ShenwuDamageNature(GameEngine.IDamageAttempt attack, DamageNature original) => !attack.IsSourceLess && (_coreShenwuNpcProgramsOperations.ShenwuEnabled(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], "shenwu:zhaohuo") || _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], CardKind.CrimsonSoulZither)) ? DamageNature.Fire : original;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 240)]
-    internal int ShenwuShuraDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && !attack.IsSourceLess && attack.CardUserSeat == attack.SourceSeat && attack.EffectiveCardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.CardUserSeat], CardKind.ShuraInfernoHalberd) ? 1 : 0;
+    internal int ShenwuShuraDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && !attack.IsSourceLess && attack.CardUserSeat == attack.SourceSeat && attack.EffectiveCardKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.CardUserSeat], CardKind.ShuraInfernoHalberd) ? 1 : 0;
     internal int ShenwuDustlessDistanceBonus(CharacterState source, CharacterState target) => _coreMatchParticipantsPlayersAccess._players.Count(owner => owner.IsAlive && owner.Seat != target.Seat && owner.TeamId is { } team && team == target.TeamId && source.TeamId != team && _characterHuCheErMouOperations.KongwuEffectiveEquipment(owner).Any(card => card.Kind == CardKind.DustlessGoldenSpear));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27800)]
     internal bool AllowsShenwuShuraRecovery(ProgramTriggerLegalityContext gate)
     {
         if (gate.SkillId != "shenwu:shura-inferno-halberd")
             return true;
-        return _corePhysicalOwnedCardQueriesOperations.GetEquipment(gate.Owner).Any(card => card.Kind == CardKind.ShuraInfernoHalberd && ShenwuEquipmentSkillGrantId(card) == gate.Candidate.SkillInstanceId) && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsChainPropagation: false, IsSourceLess: false } attack && attack.SourceSeat == gate.OwnerSeat && attack.CardUserSeat == gate.OwnerSeat && attack.EffectiveCardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreAdvancedWeaponsOperations.HasWeaponAbility(gate.Owner, CardKind.ShuraInfernoHalberd) && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.EffectiveDesignatedTargetSeats.Contains(attack.TargetSeat) == true;
+        return _corePhysicalOwnedCardQueriesOperations.GetEquipment(gate.Owner).Any(card => card.Kind == CardKind.ShuraInfernoHalberd && ShenwuEquipmentSkillGrantId(card) == gate.Candidate.SkillInstanceId) && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsChainPropagation: false, IsSourceLess: false } attack && attack.SourceSeat == gate.OwnerSeat && attack.CardUserSeat == gate.OwnerSeat && attack.EffectiveCardKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreAdvancedWeaponsOperations.HasWeaponAbility(gate.Owner, CardKind.ShuraInfernoHalberd) && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.EffectiveDesignatedTargetSeats.Contains(attack.TargetSeat) == true;
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.DistanceBaseTerms, 20)]

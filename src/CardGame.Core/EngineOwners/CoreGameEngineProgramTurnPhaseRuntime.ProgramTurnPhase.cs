@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramTurnPhaseRuntime
@@ -29,10 +25,10 @@ internal sealed partial class CoreGameEngineProgramTurnPhaseRuntime
         foreach (var phase in phases)
             _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= phase switch
             {
-                SkillProgramTurnPhase.Judgment => global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipJudgmentPhase,
-                SkillProgramTurnPhase.Draw => global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase,
-                SkillProgramTurnPhase.Play => global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipPlayPhase,
-                SkillProgramTurnPhase.Discard => global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDiscardPhase,
+                SkillProgramTurnPhase.Judgment => GameEngine.DelayedTurnEffects.SkipJudgmentPhase,
+                SkillProgramTurnPhase.Draw => GameEngine.DelayedTurnEffects.SkipDrawPhase,
+                SkillProgramTurnPhase.Play => GameEngine.DelayedTurnEffects.SkipPlayPhase,
+                SkillProgramTurnPhase.Discard => GameEngine.DelayedTurnEffects.SkipDiscardPhase,
                 _ => throw new InvalidOperationException("Unknown turn phase.")};
         _coreAlternativePhaseCostProgramsOperations.RecordAlternativePhaseSkip(active, phases);
         return SkillProgramStepOutcome.Continue;
@@ -58,7 +54,7 @@ internal sealed partial class CoreGameEngineProgramTurnPhaseRuntime
             return SkillProgramStepOutcome.Continue;
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var nativeWindows = instruction.UseCardActionWindows || _coreCurrentSlashFireOffersOperations.HasCommittedSlashFireCapability(source) || _characterLuBuHappyGodOperations.HasHappyLuBuWuqianCapability(source) || _characterLeJiuAnniversaryOperations.HasAnniversaryLeJiuUseObserver(source);
-        var action = nativeWindows || _characterHuangYueyingOlMouOperations.HasMouHuangYueyingBingcaiCapability || _characterZhouQunOlOperations.HasZhouQunCapability || _characterKongShuOlOperations.HasKongShuCapability || _characterMaChengOlOperations.HasMaChengCapability || _characterCuiYanOlOperations.HasCuiYanCapability || _characterLiYiOlOperations.HasLiYiCapability || _characterCaiWenJiLeOperations.HasLeCaiWenJiBeifenCapability || _characterLiuYanOlOperations.HasLiuYanCapability || _coreNativeLogicalDiscardsOperations.TracksNativeLogicalDiscards || _characterLiuZanMobileOperations.TracksAlternateActualUseColor || _coreSoleTargetProtectionOperations.HasSoleTargetProtectionParticipant || phaseControlParticipant || _characterSunHaoOlOperations.HasSunHaoCanshiCapability ? _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, source.Seat, source.Seat, null, null, null, cardKind, [targetSeat], [], Array.AsReadOnly(new[] { new CardConversionSource(active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId) }), effectiveSuit: Suit.None, effectiveRank: 0)) : null;
+        var action = nativeWindows || _characterHuangYueyingOlMouOperations.HasMouHuangYueyingBingcaiCapability || _characterZhouQunOlOperations.HasZhouQunCapability || _characterKongShuOlOperations.HasKongShuCapability || _characterMaChengOlOperations.HasMaChengCapability || _characterCuiYanOlOperations.HasCuiYanCapability || _characterLiYiOlOperations.HasLiYiCapability || _characterCaiWenJiLeOperations.HasLeCaiWenJiBeifenCapability || _characterLiuYanOlOperations.HasLiuYanCapability || _coreNativeLogicalDiscardsOperations.TracksNativeLogicalDiscards || _characterLiuZanMobileOperations.TracksAlternateActualUseColor || _coreSoleTargetProtectionOperations.HasSoleTargetProtectionParticipant || phaseControlParticipant || _characterSunHaoOlOperations.HasSunHaoCanshiCapability ? _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, source.Seat, source.Seat, null, null, null, cardKind, [targetSeat], [], Array.AsReadOnly(new[] { new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId) }), effectiveSuit: Suit.None, effectiveRank: 0)) : null;
         _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, source.Seat, 0, cardKind, Array.AsReadOnly(new[] { targetSeat }), PhysicalCardIds: Array.AsReadOnly(Array.Empty<int>())) { Action = action });
         if (action is not null)
             _corePhaseNamePredictionOperations.ObservePhaseNamePredictionUse(action);

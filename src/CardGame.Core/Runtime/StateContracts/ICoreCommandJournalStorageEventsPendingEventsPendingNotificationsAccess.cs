@@ -1,10 +1,10 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreCommandJournalStorageEventsPendingEventsPendingNotificationsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreCommandJournalStorageEventsPendingEventsPendingNotificationsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.EventEnvelope> _events { get; }
+    ref readonly List<EventEnvelope> _events { get; }
 
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.IGameEvent> _pendingEvents { get; }
+    ref readonly List<IGameEvent> _pendingEvents { get; }
 
-    ref readonly global::System.Collections.Generic.Queue<global::CardGame.Core.EngineNotification> _pendingNotifications { get; }
+    ref readonly Queue<EngineNotification> _pendingNotifications { get; }
 }

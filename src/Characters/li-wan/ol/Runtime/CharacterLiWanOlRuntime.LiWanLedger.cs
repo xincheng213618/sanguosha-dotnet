@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiWanOlRuntime
 {
     internal bool HasLiWanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferLianjuSameColorGift) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawSilvMarkedCardAfterDamage);
 
-    internal static CardConversionSource LiWanSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_li_wan_ol_LiWanLedger.LiWanSource(f);
+    internal static CardConversionSource LiWanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_li_wan_ol_LiWanLedger.LiWanSource(f);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 26720)]
     internal void ObserveLiWanActualUseAndEnding(IGameEvent fact)
     {

@@ -1,33 +1,29 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoShuangMouRuntime
 {
     internal MouCaoShuangAnniversaryRuntime MouCaoShuangAnniversary => _mouCaoShuangAnniversaryOperations.Get();
 
-    int global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Turn => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber;
+    int IMouCaoShuangAnniversaryFacts.Turn => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber;
 
-    int global::CardGame.Core.IMouCaoShuangAnniversaryFacts.CurrentSeat => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat;
+    int IMouCaoShuangAnniversaryFacts.CurrentSeat => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat;
 
-    int global::CardGame.Core.IMouCaoShuangAnniversaryFacts.PhaseId => _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId;
+    int IMouCaoShuangAnniversaryFacts.PhaseId => _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId;
 
-    long global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+    long IMouCaoShuangAnniversaryFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
-    bool global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouCaoShuangAnniversaryFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    bool global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
-    bool global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
-    string global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
-    int global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Keep(int seat, int card) => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(card), _coreMatchParticipantsPlayersAccess._players[seat]);
-    bool global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Friendly(int owner, int other) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), other, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
-    IReadOnlyList<int> global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
-    SkillProgram global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    IEnumerable<T> global::CardGame.Core.IMouCaoShuangAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    bool global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Parent(ProgramSkillFrame f)
+    bool IMouCaoShuangAnniversaryFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
+    bool IMouCaoShuangAnniversaryFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
+    string IMouCaoShuangAnniversaryFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
+    int IMouCaoShuangAnniversaryFacts.Keep(int seat, int card) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(card), _coreMatchParticipantsPlayersAccess._players[seat]);
+    bool IMouCaoShuangAnniversaryFacts.Friendly(int owner, int other) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), other, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
+    IReadOnlyList<int> IMouCaoShuangAnniversaryFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
+    SkillProgram IMouCaoShuangAnniversaryFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
+    IEnumerable<T> IMouCaoShuangAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    bool IMouCaoShuangAnniversaryFacts.Parent(ProgramSkillFrame f)
     {
         if (f.TriggerId != f.ActivationId || f.WindowContext is not { } w || w.OwnerSeat != f.OwnerSeat)
             return false;
@@ -49,11 +45,11 @@ internal sealed partial class CharacterCaoShuangMouRuntime
             TurnEndingBoundaryFrame p when p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count => p.Items[p.ItemIndex].Candidate,
             _ => null
         };
-        return candidate is not null && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
+        return candidate is not null && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
     }
 
-    bool global::CardGame.Core.IMouCaoShuangAnniversaryFacts.ActualPlay(int owner) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == owner && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == owner && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p);
-    MouCaoShuangAnniversaryUse? global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Use(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
+    bool IMouCaoShuangAnniversaryFacts.ActualPlay(int owner) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == owner && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == owner && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p);
+    MouCaoShuangAnniversaryUse? IMouCaoShuangAnniversaryFacts.Use(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
     {
         if (w.CardUse is not { } info || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame p || p.Action.ActionId != info.CardActionId || p.Action.ActorSeat != c.OwnerSeat || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count)
             return null;
@@ -63,17 +59,17 @@ internal sealed partial class CharacterCaoShuangMouRuntime
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(info.ParentCardUseFrameId);
         if (w.Window == SkillProgramTriggerWindow.CardUseCommitted)
             return new(p.Id, p.Action, use?.Id ?? info.ParentCardUseFrameId, -1, p.Action.EffectiveIsRed);
-        if (w.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || use is null || use.TargetSeats is not [var target] || target == c.OwnerSeat || !((global::CardGame.Core.IMouCaoShuangAnniversaryFacts)this).Alive(target))
+        if (w.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || use is null || use.TargetSeats is not [var target] || target == c.OwnerSeat || !((IMouCaoShuangAnniversaryFacts)this).Alive(target))
             return null;
         return new(p.Id, p.Action, use.Id, target, p.Action.EffectiveIsRed ?? (p.Action.EffectiveSuit is { } suit && suit != Suit.None ? suit is Suit.Heart or Suit.Diamond : null));
     }
 
-    IReadOnlyList<MouCaoShuangAnniversaryCard> global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Payable(int payer, bool recast) => !((global::CardGame.Core.IMouCaoShuangAnniversaryFacts)this).Alive(payer) ? [] : Array.AsReadOnly((recast ? new[] { CardZoneKind.Hand } : new[] { CardZoneKind.Hand, CardZoneKind.Equipment }).SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, payer)).Where(c => recast || !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(payer, c, new(z, payer), OwnedCardMoveIntent.Discard)).Select(c => new MouCaoShuangAnniversaryCard(c.Id, c.Kind, new(z, payer), c.DisplayName))).ToArray());
-    bool global::CardGame.Core.IMouCaoShuangAnniversaryFacts.Hurt(int source, int victim) => _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Any(d => !d.SourceLess && d.Amount > 0 && d.SourceSeat == source && d.TargetSeat == victim);
-    void global::CardGame.Core.IMouCaoShuangAnniversaryNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
-    void global::CardGame.Core.IMouCaoShuangAnniversaryNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
-    bool global::CardGame.Core.IMouCaoShuangAnniversaryNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    void global::CardGame.Core.IMouCaoShuangAnniversaryNative.Move(ProgramSkillFrame f)
+    IReadOnlyList<MouCaoShuangAnniversaryCard> IMouCaoShuangAnniversaryFacts.Payable(int payer, bool recast) => !((IMouCaoShuangAnniversaryFacts)this).Alive(payer) ? [] : Array.AsReadOnly((recast ? new[] { CardZoneKind.Hand } : new[] { CardZoneKind.Hand, CardZoneKind.Equipment }).SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, payer)).Where(c => recast || !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(payer, c, new(z, payer), OwnedCardMoveIntent.Discard)).Select(c => new MouCaoShuangAnniversaryCard(c.Id, c.Kind, new(z, payer), c.DisplayName))).ToArray());
+    bool IMouCaoShuangAnniversaryFacts.Hurt(int source, int victim) => _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Any(d => !d.SourceLess && d.Amount > 0 && d.SourceSeat == source && d.TargetSeat == victim);
+    void IMouCaoShuangAnniversaryNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    void IMouCaoShuangAnniversaryNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+    bool IMouCaoShuangAnniversaryNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
+    void IMouCaoShuangAnniversaryNative.Move(ProgramSkillFrame f)
     {
         if (!MouCaoShuangAnniversary.Valid(f) || f.MouCaoShuangAnniversary is not { Stage: MouCaoShuangAnniversaryStage.MoveChildren, Cards.Count: > 0 } r || r.Cards.Any(c => !_characterCaoShuangMouOperations.CreateMouCaoShuangAnniversaryFacts().Payable(r.Payer, r.Option == 3).Contains(c)))
             throw new InvalidOperationException("Jianzhuan requires the actual chooser's frozen available entities.");
@@ -98,7 +94,7 @@ internal sealed partial class CharacterCaoShuangMouRuntime
             _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, r.Payer, ids, new(MouCaoShuangAnniversaryRuntime.DiscardReason), Paid);
     }
 
-    void global::CardGame.Core.IMouCaoShuangAnniversaryNative.CompleteRecast(ProgramSkillFrame f, int actual)
+    void IMouCaoShuangAnniversaryNative.CompleteRecast(ProgramSkillFrame f, int actual)
     {
         var r = f.MouCaoShuangAnniversary!;
         if (!MouCaoShuangAnniversary.Valid(f) || r.Option != 3 || r.Stage != MouCaoShuangAnniversaryStage.DrawChildren || r.Draw?.ActualDrawIds.Count != actual)
@@ -108,7 +104,7 @@ internal sealed partial class CharacterCaoShuangMouRuntime
         _coreNativeRecastInvocationsOperations.CompleteFrameNativeRecastInvocation(f, actual);
     }
 
-    void global::CardGame.Core.IMouCaoShuangAnniversaryNative.Delete(ProgramSkillFrame f)
+    void IMouCaoShuangAnniversaryNative.Delete(ProgramSkillFrame f)
     {
         if (!MouCaoShuangAnniversary.Valid(f) || f.MouCaoShuangAnniversary is not { Operation: SkillProgramEffectOp.DeleteMouCaoShuangJianzhuanOption } r)
             throw new InvalidOperationException("Jianzhuan deletion requires its actual completed Play.");
@@ -118,9 +114,9 @@ internal sealed partial class CharacterCaoShuangMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouCaoShuangAnniversaryDeletedEvent(f.Id, f.OwnerSeat, r.Turn, r.PhaseId, item, r.Remaining, r.Remaining & ~(1 << (item - 1)), before, _randomOperations._random.State));
     }
 
-    void global::CardGame.Core.IMouCaoShuangAnniversaryNative.Maximum(ProgramSkillFrame f) => _coreProgramLifecycleOperations.ChangeProgramMaximumHp(f, 2);
-    void global::CardGame.Core.IMouCaoShuangAnniversaryNative.Recover(ProgramSkillFrame f) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, 2, null, null);
-    void global::CardGame.Core.IMouCaoShuangAnniversaryNative.Grant(ProgramSkillFrame f)
+    void IMouCaoShuangAnniversaryNative.Maximum(ProgramSkillFrame f) => _coreProgramLifecycleOperations.ChangeProgramMaximumHp(f, 2);
+    void IMouCaoShuangAnniversaryNative.Recover(ProgramSkillFrame f) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, 2, null, null);
+    void IMouCaoShuangAnniversaryNative.Grant(ProgramSkillFrame f)
     {
         if (!MouCaoShuangAnniversary.Valid(f) || f.MouCaoShuangAnniversary is not { Stage: MouCaoShuangAnniversaryStage.Grant })
             throw new InvalidOperationException("Fanshi grant requires its completed native repeats and recovery.");
@@ -133,5 +129,5 @@ internal sealed partial class CharacterCaoShuangMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouCaoShuangAnniversaryGrantedEvent(f.Id, f.OwnerSeat));
     }
 
-    void global::CardGame.Core.IMouCaoShuangAnniversaryNative.LoseHp(ProgramSkillFrame f, int target) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(f.Id, f.SkillId, target, 1);
+    void IMouCaoShuangAnniversaryNative.LoseHp(ProgramSkillFrame f, int target) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(f.Id, f.SkillId, target, 1);
 }

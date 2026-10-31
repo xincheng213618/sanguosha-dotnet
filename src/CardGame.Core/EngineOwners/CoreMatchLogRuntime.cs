@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreMatchLogRuntime
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterSimaYiMouEntries _characterSimaYiMouOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelObserversAccess _kernelCoreGameEngineObserversOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStoragePendingNotificationsAccess _coreCommandJournalStoragePendingNotificationsAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreGameLogLogLogSequenceAccess _coreGameLogLogLogSequenceAccess;
-    internal CoreMatchLogRuntime(global::CardGame.Core.RuntimeEntries.CharacterSimaYiMouEntries characterSimaYiMouOperations, global::CardGame.Core.EngineOwners.IKernelObserversAccess kernelCoreGameEngineObserversOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreCommandJournalStoragePendingNotificationsAccess coreCommandJournalStoragePendingNotificationsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreGameLogLogLogSequenceAccess coreGameLogLogLogSequenceAccess)
+    private readonly RuntimeEntries.CharacterSimaYiMouEntries _characterSimaYiMouOperations;
+    private readonly IKernelObserversAccess _kernelCoreGameEngineObserversOperations;
+    private readonly EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess _coreActualTurnProgressTurnNumberAccess;
+    private readonly EngineStates.Contracts.ICoreCommandJournalStoragePendingNotificationsAccess _coreCommandJournalStoragePendingNotificationsAccess;
+    private readonly EngineStates.Contracts.ICoreGameLogLogLogSequenceAccess _coreGameLogLogLogSequenceAccess;
+    internal CoreMatchLogRuntime(RuntimeEntries.CharacterSimaYiMouEntries characterSimaYiMouOperations, IKernelObserversAccess kernelCoreGameEngineObserversOperations, EngineStates.Contracts.ICoreActualTurnProgressTurnNumberAccess coreActualTurnProgressTurnNumberAccess, EngineStates.Contracts.ICoreCommandJournalStoragePendingNotificationsAccess coreCommandJournalStoragePendingNotificationsAccess, EngineStates.Contracts.ICoreGameLogLogLogSequenceAccess coreGameLogLogLogSequenceAccess)
     {
         this._characterSimaYiMouOperations = characterSimaYiMouOperations;
         this._kernelCoreGameEngineObserversOperations = kernelCoreGameEngineObserversOperations;

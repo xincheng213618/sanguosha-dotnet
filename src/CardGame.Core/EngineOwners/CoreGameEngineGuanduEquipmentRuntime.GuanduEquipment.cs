@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGuanduEquipmentRuntime
 {
     internal string? GuanduEquipmentSkillGrantId(Card card) => _coreEquipmentContentOperations.EquipmentRules.GetSkillBinding(card.Kind)is { } binding && binding.SkillId.StartsWith("guandu:", StringComparison.Ordinal) ? binding.CreateGrantId(card.Id) : null;
-    internal static bool IsGuanduThunderChariotDeparture(Card card, CardLocation from, CardLocation to) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GuanduEquipment.IsGuanduThunderChariotDeparture(card, from, to);
+    internal static bool IsGuanduThunderChariotDeparture(Card card, CardLocation from, CardLocation to) => RuntimeSkills.RuntimeRules_Core_GuanduEquipment.IsGuanduThunderChariotDeparture(card, from, to);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 44002)]
     internal void RecordGuanduChariotDestruction(IGameEvent payload)
     {

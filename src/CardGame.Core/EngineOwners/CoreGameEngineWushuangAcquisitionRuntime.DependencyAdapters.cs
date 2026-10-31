@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreWushuangModeProjectionRuntime))]
-internal sealed class CoreWushuangAcquisitionCoreWushuangModeProjectionAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreWushuangModeProjectionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreWushuangAcquisitionCoreWushuangModeProjectionOperations
+[Core.ProgramCapability(typeof(CoreWushuangModeProjectionRuntime))]
+internal sealed class CoreWushuangAcquisitionCoreWushuangModeProjectionAdapter(Func<CoreWushuangModeProjectionRuntime> targetFactory) : ICoreWushuangAcquisitionCoreWushuangModeProjectionOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreWushuangModeProjectionRuntime> _targetFactory = targetFactory;
+    private readonly Func<CoreWushuangModeProjectionRuntime> _targetFactory = targetFactory;
     public bool IsWushuangMode { get => this._targetFactory().IsWushuangMode; }
 }

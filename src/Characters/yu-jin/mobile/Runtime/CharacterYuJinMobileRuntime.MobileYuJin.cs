@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuJinMobileRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterYuJinMobileRuntime
     internal bool MobileYuJinSubmittedConversionUnavailable(ProgramViewAsLegalityQuery query) => query.Source.SkillId == MobileYuJinJieyue.Skill && (!HasMobileYuJinPile(query.Owner.Seat, query.Source.SkillInstanceId) || query.CardIds.Count != 1 || _cardZonesOperations._cardZones.GetLocation(query.CardIds[0]) != CardLocation.Hand(query.Owner.Seat));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 76300, SkillProgramEffectOp.CollectMobileYuJinJieyue)]
     internal bool MobileYuJinPreparationHasCards(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && HasMobileYuJinPile(candidate.OwnerSeat, candidate.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileYuJinHost.Transfer(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginMobileYuJinTransfer(frame, effect);
+    SkillProgramStepOutcome IMobileYuJinHost.Transfer(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginMobileYuJinTransfer(frame, effect);
     internal static string MobileYuJinTransferReason(SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMobileYuJinJieyue ? "skill.mobile-yu-jin.jieyue.store" : "skill.mobile-yu-jin.jieyue.retrieve";
     internal SkillProgramStepOutcome BeginMobileYuJinTransfer(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
@@ -39,7 +35,7 @@ internal sealed partial class CharacterYuJinMobileRuntime
         var receipt = new MobileYuJinTransferReceipt
         {
             Operation = operation,
-            Source = new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId),
+            Source = new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId),
             GameplayHash = frame.GameplayHash,
             Pile = pile,
             ActualTurn = _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber,
@@ -73,7 +69,7 @@ internal sealed partial class CharacterYuJinMobileRuntime
 
     internal bool ValidMobileYuJinTransfer(ProgramSkillFrame frame)
     {
-        if (frame.MobileYuJinTransfer is not { } r || frame.SkillId != MobileYuJinJieyue.Skill || r.Source != new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || r.GameplayHash != frame.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ParentId != frame.WindowContext?.ParentFrameId || r.InstructionIndex != frame.InstructionIndex || !ExactMobileYuJinParent(frame, r.Operation == SkillProgramEffectOp.ResolveMobileYuJinJieyue) || r.Pile.OwnerSeat != frame.OwnerSeat || r.Pile.SkillId != frame.SkillId || r.Pile.SkillInstanceId != frame.SkillInstanceId || r.Pile.Capacity != int.MaxValue || r.Cards.Count == 0 || r.Cards.Count != r.From.Count || r.Cards.Distinct().Count() != r.Cards.Count || r.Before < 0 || r.After <= r.Before || r.After > _coreCardMovementJournalCardMovementsAccess._cardMovements.Count)
+        if (frame.MobileYuJinTransfer is not { } r || frame.SkillId != MobileYuJinJieyue.Skill || r.Source != new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || r.GameplayHash != frame.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ParentId != frame.WindowContext?.ParentFrameId || r.InstructionIndex != frame.InstructionIndex || !ExactMobileYuJinParent(frame, r.Operation == SkillProgramEffectOp.ResolveMobileYuJinJieyue) || r.Pile.OwnerSeat != frame.OwnerSeat || r.Pile.SkillId != frame.SkillId || r.Pile.SkillInstanceId != frame.SkillInstanceId || r.Pile.Capacity != int.MaxValue || r.Cards.Count == 0 || r.Cards.Count != r.From.Count || r.Cards.Distinct().Count() != r.Cards.Count || r.Before < 0 || r.After <= r.Before || r.After > _coreCardMovementJournalCardMovementsAccess._cardMovements.Count)
             return false;
         var store = r.Operation == SkillProgramEffectOp.ResolveMobileYuJinJieyue;
         if (!store && r.Operation != SkillProgramEffectOp.CollectMobileYuJinJieyue || frame.TriggerId != (store ? MobileYuJinJieyue.Ending : MobileYuJinJieyue.Preparation) || frame.InstructionIndex != (store ? 3 : 1) || frame.WindowContext?.Window != (store ? SkillProgramTriggerWindow.TurnEnding : SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) || r.Destination != (store ? r.Pile.Location : CardLocation.Hand(frame.OwnerSeat)) || store && (r.Cards.Count != 1 || frame.SelectedTargetSeats is not [var target] || r.From.Any(l => l.OwnerSeat != target || l.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))) || !store && r.From.Any(l => l != r.Pile.Location))

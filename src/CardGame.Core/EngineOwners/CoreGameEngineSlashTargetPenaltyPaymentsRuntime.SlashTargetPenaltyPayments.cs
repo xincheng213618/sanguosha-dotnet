@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -228,10 +225,10 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyPaymentsRuntime
         var target = _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat];
         var equipment = _corePhysicalOwnedCardQueriesOperations.GetEquipment(target).ToArray();
         var recast = decision.Choices.SingleOrDefault(c => c.Parameters.GetValueOrDefault("penalty-option") == "recast");
-        var discard = decision.Choices.Where(c => c.Parameters.GetValueOrDefault("penalty-option") == "discard").OrderBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), target) : 10).ThenBy(c => c.Id.Value, StringComparer.Ordinal).FirstOrDefault();
-        var recastCost = equipment.Sum(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(c, target)) - equipment.Length * 3 - (target.Hp < target.MaxHp && equipment.Any(c => c.Kind == CardKind.SilverLion) ? 4 : 0);
-        return recast is not null && (discard is null || recastCost < (discard.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(discard.Cards[0]), target) : 10)) ? recast : discard ?? recast ?? throw new InvalidOperationException("A target penalty has no published legal choice.");
+        var discard = decision.Choices.Where(c => c.Parameters.GetValueOrDefault("penalty-option") == "discard").OrderBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), target) : 10).ThenBy(c => c.Id.Value, StringComparer.Ordinal).FirstOrDefault();
+        var recastCost = equipment.Sum(c => CoreNativeAiDecisionsRuntime.GetKeepValue(c, target)) - equipment.Length * 3 - (target.Hp < target.MaxHp && equipment.Any(c => c.Kind == CardKind.SilverLion) ? 4 : 0);
+        return recast is not null && (discard is null || recastCost < (discard.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(discard.Cards[0]), target) : 10)) ? recast : discard ?? recast ?? throw new InvalidOperationException("A target penalty has no published legal choice.");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISlashTargetPenaltyProgramHost.RequireTargetDiscardOrEquipmentRecast(ProgramSkillFrame f) => RequireTargetDiscardOrEquipmentRecast(f);
+    SkillProgramStepOutcome ISlashTargetPenaltyProgramHost.RequireTargetDiscardOrEquipmentRecast(ProgramSkillFrame f) => RequireTargetDiscardOrEquipmentRecast(f);
 }

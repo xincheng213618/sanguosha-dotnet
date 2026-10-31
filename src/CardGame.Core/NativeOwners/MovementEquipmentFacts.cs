@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MovementEquipmentFacts(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeDamageHandlesEntries> getCoreNativeDamageHandlesRuntime, global::CardGame.Core.EngineStates.CoreCardMovementJournalState cardMovementJournalState, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterWeiYanHappyGodEntries> getCharacterWeiYanHappyGodRuntime, global::System.Func<global::CardGame.Core.CardZoneStore> getCardZoneStore) : IMovementEquipmentFacts
+internal sealed class MovementEquipmentFacts(Func<RuntimeEntries.CoreNativeDamageHandlesEntries> getCoreNativeDamageHandlesRuntime, EngineStates.CoreCardMovementJournalState cardMovementJournalState, Func<RuntimeEntries.CharacterWeiYanHappyGodEntries> getCharacterWeiYanHappyGodRuntime, Func<CardZoneStore> getCardZoneStore) : IMovementEquipmentFacts
 {
     public bool UsesStorageEquipment => getCoreNativeDamageHandlesRuntime().UsesFormalWoodenOx;
     public bool UsesRecoveryArmor => getCoreNativeDamageHandlesRuntime().UsesFormalSilverLion;

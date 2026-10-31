@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuQiOlRuntime
 {
-    internal static string WenjiName(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_qi_ol_Wenji_Observers.WenjiName(kind);
+    internal static string WenjiName(CardKind kind) => RuntimeSkills.RuntimeRules_liu_qi_ol_Wenji_Observers.WenjiName(kind);
     internal bool IsWenjiResponseForbidden(CardActionContext originalUse, int responderSeat)
     {
         if (_characterZhangLiaoHappyGodOperations.HappyZlCannotRespond(originalUse, responderSeat))

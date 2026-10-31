@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreAlternativePhaseCostProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IAlternativePhaseCostProgramHost.PayOwnedCardOrMarker(ProgramSkillFrame frame, IReadOnlyList<CardZoneKind> zones, PlayerMarkerKind marker) => BeginAlternativePhaseCost(frame, zones, marker);
+    SkillProgramStepOutcome IAlternativePhaseCostProgramHost.PayOwnedCardOrMarker(ProgramSkillFrame frame, IReadOnlyList<CardZoneKind> zones, PlayerMarkerKind marker) => BeginAlternativePhaseCost(frame, zones, marker);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.AfterCondition, 20)]
     internal bool CanOfferAlternativePhaseCost(CharacterState owner, SkillProgramTrigger trigger, ProgramTriggerCandidate candidate)
     {
@@ -85,10 +81,10 @@ internal sealed partial class CoreAlternativePhaseCostProgramsRuntime
         var receipt = new ProgramAlternativePhaseCostReceipt(frame.InstructionIndex, markerPayment ? ProgramAlternativePhaseCostKind.RemoveMarker : ProgramAlternativePhaseCostKind.DiscardCard, marker, card?.Id, from);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { AlternativePhaseCost = receipt });
         if (markerPayment)
-            _coreProgramMarkerPaymentsOperations.PayProgramMarkerCost(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], new(marker, 1), frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame));
+            _coreProgramMarkerPaymentsOperations.PayProgramMarkerCost(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], new(marker, 1), frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame));
         else
             _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(frame.OwnerSeat, frame.OwnerSeat, card!, from!.Value, new($"skill-program.{(frame.SkillId)}.{(effect.Op)}"));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAlternativePhaseCostPaidEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.OwnerSeat, receipt.Kind, marker, card?.Id, from));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAlternativePhaseCostPaidEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.OwnerSeat, receipt.Kind, marker, card?.Id, from));
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
@@ -116,7 +112,7 @@ internal sealed partial class CoreAlternativePhaseCostProgramsRuntime
         var marker = decision.Choices.SingleOrDefault(c => c.Parameters.GetValueOrDefault("program-action") == "alternative-phase-cost-marker");
         if (marker is not null)
             return marker;
-        return decision.Choices.OrderBy(choice => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(choice.Cards.Single())).Single(card => card.Id == choice.Cards[0]), _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat])).ThenBy(choice => choice.Id.Value, StringComparer.Ordinal).First();
+        return decision.Choices.OrderBy(choice => CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(choice.Cards.Single())).Single(card => card.Id == choice.Cards[0]), _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat])).ThenBy(choice => choice.Id.Value, StringComparer.Ordinal).First();
     }
 
     internal void RecordAlternativePhaseSkip(ProgramSkillFrame frame, IReadOnlyList<SkillProgramTurnPhase> phases)
@@ -133,7 +129,7 @@ internal sealed partial class CoreAlternativePhaseCostProgramsRuntime
             throw new InvalidOperationException("An actual phase skip lost its starting parent.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { ActualPhaseSubstitution = new(parent.Id, frame.Id, frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, phases[0]) });
         foreach (var phase in phases)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, frame.WindowContext!.Window, phase));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, frame.WindowContext!.Window, phase));
     }
 
     internal void CompleteActualJudgmentStarting(ProgramLifecycleTriggerWindowFrame frame)

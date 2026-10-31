@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -14,7 +11,7 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
     internal bool HasHappyZl => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveHappyZhangLiaoDuorui);
 
     internal static CardConversionSource HappyZlSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IHappyZhangLiaoHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyZl(f, op);
+    SkillProgramStepOutcome IHappyZhangLiaoHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyZl(f, op);
     internal int HappyZlScore() => _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive && p.Hp < p.MaxHp) + _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Sum(p => _characterZhangLiaoAnniversaryGodOperations.AnnZlAbolished(p.Seat));
     internal IEnumerable<RuleQueryContribution> HappyZlNumericContributions(CharacterState player, SkillRuleQuery query) => query == SkillRuleQuery.SlashLimit && player.IsAlive && _coreNativeSkillContextQueriesOperations.HasProgramSkill(player, "happy:zhiti") && HappyZlScore() > 2 ? [new FiniteRuleQueryContribution("happy:zhiti", SkillRuleOperation.Add, 1)] : [];
     internal IEnumerable<HappyZlLeaseEvent> ActiveHappyZlLeases(int owner, int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<HappyZlLeaseEvent>().Where(e => e.Source.OwnerSeat == owner && e.Target == target && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappyZlLeaseExpiredEvent>().Any(x => x.LeaseFrameId == e.FrameId));
@@ -27,7 +24,7 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
         var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
         if (attack.IsSourceLess || !attack.DamageWasApplied || attack.SourceSeat != owner || attack.TargetSeat != target || attack.CardUserSeat != owner)
             return null;
-        return _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { Action: { } a } use && a.ActorSeat == owner && HappyZlColor(owner, target, a.EffectiveIsRed ?? global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(a.EffectiveSuit))is not null ? use : null;
+        return _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { Action: { } a } use && a.ActorSeat == owner && HappyZlColor(owner, target, a.EffectiveIsRed ?? CoreGameEnginePublicPileColorsRuntime.SuitColor(a.EffectiveSuit))is not null ? use : null;
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 40980, SkillProgramEffectOp.ResolveHappyZhangLiaoDuorui, SkillProgramEffectOp.ResolveHappyZhangLiaoDuoruiDamage, SkillProgramEffectOp.ResolveHappyZhangLiaoZhiti)]
@@ -218,7 +215,7 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Happy Zhang Liao lost choice owner.");
         var r = f.HappyZhangLiao!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([chosen], HappyZlChoices(f).Where(c => c.Id == chosen.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([chosen], HappyZlChoices(f).Where(c => c.Id == chosen.Id).ToArray()))
             throw new InvalidOperationException("Happy Zhang Liao requires his exact current dynamic card choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -236,7 +233,7 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         if (r.Stage == HappyZlStage.Hand)
         {
-            var color = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[r.Target], card));
+            var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[r.Target], card));
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { HappyZhangLiao = r with { Stage = HappyZlStage.GainChildren, Card = card.Id, Color = color }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(f.OwnerSeat), new(HappyZlTake), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.Target, f.OwnerSeat, [card.Id], before, (_, _) =>
             {

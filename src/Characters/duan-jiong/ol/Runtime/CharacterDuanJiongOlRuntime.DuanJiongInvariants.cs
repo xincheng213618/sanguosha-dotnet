@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDuanJiongOlRuntime
@@ -14,12 +10,12 @@ internal sealed partial class CharacterDuanJiongOlRuntime
             return false;
         if (r.Ending)
         {
-            if (f.TriggerId != "delegate-current" || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Ending || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not TurnEndingBoundaryFrame parent || parent.OwnerSeat != f.OwnerSeat || parent.TurnNumber != r.Phase.TurnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || context.SourceSeat != parent.OwnerSeat || context.TargetSeat != parent.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
+            if (f.TriggerId != "delegate-current" || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Ending || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not TurnEndingBoundaryFrame parent || parent.OwnerSeat != f.OwnerSeat || parent.TurnNumber != r.Phase.TurnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || context.SourceSeat != parent.OwnerSeat || context.TargetSeat != parent.OwnerSeat || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
                 return false;
         }
         else if (f.ActivationId != "sweep" || f.TriggerId is not null || f.WindowContext is not null || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Play || r.ActorSeat != f.OwnerSeat || r.DelegateFee is not null)
             return false;
-        if (r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.DrawCount is < 0 or > 1 || r.RequiredCount is < 0 or > 2 || r.ForbiddenSuitMask is < 0 or > 15 || r.Candidates.Select(c => c.CardId).Distinct().Count() != r.Candidates.Count || r.Selected.Select(c => c.CardId).Distinct().Count() != r.Selected.Count || r.Payments.Select(c => c.CardId).Distinct().Count() != r.Payments.Count || r.Payments.Count > 2 || r.UsedCardIds.Distinct().Count() != r.UsedCardIds.Count || r.UsedCardIds.Any(id => !r.Payments.Any(c => c.CardId == id && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind))) || r.Selected.Any(c => c.CardId <= 0 || c.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)))
+        if (r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.DrawCount is < 0 or > 1 || r.RequiredCount is < 0 or > 2 || r.ForbiddenSuitMask is < 0 or > 15 || r.Candidates.Select(c => c.CardId).Distinct().Count() != r.Candidates.Count || r.Selected.Select(c => c.CardId).Distinct().Count() != r.Selected.Count || r.Payments.Select(c => c.CardId).Distinct().Count() != r.Payments.Count || r.Payments.Count > 2 || r.UsedCardIds.Distinct().Count() != r.UsedCardIds.Count || r.UsedCardIds.Any(id => !r.Payments.Any(c => c.CardId == id && CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind))) || r.Selected.Any(c => c.CardId <= 0 || c.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)))
             return false;
         var entities = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DuanJiongSaoguEntityPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
         foreach (var e in entities)
@@ -41,7 +37,7 @@ internal sealed partial class CharacterDuanJiongOlRuntime
                 return false;
         var issued = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DuanJiongSaoguNativeIssuedEvent>().Where(e => e.Origin.ProgramFrameId == f.Id).ToArray();
         var returned = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DuanJiongSaoguNativeReturnedEvent>().Where(e => e.Origin.ProgramFrameId == f.Id).ToArray();
-        if (issued.Select(e => e.Origin.CardId).Distinct().Count() != issued.Length || issued.Any(e => !r.UsedCardIds.Contains(e.Origin.CardId) || e.Origin.ActorSeat != r.ActorSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.Origin.Kind)) || returned.Any(e => issued.Count(i => i.Origin == e.Origin) != 1) || returned.Select(e => e.Origin).Distinct().Count() != returned.Length)
+        if (issued.Select(e => e.Origin.CardId).Distinct().Count() != issued.Length || issued.Any(e => !r.UsedCardIds.Contains(e.Origin.CardId) || e.Origin.ActorSeat != r.ActorSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(e.Origin.Kind)) || returned.Any(e => issued.Count(i => i.Origin == e.Origin) != 1) || returned.Select(e => e.Origin).Distinct().Count() != returned.Length)
             return false;
         if (r.Stage == DuanJiongSaoguStage.NativeUse)
             return r.SelectedUseCardId is { } id && r.ReservedUseId is> 0 && r.UsedCardIds.Contains(id) && (r.NativeUse is null ? issued.Length == r.UsedCardIds.Count - 1 : r.NativeUse.CardId == id && r.NativeUse.CardUseFrameId == r.ReservedUseId && issued.Count(e => e.Origin == r.NativeUse) == 1) && returned.Length == r.UsedCardIds.Count - 1;

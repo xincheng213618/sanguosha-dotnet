@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeActionDispatchRuntime
@@ -39,7 +35,7 @@ internal sealed partial class CoreNativeActionDispatchRuntime
                 throw new InvalidOperationException("The equipment-effect selection is invalid.");
             }
 
-            if (!global::CardGame.Core.EngineOwners.CoreGameEngineZhangbaSelectionsRuntime.MatchesPublishedCardGroupTarget(action, cardIds, targets))
+            if (!CoreGameEngineZhangbaSelectionsRuntime.MatchesPublishedCardGroupTarget(action, cardIds, targets))
                 throw new InvalidOperationException("The equipment-effect materials have no published compatible target.");
             if (action.EquipmentKind == CardKind.WoodenOx)
             {

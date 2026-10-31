@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouChengYuFacts(global::CardGame.Core.EngineStates.CoreActualTurnProgressState actualTurnProgressState, global::CardGame.Core.EngineStates.CoreMatchOutcomeState matchOutcomeState, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterChengYuMouOlEntries> getCharacterChengYuMouOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineCardUseLifecycleEntries> getCoreGameEngineCardUseLifecycleRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries> getCoreGameEngineDesignatedExtraTargetsRuntime) : IMouChengYuFacts
+internal sealed class MouChengYuFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CharacterChengYuMouOlEntries> getCharacterChengYuMouOlRuntime, Func<RuntimeEntries.CoreGameEngineCardUseLifecycleEntries> getCoreGameEngineCardUseLifecycleRuntime, Func<RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries> getCoreGameEngineDesignatedExtraTargetsRuntime) : IMouChengYuFacts
 {
     public int Turn => actualTurnProgressState.ReferenceToTurnNumber;
     public bool GameOver => matchOutcomeState.ReferenceToWinner != Winner.None;
@@ -20,7 +20,7 @@ internal sealed class MouChengYuFacts(global::CardGame.Core.EngineStates.CoreAct
             return[];
         // An entity-backed delayed placement has exactly one native Judgment
         // destination. Extra targeting must not clone its physical entity.
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(use.CardKind))
+        if (EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(use.CardKind))
             return[];
         var original = use.TargetSeats.Count == 0 && use.CardKind == CardKind.DrawTwo ? new[]
         {

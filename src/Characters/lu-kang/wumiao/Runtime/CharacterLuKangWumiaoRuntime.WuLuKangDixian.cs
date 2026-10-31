@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,7 +9,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     internal const string WuLuKangDixianObtainReason = "skill-program.wumiao:dixian.obtain";
     internal bool HasWuLuKangDixianCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveWuLuKangDixian);
 
-    internal static CardConversionSource WuLuKangDixianSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangDixian.WuLuKangDixianSource(f);
+    internal static CardConversionSource WuLuKangDixianSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangDixian.WuLuKangDixianSource(f);
     internal bool HasWuLuKangDixianOriginalPayment(ProgramSkillFrame f)
     {
         if (f.SkillId != WuLuKangComposition.Dixian || f.ActivationId != "declare-rank" || f.TriggerId is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !WuLuKangComposition.IsDixian(p))
@@ -38,11 +35,11 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal static IReadOnlyList<PromptChoice> WuLuKangDixianChoices(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangDixian.WuLuKangDixianChoices(f);
+    internal static IReadOnlyList<PromptChoice> WuLuKangDixianChoices(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangDixian.WuLuKangDixianChoices(f);
     [ProgramAnswer("wu-lu-kang-dixian")]
     internal void AnswerWuLuKangDixian(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuLuKangDixian: { Stage: WuLuKangDixianStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HasWuLuKangDixianOriginalPayment(f) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuLuKangDixianChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuLuKangDixian: { Stage: WuLuKangDixianStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HasWuLuKangDixianOriginalPayment(f) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuLuKangDixianChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Dixian accepts only its owner's current declared-rank choice.");
         RequireWuLuKangDixian(f);
         var rank = int.Parse(choice.Parameters["rank"], CultureInfo.InvariantCulture);
@@ -172,5 +169,5 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IWuLuKangDixianHost.Resolve(ProgramSkillFrame f) => BeginWuLuKangDixian(f);
+    SkillProgramStepOutcome IWuLuKangDixianHost.Resolve(ProgramSkillFrame f) => BeginWuLuKangDixian(f);
 }

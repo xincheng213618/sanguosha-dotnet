@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Collections.ObjectModel;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramParticipantPhaseOperationsRuntime
@@ -37,7 +32,7 @@ internal sealed partial class CoreProgramParticipantPhaseOperationsRuntime
             throw new InvalidOperationException("Suit restriction requires completed real discard payment.");
         var card = _cardZonesOperations._cardZones.CardsAt(location).Single(c => c.Id == id);
         var suit = set.FrozenRevealedSuit ?? card.Suit;
-        var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantActionProhibition(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), [], [CardActionType.Use], [suit]);
+        var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantActionProhibition(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), [], [CardActionType.Use], [suit]);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionProhibitionGrantedEvent(granted));
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { CardSetBindings = Array.AsReadOnly(active.CardSetBindings.Select(b => b.Name == bind ? b with { Visibility = SkillProgramCardSetVisibility.Public, FrozenRevealedSuit = suit } : b).ToArray()) });
     }
@@ -57,6 +52,6 @@ internal sealed partial class CoreProgramParticipantPhaseOperationsRuntime
 
     internal bool FullDiscardPhaseSuitsAllDistinct => _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuitTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuits.Count >= 2 && _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuits.Distinct().Count() == _coreProgramParticipantPhaseOperationsFullDiscardPhaseSuitTurnFullDiscardPhaseSuitsAccess._fullDiscardPhaseSuits.Count;
 
-    void global::CardGame.Core.IParticipantPhaseProgramEffectHost.ConsumeTargetPhaseLedger(ProgramSkillFrame frame, string usageId) => ConsumeProgramTargetPhaseLedger(frame, usageId);
-    void global::CardGame.Core.IParticipantPhaseProgramEffectHost.GrantTurnBoundSuitUseProhibition(ProgramSkillFrame frame, string sourceBind) => GrantProgramTurnBoundSuitUseProhibition(frame, sourceBind);
+    void IParticipantPhaseProgramEffectHost.ConsumeTargetPhaseLedger(ProgramSkillFrame frame, string usageId) => ConsumeProgramTargetPhaseLedger(frame, usageId);
+    void IParticipantPhaseProgramEffectHost.GrantTurnBoundSuitUseProhibition(ProgramSkillFrame frame, string sourceBind) => GrantProgramTurnBoundSuitUseProhibition(frame, sourceBind);
 }

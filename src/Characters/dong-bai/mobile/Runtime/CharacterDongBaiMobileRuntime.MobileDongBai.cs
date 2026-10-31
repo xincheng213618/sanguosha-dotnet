@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongBaiMobileRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CharacterDongBaiMobileRuntime
     internal bool MobileLianzhuGiftMoved(MobileLianzhuIssuedEvent e) => ValidMobileLianzhuIssued(e) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == e.CardId && m.From == e.From && m.Sequence > e.Before && m.Reason.Value == "skill-program.mobile:lianzhu.InitialGiftChildren");
     internal MobileLianzhuIssuedEvent? ActiveMobileLianzhu(int owner) => MobileLianzhuPhase(owner)is { } phase && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive ? _coreProgramEventHistoryOperations.ProgramEventHistory<MobileLianzhuIssuedEvent>().SingleOrDefault(e => e.Source.OwnerSeat == owner && e.Phase == phase && MobileLianzhuGiftPaid(e)) : null;
     internal bool MobileLianzhuHolder(int owner, int target) => ActiveMobileLianzhu(owner)is { } e && _cardZonesOperations._cardZones.GetLocation(e.CardId)is { OwnerSeat: { } holder, Zone: CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment } && holder == target;
-    SkillProgramStepOutcome global::CardGame.Core.IMobileDongBaiHost.Execute(ProgramSkillFrame f, SkillProgramEffect effect) => effect.Op switch
+    SkillProgramStepOutcome IMobileDongBaiHost.Execute(ProgramSkillFrame f, SkillProgramEffect effect) => effect.Op switch
     {
         SkillProgramEffectOp.PrepareMobileDongBaiLianzhu => PrepareMobileLianzhu(f, effect.SourceBind),
         SkillProgramEffectOp.ResolveMobileDongBaiLianzhuRelay => BeginMobileLianzhuRelay(f),

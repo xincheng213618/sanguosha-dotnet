@@ -1,8 +1,7 @@
 #nullable enable
-using System.Globalization;
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class SourceKeshouCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineShanheSourceKeshouEntries> getCoreGameEngineShanheSourceKeshouRuntime) : ISourceKeshouHost
+internal sealed class SourceKeshouCapability(Func<RuntimeEntries.CoreGameEngineShanheSourceKeshouEntries> getCoreGameEngineShanheSourceKeshouRuntime) : ISourceKeshouHost
 {
     public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, string step) => getCoreGameEngineShanheSourceKeshouRuntime().ResolveSourceKeshou(f, step);
 }

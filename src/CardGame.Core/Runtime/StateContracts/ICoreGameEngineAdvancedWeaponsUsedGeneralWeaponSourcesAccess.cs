@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineAdvancedWeaponsUsedGeneralWeaponSourcesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineAdvancedWeaponsUsedGeneralWeaponSourcesAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.HashSet<string> _usedGeneralWeaponSources { get; }
+    ref readonly HashSet<string> _usedGeneralWeaponSources { get; }
 }

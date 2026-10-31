@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramStateProjectionRuntime
@@ -53,9 +49,9 @@ internal sealed partial class CoreGameEngineProgramStateProjectionRuntime
         return snapshot with
         {
             PublicRuleStates = _coreGameActivationProgressOperations.GetSkillPublicRuleStates(owner, skillId),
-            BooleanStates = states is null ? global::CardGame.Core.EngineOwners.CoreGameEngineProgramStateProjectionDefinitions.EmptyProgramBooleanStateSnapshots : Array.AsReadOnly(states.ToArray()),
-            DirectedPolicies = _coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess._directedTurnCardPolicies.Count == 0 ? global::CardGame.Core.EngineOwners.CoreGameEngineProgramStateProjectionDefinitions.EmptyDirectedPolicySnapshots : CreateNonemptyDirectedPolicySnapshots(owner, skillId),
-            ActionProhibitions = _turnCardUseEffectsOperations._turnCardUseEffects.ActionProhibitions.Count == 0 ? global::CardGame.Core.EngineOwners.CoreGameEngineProgramStateProjectionDefinitions.EmptyActionProhibitionSnapshots : CreateNonemptyActionProhibitionSnapshots(owner, skillId)
+            BooleanStates = states is null ? CoreGameEngineProgramStateProjectionDefinitions.EmptyProgramBooleanStateSnapshots : Array.AsReadOnly(states.ToArray()),
+            DirectedPolicies = _coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess._directedTurnCardPolicies.Count == 0 ? CoreGameEngineProgramStateProjectionDefinitions.EmptyDirectedPolicySnapshots : CreateNonemptyDirectedPolicySnapshots(owner, skillId),
+            ActionProhibitions = _turnCardUseEffectsOperations._turnCardUseEffects.ActionProhibitions.Count == 0 ? CoreGameEngineProgramStateProjectionDefinitions.EmptyActionProhibitionSnapshots : CreateNonemptyActionProhibitionSnapshots(owner, skillId)
         };
     }
 

@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePaidVirtualSlashTargetsRuntime
 {
-    internal bool TryContinuePaidVirtualSlashTargets(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryContinuePaidVirtualSlashTargets(NativeOwners.CardAttackHandle attack)
     {
         if (_characterDaQiaoLeOperations.IsTargetScopedZixiEffectRound(attack.ResolutionId))
             return false;
-        if (!_coreForeignPublicPileSlashesOperations.IsForeignPublicPileSlashUse(attack.ResolutionId) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.Card is not null)
+        if (!_coreForeignPublicPileSlashesOperations.IsForeignPublicPileSlashUse(attack.ResolutionId) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.Card is not null)
             return false;
         var next = use.TargetIndex + 1;
         while (next < use.TargetSeats.Count && !_coreMatchParticipantsPlayersAccess._players[use.TargetSeats[next]].IsAlive)

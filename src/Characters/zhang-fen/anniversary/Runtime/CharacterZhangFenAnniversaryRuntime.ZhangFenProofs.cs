@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangFenAnniversaryRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
             CardsMovedTriggerWindowFrame m when m.Id == r.ParentId && m.CandidateIndex >= 0 && m.CandidateIndex < m.Candidates.Count => m.Candidates[m.CandidateIndex],
             _ => null
         };
-        if (candidate is null || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
+        if (candidate is null || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
             return false;
         if (r.Op == SkillProgramEffectOp.ResolveAnniversaryZhangFenWanglu)
             return f.SkillId == ZhangFenComposition.Wanglu && w.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && f.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && r.CartId > 0 && IsRealDagongChe(r.CartId) && r.Stage is ZhangFenStage.PlaceChildren or ZhangFenStage.ExtraPhase or ZhangFenStage.Done;

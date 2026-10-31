@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class TangJiProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterTangJiOlEntries> getCharacterTangJiOlRuntime) : ITangJiProgramHost
+internal sealed class TangJiProgramCapability(Func<RuntimeEntries.CharacterTangJiOlEntries> getCharacterTangJiOlRuntime) : ITangJiProgramHost
 {
     public SkillProgramStepOutcome KanggeChooseTarget(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterTangJiOlRuntime().KanggeProgramChooseTarget(frame, effect);
     public SkillProgramStepOutcome KanggeGainDraw(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterTangJiOlRuntime().KanggeProgramGainDraw(frame, effect);

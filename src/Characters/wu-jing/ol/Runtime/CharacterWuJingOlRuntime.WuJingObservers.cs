@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuJingOlRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CharacterWuJingOlRuntime
         if (f.PendingMovementContinuation is null)
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return r.Stage == WuJingStage.NativeChildren ? moved.ResumeProgramFrameId == f.Id && IsWuJingNativeSettlementBatch(f, moved.Batch) : r.Stage is WuJingStage.RewardChildren or WuJingStage.ClaimChildren && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.To == CardLocation.Hand(f.OwnerSeat) && (r.Stage == WuJingStage.RewardChildren ? m.From == CardLocation.DrawPile && m.CardId == r.RewardCardId && m.Reason.Value == WuJingRewardReason : m.From == CardLocation.DiscardPile && r.Entities.Any(e => e.CardId == m.CardId) && m.Reason.Value == WuJingClaimReason));
+            return r.Stage == WuJingStage.NativeChildren ? moved.ResumeProgramFrameId == f.Id && IsWuJingNativeSettlementBatch(f, moved.Batch) : r.Stage is WuJingStage.RewardChildren or WuJingStage.ClaimChildren && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.To == CardLocation.Hand(f.OwnerSeat) && (r.Stage == WuJingStage.RewardChildren ? m.From == CardLocation.DrawPile && m.CardId == r.RewardCardId && m.Reason.Value == WuJingRewardReason : m.From == CardLocation.DiscardPile && r.Entities.Any(e => e.CardId == m.CardId) && m.Reason.Value == WuJingClaimReason));
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         return child is ProgramLifecycleTriggerWindowFrame state && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && state.ResumeProgramFrameId == f.Id && state.CharacterStateContinuation == CharacterStateContinuation.Program && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);

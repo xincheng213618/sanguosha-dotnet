@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoChunOlRuntime
@@ -57,7 +53,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateCaoChunFactionSlashParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
+    internal bool ValidateCaoChunFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
     {
         if (f.CaoChun?.Faction is not { } issued)
             return false;
@@ -66,7 +62,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
         return true;
     }
 
-    internal bool PrepareCaoChunFactionNative(ProgramSkillFrame f, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind)
+    internal bool PrepareCaoChunFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind)
     {
         if (!ValidateCaoChunFactionSlashParent(pending, f))
             return false;
@@ -83,7 +79,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
         return true;
     }
 
-    internal bool FinishCaoChunFactionDeclined(long id, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending)
+    internal bool FinishCaoChunFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.CaoChun?.Faction is null)
             return false;

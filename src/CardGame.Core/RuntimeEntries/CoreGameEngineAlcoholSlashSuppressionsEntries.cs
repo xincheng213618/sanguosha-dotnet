@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime))]
 internal sealed partial class CoreGameEngineAlcoholSlashSuppressionsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime> _resolve;
-    private CoreGameEngineAlcoholSlashSuppressionsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime> _resolve;
+    private CoreGameEngineAlcoholSlashSuppressionsEntries(Func<EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineAlcoholSlashSuppressionsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineAlcoholSlashSuppressionsEntries Create(Func<EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime> resolve) => new(resolve);
 }

@@ -1,9 +1,9 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class OwnedDrawPhaseFacts(global::CardGame.Core.EngineStates.CoreMatchOutcomeState matchOutcomeState, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineNativeDrawAttemptsEntries> getCoreGameEngineNativeDrawAttemptsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineNativeDrawThresholdEntries> getCoreGameEngineNativeDrawThresholdRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineShanheS5ShensuEntries> getCoreGameEngineShanheS5ShensuRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZhuHuanBoundaryMobileEntries> getCharacterZhuHuanBoundaryMobileRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreLeastHandMarkerDrawProgramsEntries> getCoreLeastHandMarkerDrawProgramsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineTableOrderEntries> getCoreGameEngineTableOrderRuntime) : IOwnedDrawPhaseFacts
+internal sealed class OwnedDrawPhaseFacts(EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreGameEngineNativeDrawAttemptsEntries> getCoreGameEngineNativeDrawAttemptsRuntime, Func<RuntimeEntries.CoreGameEngineNativeDrawThresholdEntries> getCoreGameEngineNativeDrawThresholdRuntime, Func<RuntimeEntries.CoreGameEngineShanheS5ShensuEntries> getCoreGameEngineShanheS5ShensuRuntime, Func<RuntimeEntries.CharacterZhuHuanBoundaryMobileEntries> getCharacterZhuHuanBoundaryMobileRuntime, Func<RuntimeEntries.CoreLeastHandMarkerDrawProgramsEntries> getCoreLeastHandMarkerDrawProgramsRuntime, Func<RuntimeEntries.CoreGameEngineTableOrderEntries> getCoreGameEngineTableOrderRuntime) : IOwnedDrawPhaseFacts
 {
     public Winner Winner => matchOutcomeState.ReferenceToWinner;
-    public int SkipDrawPhaseMask => (int)global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase;
+    public int SkipDrawPhaseMask => (int)GameEngine.DelayedTurnEffects.SkipDrawPhase;
     public bool HasAttemptCapability => getCoreGameEngineNativeDrawAttemptsRuntime().HasNativeDrawAttemptCapability;
     public bool TracksNativeDrawThresholds => getCoreGameEngineNativeDrawThresholdRuntime().TracksNativeDrawThresholds;
     public bool TracksShanheS5PhaseSkips => getCoreGameEngineShanheS5ShensuRuntime().TracksShanheS5PhaseSkips;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiKangMobileRuntime
@@ -29,11 +25,11 @@ internal sealed partial class CharacterJiKangMobileRuntime
         if (child is DyingFrame dying)
             return r.Stage is MobileJiKangStage.HealthChildren or MobileJiKangStage.KillerHealthChildren && dying.ParentFrameId == f.Id && dying.VictimSeat == r.Subject && dying.ResumesProgramSkill && dying.KillerSeat is null;
         if (child is HpChangedTriggerWindowFrame hp)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && (r.Stage is MobileJiKangStage.HealthChildren or MobileJiKangStage.KillerHealthChildren && hp.Change.TargetSeat == r.Subject || r.Stage is MobileJiKangStage.CostChildren or MobileJiKangStage.KillerDiscardChildren or MobileJiKangStage.ClubChildren && hp.Change.Kind == HpChangeKind.Recovery);
+            return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && (r.Stage is MobileJiKangStage.HealthChildren or MobileJiKangStage.KillerHealthChildren && hp.Change.TargetSeat == r.Subject || r.Stage is MobileJiKangStage.CostChildren or MobileJiKangStage.KillerDiscardChildren or MobileJiKangStage.ClubChildren && hp.Change.Kind == HpChangeKind.Recovery);
         if (child is RecoveryReplacementFrame recovery)
             return _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.Program && (r.Stage == MobileJiKangStage.HealthChildren && r.Comparison < 0 && recovery.Attempt.SourceSeat == f.OwnerSeat && recovery.Attempt.TargetSeat == r.Subject && recovery.Attempt.Amount == 1 || r.Stage is MobileJiKangStage.CostChildren or MobileJiKangStage.KillerDiscardChildren or MobileJiKangStage.ClubChildren && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == MobileJiKangDiscard);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return r.Stage is MobileJiKangStage.CostChildren or MobileJiKangStage.KillerDiscardChildren or MobileJiKangStage.ClubChildren && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After);
+            return r.Stage is MobileJiKangStage.CostChildren or MobileJiKangStage.KillerDiscardChildren or MobileJiKangStage.ClubChildren && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After);
         return child is ProgramLifecycleTriggerWindowFrame lifecycle && lifecycle.ResumeProgramFrameId == f.Id && (lifecycle.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange || lifecycle is { Window: SkillProgramTriggerWindow.SkillsChanged, Continuation: ProgramLifecycleContinuation.ResumeParentProgram });
     }
 

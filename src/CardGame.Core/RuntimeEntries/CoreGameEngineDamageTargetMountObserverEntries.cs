@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDamageTargetMountObserverEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime> _resolve;
-    private CoreGameEngineDamageTargetMountObserverEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime> _resolve;
+    private CoreGameEngineDamageTargetMountObserverEntries(Func<EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineDamageTargetMountObserverEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineDamageTargetMountObserverEntries Create(Func<EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime> resolve) => new(resolve);
 }

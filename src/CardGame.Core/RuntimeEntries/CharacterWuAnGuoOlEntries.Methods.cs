@@ -3,25 +3,25 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterWuAnGuoOlEntries
 {
     internal bool AdvanceWuAnGuoSubtree() => _resolve().AdvanceWuAnGuoSubtree();
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginWuAnGuoLiyong(global::CardGame.Core.ProgramSkillFrame input) => _resolve().BeginWuAnGuoLiyong(input);
-    internal void BeginWuAnGuoLiyongDuel(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.WuAnGuoLiyongDuelOrigin origin) => _resolve().BeginWuAnGuoLiyongDuel(frame, origin);
-    internal bool CanActivateWuAnGuoLiyong(global::CardGame.Core.CharacterState owner) => _resolve().CanActivateWuAnGuoLiyong(owner);
+    internal SkillProgramStepOutcome BeginWuAnGuoLiyong(ProgramSkillFrame input) => _resolve().BeginWuAnGuoLiyong(input);
+    internal void BeginWuAnGuoLiyongDuel(ProgramSkillFrame frame, WuAnGuoLiyongDuelOrigin origin) => _resolve().BeginWuAnGuoLiyongDuel(frame, origin);
+    internal bool CanActivateWuAnGuoLiyong(CharacterState owner) => _resolve().CanActivateWuAnGuoLiyong(owner);
     internal bool CanIssueWuAnGuoLiyongDuel(int actor, int target) => _resolve().CanIssueWuAnGuoLiyongDuel(actor, target);
-    internal bool ContinuePaidWuAnGuoLiyong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ContinuePaidWuAnGuoLiyong(f);
+    internal bool ContinuePaidWuAnGuoLiyong(ProgramSkillFrame f) => _resolve().ContinuePaidWuAnGuoLiyong(f);
     internal void ContinueWuAnGuoLiyong(long id) => _resolve().ContinueWuAnGuoLiyong(id);
-    internal void FinishWuAnGuoLiyong(global::CardGame.Core.ProgramSkillFrame f, bool issued) => _resolve().FinishWuAnGuoLiyong(f, issued);
+    internal void FinishWuAnGuoLiyong(ProgramSkillFrame f, bool issued) => _resolve().FinishWuAnGuoLiyong(f, issued);
     internal bool HasWuAnGuoLiyongCompletedUseParent(long useId) => _resolve().HasWuAnGuoLiyongCompletedUseParent(useId);
     internal bool IsWuAnGuoLiyongDuelUse(long id) => _resolve().IsWuAnGuoLiyongDuelUse(id);
-    internal bool IsWuAnGuoYangConversionAvailable(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardConversionSource source, bool forResponse) => _resolve().IsWuAnGuoYangConversionAvailable(owner, card, source, forResponse);
-    internal bool MatchesWuAnGuoLiyong(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.WuAnGuoLiyongDuelOrigin origin) => _resolve().MatchesWuAnGuoLiyong(f, origin);
-    internal void ObserveWuAnGuoActualUses(global::CardGame.Core.IGameEvent payload) => _resolve().ObserveWuAnGuoActualUses(payload);
+    internal bool IsWuAnGuoYangConversionAvailable(CharacterState owner, Card card, CardConversionSource source, bool forResponse) => _resolve().IsWuAnGuoYangConversionAvailable(owner, card, source, forResponse);
+    internal bool MatchesWuAnGuoLiyong(ProgramSkillFrame f, WuAnGuoLiyongDuelOrigin origin) => _resolve().MatchesWuAnGuoLiyong(f, origin);
+    internal void ObserveWuAnGuoActualUses(IGameEvent payload) => _resolve().ObserveWuAnGuoActualUses(payload);
     internal bool ResumeWuAnGuoLiyong(long id) => _resolve().ResumeWuAnGuoLiyong(id);
-    internal bool ReturnWuAnGuoLiyongAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnWuAnGuoLiyongAttack(completion);
-    internal void ReturnWuAnGuoLiyongUse(global::CardGame.Core.CardUseFrame use) => _resolve().ReturnWuAnGuoLiyongUse(use);
-    internal bool ValidWuAnGuoLiyong(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidWuAnGuoLiyong(f);
-    internal bool WuAnGuoConversionUnavailable(global::CardGame.Core.ProgramViewAsSourceQuery query) => _resolve().WuAnGuoConversionUnavailable(query);
-    internal bool WuAnGuoFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().WuAnGuoFirstChild(f, child);
-    internal global::CardGame.Core.ProgramSkillFrame? WuAnGuoObserverRoot() => _resolve().WuAnGuoObserverRoot();
+    internal bool ReturnWuAnGuoLiyongAttack(GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnWuAnGuoLiyongAttack(completion);
+    internal void ReturnWuAnGuoLiyongUse(CardUseFrame use) => _resolve().ReturnWuAnGuoLiyongUse(use);
+    internal bool ValidWuAnGuoLiyong(ProgramSkillFrame f) => _resolve().ValidWuAnGuoLiyong(f);
+    internal bool WuAnGuoConversionUnavailable(ProgramViewAsSourceQuery query) => _resolve().WuAnGuoConversionUnavailable(query);
+    internal bool WuAnGuoFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().WuAnGuoFirstChild(f, child);
+    internal ProgramSkillFrame? WuAnGuoObserverRoot() => _resolve().WuAnGuoObserverRoot();
     internal int WuAnGuoUsedSuitMask(int seat) => _resolve().WuAnGuoUsedSuitMask(seat);
     internal bool HasWuAnGuoCapability { get => _resolve().HasWuAnGuoCapability; }
 }

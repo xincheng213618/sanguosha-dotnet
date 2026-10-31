@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPanShuOlRuntime
 {
     internal int CountNonConvertedActualUsesThisTurn(int ownerSeat) => _corePlayCardHistoryOperations.EventsSinceLastBoundary(item => item is TurnStartedEvent or TurnEndedEvent).OfType<CardActionAcceptedEvent>().Count(item => item.Action.Type == CardActionType.Use && item.Action.ActorSeat == ownerSeat && item.Action.ConversionChain.Count == 0 && item.Action.PhysicalCards.Count > 0 && item.Action.PhysicalCards.All(cost => cost.CardKind == item.Action.EffectiveKind));
-    internal static bool IsOtherLastHandLossTrigger(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_pan_shu_ol_PanShuPrograms.IsOtherLastHandLossTrigger(trigger);
+    internal static bool IsOtherLastHandLossTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_pan_shu_ol_PanShuPrograms.IsOtherLastHandLossTrigger(trigger);
     internal IEnumerable<ProgramTriggerCandidate> CollectOtherLastHandLossCandidates(CardMovementBatchContext batch)
     {
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive))
@@ -31,7 +27,7 @@ internal sealed partial class CharacterPanShuOlRuntime
             }
     }
 
-    internal static bool LostLastHandCard(CardMovementBatchContext batch, int sourceSeat) => global::CardGame.Core.RuntimeSkills.RuntimeRules_pan_shu_ol_PanShuPrograms.LostLastHandCard(batch, sourceSeat);
+    internal static bool LostLastHandCard(CardMovementBatchContext batch, int sourceSeat) => RuntimeSkills.RuntimeRules_pan_shu_ol_PanShuPrograms.LostLastHandCard(batch, sourceSeat);
     internal IReadOnlySet<SkillProgramCardCategory> CardIdsCategorySet(IReadOnlyList<int> cardIds)
     {
         var categories = new HashSet<SkillProgramCardCategory>();
@@ -41,7 +37,7 @@ internal sealed partial class CharacterPanShuOlRuntime
             if (location.OwnerSeat is null)
                 continue;
             var card = _cardZonesOperations._cardZones.CardsAt(location).Single(item => item.Id == cardId);
-            categories.Add(global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind));
+            categories.Add(CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind));
         }
 
         return categories;
@@ -51,7 +47,7 @@ internal sealed partial class CharacterPanShuOlRuntime
     {
         var instance = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).ProgramInstances.SingleOrDefault(item => item.SkillId == targetSkillId) ?? throw new InvalidOperationException($"The paired program instance '{(targetSkillId)}' is not installed.");
         var definition = _coreProgramPersistentStateOperations.GetProgramBooleanStateDefinition2(targetSkillId, stateId);
-        var key = new global::CardGame.Core.GameEngine.ProgramBooleanStateKey(frame.OwnerSeat, targetSkillId, instance.SkillInstanceId, stateId);
+        var key = new GameEngine.ProgramBooleanStateKey(frame.OwnerSeat, targetSkillId, instance.SkillInstanceId, stateId);
         if (_coreProgramPersistentStateOperations.GetProgramBooleanState2(frame.OwnerSeat, targetSkillId, instance.SkillInstanceId, stateId) == value)
             return;
         _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates[key] = value;
@@ -75,9 +71,9 @@ internal sealed partial class CharacterPanShuOlRuntime
         _coreRuntimeOperations.PopResolutionFrame(recovery, ResolutionFrameKind.Recovery);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IPanShuProgramHost.ZhirenReorderTopByLength(ProgramSkillFrame frame, SkillProgramEffect effect) => ZhirenProgramReorderTopByLength(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IPanShuProgramHost.ZhirenResolveFieldTiers(ProgramSkillFrame frame, SkillProgramEffect effect) => ZhirenProgramResolveFieldTiers(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IPanShuProgramHost.YanerResolvePairBenefit(ProgramSkillFrame frame, SkillProgramEffect effect) => YanerProgramResolvePairBenefit(frame, effect);
+    SkillProgramStepOutcome IPanShuProgramHost.ZhirenReorderTopByLength(ProgramSkillFrame frame, SkillProgramEffect effect) => ZhirenProgramReorderTopByLength(frame, effect);
+    SkillProgramStepOutcome IPanShuProgramHost.ZhirenResolveFieldTiers(ProgramSkillFrame frame, SkillProgramEffect effect) => ZhirenProgramResolveFieldTiers(frame, effect);
+    SkillProgramStepOutcome IPanShuProgramHost.YanerResolvePairBenefit(ProgramSkillFrame frame, SkillProgramEffect effect) => YanerProgramResolvePairBenefit(frame, effect);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 1300)]
     internal void CollectWindow_CollectOtherLastHandLossCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result) => result.AddRange(CollectOtherLastHandLossCandidates(batch));
     [ProgramPipelineHook(ProgramPipelinePhase.ExcludeOrdinaryMovementCandidate, 2900)]

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunShangxiangSpOlRuntime
@@ -29,7 +25,7 @@ internal sealed partial class CharacterSunShangxiangSpOlRuntime
     internal bool ExactSpSunShangxiangFanxiangParent(ProgramSkillFrame f, long id)
     {
         var n = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        return n > 0 && _resolutionStackOperations._resolutionStack[n - 1] is ProgramLifecycleTriggerWindowFrame parent && parent.Id == id && parent.OwnerSeat == f.OwnerSeat && parent.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]);
+        return n > 0 && _resolutionStackOperations._resolutionStack[n - 1] is ProgramLifecycleTriggerWindowFrame parent && parent.Id == id && parent.OwnerSeat == f.OwnerSeat && parent.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]);
     }
 
     internal bool ValidSpSunShangxiangFanxiang(ProgramSkillFrame f) => f.SpSunShangxiangFanxiang is { } r && r.Source == SpSunShangxiangSource(f) && r.GameplayHash == f.GameplayHash && f.SkillId == SpSunShangxiangOlComposition.Fanxiang && f.TriggerId == "assisted-wounded-awakening" && f.ActivationId == f.TriggerId && f.WindowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } w && w.ParentFrameId == r.LifecycleId && w.SourceSeat == f.OwnerSeat && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<SpSunShangxiangFanxiangAcceptedEvent>().Count(e => e == new SpSunShangxiangFanxiangAcceptedEvent(f.Id, r)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<SpSunShangxiangFanxiangAcceptedEvent>().Count(e => e.Receipt.Source.OwnerSeat == f.OwnerSeat) == 1 && (SpSunShangxiangHelpedSeats(f.OwnerSeat).Contains(r.QualifiedSeat) || r.QualifiedSeat == -1 && _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningReceipt(f)) && r.MaximumBefore > 0 && ExactSpSunShangxiangFanxiangParent(f, r.LifecycleId);

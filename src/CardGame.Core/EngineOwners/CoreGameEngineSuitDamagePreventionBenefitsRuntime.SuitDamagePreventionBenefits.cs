@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -75,7 +72,7 @@ internal sealed partial class CoreGameEngineSuitDamagePreventionBenefitsRuntime
     [ProgramAnswer("suit-prevention-benefit")]
     internal void ResolveSuitPreventionBenefit(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.SuitPreventionBenefit is not { } r || r.Stage is not (SuitPreventionBenefitStage.ChoosingCost or SuitPreventionBenefitStage.ChoosingRecipient) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [SuitPreventionBenefitChoices(f).Single(c => c.Id == choice.Id)]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.SuitPreventionBenefit is not { } r || r.Stage is not (SuitPreventionBenefitStage.ChoosingCost or SuitPreventionBenefitStage.ChoosingRecipient) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [SuitPreventionBenefitChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Suit prevention answer lost its private owning choice.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
         {
@@ -242,7 +239,7 @@ internal sealed partial class CoreGameEngineSuitDamagePreventionBenefitsRuntime
 
     internal bool IsValidSuitPreventionBenefit(ProgramSkillFrame f, bool requirePayment)
     {
-        if (f.SuitPreventionBenefit is not { } r || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || r.InstructionIndex != f.InstructionIndex || SuitBenefitEffect(f).Op != SkillProgramEffectOp.DiscardSuitPreventDamageAndBenefit || context.ParentFrameId != r.BeforeDamageFrameId || context.TargetSeat != f.OwnerSeat || context.Amount != r.OriginalAmount || context.SourceSeat != (r.SourceLess ? null : r.SourceSeat) || r.OriginalTargetSeat != f.OwnerSeat || r.OriginalAmount <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.SourceSeat) || !_resolutionStackOperations._resolutionStack.Any(p => p.Id == r.OriginalAttackFrameId) || _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().SingleOrDefault(w => w.Id == r.BeforeDamageFrameId)is not { } parent || (parent.ContinuationAttackResolutionId ?? parent.ParentFrameId) != r.OriginalAttackFrameId || parent.SourceSeat != r.SourceSeat || parent.TargetSeat != f.OwnerSeat || parent.Amount != r.OriginalAmount || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex].Candidate))
+        if (f.SuitPreventionBenefit is not { } r || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || r.InstructionIndex != f.InstructionIndex || SuitBenefitEffect(f).Op != SkillProgramEffectOp.DiscardSuitPreventDamageAndBenefit || context.ParentFrameId != r.BeforeDamageFrameId || context.TargetSeat != f.OwnerSeat || context.Amount != r.OriginalAmount || context.SourceSeat != (r.SourceLess ? null : r.SourceSeat) || r.OriginalTargetSeat != f.OwnerSeat || r.OriginalAmount <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.SourceSeat) || !_resolutionStackOperations._resolutionStack.Any(p => p.Id == r.OriginalAttackFrameId) || _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().SingleOrDefault(w => w.Id == r.BeforeDamageFrameId)is not { } parent || (parent.ContinuationAttackResolutionId ?? parent.ParentFrameId) != r.OriginalAttackFrameId || parent.SourceSeat != r.SourceSeat || parent.TargetSeat != f.OwnerSeat || parent.Amount != r.OriginalAmount || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex].Candidate))
             return false;
         var paid = r.Stage is not (SuitPreventionBenefitStage.ChoosingCost or SuitPreventionBenefitStage.ChoosingRecipient);
         if (parent.Prevented != paid || requirePayment && !paid)
@@ -254,6 +251,6 @@ internal sealed partial class CoreGameEngineSuitDamagePreventionBenefitsRuntime
         return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSuitPreventionPaymentEvent>().Count(e => e.ProgramFrameId == f.Id && e.BeforeDamageFrameId == parent.Id && e.OriginalAttackFrameId == r.OriginalAttackFrameId && e.OwnerSeat == f.OwnerSeat && e.CostCardId == cardId && e.CostFrom == from && e.EffectiveSuit == r.CostEffectiveSuit && e.RecipientSeat == seat && e.Branch == r.Branch && e.MovementSequence == r.CostMovementSequence) == 1 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDamagePreventedEvent>().Count(e => e.FrameId == parent.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.OwnerSeat == f.OwnerSeat && e.Amount == parent.Amount) == 1;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISuitPreventionAndJudgmentPlacementHost.DiscardSuitPreventDamageAndBenefit(ProgramSkillFrame f) => BeginSuitPreventionBenefit(f);
-    SkillProgramStepOutcome global::CardGame.Core.ISuitPreventionAndJudgmentPlacementHost.PlaceMatchedJudgmentCard(ProgramSkillFrame f, string bind, IReadOnlyList<Suit> suits) => _coreMatchedJudgmentPlacementsOperations.BeginMatchedJudgmentPlacement(f, bind, suits);
+    SkillProgramStepOutcome ISuitPreventionAndJudgmentPlacementHost.DiscardSuitPreventDamageAndBenefit(ProgramSkillFrame f) => BeginSuitPreventionBenefit(f);
+    SkillProgramStepOutcome ISuitPreventionAndJudgmentPlacementHost.PlaceMatchedJudgmentCard(ProgramSkillFrame f, string bind, IReadOnlyList<Suit> suits) => _coreMatchedJudgmentPlacementsOperations.BeginMatchedJudgmentPlacement(f, bind, suits);
 }

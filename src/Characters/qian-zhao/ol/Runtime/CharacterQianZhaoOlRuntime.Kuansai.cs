@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQianZhaoOlRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
     internal bool HasKuansaiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveKuansaiTargetChoice);
 
     internal CardUseFrame? KuansaiUse(ProgramSkillWindowContext context) => context is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } c } && _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } action } use && action.ActionId == c.CardActionId && action.EffectiveKind == use.CardKind && !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(use.CardKind) && _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Any(w => w.Id == context.ParentFrameId && w.ParentFrameId == use.Id && w.Action.ActionId == action.ActionId) ? use : null;
-    internal static IReadOnlyList<int> KuansaiActualTargets(CardUseFrame use) => global::CardGame.Core.RuntimeSkills.RuntimeRules_qian_zhao_ol_Kuansai.KuansaiActualTargets(use);
+    internal static IReadOnlyList<int> KuansaiActualTargets(CardUseFrame use) => RuntimeSkills.RuntimeRules_qian_zhao_ol_Kuansai.KuansaiActualTargets(use);
     internal bool CanKuansaiRecover(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && _coreMatchParticipantsPlayersAccess._players[owner].Hp < _coreMatchParticipantsPlayersAccess._players[owner].MaxHp;
     internal IReadOnlyList<Card> KuansaiGiftCards(int chooser, int owner) => chooser == owner || !_coreMatchParticipantsPlayersAccess._players[chooser].IsAlive || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive ? [] : Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[chooser]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(chooser)).Where(c => !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Transfer)).ToArray());
     internal bool KuansaiHasChoice(int target, int owner) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && (CanKuansaiRecover(owner) || KuansaiGiftCards(target, owner).Count > 0);
@@ -130,7 +126,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Qian Zhao lost its owning choice frame.");
         var choices = f.WeifuTargets is not null ? WeifuTargetChoices(f) : KuansaiChoices(f);
         var chooser = f.Kuansai is { Stage: KuansaiStage.Benefit, ChooserSeat: { } seat } ? seat : f.OwnerSeat;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Qian Zhao requires the exact actual participant's published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (f.WeifuTargets is { } targets)

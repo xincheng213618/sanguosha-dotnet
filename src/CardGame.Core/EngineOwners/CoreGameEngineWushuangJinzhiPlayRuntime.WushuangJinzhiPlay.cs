@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangJinzhiPlayRuntime
@@ -25,7 +21,7 @@ internal sealed partial class CoreGameEngineWushuangJinzhiPlayRuntime
         {
             var kind = selection.OutputKind;
             var targets = WushuangJinzhiPlayTargets(owner, selection);
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && targets.Count == 0 || kind == CardKind.Peach && targets.Count == 0 || kind == CardKind.Alcohol && !WushuangJinzhiAlcoholAllowed(owner, selection.Cards))
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && targets.Count == 0 || kind == CardKind.Peach && targets.Count == 0 || kind == CardKind.Alcohol && !WushuangJinzhiAlcoholAllowed(owner, selection.Cards))
                 continue;
             var ids = Array.AsReadOnly(selection.Cards.Select(c => c.Id).Order().ToArray());
             var targetCount = kind == CardKind.Alcohol ? 0 : 1;
@@ -36,7 +32,7 @@ internal sealed partial class CoreGameEngineWushuangJinzhiPlayRuntime
                 ConversionSource = selection.Source,
                 SelectableCardIds = ids,
                 SelectableTargetSeats = Array.AsReadOnly(targets.ToArray()),
-                ProgramAiHint = new(0, kind == CardKind.Peach ? 1 : 0, 0, 0, 0, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0, false, false)
+                ProgramAiHint = new(0, kind == CardKind.Peach ? 1 : 0, 0, 0, 0, CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0, false, false)
                 {
                     ValueAdjustment = kind == CardKind.Alcohol ? 10 : 0
                 }
@@ -49,7 +45,7 @@ internal sealed partial class CoreGameEngineWushuangJinzhiPlayRuntime
         var kind = selection.OutputKind;
         var suit = Suit.None;
         bool? color = null;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, p, kind, suit, effectiveColor: color, physicalCardIds: selection.Cards.Select(c => c.Id).ToArray(), conversionSource: selection.Source)).Select(p => p.Seat).ToArray();
         return kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(owner) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit) ? [owner.Seat] : [];
     }
@@ -61,7 +57,7 @@ internal sealed partial class CoreGameEngineWushuangJinzhiPlayRuntime
             return error;
         if (action.ConversionSource is not { } source || action.PlayedCardKind is not { } kind || !_coreWushuangJinzhiOperations.IsWushuangJinzhiSource(source) || _coreWushuangJinzhiOperations.WushuangJinzhiSelections(owner, kind, false).SingleOrDefault(s => s.Source == source && s.Cards.Select(c => c.Id).Order().SequenceEqual(ids.Order()))is not { } selection)
             return new(CommandErrorCode.InvalidCard, "锦织的真实同色材料、本轮次数或技能资格已变化。");
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind == CardKind.Peach)
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind == CardKind.Peach)
         {
             if (targets.Count != 1 || !WushuangJinzhiPlayTargets(owner, selection).Contains(targets[0]))
                 return new(CommandErrorCode.InvalidTarget, "锦织目标或原生杀次数不合法。");
@@ -119,7 +115,7 @@ internal sealed partial class CoreGameEngineWushuangJinzhiPlayRuntime
         var kind = selected.PlayedCardKind!.Value;
         var selection = _coreWushuangJinzhiOperations.WushuangJinzhiSelections(actor, kind, false).Single(s => s.Source == source && s.Cards.Select(c => c.Id).Order().SequenceEqual(ids.Order()));
         var appearance = _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, selection.Cards[0], source);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], appearance, kind, actor.Seat, physicalCards: selection.Cards, conversionSource: source);
         else if (kind == CardKind.Peach)
             _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(actor, actor, appearance, "桃", kind, conversionSource: source, physicalCards: selection.Cards);

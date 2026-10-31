@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRoundFirstSlashTargetsRuntime
 {
     internal IEnumerable<RuleQueryContribution> RoundFirstSlashTargetContributions(CharacterState owner, CardKind kind, long? declaredUseFrameId = null)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreActualRoundProgressRoundNumberAccess._roundNumber < 1 || !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasRoundFirstSlashTargetPolicy)
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreActualRoundProgressRoundNumberAccess._roundNumber < 1 || !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasRoundFirstSlashTargetPolicy)
             yield break;
         var bindings = _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.RoundFirstSlashAdditionalTargets, kind).ToArray();
         if (bindings.Length == 0)

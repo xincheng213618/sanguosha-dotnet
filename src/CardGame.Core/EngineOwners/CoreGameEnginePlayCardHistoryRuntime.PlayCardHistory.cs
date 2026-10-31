@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePlayCardHistoryRuntime
@@ -37,10 +33,10 @@ internal sealed partial class CoreGameEnginePlayCardHistoryRuntime
     internal bool PreviousPlayCardIsBasic(CardActionContext action)
     {
         var previous = PreviousPlayCard(action.ActorSeat, action.ActionId);
-        return previous is not null && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(previous.EffectiveKind, SkillProgramCardCategory.Basic);
+        return previous is not null && CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(previous.EffectiveKind, SkillProgramCardCategory.Basic);
     }
 
-    internal bool? PreviousPlayCardIsBasicFor(int actorSeat) => PreviousPlayCard(actorSeat)is { } previous && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(previous.EffectiveKind, SkillProgramCardCategory.Basic);
+    internal bool? PreviousPlayCardIsBasicFor(int actorSeat) => PreviousPlayCard(actorSeat)is { } previous && CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(previous.EffectiveKind, SkillProgramCardCategory.Basic);
     internal int DamageInstancesTakenThisTurn(int ownerSeat) => EventsSinceLastBoundary(item => item is TurnStartedEvent).OfType<DamageAppliedEvent>().Count(item => item.TargetSeat == ownerSeat && item.Amount > 0);
     internal string ViewAsUsageId(CardConversionSource source, SkillProgramViewAs rule) => $"view-as:{(rule.UsageGroup ?? rule.Id)}@{(source.SkillInstanceId)}";
     internal bool CanUsePhaseLimitedViewAs(IndexedSkillProgramInstance instance, SkillProgramViewAs rule, CharacterState owner) => rule.EqualNameLengthUse ? _characterMiHengLeOperations.CanUseSiruiPhase(owner, new(instance.SkillId, rule.Id, owner.Seat, instance.SkillInstanceId)) : rule.UsesPerPhase is not { } limit || (_coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && owner.Seat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat && _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, instance.SkillId, ViewAsUsageId(new(instance.SkillId, rule.Id, owner.Seat, instance.SkillInstanceId), rule), SkillUsageScope.Phase) < limit);
@@ -100,7 +96,7 @@ internal sealed partial class CoreGameEnginePlayCardHistoryRuntime
                         continue;
                     var usedCard = ApplyProgramUseAppearance(actor, card, source);
                     var name = CardCatalog.Get(kind).DisplayName;
-                    if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+                    if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
                     {
                         var targets = _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, usedCard, source, effectiveKind: kind);
                         foreach (var target in targets)

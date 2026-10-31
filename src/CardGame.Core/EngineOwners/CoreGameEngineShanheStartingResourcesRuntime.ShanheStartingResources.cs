@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
@@ -41,7 +37,7 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
         return card.Kind == item.Kind && card.Suit == item.Suit && card.Rank == item.Rank;
     }
 
-    internal bool ShanheStartingResourceWasAcquired(int id, int before = int.MaxValue) => _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == id && m.Sequence < before && m.To.Zone == CardZoneKind.Hand && m.From != m.To && m.Reason != CardMoveReasons.InitialDeal && m.Reason != CardMoveReasons.Draw && m.Reason != CardMoveReasons.RecastDraw && m.Reason != global::CardGame.Core.EngineOwners.CoreGameEngineShanheMarketDefinitions.ShanheMarketCardGain);
+    internal bool ShanheStartingResourceWasAcquired(int id, int before = int.MaxValue) => _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == id && m.Sequence < before && m.To.Zone == CardZoneKind.Hand && m.From != m.To && m.Reason != CardMoveReasons.InitialDeal && m.Reason != CardMoveReasons.Draw && m.Reason != CardMoveReasons.RecastDraw && m.Reason != CoreGameEngineShanheMarketDefinitions.ShanheMarketCardGain);
     internal void CaptureShanheClaimedDeclarationUse(DeclaredCardPayment paid)
     {
         if (!IsShanheStartingResource(paid.Cost.CardId) || ShanheStartingResourceWasAcquired(paid.Cost.CardId) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame { Action: { Type: CardActionType.Use } action } use || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == paid.OwnerFrameId)?.AcceptedDeclarationPayment is not { Claimed: true } invoice || invoice != paid with
@@ -92,7 +88,7 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
             return true;
         }
 
-        if (used is not null && used.EntrySequence == entry.Sequence && (global::CardGame.Core.EngineOwners.CoreGameEngineNativeUsedDiscardOriginsRuntime.IsNativeUseFinishReason(reason) || reason.Value == "area.abolished.equipment") && _coreCardUseLifecycleOperations.LifecycleCardUse(used.UseFrameId)is { Action: { } action } && action.ActionId == used.ActionId && action.PhysicalCards.Any(c => c.CardId == cardId && c.From == entry.From && c.CardKind == entry.CardKind))
+        if (used is not null && used.EntrySequence == entry.Sequence && (CoreGameEngineNativeUsedDiscardOriginsRuntime.IsNativeUseFinishReason(reason) || reason.Value == "area.abolished.equipment") && _coreCardUseLifecycleOperations.LifecycleCardUse(used.UseFrameId)is { Action: { } action } && action.ActionId == used.ActionId && action.PhysicalCards.Any(c => c.CardId == cardId && c.From == entry.From && c.CardKind == entry.CardKind))
         {
             entrySequence = entry.Sequence;
             parentFrame = used.UseFrameId;

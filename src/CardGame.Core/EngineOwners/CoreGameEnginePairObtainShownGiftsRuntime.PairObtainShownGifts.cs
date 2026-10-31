@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Collections.ObjectModel;
 using System.Globalization;
 
@@ -11,7 +8,7 @@ internal sealed partial class CoreGameEnginePairObtainShownGiftsRuntime
 {
     internal long PairBenefitSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count == 0 ? 0 : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements[^1].Sequence;
 
-    internal CardConversionSource PairBenefitSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource PairBenefitSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool PairBenefitSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
     internal string PairBenefitMoveReason(ProgramSkillFrame f, bool gift) => $"skill-program.{(f.SkillId)}.{((gift ? SkillProgramEffectOp.GiveShownCardToLeastOriginalTarget : SkillProgramEffectOp.ObtainOneFromEachSelectedTarget))}";
     internal IReadOnlyList<PromptChoice> PairObtainChoices(ProgramSkillFrame f, int target, IReadOnlyList<CardZoneKind> zones) => Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, target, zones, OwnedCardMoveIntent.Obtain).Select(c => c with { Parameters = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(c.Parameters) { ["program-action"] = "pair-obtain", ["cursor"] = f.PairObtain!.Cursor.ToString(CultureInfo.InvariantCulture) }) }).ToArray());
@@ -290,11 +287,11 @@ internal sealed partial class CoreGameEnginePairObtainShownGiftsRuntime
 
         // Foreign hands have no Cards/identity. AI ranks only published equipment
         // or its own cards, then deterministically chooses an opaque slot.
-        return decision.Choices.OrderByDescending(c => c.Cards is [var id] && c.Parameters.GetValueOrDefault("card-owner-seat") != f.OwnerSeat.ToString(CultureInfo.InvariantCulture) ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(card => card.Id == id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+        return decision.Choices.OrderByDescending(c => c.Cards is [var id] && c.Parameters.GetValueOrDefault("card-owner-seat") != f.OwnerSeat.ToString(CultureInfo.InvariantCulture) ? CoreNativeAiDecisionsRuntime.GetKeepValue(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(card => card.Id == id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IPairObtainFixedRecipientProgramHost.ObtainOneFromEachSelectedTarget(ProgramSkillFrame f, SkillProgramEffect e) => ObtainOneFromEachSelectedTarget(f, e);
-    SkillProgramStepOutcome global::CardGame.Core.IPairObtainFixedRecipientProgramHost.GiveShownCardToLeastOriginalTarget(ProgramSkillFrame f, SkillProgramEffect e) => GiveShownCardToLeastOriginalTarget(f, e);
-    SkillProgramStepOutcome global::CardGame.Core.IPairObtainFixedRecipientProgramHost.IssueFixedRecipientBenefit(ProgramSkillFrame f, SkillProgramEffect e) => _coreFixedRecipientBenefitsOperations.IssueFixedRecipientBenefit(f, e);
-    SkillProgramStepOutcome global::CardGame.Core.IPairObtainFixedRecipientProgramHost.SelectIssuedFixedRecipient(ProgramSkillFrame f, SkillProgramEffect e) => _coreFixedRecipientBenefitsOperations.SelectIssuedFixedRecipient(f, e);
+    SkillProgramStepOutcome IPairObtainFixedRecipientProgramHost.ObtainOneFromEachSelectedTarget(ProgramSkillFrame f, SkillProgramEffect e) => ObtainOneFromEachSelectedTarget(f, e);
+    SkillProgramStepOutcome IPairObtainFixedRecipientProgramHost.GiveShownCardToLeastOriginalTarget(ProgramSkillFrame f, SkillProgramEffect e) => GiveShownCardToLeastOriginalTarget(f, e);
+    SkillProgramStepOutcome IPairObtainFixedRecipientProgramHost.IssueFixedRecipientBenefit(ProgramSkillFrame f, SkillProgramEffect e) => _coreFixedRecipientBenefitsOperations.IssueFixedRecipientBenefit(f, e);
+    SkillProgramStepOutcome IPairObtainFixedRecipientProgramHost.SelectIssuedFixedRecipient(ProgramSkillFrame f, SkillProgramEffect e) => _coreFixedRecipientBenefitsOperations.SelectIssuedFixedRecipient(f, e);
 }

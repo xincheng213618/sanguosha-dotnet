@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFeiYiOlRuntime
 {
     internal const string FeiYiDrawReason = "skill-program.fei-yi.draw";
-    internal const string FeiYiDiscardReason = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FeiYiDiscardReason;
-    internal CardConversionSource FeiYiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal const string FeiYiDiscardReason = RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FeiYiDiscardReason;
+    internal CardConversionSource FeiYiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool FeiYiSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IFeiYiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginFeiYi(f, op);
+    SkillProgramStepOutcome IFeiYiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginFeiYi(f, op);
     internal SkillProgramStepOutcome BeginFeiYi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -92,7 +89,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
     [ProgramAnswer("fei-yi")]
     internal void AnswerFeiYi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FeiYi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FeiYiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FeiYi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FeiYiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Fei Yi lost its exact private legal choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -206,5 +203,5 @@ internal sealed partial class CharacterFeiYiOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26600)]
     internal bool ContinuePaidFeiYi(ProgramSkillFrame f) => f.FeiYi is { Paid: true } r && _coreProgramEventHistoryOperations.ProgramEventHistory<FeiYiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.YanruParityDrawDiscard, SkillProgramEffectOp.RevealSingletonAndArmRankEffects)]
-    internal PromptChoice AiFeiYi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "finish") ?? p.Choices.Where(c => c.Parameters["branch"] != "unpick").OrderBy(c => c.Cards.Count == 0 ? 0 : global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
+    internal PromptChoice AiFeiYi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "finish") ?? p.Choices.Where(c => c.Parameters["branch"] != "unpick").OrderBy(c => c.Cards.Count == 0 ? 0 : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
 }

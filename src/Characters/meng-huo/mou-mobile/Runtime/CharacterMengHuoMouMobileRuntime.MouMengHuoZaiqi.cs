@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -65,7 +62,7 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouMengHuo;
-        if (r is null || !ValidMouMh(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouMengHuoStage.Selecting ? f.OwnerSeat : r.Targets[r.Cursor]) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouMhChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (r is null || !ValidMouMh(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouMengHuoStage.Selecting ? f.OwnerSeat : r.Targets[r.Cursor]) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouMhChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Zaiqi accepts only the actual chooser's published private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = selected.Parameters["branch"];
@@ -220,11 +217,11 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
         var r = f.MouMengHuo!;
         if (r.Stage == MouMengHuoStage.Selecting)
         {
-            var next = p.Choices.Where(c => c.Parameters["branch"] == "toggle" && !r.Targets.Contains(c.Targets.Single()) && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).OrderBy(c => c.Targets.Single()).FirstOrDefault();
+            var next = p.Choices.Where(c => c.Parameters["branch"] == "toggle" && !r.Targets.Contains(c.Targets.Single()) && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).OrderBy(c => c.Targets.Single()).FirstOrDefault();
             return next ?? p.Choices.Single(c => c.Parameters["branch"] == (r.Targets.Count > 0 ? "confirm" : "skip"));
         }
 
-        var cheapest = p.Choices.Where(c => c.Parameters["branch"] == "discard").OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).FirstOrDefault();
-        return cheapest is not null && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp < _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(cheapest.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) <= 4 ? cheapest : p.Choices.Single(c => c.Parameters["branch"] == "draw");
+        var cheapest = p.Choices.Where(c => c.Parameters["branch"] == "discard").OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).FirstOrDefault();
+        return cheapest is not null && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp < _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(cheapest.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) <= 4 ? cheapest : p.Choices.Single(c => c.Parameters["branch"] == "draw");
     }
 }

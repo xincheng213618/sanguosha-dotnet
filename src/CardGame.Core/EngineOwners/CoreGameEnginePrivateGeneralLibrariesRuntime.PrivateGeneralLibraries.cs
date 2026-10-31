@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePrivateGeneralLibrariesRuntime
 {
     internal bool HasPrivateGeneralLibraryCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializePrivateGeneralLibrary);
 
-    SkillProgramStepOutcome global::CardGame.Core.IPrivateGeneralLibraryProgramHost.ExecutePrivateGeneralLibrary(SkillProgramEffect e, ProgramSkillFrame f) => ExecutePrivateGeneralLibrary(e, f);
+    SkillProgramStepOutcome IPrivateGeneralLibraryProgramHost.ExecutePrivateGeneralLibrary(SkillProgramEffect e, ProgramSkillFrame f) => ExecutePrivateGeneralLibrary(e, f);
     internal bool LibraryBaseSourceLive(PrivateGeneralLibrarySource source)
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(source.OwnerSeat))
@@ -91,11 +87,11 @@ internal sealed partial class CoreGameEnginePrivateGeneralLibrariesRuntime
             return lord;
         var changed = _coreGameEnginePrivateGeneralLibrariesFieldsAccess._privateLibraryOwnerDependencies.Length != _coreMatchParticipantsPlayersAccess._players.Count;
         if (changed)
-            _coreGameEnginePrivateGeneralLibrariesFieldsAccess._privateLibraryOwnerDependencies = new global::CardGame.Core.GameEngine.ProjectionDependency[_coreMatchParticipantsPlayersAccess._players.Count];
+            _coreGameEnginePrivateGeneralLibrariesFieldsAccess._privateLibraryOwnerDependencies = new GameEngine.ProjectionDependency[_coreMatchParticipantsPlayersAccess._players.Count];
         for (var i = 0; i < _coreMatchParticipantsPlayersAccess._players.Count; i++)
         {
             var player = _coreMatchParticipantsPlayersAccess._players[i];
-            var currentOwner = new global::CardGame.Core.GameEngine.ProjectionDependency(player.SkillGrants.Revision, player.IsAlive, player.Hp, player.Role, player.GeneralSelected, player.GeneralRevealed, player.SecondaryGeneralSelected, player.SecondaryGeneralRevealed);
+            var currentOwner = new GameEngine.ProjectionDependency(player.SkillGrants.Revision, player.IsAlive, player.Hp, player.Role, player.GeneralSelected, player.GeneralRevealed, player.SecondaryGeneralSelected, player.SecondaryGeneralRevealed);
             if (_coreGameEnginePrivateGeneralLibrariesFieldsAccess._privateLibraryOwnerDependencies[i] == currentOwner)
                 continue;
             _coreGameEnginePrivateGeneralLibrariesFieldsAccess._privateLibraryOwnerDependencies[i] = currentOwner;

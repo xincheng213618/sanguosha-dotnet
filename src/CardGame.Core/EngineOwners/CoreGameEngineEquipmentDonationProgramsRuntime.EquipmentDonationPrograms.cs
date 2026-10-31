@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEquipmentDonationProgramsRuntime
 {
     internal const string EquipmentDonationMoveReason = "program.all-equipment-donation.give";
-    internal static string EquipmentDonationUsage(string id) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_EquipmentDonationPrograms.EquipmentDonationUsage(id);
+    internal static string EquipmentDonationUsage(string id) => RuntimeSkills.RuntimeRules_Core_EquipmentDonationPrograms.EquipmentDonationUsage(id);
     internal long EquipmentDonationSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count == 0 ? 0 : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements[^1].Sequence;
 
     internal SkillProgramStepOutcome AwaitEquipmentDonationMovements(long frameId)
@@ -58,7 +55,7 @@ internal sealed partial class CoreGameEngineEquipmentDonationProgramsRuntime
             _corePhysicalMovementFacadesOperations.MoveCards(cards, CardLocation.Processing, CardLocation.Hand(recipient), new(EquipmentDonationMoveReason), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, frame.OwnerSeat, recipient, cards.Select(c => c.Id).ToArray(), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
             var after = EquipmentDonationSequence;
             var delivered = cards.Count(c => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > before && m.Sequence <= after && m.CardId == c.Id && m.From == CardLocation.Processing && m.To == CardLocation.Hand(recipient) && m.Reason.Value == EquipmentDonationMoveReason));
-            var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+            var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
             if (!_skillRuntimeStateOperations._skillRuntimeState.TryConsumeUsage(frame.OwnerSeat, frame.SkillId, EquipmentDonationUsage(usageId), SkillUsageScope.Game, 1))
                 throw new InvalidOperationException("The paid donation lost its exact unconsumed game-wide opportunity.");
             frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -201,6 +198,6 @@ internal sealed partial class CoreGameEngineEquipmentDonationProgramsRuntime
         return decision.Choices.Where(c => c.Parameters["option"].StartsWith("target:", StringComparison.Ordinal)).Select(c => (Choice: c, Value: _coreAiBrainsAiBrainsAccess._aiBrains[r.RecipientSeat].ScoreProgramTarget(view, c.Targets.Single(), new(0, 0, 0, 0, 0, 1, false, false)))).Where(c => c.Value > 0).OrderByDescending(c => c.Value).ThenBy(c => c.Choice.Targets.Single()).Select(c => c.Choice).FirstOrDefault() ?? decision.Choices.Single(c => c.Parameters["option"] == "confirm");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IEquipmentDonationProgramHost.DonateAllEquipmentAndOfferRecipientBenefits(ProgramSkillFrame f, string usageId) => RunAllEquipmentDonation(f, usageId);
-    SkillProgramStepOutcome global::CardGame.Core.IEquipmentDonationProgramHost.ChooseEquipmentOrDrawAfterOtherActualTurn(ProgramSkillFrame f) => _coreActualEndedTurnEquipmentOperations.RunActualEndedTurnEquipment(f);
+    SkillProgramStepOutcome IEquipmentDonationProgramHost.DonateAllEquipmentAndOfferRecipientBenefits(ProgramSkillFrame f, string usageId) => RunAllEquipmentDonation(f, usageId);
+    SkillProgramStepOutcome IEquipmentDonationProgramHost.ChooseEquipmentOrDrawAfterOtherActualTurn(ProgramSkillFrame f) => _coreActualEndedTurnEquipmentOperations.RunActualEndedTurnEquipment(f);
 }

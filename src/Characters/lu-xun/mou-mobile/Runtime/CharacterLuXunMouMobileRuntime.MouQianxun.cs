@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuXunMouMobileRuntime
@@ -83,10 +79,10 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
         }
 
         if (r.Stage == MouLuXunStage.Distribution)
-            return prompt.Choices.Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).OrderBy(c => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.Targets[0]]).Count).FirstOrDefault() ?? prompt.Choices[0];
+            return prompt.Choices.Where(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).OrderBy(c => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.Targets[0]]).Count).FirstOrDefault() ?? prompt.Choices[0];
         if (r.Stage == MouLuXunStage.NameChoice)
             return prompt.Choices[0];
         var options = MouLuXunUseOptions(f);
-        return prompt.Choices.FirstOrDefault(c => c.Parameters["verb"] == "use" && (options[int.Parse(c.Parameters["value"])].ActionKind is LegalActionKind.DrawTwo or LegalActionKind.FiveGrains or LegalActionKind.PeachGarden || c.Targets.Any(target => !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])))) ?? prompt.Choices.Last();
+        return prompt.Choices.FirstOrDefault(c => c.Parameters["verb"] == "use" && (options[int.Parse(c.Parameters["value"])].ActionKind is LegalActionKind.DrawTwo or LegalActionKind.FiveGrains or LegalActionKind.PeachGarden || c.Targets.Any(target => !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])))) ?? prompt.Choices.Last();
     }
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMiHengLeRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterMiHengLeRuntime
             return false;
         if (r.NativeKind == SiruiNativeUseKind.CardUse)
         {
-            if (frame is not CardUseFrame { Action: { Type: CardActionType.Use } action } use || action.ActionId != r.ActionId || action.ActorSeat != r.Source.OwnerSeat || action.ProviderSeat != r.Source.OwnerSeat || !action.ConversionChain.Contains(r.Source) || action.PhysicalCards is not [var cost] || cost.CardId != r.CardId || cost.From != r.From || cost.CardKind != r.PrintedKind || use.PhysicalCardIds is not [var id] || id != r.CardId || action.EffectiveKind != r.OutputKind && !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.OutputKind)))
+            if (frame is not CardUseFrame { Action: { Type: CardActionType.Use } action } use || action.ActionId != r.ActionId || action.ActorSeat != r.Source.OwnerSeat || action.ProviderSeat != r.Source.OwnerSeat || !action.ConversionChain.Contains(r.Source) || action.PhysicalCards is not [var cost] || cost.CardId != r.CardId || cost.From != r.From || cost.CardKind != r.PrintedKind || use.PhysicalCardIds is not [var id] || id != r.CardId || action.EffectiveKind != r.OutputKind && !(CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(r.OutputKind)))
                 return false;
         }
         else if (r.NativeKind == SiruiNativeUseKind.Dodge && frame is not CardUseFrame || r.NativeKind == SiruiNativeUseKind.Nullification && frame is not NullificationWindowFrame)

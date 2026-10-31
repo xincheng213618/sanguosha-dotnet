@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangCanOlRuntime
@@ -39,7 +35,7 @@ internal sealed partial class CharacterWangCanOlRuntime
                 throw new InvalidOperationException("Sanwen draw request must derive from exactly twice its own actual discard count.");
             if (r.Stage == WangCanStage.QiaiGift && (r.Cursor < 0 || r.Cursor >= r.Seats.Count || moves.Any(m => m.From.OwnerSeat != r.Seats[r.Cursor] || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || m.To != CardLocation.Hand(f.OwnerSeat)) || r.ActualCount != 1))
                 throw new InvalidOperationException("Qiai payment lost its exact living payer's chosen HE entity.");
-            if (r.Stage == WangCanStage.DenglouGain && moves.Any(m => m.From != r.Lease || m.To != CardLocation.Hand(f.OwnerSeat) || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).Kind) == SkillProgramCardCategory.Basic))
+            if (r.Stage == WangCanStage.DenglouGain && moves.Any(m => m.From != r.Lease || m.To != CardLocation.Hand(f.OwnerSeat) || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).Kind) == SkillProgramCardCategory.Basic))
                 throw new InvalidOperationException("Denglou first obtains only the actual nonbasic leased entities.");
             if (r.Stage is WangCanStage.DenglouDiscard or WangCanStage.DenglouCancel && moves.Any(m => m.From != r.Lease || m.To != CardLocation.DiscardPile))
                 throw new InvalidOperationException("Denglou disposal cannot move another zone's cards.");

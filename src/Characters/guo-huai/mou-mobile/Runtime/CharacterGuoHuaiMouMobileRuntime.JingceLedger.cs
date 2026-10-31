@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoHuaiMouMobileRuntime
 {
     internal bool HasMouGuoHuaiMobile => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart);
 
-    internal static CardConversionSource MouGhSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_huai_mou_mobile_Jingce_Ledger.MouGhSource(f);
-    internal static bool IsMouGuoHuaiGainTrigger(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_huai_mou_mobile_Jingce_Ledger.IsMouGuoHuaiGainTrigger(t);
+    internal static CardConversionSource MouGhSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_guo_huai_mou_mobile_Jingce_Ledger.MouGhSource(f);
+    internal static bool IsMouGuoHuaiGainTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_guo_huai_mou_mobile_Jingce_Ledger.IsMouGuoHuaiGainTrigger(t);
     internal bool LiveMouGhSource(CardConversionSource source, string hash) => _coreMatchParticipantsPlayersAccess._players[source.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], source.SkillId, source.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash == hash;
     internal IEnumerable<MouGuoHuaiPredictionIssuedEvent> UnverifiedMouGhPredictions() => _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Where(p => _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionPlacedEvent>().Any(e => e.PredictionId == p.PredictionId && e.CardId == p.CardId && e.To == CardLocation.DrawPile) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionVerifiedEvent>().Any(e => e.PredictionId == p.PredictionId) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionDueEvent>().Any(e => e.PredictionId == p.PredictionId) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == p.PredictionId));
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 32000)]

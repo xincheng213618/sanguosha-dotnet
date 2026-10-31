@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Collections.ObjectModel;
 using System.Globalization;
 
@@ -34,7 +31,7 @@ internal sealed partial class CoreGameEngineOwnedHandRankSumProgramsRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal static int OwnedHandSelectedRankSum(ProgramOwnedHandRankSumSelection draft) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_OwnedHandRankSumPrograms.OwnedHandSelectedRankSum(draft);
+    internal static int OwnedHandSelectedRankSum(ProgramOwnedHandRankSumSelection draft) => RuntimeSkills.RuntimeRules_Core_OwnedHandRankSumPrograms.OwnedHandSelectedRankSum(draft);
     internal IReadOnlyList<PromptChoice> OwnedHandRankSumChoices(ProgramSkillFrame frame)
     {
         var draft = frame.OwnedHandRankSumSelection ?? throw new InvalidOperationException("Missing private rank-sum draft.");
@@ -75,7 +72,7 @@ internal sealed partial class CoreGameEngineOwnedHandRankSumProgramsRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
         var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
         var draft = frame.OwnedHandRankSumSelection!;
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], OwnedHandRankSumChoices(frame).Where(c => c.Id == selected.Id).ToArray()))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], OwnedHandRankSumChoices(frame).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The rank-sum choice is not an exact published, completable selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
@@ -114,5 +111,5 @@ internal sealed partial class CoreGameEngineOwnedHandRankSumProgramsRuntime
         return decision.Choices.OrderBy(c => c.Cards.Count == 0 ? 0d : CardCatalog.Get(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Single(card => card.Id == c.Cards[0]).Kind).HandKeepValue).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IOwnedHandRankSumHost.BeginOwnedHandRankSum(ProgramSkillFrame frame, int exactRankSum, string resultBind) => BeginOwnedHandRankSum(frame, exactRankSum, resultBind);
+    SkillProgramStepOutcome IOwnedHandRankSumHost.BeginOwnedHandRankSum(ProgramSkillFrame frame, int exactRankSum, string resultBind) => BeginOwnedHandRankSum(frame, exactRankSum, resultBind);
 }

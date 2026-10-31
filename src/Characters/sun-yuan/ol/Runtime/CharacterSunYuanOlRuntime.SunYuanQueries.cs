@@ -1,19 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunYuanOlRuntime
 {
     internal bool HasSunYuanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveSayingPlayStartObtainAndReply) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveDongxinDamageDiscardAndReclaim);
 
-    internal static CardConversionSource SunYuanSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_yuan_ol_SunYuanQueries.SunYuanSource(f);
-    internal static string SunYuanHash<T>(T value) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_yuan_ol_SunYuanQueries.SunYuanHash<T>(value);
+    internal static CardConversionSource SunYuanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_sun_yuan_ol_SunYuanQueries.SunYuanSource(f);
+    internal static string SunYuanHash<T>(T value) => RuntimeSkills.RuntimeRules_sun_yuan_ol_SunYuanQueries.SunYuanHash<T>(value);
     internal bool SunYuanParent(ProgramSkillFrame f)
     {
         if (f.TriggerId is null || f.WindowContext is not { } c || c.OwnerSeat != f.OwnerSeat)

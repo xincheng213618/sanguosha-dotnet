@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheGuideSkillsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheGuideSkillsHost.ResolveGuideSkill(ProgramSkillFrame frame, SkillProgramEffect effect) => ResolveShanheGuideSkill(frame, effect);
+    SkillProgramStepOutcome IShanheGuideSkillsHost.ResolveGuideSkill(ProgramSkillFrame frame, SkillProgramEffect effect) => ResolveShanheGuideSkill(frame, effect);
     internal bool IsShanheFriendlySeat(int owner, int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && (owner == seat || _coreTeamActivityProgramsOperations.OtherRevealedPublicTeamAlly(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[seat]));
     [ProgramDamageHook(ProgramDamagePhase.FactModifiers, 5409)]
-    internal IEnumerable<(CardUseEffectSource Source, int Amount)> ShanheBuwuDamageBonuses(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal IEnumerable<(CardUseEffectSource Source, int Amount)> ShanheBuwuDamageBonuses(GameEngine.IDamageAttempt attack)
     {
         if (attack.IsSourceLess || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat) || !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShanheBuwu))
             return[];

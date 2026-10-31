@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMengDaOlRuntime
 {
     internal bool HasGoudeCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveGoudeActualTurnEnd);
 
-    internal static CardConversionSource MengDaSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_meng_da_ol_MengDaLedger.MengDaSource(f);
+    internal static CardConversionSource MengDaSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_meng_da_ol_MengDaLedger.MengDaSource(f);
     internal IReadOnlyList<int> GoudeFactionSeats(int owner)
     {
         var faction = _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[owner]);
@@ -19,14 +15,14 @@ internal sealed partial class CharacterMengDaOlRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27240)]
     internal void ObserveGoudeZeroSlash(IGameEvent fact)
     {
-        if (!HasGoudeCapability || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber < 1 || fact is not CardUseDeclaredEvent { CardId: 0 } declared || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(declared.CardKind) || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == declared.ResolutionId)is not { CardId: 0, PhysicalCardIds.Count: 0, Action: { Type: CardActionType.Use } action } use || action.ActorSeat != declared.SourceSeat || use.SourceSeat != declared.SourceSeat || action.EffectiveKind != declared.CardKind || _coreProgramEventHistoryOperations.ProgramEventHistory<GoudeZeroSlashDeclaredEvent>().Any(e => e.UseId == use.Id))
+        if (!HasGoudeCapability || _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber < 1 || fact is not CardUseDeclaredEvent { CardId: 0 } declared || !CoreNativeCardClassificationsRuntime.IsSlashCard(declared.CardKind) || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == declared.ResolutionId)is not { CardId: 0, PhysicalCardIds.Count: 0, Action: { Type: CardActionType.Use } action } use || action.ActorSeat != declared.SourceSeat || use.SourceSeat != declared.SourceSeat || action.EffectiveKind != declared.CardKind || _coreProgramEventHistoryOperations.ProgramEventHistory<GoudeZeroSlashDeclaredEvent>().Any(e => e.UseId == use.Id))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GoudeZeroSlashDeclaredEvent(_coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, use.Id, action.ActionId, action.ActorSeat, action.ProviderSeat));
     }
 
     internal int GoudeZeroSlashActor(GoudeZeroSlashDeclaredEvent observed, IReadOnlyList<IGameEvent> history)
     {
-        if (history.OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == observed.UseId && e.CardId == 0 && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind) && e.SourceSeat == observed.ActorSeat) != 1)
+        if (history.OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == observed.UseId && e.CardId == 0 && CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind) && e.SourceSeat == observed.ActorSeat) != 1)
             throw new InvalidOperationException("Goude lost its true native zero-entity Slash declaration.");
         var actor = observed.ActorSeat;
         foreach (var e in history.OfType<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == observed.UseId))

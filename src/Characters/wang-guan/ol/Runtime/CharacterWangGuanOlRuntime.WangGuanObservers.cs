@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangGuanOlRuntime
@@ -19,7 +15,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
 
         if (f.InstructionIndex is not (0 or 1) || f.SkillId != "ol:miuyan" || f.TriggerId is null || f.WindowContext is not { } context)
             return false;
-        return CanRunIssuedMiuyanCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority), context);
+        return CanRunIssuedMiuyanCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority), context);
     }
 
     internal bool WangGuanFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -27,7 +23,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
         if (f.WangGuan is not { Stage: WangGuanStage.MiuyanGainChildren or WangGuanStage.ShiluDrawChildren } r)
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (r.Op == SkillProgramEffectOp.ResolveShiluDrawRevealIdentity ? m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == ShiluDrawReason || m.Reason == CardMoveReasons.Reshuffle : r.Entities.Any(e => e.CardId == m.CardId && m.From == CardLocation.Hand(e.HolderSeat)) && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MiuyanGainReason));
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (r.Op == SkillProgramEffectOp.ResolveShiluDrawRevealIdentity ? m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == ShiluDrawReason || m.Reason == CardMoveReasons.Reshuffle : r.Entities.Any(e => e.CardId == m.CardId && m.From == CardLocation.Hand(e.HolderSeat)) && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MiuyanGainReason));
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 

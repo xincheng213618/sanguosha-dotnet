@@ -1,22 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengJiChengCuiOlRuntime
 {
     internal bool HasChengJiChengCui => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveTousuiDodgeRequirement) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveXumingDamagePromise);
 
-    internal static CardConversionSource ChengJiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ChengJiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool IsTousuiSource(CardConversionSource? source) => source is { SkillId: ChengJiChengCuiComposition.Tousui, BindingId: "bottom-cost-slash" } && _corePlayCardHistoryOperations.ViewAsRule(source)is not null;
     internal IReadOnlyList<Card> TousuiPhysicalCards(CharacterState actor) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).DistinctBy(c => c.Id).Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id)is { OwnerSeat: var seat, Zone: var zone } && seat == actor.Seat && zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.WoodenOxGrain).ToArray());
     internal bool IsTousuiVariableSource(CharacterState actor, SkillProgramViewAs rule, Card card, CardLocation from) => rule.CostDestination == SkillProgramCardDestination.DrawPileBottom && rule.VariableInputCount && from.OwnerSeat == actor.Seat && TousuiPhysicalCards(actor).Any(c => c.Id == card.Id);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 32200)]
     internal void CaptureTousuiUse(IGameEvent fact)
     {
-        if (!HasChengJiChengCui || fact is not CardUseDeclaredEvent e || _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)is not { Action: { Type: CardActionType.Use } action, Tousui: null } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (!HasChengJiChengCui || fact is not CardUseDeclaredEvent e || _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)is not { Action: { Type: CardActionType.Use } action, Tousui: null } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             return;
         var source = action.ConversionChain.LastOrDefault(IsTousuiSource);
         if (source is null)
@@ -30,7 +26,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TousuiMaterialFrozenEvent(use.Id, index, action.PhysicalCards[index]));
     }
 
-    internal bool TousuiUseProof(CardUseFrame use) => use.Tousui is { } r && use.Action is { Type: CardActionType.Use } a && r.UseId == use.Id && r.ActionId == a.ActionId && r.Source.OwnerSeat == r.ProviderSeat && a.ProviderSeat == r.ProviderSeat && r.MaterialCount > 0 && a.PhysicalCards.Count == r.MaterialCount && IsTousuiSource(r.Source) && a.ConversionChain.Contains(r.Source) && a.EffectiveKind == use.CardKind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreProgramEventHistoryOperations.ProgramEventHistory<TousuiUseIssuedEvent>().Count(e => e == new TousuiUseIssuedEvent(use.Id, a.ActionId, r.Source, r.GameplayHash, r.ActorSeat, r.ProviderSeat, r.MaterialCount)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<TousuiMaterialFrozenEvent>().Where(e => e.UseId == use.Id).OrderBy(e => e.Index).Select(e => e.Cost).SequenceEqual(a.PhysicalCards);
+    internal bool TousuiUseProof(CardUseFrame use) => use.Tousui is { } r && use.Action is { Type: CardActionType.Use } a && r.UseId == use.Id && r.ActionId == a.ActionId && r.Source.OwnerSeat == r.ProviderSeat && a.ProviderSeat == r.ProviderSeat && r.MaterialCount > 0 && a.PhysicalCards.Count == r.MaterialCount && IsTousuiSource(r.Source) && a.ConversionChain.Contains(r.Source) && a.EffectiveKind == use.CardKind && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreProgramEventHistoryOperations.ProgramEventHistory<TousuiUseIssuedEvent>().Count(e => e == new TousuiUseIssuedEvent(use.Id, a.ActionId, r.Source, r.GameplayHash, r.ActorSeat, r.ProviderSeat, r.MaterialCount)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<TousuiMaterialFrozenEvent>().Where(e => e.UseId == use.Id).OrderBy(e => e.Index).Select(e => e.Cost).SequenceEqual(a.PhysicalCards);
     // The existing atomic native Slash payment owns all movement children. This
     // callback only fixes the native bottom order and signs that same payment.
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.CaptureMovement, 32200)]
@@ -61,11 +57,11 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IChengJiChengCuiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    SkillProgramStepOutcome IChengJiChengCuiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.ResolveTousuiDodgeRequirement => ResolveTousuiRequirement(f),
         SkillProgramEffectOp.ResolveXumingDamagePromise => ResolveXumingDamage(f),
         SkillProgramEffectOp.ResolveXumingIssuedTurnEndUses => BeginXumingEnding(f),
         _ => throw new InvalidOperationException("Unknown Cheng Ji Cheng Cui operation.")};
-    IReadOnlyList<Card> global::CardGame.Core.ITousuiSelectionQuery.Cards(int owner) => TousuiSources(_coreMatchParticipantsPlayersAccess._players[owner]).SelectMany(TousuiRequestCards).DistinctBy(c => c.Id).ToArray();
+    IReadOnlyList<Card> ITousuiSelectionQuery.Cards(int owner) => TousuiSources(_coreMatchParticipantsPlayersAccess._players[owner]).SelectMany(TousuiRequestCards).DistinctBy(c => c.Id).ToArray();
 }

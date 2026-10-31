@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLingTongBoundaryMobileRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryLingTongHost.SelectEquipmentPair(ProgramSkillFrame frame) => SelectBoundaryLingTongEquipmentPair(frame);
-    IReadOnlyList<int> global::CardGame.Core.IBoundaryLingTongQueries.MovableSources(int ownerSeat) => Array.AsReadOnly(BoundaryLingTongEquipmentPairs(ownerSeat).Select(p => p.Source).Distinct().ToArray());
+    SkillProgramStepOutcome IBoundaryLingTongHost.SelectEquipmentPair(ProgramSkillFrame frame) => SelectBoundaryLingTongEquipmentPair(frame);
+    IReadOnlyList<int> IBoundaryLingTongQueries.MovableSources(int ownerSeat) => Array.AsReadOnly(BoundaryLingTongEquipmentPairs(ownerSeat).Select(p => p.Source).Distinct().ToArray());
     internal IEnumerable<(int Source, int Destination)> BoundaryLingTongEquipmentPairs(int ownerSeat) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != ownerSeat).SelectMany(source => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != ownerSeat && p.Seat != source.Seat && _corePhysicalOwnedCardQueriesOperations.GetEquipment(source).Any(c => !c.IsGeneralWeapon && _coreProgramCardPaymentsOperations.CanEnterEquipmentSlot(p.Seat, c))).Select(destination => (source.Seat, destination.Seat)));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 56800, SkillProgramEffectOp.SelectBoundaryLingTongEquipmentPair)]
     internal bool QualifyBoundaryLingTongXuanfeng(ProgramTriggerLegalityContext gate)

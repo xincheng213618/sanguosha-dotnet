@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuoXianOlRuntime
@@ -34,7 +30,7 @@ internal sealed partial class CharacterLuoXianOlRuntime
             return false;
         if (pending.Stage == DailiStage.FlipChildren && child is ProgramLifecycleTriggerWindowFrame flip)
             return flip.Window is SkillProgramTriggerWindow.CharacterTurnedOver or SkillProgramTriggerWindow.CharacterTurnedFaceUp && flip.ResumeProgramFrameId == frame.Id && flip.CharacterStateContinuation == CharacterStateContinuation.Program && flip.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && flip.OwnerSeat == frame.OwnerSeat && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CharacterStateChangedEvent>().Any(e => e.Change.Id == flip.Id && e.Change.ParentFrameId == frame.Id && e.Change.TargetSeat == frame.OwnerSeat);
-        return pending.Stage == DailiStage.DrawChildren && child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > pending.Before && m.Sequence <= pending.After && m.Reason.Value == "skill-program.daili.draw");
+        return pending.Stage == DailiStage.DrawChildren && child is CardsMovedTriggerWindowFrame moved && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > pending.Before && m.Sequence <= pending.After && m.Reason.Value == "skill-program.daili.draw");
     }
 
     internal ProgramSkillFrame? DailiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.DailiFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));

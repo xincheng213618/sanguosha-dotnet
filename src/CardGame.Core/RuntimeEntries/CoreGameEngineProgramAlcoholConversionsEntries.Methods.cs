@@ -2,5 +2,5 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramAlcoholConversionsEntries
 {
-    internal void ValidateAlcoholConversion(global::CardGame.Core.CharacterState owner, global::CardGame.Core.Card card, global::CardGame.Core.CardConversionSource? source, bool forResponse) => _resolve().ValidateAlcoholConversion(owner, card, source, forResponse);
+    internal void ValidateAlcoholConversion(CharacterState owner, Card card, CardConversionSource? source, bool forResponse) => _resolve().ValidateAlcoholConversion(owner, card, source, forResponse);
 }

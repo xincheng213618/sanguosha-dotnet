@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
                 ["output-kind"] = kind.ToString(),
                 ["dying-use"] = dyingUse ? "true" : "false"
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
             choices.Add(new(new ChoiceId($"tiered-zero.{(kind)}.{(source.SkillId)}.{(source.BindingId)}.{(source.SkillInstanceId)}"), $"发动【{(_coreCardConversionsOperations.ProgramConversionName(source))}】，视为使用【{(CardCatalog.Get(kind).DisplayName)}】。", [], [], parameters));
         }
 
@@ -38,12 +34,12 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
     internal bool HasTieredRoundZeroDyingResponse(CharacterState responder) => TieredRoundZeroResponseChoices(responder, CardKind.Peach, true).Count > 0 || TieredRoundZeroResponseChoices(responder, CardKind.Alcohol, true).Count > 0;
     internal void ResolveTieredRoundZeroResponse(PromptChoice choice, bool advance)
     {
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !prompt.Choices.Any(c => c.Id == choice.Id && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || choice.Cards.Count != 0 || choice.Targets.Count != 0 || choice.Parameters.GetValueOrDefault("response") != "tiered-round-zero-use" || !Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("output-kind"), out var kind))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !prompt.Choices.Any(c => c.Id == choice.Id && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || choice.Cards.Count != 0 || choice.Targets.Count != 0 || choice.Parameters.GetValueOrDefault("response") != "tiered-round-zero-use" || !Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("output-kind"), out var kind))
             throw new InvalidOperationException("A zero-material response must be the current published exact choice.");
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
         var dyingUse = choice.Parameters.GetValueOrDefault("dying-use") == "true";
-        if (!TieredRoundZeroResponseChoices(actor, kind, dyingUse).Any(c => c.Id == choice.Id && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || dyingUse && prompt.Kind != DecisionKind.RescueDying || !dyingUse && prompt.Kind != (kind == CardKind.Nullification ? DecisionKind.Nullification : DecisionKind.RespondDodge))
+        if (!TieredRoundZeroResponseChoices(actor, kind, dyingUse).Any(c => c.Id == choice.Id && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || dyingUse && prompt.Kind != DecisionKind.RescueDying || !dyingUse && prompt.Kind != (kind == CardKind.Nullification ? DecisionKind.Nullification : DecisionKind.RespondDodge))
             throw new InvalidOperationException("A zero-material response lost its use-qualified producer and allowance before acceptance.");
         if (_characterWoLongFengChuOlOperations.TryBeginEquipmentSlotNamedResponse(actor, source, choice, dyingUse))
             return;
@@ -98,7 +94,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
             _coreNamedAmbushInvalidationOperations.BindNamedAmbushCounterspell(pending.Id, action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(0, actor.Seat, pending.SourceSeat, CardKind.Nullification));
         if (pending.NamedAmbushResponse is null)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, actor.Seat, 0, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, actor.Seat, 0, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(action));
         if (pending.NamedAmbushResponse is null)
@@ -154,17 +150,17 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
             CardUseFrame u => u.TieredRoundResponseUse,
             _ => null
         };
-        if (r is null || r.OwnerFrameId != owner.Id || r.CardActionId != action.ActionId || r.FrozenTier is < 0 or > 2 || r.MaterialCount != (r.FrozenTier == 2 ? 0 : 1) || zeroOnly && r.FrozenTier != 2 || action.Type != CardActionType.Response || action.PhysicalCards.Count != r.MaterialCount || action.ActorSeat != r.ActorSeat || action.ProviderSeat != r.ActorSeat || action.ResponderSeat != r.ActorSeat || action.RequesterSeat is not null || action.EffectiveKind != r.EffectiveKind || action.ConversionChain is not [var source] || source != r.Source || source.OwnerSeat != r.ActorSeat || _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program is not { } definition || definition.GameplayHash != r.GameplayHash || _coreActivityOrdinaryTricksOperations.ActivityRuntimeProgram(definition).ViewAs.SingleOrDefault(v => v.Id == source.BindingId)is not { UseOnly: true, TieredRoundConversion: { } policy } rule || rule.InputCount != r.MaterialCount || policy.StateId != r.StateId || policy.UsageId != r.UsageId || rule.OutputKind != r.EffectiveKind || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(r.ActorSeat, source.SkillId, global::CardGame.Core.EngineOwners.CoreProgramTieredRoundConversionRuntime.TieredRoundUsage(policy), r.FrozenTier == 0 ? SkillUsageScope.Phase : SkillUsageScope.Round) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TieredRoundConversionUseIssuedEvent>().Count(e => e.Receipt == r) != 1)
+        if (r is null || r.OwnerFrameId != owner.Id || r.CardActionId != action.ActionId || r.FrozenTier is < 0 or > 2 || r.MaterialCount != (r.FrozenTier == 2 ? 0 : 1) || zeroOnly && r.FrozenTier != 2 || action.Type != CardActionType.Response || action.PhysicalCards.Count != r.MaterialCount || action.ActorSeat != r.ActorSeat || action.ProviderSeat != r.ActorSeat || action.ResponderSeat != r.ActorSeat || action.RequesterSeat is not null || action.EffectiveKind != r.EffectiveKind || action.ConversionChain is not [var source] || source != r.Source || source.OwnerSeat != r.ActorSeat || _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program is not { } definition || definition.GameplayHash != r.GameplayHash || _coreActivityOrdinaryTricksOperations.ActivityRuntimeProgram(definition).ViewAs.SingleOrDefault(v => v.Id == source.BindingId)is not { UseOnly: true, TieredRoundConversion: { } policy } rule || rule.InputCount != r.MaterialCount || policy.StateId != r.StateId || policy.UsageId != r.UsageId || rule.OutputKind != r.EffectiveKind || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(r.ActorSeat, source.SkillId, CoreProgramTieredRoundConversionRuntime.TieredRoundUsage(policy), r.FrozenTier == 0 ? SkillUsageScope.Phase : SkillUsageScope.Round) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TieredRoundConversionUseIssuedEvent>().Count(e => e.Receipt == r) != 1)
             return false;
         return owner switch
         {
             NullificationWindowFrame n => r.EffectiveKind == CardKind.Nullification && _coreDelayedNullificationOperations.HasNullificationEffectOwner(n) && action.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(n) && action.OpponentSeat == n.SourceSeat,
-            CardUseFrame use => r.EffectiveKind == CardKind.Dodge && use.CardAttack is { } attack && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.ParentActionId == use.Action?.ActionId && action.ActorSeat == attack.TargetSeat && action.OpponentSeat == attack.SourceSeat,
+            CardUseFrame use => r.EffectiveKind == CardKind.Dodge && use.CardAttack is { } attack && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.ParentActionId == use.Action?.ActionId && action.ActorSeat == attack.TargetSeat && action.OpponentSeat == attack.SourceSeat,
             _ => false
         };
     }
 
-    internal static TieredRoundConversionUseReceipt? TieredRoundResponseReceipt(ResolutionFrame owner) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_TieredRoundZeroResponses.TieredRoundResponseReceipt(owner);
+    internal static TieredRoundConversionUseReceipt? TieredRoundResponseReceipt(ResolutionFrame owner) => RuntimeSkills.RuntimeRules_Core_TieredRoundZeroResponses.TieredRoundResponseReceipt(owner);
     internal CardActionContext RequireTieredRoundIssuedResponseAction(ResolutionFrame owner)
     {
         var receipt = TieredRoundResponseReceipt(owner) ?? throw new InvalidOperationException("A tiered response lost its issued receipt.");
@@ -174,7 +170,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
         return fact.Action;
     }
 
-    internal void ClearTieredRoundDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void ClearTieredRoundDodgeResponse(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { TieredRoundResponseUse: not null } use)
             return;
@@ -219,7 +215,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
         var choices = TieredRoundZeroResponseChoices(actor, CardKind.Peach, true).Concat(TieredRoundZeroResponseChoices(actor, CardKind.Alcohol, true)).ToArray();
         if (choices.Length == 0)
             return false;
-        var(use, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseProgramDyingRescue(_corePlayerViewProjectionOperations.CreateSnapshot(actor.Seat), dying.VictimSeat, _coreCardConversionsOperations.ProgramConversionName(global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choices[0])), ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
+        var(use, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseProgramDyingRescue(_corePlayerViewProjectionOperations.CreateSnapshot(actor.Seat), dying.VictimSeat, _coreCardConversionsOperations.ProgramConversionName(CoreGameEngineCardConversionsRuntime.RequireConversionSource(choices[0])), ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
         _coreNativeAiDecisionsOperations.AddThought(thought);
         if (!use)
             return false;

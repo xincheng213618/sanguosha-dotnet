@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CoreGameEngineDamageTargetBudgetRuntime
 {
     internal bool TracksDamageTargetBudgetTargets => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AddDamageMarkerBudgetTargets);
 
-    internal static bool DamageBudgetCard(CardActionContext a) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DamageTargetBudget.DamageBudgetCard(a);
-    internal CardConversionSource BudgetSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static bool DamageBudgetCard(CardActionContext a) => RuntimeSkills.RuntimeRules_Core_DamageTargetBudget.DamageBudgetCard(a);
+    internal CardConversionSource BudgetSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static bool DamageBudgetParticipantMatches(SkillProgramTrigger trigger, int owner, ProgramSkillWindowContext context) => trigger.Subject switch
     {
         SkillProgramTriggerSubject.Any => context.SourceSeat == owner || context.TargetSeat == owner,
@@ -37,7 +34,7 @@ internal sealed partial class CoreGameEngineDamageTargetBudgetRuntime
         {
             var c = f.WindowContext ?? throw new InvalidOperationException("A damage budget lost its native occurrence.");
             var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-            if (f.InstructionIndex != 1 || c.Window != SkillProgramTriggerWindow.AfterDamageApplied || c.OccurrenceIndex != 0 || c.Amount <= 0 || !DamageBudgetParticipantMatches(_coreProgramLifecycleOperations.GetProgramTrigger(f), f.OwnerSeat, c) || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame w || w.Id != c.ParentFrameId || w.ParentFrameId != c.DamageFrameId || w.TriggerWindow != c.Window || w.TargetSeat != c.TargetSeat || (_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(w).IsSourceLess ? c.SourceSeat is not null : w.SourceSeat != c.SourceSeat) || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == w.ParentFrameId)is not { } damage || damage.Amount != c.Amount || damage.TargetSeat != c.TargetSeat || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageTargetBudgetGainedEvent>().Any(x => x.DamageWindowFrameId == w.Id && x.Source == BudgetSource(f)))
+            if (f.InstructionIndex != 1 || c.Window != SkillProgramTriggerWindow.AfterDamageApplied || c.OccurrenceIndex != 0 || c.Amount <= 0 || !DamageBudgetParticipantMatches(_coreProgramLifecycleOperations.GetProgramTrigger(f), f.OwnerSeat, c) || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame w || w.Id != c.ParentFrameId || w.ParentFrameId != c.DamageFrameId || w.TriggerWindow != c.Window || w.TargetSeat != c.TargetSeat || (_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(w).IsSourceLess ? c.SourceSeat is not null : w.SourceSeat != c.SourceSeat) || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == w.ParentFrameId)is not { } damage || damage.Amount != c.Amount || damage.TargetSeat != c.TargetSeat || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageTargetBudgetGainedEvent>().Any(x => x.DamageWindowFrameId == w.Id && x.Source == BudgetSource(f)))
                 throw new InvalidOperationException("A damage budget requires one exact applied damage occurrence matching its declared participant.");
             _coreAttributedMarkerEventsOperations.MutateParticipantMarker(f, f.OwnerSeat, e.Marker!.Value, 1);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DamageTargetBudgetGainedEvent(f.Id, w.Id, BudgetSource(f), e.Marker.Value, c.SourceSeat, c.TargetSeat!.Value, c.Amount, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(e.Marker.Value)));
@@ -98,7 +95,7 @@ internal sealed partial class CoreGameEngineDamageTargetBudgetRuntime
         };
         var choices = new List<PromptChoice>();
         if (r.AddedTargets.Count / pairSize < r.FrozenBudget)
-            foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(p => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) ? _coreRecipientCategorySlashTargetsOperations.CanBeRecipientCategorySlashTarget(use, p) : _coreUniqueLeaderTrickTargetsOperations.CanBeUniqueLeaderTrickTarget(use, p)).OrderBy(p => p.Seat))
+            foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(p => CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) ? _coreRecipientCategorySlashTargetsOperations.CanBeRecipientCategorySlashTarget(use, p) : _coreUniqueLeaderTrickTargetsOperations.CanBeUniqueLeaderTrickTarget(use, p)).OrderBy(p => p.Seat))
             {
                 if (pairSize == 2)
                     foreach (var victim in _coreMatchParticipantsPlayersAccess._players.Where(v => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(target, v)).OrderBy(p => p.Seat))
@@ -134,7 +131,7 @@ internal sealed partial class CoreGameEngineDamageTargetBudgetRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("No owning budget choice.");
         var use = RequireDamageBudgetUse(f, out _);
         var r = f.DamageTargetBudget!;
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !BuildDamageBudgetChoices(f, use, r).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !BuildDamageBudgetChoices(f, use, r).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
             throw new InvalidOperationException("A budget answer changed its current legal frozen selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["branch"] == "add")
@@ -205,7 +202,7 @@ internal sealed partial class CoreGameEngineDamageTargetBudgetRuntime
         {
             var target = _coreMatchParticipantsPlayersAccess._players[c.Targets[use.CardKind == CardKind.BorrowedSword ? 1 : 0]];
             var beneficial = use.CardKind is CardKind.DrawTwo or CardKind.FiveGrains or CardKind.PeachGarden || use.CardKind == CardKind.IronChain && target.IsChained;
-            if (beneficial == global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], target))
+            if (beneficial == CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], target))
                 return c;
         }
 
@@ -224,5 +221,5 @@ internal sealed partial class CoreGameEngineDamageTargetBudgetRuntime
     }
 
     internal bool HasDamageTargetBudgetTail(CardUseFrame use) => use.DamageTargetBudget is { Completed: true, AddedTargets.Count: > 0 } r && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageTargetBudgetResolvedEvent>().Any(x => x.ProgramFrameId == r.ProgramFrameId && IsDamageBudgetResolvedFact(use, x, r.OriginalTargets, r.Source.OwnerSeat));
-    SkillProgramStepOutcome global::CardGame.Core.IDamageTargetBudgetHost.ApplyDamageTargetBudget(SkillProgramEffect e, ProgramSkillFrame f) => ApplyDamageTargetBudget(e, f);
+    SkillProgramStepOutcome IDamageTargetBudgetHost.ApplyDamageTargetBudget(SkillProgramEffect e, ProgramSkillFrame f) => ApplyDamageTargetBudget(e, f);
 }

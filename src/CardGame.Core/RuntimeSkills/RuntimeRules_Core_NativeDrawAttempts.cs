@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_NativeDrawAttempts
 {
     internal static bool NativeDrawAttemptRidesOn(ResolutionFrame child, ResolutionFrame parent) =>
@@ -15,5 +15,5 @@ internal static class RuntimeRules_Core_NativeDrawAttempts
             lifecycle.NativeDrawAttempt is { } context && programChild.WindowContext?.NativeDraw == context &&
             programChild.WindowContext.ParentFrameId == lifecycle.Id &&
             lifecycle.CandidateIndex >= 0 && lifecycle.CandidateIndex < lifecycle.Candidates.Count &&
-            CardGame.Core.RuntimeSkills.RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(programChild, lifecycle.Candidates[lifecycle.CandidateIndex]);
+            RuntimeRules_Core_DamageTargetMountObserver.MountObserverCandidateMatches(programChild, lifecycle.Candidates[lifecycle.CandidateIndex]);
 }

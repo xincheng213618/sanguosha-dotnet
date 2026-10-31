@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeWeaponResponsesRuntime
 {
-    internal bool TryBeginCixiongDoubleSwordsChoice(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryBeginCixiongDoubleSwordsChoice(NativeOwners.CardAttackHandle attack)
     {
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
@@ -36,7 +32,7 @@ internal sealed partial class CoreNativeWeaponResponsesRuntime
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords ?? throw new InvalidOperationException("There is no Cixiong Double Swords choice to resolve.");
         var attack = pending.Attack;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.CixiongDoubleSwords } decision || !selected.Parameters.TryGetValue("action", out var action))
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.CixiongDoubleSwords } decision || !selected.Parameters.TryGetValue("action", out var action))
         {
             throw new InvalidOperationException("The Cixiong Double Swords continuation is inconsistent.");
         }
@@ -91,7 +87,7 @@ internal sealed partial class CoreNativeWeaponResponsesRuntime
         CompleteCixiongDoubleSwords(pending, activated: true, targetDiscarded: false, discardedCardId: null, sourceDrawCount: drawn.Count);
     }
 
-    internal void CompleteCixiongDoubleSwords(global::CardGame.Core.NativeOwners.CixiongDoubleSwordsHandle pending, bool activated, bool targetDiscarded, int? discardedCardId, int sourceDrawCount)
+    internal void CompleteCixiongDoubleSwords(NativeOwners.CixiongDoubleSwordsHandle pending, bool activated, bool targetDiscarded, int? discardedCardId, int sourceDrawCount)
     {
         if (_characterCaoPiAnniversaryGodOperations.TryCompleteKemingCixiong(pending, activated, targetDiscarded, discardedCardId, sourceDrawCount))
             return;

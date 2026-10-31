@@ -1,9 +1,9 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreGameEngineNextSlashProgramsState : global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNextSlashProgramsNamedNextSlashReservesAccess
+internal sealed class CoreGameEngineNextSlashProgramsState : Contracts.ICoreGameEngineNextSlashProgramsNamedNextSlashReservesAccess
 {
-    private global::System.Collections.Generic.List<global::CardGame.Core.GameEngine.NamedNextSlashReserve> _namedNextSlashReserves = [];
-    internal ref readonly global::System.Collections.Generic.List<global::CardGame.Core.GameEngine.NamedNextSlashReserve> ReferenceToNamedNextSlashReserves => ref _namedNextSlashReserves;
+    private List<GameEngine.NamedNextSlashReserve> _namedNextSlashReserves = [];
+    internal ref readonly List<GameEngine.NamedNextSlashReserve> ReferenceToNamedNextSlashReserves => ref _namedNextSlashReserves;
 
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.GameEngine.NamedNextSlashReserve> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineNextSlashProgramsNamedNextSlashReservesAccess._namedNextSlashReserves => ref _namedNextSlashReserves;
+    ref readonly List<GameEngine.NamedNextSlashReserve> Contracts.ICoreGameEngineNextSlashProgramsNamedNextSlashReservesAccess._namedNextSlashReserves => ref _namedNextSlashReserves;
 }

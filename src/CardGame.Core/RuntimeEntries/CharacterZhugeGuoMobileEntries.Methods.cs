@@ -3,19 +3,19 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhugeGuoMobileEntries
 {
     internal bool AdvanceMobileQirangObserver() => _resolve().AdvanceMobileQirangObserver();
-    internal void AssertMobileQirangGain(global::CardGame.Core.ProgramSkillFrame f) => _resolve().AssertMobileQirangGain(f);
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginMobileZhugeGuo(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginMobileZhugeGuo(supplied, op);
-    internal bool CanOfferMobileZhugeGuo(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanOfferMobileZhugeGuo(g);
-    internal void CaptureMobileQirangUse(global::CardGame.Core.IGameEvent payload) => _resolve().CaptureMobileQirangUse(payload);
-    internal global::CardGame.Core.MobileQirangGainReceipt? CurrentMobileQirangGain(int owner, int card) => _resolve().CurrentMobileQirangGain(owner, card);
-    internal bool KeepMobileQirangGain(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepMobileQirangGain(f);
-    internal global::CardGame.Core.MobileQirangGainReceipt? MobileQirangCommittedGain(global::CardGame.Core.ProgramTriggerCandidate c, global::CardGame.Core.ProgramSkillWindowContext context) => _resolve().MobileQirangCommittedGain(c, context);
-    internal bool MobileQirangDistance(global::CardGame.Core.ProgramCardDistanceQuery q) => _resolve().MobileQirangDistance(q);
+    internal void AssertMobileQirangGain(ProgramSkillFrame f) => _resolve().AssertMobileQirangGain(f);
+    internal SkillProgramStepOutcome BeginMobileZhugeGuo(ProgramSkillFrame supplied, SkillProgramEffectOp op) => _resolve().BeginMobileZhugeGuo(supplied, op);
+    internal bool CanOfferMobileZhugeGuo(ProgramTriggerLegalityContext g) => _resolve().CanOfferMobileZhugeGuo(g);
+    internal void CaptureMobileQirangUse(IGameEvent payload) => _resolve().CaptureMobileQirangUse(payload);
+    internal MobileQirangGainReceipt? CurrentMobileQirangGain(int owner, int card) => _resolve().CurrentMobileQirangGain(owner, card);
+    internal bool KeepMobileQirangGain(ProgramSkillFrame f) => _resolve().KeepMobileQirangGain(f);
+    internal MobileQirangGainReceipt? MobileQirangCommittedGain(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().MobileQirangCommittedGain(c, context);
+    internal bool MobileQirangDistance(ProgramCardDistanceQuery q) => _resolve().MobileQirangDistance(q);
     internal bool MobileQirangDyingProof() => _resolve().MobileQirangDyingProof();
-    internal global::CardGame.Core.CardMovementRecord? MobileQirangEquipmentEntry(int owner, global::CardGame.Core.ProgramSkillWindowContext c) => _resolve().MobileQirangEquipmentEntry(owner, c);
-    internal bool MobileQirangObserverChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MobileQirangObserverChild(f, child);
-    internal global::CardGame.Core.ProgramSkillFrame? MobileQirangObserverRoot() => _resolve().MobileQirangObserverRoot();
-    internal bool MobileQirangUsePaid(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.MobileQirangUseReceipt q) => _resolve().MobileQirangUsePaid(use, q);
-    internal global::CardGame.Core.CardSnapshot[] MobileYuhuaPrivateView(int viewer) => _resolve().MobileYuhuaPrivateView(viewer);
+    internal CardMovementRecord? MobileQirangEquipmentEntry(int owner, ProgramSkillWindowContext c) => _resolve().MobileQirangEquipmentEntry(owner, c);
+    internal bool MobileQirangObserverChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MobileQirangObserverChild(f, child);
+    internal ProgramSkillFrame? MobileQirangObserverRoot() => _resolve().MobileQirangObserverRoot();
+    internal bool MobileQirangUsePaid(CardUseFrame use, MobileQirangUseReceipt q) => _resolve().MobileQirangUsePaid(use, q);
+    internal CardSnapshot[] MobileYuhuaPrivateView(int viewer) => _resolve().MobileYuhuaPrivateView(viewer);
     internal bool ResumeMobileQirang(long id) => _resolve().ResumeMobileQirang(id);
 }

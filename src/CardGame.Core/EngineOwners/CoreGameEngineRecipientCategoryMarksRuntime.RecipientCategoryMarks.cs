@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,13 +7,13 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
 {
     internal bool TracksRecipientCategoryMarks => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GiveHandAndGrantCategoryMark);
 
-    internal static RecipientCategoryMarkKind RecipientMarkKind(SkillProgramEffectOp op) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecipientCategoryMarks.RecipientMarkKind(op);
-    internal static PlayerMarkerKind RecipientPublicMarker(RecipientCategoryMarkKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecipientCategoryMarks.RecipientPublicMarker(kind);
-    internal static CardConversionSource RecipientMarkSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecipientCategoryMarks.RecipientMarkSource(f);
-    internal static string RecipientMarkReason(ProgramSkillFrame f, string suffix) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecipientCategoryMarks.RecipientMarkReason(f, suffix);
+    internal static RecipientCategoryMarkKind RecipientMarkKind(SkillProgramEffectOp op) => RuntimeSkills.RuntimeRules_Core_RecipientCategoryMarks.RecipientMarkKind(op);
+    internal static PlayerMarkerKind RecipientPublicMarker(RecipientCategoryMarkKind kind) => RuntimeSkills.RuntimeRules_Core_RecipientCategoryMarks.RecipientPublicMarker(kind);
+    internal static CardConversionSource RecipientMarkSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_RecipientCategoryMarks.RecipientMarkSource(f);
+    internal static string RecipientMarkReason(ProgramSkillFrame f, string suffix) => RuntimeSkills.RuntimeRules_Core_RecipientCategoryMarks.RecipientMarkReason(f, suffix);
     internal long RecipientMarkSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static Dictionary<string, string> RecipientMarkParameters(ProgramSkillFrame f, string action) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecipientCategoryMarks.RecipientMarkParameters(f, action);
+    internal static Dictionary<string, string> RecipientMarkParameters(ProgramSkillFrame f, string action) => RuntimeSkills.RuntimeRules_Core_RecipientCategoryMarks.RecipientMarkParameters(f, action);
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeRecipientCategoryGiftObservers(CharacterState drawOwner, IReadOnlyList<ProgramTriggerCandidate> existing)
     {
         if (!TracksRecipientCategoryMarks)
@@ -91,7 +88,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
         _coreGameEngineRecipientCategoryMarksRecipientCategoryMarkLedgerStartedRecipientCategoryMarksAccess._recipientCategoryMarkLedgerStarted = true;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RecipientCategoryMarkStartedEvent(f.Id, r.Source, r.GameplayHash, r.SourceSkillId, r.StateId, r.Operation, holder, r.ParentWindowId, token?.TokenId));
         if (r.OriginalDyingCursor is { } original)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RecipientCategoryMarkDyingCursorIssuedEvent(f.Id, original.DyingFrameId, global::CardGame.Core.EngineOwners.CoreGameEngineDyingSuitsAndHistoricalUseObserversRuntime.DyingSuitsCursorHash(original)));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RecipientCategoryMarkDyingCursorIssuedEvent(f.Id, original.DyingFrameId, CoreGameEngineDyingSuitsAndHistoricalUseObserversRuntime.DyingSuitsCursorHash(original)));
         if (!gift)
         {
             _coreGameEngineRecipientCategoryMarksRecipientCategoryMarkLedgerStartedRecipientCategoryMarksAccess._recipientCategoryMarks.Remove(new(holder, r.SourceSkillId, r.StateId));
@@ -151,7 +148,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
         PromptChoice Finish(string stage) => new(new($"category-mark.{(f.Id)}.{(stage)}.finish"), "完成选择", [], [], RecipientMarkParameters(f, "finish"));
         if (r.Stage == RecipientCategoryMarkStage.ChoosingGift)
             foreach (var m in r.Materials)
-                choices.Add(new(new($"category-mark.{(f.Id)}.gift.{(m.CardId)}"), global::CardGame.Core.EngineOwners.CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId)), [m.CardId], [], RecipientMarkParameters(f, "gift")));
+                choices.Add(new(new($"category-mark.{(f.Id)}.gift.{(m.CardId)}"), CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId)), [m.CardId], [], RecipientMarkParameters(f, "gift")));
         else if (r.Stage == RecipientCategoryMarkStage.ChoosingTarget)
             foreach (var seat in r.CandidateSeats)
                 choices.Add(new(new($"category-mark.{(f.Id)}.discard-target.{(seat)}"), _coreMatchParticipantsPlayersAccess._players[seat].Name, [], [seat], RecipientMarkParameters(f, "discard-target")));
@@ -163,7 +160,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
                 parameters["source-zone"] = m.From.Zone.ToString();
                 parameters["slot-index"] = m.SlotIndex.ToString(CultureInfo.InvariantCulture);
                 parameters["card-owner-seat"] = r.TargetSeat!.Value.ToString(CultureInfo.InvariantCulture);
-                choices.Add(new(new($"category-mark.{(f.Id)}.discard.{(m.From.Zone)}.{(m.SlotIndex)}"), m.Hidden ? $"第 {(m.SlotIndex + 1)} 张手牌" : global::CardGame.Core.EngineOwners.CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId)), m.Hidden ? [] : [m.CardId], [], parameters));
+                choices.Add(new(new($"category-mark.{(f.Id)}.discard.{(m.From.Zone)}.{(m.SlotIndex)}"), m.Hidden ? $"第 {(m.SlotIndex + 1)} 张手牌" : CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId)), m.Hidden ? [] : [m.CardId], [], parameters));
             }
 
             choices.Add(Finish("discard"));
@@ -205,7 +202,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
     internal void ResolveRecipientCategoryMarkChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Category mark choice lost its owning frame.");
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_coreRecipientCategoryMarkObserversOperations.IsRecipientCategoryMarkChoice(f, prompt) || !RecipientCategoryMarkChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, choice)))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_coreRecipientCategoryMarkObserversOperations.IsRecipientCategoryMarkChoice(f, prompt) || !RecipientCategoryMarkChoices(f).Any(c => CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, choice)))
             throw new InvalidOperationException("A category mark choice changed its exact published actor, material or target.");
         var r = f.RecipientCategoryMark!;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -270,7 +267,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
         }
 
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
-        var category = global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind);
+        var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind);
         var kind = category switch
         {
             SkillProgramCardCategory.Trick => RecipientCategoryMarkKind.Rescue,
@@ -280,7 +277,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
         var e = _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects.Single();
         var before = RecipientMarkSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PublicHandRevealSelection = new("recipient-category-hand-gift", f.InstructionIndex, 0, id, card.Kind, CardLocation.Hand(r.HolderSeat), CardLocation.Hand(f.OwnerSeat), f.OwnerSeat, r.HolderSeat, EffectiveKind: card.Kind) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), r.HolderSeat, "category-mark-gift", Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), r.HolderSeat, "category-mark-gift", Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
         if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "recipient-category-hand-gift"))
             return;
         ContinueRecipientCategoryPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
@@ -363,8 +360,8 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 570)]
     internal bool CanContinueRecipientCategoryMark(ProgramSkillFrame f) => f.RecipientCategoryMark is { } r && (r.Consumed || r.Stage == RecipientCategoryMarkStage.GiftChildren) && _coreRecipientCategoryMarkObserversOperations.ValidRecipientCategoryMarkReceipt(f);
     [ProgramAiChoice(SkillProgramEffectOp.GiveHandAndGrantCategoryMark, SkillProgramEffectOp.SpendCategoryMarkForDyingRecovery, SkillProgramEffectOp.SpendCategoryMarkForAreaDiscard, SkillProgramEffectOp.SpendCategoryMarkForSlashTargets)]
-    internal PromptChoice SelectAiRecipientCategoryMarkChoice(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("mark-action") != "finish" && (c.Targets.Count == 0 || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]))) ?? p.Choices[0];
-    SkillProgramStepOutcome global::CardGame.Core.IRecipientCategoryMarksProgramHost.ExecuteRecipientCategoryMark(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteRecipientCategoryMark(f, e);
+    internal PromptChoice SelectAiRecipientCategoryMarkChoice(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("mark-action") != "finish" && (c.Targets.Count == 0 || !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]))) ?? p.Choices[0];
+    SkillProgramStepOutcome IRecipientCategoryMarksProgramHost.ExecuteRecipientCategoryMark(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteRecipientCategoryMark(f, e);
     [PublicHandRevealReturn("recipient-category-hand-gift")]
     internal void ContinueRecipientCategoryPublicReveal(ProgramSkillFrame f)
     {
@@ -380,7 +377,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
             return;
         }
 
-        var category = global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(payment.EffectiveKind!.Value);
+        var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(payment.EffectiveKind!.Value);
         var kind = category switch
         {
             SkillProgramCardCategory.Trick => RecipientCategoryMarkKind.Rescue,

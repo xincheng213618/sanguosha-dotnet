@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -37,7 +34,7 @@ internal sealed partial class CharacterPangTongFriendRuntime
             foreach (var id in receipt.Cards.Except(receipt.Selected).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(frame.OwnerSeat)))
             {
                 var card = _coreCardAttackStateOperations.GetAttackCard(id);
-                choices.Add(new(new($"friend-manjuan.{(frame.Id)}.{(receipt.Selected.Count)}.{(id)}"), $"选择【{(card.DisplayName)}】（{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))}{(card.RankText)}），按选择顺序从顶至底放置", [id], [], Parameters(id.ToString(CultureInfo.InvariantCulture))));
+                choices.Add(new(new($"friend-manjuan.{(frame.Id)}.{(receipt.Selected.Count)}.{(id)}"), $"选择【{(card.DisplayName)}】（{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))}{(card.RankText)}），按选择顺序从顶至底放置", [id], [], Parameters(id.ToString(CultureInfo.InvariantCulture))));
             }
 
             choices.Add(new(new($"friend-manjuan.{(frame.Id)}.finish"), receipt.Selected.Count == 0 ? "不放置牌" : $"放置已选 {(receipt.Selected.Count)} 张牌并换牌", [], [], Parameters("finish")));
@@ -72,7 +69,7 @@ internal sealed partial class CharacterPangTongFriendRuntime
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Friend Pang Tong lost its program.");
         var canonical = FriendPangTongChoices(frame).SingleOrDefault(choice => choice.Id == selected.Id);
-        if (canonical is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [selected]))
+        if (canonical is null || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [selected]))
             throw new InvalidOperationException("Friend Pang Tong changed its exact private cards, order or use targets.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var receipt = frame.FriendPangTong!;

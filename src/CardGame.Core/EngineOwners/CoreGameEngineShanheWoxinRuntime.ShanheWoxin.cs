@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheWoxinRuntime
@@ -11,7 +6,7 @@ internal sealed partial class CoreGameEngineShanheWoxinRuntime
     internal bool HasWoxinPolicy => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.ReserveNextDamageAfterOffTurnHit);
 
     internal CardUseEffectSource? WoxinSource(int owner, IReadOnlySet<string>? visible = null) => _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[owner], SkillProgramCardPolicyKind.ReserveNextDamageAfterOffTurnHit).Where(item => visible is null || visible.Contains(item.Source.SkillId)).Select(item => new CardUseEffectSource(item.Source.SkillId, item.Policy.Id, owner, item.Source.SkillInstanceId)).FirstOrDefault();
-    internal ShanheWoxinReservation? WoxinReceipt(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ShanheWoxin : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ShanheWoxin;
+    internal ShanheWoxinReservation? WoxinReceipt(GameEngine.IDamageAttempt attack) => attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ShanheWoxin : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ShanheWoxin;
     internal IEnumerable<ShanheWoxinReservation> LiveWoxinReservations()
     {
         foreach (var frame in _resolutionStackOperations._resolutionStack)
@@ -42,7 +37,7 @@ internal sealed partial class CoreGameEngineShanheWoxinRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 63300)]
-    internal int ReserveWoxinDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int ReserveWoxinDamage(GameEngine.IDamageAttempt attack)
     {
         if (!HasWoxinPolicy || attack.IsSourceLess || attack.IsChainPropagation)
             return 0;
@@ -56,7 +51,7 @@ internal sealed partial class CoreGameEngineShanheWoxinRuntime
         if (credits.Length == 0)
             return 0;
         var receipt = new ShanheWoxinReservation(_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinReservationIssuedEvent>().Count + 1L, attack.ResolutionId, binding, hash, attack.TargetSeat, credits.Length);
-        if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (attack is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, state => state with { ShanheWoxin = receipt });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, state => state!with { ShanheWoxin = receipt });
@@ -91,11 +86,11 @@ internal sealed partial class CoreGameEngineShanheWoxinRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheWoxinCreditEarnedEvent(_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinCreditEarnedEvent>().Count + 1, earnedBinding, _contentRegistryOperations._contentRegistry.GetSkill(earnedBinding.SkillId).Program!.GameplayHash, damage.Id, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, applied.Amount));
     }
 
-    internal int WoxinPublicBonus(GameSnapshot view, int sourceSeat, bool sourceLess, bool chain, global::CardGame.Core.GameEngine.IDamageAttempt? attack)
+    internal int WoxinPublicBonus(GameSnapshot view, int sourceSeat, bool sourceLess, bool chain, GameEngine.IDamageAttempt? attack)
     {
         if (!HasWoxinPolicy || sourceLess || chain || !_coreMatchParticipantsPlayersAccess._players[sourceSeat].IsAlive)
             return 0;
-        var visible = global::CardGame.Core.EngineOwners.CoreGameEnginePublicDamagePredictionRuntime.VisiblePredictionSkillIds(view.Players.Single(player => player.Seat == sourceSeat));
+        var visible = CoreGameEnginePublicDamagePredictionRuntime.VisiblePredictionSkillIds(view.Players.Single(player => player.Seat == sourceSeat));
         if (attack is not null && WoxinReceipt(attack)is { } receipt)
             return visible.Contains(receipt.Source.SkillId) ? receipt.Amount : 0;
         var binding = WoxinSource(sourceSeat, visible);

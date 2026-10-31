@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWeiZiOlRuntime
@@ -25,7 +21,7 @@ internal sealed partial class CharacterWeiZiOlRuntime
         }
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IWeiZiProgramHost.YuanziResolve(ProgramSkillFrame frame, SkillProgramEffect effect) => YuanziProgramResolve(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IWeiZiProgramHost.YuanziDamageDraw(ProgramSkillFrame frame, SkillProgramEffect effect) => YuanziProgramDamageDraw(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IWeiZiProgramHost.LiejieSourceDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => LiejieProgramSourceDiscard(frame, effect);
+    SkillProgramStepOutcome IWeiZiProgramHost.YuanziResolve(ProgramSkillFrame frame, SkillProgramEffect effect) => YuanziProgramResolve(frame, effect);
+    SkillProgramStepOutcome IWeiZiProgramHost.YuanziDamageDraw(ProgramSkillFrame frame, SkillProgramEffect effect) => YuanziProgramDamageDraw(frame, effect);
+    SkillProgramStepOutcome IWeiZiProgramHost.LiejieSourceDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => LiejieProgramSourceDiscard(frame, effect);
 }

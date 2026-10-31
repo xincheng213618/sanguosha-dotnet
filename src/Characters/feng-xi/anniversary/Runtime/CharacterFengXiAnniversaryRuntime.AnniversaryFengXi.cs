@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFengXiAnniversaryRuntime
 {
-    internal static CardConversionSource FengXiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource FengXiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardMoveReason FengXiDrawReason => new("skill.anniversary.boyan.draw");
     internal static CardMoveReason FengXiDiscardReason => new("skill.anniversary.yusui.discard");
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 44500, SkillProgramEffectOp.ResolveAnniversaryFengXiYusui)]
     internal bool CanOfferFengXi(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => w is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { IsPublicRed: false } card } && card.ActorSeat != c.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(card.ActorSeat) && _coreMatchParticipantsPlayersAccess._players[card.ActorSeat].IsAlive && _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } action } use && action.ActionId == card.CardActionId && action.ActorSeat == card.ActorSeat && use.TargetSeats.Contains(c.OwnerSeat);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryFengXiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginFengXi(f, op);
+    SkillProgramStepOutcome IAnniversaryFengXiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginFengXi(f, op);
     internal SkillProgramStepOutcome BeginFengXi(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -93,7 +89,7 @@ internal sealed partial class CharacterFengXiAnniversaryRuntime
     [ProgramAnswer("anniversary-feng-xi")]
     internal void AnswerFengXi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryFengXi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == AnniversaryFengXiStage.DiscardChoice ? r.Target : f.OwnerSeat) || !FengXiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryFengXi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == AnniversaryFengXiStage.DiscardChoice ? r.Target : f.OwnerSeat) || !FengXiChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Feng Xi rejects a stale branch or another participant's private discard.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

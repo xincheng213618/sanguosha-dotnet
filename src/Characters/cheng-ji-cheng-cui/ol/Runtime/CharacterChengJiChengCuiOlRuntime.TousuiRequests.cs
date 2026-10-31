@@ -1,10 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengJiChengCuiOlRuntime
@@ -49,7 +45,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
                         target.ToString(CultureInfo.InvariantCulture)
                     }
                 };
-                global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, source);
+                CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, source);
                 result.Add(new(new($"tousui.request.{(f.Id)}.{(source.SkillInstanceId)}.{(source.BindingId)}.{(actorSeat)}.{(target)}"), "发动【透髓】：私下选择至少一张手牌或装备牌当【杀】使用", [], [target], p));
             }
 
@@ -59,9 +55,9 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
     internal bool HasTousuiProgramSlash(CharacterState actor, IEnumerable<int> targets) => actor.IsAlive && targets.Any(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && s != actor.Seat && _coreMatchParticipantsPlayersAccess._players[s].IsAlive) && TousuiSources(actor).Any(s => TousuiRequestCards(s).Count >= 1);
     internal bool TousuiProgramActor(ProgramSkillFrame f, SkillProgramEffectOp op, int actor) => op == SkillProgramEffectOp.ResolvePingduanOrderedBasicRecastEquipment ? f.KeBiNengPingduan is { Stage: KeBiNengPingduanStage.BasicChoice } r && r.ActorSeat == actor && _characterKeBiNengOlOperations.ValidKeBiNeng(f) : _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(f, op, actor);
     internal int[] TousuiProgramTargets(ProgramSkillFrame f, int actor, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolvePingduanOrderedBasicRecastEquipment && TousuiProgramActor(f, op, actor) ? _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != actor).Select(p => p.Seat).ToArray() : _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramTargets(f, actor, op);
-    internal IReadOnlyList<PromptChoice> TousuiBorrowedSlashChoices(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending)
+    internal IReadOnlyList<PromptChoice> TousuiBorrowedSlashChoices(NativeOwners.BorrowedSwordHandle pending)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(pending.WeaponOwnerSeat) || !_coreMatchParticipantsPlayersAccess._players[pending.WeaponOwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[pending.SlashTargetSeat].IsAlive)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(pending.WeaponOwnerSeat) || !_coreMatchParticipantsPlayersAccess._players[pending.WeaponOwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[pending.SlashTargetSeat].IsAlive)
             return[];
         return Array.AsReadOnly(TousuiSources(_coreMatchParticipantsPlayersAccess._players[pending.WeaponOwnerSeat]).Where(s => TousuiRequestCards(s).Count >= 1).Select(s =>
         {
@@ -88,30 +84,30 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
                     pending.SlashTargetSeat.ToString(CultureInfo.InvariantCulture)
                 }
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, s);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, s);
             return new PromptChoice(new($"tousui.borrowed.{(pending.ResolutionId)}.{(s.SkillInstanceId)}.{(s.BindingId)}"), "发动【透髓】：将至少一张手牌或装备牌当【杀】使用", [], [pending.SlashTargetSeat], p);
         }).ToArray());
     }
 
-    internal bool TryBeginTousuiBorrowedSlash(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending, PromptChoice selected)
+    internal bool TryBeginTousuiBorrowedSlash(NativeOwners.BorrowedSwordHandle pending, PromptChoice selected)
     {
         if (selected.Parameters.GetValueOrDefault("response") != TousuiRequestOpen)
             return false;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondSlash } original || !pending.AwaitingSlashChoice || original.PlayerSeat != pending.WeaponOwnerSeat || !TousuiBorrowedSlashChoices(pending).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is not { TousuiRequest: null } parent || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ResponseWindowFrame response || response.ParentFrameId != parent.Id)
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondSlash } original || !pending.AwaitingSlashChoice || original.PlayerSeat != pending.WeaponOwnerSeat || !TousuiBorrowedSlashChoices(pending).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is not { TousuiRequest: null } parent || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ResponseWindowFrame response || response.ParentFrameId != parent.Id)
             throw new InvalidOperationException("Tousui lost its original Borrowed Sword Slash-use request.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
         var r = new TousuiRequestReceipt(parent.Id, 0, null, pending.WeaponOwnerSeat, pending.SlashTargetSeat, source, _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.GameplayHash, original);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(parent.Id, u => u with { TousuiRequest = r });
         BeginTousuiRequest(r);
         return true;
     }
 
-    internal IReadOnlyList<PromptChoice> TousuiQinglongSlashChoices(global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending)
+    internal IReadOnlyList<PromptChoice> TousuiQinglongSlashChoices(NativeOwners.QinglongCrescentBladeHandle pending)
     {
         var attack = pending.Attack;
         var actor = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || !_coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target))
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || !_coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target))
             return[];
         return Array.AsReadOnly(TousuiSources(actor).Where(s => TousuiRequestCards(s).Count >= 1).Select(s =>
         {
@@ -138,19 +134,19 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
                     target.Seat.ToString(CultureInfo.InvariantCulture)
                 }
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, s);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, s);
             return new PromptChoice(new($"tousui.qinglong.{(attack.ResolutionId)}.{(s.SkillInstanceId)}.{(s.BindingId)}"), "发动【透髓】：选择至少一张牌追杀", [], [target.Seat], p);
         }).ToArray());
     }
 
-    internal bool TryBeginTousuiQinglongSlash(global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending, PromptChoice selected)
+    internal bool TryBeginTousuiQinglongSlash(NativeOwners.QinglongCrescentBladeHandle pending, PromptChoice selected)
     {
         if (selected.Parameters.GetValueOrDefault("action") != TousuiRequestOpen)
             return false;
         var attack = pending.Attack;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.QinglongCrescentBlade, IsPrivate: true } original || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, pending) || original.PlayerSeat != attack.SourceSeat || !TousuiQinglongSlashChoices(pending).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { TousuiRequest: null } parent || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != parent.Id)
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.QinglongCrescentBlade, IsPrivate: true } original || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, pending) || original.PlayerSeat != attack.SourceSeat || !TousuiQinglongSlashChoices(pending).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { TousuiRequest: null } parent || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != parent.Id)
             throw new InvalidOperationException("Tousui lost its exact native Qinglong Slash-use request.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
         var r = new TousuiRequestReceipt(parent.Id, 0, null, attack.SourceSeat, attack.TargetSeat, source, _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.GameplayHash, original);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(parent.Id, u => u with { TousuiRequest = r });
         BeginTousuiRequest(r);
@@ -160,12 +156,12 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
     [ProgramAnswer(TousuiRequestOpen)]
     internal void OpenTousuiProgramRequest(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TousuiRequest: null } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } original || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)is not { } effect || selected.Targets is not [var target] || !TousuiProgramSlashChoices(f, original.PlayerSeat, TousuiProgramTargets(f, original.PlayerSeat, effect.Op)).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || !original.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TousuiRequest: null } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } original || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)is not { } effect || selected.Targets is not [var target] || !TousuiProgramSlashChoices(f, original.PlayerSeat, TousuiProgramTargets(f, original.PlayerSeat, effect.Op)).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || !original.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Tousui lost its exact program-request actor, instruction or legal published frontier.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
         var r = new TousuiRequestReceipt(f.Id, f.InstructionIndex, effect.Op, original.PlayerSeat, target, source, _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.GameplayHash, original)
         {
-            RequestSource = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            RequestSource = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             RequestGameplayHash = f.GameplayHash
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { TousuiRequest = r });
@@ -188,15 +184,15 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
     };
     internal bool ValidTousuiRequest(TousuiRequestReceipt r)
     {
-        if (r.OwnerFrameId <= 0 || r.Source.OwnerSeat != r.ActorSeat || r.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash || _corePlayCardHistoryOperations.ViewAsRule(r.Source)is not { CostDestination: SkillProgramCardDestination.DrawPileBottom } || r.OriginalDecision.PlayerSeat != r.ActorSeat || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Any(id => !TousuiRequestCards(r.Source).Any(c => c.Id == id)) || _coreProgramEventHistoryOperations.ProgramEventHistory<TousuiRequestStartedEvent>().Count(e => e.OwnerFrameId == r.OwnerFrameId && e.InstructionIndex == r.InstructionIndex && e.RequestOp == r.RequestOp && e.ActorSeat == r.ActorSeat && e.TargetSeat == r.TargetSeat && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.OriginalPromptId == r.OriginalDecision.PromptId && e.OriginalRevision == r.OriginalDecision.Revision && e.OriginalDecisionHash == TousuiOriginalDecisionHash(r.OriginalDecision)) != 1 || !r.OriginalDecision.ValidTargetSeats.Contains(r.TargetSeat) || !r.OriginalDecision.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == TousuiRequestOpen && c.Parameters.GetValueOrDefault("frame-id") == r.OwnerFrameId.ToString(CultureInfo.InvariantCulture) && c.Parameters.GetValueOrDefault("actor-seat") == r.ActorSeat.ToString(CultureInfo.InvariantCulture) && c.Targets.SequenceEqual([r.TargetSeat]) && global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(c.Parameters, out var s) && s == r.Source))
+        if (r.OwnerFrameId <= 0 || r.Source.OwnerSeat != r.ActorSeat || r.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash || _corePlayCardHistoryOperations.ViewAsRule(r.Source)is not { CostDestination: SkillProgramCardDestination.DrawPileBottom } || r.OriginalDecision.PlayerSeat != r.ActorSeat || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Any(id => !TousuiRequestCards(r.Source).Any(c => c.Id == id)) || _coreProgramEventHistoryOperations.ProgramEventHistory<TousuiRequestStartedEvent>().Count(e => e.OwnerFrameId == r.OwnerFrameId && e.InstructionIndex == r.InstructionIndex && e.RequestOp == r.RequestOp && e.ActorSeat == r.ActorSeat && e.TargetSeat == r.TargetSeat && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.OriginalPromptId == r.OriginalDecision.PromptId && e.OriginalRevision == r.OriginalDecision.Revision && e.OriginalDecisionHash == TousuiOriginalDecisionHash(r.OriginalDecision)) != 1 || !r.OriginalDecision.ValidTargetSeats.Contains(r.TargetSeat) || !r.OriginalDecision.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == TousuiRequestOpen && c.Parameters.GetValueOrDefault("frame-id") == r.OwnerFrameId.ToString(CultureInfo.InvariantCulture) && c.Parameters.GetValueOrDefault("actor-seat") == r.ActorSeat.ToString(CultureInfo.InvariantCulture) && c.Targets.SequenceEqual([r.TargetSeat]) && CoreGameEngineCardConversionsRuntime.TryReadConversionSource(c.Parameters, out var s) && s == r.Source))
             return false;
         var selected = _coreProgramEventHistoryOperations.ProgramEventHistory<TousuiRequestMaterialSelectedEvent>().Where(e => e.OwnerFrameId == r.OwnerFrameId && e.OriginalPromptId == r.OriginalDecision.PromptId).OrderBy(e => e.Index).ToArray();
         if (selected.Length != r.Selected.Count || !selected.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, selected.Length)) || !selected.Select(e => e.CardId).SequenceEqual(r.Selected) || selected.Any(e => e.ActorSeat != r.ActorSeat || e.From != _cardZonesOperations._cardZones.GetLocation(e.CardId)))
             return false;
         if (r.RequestOp is { } op)
-            return r.OriginalDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { TousuiRequest: { } stored } f && stored == r && f.Id == r.OwnerFrameId && f.InstructionIndex == r.InstructionIndex && f.GameplayHash == r.RequestGameplayHash && r.OriginalDecision.SourceSeat == f.OwnerSeat && r.OriginalDecision.TargetSeat == r.ActorSeat && r.OriginalDecision.SkillPrompt?.SkillId == f.SkillId && r.RequestSource == new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == op && TousuiProgramActor(f, op, r.ActorSeat) && TousuiProgramTargets(f, r.ActorSeat, op).Contains(r.TargetSeat);
+            return r.OriginalDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { TousuiRequest: { } stored } f && stored == r && f.Id == r.OwnerFrameId && f.InstructionIndex == r.InstructionIndex && f.GameplayHash == r.RequestGameplayHash && r.OriginalDecision.SourceSeat == f.OwnerSeat && r.OriginalDecision.TargetSeat == r.ActorSeat && r.OriginalDecision.SkillPrompt?.SkillId == f.SkillId && r.RequestSource == new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == op && TousuiProgramActor(f, op, r.ActorSeat) && TousuiProgramTargets(f, r.ActorSeat, op).Contains(r.TargetSeat);
         if (r.OriginalDecision.Kind == DecisionKind.QinglongCrescentBlade)
-            return r.OriginalDecision.IsPrivate && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack) && q.Attack.ResolutionId == r.OwnerFrameId && q.Attack.SourceSeat == r.ActorSeat && q.Attack.TargetSeat == r.TargetSeat && r.OriginalDecision.SourceSeat == r.ActorSeat && r.OriginalDecision.TargetSeat == r.TargetSeat && r.OriginalDecision.IncomingCard == q.Attack.EffectiveCardKind && r.OriginalDecision.SkillPrompt is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { TousuiRequest: { } native } u && u.Id == r.OwnerFrameId && native == r;
+            return r.OriginalDecision.IsPrivate && _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack) && q.Attack.ResolutionId == r.OwnerFrameId && q.Attack.SourceSeat == r.ActorSeat && q.Attack.TargetSeat == r.TargetSeat && r.OriginalDecision.SourceSeat == r.ActorSeat && r.OriginalDecision.TargetSeat == r.TargetSeat && r.OriginalDecision.IncomingCard == q.Attack.EffectiveCardKind && r.OriginalDecision.SkillPrompt is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { TousuiRequest: { } native } u && u.Id == r.OwnerFrameId && native == r;
         return r.OriginalDecision is { Kind: DecisionKind.RespondSlash, RequiredCardKind: CardKind.Slash, IncomingCard: CardKind.BorrowedSword } && _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true } borrowed && borrowed.ResolutionId == r.OwnerFrameId && borrowed.WeaponOwnerSeat == r.ActorSeat && borrowed.SlashTargetSeat == r.TargetSeat && r.OriginalDecision.SourceSeat == borrowed.SourceSeat && r.OriginalDecision.TargetSeat == r.TargetSeat && r.OriginalDecision.SkillPrompt is null && _coreCardUseLifecycleOperations.LifecycleCardUse(r.OwnerFrameId)?.TousuiRequest == r && _resolutionStackOperations._resolutionStack.LastOrDefault()is ResponseWindowFrame response && response.ParentFrameId == r.OwnerFrameId;
     }
 
@@ -257,7 +253,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
     [ProgramAnswer(TousuiRequestPick)]
     internal void AnswerTousuiRequest(PromptChoice selected)
     {
-        if (CurrentTousuiRequest()is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != r.ActorSeat || !TousuiRequestPickChoices(r).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (CurrentTousuiRequest()is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != r.ActorSeat || !TousuiRequestPickChoices(r).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Tousui private selection requires its real published actor and exact card identity.");
         var branch = selected.Parameters["branch"];
         if (branch == "card")
@@ -374,7 +370,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
         choice = null !;
         if (!HasTousuiRequestPrompt() || CurrentTousuiRequest()is not { } r || p.PlayerSeat != r.ActorSeat)
             return false;
-        choice = p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "finish") ?? p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[r.ActorSeat])).ThenBy(c => c.Cards[0]).FirstOrDefault() ?? p.Choices.Single(c => c.Parameters["branch"] == "cancel");
+        choice = p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "finish") ?? p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[r.ActorSeat])).ThenBy(c => c.Cards[0]).FirstOrDefault() ?? p.Choices.Single(c => c.Parameters["branch"] == "cancel");
         return true;
     }
 }

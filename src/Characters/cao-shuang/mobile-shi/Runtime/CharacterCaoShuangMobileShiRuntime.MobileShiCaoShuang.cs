@@ -1,25 +1,22 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoShuangMobileShiRuntime
 {
     internal const string ShiCaoShuangSheQuanSkill = ShiCaoShuangComposition.SheQuanSkill, ShiCaoShuangDianYiSkill = ShiCaoShuangComposition.DianYiSkill, ShiCaoShuangJianZhuanSkill = ShiCaoShuangComposition.JianZhuanSkill, ShiCaoShuangNiZunSkill = ShiCaoShuangComposition.NiZunSkill;
-    internal static CardConversionSource ShiCaoShuangSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiCaoShuangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasShiCaoShuangCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveShiCaoShuangNiZunUse);
 
     internal bool ShiCaoShuangHasSkill(int seat, string skillId) => _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants.Any(grant => grant.IsEnabled && grant.SkillId == skillId) || _coreNationalSkillsOperations.EnabledContentSkillIds(_coreMatchParticipantsPlayersAccess._players[seat]).Contains(skillId, StringComparer.Ordinal);
     internal int? ShiCaoShuangOwnerSeat => Enumerable.Range(0, _coreMatchParticipantsPlayersAccess._players.Count).Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && ShiCaoShuangHasSkill(seat, ShiCaoShuangNiZunSkill)).Cast<int?>().FirstOrDefault();
 
-    SkillProgramStepOutcome global::CardGame.Core.IShiCaoShuangHost.ResolveSheQuan(ProgramSkillFrame frame) => BeginShiCaoShuang(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiCaoShuangHost.ResolveDianYi(ProgramSkillFrame frame) => BeginShiCaoShuang(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiCaoShuangHost.ResolveJianZhuan(ProgramSkillFrame frame) => BeginShiCaoShuang(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiCaoShuangHost.ResolveNiZunStash(ProgramSkillFrame frame) => BeginShiCaoShuang(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiCaoShuangHost.ResolveNiZunUse(ProgramSkillFrame frame) => BeginShiCaoShuang(frame);
+    SkillProgramStepOutcome IShiCaoShuangHost.ResolveSheQuan(ProgramSkillFrame frame) => BeginShiCaoShuang(frame);
+    SkillProgramStepOutcome IShiCaoShuangHost.ResolveDianYi(ProgramSkillFrame frame) => BeginShiCaoShuang(frame);
+    SkillProgramStepOutcome IShiCaoShuangHost.ResolveJianZhuan(ProgramSkillFrame frame) => BeginShiCaoShuang(frame);
+    SkillProgramStepOutcome IShiCaoShuangHost.ResolveNiZunStash(ProgramSkillFrame frame) => BeginShiCaoShuang(frame);
+    SkillProgramStepOutcome IShiCaoShuangHost.ResolveNiZunUse(ProgramSkillFrame frame) => BeginShiCaoShuang(frame);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 67900, SkillProgramEffectOp.ResolveShiCaoShuangNiZunUse)]
     internal bool CanStartShiCaoShuangNiZunUse(CharacterState owner, string skill) => skill != ShiCaoShuangNiZunSkill || ShiCaoShuangStashedIds(owner.Seat).Count > 0;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 67900, SkillProgramEffectOp.ResolveShiCaoShuangSheQuan, SkillProgramEffectOp.ResolveShiCaoShuangDianYi, SkillProgramEffectOp.ResolveShiCaoShuangJianZhuan, SkillProgramEffectOp.ResolveShiCaoShuangNiZunStash)]
@@ -238,7 +235,7 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
     [ProgramAnswer(ShiCaoShuangComposition.ProgramAction)]
     internal void AnswerShiCaoShuang(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiCaoShuang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiCaoShuangChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiCaoShuang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiCaoShuangChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Shi Cao Shuang choice lost its current frame or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -469,7 +466,7 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 67900)]
     internal bool ContinuePaidShiCaoShuang(ProgramSkillFrame f) => f.ShiCaoShuang is { Stage: > 0 };
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 67900)]
-    internal int ShiCaoShuangNiZunDamagePenalty(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int ShiCaoShuangNiZunDamagePenalty(GameEngine.IDamageAttempt attack)
     {
         var target = attack.TargetSeat;
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !ShiCaoShuangHasSkill(target, ShiCaoShuangNiZunSkill) || !ShiCaoShuangNiZunDamagePenaltyPending(target))

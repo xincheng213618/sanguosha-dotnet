@@ -1,21 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoTuOlRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IWeijieHost.Resolve(ProgramSkillFrame f) => ResolveWeijie(f);
+    SkillProgramStepOutcome IWeijieHost.Resolve(ProgramSkillFrame f) => ResolveWeijie(f);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 27462, SkillProgramEffectOp.ResolveWeijieRequiredBasicRequest)]
     internal bool IsWeijieOrdinaryActivation(ProgramActivationLegalityContext context) => false;
-    internal static string WeijieDecisionHash(PendingDecision p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_tu_ol_Weijie.WeijieDecisionHash(p);
-    internal static bool SameWeijieNeed(WeijieNeed a, WeijieNeed b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_tu_ol_Weijie.SameWeijieNeed(a, b);
+    internal static string WeijieDecisionHash(PendingDecision p) => RuntimeSkills.RuntimeRules_guo_tu_ol_Weijie.WeijieDecisionHash(p);
+    internal static bool SameWeijieNeed(WeijieNeed a, WeijieNeed b) => RuntimeSkills.RuntimeRules_guo_tu_ol_Weijie.SameWeijieNeed(a, b);
     internal bool IsWeijieAnswer(ChoiceId id) => _corePendingDecisionPolicyPipelineOperations._pendingDecision?.Choices.Any(c => c.Id == id && (c.Parameters.ContainsKey(WeijieOpen) || c.Parameters.ContainsKey(WeijieChoice))) == true;
     internal CommandResult SubmitWeijieAnswer(int actor, PromptId prompt, ChoiceId id)
     {
@@ -39,8 +33,8 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         var p = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("Weijie has no real native request.");
         var n = CaptureWeijieNeed(p) ?? throw new InvalidOperationException("Weijie lost its exact native requester.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(c);
-        if (!p.Choices.Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])) || !WeijieSources(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]).Any(s => s.Source == source) || !WeijieVictims(p.PlayerSeat).Any() || !WeijieOutputs(n).Any())
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(c);
+        if (!p.Choices.Any(x => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])) || !WeijieSources(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]).Any(s => s.Source == source) || !WeijieVictims(p.PlayerSeat).Any() || !WeijieOutputs(n).Any())
             throw new InvalidOperationException("Weijie cannot replace an unavailable native request or source.");
         var hash = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.GameplayHash;
         var f = new ProgramSkillFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, p.PlayerSeat, source.SkillId, source.BindingId, hash, 0, [], [])
@@ -125,7 +119,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
             return;
         }
 
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Weijie: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WeijieChoices(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Weijie: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WeijieChoices(f).Any(x => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
             throw new InvalidOperationException("Weijie changed its exact private declaration or opaque native slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -160,7 +154,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         if (c.Parameters.GetValueOrDefault("source-zone") != CardZoneKind.Hand.ToString() || !int.TryParse(c.Parameters.GetValueOrDefault("slot-index"), out var slot))
             throw new InvalidOperationException("Weijie lost its genuine opaque Hand slot.");
         var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.Hand(victim))[slot];
-        var name = global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[victim], card));
+        var name = CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[victim], card));
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Weijie = r with { Stage = WeijieStage.CostChildren, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, [card.Id], new(WeijieDiscardReason), (batch, moves) =>
@@ -190,7 +184,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
 
         if (DrainWeijie(f))
             return;
-        var matched = r.Paid is { } p && p.EffectiveName == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(p.OutputKind);
+        var matched = r.Paid is { } p && p.EffectiveName == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(p.OutputKind);
         var legal = matched && WeijieNativeNeedCurrent(r) && WeijieNativeLegal(r.Need, r.OutputKind!.Value, r.TargetSeat!.Value);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WeijieAttemptResolvedEvent(f.Id, matched, legal));
         FinishWeijieAttempt(f, legal);

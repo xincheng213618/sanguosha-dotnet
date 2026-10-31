@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ConvertingGiftProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineConvertingGiftsEntries> getCoreGameEngineConvertingGiftsRuntime, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState) : IConvertingGiftProgramHost
+internal sealed class ConvertingGiftProgramCapability(Func<RuntimeEntries.CoreGameEngineConvertingGiftsEntries> getCoreGameEngineConvertingGiftsRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState) : IConvertingGiftProgramHost
 {
     public SkillProgramStepOutcome GiveSelectedOwnedCardAndDamage(ProgramSkillFrame f, int limit) => getCoreGameEngineConvertingGiftsRuntime().BeginConvertingGiftDamage(f, limit);
     public SkillProgramStepOutcome ObserveDamageSourceHandAndGive(ProgramSkillFrame f, int limit) => getCoreGameEngineConvertingGiftsRuntime().BeginDamageSourceObservationGift(f, limit);

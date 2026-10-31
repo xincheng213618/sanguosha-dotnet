@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaHuiOlRuntime
@@ -18,21 +13,21 @@ internal sealed partial class CharacterSimaHuiOlRuntime
         return !(features.HasOperation(SkillProgramEffectOp.DistributeTopCardsAfterElementalChainOrigin) && !TrySimaHuiChainOrigin(candidate.OwnerSeat, trigger, context, out _));
     }
 
-    internal bool CanOfferSimaHuiDamage(int owner, SkillProgramTrigger trigger, global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool CanOfferSimaHuiDamage(int owner, SkillProgramTrigger trigger, GameEngine.IDamageAttempt attack)
     {
         if (!ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.DistributeTopCardsAfterElementalChainOrigin))
             return true;
         return TrySimaHuiOriginalChainMembers(attack, out _);
     }
 
-    internal bool TrySimaHuiOriginalChainMembers(global::CardGame.Core.GameEngine.IDamageAttempt attack, out int[] members)
+    internal bool TrySimaHuiOriginalChainMembers(GameEngine.IDamageAttempt attack, out int[] members)
     {
         members = [];
         if (!attack.DamageWasApplied || attack.DamageAmount <= 0 || attack.IsChainPropagation || _coreNativeCardClassificationsOperations.GetDamageNature(attack) == DamageNature.Normal || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat))
             return false;
         IReadOnlyList<int> propagated;
         int index;
-        if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (attack is NativeOwners.ProgramAttackHandle)
         {
             var state = _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId);
             if (state.ChainedTargetSeats is null)
@@ -40,7 +35,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
             propagated = state.ChainedTargetSeats;
             index = state.ChainedTargetIndex;
         }
-        else if (attack is global::CardGame.Core.NativeOwners.CardAttackHandle)
+        else if (attack is NativeOwners.CardAttackHandle)
         {
             var state = _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId);
             propagated = state.ChainedTargetSeats;

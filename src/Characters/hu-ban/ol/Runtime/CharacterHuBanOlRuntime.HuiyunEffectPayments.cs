@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuBanOlRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterHuBanOlRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27383)]
     internal void RecordHuiyunEffectPayment(IGameEvent fact)
     {
-        if (!HasHuBanCapability || fact is not FireAttackResolvedEvent { CausedDamage: true, MatchingDiscardCardId: { } card } e || _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)is not { Action: { } action, FireAttackSelection.RevealedCardId: { } revealed } use || use.ColorFireAttack?.PaidCardId is not null || use.MouZhitianPayment is not null || !TryGetHuiyunFirePayment(use, out var initial, out _) || revealed != e.RevealedCardId || use.SourceSeat != e.SourceSeat || global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use) != e.TargetSeat)
+        if (!HasHuBanCapability || fact is not FireAttackResolvedEvent { CausedDamage: true, MatchingDiscardCardId: { } card } e || _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)is not { Action: { } action, FireAttackSelection.RevealedCardId: { } revealed } use || use.ColorFireAttack?.PaidCardId is not null || use.MouZhitianPayment is not null || !TryGetHuiyunFirePayment(use, out var initial, out _) || revealed != e.RevealedCardId || use.SourceSeat != e.SourceSeat || CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use) != e.TargetSeat)
             return;
         var finish = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == card && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.FireAttackDiscardFinished && m.Sequence > initial.Sequence);
         var hand = finish is null ? null : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == card && m.From == CardLocation.Hand(e.SourceSeat) && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.FireAttackDiscard && m.Sequence > initial.Sequence && m.Sequence < finish.Sequence);

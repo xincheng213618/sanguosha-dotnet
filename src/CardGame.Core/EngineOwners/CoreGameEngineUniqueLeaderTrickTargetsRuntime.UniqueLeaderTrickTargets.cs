@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -16,7 +13,7 @@ internal sealed partial class CoreGameEngineUniqueLeaderTrickTargetsRuntime
 
     internal void CaptureUniqueLeaderTrickQualification(CardActionContext action, SkillProgramTriggerWindow window)
     {
-        if (!TracksUniqueLeaderTrickTargets || window != SkillProgramTriggerWindow.CardUseTargetsFinalized || action.Type != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind) || action.ResponderSeat is not null || action.OpponentSeat is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Action?.ActionId != action.ActionId || use.SourceSeat != action.ActorSeat || use.CardKind != action.EffectiveKind || !use.TargetSeats.SequenceEqual(action.TargetSeats))
+        if (!TracksUniqueLeaderTrickTargets || window != SkillProgramTriggerWindow.CardUseTargetsFinalized || action.Type != CardActionType.Use || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind) || action.ResponderSeat is not null || action.OpponentSeat is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Action?.ActionId != action.ActionId || use.SourceSeat != action.ActorSeat || use.CardKind != action.EffectiveKind || !use.TargetSeats.SequenceEqual(action.TargetSeats))
             return;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<UniqueLeaderTrickQualificationEvent>().Where(e => e.CardUseFrameId == use.Id).ToArray();
         if (history.Length != 0)
@@ -45,7 +42,7 @@ internal sealed partial class CoreGameEngineUniqueLeaderTrickTargetsRuntime
     {
         use = null !;
         window = null !;
-        return context.CardUse is { } identity && _coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(identity.ActorSeat, context, out use, out window) && window.Continuation == ProgramCardContinuation.FinalizedTrick && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) && UniqueLeaderTrickQualification(use)is { } qualification && qualification.ActorSeat == identity.ActorSeat;
+        return context.CardUse is { } identity && _coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(identity.ActorSeat, context, out use, out window) && window.Continuation == ProgramCardContinuation.FinalizedTrick && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) && UniqueLeaderTrickQualification(use)is { } qualification && qualification.ActorSeat == identity.ActorSeat;
     }
 
     internal bool UniqueLeaderTrickEligible(CardUseFrame use, int owner, SkillProgramEffectOp operation)
@@ -56,7 +53,7 @@ internal sealed partial class CoreGameEngineUniqueLeaderTrickTargetsRuntime
 
     internal bool CanBeUniqueLeaderTrickTarget(CardUseFrame use, CharacterState target)
     {
-        if (use.Action is not { } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || !target.IsAlive || _coreCardUseModulesOperations.HasTurnCardTargetRestriction(action.ActorSeat, SkillProgramCardTargetRestriction.SelfOnly) && target.Seat != action.ActorSeat)
+        if (use.Action is not { } action || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || !target.IsAlive || _coreCardUseModulesOperations.HasTurnCardTargetRestriction(action.ActorSeat, SkillProgramCardTargetRestriction.SelfOnly) && target.Seat != action.ActorSeat)
             return false;
         if (use.CardKind == CardKind.UnexpectedAssault)
             return !action.EffectiveDesignatedTargetSeats.Contains(target.Seat) && _coreProgramCardUseRolesOperations.CanBeProgramCardUseRoleTarget(use, target) && !_coreHandComparisonOperations.IsSelfTargetForbiddenAction(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], use.CardKind, [target.Seat]);
@@ -159,7 +156,7 @@ internal sealed partial class CoreGameEngineUniqueLeaderTrickTargetsRuntime
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A trick target choice lost its owning program.");
         var draft = frame.UniqueLeaderTrickTargetDraft ?? throw new InvalidOperationException("The trick target draft is missing.");
         var choice = draft.Choices.SingleOrDefault(c => c.Id == selected.Id);
-        if (choice is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]))
+        if (choice is null || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]))
             throw new InvalidOperationException("The trick target answer changed its published choice.");
         var use = RequireUniqueLeaderTrickParent(frame, out _);
         var targets = draft.OriginalTargetSeats;
@@ -199,18 +196,18 @@ internal sealed partial class CoreGameEngineUniqueLeaderTrickTargetsRuntime
             var beneficial = use.CardKind is CardKind.DrawTwo or CardKind.PeachGarden or CardKind.FiveGrains || use.CardKind == CardKind.IronChain && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsChained;
             // A healthy joining player may trade one possible native damage for two cards.
             // Public HP alone is used; no foreign hand identities inform this choice.
-            var affordable = global::CardGame.Core.EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(use.CardKind) && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Hp > 1;
+            var affordable = CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(use.CardKind) && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Hp > 1;
             return beneficial || affordable ? decision.Choices.First(c => c.Targets.Count > 0) : decision.Choices.Single(c => c.Targets.Count == 0);
         }
 
         bool Helpful(int target) => use.CardKind is CardKind.DrawTwo or CardKind.PeachGarden or CardKind.FiveGrains || use.CardKind == CardKind.IronChain && _coreMatchParticipantsPlayersAccess._players[target].IsChained;
-        return decision.Choices.Where(c => c.Targets.Count > 0).FirstOrDefault(c => use.CardKind == CardKind.BorrowedSword ? !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[1]]) : Helpful(c.Targets[0]) == global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? decision.Choices.Single(c => c.Targets.Count == 0);
+        return decision.Choices.Where(c => c.Targets.Count > 0).FirstOrDefault(c => use.CardKind == CardKind.BorrowedSword ? !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[1]]) : Helpful(c.Targets[0]) == CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? decision.Choices.Single(c => c.Targets.Count == 0);
     }
 
     internal bool IsUniqueLeaderTrickTargetFact(CardUseFrame use, UniqueLeaderTrickTargetResolvedEvent fact, IReadOnlyList<int> originalTargets)
     {
         var normalizationOnly = use.CardKind == CardKind.DrawTwo && fact.AddedTargetSeats.Count == 0 && originalTargets is [var self] && self == UniqueLeaderTrickQualification(use)?.ActorSeat;
-        if (use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || fact.CardUseFrameId != use.Id || fact.ActionId != action.ActionId || fact.InstructionIndex != 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(fact.Source.OwnerSeat) || !UniqueLeaderTrickTargetContract.IsTargetOperation(fact.Operation) || !fact.OriginalTargetSeats.SequenceEqual(originalTargets) || !normalizationOnly && fact.AddedTargetSeats.Count != (use.CardKind == CardKind.BorrowedSword ? 2 : 1) || fact.AddedTargetSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || !normalizationOnly && (use.CardKind == CardKind.BorrowedSword ? originalTargets.Where((_, i) => i % 2 == 0) : originalTargets).Contains(fact.AddedTargetSeats[0]) || !fact.ResultTargetSeats.SequenceEqual(originalTargets.Concat(fact.AddedTargetSeats)) || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program is not { } program || program.GameplayHash != fact.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == fact.Source.BindingId)is not { } trigger || trigger.Effects is not [{ } effect] || effect.Op != fact.Operation)
+        if (use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || fact.CardUseFrameId != use.Id || fact.ActionId != action.ActionId || fact.InstructionIndex != 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(fact.Source.OwnerSeat) || !UniqueLeaderTrickTargetContract.IsTargetOperation(fact.Operation) || !fact.OriginalTargetSeats.SequenceEqual(originalTargets) || !normalizationOnly && fact.AddedTargetSeats.Count != (use.CardKind == CardKind.BorrowedSword ? 2 : 1) || fact.AddedTargetSeats.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || !normalizationOnly && (use.CardKind == CardKind.BorrowedSword ? originalTargets.Where((_, i) => i % 2 == 0) : originalTargets).Contains(fact.AddedTargetSeats[0]) || !fact.ResultTargetSeats.SequenceEqual(originalTargets.Concat(fact.AddedTargetSeats)) || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program is not { } program || program.GameplayHash != fact.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == fact.Source.BindingId)is not { } trigger || trigger.Effects is not [{ } effect] || effect.Op != fact.Operation)
             return false;
         var qualification = UniqueLeaderTrickQualification(use);
         if (qualification is null || (fact.Operation == SkillProgramEffectOp.OfferUniqueLargestHandTrickTargetAddition ? qualification.UniqueLargestHandSeat != qualification.ActorSeat : qualification.OriginalPrimaryTargetCount != 1 || qualification.OriginalSinglePrimaryTargetSeat == fact.Source.OwnerSeat || qualification.OriginalSinglePrimaryTargetSeat != qualification.UniqueLargestHpSeat || !normalizationOnly && fact.AddedTargetSeats[0] != fact.Source.OwnerSeat))
@@ -220,7 +217,7 @@ internal sealed partial class CoreGameEngineUniqueLeaderTrickTargetsRuntime
     }
 
     internal bool HasUniqueLeaderTrickTargetTail(CardUseFrame use) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<UniqueLeaderTrickTargetResolvedEvent>().Any(e => e.AddedTargetSeats.Count > 0 && IsUniqueLeaderTrickTargetFact(use, e, e.OriginalTargetSeats) && use.Action!.TargetSeats.Count >= e.ResultTargetSeats.Count && use.Action.TargetSeats.Take(e.ResultTargetSeats.Count).SequenceEqual(e.ResultTargetSeats) && use.TargetSeats.SequenceEqual(use.Action.TargetSeats));
-    SkillProgramStepOutcome global::CardGame.Core.IUniqueLeaderTrickTargetHost.OfferUniqueLargestHandTrickTargetAddition(ProgramSkillFrame frame) => OfferUniqueLeaderTrickTarget(frame, SkillProgramEffectOp.OfferUniqueLargestHandTrickTargetAddition);
-    SkillProgramStepOutcome global::CardGame.Core.IUniqueLeaderTrickTargetHost.JoinUniqueLargestHpTrickTargetAndDrawAfterDamage(ProgramSkillFrame frame) => OfferUniqueLeaderTrickTarget(frame, SkillProgramEffectOp.JoinUniqueLargestHpTrickTargetAndDrawAfterDamage);
-    SkillProgramStepOutcome global::CardGame.Core.IUniqueLeaderTrickTargetHost.DrawAfterJoinedTrickDamage(ProgramSkillFrame frame) => _coreJoinedTrickDamageRewardsOperations.BeginJoinedTrickDamageReward(frame);
+    SkillProgramStepOutcome IUniqueLeaderTrickTargetHost.OfferUniqueLargestHandTrickTargetAddition(ProgramSkillFrame frame) => OfferUniqueLeaderTrickTarget(frame, SkillProgramEffectOp.OfferUniqueLargestHandTrickTargetAddition);
+    SkillProgramStepOutcome IUniqueLeaderTrickTargetHost.JoinUniqueLargestHpTrickTargetAndDrawAfterDamage(ProgramSkillFrame frame) => OfferUniqueLeaderTrickTarget(frame, SkillProgramEffectOp.JoinUniqueLargestHpTrickTargetAndDrawAfterDamage);
+    SkillProgramStepOutcome IUniqueLeaderTrickTargetHost.DrawAfterJoinedTrickDamage(ProgramSkillFrame frame) => _coreJoinedTrickDamageRewardsOperations.BeginJoinedTrickDamageReward(frame);
 }

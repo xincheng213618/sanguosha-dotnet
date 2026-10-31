@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_yan_jun_ol_Guanchao_Programs
 {
     internal static bool MatchesGuanchaoPattern(IReadOnlyList<int?> ranks, bool ascending)

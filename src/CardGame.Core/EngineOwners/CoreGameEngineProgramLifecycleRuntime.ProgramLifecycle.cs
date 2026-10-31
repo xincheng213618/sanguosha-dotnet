@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramLifecycleRuntime
@@ -69,7 +65,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         return ProgramInstructionResolver.Default.Resolve(program, ProgramInstructionSourceKind.Trigger, triggerId).Trigger!;
     }
 
-    internal static string GetProgramBindingId(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame);
+    internal static string GetProgramBindingId(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame);
     internal void SetProgramCardSet(long frameId, string bind, IReadOnlyList<int> cardIds, SkillProgramCardSetVisibility visibility, IReadOnlyList<CardLocation>? sourceLocations = null, Suit? frozenRevealedSuit = null, int? selectionActorSeat = null) => _programBoundCardOperations.Get().SetProgramCardSet(frameId, bind, cardIds, visibility, sourceLocations, frozenRevealedSuit, selectionActorSeat);
     internal ProgramSkillCardSetBinding GetProgramCardSet(ProgramSkillFrame frame, string bind) => ProgramBoundCardRuntime.GetProgramCardSet(frame, bind);
     internal SkillProgramStepOutcome ScheduleProgramPhase(ProgramSkillFrame frame, TurnPhase phase, SkillProgramPhaseContinuation continuation, int? beneficiarySeat = null) => _programPhaseSchedulingOperations.Get().ScheduleProgramPhase(frame, phase, continuation, beneficiarySeat);
@@ -159,7 +155,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeGuanduForeignDrawObservers(CharacterState subject, IReadOnlyList<ProgramTriggerCandidate> existing, out IReadOnlyDictionary<int, SkillProgramTriggerFacts>? participants) => _programDrawDiscardWindowEntryOperations.Get().IncludeGuanduForeignDrawObservers(subject, existing, out participants);
     internal bool TryBeginDrawPhaseProgramWindow(CharacterState owner, bool skipPlayPhaseAfterDraw) => _programDrawDiscardWindowEntryOperations.Get().TryBeginDrawPhase(owner, skipPlayPhaseAfterDraw);
     internal bool TryBeginAfterNormalDrawProgramWindow(CharacterState owner) => _programDrawDiscardWindowEntryOperations.Get().TryBeginAfterNormalDraw(owner);
-    internal bool TryBeginDrawPhaseEndedProgramWindow(CharacterState owner, global::CardGame.Core.GameEngine.DelayedTurnEffects delayedEffects) => _programDrawDiscardWindowEntryOperations.Get().TryBeginDrawPhaseEnded(owner, (int)delayedEffects);
+    internal bool TryBeginDrawPhaseEndedProgramWindow(CharacterState owner, GameEngine.DelayedTurnEffects delayedEffects) => _programDrawDiscardWindowEntryOperations.Get().TryBeginDrawPhaseEnded(owner, (int)delayedEffects);
     internal bool TryBeginDiscardPhaseProgramWindow(CharacterState owner) => _programDrawDiscardWindowEntryOperations.Get().TryBeginDiscardPhase(owner);
     internal bool TryBeginDiscardPhaseEndedProgramWindow(CharacterState phaseOwner) => _programDrawDiscardWindowEntryOperations.Get().TryBeginDiscardPhaseEnded(phaseOwner);
     internal bool TryBeginTurnEndingBoundary(CharacterState owner) => _programPhaseBoundaryOperations.Get().TryBeginTurnEndingBoundary(owner);
@@ -395,7 +391,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         var skill = _contentRegistryOperations._contentRegistry!.GetSkill(skillId);
         var trigger = ProgramInstructionResolver.Default.Resolve(skill.Program!, ProgramInstructionSourceKind.Trigger, bindingId).Trigger!;
         var owner = _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat];
-        var publicContext = global::CardGame.Core.EngineOwners.CoreGameEnginePhaseHandExtraTurnAiRuntime.WithPhaseHandExtraTurnTargetPricing(WithProgramConditionFacts(CreateProgramAiPublicContext(trigger, owner, decision.PlayerSeat), owner, skillId, skillInstanceId), skill.Program!, trigger);
+        var publicContext = CoreGameEnginePhaseHandExtraTurnAiRuntime.WithPhaseHandExtraTurnTargetPricing(WithProgramConditionFacts(CreateProgramAiPublicContext(trigger, owner, decision.PlayerSeat), owner, skillId, skillInstanceId), skill.Program!, trigger);
         var estimate = EstimateCompositionForAi(owner, trigger.Effects, publicContext, windowContext: pendingContext).Estimate;
         estimate = _corePhaseHandExtraTurnAiOperations.IncludePhaseHandExtraTurnDeclarationForAi(estimate, owner, skillId, skillInstanceId, skill.Program!, trigger, publicContext, pendingContext);
         var shouldActivate = !estimate.IsSelfLethal && estimate.Score > 0d;
@@ -427,7 +423,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
             var skill = _contentRegistryOperations._contentRegistry!.GetSkill(choice.Parameters["skill-id"]);
             var trigger = ProgramInstructionResolver.Default.Resolve(skill.Program!, ProgramInstructionSourceKind.Trigger, choice.Parameters["binding-id"]).Trigger!;
             var candidateContext = GetPendingProgramTriggerCandidate().Context;
-            var publicContext = global::CardGame.Core.EngineOwners.CoreGameEnginePhaseHandExtraTurnAiRuntime.WithPhaseHandExtraTurnTargetPricing(WithProgramConditionFacts(CreateProgramAiPublicContext(trigger, owner, decision.PlayerSeat), owner, choice.Parameters["skill-id"], choice.Parameters["skill-instance-id"]), skill.Program!, trigger);
+            var publicContext = CoreGameEnginePhaseHandExtraTurnAiRuntime.WithPhaseHandExtraTurnTargetPricing(WithProgramConditionFacts(CreateProgramAiPublicContext(trigger, owner, decision.PlayerSeat), owner, choice.Parameters["skill-id"], choice.Parameters["skill-instance-id"]), skill.Program!, trigger);
             var estimate = EstimateCompositionForAi(owner, trigger.Effects, publicContext, windowContext: candidateContext).Estimate;
             estimate = _corePhaseHandExtraTurnAiOperations.IncludePhaseHandExtraTurnDeclarationForAi(estimate, owner, choice.Parameters["skill-id"], choice.Parameters["skill-instance-id"], skill.Program!, trigger, publicContext, candidateContext);
             var action = new LegalAction(LegalActionKind.UseProgramSkill, null, null, $"发动【{(skill.Name)}】");
@@ -603,7 +599,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         if (effects.Any(e => e.Op == SkillProgramEffectOp.DiscardDamageTargetAndClaimMount) && windowContext?.TargetSeat is { } mountTarget)
             publishedTargets = [mountTarget];
         GameSnapshot? targetSnapshot = null;
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineFinalTargetSlashRuntime.HasFinalTargetSlashEffects(effects) && windowContext is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, Facts: { } finalFacts, TargetSeat: { } finalSeat })
+        if (CoreGameEngineFinalTargetSlashRuntime.HasFinalTargetSlashEffects(effects) && windowContext is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, Facts: { } finalFacts, TargetSeat: { } finalSeat })
         {
             targetSnapshot = _corePlayerViewProjectionOperations.CreateSnapshot(owner.Seat);
             publicContext = publicContext with
@@ -622,7 +618,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         var snapshot = targetSnapshot ?? _corePlayerViewProjectionOperations.CreateSnapshot(owner.Seat);
         return targets.Select(targetSeat =>
         {
-            var estimate = ProgramCompositionAi.Estimate(effects, context, owner.IsFaceDown, publicContext with { SelectedTarget = _corePublicDamagePredictionOperations.CreateAiSkillContext(_coreMatchParticipantsPlayersAccess._players[targetSeat], owner.Seat, snapshot), HasOwnedCardCategory = (zones, categories, kinds) => zones.Contains(CardZoneKind.Equipment) && _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Any(card => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardFilter(card.Kind, categories, kinds)), AttackRangeCoverageDecreased = _ => _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Any(card => _coreProgramCardPaymentsOperations.WouldEquipmentRemovalReduceCoverage(targetSeat, card.Id)) });
+            var estimate = ProgramCompositionAi.Estimate(effects, context, owner.IsFaceDown, publicContext with { SelectedTarget = _corePublicDamagePredictionOperations.CreateAiSkillContext(_coreMatchParticipantsPlayersAccess._players[targetSeat], owner.Seat, snapshot), HasOwnedCardCategory = (zones, categories, kinds) => zones.Contains(CardZoneKind.Equipment) && _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Any(card => CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardFilter(card.Kind, categories, kinds)), AttackRangeCoverageDecreased = _ => _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Any(card => _coreProgramCardPaymentsOperations.WouldEquipmentRemovalReduceCoverage(targetSeat, card.Id)) });
             var targetValue = _coreAiBrainsAiBrainsAccess._aiBrains[owner.Seat].ScoreProgramTarget(snapshot, targetSeat, estimate.Hint);
             return (Estimate: estimate with { Score = estimate.Score + targetValue }, TargetSeat: (int? )targetSeat);
         }).OrderByDescending(candidate => candidate.Estimate.Score).ThenBy(candidate => candidate.TargetSeat).First();
@@ -650,7 +646,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
             ChoiceResult = bind => frame.ChoiceBindings.SingleOrDefault(item => item.Name == bind)?.OptionId
         };
         if (frame.TriggerId is { } triggerId)
-            publicContext = global::CardGame.Core.EngineOwners.CoreGameEnginePhaseHandExtraTurnAiRuntime.WithPhaseHandExtraTurnTargetPricing(publicContext, program, ProgramInstructionResolver.Default.Resolve(program, ProgramInstructionSourceKind.Trigger, triggerId).Trigger!);
+            publicContext = CoreGameEnginePhaseHandExtraTurnAiRuntime.WithPhaseHandExtraTurnTargetPricing(publicContext, program, ProgramInstructionResolver.Default.Resolve(program, ProgramInstructionSourceKind.Trigger, triggerId).Trigger!);
         var selected = EstimateCompositionForAi(owner, effects, publicContext, targets);
         return decision.Choices.First(choice => choice.Targets.Contains(selected.TargetSeat ?? throw new InvalidOperationException("A configured target selection has no published candidate.")));
     }
@@ -737,7 +733,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         SkillProgramTriggerWindow.SelfDyingResponse,
         SkillProgramTriggerWindow.DyingResponse
     }.Where(window => window != SkillProgramTriggerWindow.SelfDyingResponse || responder.Seat == dying.VictimSeat).SelectMany(window => CollectProgramTriggerCandidates(responder, window)).Where(candidate => GetProgramTrigger(candidate).Window != SkillProgramTriggerWindow.SelfDyingResponse || !dying.AttemptedSelfDyingBindings.Contains(SelfDyingBindingKey(candidate.SkillId, candidate.BindingId, candidate.SkillInstanceId))).Where(candidate => CanRunProgramTrigger(candidate, CreateDyingProgramContext(dying, candidate))).ToArray();
-    internal static string SelfDyingBindingKey(string skillId, string bindingId, string skillInstanceId) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.SelfDyingBindingKey(skillId, bindingId, skillInstanceId);
+    internal static string SelfDyingBindingKey(string skillId, string bindingId, string skillInstanceId) => RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.SelfDyingBindingKey(skillId, bindingId, skillInstanceId);
     internal bool TryBeginMandatorySelfDyingProgram(DyingFrame dying)
     {
         if (dying.ResponderIndex >= dying.ResponderSeats.Count || dying.ResponderSeat != dying.VictimSeat)
@@ -753,7 +749,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
     internal void BeginDyingProgramBinding(ProgramTriggerCandidate candidate, DyingFrame dying) => BeginProgramBinding(candidate, CreateDyingProgramContext(dying, candidate));
     internal ProgramSkillWindowContext CreateAfterDamageProgramContext(DamageTriggerWindowFrame damage, ProgramTriggerCandidate candidate)
     {
-        if (global::CardGame.Core.EngineOwners.CharacterTaoQianOlRuntime.IsZhaohuoTrigger(GetProgramTrigger(candidate)))
+        if (CharacterTaoQianOlRuntime.IsZhaohuoTrigger(GetProgramTrigger(candidate)))
             return _characterTaoQianOlOperations.CreateZhaohuoDamageContext(damage, candidate);
         if (_characterXiZhiCaiOlOperations.IsXianfuEchoTrigger(GetProgramTrigger(candidate)))
             return _characterXiZhiCaiOlOperations.CreateXianfuDamageContext(damage, candidate);
@@ -781,7 +777,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
             DamageTargetIsOther = candidate.OwnerSeat != attack.TargetSeat,
             AppliedDamageAmount = _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesTriggerValue(SkillProgramTriggerValueKind.AppliedDamageAmount) ? attack.DamageAmount : null,
             DamageTargetIsPublicTeamEnemy = _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesTriggerCondition(SkillProgramTriggerConditionKind.DamageTargetIsPublicTeamEnemy) ? candidate.OwnerSeat != attack.TargetSeat && owner.TeamRevealed && _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].TeamRevealed && _coreTeamActivityProgramsOperations.PublicTeamEnemy(candidate.OwnerSeat, _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat]) : null,
-            DamageFromOwnerTrickUse = _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesTriggerCondition(SkillProgramTriggerConditionKind.DamageFromOwnerTrickUse) ? !attack.IsSourceLess && !attack.IsChainPropagation && attack.SourceSeat == candidate.OwnerSeat && attack.CardUserSeat == candidate.OwnerSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action is { Type: CardActionType.Use } trickUse && trickUse.ActorSeat == candidate.OwnerSeat && trickUse.EffectiveKind == attack.EffectiveCardKind && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(trickUse.EffectiveKind) == SkillProgramCardCategory.Trick : null,
+            DamageFromOwnerTrickUse = _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesTriggerCondition(SkillProgramTriggerConditionKind.DamageFromOwnerTrickUse) ? !attack.IsSourceLess && !attack.IsChainPropagation && attack.SourceSeat == candidate.OwnerSeat && attack.CardUserSeat == candidate.OwnerSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action is { Type: CardActionType.Use } trickUse && trickUse.ActorSeat == candidate.OwnerSeat && trickUse.EffectiveKind == attack.EffectiveCardKind && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(trickUse.EffectiveKind) == SkillProgramCardCategory.Trick : null,
             DamageSourceIsOwner = !attack.IsSourceLess && candidate.OwnerSeat == attack.SourceSeat,
             EventSourceMarkerCounts = _coreAttributedMarkerEventsOperations.HasAttributedEventOperations() && !attack.IsSourceLess && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) ? new Dictionary<PlayerMarkerKind, int>(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].Markers) : null,
             DamageSourceFactionId = attack.IsSourceLess ? null : _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat]),

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CoreGameEngineSourceExecutionerHuanfuRuntime
 {
     internal const string SourceHuanfuDiscard = "skill-program.source-huanfu-3156.discard";
     internal const string SourceHuanfuDraw = "skill-program.source-huanfu-3156.draw";
-    internal static CardConversionSource SourceHuanfuSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal CardUseFrame? SourceHuanfuUse(ProgramSkillWindowContext context) => context.CardUse is { } card ? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == card.ParentCardUseFrameId && u.Action is { Type: CardActionType.Use } a && a.ActionId == card.CardActionId && a.ActorSeat == card.ActorSeat && u.SourceSeat == card.ActorSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && u.CardKind == card.EffectiveKind) : null;
+    internal static CardConversionSource SourceHuanfuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardUseFrame? SourceHuanfuUse(ProgramSkillWindowContext context) => context.CardUse is { } card ? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == card.ParentCardUseFrameId && u.Action is { Type: CardActionType.Use } a && a.ActionId == card.CardActionId && a.ActorSeat == card.ActorSeat && u.SourceSeat == card.ActorSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && u.CardKind == card.EffectiveKind) : null;
     internal IReadOnlyList<PromptChoice> SourceHuanfuCosts(ProgramSkillFrame f) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard).Where(c => c.Cards.Count == 1).ToArray();
     internal bool SourceHuanfuArmQualifies(int owner, string binding, ProgramSkillWindowContext context) => _coreSourceExecutionerYishiOperations.SourceExecutionerMode && context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].MaxHp > 0 && SourceHuanfuUse(context)is { Action: { } a } use && use.SourceExecutionerHuanfuBets?.Any(b => b.Source.OwnerSeat == owner) != true && (binding == "actor-wager" ? a.ActorSeat == owner : binding == "target-wager" && a.ActorSeat != owner && a.TargetSeats.Contains(owner)) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner])).Any(card => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard));
     internal CardUseFrame ExactSourceHuanfuParent(ProgramSkillFrame f)
@@ -19,7 +16,7 @@ internal sealed partial class CoreGameEngineSourceExecutionerHuanfuRuntime
         if (f.SkillId != SourceExecutionerContract.Huanfu || f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { } context || SourceHuanfuUse(context)is not { Action: { } action } use || !_coreSourceExecutionerYishiOperations.SourceExecutionerMode)
             throw new InvalidOperationException("Source3156 Huanfu lost its original real Slash Use.");
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (i < 2 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramCardTriggerWindowFrame window || window.Id != context.ParentFrameId || window.ParentFrameId != use.Id || _resolutionStackOperations._resolutionStack[i - 2].Id != use.Id || window.Action.ActionId != action.ActionId || window.Action.Type != CardActionType.Use || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || _coreCardActionsOperations.CreateCardActionProgramContext2(window, window.Candidates[window.CandidateIndex]) != context)
+        if (i < 2 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramCardTriggerWindowFrame window || window.Id != context.ParentFrameId || window.ParentFrameId != use.Id || _resolutionStackOperations._resolutionStack[i - 2].Id != use.Id || window.Action.ActionId != action.ActionId || window.Action.Type != CardActionType.Use || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || _coreCardActionsOperations.CreateCardActionProgramContext2(window, window.Candidates[window.CandidateIndex]) != context)
             throw new InvalidOperationException("Source3156 Huanfu lost its original card window and exact instance candidate.");
         return use;
     }
@@ -60,7 +57,7 @@ internal sealed partial class CoreGameEngineSourceExecutionerHuanfuRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Huanfu lost its own selection frame.");
         var r = f.SourceExecutionerHuanfu ?? throw new InvalidOperationException("Huanfu lost its wager receipt.");
-        if (r.Stage != SourceExecutionerHuanfuStage.Cards || selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], SourceHuanfuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (r.Stage != SourceExecutionerHuanfuStage.Cards || selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], SourceHuanfuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Huanfu's real HE wager or maximum HP changed.");
         ExactSourceHuanfuParent(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

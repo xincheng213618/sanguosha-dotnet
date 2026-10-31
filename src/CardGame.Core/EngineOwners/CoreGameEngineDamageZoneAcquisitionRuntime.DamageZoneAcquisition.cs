@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime
 {
     internal const string DamageAcquisitionReason = "skill-program.damage-zone-acquisition.obtain";
-    internal CardConversionSource DamageAcquisitionSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource DamageAcquisitionSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 820)]
     internal bool CanOfferDamageZoneAndAdjacentTarget(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -27,7 +24,7 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime
         if (f.TriggerId is null || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target, DamageFrameId: { } damageId } c || source != f.OwnerSeat || target == source || _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is not [{ Op: SkillProgramEffectOp.ObtainEachDamageTargetZoneThenSelfOnly }])
             return false;
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        return i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is DamageTriggerWindowFrame w && w.Id == c.ParentFrameId && w.ParentFrameId == damageId && w.TriggerWindow == c.Window && w.SourceSeat == source && w.TargetSeat == target && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) && _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damageId)is { } damage && damage.SourceSeat == source && damage.TargetSeat == target && damage.Amount == c.Amount && DamageAcquisitionHasExactOwningAttack(damage, w);
+        return i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is DamageTriggerWindowFrame w && w.Id == c.ParentFrameId && w.ParentFrameId == damageId && w.TriggerWindow == c.Window && w.SourceSeat == source && w.TargetSeat == target && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) && _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damageId)is { } damage && damage.SourceSeat == source && damage.TargetSeat == target && damage.Amount == c.Amount && DamageAcquisitionHasExactOwningAttack(damage, w);
     }
 
     internal bool DamageAcquisitionHasExactOwningAttack(DamageFrame damage, DamageTriggerWindowFrame window)
@@ -35,7 +32,7 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime
         // A paid gain observer may issue its own damage and dying child. The
         // global current attack then belongs to that child; the original damage
         // remains suspended on its own typed frame and must be proved there.
-        global::CardGame.Core.GameEngine.IDamageAttempt? attack = _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == damage.ParentFrameId) switch
+        GameEngine.IDamageAttempt? attack = _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == damage.ParentFrameId) switch
         {
             ProgramSkillFrame { AttackAttempt: not null } => _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(damage.ParentFrameId),
             CardUseFrame { CardAttack: not null } or ProgramSkillFrame { CardAttack: not null } or JudgmentFrame { CardAttack: not null } => _kernelCoreMainOperations.CreateCardAttackHandle(damage.ParentFrameId),
@@ -65,7 +62,7 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal IReadOnlyList<PromptChoice> DamageAcquisitionChoices(ProgramSkillFrame f) => f.DamageZoneAcquisition is { NextZone: < 3 } r && _coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive ? Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, r.VictimSeat, [global::CardGame.Core.EngineOwners.CoreGameEngineDamageZoneAcquisitionDefinitions.DamageAcquisitionZones[r.NextZone]], OwnedCardMoveIntent.Obtain).Select(c => PromptChoiceProjection.Freeze(c with { Parameters = new Dictionary<string, string>(c.Parameters) { ["program-action"] = "damage-zone-acquisition" } })).ToArray()) : [];
+    internal IReadOnlyList<PromptChoice> DamageAcquisitionChoices(ProgramSkillFrame f) => f.DamageZoneAcquisition is { NextZone: < 3 } r && _coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive ? Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, r.VictimSeat, [CoreGameEngineDamageZoneAcquisitionDefinitions.DamageAcquisitionZones[r.NextZone]], OwnedCardMoveIntent.Obtain).Select(c => PromptChoiceProjection.Freeze(c with { Parameters = new Dictionary<string, string>(c.Parameters) { ["program-action"] = "damage-zone-acquisition" } })).ToArray()) : [];
     internal void PublishDamageAcquisitionChoice(ProgramSkillFrame f)
     {
         var r = f.DamageZoneAcquisition!;
@@ -105,7 +102,7 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Damage acquisition lost its owning program.");
         RequireDamageAcquisitionReceipt(f);
         var r = f.DamageZoneAcquisition!;
-        if (r.Stage != DamageZoneAcquisitionStage.Selecting || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], r.Choices.Where(c => c.Id == selected.Id).ToArray()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DamageAcquisitionChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (r.Stage != DamageZoneAcquisitionStage.Selecting || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], r.Choices.Where(c => c.Id == selected.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DamageAcquisitionChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Damage acquisition must retain its exact published opaque/public slot.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
         {
@@ -114,7 +111,7 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime
             return;
         }
 
-        var from = new CardLocation(global::CardGame.Core.EngineOwners.CoreGameEngineDamageZoneAcquisitionDefinitions.DamageAcquisitionZones[r.NextZone], r.VictimSeat);
+        var from = new CardLocation(CoreGameEngineDamageZoneAcquisitionDefinitions.DamageAcquisitionZones[r.NextZone], r.VictimSeat);
         var cards = _cardZonesOperations._cardZones.CardsAt(from);
         var slot = int.Parse(selected.Parameters["slot-index"], CultureInfo.InvariantCulture);
         var card = cards[slot];
@@ -179,13 +176,13 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime
     internal void RequireDamageAcquisitionReceipt(ProgramSkillFrame f)
     {
         var r = f.DamageZoneAcquisition ?? throw new InvalidOperationException("Damage acquisition lost its receipt.");
-        if (!ExactDamageAcquisitionParent(f) || r.WindowId != f.WindowContext!.ParentFrameId || r.DamageId != f.WindowContext.DamageFrameId || r.Source != DamageAcquisitionSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.VictimSeat != f.WindowContext.TargetSeat || r.NextZone is < 0 or > 3 || r.Cards.Count != r.From.Count || r.Cards.Count > r.NextZone || r.Cards.Distinct().Count() != r.Cards.Count || r.From.Select(l => l.Zone).Distinct().Count() != r.From.Count || r.From.Any(l => l.OwnerSeat != r.VictimSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageZoneAcquisitionDefinitions.DamageAcquisitionZones.Contains(l.Zone)) || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageZoneAcquisitionStartedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Receipt.WindowId == r.WindowId && e.Receipt.DamageId == r.DamageId && e.Receipt.Source == r.Source && e.Receipt.GameplayHash == r.GameplayHash && e.Receipt.ActualTurn == r.ActualTurn && e.Receipt.VictimSeat == r.VictimSeat) != 1)
+        if (!ExactDamageAcquisitionParent(f) || r.WindowId != f.WindowContext!.ParentFrameId || r.DamageId != f.WindowContext.DamageFrameId || r.Source != DamageAcquisitionSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.VictimSeat != f.WindowContext.TargetSeat || r.NextZone is < 0 or > 3 || r.Cards.Count != r.From.Count || r.Cards.Count > r.NextZone || r.Cards.Distinct().Count() != r.Cards.Count || r.From.Select(l => l.Zone).Distinct().Count() != r.From.Count || r.From.Any(l => l.OwnerSeat != r.VictimSeat || !CoreGameEngineDamageZoneAcquisitionDefinitions.DamageAcquisitionZones.Contains(l.Zone)) || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageZoneAcquisitionStartedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Receipt.WindowId == r.WindowId && e.Receipt.DamageId == r.DamageId && e.Receipt.Source == r.Source && e.Receipt.GameplayHash == r.GameplayHash && e.Receipt.ActualTurn == r.ActualTurn && e.Receipt.VictimSeat == r.VictimSeat) != 1)
             throw new InvalidOperationException("Damage acquisition lost its actual candidate, source or one-per-zone invoice.");
         if (r.Stage == DamageZoneAcquisitionStage.Selecting)
         {
             if (f.PendingMovementContinuation is not null || r.Before != 0 || r.After != 0 || r.Cards.Select((id, i) => _cardZonesOperations._cardZones.GetLocation(id) != r.From[i]).Any(x => x))
                 throw new InvalidOperationException("Unpaid zone acquisition cannot retain a completed movement.");
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && (prompt.Kind != DecisionKind.ProgramTrigger || prompt.PlayerSeat != f.OwnerSeat || !prompt.IsPrivate || prompt.TargetSeat != r.VictimSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, r.Choices)))
+            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && (prompt.Kind != DecisionKind.ProgramTrigger || prompt.PlayerSeat != f.OwnerSeat || !prompt.IsPrivate || prompt.TargetSeat != r.VictimSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, r.Choices)))
                 throw new InvalidOperationException("Zone acquisition lost its chooser or foreign hand privacy.");
             return;
         }
@@ -208,7 +205,7 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ObtainEachDamageTargetZoneThenSelfOnly)]
-    internal PromptChoice SelectAiDamageAcquisition(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderByDescending(c => c.Cards is [var id] ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).First();
-    SkillProgramStepOutcome global::CardGame.Core.IDamageZoneAndAdjacentTargetHost.ObtainEachDamageTargetZoneThenSelfOnly(ProgramSkillFrame f) => BeginDamageZoneAcquisition(f);
-    SkillProgramStepOutcome global::CardGame.Core.IDamageZoneAndAdjacentTargetHost.JoinAdjacentRedCardTarget(ProgramSkillFrame f) => _coreAdjacentRedTargetsOperations.BeginAdjacentRedTarget(f);
+    internal PromptChoice SelectAiDamageAcquisition(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderByDescending(c => c.Cards is [var id] ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 0).First();
+    SkillProgramStepOutcome IDamageZoneAndAdjacentTargetHost.ObtainEachDamageTargetZoneThenSelfOnly(ProgramSkillFrame f) => BeginDamageZoneAcquisition(f);
+    SkillProgramStepOutcome IDamageZoneAndAdjacentTargetHost.JoinAdjacentRedCardTarget(ProgramSkillFrame f) => _coreAdjacentRedTargetsOperations.BeginAdjacentRedTarget(f);
 }

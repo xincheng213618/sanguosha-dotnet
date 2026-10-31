@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoSiOlRuntime
 {
     internal const string TanbeiGainReason = "skill-program.tanbei.gain";
-    internal static CardConversionSource GuoSiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_guo_si_ol_GuoSiPrograms.GuoSiSource(f);
+    internal static CardConversionSource GuoSiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_guo_si_ol_GuoSiPrograms.GuoSiSource(f);
     internal SkillProgramStepOutcome ExecuteGuoSi(SkillProgramEffectOp op, ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -67,7 +63,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
         RequireIssuedGuoSi(f);
         var r = f.GuoSi!;
         var actor = r.Stage == GuoSiStage.TargetChoice ? r.Target : f.OwnerSeat;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != actor || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], GuoSiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != actor || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], GuoSiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Guo Si choice lost actual chooser, material or target authority.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == GuoSiStage.SidaoChoice)
@@ -164,5 +160,5 @@ internal sealed partial class CharacterGuoSiOlRuntime
             throw new InvalidOperationException("Sidao terminal completion requires its once-returned native use.");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IGuoSiProgramHost.ExecuteGuoSi(SkillProgramEffectOp op, ProgramSkillFrame f) => ExecuteGuoSi(op, f);
+    SkillProgramStepOutcome IGuoSiProgramHost.ExecuteGuoSi(SkillProgramEffectOp op, ProgramSkillFrame f) => ExecuteGuoSi(op, f);
 }

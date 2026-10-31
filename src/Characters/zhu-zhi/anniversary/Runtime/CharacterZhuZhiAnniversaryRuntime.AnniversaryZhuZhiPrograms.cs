@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuZhiAnniversaryRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryZhuZhiHost.Qualify(ProgramSkillFrame frame, string resultBind) => QualifyAnniversaryAnguo(frame, resultBind);
+    SkillProgramStepOutcome IAnniversaryZhuZhiHost.Qualify(ProgramSkillFrame frame, string resultBind) => QualifyAnniversaryAnguo(frame, resultBind);
     internal SkillProgramStepOutcome QualifyAnniversaryAnguo(ProgramSkillFrame supplied, string bind)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -45,7 +41,7 @@ internal sealed partial class CharacterZhuZhiAnniversaryRuntime
 
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ChoiceBindings = Array.AsReadOnly(f.ChoiceBindings.Append(new ProgramChoiceResultBinding(bind, eligible ? "perform" : "skip", f.OwnerSeat)).ToArray()) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryZhuZhiBranchEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), bind, recipient, eligible));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryZhuZhiBranchEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), bind, recipient, eligible));
         return SkillProgramStepOutcome.Continue;
     }
 }

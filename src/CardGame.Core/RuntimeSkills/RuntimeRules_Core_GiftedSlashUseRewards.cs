@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_GiftedSlashUseRewards
 {
     internal static string GiftedSlashGiftReason(string skill) => $"skill-program.{skill}.{SkillProgramEffectOp.GiveBoundHandAsSlashWithUseReward}.gift";

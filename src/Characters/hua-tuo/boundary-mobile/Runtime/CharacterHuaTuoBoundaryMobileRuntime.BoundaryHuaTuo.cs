@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaTuoBoundaryMobileRuntime
@@ -17,8 +12,8 @@ internal sealed partial class CharacterHuaTuoBoundaryMobileRuntime
     }
 
     internal IEnumerable<BoundaryHuaTuoQingnangPaidEvent> BoundaryHuaTuoPayments(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryHuaTuoQingnangPaidEvent>().Where(e => e.Payment.Source.OwnerSeat == owner && ValidBoundaryHuaTuoPayment(e));
-    int global::CardGame.Core.IBoundaryHuaTuoSelection.PhaseLimit(int owner) => BoundaryHuaTuoCurrentPlay(owner)is { } phase ? 1 + BoundaryHuaTuoPayments(owner).Count(e => e.Payment.Phase == phase && e.Payment.Red) : 0;
-    bool global::CardGame.Core.IBoundaryHuaTuoSelection.MaySelect(int owner, int target) => !BoundaryHuaTuoPayments(owner).Any(e => e.Payment.Phase.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Payment.Target == target);
+    int IBoundaryHuaTuoSelection.PhaseLimit(int owner) => BoundaryHuaTuoCurrentPlay(owner)is { } phase ? 1 + BoundaryHuaTuoPayments(owner).Count(e => e.Payment.Phase == phase && e.Payment.Red) : 0;
+    bool IBoundaryHuaTuoSelection.MaySelect(int owner, int target) => !BoundaryHuaTuoPayments(owner).Any(e => e.Payment.Phase.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Payment.Target == target);
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 60910)]
     internal void CaptureBoundaryHuaTuoStart(ProgramSkillStartedEvent started)
     {

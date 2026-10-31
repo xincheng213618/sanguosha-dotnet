@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramDamageTransferRuntime
@@ -19,7 +15,7 @@ internal sealed partial class CoreGameEngineProgramDamageTransferRuntime
         var cost = _coreProgramLifecycleOperations.GetProgramCardSet(active, sourceBind);
         if (cost.CardIds.Count != 1)
             throw new InvalidOperationException("Damage redirection requires exactly one bound cost card.");
-        attack.RedirectFinalizedDamageTarget(recipientSeat, new global::CardGame.Core.GameEngine.ProgramDamageTransferFollowup(active.SkillId, active.OwnerSeat, recipientSeat, drawLostHpAfterDamage));
+        attack.RedirectFinalizedDamageTarget(recipientSeat, new GameEngine.ProgramDamageTransferFollowup(active.SkillId, active.OwnerSeat, recipientSeat, drawLostHpAfterDamage));
         _coreRecipientScopedDamageOperations.UpdateRecipientScopedDamageRedirect(attack);
         _coreRuntimeOperations.ReplaceRuntimeFrame(_resolutionStackOperations._resolutionStack[^2].Id, window with { RedirectedTargetSeat = recipientSeat });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDamageTransferredEvent(attack.ResolutionId, active.SkillId, active.OwnerSeat, attack.SourceSeat, recipientSeat, cost.CardIds[0], window.Amount, window.Nature));

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterAHuiNanOlRuntime
@@ -16,14 +12,14 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         var kind = r.History[2].Kind;
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
             return[];
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, p, new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: []) && !_coreHandComparisonOperations.IsSelfTargetForbiddenAction(actor, kind, [p.Seat]) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, Suit.None, null) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, Suit.None)).Select(p => (IReadOnlyList<int>)Array.AsReadOnly(new[] { p.Seat })).ToArray());
         if (kind is CardKind.Peach or CardKind.Alcohol && (kind != CardKind.Peach || _coreTreatedWoundedOperations.IsRuleWounded(actor)) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None, null) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, actor.Seat, kind))
             return Array.AsReadOnly(new IReadOnlyList<int>[] { Array.AsReadOnly(new[] { actor.Seat }) });
         return[];
     }
 
-    internal bool IsAHuiNanJuemanSlashQuery(CharacterState actor) => HasAHuiNanCapability && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AHuiNanJueman: { Stage: AHuiNanJuemanStage.UseChoice } r } f && f.OwnerSeat == actor.Seat && r.History.Count == 3 && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.History[2].Kind) && ValidAHuiNan(f);
+    internal bool IsAHuiNanJuemanSlashQuery(CharacterState actor) => HasAHuiNanCapability && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AHuiNanJueman: { Stage: AHuiNanJuemanStage.UseChoice } r } f && f.OwnerSeat == actor.Seat && r.History.Count == 3 && CoreNativeCardClassificationsRuntime.IsSlashCard(r.History[2].Kind) && ValidAHuiNan(f);
     internal bool MatchesAHuiNanJueman(ProgramSkillFrame f, AHuiNanJuemanUseOrigin o) => f.AHuiNanJueman is { Stage: AHuiNanJuemanStage.NativeUse, Use: { } expected } r && o == expected && o.ProgramFrameId == f.Id && o.Source == r.Source && o.GameplayHash == r.GameplayHash && o.ActualTurn == r.ActualTurn && o.ActorSeat == f.OwnerSeat && r.History.Count == 3 && r.History[2].Kind == o.CardKind && ValidAHuiNan(f);
     internal void BeginAHuiNanJuemanUse(ProgramSkillFrame f, AHuiNanJuemanUseOrigin o, IReadOnlyList<int> targets)
     {
@@ -46,7 +42,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
             return;
         }
 
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(o.CardKind))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(o.CardKind))
             throw new InvalidOperationException("Jueman cannot actively use an otherwise unplayable basic card.");
         var current = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, current.TargetSeats[0], null, 1 + actor.AlcoholDamageBonus, o.CardKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[current.TargetSeats[0]], o.CardKind));
@@ -68,7 +64,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         var a = current;
         if (use.CurrentSlashFirePolicy is { } fire)
         {
-            if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(o.CardKind) || fire.OriginalKind != o.CardKind || fire.OriginalAction.ActionId != current.ActionId)
+            if (!CoreNativeCardClassificationsRuntime.IsSlashCard(o.CardKind) || fire.OriginalKind != o.CardKind || fire.OriginalAction.ActionId != current.ActionId)
                 return false;
             _coreCurrentSlashFireOffersOperations.AssertCurrentSlashFirePolicy(use);
             a = fire.OriginalAction;
@@ -84,10 +80,10 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     internal bool HasIssuedAHuiNanJuemanUse(long id) => IsAHuiNanJuemanUse(id);
     internal bool MatchesAHuiNanJuemanUseAction(long id, CardActionContext a, int cardId) => cardId == 0 && IsAHuiNanJuemanUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action is { } issued && a.ActionId == issued.ActionId && a.Type == CardActionType.Use && a.EffectiveKind == issued.EffectiveKind && a.ActorSeat == issued.ActorSeat && a.ProviderSeat == issued.ProviderSeat && a.PhysicalCards.Count == 0 && a.ConversionChain.SequenceEqual(issued.ConversionChain) && a.TargetSeats.SequenceEqual(issued.TargetSeats) && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed == false;
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 130)]
-    internal bool FinishAHuiNanJuemanAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishAHuiNanJuemanAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (!IsAHuiNanJuemanUse(attack.ResolutionId) || attack.Card is not null || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (!IsAHuiNanJuemanUse(attack.ResolutionId) || attack.Card is not null || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);

@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuPanOlRuntime
 {
-    internal static IReadOnlyList<int> PijingFoldTargets(IReadOnlyList<int> original, IReadOnlyList<PijingToggle> toggles, CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_pan_ol_PijingTargets.PijingFoldTargets(original, toggles, kind);
+    internal static IReadOnlyList<int> PijingFoldTargets(IReadOnlyList<int> original, IReadOnlyList<PijingToggle> toggles, CardKind kind) => RuntimeSkills.RuntimeRules_liu_pan_ol_PijingTargets.PijingFoldTargets(original, toggles, kind);
     internal IReadOnlyList<PijingToggle> PijingInitialOptions(CardUseFrame use, IReadOnlyList<PijingToggle> selected)
     {
         var targets = PijingFoldTargets(use.TargetSeats, selected, use.CardKind);
@@ -39,7 +36,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
         var a = use.Action!;
         var actor = _coreMatchParticipantsPlayersAccess._players[a.ActorSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[issuer];
-        return issuer != a.ActorSeat && !a.EffectiveDesignatedTargetSeats.Contains(issuer) && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count > 0 && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, issuer, use.CardKind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, a.EffectiveSuit ?? Suit.None, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(a)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, issuer, a.EffectiveSuit) && !_coreHandComparisonOperations.IsSelfTargetForbiddenAction(actor, use.CardKind, [issuer]) ? new IReadOnlyList<int>[]
+        return issuer != a.ActorSeat && !a.EffectiveDesignatedTargetSeats.Contains(issuer) && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count > 0 && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, issuer, use.CardKind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, a.EffectiveSuit ?? Suit.None, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(a)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, issuer, a.EffectiveSuit) && !_coreHandComparisonOperations.IsSelfTargetForbiddenAction(actor, use.CardKind, [issuer]) ? new IReadOnlyList<int>[]
         {
             Array.AsReadOnly(new[] { issuer })
         }
@@ -107,7 +104,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
     [ProgramAnswer("pijing")]
     internal void AnswerPijing(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Pijing: { } r } f || r.Stage is not (PijingStage.Toggles or PijingStage.Reciprocal) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Reciprocal ? r.ActorSeat : f.OwnerSeat) || !PijingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Pijing: { } r } f || r.Stage is not (PijingStage.Toggles or PijingStage.Reciprocal) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Reciprocal ? r.ActorSeat : f.OwnerSeat) || !PijingChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Pijing requires its original actual chooser and currently legal public target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -183,7 +180,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
 
     internal CardUseFrame RebasePijingSlashTargets(CardUseFrame use, IReadOnlyList<int> targets)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardAttack is not { } original)
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardAttack is not { } original)
             return use with
             {
                 TargetIndex = 0,

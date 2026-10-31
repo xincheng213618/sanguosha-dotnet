@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5HujiaRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CoreGameEngineShanheS5HujiaRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.SkillId != "shanhe:s5-hujia-995" || f.ShanheS5Hujia is not null || f.InstructionIndex != 1 || f.WindowContext is not { OptionalChooserSeat: { } chooser } context || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramCardTriggerWindowFrame parent || parent.Id != context.ParentFrameId || context.CardUse?.CardActionId != parent.Action.ActionId || context.Window != SkillProgramTriggerWindow.CardResponseAccepted || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] is not { } candidate || candidate.SkillId != f.SkillId || candidate.SkillInstanceId != f.SkillInstanceId || candidate.OwnerSeat != f.OwnerSeat || candidate.TriggerId != f.TriggerId || parent.Action.EffectiveKind != CardKind.Dodge || _coreProgramFactionActionRewardOperations.FactionActionRewardChooser(f.OwnerSeat, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!.Triggers.Single(t => t.Id == f.TriggerId), parent.Action) != chooser || !_coreLordSkillProjectionsOperations.HasSkillRoleQualification(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId, Role.Lord))
             throw new InvalidOperationException("S5 Hujia lost its actual qualified Lord, off-turn Wei chooser or native Dodge action.");
-        var receipt = new ShanheS5HujiaRewardReceipt(new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, parent.Action.ActionId, parent.Id, chooser, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
+        var receipt = new ShanheS5HujiaRewardReceipt(new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, parent.Action.ActionId, parent.Id, chooser, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheS5Hujia = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5HujiaRewardIssuedEvent(f.Id, receipt));
     }
@@ -37,6 +33,6 @@ internal sealed partial class CoreGameEngineShanheS5HujiaRuntime
         return true;
     }
 
-    void global::CardGame.Core.IShanheS5HujiaHost.BindShanheS5HujiaReward(ProgramSkillFrame frame) => BindShanheS5HujiaReward(frame);
-    void global::CardGame.Core.IShanheS5JianxiongHost.ClaimShanheS5JianxiongCards(ProgramSkillFrame frame) => ClaimShanheS5JianxiongCards(frame);
+    void IShanheS5HujiaHost.BindShanheS5HujiaReward(ProgramSkillFrame frame) => BindShanheS5HujiaReward(frame);
+    void IShanheS5JianxiongHost.ClaimShanheS5JianxiongCards(ProgramSkillFrame frame) => ClaimShanheS5JianxiongCards(frame);
 }

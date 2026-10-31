@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
@@ -68,7 +64,7 @@ internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
 
     internal bool MatchesActualEndedEquipmentRoot(ProgramSkillFrame f)
     {
-        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded, ActualEndedEquipment: not null } context || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } parent || parent.AfterTurnEnded?.CurrentChild is not { } child || child.FrameId != f.Id || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, child.Candidate))
+        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded, ActualEndedEquipment: not null } context || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } parent || parent.AfterTurnEnded?.CurrentChild is not { } child || child.FrameId != f.Id || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, child.Candidate))
             return false;
         return MatchesActualEndedEquipmentContext(parent, child.Candidate, context, _coreProgramLifecycleOperations.GetProgramTrigger2(child.Candidate), requireLivingTurnOwner: false);
     }
@@ -81,7 +77,7 @@ internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
         if (f.ActualEndedEquipment is null)
         {
             var context = f.WindowContext!;
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ActualEndedEquipment = new(0, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, context.ParentFrameId, context.OccurrenceIndex, context.ActualEndedEquipment!, ActualEndedTurnEquipmentStage.Offering) });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ActualEndedEquipment = new(0, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, context.ParentFrameId, context.OccurrenceIndex, context.ActualEndedEquipment!, ActualEndedTurnEquipmentStage.Offering) });
         }
 
         if (!_coreEquipmentDonationObserversOperations.IsValidActualEndedEquipment(f))
@@ -190,5 +186,5 @@ internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ChooseEquipmentOrDrawAfterOtherActualTurn)]
-    internal PromptChoice SelectAiActualEndedEquipment(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderByDescending(c => c.Parameters["option"] == "equipment" ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 5d).ThenBy(c => c.Cards.FirstOrDefault()).First();
+    internal PromptChoice SelectAiActualEndedEquipment(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderByDescending(c => c.Parameters["option"] == "equipment" ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 5d).ThenBy(c => c.Cards.FirstOrDefault()).First();
 }

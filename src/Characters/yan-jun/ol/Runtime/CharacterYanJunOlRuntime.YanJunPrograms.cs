@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanJunOlRuntime
@@ -50,9 +46,9 @@ internal sealed partial class CharacterYanJunOlRuntime
         return Array.FindLastIndex(facts, e => e is PhaseChangedEvent phase && phase.Phase == TurnPhase.Play && phase.ActorSeat == ownerSeat);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IYanJunProgramHost.GuanchaoChoosePattern(ProgramSkillFrame frame, SkillProgramEffect effect) => GuanchaoProgramChoosePattern(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IYanJunProgramHost.GuanchaoRankDraw(ProgramSkillFrame frame, SkillProgramEffect effect) => GuanchaoProgramRankDraw(frame, effect);
-    SkillProgramStepOutcome global::CardGame.Core.IYanJunProgramHost.XunxianGiftUsedCard(ProgramSkillFrame frame, SkillProgramEffect effect) => XunxianProgramGiftUsedCard(frame, effect);
+    SkillProgramStepOutcome IYanJunProgramHost.GuanchaoChoosePattern(ProgramSkillFrame frame, SkillProgramEffect effect) => GuanchaoProgramChoosePattern(frame, effect);
+    SkillProgramStepOutcome IYanJunProgramHost.GuanchaoRankDraw(ProgramSkillFrame frame, SkillProgramEffect effect) => GuanchaoProgramRankDraw(frame, effect);
+    SkillProgramStepOutcome IYanJunProgramHost.XunxianGiftUsedCard(ProgramSkillFrame frame, SkillProgramEffect effect) => XunxianProgramGiftUsedCard(frame, effect);
     [ProgramPipelineHook(ProgramPipelinePhase.SelectLegacyDiscardIndexes, 600)]
     internal int[]? SelectWindowIndexes_MatchingOwnSettledActionCardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger)
     {

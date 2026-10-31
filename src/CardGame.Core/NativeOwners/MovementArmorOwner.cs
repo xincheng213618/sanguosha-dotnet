@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MovementArmorOwner(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries> getCharacterDaQiaoXiaoQiaoHappyGodRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineExtendedViewAsEntries> getCoreGameEngineExtendedViewAsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterHuCheErMouEntries> getCharacterHuCheErMouRuntime, CharacterState owner) : IMovementArmorOwner
+internal sealed class MovementArmorOwner(Func<RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries> getCharacterDaQiaoXiaoQiaoHappyGodRuntime, Func<RuntimeEntries.CoreGameEngineExtendedViewAsEntries> getCoreGameEngineExtendedViewAsRuntime, Func<RuntimeEntries.CharacterHuCheErMouEntries> getCharacterHuCheErMouRuntime, CharacterState owner) : IMovementArmorOwner
 {
     public bool Alive => owner.IsAlive;
     public bool HasHpValue => owner.HasHpValue;

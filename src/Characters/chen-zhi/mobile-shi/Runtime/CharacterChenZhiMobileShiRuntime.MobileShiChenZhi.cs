@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,14 +7,14 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
 {
     internal const string ShiCzQuanchong = "mobile:shi-quanchong", ShiCzRenxing = "mobile:shi-renxing";
     internal const string ShiCzDiscard = "skill.mobile-shi-chen-zhi.discard", ShiCzDraw = "skill-program.mobile-shi-chen-zhi.draw";
-    internal static CardConversionSource ShiCzSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiChenZhiHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginShiCz(frame, operation);
+    internal static CardConversionSource ShiCzSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMobileShiChenZhiHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginShiCz(frame, operation);
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.CaptureMovement, 47600)]
     internal void CaptureShiCzFirstDiscard(CardMovementBatchContext batch)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing) || batch.TurnNumber < 1 || batch.DiscardRecoveryPhase is { Kind: ActualDiscardRecoveryPhaseKind.Discard } || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().Any(e => e.ActualTurn == batch.TurnNumber))
             return;
-        var first = batch.Movements.FirstOrDefault(m => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is { } from && global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(from));
+        var first = batch.Movements.FirstOrDefault(m => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is { } from && CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(from));
         if (first is not null)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiChenZhiFirstDiscardEvent(batch.TurnNumber, batch.Id, first.Sequence));
     }
@@ -54,7 +51,7 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
 
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 47600)]
     internal bool IsIssuedShiCzExtraStart(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => candidate.SkillId == ShiCzQuanchong && candidate.BindingId == "quanchong-extra-start" && context.Window == SkillProgramTriggerWindow.TurnBeforeStart && ShiCzPendingExtra(candidate.OwnerSeat)is { } grant && grant.Source.SkillInstanceId == candidate.SkillInstanceId && grant.GameplayHash == candidate.GameplayHash && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame parent && parent.Window == context.Window && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == candidate;
-    internal bool ShiCzUsedOrPlayedSlash(int seat) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Reverse().TakeWhile(e => e is not TurnStartedEvent).OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActorSeat == seat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.Action.EffectiveKind));
+    internal bool ShiCzUsedOrPlayedSlash(int seat) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Reverse().TakeWhile(e => e is not TurnStartedEvent).OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActorSeat == seat && CoreNativeCardClassificationsRuntime.IsSlashCard(e.Action.EffectiveKind));
     internal IReadOnlyList<PromptChoice> ShiCzPaymentChoices(ProgramSkillFrame f, int holder) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, holder, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard, canSelect: (zone, card) => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, card, new(zone, holder), OwnedCardMoveIntent.Discard));
     internal IReadOnlyList<int> ShiCzDiscardTargets(ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !ShiCzUsedOrPlayedSlash(p.Seat) && ShiCzPaymentChoices(frame, p.Seat).Count > 0).Select(p => p.Seat).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 47600)]
@@ -151,7 +148,7 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
     [ProgramAnswer("mobile-shi-chen-zhi")]
     internal void AnswerShiCz(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiChenZhi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiCzChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiChenZhi: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiCzChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Renxing lost its current native branch, target or opaque card slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -274,10 +271,10 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
     {
         var r = f.MobileShiChenZhi!;
         if (r.Stage == MobileShiChenZhiStage.ChooseEffect)
-            return pending.Choices.FirstOrDefault(c => c.Parameters["branch"] == "discard" && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[r.TurnOwner]) && ShiCzDiscardTargets(f).Any(s => !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[s]))) ?? pending.Choices[0];
+            return pending.Choices.FirstOrDefault(c => c.Parameters["branch"] == "discard" && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[r.TurnOwner]) && ShiCzDiscardTargets(f).Any(s => !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[s]))) ?? pending.Choices[0];
         if (r.Stage == MobileShiChenZhiStage.ChooseTarget)
-            return pending.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).First();
-        return pending.Choices.OrderByDescending(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[r.TargetSeat]) : 4).First();
+            return pending.Choices.OrderBy(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).First();
+        return pending.Choices.OrderByDescending(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[r.TargetSeat]) : 4).First();
     }
 
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiChenZhiPublicStates(CharacterState owner, string skillId)

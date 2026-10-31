@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineJiqiaoObserversRuntime
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineJiqiaoObserversRuntime
     internal bool IsExactJiqiaoStageMovement(ProgramSkillFrame f, JiqiaoPaidPending r, CardMovementRecord m) => r.Stage switch
     {
         JiqiaoPaidStage.CostChildren => m.Reason.Value == "program.jiqiao.cost" && m.From.OwnerSeat == f.OwnerSeat && IsJiqiaoPaidCostDestination(f, m) && _coreProgramLifecycleOperations.GetProgramCardSet(f, r.Invoice.CostBind).CardIds.Contains(m.CardId),
-        JiqiaoPaidStage.RevealChildren => m.Reason.Value == $"skill-program.{(f.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.reveal" && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && _coreProgramLifecycleOperations.GetProgramCardSet(f, r.Invoice.RevealBind).CardIds.Contains(m.CardId),
+        JiqiaoPaidStage.RevealChildren => m.Reason.Value == $"skill-program.{(f.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.reveal" && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && _coreProgramLifecycleOperations.GetProgramCardSet(f, r.Invoice.RevealBind).CardIds.Contains(m.CardId),
         JiqiaoPaidStage.ClaimChildren => m.Reason.Value == "program.jiqiao.obtain" && m.From == CardLocation.Processing && m.To == CardLocation.Hand(f.OwnerSeat) && _coreProgramLifecycleOperations.GetProgramCardSet(f, r.Invoice.RevealBind).CardIds.Contains(m.CardId),
         JiqiaoPaidStage.CleanupChildren => m.Reason.Value == "program.jiqiao.remainder" && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && _coreProgramLifecycleOperations.GetProgramCardSet(f, r.Invoice.RevealBind).CardIds.Contains(m.CardId),
         _ => false
@@ -54,5 +50,5 @@ internal sealed partial class CoreGameEngineJiqiaoObserversRuntime
     internal ProgramSkillFrame? JiqiaoObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.JiqiaoFirstChild(r, c), (i) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 150)]
     internal bool TryAdvanceJiqiaoSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && JiqiaoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
-    SkillProgramStepOutcome global::CardGame.Core.IJiqiaoProgramHost.ExecutePaidJiqiao(ProgramSkillFrame f, SkillProgramEffect e) => _coreJiqiaoProgramsOperations.ExecutePaidJiqiao(f, e);
+    SkillProgramStepOutcome IJiqiaoProgramHost.ExecutePaidJiqiao(ProgramSkillFrame f, SkillProgramEffect e) => _coreJiqiaoProgramsOperations.ExecutePaidJiqiao(f, e);
 }

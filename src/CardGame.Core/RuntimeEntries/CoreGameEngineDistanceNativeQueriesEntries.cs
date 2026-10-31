@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDistanceNativeQueriesEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDistanceNativeQueriesRuntime> _resolve;
-    private CoreGameEngineDistanceNativeQueriesEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDistanceNativeQueriesRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineDistanceNativeQueriesRuntime> _resolve;
+    private CoreGameEngineDistanceNativeQueriesEntries(Func<EngineOwners.CoreGameEngineDistanceNativeQueriesRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineDistanceNativeQueriesEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDistanceNativeQueriesRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineDistanceNativeQueriesEntries Create(Func<EngineOwners.CoreGameEngineDistanceNativeQueriesRuntime> resolve) => new(resolve);
 }

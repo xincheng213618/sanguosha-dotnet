@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaYiMouRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
 
     internal bool MatchesMouSmPlayedDeclaration(ProgramSkillFrame f, CardDeclarationFrame d)
     {
-        if (!MouSimaYi.Valid(f) || f.MouSimaYi is not { Stage: MouSmStage.PlayedDeclaration, Played: { Source: { } source, Cards: [var cardId] } plan, Response: null, ResponseActionId: 0 } r || d.OwnerSeat != r.Actor || d.TurnNumber != r.Turn || d.Return is not { Purpose: CardDeclarationPurpose.MouSimaYiPlayed, UseAction: null } ret || ret.ParentFrameId != f.Id || ret.ParentKind != f.Kind || ret.ParentStep != f.Step || ret.ActorSeat != r.Actor || ret.TargetSeat != f.OwnerSeat || ret.FinalEffectiveKind != plan.Kind || d.TargetSeats.Count != 0 || d.Payment is not { Claimed: false } p || p.DeclarationId != d.Id || p.OwnerFrameId != d.Id || p.ProviderSeat != r.Actor || p.ActorSeat != r.Actor || p.Cost.CardId != cardId || p.Cost.From != CardLocation.Hand(r.Actor) || p.Source != source || source.OwnerSeat != r.Actor || _corePlayCardHistoryOperations.ViewAsRule(source)is not { DeclarationValidation: not null } rule || rule.OutputKind != p.DeclaredKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.MatchesRequiredCard(p.DeclaredKind, plan.Kind) || (p.FrozenSuit is { } s ? s is not (Suit.Heart or Suit.Diamond) : p.Cost.EffectiveIsRed != true))
+        if (!MouSimaYi.Valid(f) || f.MouSimaYi is not { Stage: MouSmStage.PlayedDeclaration, Played: { Source: { } source, Cards: [var cardId] } plan, Response: null, ResponseActionId: 0 } r || d.OwnerSeat != r.Actor || d.TurnNumber != r.Turn || d.Return is not { Purpose: CardDeclarationPurpose.MouSimaYiPlayed, UseAction: null } ret || ret.ParentFrameId != f.Id || ret.ParentKind != f.Kind || ret.ParentStep != f.Step || ret.ActorSeat != r.Actor || ret.TargetSeat != f.OwnerSeat || ret.FinalEffectiveKind != plan.Kind || d.TargetSeats.Count != 0 || d.Payment is not { Claimed: false } p || p.DeclarationId != d.Id || p.OwnerFrameId != d.Id || p.ProviderSeat != r.Actor || p.ActorSeat != r.Actor || p.Cost.CardId != cardId || p.Cost.From != CardLocation.Hand(r.Actor) || p.Source != source || source.OwnerSeat != r.Actor || _corePlayCardHistoryOperations.ViewAsRule(source)is not { DeclarationValidation: not null } rule || rule.OutputKind != p.DeclaredKind || !CoreNativeCardClassificationsRuntime.MatchesRequiredCard(p.DeclaredKind, plan.Kind) || (p.FrozenSuit is { } s ? s is not (Suit.Heart or Suit.Diamond) : p.Cost.EffectiveIsRed != true))
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<CardDeclarationCommittedEvent>().Count(e => e.DeclarationId == d.Id && e.OwnerSeat == r.Actor && e.ActorSeat == r.Actor && e.DeclaredKind == p.DeclaredKind && e.TargetSeats.Count == 0) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.CardId == cardId && m.From == p.Cost.From && m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay") == 1;
     }

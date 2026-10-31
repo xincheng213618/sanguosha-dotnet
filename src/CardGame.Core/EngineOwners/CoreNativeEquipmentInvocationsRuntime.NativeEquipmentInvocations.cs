@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeEquipmentInvocationsRuntime
@@ -18,7 +13,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
         NativeEquipmentInvocationKind.Qinglong => CardKind.QinglongCrescentBlade,
         _ => throw new InvalidOperationException("Unknown native equipment invocation.")};
     internal static string NativeEquipmentFingerprint(NativeEquipmentInvocationReceipt r) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(System.Text.Json.JsonSerializer.Serialize(r))));
-    internal NativeEquipmentInvocationReceipt CaptureNativeEquipmentInvocation(global::CardGame.Core.NativeOwners.CardAttackHandle attack, NativeEquipmentInvocationKind kind, int actorSeat, int targetSeat)
+    internal NativeEquipmentInvocationReceipt CaptureNativeEquipmentInvocation(NativeOwners.CardAttackHandle attack, NativeEquipmentInvocationKind kind, int actorSeat, int targetSeat)
     {
         var parent = _resolutionStackOperations._resolutionStack.LastOrDefault() ?? throw new InvalidOperationException("Equipment invocation requires a live native owner.");
         var equipment = NativeInvocationEquipment(kind);
@@ -41,18 +36,18 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
         return true;
     }
 
-    internal bool TryBeginBaguaEquipmentInvocation(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CharacterState defender, bool factionDefense = false)
+    internal bool TryBeginBaguaEquipmentInvocation(NativeOwners.CardAttackHandle attack, CharacterState defender, bool factionDefense = false)
     {
         if (!_characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers)
             return false;
         return TryBeginNativeEquipmentInvocation(CaptureNativeEquipmentInvocation(attack, factionDefense ? NativeEquipmentInvocationKind.FactionBagua : NativeEquipmentInvocationKind.Bagua, defender.Seat, attack.TargetSeat));
     }
 
-    internal bool TryBeginIceSwordEquipmentInvocation(global::CardGame.Core.NativeOwners.IceSwordHandle pending) => !_characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers ? false : TryBeginNativeEquipmentInvocation(CaptureNativeEquipmentInvocation(pending.Attack, NativeEquipmentInvocationKind.IceSword, pending.Attack.SourceSeat, pending.Attack.TargetSeat));
-    internal bool TryBeginStoneAxeEquipmentInvocation(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => !_characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers ? false : TryBeginNativeEquipmentInvocation(CaptureNativeEquipmentInvocation(attack, NativeEquipmentInvocationKind.StoneAxe, attack.SourceSeat, attack.TargetSeat));
-    internal bool TryBeginQilinBowEquipmentInvocation(global::CardGame.Core.NativeOwners.CardAttackHandle attack, Card discardedMount) => !_characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers ? false : TryBeginNativeEquipmentInvocation(CaptureNativeEquipmentInvocation(attack, NativeEquipmentInvocationKind.QilinBow, attack.SourceSeat, attack.TargetSeat)with { SelectedCardId = discardedMount.Id });
-    internal bool TryBeginCixiongEquipmentInvocation(global::CardGame.Core.NativeOwners.CixiongDoubleSwordsHandle pending) => !_characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers ? false : TryBeginNativeEquipmentInvocation(CaptureNativeEquipmentInvocation(pending.Attack, NativeEquipmentInvocationKind.Cixiong, pending.Attack.SourceSeat, pending.Attack.TargetSeat));
-    internal bool TryBeginQinglongEquipmentInvocation(global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending, Card slash, CardKind effectiveSlashKind, int physicalOwnerSeat, IReadOnlyList<Card> physicalCards, global::CardGame.Core.NativeOwners.FactionCardRequestHandle? jijiang = null, CardConversionSource? conversionSource = null)
+    internal bool TryBeginIceSwordEquipmentInvocation(NativeOwners.IceSwordHandle pending) => !_characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers ? false : TryBeginNativeEquipmentInvocation(CaptureNativeEquipmentInvocation(pending.Attack, NativeEquipmentInvocationKind.IceSword, pending.Attack.SourceSeat, pending.Attack.TargetSeat));
+    internal bool TryBeginStoneAxeEquipmentInvocation(NativeOwners.CardAttackHandle attack) => !_characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers ? false : TryBeginNativeEquipmentInvocation(CaptureNativeEquipmentInvocation(attack, NativeEquipmentInvocationKind.StoneAxe, attack.SourceSeat, attack.TargetSeat));
+    internal bool TryBeginQilinBowEquipmentInvocation(NativeOwners.CardAttackHandle attack, Card discardedMount) => !_characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers ? false : TryBeginNativeEquipmentInvocation(CaptureNativeEquipmentInvocation(attack, NativeEquipmentInvocationKind.QilinBow, attack.SourceSeat, attack.TargetSeat)with { SelectedCardId = discardedMount.Id });
+    internal bool TryBeginCixiongEquipmentInvocation(NativeOwners.CixiongDoubleSwordsHandle pending) => !_characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers ? false : TryBeginNativeEquipmentInvocation(CaptureNativeEquipmentInvocation(pending.Attack, NativeEquipmentInvocationKind.Cixiong, pending.Attack.SourceSeat, pending.Attack.TargetSeat));
+    internal bool TryBeginQinglongEquipmentInvocation(NativeOwners.QinglongCrescentBladeHandle pending, Card slash, CardKind effectiveSlashKind, int physicalOwnerSeat, IReadOnlyList<Card> physicalCards, NativeOwners.FactionCardRequestHandle? jijiang = null, CardConversionSource? conversionSource = null)
     {
         if (!_characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers)
             return false;
@@ -73,7 +68,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
         return TryBeginNativeEquipmentInvocation(r);
     }
 
-    internal global::CardGame.Core.GameEngine.NativeEquipmentSuspensionProjection? FindNativeEquipmentInvocation(long attackId)
+    internal GameEngine.NativeEquipmentSuspensionProjection? FindNativeEquipmentInvocation(long attackId)
     {
         for (var index = 0; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
         {
@@ -94,7 +89,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
     internal static bool ValidNativeEquipmentReceipt(NativeEquipmentInvocationReceipt r) => Enum.IsDefined(r.Kind) && r.PhysicalCardIds is System.Collections.IList { IsReadOnly: true } && r.PhysicalFrom is System.Collections.IList { IsReadOnly: true } && r.PhysicalFrom.Count == r.PhysicalCardIds.Count && r.PhysicalCardIds.Distinct().Count() == r.PhysicalCardIds.Count && r.CommitmentNonce.Length == 16 && r.CommitmentNonce.All(Uri.IsHexDigit) && r.SkillKey == CardCatalog.Get(NativeInvocationEquipment(r.Kind)).DisplayName && !string.IsNullOrWhiteSpace(r.OccurrenceKey);
     internal bool NativeEquipmentHostMatches(ResolutionFrame parent, CardUseFrame root, NativeEquipmentInvocationReceipt r)
     {
-        if (root.CardAttack is not { } attack || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || attack.TargetSeat != r.TargetSeat || attack.EffectiveCardKind != root.CardKind || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || (r.Kind is NativeEquipmentInvocationKind.Bagua or NativeEquipmentInvocationKind.FactionBagua ? !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(root.CardKind) && root.CardKind != CardKind.ArrowBarrage : !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(root.CardKind)))
+        if (root.CardAttack is not { } attack || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || attack.TargetSeat != r.TargetSeat || attack.EffectiveCardKind != root.CardKind || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || (r.Kind is NativeEquipmentInvocationKind.Bagua or NativeEquipmentInvocationKind.FactionBagua ? !CoreNativeCardClassificationsRuntime.IsSlashCard(root.CardKind) && root.CardKind != CardKind.ArrowBarrage : !CoreNativeCardClassificationsRuntime.IsSlashCard(root.CardKind)))
             return false;
         var c = root.Continuations;
         if (r.Kind == NativeEquipmentInvocationKind.FactionBagua)
@@ -111,7 +106,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
             NativeEquipmentInvocationKind.StoneAxe => root.Step == ResolutionFrameStep.ResolvingEffect && c.StoneAxe is not { Active: true } && _coreProgramEventHistoryOperations.ProgramEventHistory<StoneAxeResolvedEvent>().LastOrDefault(e => e.ResolutionId == root.Id)is { Used: true, DiscardedCardIds.Count: 2 } paid && paid.SourceSeat == attack.SourceSeat && paid.TargetSeat == attack.TargetSeat && paid.DiscardedCardIds.Distinct().Count() == 2,
             NativeEquipmentInvocationKind.QilinBow => root.Step == ResolutionFrameStep.ResolvingEffect && attack.QilinBowAttempted && c.QilinBow is not { Active: true } && r.SelectedCardId > 0,
             NativeEquipmentInvocationKind.Cixiong => root.Step == ResolutionFrameStep.Declared && c.CixiongDoubleSwords is { Active: true, Stage: CixiongDoubleSwordsStage.TargetChoice },
-            NativeEquipmentInvocationKind.Qinglong => root.Step == ResolutionFrameStep.AwaitingResponse && c.QinglongCrescentBlade is { Active: true } && r.SlashCard is not null && r.SelectedCardId == r.SlashCard.Id && r.EffectiveSlashKind is { } effective && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(effective) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.PhysicalOwnerSeat),
+            NativeEquipmentInvocationKind.Qinglong => root.Step == ResolutionFrameStep.AwaitingResponse && c.QinglongCrescentBlade is { Active: true } && r.SlashCard is not null && r.SelectedCardId == r.SlashCard.Id && r.EffectiveSlashKind is { } effective && CoreNativeCardClassificationsRuntime.IsSlashCard(effective) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(r.PhysicalOwnerSeat),
             _ => false
         };
     }
@@ -124,7 +119,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
         // edges; an unrecognized child of that native frame must be rejected.
         if (parent is SkillInvocationFrame || child is SkillInvocationFrame)
             return _characterHuaTuoAnniversaryGodOperations.SkillInvocationStructuralEdge(parent, child);
-        return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreObserverSubtreesOperations.IsMovementObserverEdge(index);
+        return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreObserverSubtreesOperations.IsMovementObserverEdge(index);
     }
     internal ResolutionFrame? NativeEquipmentInvariantTop(ResolutionFrame? actualTop)
     {
@@ -137,8 +132,8 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not { NativeEquipmentInvocation: { } r } parent || parent.Id != frame.ParentFrameId || frame.ReturnKind != SkillInvocationReturnKind.NativeEquipment || frame.ActorSeat != r.ActorSeat || frame.SkillKey != r.SkillKey || frame.OccurrenceKey != r.OccurrenceKey || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeEquipmentInvocationIssuedEvent>().Count(e => e == new NativeEquipmentInvocationIssuedEvent(parent.Id, r.AttackId, r.Kind, r.ActorSeat, r.TargetSeat, r.SkillKey, r.OccurrenceKey, NativeEquipmentFingerprint(r))) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeEquipmentInvocationReturnedEvent>().Any(e => e.InvocationId == frame.Id) || !_coreProgramEventHistoryOperations.ProgramEventHistory<SkillInvocationCompletedEvent>().Any(e => e.FrameId == frame.Id && e.ParentFrameId == parent.Id && e.OccurrenceKey == r.OccurrenceKey))
             throw new InvalidOperationException("A native equipment activation lost its original exact invocation return.");
-        global::CardGame.Core.NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle(r.AttackId);
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || r.TargetSeat != attack.TargetSeat)
+        NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle(r.AttackId);
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || r.TargetSeat != attack.TargetSeat)
             throw new InvalidOperationException("Native equipment resumed a different attack or target.");
         var canceled = !_coreMatchParticipantsPlayersAccess._players[r.ActorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None;
         _coreRuntimeOperations.ReplaceRuntimeTop(parent with { NativeEquipmentInvocation = null });
@@ -155,7 +150,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
             case NativeEquipmentInvocationKind.FactionBagua:
             {
                 var faction = r.Kind == NativeEquipmentInvocationKind.FactionBagua;
-                if (faction && (_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not { } defense || defense.CurrentCandidateSeat != r.ActorSeat || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(defense.Attack, attack)))
+                if (faction && (_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not { } defense || defense.CurrentCandidateSeat != r.ActorSeat || !CoreNativeDamageHandlesRuntime.SameAttackOwner(defense.Attack, attack)))
                     throw new InvalidOperationException("Faction Bagua lost its original provider cursor.");
                 var result = _coreNativeJudgmentOperations.BeginJudgment(attack, r.ActorSeat, JudgmentReasons.BaguaDefense, attack.ResolutionId, attack.EffectiveCardKind, faction ? JudgmentContinuationKind.FactionDefenseBagua : JudgmentContinuationKind.Bagua);
                 if (result is { } succeeded)
@@ -170,7 +165,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
             }
 
             case NativeEquipmentInvocationKind.IceSword:
-                if (_coreNativeCardContinuationCursorsOperations.ActiveIceSword is not { Activated: true } ice || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(ice.Attack, attack))
+                if (_coreNativeCardContinuationCursorsOperations.ActiveIceSword is not { Activated: true } ice || !CoreNativeDamageHandlesRuntime.SameAttackOwner(ice.Attack, attack))
                     throw new InvalidOperationException("Ice Sword lost its accepted activation.");
                 if (_coreNativeIceSwordOperations.GetIceSwordTargetCardCount(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat], r.ActorSeat) == 0)
                     _coreNativeIceSwordOperations.FinishIceSwordPrevention(ice);
@@ -187,7 +182,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
                 ContinueInvokedQilinBow(attack, _coreNativeQilinBowOperations.GetQilinBowTargetMounts(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat]).SingleOrDefault(c => c.Id == r.SelectedCardId));
                 return;
             case NativeEquipmentInvocationKind.Cixiong:
-                if (_coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords is not { Stage: CixiongDoubleSwordsStage.TargetChoice } cixiong || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(cixiong.Attack, attack))
+                if (_coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords is not { Stage: CixiongDoubleSwordsStage.TargetChoice } cixiong || !CoreNativeDamageHandlesRuntime.SameAttackOwner(cixiong.Attack, attack))
                     throw new InvalidOperationException("Cixiong lost its accepted target-choice stage.");
                 PublishCixiongAcceptedTargetChoice(cixiong);
                 return;
@@ -199,7 +194,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
         }
     }
 
-    internal void CancelNativeEquipmentContinuation(NativeEquipmentInvocationReceipt r, global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CancelNativeEquipmentContinuation(NativeEquipmentInvocationReceipt r, NativeOwners.CardAttackHandle attack)
     {
         if (r.Kind == NativeEquipmentInvocationKind.FactionBagua && _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } defense)
         {
@@ -208,11 +203,11 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
             return;
         }
 
-        if (_coreNativeCardContinuationCursorsOperations.ActiveIceSword is { } ice && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(ice.Attack, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveIceSword is { } ice && CoreNativeDamageHandlesRuntime.SameAttackOwner(ice.Attack, attack))
             _coreNativeCardContinuationCursorsOperations.ActiveIceSword = null;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords is { } cixiong && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(cixiong.Attack, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords is { } cixiong && CoreNativeDamageHandlesRuntime.SameAttackOwner(cixiong.Attack, attack))
             _coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords = null;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, attack))
             _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade = null;
         if (r.Kind == NativeEquipmentInvocationKind.Qinglong)
             _coreQinglongInsertionOperations.RestoreFactionRequestAfterQinglongChoice(attack.ResolutionId);
@@ -222,12 +217,12 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
         _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
 
-    internal void PublishCixiongAcceptedTargetChoice(global::CardGame.Core.NativeOwners.CixiongDoubleSwordsHandle pending)
+    internal void PublishCixiongAcceptedTargetChoice(NativeOwners.CixiongDoubleSwordsHandle pending)
     {
-        global::CardGame.Core.NativeOwners.CardAttackHandle attack = pending.Attack;
+        NativeOwners.CardAttackHandle attack = pending.Attack;
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords, pending) || pending.Stage != CixiongDoubleSwordsStage.TargetChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveCixiongDoubleSwords, pending) || pending.Stage != CixiongDoubleSwordsStage.TargetChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             throw new InvalidOperationException("Cixiong target choice requires the exact already accepted activation.");
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(target).OrderBy(c => c.Id).ToArray();
         var choices = hand.Select(card => new PromptChoice(new($"cixiong.discard.card-{(card.Id)}"), $"弃置【{(card.DisplayName)}】（{(card.RankText)}）", [card.Id], [], new Dictionary<string, string> { ["action"] = "cixiong-discard" })).Append(new(new("cixiong.allow-draw"), $"令 {(source.Name)} 摸一张牌。", [], [], new Dictionary<string, string> { ["action"] = "cixiong-draw" })).ToArray();
@@ -241,7 +236,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
         _coreMatchOutcomeStatusWinnerAccess._status = target.IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
 
-    internal void ContinueInvokedQilinBow(global::CardGame.Core.NativeOwners.CardAttackHandle attack, Card? mount)
+    internal void ContinueInvokedQilinBow(NativeOwners.CardAttackHandle attack, Card? mount)
     {
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
@@ -255,10 +250,10 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
 
-    internal void ContinueInvokedQinglong(NativeEquipmentInvocationReceipt r, global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void ContinueInvokedQinglong(NativeEquipmentInvocationReceipt r, NativeOwners.CardAttackHandle attack)
     {
-        global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle pending = _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade;
-        if (pending is null || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(pending.Attack, attack) || r.SlashCard is null || r.EffectiveSlashKind is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.PhysicalOwnerSeat))
+        NativeOwners.QinglongCrescentBladeHandle pending = _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade;
+        if (pending is null || !CoreNativeDamageHandlesRuntime.SameAttackOwner(pending.Attack, attack) || r.SlashCard is null || r.EffectiveSlashKind is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.PhysicalOwnerSeat))
             throw new InvalidOperationException("Qinglong lost its exact accepted Slash materials.");
         var materials = r.PhysicalCardIds.Select(_coreCardAttackStateOperations.GetAttackCard).ToArray();
         var provider = _coreMatchParticipantsPlayersAccess._players[r.PhysicalOwnerSeat];
@@ -269,7 +264,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
             return;
         }
 
-        global::CardGame.Core.NativeOwners.FactionCardRequestHandle? jijiang = r.FactionRequestId is { } requestId ? _kernelCoreMainOperations.CreateFactionCardRequestHandle(requestId) : null;
+        NativeOwners.FactionCardRequestHandle? jijiang = r.FactionRequestId is { } requestId ? _kernelCoreMainOperations.CreateFactionCardRequestHandle(requestId) : null;
         // Only this verified typed return may bypass the original invocation
         // gate. Actual card payment and Slash settlement remain native.
         _coreNativeQinglongOperations.BeginQinglongCrescentBladeFollowup(pending, r.SlashCard, r.EffectiveSlashKind.Value, r.PhysicalOwnerSeat, materials, jijiang, r.ConversionSource, skipInvocation: true);

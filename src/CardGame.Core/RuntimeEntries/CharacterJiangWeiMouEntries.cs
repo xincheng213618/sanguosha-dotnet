@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterJiangWeiMouEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterJiangWeiMouRuntime> _resolve;
-    private CharacterJiangWeiMouEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterJiangWeiMouRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterJiangWeiMouRuntime> _resolve;
+    private CharacterJiangWeiMouEntries(Func<EngineOwners.CharacterJiangWeiMouRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterJiangWeiMouEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterJiangWeiMouRuntime> resolve) => new(resolve);
+    internal static CharacterJiangWeiMouEntries Create(Func<EngineOwners.CharacterJiangWeiMouRuntime> resolve) => new(resolve);
 }

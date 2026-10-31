@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePindianMaximumSlashClaimsRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CoreGameEnginePindianMaximumSlashClaimsRuntime
             (Id: result.SourceCardId, Rank: result.SourceRank),
             (Id: result.OpponentCardId, Rank: result.OpponentRank)
         };
-        var slashes = cards.Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.Processing && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == c.Id).Kind)).ToArray();
+        var slashes = cards.Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.Processing && CoreNativeCardClassificationsRuntime.IsSlashCard(_cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == c.Id).Kind)).ToArray();
         var maximum = slashes.Length == 0 ? 0 : slashes.Max(c => c.Rank);
         var maximumIds = slashes.Where(c => c.Rank == maximum).Select(c => c.Id).ToArray();
         var claims = new List<PindianPolicyClaim>();

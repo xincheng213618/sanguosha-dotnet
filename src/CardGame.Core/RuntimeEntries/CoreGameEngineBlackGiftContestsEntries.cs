@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineBlackGiftContestsRuntime))]
 internal sealed partial class CoreGameEngineBlackGiftContestsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime> _resolve;
-    private CoreGameEngineBlackGiftContestsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineBlackGiftContestsRuntime> _resolve;
+    private CoreGameEngineBlackGiftContestsEntries(Func<EngineOwners.CoreGameEngineBlackGiftContestsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineBlackGiftContestsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineBlackGiftContestsEntries Create(Func<EngineOwners.CoreGameEngineBlackGiftContestsRuntime> resolve) => new(resolve);
 }

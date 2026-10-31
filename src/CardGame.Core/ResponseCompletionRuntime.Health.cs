@@ -3,11 +3,11 @@ namespace CardGame.Core;
 internal sealed partial class ResponseCompletionRuntime
 {
     private static bool IsResponseCompletionSilverLionAttempt(IReadOnlyList<CardMovementRecord> costs, RecoveryAttempt a) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ResponseCompletionHealth.IsResponseCompletionSilverLionAttempt(costs,a);
+        RuntimeSkills.RuntimeRules_Core_ResponseCompletionHealth.IsResponseCompletionSilverLionAttempt(costs,a);
     private static bool IsResponseCompletionSilverLionHealth(IReadOnlyList<CardMovementRecord> costs, HpChangeContext h) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ResponseCompletionHealth.IsResponseCompletionSilverLionHealth(costs,h);
+        RuntimeSkills.RuntimeRules_Core_ResponseCompletionHealth.IsResponseCompletionSilverLionHealth(costs,h);
     private static bool SameResponseCompletionRecovery(RecoveryAttempt a, RecoveryAttempt b) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ResponseCompletionHealth.SameResponseCompletionRecovery(a,b);
+        RuntimeSkills.RuntimeRules_Core_ResponseCompletionHealth.SameResponseCompletionRecovery(a,b);
 
     internal bool TryDrainResponseCompletionHealth(ProgramCardTriggerWindowFrame supplied)
     {

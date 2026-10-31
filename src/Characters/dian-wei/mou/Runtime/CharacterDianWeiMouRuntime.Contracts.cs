@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICharacterDianWeiMouMouDianWeiOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterDianWeiMouMouDianWeiOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MouDianWeiRuntime Get();
+    MouDianWeiRuntime Get();
 }

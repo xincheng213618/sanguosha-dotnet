@@ -1,10 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaTuoHappyGodRuntime
@@ -45,7 +41,7 @@ internal sealed partial class CharacterHuaTuoHappyGodRuntime
         "happy:taoxian" => gate.WindowContext?.CardUse is { EffectiveKind: CardKind.Peach } use && use.ActorSeat != gate.OwnerSeat,
         _ => true
     };
-    SkillProgramStepOutcome global::CardGame.Core.IHappyHuaTuoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveHappyHuaTuo(f, op);
+    SkillProgramStepOutcome IHappyHuaTuoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveHappyHuaTuo(f, op);
     internal SkillProgramStepOutcome ResolveHappyHuaTuo(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -59,7 +55,7 @@ internal sealed partial class CharacterHuaTuoHappyGodRuntime
 
         if (op == SkillProgramEffectOp.GainHappyHuaTuoMedicine)
         {
-            if (f.WindowContext is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } context || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.Batch.Id != batch.Id || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]))
+            if (f.WindowContext is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } context || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.Batch.Id != batch.Id || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]))
                 throw new InvalidOperationException("Jishi medicine requires its original native red hand-loss movement window.");
             ChangeHappyMedicine(f, HappyMedicineRedLossCount(f.OwnerSeat, f.WindowContext));
             return SkillProgramStepOutcome.Continue;
@@ -70,10 +66,10 @@ internal sealed partial class CharacterHuaTuoHappyGodRuntime
             if (!HappyHuaDyingTarget(f.WindowContext, out var dying) || HappyMedicine(f.OwnerSeat) <= 0 || f.HappyHuaRescue is not null)
                 throw new InvalidOperationException("Happy Jishi requires its actual current dying entry and an unpaid medicine.");
             var entry = _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(w => w.Id == f.WindowContext!.ParentFrameId);
-            if (entry.CandidateIndex >= entry.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, entry.Candidates[entry.CandidateIndex]))
+            if (entry.CandidateIndex >= entry.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, entry.Candidates[entry.CandidateIndex]))
                 throw new InvalidOperationException("Happy Jishi lost its unique actual dying candidate.");
             var before = HappyMedicine(f.OwnerSeat);
-            var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+            var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
             var receipt = new HappyHuaRescueReceipt(source, f.GameplayHash, entry.Id, dying.Id, dying.VictimSeat, _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp, before, before - 1);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyHuaRescue = receipt, SelectedTargetSeats = Array.AsReadOnly(new[] { dying.VictimSeat }) });
             ChangeHappyMedicine(f, -1);
@@ -84,7 +80,7 @@ internal sealed partial class CharacterHuaTuoHappyGodRuntime
 
         if (op != SkillProgramEffectOp.ResolveHappyHuaTuoShenzhen || f.HappyHuaNeedle is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } needleContext)
             throw new InvalidOperationException("Happy Shenzhen requires its original actual turn-start instruction.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyHuaNeedle = new(new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, needleContext.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, HappyHuaNeedleStage.AmountChoice, 0, HappyMedicine(f.OwnerSeat), HappyMedicine(f.OwnerSeat)) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyHuaNeedle = new(new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, needleContext.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, HappyHuaNeedleStage.AmountChoice, 0, HappyMedicine(f.OwnerSeat), HappyMedicine(f.OwnerSeat)) });
         PublishHappyHuaNeedle(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -157,7 +153,7 @@ internal sealed partial class CharacterHuaTuoHappyGodRuntime
     [ProgramAnswer("happy-hua-needle")]
     internal void AnswerHappyHuaNeedle(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyHuaNeedle: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ValidHappyHuaNeedle(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HappyHuaNeedleChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyHuaNeedle: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ValidHappyHuaNeedle(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HappyHuaNeedleChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Happy Shenzhen requires its exact original live owner menu and medicine payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

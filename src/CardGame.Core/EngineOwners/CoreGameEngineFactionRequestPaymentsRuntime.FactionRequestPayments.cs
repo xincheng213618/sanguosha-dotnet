@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFactionRequestPaymentsRuntime
 {
-    internal IReadOnlyList<PromptChoice> FactionRequestCostChoices(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending)
+    internal IReadOnlyList<PromptChoice> FactionRequestCostChoices(NativeOwners.FactionCardRequestHandle pending)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
         return _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Select(card => new PromptChoice(new ChoiceId("faction-request-cost." + card.Id), "弃置" + card.DisplayName + "，请求同势力角色提供杀。", [card.Id], [], new Dictionary<string, string> { ["response"] = "faction-request-cost", ["skill"] = _coreNativeFactionSlashOperations.GetFactionRequestSkillId(pending) })).ToArray();
     }
 
-    internal bool TryPublishFactionRequestCost(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending)
+    internal bool TryPublishFactionRequestCost(NativeOwners.FactionCardRequestHandle pending)
     {
         if (pending.PolicySource?.DiscardCost is not > 0 || pending.CostPaid)
             return false;
@@ -37,7 +33,7 @@ internal sealed partial class CoreGameEngineFactionRequestPaymentsRuntime
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest ?? throw new InvalidOperationException("Faction request payment lost its pending request.");
         var canonical = FactionRequestCostChoices(pending).SingleOrDefault(choice => choice.Id == selected.Id);
-        if (pending.CostPaid || pending.PolicySource?.DiscardCost != 1 || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondSlash } prompt || prompt.PlayerSeat != pending.OwnerSeat || canonical is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [selected]))
+        if (pending.CostPaid || pending.PolicySource?.DiscardCost != 1 || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondSlash } prompt || prompt.PlayerSeat != pending.OwnerSeat || canonical is null || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [selected]))
             throw new InvalidOperationException("Faction request payment changed its physical owner cost.");
         var cardId = canonical.Cards.Single();
         var from = _cardZonesOperations._cardZones.GetLocation(cardId);
@@ -59,8 +55,8 @@ internal sealed partial class CoreGameEngineFactionRequestPaymentsRuntime
             _kernelCoreGameEngineRuntimeOperations.AdvanceToHumanBoundary();
     }
 
-    internal global::CardGame.Core.GameEngine.FactionProviderRewardReceipt CaptureFactionProviderReward(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending) => new(pending.OwnerFrameId, pending.ProviderRewarded ? 0 : pending.PolicySource?.ProviderDrawCount ?? 0);
-    internal void RewardFactionRequestProvider(global::CardGame.Core.GameEngine.FactionProviderRewardReceipt receipt, int providerSeat)
+    internal GameEngine.FactionProviderRewardReceipt CaptureFactionProviderReward(NativeOwners.FactionCardRequestHandle pending) => new(pending.OwnerFrameId, pending.ProviderRewarded ? 0 : pending.PolicySource?.ProviderDrawCount ?? 0);
+    internal void RewardFactionRequestProvider(GameEngine.FactionProviderRewardReceipt receipt, int providerSeat)
     {
         if (receipt.DrawCount <= 0)
             return;

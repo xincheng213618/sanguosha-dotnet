@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMuShunAnniversaryRuntime
@@ -25,8 +21,8 @@ internal sealed partial class CharacterMuShunAnniversaryRuntime
             _ => throw new InvalidOperationException("Shizhao damage needs its original native attack frame.")});
     }
 
-    internal int MuShunChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
-    internal MuShunShizhaoIssuedEvent? MuShunDamageArm(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int MuShunChainCursor(GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
+    internal MuShunShizhaoIssuedEvent? MuShunDamageArm(GameEngine.IDamageAttempt attack)
     {
         if (!HasMuShunShizhaoCapability)
             return null;
@@ -34,7 +30,7 @@ internal sealed partial class CharacterMuShunAnniversaryRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.FactModifiers, 45300)]
-    internal IEnumerable<(CardUseEffectSource Source, int Amount)> MuShunNextReceivedDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal IEnumerable<(CardUseEffectSource Source, int Amount)> MuShunNextReceivedDamage(GameEngine.IDamageAttempt attack)
     {
         var arm = MuShunDamageArm(attack);
         if (arm is null || attack.DamageAmount <= 0)
@@ -54,13 +50,13 @@ internal sealed partial class CharacterMuShunAnniversaryRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 45300)]
-    internal void BeforeMuShunChain(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void BeforeMuShunChain(GameEngine.IDamageAttempt attack)
     {
         if (!HasMuShunShizhaoCapability || MuShunDamageState(attack.ResolutionId)is not { } r)
             return;
         if (attack.IsChainPropagation && r.TargetSeat == attack.TargetSeat && r.ChainCursor == MuShunChainCursor(attack))
         {
-            if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+            if (attack is NativeOwners.ProgramAttackHandle)
                 _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, s => s with { DamageAmount = r.InheritedAmount });
             else
                 _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, s => s!with { DamageAmount = r.InheritedAmount });
@@ -70,14 +66,14 @@ internal sealed partial class CharacterMuShunAnniversaryRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 45300)]
-    internal void AfterMuShunChain(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void AfterMuShunChain(GameEngine.IDamageAttempt attack)
     {
         if (!HasMuShunShizhaoCapability || !attack.IsChainPropagation || !attack.DamageAmountFinalized)
             return;
         var modifiers = MuShunNextReceivedDamage(attack).ToArray();
         if (modifiers.Length == 0)
             return;
-        if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (attack is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, s => s with { DamageAmount = checked(s.DamageAmount + 1) });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, s => s!with { DamageAmount = checked(s.DamageAmount + 1) });

@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeGuoMobileRuntime
 {
     internal const string MobileQirang = "mobile:qirang", MobileYuhua = "mobile:yuhua", MobileQirangGainReason = "skill-program.mobile-qirang.deck-trick";
-    internal static CardConversionSource MobileZhugeGuoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileZhugeGuoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileZhugeGuo(f, op);
+    internal static CardConversionSource MobileZhugeGuoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMobileZhugeGuoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileZhugeGuo(f, op);
     internal CardMovementRecord? MobileQirangEquipmentEntry(int owner, ProgramSkillWindowContext c)
     {
         if (c.Window != SkillProgramTriggerWindow.CardsGained || c.MovementBatch is not { } batch || c.MovementIndex is not { } index || index < 0 || index >= batch.Movements.Count || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().LastOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.Batch.Id != batch.Id || !parent.Batch.Movements.SequenceEqual(batch.Movements))
@@ -37,7 +33,7 @@ internal sealed partial class CharacterZhugeGuoMobileRuntime
             var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(owner);
             if (f.SkillId != MobileYuhua || context.Window != SkillProgramTriggerWindow.TurnEnding || f.OwnerSeat != _coreActualTurnProgressCurrentSeatAccess._currentSeat || !owner.HasHpValue || hand.Count <= owner.Hp)
                 throw new InvalidOperationException("Mobile Yuhua requires her actual qualified own ending.");
-            var count = hand.Select(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind)).Distinct().Count();
+            var count = hand.Select(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind)).Distinct().Count();
             var result = _coreProgramTopReorderOperations.BeginProgramTopReorder(f, count, null);
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var actual = f.TopReorder?.ViewedCardIds.Count ?? 0;
@@ -49,7 +45,7 @@ internal sealed partial class CharacterZhugeGuoMobileRuntime
 
         if (op != SkillProgramEffectOp.ObtainMobileQirangTrick || f.SkillId != MobileQirang || MobileQirangEquipmentEntry(f.OwnerSeat, context)is not { } equipment)
             throw new InvalidOperationException("Mobile Qirang requires an actual equipment entity entering its owner's equipment zone.");
-        var trick = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Trick);
+        var trick = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Trick);
         if (trick is null)
             return SkillProgramStepOutcome.Continue;
         var r = new MobileQirangGainReceipt(MobileZhugeGuoSource(f), f.GameplayHash, context.MovementBatch!.Id, equipment.Sequence, equipment.CardId, trick.Id, trick.Kind, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, 0);
@@ -80,7 +76,7 @@ internal sealed partial class CharacterZhugeGuoMobileRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 81800)]
     internal void CaptureMobileQirangUse(IGameEvent payload)
     {
-        if (payload is not CardUseDeclaredEvent declared || _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is not { Action: { Type: CardActionType.Use } a } use || a.ActorSeat != a.ProviderSeat || a.PhysicalCards is not [var material] || material.From != CardLocation.Hand(a.ActorSeat) || a.EffectiveKind != material.CardKind || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind) != SkillProgramCardCategory.Trick || CurrentMobileQirangGain(a.ActorSeat, material.CardId)is not { } gain)
+        if (payload is not CardUseDeclaredEvent declared || _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is not { Action: { Type: CardActionType.Use } a } use || a.ActorSeat != a.ProviderSeat || a.PhysicalCards is not [var material] || material.From != CardLocation.Hand(a.ActorSeat) || a.EffectiveKind != material.CardKind || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind) != SkillProgramCardCategory.Trick || CurrentMobileQirangGain(a.ActorSeat, material.CardId)is not { } gain)
             return;
         var issued = new MobileQirangUseReceipt(gain, use.Id, a, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, f => f with { MobileQirangUse = issued });
@@ -92,12 +88,12 @@ internal sealed partial class CharacterZhugeGuoMobileRuntime
         if (context is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } identity } || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId && w.Action.ActionId == identity.CardActionId)is not { } window)
             return null;
         var a = window.Action;
-        if (a.ActorSeat != c.OwnerSeat || a.ProviderSeat != c.OwnerSeat || a.PhysicalCards is not [var material] || material.From != CardLocation.Hand(c.OwnerSeat) || material.CardKind != a.EffectiveKind || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind) != SkillProgramCardCategory.Trick || a.Type == CardActionType.Response && (a.EffectiveKind != CardKind.Nullification || a.ResponderSeat != a.ActorSeat || a.RequesterSeat is not null || window.CompletedResponseReturn is not { IsCommitted: true, Kind: ProgramCompletedResponseKind.Nullification }))
+        if (a.ActorSeat != c.OwnerSeat || a.ProviderSeat != c.OwnerSeat || a.PhysicalCards is not [var material] || material.From != CardLocation.Hand(c.OwnerSeat) || material.CardKind != a.EffectiveKind || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind) != SkillProgramCardCategory.Trick || a.Type == CardActionType.Response && (a.EffectiveKind != CardKind.Nullification || a.ResponderSeat != a.ActorSeat || a.RequesterSeat is not null || window.CompletedResponseReturn is not { IsCommitted: true, Kind: ProgramCompletedResponseKind.Nullification }))
             return null;
         if (a.Type == CardActionType.Use)
         {
             var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.Action?.ActionId == a.ActionId);
-            if (use?.MobileQirangUse is not { } q || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(q.Action, a) || q.Gain.Source.SkillInstanceId != c.SkillInstanceId || q.Gain.Hash != c.GameplayHash || !MobileQirangUsePaid(use, q))
+            if (use?.MobileQirangUse is not { } q || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(q.Action, a) || q.Gain.Source.SkillInstanceId != c.SkillInstanceId || q.Gain.Hash != c.GameplayHash || !MobileQirangUsePaid(use, q))
                 return null;
             return q.Gain;
         }
@@ -107,11 +103,11 @@ internal sealed partial class CharacterZhugeGuoMobileRuntime
         return _coreProgramEventHistoryOperations.ProgramEventHistory<MobileQirangGainPaidEvent>().Select(e => e.Receipt).LastOrDefault(r => r.Source.OwnerSeat == c.OwnerSeat && r.CardId == material.CardId && r.Kind == a.EffectiveKind && r.Source.SkillInstanceId == c.SkillInstanceId && r.Hash == c.GameplayHash && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.CardId == r.CardId && m.Sequence > r.GainSequence && m.From == material.From && m.To != m.From).ToArray()is [var paid] && paid.Reason == CardMoveReasons.Nullification);
     }
 
-    internal bool MobileQirangUsePaid(CardUseFrame use, MobileQirangUseReceipt q) => q.UseId == use.Id && use.Action is { } a && global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(a, q.Action) && a.PhysicalCards is [var p] && p.CardId == q.Gain.CardId && p.CardKind == q.Gain.Kind && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileQirangUseIssuedEvent>().Count(e => e == new MobileQirangUseIssuedEvent(use.Id, a.ActionId, a.ActorSeat, p.CardId, q.Gain.GainSequence, q.MovementBefore)) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == p.CardId && m.From == p.From && m.To == CardLocation.Processing && m.Sequence > q.MovementBefore) == 1;
+    internal bool MobileQirangUsePaid(CardUseFrame use, MobileQirangUseReceipt q) => q.UseId == use.Id && use.Action is { } a && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(a, q.Action) && a.PhysicalCards is [var p] && p.CardId == q.Gain.CardId && p.CardKind == q.Gain.Kind && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileQirangUseIssuedEvent>().Count(e => e == new MobileQirangUseIssuedEvent(use.Id, a.ActionId, a.ActorSeat, p.CardId, q.Gain.GainSequence, q.MovementBefore)) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == p.CardId && m.From == p.From && m.To == CardLocation.Processing && m.Sequence > q.MovementBefore) == 1;
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 81800)]
     internal bool MobileQirangDistance(ProgramCardDistanceQuery q)
     {
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(q.Kind) != SkillProgramCardCategory.Trick)
+        if (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(q.Kind) != SkillProgramCardCategory.Trick)
             return false;
         if (q.CardUseFrameId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MobileQirangUse: { } issued } use && use.SourceSeat == q.Actor.Seat && issued.Action.ActorSeat == q.Actor.Seat && issued.Action.EffectiveKind == q.Kind && MobileQirangUsePaid(use, issued))
             return true;

@@ -56,7 +56,7 @@ internal static class ModeSkillProgramProjection
                 .Select(kind => kind!.Value).Distinct().ToArray();
             if (kinds.SequenceEqual(trigger.CardKinds)) return trigger;
             changed = true;
-            return global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ActivityOrdinaryTricks.CloneActivityTrigger(
+            return RuntimeSkills.RuntimeRules_Core_ActivityOrdinaryTricks.CloneActivityTrigger(
                 trigger, Array.AsReadOnly(kinds));
         }).ToArray();
         return !changed ? original : new SkillProgram(original.Id, original.Revision, original.GameplayHash,
@@ -67,10 +67,10 @@ internal static class ModeSkillProgramProjection
     }
 
     private static string ActivityViewAsFamily(SkillProgramViewAs rule) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ActivityOrdinaryTricks.ActivityViewAsFamily(rule);
+        RuntimeSkills.RuntimeRules_Core_ActivityOrdinaryTricks.ActivityViewAsFamily(rule);
     private static string BasicViewAsFamily(SkillProgramViewAs rule) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DragonBoatBasicConversions.DragonBoatBasicViewAsFamily(rule);
+        RuntimeSkills.RuntimeRules_Core_DragonBoatBasicConversions.DragonBoatBasicViewAsFamily(rule);
     private static SkillProgramViewAs CloneViewAs(SkillProgramViewAs rule, CardKind kind,
         string? bindingId = null, bool? forResponse = null) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ActivityOrdinaryTricks.CloneActivityViewAs(rule, kind, bindingId, forResponse);
+        RuntimeSkills.RuntimeRules_Core_ActivityOrdinaryTricks.CloneActivityViewAs(rule, kind, bindingId, forResponse);
 }

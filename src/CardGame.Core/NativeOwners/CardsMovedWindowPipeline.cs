@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class CardsMovedWindowPipeline(global::System.Func<global::CardGame.Core.ProgramPipelineHooks> getProgramPipelineHooks, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZhouFeiLeEntries> getCharacterZhouFeiLeRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineGameDomainsEntries> getCoreGameEngineGameDomainsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineWenhePoisonEntries> getCoreGameEngineWenhePoisonRuntime) : ICardsMovedWindowPipeline
+internal sealed class CardsMovedWindowPipeline(Func<ProgramPipelineHooks> getProgramPipelineHooks, Func<RuntimeEntries.CharacterZhouFeiLeEntries> getCharacterZhouFeiLeRuntime, Func<RuntimeEntries.CoreGameEngineGameDomainsEntries> getCoreGameEngineGameDomainsRuntime, Func<RuntimeEntries.CoreGameEngineWenhePoisonEntries> getCoreGameEngineWenhePoisonRuntime) : ICardsMovedWindowPipeline
 {
     public bool ExcludeOrdinaryMovementCandidate(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger) => getProgramPipelineHooks().ExcludeOrdinaryMovementCandidate(candidate, trigger);
     public void CollectMovementCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> candidates) => getProgramPipelineHooks().CollectMovementCandidates(batch, candidates);

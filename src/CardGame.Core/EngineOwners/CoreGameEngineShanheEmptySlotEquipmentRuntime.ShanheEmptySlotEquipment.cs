@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheEmptySlotEquipmentRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheEmptySlotEquipmentProgramHost.PlaceRandomDeckEquipment(ProgramSkillFrame frame, bool armorOnly) => PlaceShanheEmptySlotEquipment(frame, armorOnly);
+    SkillProgramStepOutcome IShanheEmptySlotEquipmentProgramHost.PlaceRandomDeckEquipment(ProgramSkillFrame frame, bool armorOnly) => PlaceShanheEmptySlotEquipment(frame, armorOnly);
     internal Card[] ShanheEmptySlotEquipmentCandidates(int ownerSeat, bool armorOnly = false)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[ownerSeat];
@@ -16,7 +12,7 @@ internal sealed partial class CoreGameEngineShanheEmptySlotEquipmentRuntime
         // Shanhe excludes equipment before dealing and before recycling. Its
         // random equipment skills use the registered deck's printed templates,
         // creating a native entity directly in the field, never in DrawPile.
-        var pool = _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is { StartingResourcesExpireOnUse: true } ? global::CardGame.Core.EngineOwners.CoreMatchParticipantSetupRuntime.CreateDeckFromRegistry(_contentRegistryOperations._contentRegistry, global::CardGame.Core.EngineOwners.CoreMatchParticipantSetupRuntime.ResolveDeckDefinition(_contentRegistryOperations._contentRegistry, _coreMatchDefinitionModeDefinitionOptionsAccess._options.DeckId ?? _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.DeckId)) : _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile);
+        var pool = _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is { StartingResourcesExpireOnUse: true } ? CoreMatchParticipantSetupRuntime.CreateDeckFromRegistry(_contentRegistryOperations._contentRegistry, CoreMatchParticipantSetupRuntime.ResolveDeckDefinition(_contentRegistryOperations._contentRegistry, _coreMatchDefinitionModeDefinitionOptionsAccess._options.DeckId ?? _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.DeckId)) : _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile);
         return pool.Where(card => _coreEquipmentContentOperations.EquipmentRules.IsEquipment(card.Kind) && (!armorOnly || _coreFieldEquipmentOperations.FieldEquipmentSlot(card) == EquipmentSlot.Armor) && _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Count(equipped => _coreFieldEquipmentOperations.FieldEquipmentSlot(equipped) == _coreFieldEquipmentOperations.FieldEquipmentSlot(card)) < owner.EquipmentSlotCapacity(_coreFieldEquipmentOperations.FieldEquipmentSlot(card))).OrderBy(card => card.Id).ToArray();
     }
 

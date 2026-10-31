@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangChangAnniversaryRuntime
@@ -52,7 +48,7 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 46500)]
-    internal bool ReturnWangChangAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt receipt)
+    internal bool ReturnWangChangAttack(GameEngine.AttackCompletionReceipt receipt)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryWangChang: { Stage: AnniversaryWangChangStage.NativeSlash, NativeReturned: true } r } f || r.UseId != receipt.ResolutionId)
             return false;

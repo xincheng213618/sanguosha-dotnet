@@ -1,14 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiFengOlRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.ILiFengHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginLiFeng(f, op);
+    SkillProgramStepOutcome ILiFengHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginLiFeng(f, op);
     internal SkillProgramStepOutcome BeginLiFeng(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -79,7 +74,7 @@ internal sealed partial class CharacterLiFengOlRuntime
 
             )
             {
-                var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(card => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) == category && !entities.Any(e => e.CardId == card.Id)).OrderBy(card => card.Id).ToArray();
+                var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(card => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) == category && !entities.Any(e => e.CardId == card.Id)).OrderBy(card => card.Id).ToArray();
                 if (cards.Length > 0)
                 {
                     var card = cards[_randomOperations._random.Next(cards.Length)];
@@ -160,7 +155,7 @@ internal sealed partial class CharacterLiFengOlRuntime
     [ProgramAnswer("li-feng")]
     internal void AnswerLiFeng(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiFeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !LiFengChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiFeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !LiFengChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Li Feng requires his current published recipient or exact grain choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

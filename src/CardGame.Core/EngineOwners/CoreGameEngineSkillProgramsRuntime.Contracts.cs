@@ -1,47 +1,43 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreSkillProgramsCoreProgramSelectionModulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreSkillProgramsCoreProgramSelectionModulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramSelectionRegistry ProgramSelections { get; }
+    ProgramSelectionRegistry ProgramSelections { get; }
 }
 
-internal interface ICoreSkillProgramsCoreProgramRuntimeHooksOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreSkillProgramsCoreProgramRuntimeHooksOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramRuntimeHooks RuntimeHooks { get; }
+    ProgramRuntimeHooks RuntimeHooks { get; }
 }
 
-internal interface ICoreSkillProgramsCoreEquipmentContentOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreSkillProgramsCoreEquipmentContentOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.EquipmentContentRegistry EquipmentRules { get; }
+    EquipmentContentRegistry EquipmentRules { get; }
 }
 
-internal interface ICoreSkillProgramsProgramCompletionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreSkillProgramsProgramCompletionOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramCompletionRuntime Get();
+    ProgramCompletionRuntime Get();
 }
 
-internal interface ICoreSkillProgramsCoreProgramActionModulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreSkillProgramsCoreProgramActionModulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramActionRouter ProgramActions { get; }
+    ProgramActionRouter ProgramActions { get; }
 }
 
-internal interface ICoreSkillProgramsCoreNativeRuleQueriesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreSkillProgramsCoreNativeRuleQueriesOperations : IProgramRuntimeOperations
 {
     int GetCombatDistance(int sourceSeat, int targetSeat);
 }
 
-internal interface ICoreSkillProgramsCoreProgramSelectionValidationOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreSkillProgramsCoreProgramSelectionValidationOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramSelectionValidationRegistry ProgramSelectionValidators { get; }
+    ProgramSelectionValidationRegistry ProgramSelectionValidators { get; }
 }
 
-internal interface ICoreSkillProgramsCoreWushuangModeProjectionOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreSkillProgramsCoreWushuangModeProjectionOperations : IProgramRuntimeOperations
 {
     bool IsWushuangMode { get; }
 }

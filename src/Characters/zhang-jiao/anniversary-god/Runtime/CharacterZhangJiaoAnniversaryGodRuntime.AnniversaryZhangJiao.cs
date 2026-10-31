@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodRuntime
 {
     internal const string AnniversaryYizhao = "anniversary-god:yizhao", AnniversarySanshou = "anniversary-god:sanshou", AnniversarySijun = "anniversary-god:sijun", AnniversaryTianjie = "anniversary-god:tianjie";
     internal const string HappyZhangJiaoYizhao = "happy:yizhao", HappyZhangJiaoSanshou = "happy:sanshou", HappyZhangJiaoSijun = "happy:sijun", HappyZhangJiaoTianjie = "happy:tianjie";
-    internal static CardConversionSource AnniversaryZjSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource AnniversaryZjSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool AnniversaryZjTurnShuffled() => _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent).Any(e => e is CardMovedEvent { Reason: var reason } && reason == CardMoveReasons.Reshuffle || e is AnniversaryZhangJiaoShuffledEvent s && s.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && s.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || e is MobileShiHuanJieShuffledEvent);
     internal bool HasAnniversaryTianjieDeadOwnerEnding(int actualOwner) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(actualOwner) && actualOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && !_coreMatchParticipantsPlayersAccess._players[actualOwner].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && AnniversaryZjTurnShuffled() && _coreMatchParticipantsPlayersAccess._players.Any(p => p.Seat != actualOwner && p.IsAlive && (_coreNationalSkillsOperations.HasRuntimeSkill(p, AnniversaryTianjie) || _coreNationalSkillsOperations.HasRuntimeSkill(p, HappyZhangJiaoTianjie)));
     internal bool IsAnniversaryTianjieDeadOwnerEndingCandidate(ProgramTriggerCandidate candidate, int actualOwner) => HasAnniversaryTianjieDeadOwnerEnding(actualOwner) && candidate.SkillId is (AnniversaryTianjie or HappyZhangJiaoTianjie) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && candidate.OwnerSeat != actualOwner && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], candidate.SkillId, candidate.SkillInstanceId) && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate)is { Window: SkillProgramTriggerWindow.TurnEnding, TurnOwnerScope: SkillProgramTurnOwnerScope.OtherLiving, Effects: [{ Op: SkillProgramEffectOp.ResolveAnniversaryZhangJiaoTianjie }] };
@@ -40,7 +37,7 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodRuntime
         AnniversaryTianjie or HappyZhangJiaoTianjie => AnniversaryZjTurnShuffled() && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != g.OwnerSeat),
         _ => true
     };
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryZhangJiaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffect e) => BeginAnniversaryZj(f, e);
+    SkillProgramStepOutcome IAnniversaryZhangJiaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffect e) => BeginAnniversaryZj(f, e);
     internal SkillProgramStepOutcome BeginAnniversaryZj(ProgramSkillFrame supplied, SkillProgramEffect e)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -107,7 +104,7 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodRuntime
 
     internal SkillProgramStepOutcome ResolveAnniversarySanshou(ProgramSkillFrame f, SkillProgramEffect e)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineShanheSanshouArmorRuntime.IsNativeSanshouSkill(f.SkillId) || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, TargetSeat: var victim } || victim != f.OwnerSeat)
+        if (!CoreGameEngineShanheSanshouArmorRuntime.IsNativeSanshouSkill(f.SkillId) || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, TargetSeat: var victim } || victim != f.OwnerSeat)
             throw new InvalidOperationException("Sanshou requires its original damage-target window.");
         if (e.SourceBind is null)
         {
@@ -123,7 +120,7 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodRuntime
         var shown = _coreProgramLifecycleOperations.GetProgramCardSet(f, e.SourceBind);
         if (shown.Visibility != SkillProgramCardSetVisibility.Public || shown.CardIds.Count > 3 || shown.CardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Processing))
             throw new InvalidOperationException("Sanshou requires the actual publicly revealed processing entities.");
-        var prevented = shown.CardIds.Any(id => (r.UsedCategories & (1 << (int)global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind))) == 0);
+        var prevented = shown.CardIds.Any(id => (r.UsedCategories & (1 << (int)CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind))) == 0);
         if (prevented)
             _coreDamagePreventionProgramsOperations.PreventProgramCurrentDamage(f);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversarySanshouResolvedEvent(f.Id, r.Source, r.UsedCategories, prevented));
@@ -254,7 +251,7 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.AnniversaryZhangJiao ?? throw new InvalidOperationException("Tianjie lost its original choice frame.");
-        if (r.Stage != AnniversaryZhangJiaoStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !AnniversaryTianjieChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (r.Stage != AnniversaryZhangJiaoStage.Choosing || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !AnniversaryTianjieChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Tianjie requires its exact currently published target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["option"] == "finish")

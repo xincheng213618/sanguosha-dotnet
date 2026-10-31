@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFirstSlashDuelBenefitObserversRuntime
@@ -14,8 +10,8 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitObserversRuntim
         var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == r.WindowFrameId);
         var legacy = _resolutionStackOperations._resolutionStack.OfType<FirstSlashDuelLegacyWindowFrame>().SingleOrDefault(w => w.Id == r.WindowFrameId);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(r.CardUseFrameId);
-        var candidateMatches = window is not null && r.LegacyProducerFrameId is null && window.ParentFrameId == use?.Id && window.Action.ActionId == r.ActionId && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || legacy is not null && use is not null && r.ActionId is null && r.LegacyProducerFrameId == legacy.ProducerFrameId && legacy.ParentFrameId == use.Id && legacy.CandidateIndex >= 0 && legacy.CandidateIndex < legacy.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, legacy.Candidates[legacy.CandidateIndex]) && _coreFirstSlashDuelLegacyWindowsOperations.IsFirstLegacySlashUse(use, legacy.ProducerFrameId, requireSingle: r.SelectedBranch is null);
-        if (!candidateMatches || use is null || use.Action?.ActionId != r.ActionId || use.SourceSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineFirstSlashDuelBenefitsRuntime.IsFirstSlashDuelKind(use.CardKind) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FirstSlashDuelUseRecordedEvent>().Any(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.Ordinal == 1 && e.ActorSeat == f.OwnerSeat && e.TurnNumber == r.TurnNumber && e.TurnOwnerSeat == r.TurnOwnerSeat))
+        var candidateMatches = window is not null && r.LegacyProducerFrameId is null && window.ParentFrameId == use?.Id && window.Action.ActionId == r.ActionId && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || legacy is not null && use is not null && r.ActionId is null && r.LegacyProducerFrameId == legacy.ProducerFrameId && legacy.ParentFrameId == use.Id && legacy.CandidateIndex >= 0 && legacy.CandidateIndex < legacy.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, legacy.Candidates[legacy.CandidateIndex]) && _coreFirstSlashDuelLegacyWindowsOperations.IsFirstLegacySlashUse(use, legacy.ProducerFrameId, requireSingle: r.SelectedBranch is null);
+        if (!candidateMatches || use is null || use.Action?.ActionId != r.ActionId || use.SourceSeat != f.OwnerSeat || !CoreGameEngineFirstSlashDuelBenefitsRuntime.IsFirstSlashDuelKind(use.CardKind) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FirstSlashDuelUseRecordedEvent>().Any(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.Ordinal == 1 && e.ActorSeat == f.OwnerSeat && e.TurnNumber == r.TurnNumber && e.TurnOwnerSeat == r.TurnOwnerSeat))
             return false;
         var issued = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FirstSlashDuelBenefitIssuedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
         if (r.SelectedBranch is null)

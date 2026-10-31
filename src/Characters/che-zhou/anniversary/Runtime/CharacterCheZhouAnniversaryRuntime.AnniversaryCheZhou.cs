@@ -1,21 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCheZhouAnniversaryRuntime
 {
     internal const string CheZhouAction = "anniversary-che-zhou", CheZhouObtainReason = "skill-program.anniversary:pigua.obtain";
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryCheZhouHost.Resolve(ProgramSkillFrame f) => BeginAnniversaryCheZhouPigua(f);
-    internal static CardConversionSource CheZhouSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryCheZhouHost.Resolve(ProgramSkillFrame f) => BeginAnniversaryCheZhouPigua(f);
+    internal static CardConversionSource CheZhouSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 46400)]
     internal bool CanOfferAnniversaryCheZhou(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext c) => candidate.SkillId != AnniversaryCheZhouComposition.Pigua || c is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 1, SourceSeat: { } source, TargetSeat: { } target, DamageFrameId: { } damageId } && source == candidate.OwnerSeat && source != target && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreActualRoundProgressRoundNumberAccess._roundNumber > 0 && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Count > 0 && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } window && window.ParentFrameId == damageId && window.SourceSeat == source && window.TargetSeat == target && window.TriggerWindow == c.Window && _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damageId)is { } actual && actual.SourceSeat == source && actual.TargetSeat == target && actual.Amount == c.Amount && _coreDamageZoneAcquisitionOperations.DamageAcquisitionHasExactOwningAttack(actual, window);
     internal bool ExactCheZhouDamage(ProgramSkillFrame f)
     {
-        if (f.SkillId != AnniversaryCheZhouComposition.Pigua || f.TriggerId != AnniversaryCheZhouComposition.Binding || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 1, SourceSeat: { } source, TargetSeat: { } target, DamageFrameId: { } damageId } c || source != f.OwnerSeat || target == source || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.ParentFrameId != damageId || window.SourceSeat != source || window.TargetSeat != target || window.TriggerWindow != c.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damageId)is not { } actual || actual.SourceSeat != source || actual.TargetSeat != target || actual.Amount != c.Amount || !_coreDamageZoneAcquisitionOperations.DamageAcquisitionHasExactOwningAttack(actual, window))
+        if (f.SkillId != AnniversaryCheZhouComposition.Pigua || f.TriggerId != AnniversaryCheZhouComposition.Binding || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 1, SourceSeat: { } source, TargetSeat: { } target, DamageFrameId: { } damageId } c || source != f.OwnerSeat || target == source || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.ParentFrameId != damageId || window.SourceSeat != source || window.TargetSeat != target || window.TriggerWindow != c.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damageId)is not { } actual || actual.SourceSeat != source || actual.TargetSeat != target || actual.Amount != c.Amount || !_coreDamageZoneAcquisitionOperations.DamageAcquisitionHasExactOwningAttack(actual, window))
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<DamageRequestedEvent>().Count(e => e.ResolutionId == damageId && !e.SourceLess && e.SourceSeat == source && e.TargetSeat == target && e.Amount == c.Amount && e.Nature == actual.Nature) == 1;
     }
@@ -75,7 +72,7 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
     [ProgramAnswer(CheZhouAction)]
     internal void AnswerCheZhou(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryCheZhou: { Stage: AnniversaryCheZhouStage.Selecting } r } f || !ValidCheZhou(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], CheZhouChoices(f).Where(c => c.Id == answer.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryCheZhou: { Stage: AnniversaryCheZhouStage.Selecting } r } f || !ValidCheZhou(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], CheZhouChoices(f).Where(c => c.Id == answer.Id).ToArray()))
             throw new InvalidOperationException("Pigua requires its published opaque Hand slot and unpaid original frame.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

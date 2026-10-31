@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuCheErAnniversaryRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
     internal SkillProgramStepOutcome RecordHuCheErGain(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != AnniversaryHuCheErComposition.Fuzhong || f.TriggerId != "foreign-turn-gain" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.WindowContext is not { MovementBatch: { } batch } c || !HuCheErGain(f.OwnerSeat, c) || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.Batch.Id != batch.Id || parent.Batch.TurnNumber != batch.TurnNumber || !parent.Batch.Movements.SequenceEqual(batch.Movements) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
+        if (f.SkillId != AnniversaryHuCheErComposition.Fuzhong || f.TriggerId != "foreign-turn-gain" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.WindowContext is not { MovementBatch: { } batch } c || !HuCheErGain(f.OwnerSeat, c) || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.Batch.Id != batch.Id || parent.Batch.TurnNumber != batch.TurnNumber || !parent.Batch.Movements.SequenceEqual(batch.Movements) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
             throw new InvalidOperationException("Fuzhong requires an unpaid actual out-of-turn native Hand gain batch.");
         var before = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.AnniversaryHuCheErZhong);
         _coreAttributedMarkerEventsOperations.MutateParticipantMarker(f, f.OwnerSeat, PlayerMarkerKind.AnniversaryHuCheErZhong, 1);
@@ -31,7 +27,7 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
     internal SkillProgramStepOutcome SpendHuCheErFour(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != AnniversaryHuCheErComposition.Fuzhong || f.TriggerId != "ending-four" || f.ActivationId != f.TriggerId || f.InstructionIndex != 3 || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } c || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != f.OwnerSeat || parent.TurnNumber != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHuCheErFourRemovedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.SkillId != AnniversaryHuCheErComposition.Fuzhong || f.TriggerId != "ending-four" || f.ActivationId != f.TriggerId || f.InstructionIndex != 3 || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } c || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != f.OwnerSeat || parent.TurnNumber != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHuCheErFourRemovedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Fuzhong must remove exactly four marks after its original native ending damage returns.");
         var before = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.AnniversaryHuCheErZhong);
         if (before < 4)
@@ -42,7 +38,7 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
     }
 
     internal IEnumerable<AnniversaryHuCheErSlashForbiddenEvent> ActiveHuCheErSlashBans(int actor) => !HasAnniversaryHuCheErRules || _coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHuCheErSlashForbiddenEvent>().Where(e => e.Actor == actor && e.Turn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Source.SkillId == AnniversaryHuCheErComposition.Daoji && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.Hash && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHuCheErStartedEvent>().Count(s => s.FrameId == e.FrameId && s.Source == e.Source && s.Hash == e.Hash && s.UseId == e.UseId && s.ActionId == e.ActionId && s.Actor == actor && s.Turn == e.Turn && s.TurnOwner == e.TurnOwner) == 1);
-    internal bool HuCheErSlashBan(int actor, CardKind kind) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && ActiveHuCheErSlashBans(actor).Any();
+    internal bool HuCheErSlashBan(int actor, CardKind kind) => CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && ActiveHuCheErSlashBans(actor).Any();
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeIntrinsicUseBan, 49500)]
     internal bool HuCheErUseBan(ProgramCardUseQuery q)
     {

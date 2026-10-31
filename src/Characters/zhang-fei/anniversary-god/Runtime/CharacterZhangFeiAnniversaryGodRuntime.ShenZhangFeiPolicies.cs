@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
 {
     internal bool HasShenZfXunshi(CharacterState p) => _coreNationalSkillsOperations.HasRuntimeSkill(p, ShenZhangFeiComposition.Xunshi);
     internal bool IsShenZfIdentitySource(CharacterState owner, Card card, CardConversionSource? source) => source is { SkillId: ShenZhangFeiComposition.Xunshi, BindingId: "multi-trick-slash" } && source.OwnerSeat == owner.Seat && card.Id > 0 && _coreActionQueriesOperations.GetProgramCardIdentityMatches(owner, card).Any(m => m.Source == source && m.Identity.Id == "multi-trick-slash");
-    internal bool ShenZfAttackIsColorless(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { ShenZhangFeiColorless: { } r, Action: { Type: CardActionType.Use } a } u && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && attack.EffectiveCardKind == u.CardKind && u.SourceSeat == a.ActorSeat && a.ActorSeat == attack.CardUserSeat && r.ActionId == a.ActionId && r.Source is { SkillId: ShenZhangFeiComposition.Xunshi, BindingId: "colorless-use" } && r.Source.OwnerSeat == a.ActorSeat && !string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) && r.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(ShenZhangFeiComposition.Xunshi).Program!.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhangFeiColorlessIssuedEvent>().Count(e => e.UseId == u.Id && e.Receipt == r) == 1 && ShenZfColorless(a);
+    internal bool ShenZfAttackIsColorless(NativeOwners.CardAttackHandle attack) => _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { ShenZhangFeiColorless: { } r, Action: { Type: CardActionType.Use } a } u && CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && attack.EffectiveCardKind == u.CardKind && u.SourceSeat == a.ActorSeat && a.ActorSeat == attack.CardUserSeat && r.ActionId == a.ActionId && r.Source is { SkillId: ShenZhangFeiComposition.Xunshi, BindingId: "colorless-use" } && r.Source.OwnerSeat == a.ActorSeat && !string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) && r.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(ShenZhangFeiComposition.Xunshi).Program!.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhangFeiColorlessIssuedEvent>().Count(e => e.UseId == u.Id && e.Receipt == r) == 1 && ShenZfColorless(a);
     internal Suit? ShenZfIdentitySuit(CharacterState p, Card c, CardLocation? identityLocation = null)
     {
         if (c.Id <= 0 || !HasShenZfXunshi(p) || !ShenZhangFeiComposition.MultiTricks.Contains(c.Kind))
@@ -39,7 +34,7 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
             return false;
         if (ids.Count == 0)
             return true;
-        var colors = ids.Select(id => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(p, _coreAdvancedLifecycleOperations.GetAdvancedCard(id)))).Distinct().ToArray();
+        var colors = ids.Select(id => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(p, _coreAdvancedLifecycleOperations.GetAdvancedCard(id)))).Distinct().ToArray();
         return colors.Length > 1 || colors is [null ];
     }
 
@@ -82,7 +77,7 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
     [ProgramTargetRule(ProgramTargetRulePoint.ExtraSlashTargets, 38600)]
     internal ProgramSlashTargetExpansion? ShenZfSlashTargets(ProgramSlashTargetExpansionQuery q)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) || !HasShenZfXunshi(_coreMatchParticipantsPlayersAccess._players[q.ActorSeat]) || q.EffectiveSuit != Suit.None && (q.EffectiveIsRed is not null || q.EffectiveSuit is Suit.Heart or Suit.Diamond or Suit.Spade or Suit.Club))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(q.Kind) || !HasShenZfXunshi(_coreMatchParticipantsPlayersAccess._players[q.ActorSeat]) || q.EffectiveSuit != Suit.None && (q.EffectiveIsRed is not null || q.EffectiveSuit is Suit.Heart or Suit.Diamond or Suit.Spade or Suit.Club))
             return null;
         var p = _contentRegistryOperations._contentRegistry.GetSkill(ShenZhangFeiComposition.Xunshi).Program!;
         var source = new CardUseEffectSource(p.Id, "colorless-use", q.ActorSeat, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[q.ActorSeat], p.Id));
@@ -94,7 +89,7 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
 
     [ProgramTargetRule(ProgramTargetRulePoint.ExtraSlashTargetSource, 38600)]
     internal bool ShenZfSlashTargetSource(ProgramSlashTargetSourceQuery q) => q.Source.SkillId == ShenZhangFeiComposition.Xunshi && q.Source.BindingId == "colorless-use" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(q.Source.OwnerSeat) && !string.IsNullOrWhiteSpace(q.Source.SkillInstanceId) && q.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(ShenZhangFeiComposition.Xunshi).Program!.GameplayHash;
-    internal bool ShenZfCannotRespond(int source, int responder, CardKind incoming, IReadOnlyList<int> targets) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && targets.Contains(responder) && ShenZfMark(responder, PlayerMarkerKind.ShencaiZhang) > 0 && ShenZfIssued(responder);
+    internal bool ShenZfCannotRespond(int source, int responder, CardKind incoming, IReadOnlyList<int> targets) => CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && targets.Contains(responder) && ShenZfMark(responder, PlayerMarkerKind.ShencaiZhang) > 0 && ShenZfIssued(responder);
     internal IEnumerable<RuleQueryContribution> ShenZfHandLimitContributions(CharacterState p)
     {
         if (p.IsAlive && ShenZfMark(p.Seat, PlayerMarkerKind.ShencaiSi)is> 0 and var count && ShenZfIssued(p.Seat))

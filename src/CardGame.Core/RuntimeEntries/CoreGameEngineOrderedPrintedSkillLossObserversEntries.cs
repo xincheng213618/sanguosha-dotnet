@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineOrderedPrintedSkillLossObserversRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineOrderedPrintedSkillLossObserversRuntime))]
 internal sealed partial class CoreGameEngineOrderedPrintedSkillLossObserversEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineOrderedPrintedSkillLossObserversRuntime> _resolve;
-    private CoreGameEngineOrderedPrintedSkillLossObserversEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineOrderedPrintedSkillLossObserversRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineOrderedPrintedSkillLossObserversRuntime> _resolve;
+    private CoreGameEngineOrderedPrintedSkillLossObserversEntries(Func<EngineOwners.CoreGameEngineOrderedPrintedSkillLossObserversRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineOrderedPrintedSkillLossObserversEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineOrderedPrintedSkillLossObserversRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineOrderedPrintedSkillLossObserversEntries Create(Func<EngineOwners.CoreGameEngineOrderedPrintedSkillLossObserversRuntime> resolve) => new(resolve);
 }

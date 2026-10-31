@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_liu_hong_ol_Yujue_Programs
 {
     internal static string YujueSlotDisplayName(EquipmentSlot slot) => slot switch

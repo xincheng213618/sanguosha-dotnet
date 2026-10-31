@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime))]
 internal sealed partial class CoreGameEngineDamageTargetSkillRoundDrawEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime> _resolve;
-    private CoreGameEngineDamageTargetSkillRoundDrawEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime> _resolve;
+    private CoreGameEngineDamageTargetSkillRoundDrawEntries(Func<EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineDamageTargetSkillRoundDrawEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineDamageTargetSkillRoundDrawEntries Create(Func<EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime> resolve) => new(resolve);
 }

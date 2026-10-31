@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuZhiMouOlRuntime
@@ -15,12 +11,12 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (_coreProgramVirtualDuelOperations.FrozenProgramDuelInstructionIndex(f.Id) != f.InstructionIndex || f.CardAttack is not { Active: true, EffectiveCardKind: CardKind.Duel, CardId: null, PhysicalCardIds.Count: 0 } a || a.CardUserSeat != actor || a.TargetSeat != target || f.Continuations.Duel is not { Active: true })
             throw new InvalidOperationException("Sibing direct-Duel capture requires the original native producer instruction.");
-        var d = new MouLuZhiOlDirectDuel(f.Id, f.InstructionIndex, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, actor, target);
+        var d = new MouLuZhiOlDirectDuel(f.Id, f.InstructionIndex, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, actor, target);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MouLuZhiOlDirectDuel = d });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuZhiOlDirectDeclaredEvent(d));
     }
 
-    internal bool ValidMouLzDirect(ProgramSkillFrame p, MouLuZhiOlDirectDuel d) => p.Id == d.FrameId && p.InstructionIndex == d.Instruction && p.GameplayHash == d.Hash && d.Producer == new CardConversionSource(p.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(p), p.OwnerSeat, p.SkillInstanceId) && _coreProgramVirtualDuelOperations.FrozenProgramDuelInstructionIndex(p.Id) == d.Instruction && p.CardAttack is { EffectiveCardKind: CardKind.Duel, CardId: null, PhysicalCardIds.Count: 0 } a && a.CardUserSeat == d.Actor && (p.TriggerId is null ? p.SelectedTargetSeats.SequenceEqual([d.Actor, d.Target]) : p.OwnerSeat == d.Actor && p.SelectedTargetSeats.SequenceEqual([d.Target])) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlDirectDeclaredEvent>().Count(e => e.Duel == d with { PressClosed = false, Returned = false, CounterClosed = false, DamageApplied = false, FinalTarget = 0 }) == 1;
+    internal bool ValidMouLzDirect(ProgramSkillFrame p, MouLuZhiOlDirectDuel d) => p.Id == d.FrameId && p.InstructionIndex == d.Instruction && p.GameplayHash == d.Hash && d.Producer == new CardConversionSource(p.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(p), p.OwnerSeat, p.SkillInstanceId) && _coreProgramVirtualDuelOperations.FrozenProgramDuelInstructionIndex(p.Id) == d.Instruction && p.CardAttack is { EffectiveCardKind: CardKind.Duel, CardId: null, PhysicalCardIds.Count: 0 } a && a.CardUserSeat == d.Actor && (p.TriggerId is null ? p.SelectedTargetSeats.SequenceEqual([d.Actor, d.Target]) : p.OwnerSeat == d.Actor && p.SelectedTargetSeats.SequenceEqual([d.Target])) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlDirectDeclaredEvent>().Count(e => e.Duel == d with { PressClosed = false, Returned = false, CounterClosed = false, DamageApplied = false, FinalTarget = 0 }) == 1;
     internal bool TryBeginMouLzDirectDesignation(long producerId)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(producerId);
@@ -79,7 +75,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 32900)]
-    internal bool ReturnMouLzDirect(global::CardGame.Core.GameEngine.AttackCompletionReceipt c)
+    internal bool ReturnMouLzDirect(GameEngine.AttackCompletionReceipt c)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLuZhiOlDirectDuel: { Returned: false } d } p || c.ResolutionId != p.Id || c.ProgramFrameId != p.Id)
             return false;

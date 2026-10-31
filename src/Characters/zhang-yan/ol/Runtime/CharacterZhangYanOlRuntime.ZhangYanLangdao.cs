@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangYanOlRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
     internal IReadOnlyList<LangdaoOption> ZhangYanAvailableOptions(CardConversionSource source) => Array.AsReadOnly(Enum.GetValues<LangdaoOption>().Where(option => !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanLangdaoOptionRemovedEvent>().Any(e => e.Source.OwnerSeat == source.OwnerSeat && e.Source.SkillId == source.SkillId && e.Source.SkillInstanceId == source.SkillInstanceId && e.Option == option)).ToArray());
     internal CardUseFrame? ZhangYanLangdaoParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
     {
-        if (c.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || c.CardUse is not { } card || card.ActorSeat != candidate.OwnerSeat || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != card.ParentCardUseFrameId || w.Action.ActionId != card.CardActionId || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) != candidate || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.ActionId != card.CardActionId || a.ActorSeat != candidate.OwnerSeat || use.SourceSeat != candidate.OwnerSeat)
+        if (c.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || c.CardUse is not { } card || card.ActorSeat != candidate.OwnerSeat || c.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != card.ParentCardUseFrameId || w.Action.ActionId != card.CardActionId || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) != candidate || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.ActionId != card.CardActionId || a.ActorSeat != candidate.OwnerSeat || use.SourceSeat != candidate.OwnerSeat)
             return null;
         return use;
     }
@@ -73,7 +69,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
 
     internal bool IsZhangYanLangdaoIssued(CardUseFrame use)
     {
-        if (use.ZhangYanLangdao is not { } r || use.Action is not { Type: CardActionType.Use } a || a.ActionId != r.ActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || r.Source.OwnerSeat != r.OriginalActor || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.OriginalActor, a.ProviderSeat) || r.DamageBonus is < 0 or > 2 || r.ExtraCount is < 0 or > 2 || r.OriginalTargets is not [var original] || original != r.OriginalTarget || r.SelectedOptions.Count is < 1 or > 2 || r.SelectedOptions.Distinct().Count() != r.SelectedOptions.Count || r.AddedTargets.Count > r.ExtraCount || r.AddedTargets.Distinct().Count() != r.AddedTargets.Count || r.AddedTargets.Any(r.OriginalTargets.Contains))
+        if (use.ZhangYanLangdao is not { } r || use.Action is not { Type: CardActionType.Use } a || a.ActionId != r.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || r.Source.OwnerSeat != r.OriginalActor || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.OriginalActor, a.ProviderSeat) || r.DamageBonus is < 0 or > 2 || r.ExtraCount is < 0 or > 2 || r.OriginalTargets is not [var original] || original != r.OriginalTarget || r.SelectedOptions.Count is < 1 or > 2 || r.SelectedOptions.Distinct().Count() != r.SelectedOptions.Count || r.AddedTargets.Count > r.ExtraCount || r.AddedTargets.Distinct().Count() != r.AddedTargets.Count || r.AddedTargets.Any(r.OriginalTargets.Contains))
             return false;
         var votes = _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanLangdaoVoteRevealedEvent>().Where(e => e.FrameId == r.ProgramFrameId).OrderBy(e => e.Index).ToArray();
         return votes is [{ Index: 0 } first, { Index: 1 } second] && first.Seat == r.OriginalActor && second.Seat == r.OriginalTarget && votes.Count(v => v.Option == LangdaoOption.Damage) == r.DamageBonus && votes.Count(v => v.Option == LangdaoOption.ExtraTarget) == r.ExtraCount && votes.Any(v => v.Option == LangdaoOption.NoResponse) == r.NoResponse && votes.Select(v => v.Option).Distinct().SequenceEqual(r.SelectedOptions) && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanLangdaoIssuedEvent>().Count(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.FrameId == r.ProgramFrameId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.OriginalActor == r.OriginalActor && e.OriginalTarget == r.OriginalTarget && e.DamageBonus == r.DamageBonus && e.ExtraCount == r.ExtraCount && e.NoResponse == r.NoResponse) == 1;
@@ -81,7 +77,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
 
     internal bool IsZhangYanLangdaoUnrespondable(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ZhangYanLangdao: { NoResponse: true } } use && IsZhangYanLangdaoIssued(use);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 140)]
-    internal int ZhangYanLangdaoDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { ZhangYanLangdao: { } r } use && IsZhangYanLangdaoIssued(use) ? r.DamageBonus : 0;
+    internal int ZhangYanLangdaoDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { ZhangYanLangdao: { } r } use && IsZhangYanLangdaoIssued(use) ? r.DamageBonus : 0;
     internal bool HasZhangYanLangdaoTargetTail(CardUseFrame use)
     {
         if (use.ZhangYanLangdao is not { AddedTargets.Count: > 0 } r || !IsZhangYanLangdaoIssued(use))
@@ -124,7 +120,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
         var exact = op.Op switch
         {
             SkillProgramEffectOp.OfferVirtualSlashOrDraw => parent.SelectedTargetSeats.SequenceEqual([a.ActorSeat]) && a.ConversionChain.Count == 0,
-            SkillProgramEffectOp.UseVirtualSlash => parent.OwnerSeat == a.ActorSeat && a.ConversionChain.SequenceEqual([new CardConversionSource(parent.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId)]) && (op.TargetReference is null ? parent.SelectedTargetSeats.SequenceEqual([original]) : op.TargetReference.Kind == ProgramParticipantRef.EventTarget && parent.WindowContext?.TargetSeat == original),
+            SkillProgramEffectOp.UseVirtualSlash => parent.OwnerSeat == a.ActorSeat && a.ConversionChain.SequenceEqual([new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId)]) && (op.TargetReference is null ? parent.SelectedTargetSeats.SequenceEqual([original]) : op.TargetReference.Kind == ProgramParticipantRef.EventTarget && parent.WindowContext?.TargetSeat == original),
             SkillProgramEffectOp.UseVirtualCard or SkillProgramEffectOp.OfferUnlimitedVirtualSlash => parent.OwnerSeat == a.ActorSeat && parent.SelectedTargetSeats.SequenceEqual([original]) && op.OutputKind == CardKind.Slash && op.TargetRestriction is SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget or SkillProgramCardTargetRestriction.NormalSlashTarget,
             _ => false
         };

@@ -1,23 +1,19 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiaoHuaBoundaryMobileRuntime
 {
     internal const string BoundaryMobileDangxian = "boundary:dangxian-mobile", BoundaryLiaoHuaDiscardAction = "boundary-liao-hua-discard-slash", BoundaryLiaoHuaDiscardReason = "skill-program.boundary:liao-hua-mobile.discard-slash";
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryLiaoHuaMobileHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginBoundaryLiaoHuaDiscardSlash(frame);
+    SkillProgramStepOutcome IBoundaryLiaoHuaMobileHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginBoundaryLiaoHuaDiscardSlash(frame);
     internal SkillProgramStepOutcome BeginBoundaryLiaoHuaDiscardSlash(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (frame.SkillId != BoundaryMobileDangxian || frame.TriggerId != "discard-slash-extra-play" || frame.InstructionIndex != 1 || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context || frame.BoundaryLiaoHuaDiscardSlash is not null)
             throw new InvalidOperationException("Mobile Dangxian requires its fresh original own-turn starting instruction.");
-        var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)).Select(card => card.Id).ToArray();
+        var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)).Select(card => card.Id).ToArray();
         if (cards.Length == 0 || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
-        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { BoundaryLiaoHuaDiscardSlash = new(new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, context.ParentFrameId, frame.InstructionIndex) { Candidates = cards } });
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { BoundaryLiaoHuaDiscardSlash = new(new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, context.ParentFrameId, frame.InstructionIndex) { Candidates = cards } });
         PublishBoundaryLiaoHuaDiscardSlash(frame);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -45,7 +41,7 @@ internal sealed partial class CharacterLiaoHuaBoundaryMobileRuntime
     [ProgramAnswer(BoundaryLiaoHuaDiscardAction)]
     internal void AnswerBoundaryLiaoHuaDiscardSlash(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryLiaoHuaDiscardSlash.CardId: null } frame || !ValidBoundaryLiaoHuaDiscardSlash(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], BoundaryLiaoHuaDiscardChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryLiaoHuaDiscardSlash.CardId: null } frame || !ValidBoundaryLiaoHuaDiscardSlash(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], BoundaryLiaoHuaDiscardChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Mobile Dangxian requires its current original owner's published actual discarded Slash.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
@@ -75,12 +71,12 @@ internal sealed partial class CharacterLiaoHuaBoundaryMobileRuntime
 
     internal bool ValidBoundaryLiaoHuaDiscardSlash(ProgramSkillFrame frame)
     {
-        if (frame.BoundaryLiaoHuaDiscardSlash is not { } receipt || frame.SkillId != BoundaryMobileDangxian || frame.TriggerId != "discard-slash-extra-play" || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context || context.ParentFrameId != receipt.WindowFrameId || receipt.Source != new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || receipt.GameplayHash != frame.GameplayHash || receipt.InstructionIndex != frame.InstructionIndex || receipt.Candidates.Count == 0 || receipt.Candidates.Distinct().Count() != receipt.Candidates.Count)
+        if (frame.BoundaryLiaoHuaDiscardSlash is not { } receipt || frame.SkillId != BoundaryMobileDangxian || frame.TriggerId != "discard-slash-extra-play" || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context || context.ParentFrameId != receipt.WindowFrameId || receipt.Source != new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || receipt.GameplayHash != frame.GameplayHash || receipt.InstructionIndex != frame.InstructionIndex || receipt.Candidates.Count == 0 || receipt.Candidates.Distinct().Count() != receipt.Candidates.Count)
             return false;
         if (receipt.CardId is null)
-            return receipt.Candidates.All(id => _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Any(card => card.Id == id && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)));
+            return receipt.Candidates.All(id => _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Any(card => card.Id == id && CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)));
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > receipt.Before && move.Sequence <= receipt.After).ToArray();
-        return receipt.Candidates.Contains(receipt.CardId.Value) && receipt.BatchId > 0 && moves is [var paid] && paid.CardId == receipt.CardId && paid.From == CardLocation.DiscardPile && paid.To == CardLocation.Hand(frame.OwnerSeat) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(paid.CardKind) && paid.Reason.Value == BoundaryLiaoHuaDiscardReason && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiaoHuaDiscardSlashObtainedEvent>().Count(fact => fact.FrameId == frame.Id && fact.InstructionIndex == receipt.InstructionIndex && fact.OwnerSeat == frame.OwnerSeat && fact.CardId == receipt.CardId && fact.BatchId == receipt.BatchId && fact.Before == receipt.Before && fact.After == receipt.After) == 1;
+        return receipt.Candidates.Contains(receipt.CardId.Value) && receipt.BatchId > 0 && moves is [var paid] && paid.CardId == receipt.CardId && paid.From == CardLocation.DiscardPile && paid.To == CardLocation.Hand(frame.OwnerSeat) && CoreNativeCardClassificationsRuntime.IsSlashCard(paid.CardKind) && paid.Reason.Value == BoundaryLiaoHuaDiscardReason && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiaoHuaDiscardSlashObtainedEvent>().Count(fact => fact.FrameId == frame.Id && fact.InstructionIndex == receipt.InstructionIndex && fact.OwnerSeat == frame.OwnerSeat && fact.CardId == receipt.CardId && fact.BatchId == receipt.BatchId && fact.Before == receipt.Before && fact.After == receipt.After) == 1;
     }
     [ProgramContinuation(ProgramContinuationKind.Movement, 55600)]
     internal bool ReturnBoundaryLiaoHuaDiscardMovement(ProgramSkillFrame frame)

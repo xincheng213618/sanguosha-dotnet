@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuTuGuOlRuntime
 {
     internal bool HasWuTuGuCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmHanyongNativeGroupDamage) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AccumulateRanshangFirePoint) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveRanshangEndingHpLoss);
 
-    internal static CardConversionSource WuTuGuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wu_tu_gu_ol_WuTuGu.WuTuGuSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IWuTuGuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWuTuGu(f, op);
+    internal static CardConversionSource WuTuGuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_wu_tu_gu_ol_WuTuGu.WuTuGuSource(f);
+    SkillProgramStepOutcome IWuTuGuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWuTuGu(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27320)]
     internal bool CanOfferWuTuGu(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => t.Effects is [{ Op: SkillProgramEffectOp.ArmHanyongNativeGroupDamage }] ? WuTuGuHanyongQualification(c, context)is not null : t.Effects is not [{ Op: SkillProgramEffectOp.ResolveRanshangEndingHpLoss }] || _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.RanshangRan) > 0;
     internal SkillProgramStepOutcome BeginWuTuGu(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -20,7 +16,7 @@ internal sealed partial class CharacterWuTuGuOlRuntime
             throw new InvalidOperationException("Wu Tu Gu requires the exact original native binding.");
         if (op == SkillProgramEffectOp.ArmHanyongNativeGroupDamage)
         {
-            if (f.SkillId != "ol:hanyong" || context.Window != SkillProgramTriggerWindow.CardUseCommitted || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramCardTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) || WuTuGuHanyongQualification(global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex]), context)is not { } q)
+            if (f.SkillId != "ol:hanyong" || context.Window != SkillProgramTriggerWindow.CardUseCommitted || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramCardTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) || WuTuGuHanyongQualification(CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex]), context)is not { } q)
                 throw new InvalidOperationException("Hanyong lost its frozen native-use HP/round qualification.");
             var use = _coreCardUseLifecycleOperations.LifecycleCardUse(q.UseId)!;
             if (use.WuTuGuHanyong?.Grants.Any(g => g.Source == q.Source) == true)
@@ -33,7 +29,7 @@ internal sealed partial class CharacterWuTuGuOlRuntime
 
         if (op == SkillProgramEffectOp.AccumulateRanshangFirePoint)
         {
-            if (f.SkillId != "ol:ranshang" || context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.TargetSeat != f.OwnerSeat || context.Amount <= 0 || _resolutionStackOperations._resolutionStack.Count < 3 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame damage || damage.Id != context.ParentFrameId || damage.ParentFrameId != context.DamageFrameId || damage.TargetSeat != f.OwnerSeat || damage.TriggerWindow != context.Window || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || _coreNativeCardClassificationsOperations.GetDamageNature(_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage)) != DamageNature.Fire || !_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage).DamageWasApplied || context.OccurrenceIndex < 0 || context.OccurrenceIndex >= context.Amount)
+            if (f.SkillId != "ol:ranshang" || context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.TargetSeat != f.OwnerSeat || context.Amount <= 0 || _resolutionStackOperations._resolutionStack.Count < 3 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame damage || damage.Id != context.ParentFrameId || damage.ParentFrameId != context.DamageFrameId || damage.TargetSeat != f.OwnerSeat || damage.TriggerWindow != context.Window || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || _coreNativeCardClassificationsOperations.GetDamageNature(_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage)) != DamageNature.Fire || !_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage).DamageWasApplied || context.OccurrenceIndex < 0 || context.OccurrenceIndex >= context.Amount)
                 throw new InvalidOperationException("Ranshang requires one exact point of truly applied native fire damage.");
             var source = WuTuGuSource(f);
             if (_coreProgramEventHistoryOperations.ProgramEventHistory<WuTuGuFirePointAddedEvent>().Any(e => e.DamageFrameId == context.DamageFrameId && e.Source == source && e.Point == context.OccurrenceIndex))

@@ -1,24 +1,20 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeCardUseCompletionRuntime
 {
-    internal void CompleteFinishedAttackCardUse(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CompleteFinishedAttackCardUse(NativeOwners.CardAttackHandle attack)
     {
-        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsProgramSkillUse: true, AwaitingProviders: false } jijiang && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(jijiang.ActiveAttack, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsProgramSkillUse: true, AwaitingProviders: false } jijiang && CoreNativeDamageHandlesRuntime.SameAttackOwner(jijiang.ActiveAttack, attack))
         {
             _coreNativeFactionSlashCompletionOperations.CompleteProgramFactionCardRequest(jijiang);
         }
-        else if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsQinglongCrescentBladeUse: true, AwaitingProviders: false } qinglongFactionSlash && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglongFactionSlash.ActiveAttack, attack))
+        else if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsQinglongCrescentBladeUse: true, AwaitingProviders: false } qinglongFactionSlash && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglongFactionSlash.ActiveAttack, attack))
         {
             _coreNativeFactionSlashOperations.CompleteQinglongCrescentBladeFactionSlash(qinglongFactionSlash);
         }
 
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None && _coreNativeCardContinuationCursorsOperations.ActiveQinglongFollowup is null && _coreMatchOutcomeStatusWinnerAccess._status != EngineStatus.Completed && !_characterWuAnGuoOlOperations.HasWuAnGuoLiyongCompletedUseParent(attack.ResolutionId) && (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword?.ActiveAttack is not { } borrowedAttack || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(borrowedAttack, attack)))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None && _coreNativeCardContinuationCursorsOperations.ActiveQinglongFollowup is null && _coreMatchOutcomeStatusWinnerAccess._status != EngineStatus.Completed && !_characterWuAnGuoOlOperations.HasWuAnGuoLiyongCompletedUseParent(attack.ResolutionId) && (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword?.ActiveAttack is not { } borrowedAttack || !CoreNativeDamageHandlesRuntime.SameAttackOwner(borrowedAttack, attack)))
         {
             _kernelCoreMainOperations.CompleteGame();
         }

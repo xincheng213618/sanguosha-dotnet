@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,9 +7,9 @@ internal sealed partial class CharacterWangCanMobileRuntime
 {
     internal const string MobileWangCanShanxi = "mobile:shanxi-wang-can";
     internal const string MobileWangCanXiGift = "skill-program.mobile-wang-can.xi-gift";
-    internal static CardConversionSource MobileWangCanSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MobileWangCanSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal IEnumerable<int> MobileWangCanXiTargets(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && p.Markers.GetValueOrDefault(PlayerMarkerKind.MobileWangCanXi) == 0).Select(p => p.Seat);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileWangCanHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginMobileWangCanXi(frame, op);
+    SkillProgramStepOutcome IMobileWangCanHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginMobileWangCanXi(frame, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 81500, SkillProgramEffectOp.TransferMobileWangCanXi)]
     internal bool CanOfferMobileWangCanMark(ProgramTriggerLegalityContext g) => g.SkillId == MobileWangCanShanxi && MobileWangCanXiTargets(g.OwnerSeat).Any();
     [ProgramPipelineHook(ProgramPipelinePhase.CaptureHealthChange, 81500)]
@@ -147,7 +144,7 @@ internal sealed partial class CharacterWangCanMobileRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Shanxi answer lost its original frame.");
         var r = f.MobileWangCanXi!;
-        if (selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MobileWangCanXiChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MobileWangCanXiChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Shanxi payment or target is no longer legal.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         switch (selected.Parameters["branch"])

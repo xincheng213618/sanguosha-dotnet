@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangDeBoundaryMobileRuntime
@@ -23,7 +19,7 @@ internal sealed partial class CharacterPangDeBoundaryMobileRuntime
         if (f.SkillId != BoundaryPangDeJianchu || f.TriggerId != "discard-final-target-card" || f.InstructionIndex is < 1 or > 3 || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } action, TargetSeat: { } target } || f.CardSetBindings.SingleOrDefault(b => b.Name == "discarded-target-card")is not { CardIds: [var cardId] } binding)
             return false;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == action.ParentCardUseFrameId);
-        if (use?.Action is not { Type: CardActionType.Use } native || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(native.EffectiveKind) || native.ActionId != action.CardActionId || native.ActorSeat != f.OwnerSeat || action.ActorSeat != f.OwnerSeat || !native.EffectiveDesignatedTargetSeats.Contains(target))
+        if (use?.Action is not { Type: CardActionType.Use } native || !CoreNativeCardClassificationsRuntime.IsSlashCard(native.EffectiveKind) || native.ActionId != action.CardActionId || native.ActorSeat != f.OwnerSeat || action.ActorSeat != f.OwnerSeat || !native.EffectiveDesignatedTargetSeats.Contains(target))
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryPangDeDiscardPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var paid] && paid.Instance == f.SkillInstanceId && paid.Hash == f.GameplayHash && paid.Hash == _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash && paid.UseId == use.Id && paid.ActionId == native.ActionId && paid.Owner == f.OwnerSeat && paid.Target == target && paid.CardId == cardId && paid.From.OwnerSeat == target && paid.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && binding.SourceLocations.SequenceEqual([paid.To]) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence == paid.MovementSequence && m.CardId == paid.CardId && m.CardKind == paid.Kind && m.From == paid.From && m.To == paid.To && m.Reason.Value == BoundaryPangDeDiscardReason) == 1;
     }
@@ -42,5 +38,5 @@ internal sealed partial class CharacterPangDeBoundaryMobileRuntime
         return true;
     }
 
-    internal bool IsBoundaryPangDeUnrespondable(long frameId) => _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.ResolutionId == frameId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) && _coreFinalTargetSlashOperations.FinalTargetSlashReceipts(frameId, attack.TargetSeat).Any(r => r.SkillId == BoundaryPangDeJianchu && r.PreventCancellation);
+    internal bool IsBoundaryPangDeUnrespondable(long frameId) => _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.ResolutionId == frameId && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) && _coreFinalTargetSlashOperations.FinalTargetSlashReceipts(frameId, attack.TargetSeat).Any(r => r.SkillId == BoundaryPangDeJianchu && r.PreventCancellation);
 }

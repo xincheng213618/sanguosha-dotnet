@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouShangMobileShiRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiTanfengHost.SelectTarget(ProgramSkillFrame frame, SkillProgramEffect effect) => SelectMobileShiTanfengTarget(frame, effect);
+    SkillProgramStepOutcome IMobileShiTanfengHost.SelectTarget(ProgramSkillFrame frame, SkillProgramEffect effect) => SelectMobileShiTanfengTarget(frame, effect);
     internal string MobileShiTanfengMode(ProgramSkillFrame frame) => frame.ChoiceBindings.Single(binding => binding.Name == "tanfeng-mode").OptionId;
     internal SkillProgramStepOutcome SelectMobileShiTanfengTarget(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {

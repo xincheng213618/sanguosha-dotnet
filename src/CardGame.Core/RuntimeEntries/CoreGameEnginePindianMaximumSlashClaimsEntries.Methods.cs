@@ -2,9 +2,9 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePindianMaximumSlashClaimsEntries
 {
-    internal void AssertPindianPolicyClaims(global::CardGame.Core.PindianFrame frame) => _resolve().AssertPindianPolicyClaims(frame);
-    internal bool BeginMaximumSlashPindianClaims(global::CardGame.Core.PindianFrame frame) => _resolve().BeginMaximumSlashPindianClaims(frame);
-    internal global::CardGame.Core.PindianPolicyClaims FreezePindianPolicyClaims(global::CardGame.Core.PindianFrame frame) => _resolve().FreezePindianPolicyClaims(frame);
-    internal bool HasMaximumSlashPindianClaim(global::CardGame.Core.PindianFrame frame) => _resolve().HasMaximumSlashPindianClaim(frame);
-    internal void ResolveMaximumSlashPindianClaim(global::CardGame.Core.PindianFrame frame, global::CardGame.Core.PromptChoice selected) => _resolve().ResolveMaximumSlashPindianClaim(frame, selected);
+    internal void AssertPindianPolicyClaims(PindianFrame frame) => _resolve().AssertPindianPolicyClaims(frame);
+    internal bool BeginMaximumSlashPindianClaims(PindianFrame frame) => _resolve().BeginMaximumSlashPindianClaims(frame);
+    internal PindianPolicyClaims FreezePindianPolicyClaims(PindianFrame frame) => _resolve().FreezePindianPolicyClaims(frame);
+    internal bool HasMaximumSlashPindianClaim(PindianFrame frame) => _resolve().HasMaximumSlashPindianClaim(frame);
+    internal void ResolveMaximumSlashPindianClaim(PindianFrame frame, PromptChoice selected) => _resolve().ResolveMaximumSlashPindianClaim(frame, selected);
 }

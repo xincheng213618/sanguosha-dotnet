@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,7 +10,7 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
 
     internal WuHuangFuSongTurn WuHfTurn() => new(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat);
     internal bool WuHfTurnOpen(WuHuangFuSongTurn t) => t == WuHfTurn() && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == t.Number && e.OwnerSeat == t.OwnerSeat);
-    internal static CardConversionSource WuHfSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huangfu_song_wumiao_WuHuangFuSong.WuHfSource(f);
+    internal static CardConversionSource WuHfSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_huangfu_song_wumiao_WuHuangFuSong.WuHfSource(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 30000, SkillProgramEffectOp.ResolveWuHuangFuSongChaozhen, SkillProgramEffectOp.ResolveWuHuangFuSongLianjie, SkillProgramEffectOp.SettleWuHuangFuSongJiangxian)]
     internal bool CanOfferWuHuangFuSong(ProgramTriggerCandidate candidate, SkillProgramTrigger t, ProgramSkillWindowContext c)
     {
@@ -24,7 +21,7 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
         return WuHfChaozhenAvailable(candidate.OwnerSeat) && (c.Window == SkillProgramTriggerWindow.DyingEntering && c.TargetSeat == candidate.OwnerSeat || c.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Preparation } phase && phase.ActorSeat == candidate.OwnerSeat);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IWuHuangFuSongHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWuHuangFuSong(f, op);
+    SkillProgramStepOutcome IWuHuangFuSongHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWuHuangFuSong(f, op);
     internal SkillProgramStepOutcome BeginWuHuangFuSong(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -101,7 +98,7 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.WuHuangFuSong!;
-        if (!ValidWuHf(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuHfChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidWuHf(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuHfChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Wu Huangfu Song requires his current published private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !r.Paid && r.Operation != SkillProgramEffectOp.SettleWuHuangFuSongJiangxian && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))

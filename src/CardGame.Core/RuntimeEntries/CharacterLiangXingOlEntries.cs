@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLiangXingOlEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterLiangXingOlRuntime> _resolve;
-    private CharacterLiangXingOlEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterLiangXingOlRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterLiangXingOlRuntime> _resolve;
+    private CharacterLiangXingOlEntries(Func<EngineOwners.CharacterLiangXingOlRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterLiangXingOlEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterLiangXingOlRuntime> resolve) => new(resolve);
+    internal static CharacterLiangXingOlEntries Create(Func<EngineOwners.CharacterLiangXingOlRuntime> resolve) => new(resolve);
 }

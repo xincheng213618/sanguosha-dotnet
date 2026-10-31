@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanPuOlRuntime
 {
     internal const string YanPuGiftReason = "skill-program.yan-pu.huantu.gift";
-    SkillProgramStepOutcome global::CardGame.Core.IYanPuHost.ExecuteYanPu(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYanPu(f, op);
+    SkillProgramStepOutcome IYanPuHost.ExecuteYanPu(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYanPu(f, op);
     internal SkillProgramStepOutcome BeginYanPu(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -99,7 +96,7 @@ internal sealed partial class CharacterYanPuOlRuntime
     [ProgramAnswer("yan-pu")]
     internal void AnswerYanPu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YanPu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], YanPuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YanPu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], YanPuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("YanPu lost its exact private chooser or current owned physical payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Stage != YanPuStage.EndingChoice && !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive)
@@ -288,5 +285,5 @@ internal sealed partial class CharacterYanPuOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.GiveCardSkipDrawForEnding, SkillProgramEffectOp.ResolveHuantuEnding, SkillProgramEffectOp.DrawDyingExitRoundDistance)]
-    internal PromptChoice ChooseAiYanPu(PendingDecision d, ProgramSkillFrame f) => d.Choices.FirstOrDefault(c => c.Parameters["option"] == (_coreMatchParticipantsPlayersAccess._players[f.YanPu!.Target].IsAlive ? "recover-draw" : "draw-give")) ?? d.Choices.OrderBy(c => c.Cards.Count == 0 ? 0 : global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    internal PromptChoice ChooseAiYanPu(PendingDecision d, ProgramSkillFrame f) => d.Choices.FirstOrDefault(c => c.Parameters["option"] == (_coreMatchParticipantsPlayersAccess._players[f.YanPu!.Target].IsAlive ? "recover-draw" : "draw-give")) ?? d.Choices.OrderBy(c => c.Cards.Count == 0 ? 0 : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 }

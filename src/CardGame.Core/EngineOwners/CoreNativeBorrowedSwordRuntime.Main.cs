@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeBorrowedSwordRuntime
 {
     internal Card? GetWeapon(CharacterState player) => _characterHuCheErMouOperations.KongwuEffectiveEquipment(player).FirstOrDefault(card => _coreFieldEquipmentOperations.FieldEquipmentSlot(card) == EquipmentSlot.Weapon);
-    internal bool IsLegalBorrowedSwordSlashTarget(CharacterState weaponOwner, CharacterState target, CardKind? effectiveKind = null, Suit? physicalSuit = null, bool allowAnyPhysicalSuit = true, bool? effectiveColor = null, int? effectiveRank = null, IReadOnlyList<int>? physicalCardIds = null, CardConversionSource? conversionSource = null) => effectiveKind is { } kind ? target.IsAlive && target.Seat != weaponOwner.Seat && _coreProgramTargetRulesOperations.TargetRules.AllowsSlash(new(weaponOwner, target, kind, conversionSource, physicalCardIds)) && !_coreCardUseModulesOperations.IsCardUseForbidden(weaponOwner.Seat, kind, CardActionType.Use) && (_coreProgramDistanceRulesOperations.DistanceRules.AllowsSlashDistance(ProgramDistanceStage.BorrowedSlash, new(weaponOwner, target, kind, Conversion: conversionSource, PhysicalCardIds: physicalCardIds, PhysicalSuit: physicalSuit, EffectiveColor: effectiveColor, EffectiveRank: effectiveRank, AllowAnyPhysicalSuit: allowAnyPhysicalSuit))) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(weaponOwner.Seat, target.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target) : global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(candidate => IsLegalBorrowedSwordSlashTarget(weaponOwner, target, candidate, physicalSuit, allowAnyPhysicalSuit, effectiveColor, effectiveRank, physicalCardIds, conversionSource));
+    internal bool IsLegalBorrowedSwordSlashTarget(CharacterState weaponOwner, CharacterState target, CardKind? effectiveKind = null, Suit? physicalSuit = null, bool allowAnyPhysicalSuit = true, bool? effectiveColor = null, int? effectiveRank = null, IReadOnlyList<int>? physicalCardIds = null, CardConversionSource? conversionSource = null) => effectiveKind is { } kind ? target.IsAlive && target.Seat != weaponOwner.Seat && _coreProgramTargetRulesOperations.TargetRules.AllowsSlash(new(weaponOwner, target, kind, conversionSource, physicalCardIds)) && !_coreCardUseModulesOperations.IsCardUseForbidden(weaponOwner.Seat, kind, CardActionType.Use) && (_coreProgramDistanceRulesOperations.DistanceRules.AllowsSlashDistance(ProgramDistanceStage.BorrowedSlash, new(weaponOwner, target, kind, Conversion: conversionSource, PhysicalCardIds: physicalCardIds, PhysicalSuit: physicalSuit, EffectiveColor: effectiveColor, EffectiveRank: effectiveRank, AllowAnyPhysicalSuit: allowAnyPhysicalSuit))) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(weaponOwner.Seat, target.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target) : CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(candidate => IsLegalBorrowedSwordSlashTarget(weaponOwner, target, candidate, physicalSuit, allowAnyPhysicalSuit, effectiveColor, effectiveRank, physicalCardIds, conversionSource));
     internal IReadOnlyList<Card> GetBorrowedSwordSlashCards(CharacterState weaponOwner, CharacterState slashTarget)
     {
         if (!IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget))
@@ -19,7 +15,7 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
         return _coreActionQueriesOperations.GetSlashUseCards(weaponOwner).Where(card => !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(weaponOwner.Seat, slashTarget.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, card))).Where(card =>
         {
             var baseKind = _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(weaponOwner, card);
-            if (!_coreProgramCardUseRulesOperations.GetSlashUseVariants2(weaponOwner, baseKind).Concat(_characterMiHengLeOperations.SiruiPhysicalSlashVariants(weaponOwner, card).Concat(_characterGuanYuWumiaoOperations.JuewuPhysicalSlashVariants(weaponOwner, card)).Concat(_characterCaoZhiLeOperations.FulePhysicalSlashVariants(weaponOwner, card).Concat(_coreProgramCardLegalityOperations.CardLegality.NativeSlashVariants(new(weaponOwner, card))))).DistinctBy(v => v.EffectiveKind).Any(variant => (_coreProgramDistanceRulesOperations.DistanceRules.AllowsSlashDistance(ProgramDistanceStage.BorrowedPhysicalSlash, new(weaponOwner, slashTarget, variant.EffectiveKind, card))) && IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget, variant.EffectiveKind, _coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, card), false, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, card)), _coreFinalTargetSlashOperations.SpecificSlashRank(weaponOwner, card, variant.EffectiveKind), [card.Id], _coreActionQueriesOperations.GetProgramViewAsConversions(weaponOwner, card, variant.EffectiveKind, false).FirstOrDefault(_characterMiHengLeOperations.IsSiruiSource))))
+            if (!_coreProgramCardUseRulesOperations.GetSlashUseVariants2(weaponOwner, baseKind).Concat(_characterMiHengLeOperations.SiruiPhysicalSlashVariants(weaponOwner, card).Concat(_characterGuanYuWumiaoOperations.JuewuPhysicalSlashVariants(weaponOwner, card)).Concat(_characterCaoZhiLeOperations.FulePhysicalSlashVariants(weaponOwner, card).Concat(_coreProgramCardLegalityOperations.CardLegality.NativeSlashVariants(new(weaponOwner, card))))).DistinctBy(v => v.EffectiveKind).Any(variant => (_coreProgramDistanceRulesOperations.DistanceRules.AllowsSlashDistance(ProgramDistanceStage.BorrowedPhysicalSlash, new(weaponOwner, slashTarget, variant.EffectiveKind, card))) && IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget, variant.EffectiveKind, _coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, card), false, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, card)), _coreFinalTargetSlashOperations.SpecificSlashRank(weaponOwner, card, variant.EffectiveKind), [card.Id], _coreActionQueriesOperations.GetProgramViewAsConversions(weaponOwner, card, variant.EffectiveKind, false).FirstOrDefault(_characterMiHengLeOperations.IsSiruiSource))))
                 return false;
             var location = _cardZonesOperations._cardZones.GetLocation(card.Id);
             if (location != CardLocation.Equipment(weaponOwner.Seat) || _coreFieldEquipmentOperations.FieldEquipmentSlot(card) != EquipmentSlot.Weapon)
@@ -33,15 +29,15 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
         }).ToArray();
     }
 
-    internal bool CanRequestBorrowedSwordFactionSlash(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending)
+    internal bool CanRequestBorrowedSwordFactionSlash(NativeOwners.BorrowedSwordHandle pending)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.WeaponOwnerSeat];
         return !pending.FactionSlashAttempted && owner.IsAlive && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(owner, CardKind.Slash)is not null && IsLegalBorrowedSwordSlashTarget(owner, _coreMatchParticipantsPlayersAccess._players[pending.SlashTargetSeat]) && _coreProgramFactionPoliciesOperations.GetFactionSlashCandidateSeats(owner.Seat).Count > 0;
     }
 
-    internal void BeginBorrowedSwordSlashChoice(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending, bool includeFactionSlash, bool keepCurrentRequest = false)
+    internal void BeginBorrowedSwordSlashChoice(NativeOwners.BorrowedSwordHandle pending, bool includeFactionSlash, bool keepCurrentRequest = false)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || pending.ActiveAttack is not null)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || pending.ActiveAttack is not null)
         {
             throw new InvalidOperationException("Borrowed Sword is not awaiting its forced Slash choice.");
         }
@@ -77,10 +73,10 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
         var choices = slashes.SelectMany(card =>
         {
             var baseEffectiveKind = _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(weaponOwner, card);
-            return _coreNativeTargetLegalityOperations.GetSlashUseKinds(weaponOwner, baseEffectiveKind).Concat(_characterMiHengLeOperations.SiruiPhysicalSlashVariants(weaponOwner, card).Concat(_characterGuanYuWumiaoOperations.JuewuPhysicalSlashVariants(weaponOwner, card)).Concat(_characterCaoZhiLeOperations.FulePhysicalSlashVariants(weaponOwner, card).Concat(_coreProgramCardLegalityOperations.CardLegality.NativeSlashVariants(new(weaponOwner, card)))).Select(v => v.EffectiveKind)).Distinct().Where(effectiveKind => effectiveKind == baseEffectiveKind || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Slash) || _coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(weaponOwner, card) || (_characterMiHengLeOperations.IsSiruiPhysicalSlashKind(weaponOwner, card, effectiveKind) || _characterCaoZhiLeOperations.IsFulePhysicalSlashKind(weaponOwner, card, effectiveKind))).SelectMany(effectiveKind =>
+            return _coreNativeTargetLegalityOperations.GetSlashUseKinds(weaponOwner, baseEffectiveKind).Concat(_characterMiHengLeOperations.SiruiPhysicalSlashVariants(weaponOwner, card).Concat(_characterGuanYuWumiaoOperations.JuewuPhysicalSlashVariants(weaponOwner, card)).Concat(_characterCaoZhiLeOperations.FulePhysicalSlashVariants(weaponOwner, card).Concat(_coreProgramCardLegalityOperations.CardLegality.NativeSlashVariants(new(weaponOwner, card)))).Select(v => v.EffectiveKind)).Distinct().Where(effectiveKind => effectiveKind == baseEffectiveKind || CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Slash) || _coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(weaponOwner, card) || (_characterMiHengLeOperations.IsSiruiPhysicalSlashKind(weaponOwner, card, effectiveKind) || _characterCaoZhiLeOperations.IsFulePhysicalSlashKind(weaponOwner, card, effectiveKind))).SelectMany(effectiveKind =>
             {
                 var usesZhuqueFan = effectiveKind != baseEffectiveKind && !(_characterMiHengLeOperations.IsSiruiPhysicalSlashKind(weaponOwner, card, effectiveKind) || _characterCaoZhiLeOperations.IsFulePhysicalSlashKind(weaponOwner, card, effectiveKind));
-                var cardDescription = usesZhuqueFan ? $"发动【朱雀羽扇】，将【杀】改为【火杀】使用" : global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Slash) ? $"使用【{(CardCatalog.Get(effectiveKind).DisplayName)}】" : $"将【{(card.DisplayName)}】当作【杀】使用";
+                var cardDescription = usesZhuqueFan ? $"发动【朱雀羽扇】，将【杀】改为【火杀】使用" : CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Slash) ? $"使用【{(CardCatalog.Get(effectiveKind).DisplayName)}】" : $"将【{(card.DisplayName)}】当作【杀】使用";
                 var suffix = usesZhuqueFan ? ".as-FireSlash" : string.Empty;
                 return _coreCardConversionsOperations.CreateConversionChoiceVariants(weaponOwner, card, usesZhuqueFan ? baseEffectiveKind : effectiveKind, forResponse: false, $"borrowed-sword.slash.card-{(card.Id)}{(suffix)}", $"{(cardDescription)}攻击 {(slashTarget.Name)}。", [card.Id], [slashTarget.Seat], new Dictionary<string, string> { ["response"] = "borrowed-sword-slash", ["response-card-kind"] = effectiveKind.ToString(), ["target-seat"] = slashTarget.Seat.ToString(System.Globalization.CultureInfo.InvariantCulture) }).Where(choice => _characterMiHengLeOperations.SiruiBorrowedChoiceAllowed(weaponOwner, slashTarget, card, choice));
             });
@@ -99,7 +95,7 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
                 ["response-card-kind"] = selection.OutputKind.ToString(),
                 ["target-seat"] = slashTarget.Seat.ToString(System.Globalization.CultureInfo.InvariantCulture)
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
             choices.Add(new PromptChoice(new ChoiceId($"borrowed-sword.program-view-as-slash.{(selection.Source.SkillId.Length)}:" + $"{(selection.Source.SkillId)}.{(selection.Source.BindingId)}.cards-{(string.Join('-', cardIds))}"), $"发动【{(_coreCardConversionsOperations.ProgramConversionName(selection.Source))}】，将 {(cardIds.Length)} 张手牌当【{(CardCatalog.Get(selection.OutputKind).DisplayName)}】攻击 {(slashTarget.Name)}。", cardIds, [slashTarget.Seat], parameters));
         }
 
@@ -125,7 +121,7 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ResponseRequestedEvent(source.Seat, weaponOwner.Seat, CardKind.BorrowedSword, CardKind.Slash));
     }
 
-    internal void ResolveBorrowedSwordSlashChoice(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending, Card slash, CardKind? requestedEffectiveKind = null)
+    internal void ResolveBorrowedSwordSlashChoice(NativeOwners.BorrowedSwordHandle pending, Card slash, CardKind? requestedEffectiveKind = null)
     {
         var declaredOwner = _coreMatchParticipantsPlayersAccess._players[pending.WeaponOwnerSeat];
         if (_coreCardDeclarationsOperations.TryBeginCardDeclaration(declaredOwner, slash, requestedEffectiveKind ?? CardKind.Slash, _coreCardDeclarationsOperations.PeekDeclarationConversion(declaredOwner, slash, requestedEffectiveKind ?? CardKind.Slash, true), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.BorrowedSword, declaredOwner.Seat, finalKind: requestedEffectiveKind ?? CardKind.Slash), [pending.SlashTargetSeat]))
@@ -141,7 +137,7 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
             throw new InvalidOperationException("The selected Borrowed Sword Slash conversion is no longer legal.");
         }
 
-        if (!IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget, effectiveKind, _coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, selected), false, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, selected)), _coreFinalTargetSlashOperations.SpecificSlashRank(weaponOwner, selected, effectiveKind), [selected.Id], _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion) || !(_characterLuBuOlMagicOperations.MoGangquanBorrowedDistance(weaponOwner, slashTarget, effectiveKind, [selected.Id], _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion) || _characterHuangfuSongWumiaoOperations.HasWuHfOrWuyouMaterialPrivilege(weaponOwner, effectiveKind, [selected.Id]) || _characterMiHengLeOperations.HasSiruiSlashDistance(weaponOwner, effectiveKind, [selected.Id], _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion) || _coreRoundGainedSourceUsesOperations.HasRoundGainedBasicBonus(weaponOwner, effectiveKind, [selected.Id]) || _coreCurrentTurnShownCardBenefitsOperations.HasSlashUseDistanceBySuit(weaponOwner, effectiveKind, _coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, selected)) || _coreTurnRedSlashBenefitsOperations.HasTurnRedSlashPolicy(weaponOwner.Seat, effectiveKind, _coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, selected)) || _coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance(weaponOwner, selected) || _coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(weaponOwner, slashTarget, effectiveKind, physicalCardIds: [selected.Id]) || _coreFinalTargetSlashOperations.IsWithinSpecificSlashRange(weaponOwner, slashTarget, effectiveKind, _coreFinalTargetSlashOperations.SpecificSlashRank(weaponOwner, selected, effectiveKind))))
+        if (!IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget, effectiveKind, _coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, selected), false, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, selected)), _coreFinalTargetSlashOperations.SpecificSlashRank(weaponOwner, selected, effectiveKind), [selected.Id], _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion) || !(_characterLuBuOlMagicOperations.MoGangquanBorrowedDistance(weaponOwner, slashTarget, effectiveKind, [selected.Id], _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion) || _characterHuangfuSongWumiaoOperations.HasWuHfOrWuyouMaterialPrivilege(weaponOwner, effectiveKind, [selected.Id]) || _characterMiHengLeOperations.HasSiruiSlashDistance(weaponOwner, effectiveKind, [selected.Id], _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion) || _coreRoundGainedSourceUsesOperations.HasRoundGainedBasicBonus(weaponOwner, effectiveKind, [selected.Id]) || _coreCurrentTurnShownCardBenefitsOperations.HasSlashUseDistanceBySuit(weaponOwner, effectiveKind, _coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, selected)) || _coreTurnRedSlashBenefitsOperations.HasTurnRedSlashPolicy(weaponOwner.Seat, effectiveKind, _coreNativeCardAppearanceOperations.EffectiveSuit(weaponOwner, selected)) || _coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance(weaponOwner, selected) || _coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(weaponOwner, slashTarget, effectiveKind, physicalCardIds: [selected.Id]) || _coreFinalTargetSlashOperations.IsWithinSpecificSlashRange(weaponOwner, slashTarget, effectiveKind, _coreFinalTargetSlashOperations.SpecificSlashRank(weaponOwner, selected, effectiveKind))))
         {
             throw new InvalidOperationException("The selected Borrowed Sword Slash target is no longer legal.");
         }
@@ -155,11 +151,11 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
         _coreNativeSlashUseOperations.ResolveSlashCore(weaponOwner, slashTarget, selected, effectiveKind, weaponOwner.Seat, borrowedSword: pending, usesZhuqueFan: usesZhuqueFan);
     }
 
-    internal void ResolveBorrowedSwordZhangbaSlashChoice(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending, IReadOnlyList<Card> pair)
+    internal void ResolveBorrowedSwordZhangbaSlashChoice(NativeOwners.BorrowedSwordHandle pending, IReadOnlyList<Card> pair)
     {
         var weaponOwner = _coreMatchParticipantsPlayersAccess._players[pending.WeaponOwnerSeat];
         var slashTarget = _coreMatchParticipantsPlayersAccess._players[pending.SlashTargetSeat];
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || !pending.AwaitingSlashChoice || !IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(weaponOwner, pair), allowAnyPhysicalSuit: false, effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(weaponOwner, pair), effectiveRank: _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(weaponOwner, pair), physicalCardIds: _coreProgramCardPoliciesOperations.HasCardPolicy(weaponOwner, SkillProgramCardPolicyKind.RoundGainedOtherSourceUse) ? pair.Select(c => c.Id).ToArray() : null) || _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(weaponOwner, pair.Select(card => card.Id).ToArray())is null || _coreFinalTargetSlashOperations.HasRankSlashRange(weaponOwner, CardKind.Slash) && !IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget, CardKind.Slash, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(weaponOwner, pair), false, _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(weaponOwner, pair), _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(weaponOwner, pair), _coreProgramCardPoliciesOperations.HasCardPolicy(weaponOwner, SkillProgramCardPolicyKind.RoundGainedOtherSourceUse) ? pair.Select(c => c.Id).ToArray() : null))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || !pending.AwaitingSlashChoice || !IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(weaponOwner, pair), allowAnyPhysicalSuit: false, effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(weaponOwner, pair), effectiveRank: _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(weaponOwner, pair), physicalCardIds: _coreProgramCardPoliciesOperations.HasCardPolicy(weaponOwner, SkillProgramCardPolicyKind.RoundGainedOtherSourceUse) ? pair.Select(c => c.Id).ToArray() : null) || _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(weaponOwner, pair.Select(card => card.Id).ToArray())is null || _coreFinalTargetSlashOperations.HasRankSlashRange(weaponOwner, CardKind.Slash) && !IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget, CardKind.Slash, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(weaponOwner, pair), false, _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(weaponOwner, pair), _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(weaponOwner, pair), _coreProgramCardPoliciesOperations.HasCardPolicy(weaponOwner, SkillProgramCardPolicyKind.RoundGainedOtherSourceUse) ? pair.Select(c => c.Id).ToArray() : null))
         {
             throw new InvalidOperationException("The selected Borrowed Sword Zhangba Slash is no longer legal.");
         }
@@ -173,11 +169,11 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
         _coreNativeSlashUseOperations.ResolveSlashCore(weaponOwner, slashTarget, pair[0], CardKind.Slash, weaponOwner.Seat, borrowedSword: pending, physicalCards: pair);
     }
 
-    internal void ResolveBorrowedSwordProgramMultiCardSlashChoice(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending, ProgramMultiCardViewAsSelection selection)
+    internal void ResolveBorrowedSwordProgramMultiCardSlashChoice(NativeOwners.BorrowedSwordHandle pending, ProgramMultiCardViewAsSelection selection)
     {
         var weaponOwner = _coreMatchParticipantsPlayersAccess._players[pending.WeaponOwnerSeat];
         var slashTarget = _coreMatchParticipantsPlayersAccess._players[pending.SlashTargetSeat];
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || !pending.AwaitingSlashChoice || !IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget, selection.OutputKind, _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(weaponOwner, selection), false, _coreGuanHaiBridgesOperations.ProgramMultiCardColor(weaponOwner, selection), physicalCardIds: selection.Cards.Select(card => card.Id).ToArray()) || _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(weaponOwner, selection.Cards.Select(card => card.Id).ToArray(), selection.OutputKind, forResponse: false, selection.Source)is null)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || !pending.AwaitingSlashChoice || !IsLegalBorrowedSwordSlashTarget(weaponOwner, slashTarget, selection.OutputKind, _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(weaponOwner, selection), false, _coreGuanHaiBridgesOperations.ProgramMultiCardColor(weaponOwner, selection), physicalCardIds: selection.Cards.Select(card => card.Id).ToArray()) || _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(weaponOwner, selection.Cards.Select(card => card.Id).ToArray(), selection.OutputKind, forResponse: false, selection.Source)is null)
         {
             throw new InvalidOperationException("The selected Borrowed Sword configured Slash is no longer legal.");
         }
@@ -191,9 +187,9 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
         _coreCardConversionsOperations.ResolveProgramMultiCardSlash(weaponOwner, slashTarget, selection, borrowedSword: pending, enforceOwnTurnSlashLimit: false);
     }
 
-    internal void CompleteBorrowedSwordWithoutSlash(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending, bool transferWeapon)
+    internal void CompleteBorrowedSwordWithoutSlash(NativeOwners.BorrowedSwordHandle pending, bool transferWeapon)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || pending.ActiveAttack is not null)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || pending.ActiveAttack is not null)
         {
             throw new InvalidOperationException("Borrowed Sword fallback is not current.");
         }
@@ -232,9 +228,9 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
         FinishBorrowedSword(pending);
     }
 
-    internal void CompleteBorrowedSwordAfterSlash(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending)
+    internal void CompleteBorrowedSwordAfterSlash(NativeOwners.BorrowedSwordHandle pending)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || pending.ActiveAttack is null || pending.SlashCardId is null || pending.EffectiveSlashKind is null)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || pending.ActiveAttack is null || pending.SlashCardId is null || pending.EffectiveSlashKind is null)
         {
             throw new InvalidOperationException("Borrowed Sword Slash completion is not current.");
         }
@@ -244,7 +240,7 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
         FinishBorrowedSword(pending);
     }
 
-    internal void FinishBorrowedSword(global::CardGame.Core.NativeOwners.BorrowedSwordHandle pending)
+    internal void FinishBorrowedSword(NativeOwners.BorrowedSwordHandle pending)
     {
         if (_characterZhugeGuoLeOperations.FinishLeChengyanBorrowedNative(pending))
             return;
@@ -252,7 +248,7 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
             _coreNativeNullificationFramesOperations.SetCardUseTargetIndex(pending.ResolutionId, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == pending.ResolutionId).TargetSeats.Count);
         _coreSequentialTrickTargetsOperations.MoveFinishedTrickCard(pending.ResolutionId, pending.Card);
         _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword = null;
-        if (global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest?.BorrowedSword, pending))
+        if (CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest?.BorrowedSword, pending))
         {
             _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = null;
         }

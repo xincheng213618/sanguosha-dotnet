@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreActiveNativeAttackQueriesRuntime
 {
-    internal global::CardGame.Core.NativeOwners.CardAttackHandle? ActiveCardAttack
+    internal NativeOwners.CardAttackHandle? ActiveCardAttack
     {
         get => _resolutionStackOperations._resolutionStack.LastOrDefault(frame => frame switch
         {
@@ -18,7 +14,7 @@ internal sealed partial class CoreActiveNativeAttackQueriesRuntime
         })is { } owner ? _kernelCoreMainOperations.CreateCardAttackHandle(owner.Id) : null;
         set
         {
-            global::CardGame.Core.NativeOwners.CardAttackHandle current = ActiveCardAttack;
+            NativeOwners.CardAttackHandle current = ActiveCardAttack;
             if (current is not null && current.ResolutionId != value?.ResolutionId)
                 _coreCardAttackStateOperations.UpdateCardAttackState(current.ResolutionId, state => state!with { Active = false });
             if (value is not null)

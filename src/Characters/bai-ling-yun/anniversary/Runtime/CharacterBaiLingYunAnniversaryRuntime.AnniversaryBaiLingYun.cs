@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
 {
-    internal static CardConversionSource AnniversaryBlySource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource AnniversaryBlySource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardLocation AnniversaryBlyLease(ProgramSkillFrame f) => new(CardZoneKind.PrivatePersistentPile, f.OwnerSeat, $"linghui:{(f.Id)}");
     internal static CardMoveReason AnniversaryBlyReason(string step) => new("skill.anniversary.linghui." + step);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 43600, SkillProgramEffectOp.ResolveAnniversaryBaiLingYunLinghui)]
     internal bool CanOfferAnniversaryBly(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => c.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent).OfType<PlayerDyingEvent>().Any();
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryBaiLingYunHost.Begin(ProgramSkillFrame frame) => BeginAnniversaryBly(frame);
+    SkillProgramStepOutcome IAnniversaryBaiLingYunHost.Begin(ProgramSkillFrame frame) => BeginAnniversaryBly(frame);
     internal SkillProgramStepOutcome BeginAnniversaryBly(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -72,7 +68,7 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
     [ProgramAnswer("anniversary-linghui")]
     internal void AnswerAnniversaryBly(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryBly.Stage: AnniversaryBlyStage.Choice } f || !AnniversaryBlyChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryBly.Stage: AnniversaryBlyStage.Choice } f || !AnniversaryBlyChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Linghui rejects a stale private entity or target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
 {
     internal bool HasRecipientDamageCardColorHealth(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[seat]).GetInstanceTriggers(SkillProgramTriggerWindow.BeforeDamageApplied).Any(binding => ResolveDamageCardColorHealthDescriptor.IsTrigger(binding.Trigger));
-    internal bool TryGetDamageHealthCard(global::CardGame.Core.GameEngine.IDamageAttempt attack, out CardKind kind, out Suit suit, out bool red, out CardUseFrame? use)
+    internal bool TryGetDamageHealthCard(GameEngine.IDamageAttempt attack, out CardKind kind, out Suit suit, out bool red, out CardUseFrame? use)
     {
         use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId);
         var action = use?.Action;
@@ -19,15 +15,15 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
             return nativeUse.CardKind == kind && (action is null || action.Type == CardActionType.Use && action.EffectiveKind == kind) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == nativeUse.Id && e.CardId == nativeUse.CardId) == 1;
         if (attack.Card is not null)
             return true;
-        return attack is global::CardGame.Core.NativeOwners.CardAttackHandle cardAttack && kind == CardKind.Duel && _coreProgramVirtualDuelOperations.IsProgramVirtualDuelAttackConsistent(cardAttack, Array.Empty<Card>());
+        return attack is NativeOwners.CardAttackHandle cardAttack && kind == CardKind.Duel && _coreProgramVirtualDuelOperations.IsProgramVirtualDuelAttackConsistent(cardAttack, Array.Empty<Card>());
     }
 
-    internal bool ExactDamageColorHealthParent(ProgramSkillFrame f, out BeforeDamageProgramWindowFrame window, out global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool ExactDamageColorHealthParent(ProgramSkillFrame f, out BeforeDamageProgramWindowFrame window, out GameEngine.IDamageAttempt attack)
     {
         window = null !;
         attack = null !;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index < 1 || f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, Amount: > 0 } context || _resolutionStackOperations._resolutionStack[index - 1] is not BeforeDamageProgramWindowFrame before || before.Id != context.ParentFrameId || before.TargetSeat != f.OwnerSeat || context.OwnerSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || before.Amount != context.Amount || before.Prevented || before.RedirectedTargetSeat is not null || before.CandidateIndex < 0 || before.CandidateIndex >= before.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, before.Candidates[before.CandidateIndex].Candidate) || !ResolveDamageCardColorHealthDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f)))
+        if (index < 1 || f.InstructionIndex != 1 || f.TriggerId is null || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, Amount: > 0 } context || _resolutionStackOperations._resolutionStack[index - 1] is not BeforeDamageProgramWindowFrame before || before.Id != context.ParentFrameId || before.TargetSeat != f.OwnerSeat || context.OwnerSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || before.Amount != context.Amount || before.Prevented || before.RedirectedTargetSeat is not null || before.CandidateIndex < 0 || before.CandidateIndex >= before.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, before.Candidates[before.CandidateIndex].Candidate) || !ResolveDamageCardColorHealthDescriptor.IsTrigger(_coreProgramLifecycleOperations.GetProgramTrigger(f)))
             return false;
         var native = _coreLastDamageSourceReciprocityObserversOperations.LastDamageSourceOriginalAttack(before.ContinuationAttackResolutionId ?? before.ParentFrameId);
         if (native is null || native.TargetSeat != before.TargetSeat || native.SourceSeat != before.SourceSeat || context.SourceSeat != (native.IsSourceLess ? null : native.SourceSeat) || _coreNativeCardClassificationsOperations.GetDamageNature(native) != before.Nature)
@@ -47,7 +43,7 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         if (!owner.IsAlive || !owner.HasHpValue || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
             return SkillProgramStepOutcome.Continue;
-        var receipt = new ProgramDamageCardColorHealthReceipt(f.Id, f.InstructionIndex, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, before.Id, attack.ResolutionId, use?.Id, use?.Action?.ActionId, attack.Card?.Id, f.OwnerSeat, attack.IsSourceLess ? null : attack.SourceSeat, before.Amount, kind, suit, red, owner.Hp, owner.MaxHp, red ? checked(owner.MaxHp + before.Amount) : owner.MaxHp);
+        var receipt = new ProgramDamageCardColorHealthReceipt(f.Id, f.InstructionIndex, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, before.Id, attack.ResolutionId, use?.Id, use?.Action?.ActionId, attack.Card?.Id, f.OwnerSeat, attack.IsSourceLess ? null : attack.SourceSeat, before.Amount, kind, suit, red, owner.Hp, owner.MaxHp, red ? checked(owner.MaxHp + before.Amount) : owner.MaxHp);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DamageCardColorHealth = receipt });
         if (red)
             _coreProgramLifecycleOperations.ChangeProgramMaximumHp(f, receipt.Amount);
@@ -60,7 +56,7 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
 
     internal bool ValidDamageCardColorHealth(ProgramSkillFrame f)
     {
-        if (f.DamageCardColorHealth is not { } r || r.ProgramFrameId != f.Id || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.PendingMovementContinuation is not null || !ExactDamageColorHealthParent(f, out var before, out var attack) || !TryGetDamageHealthCard(attack, out var kind, out var suit, out var red, out var use))
+        if (f.DamageCardColorHealth is not { } r || r.ProgramFrameId != f.Id || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.PendingMovementContinuation is not null || !ExactDamageColorHealthParent(f, out var before, out var attack) || !TryGetDamageHealthCard(attack, out var kind, out var suit, out var red, out var use))
             return false;
         return r.BeforeDamageWindowId == before.Id && r.AttackResolutionId == attack.ResolutionId && r.CardUseFrameId == use?.Id && r.CardActionId == use?.Action?.ActionId && r.PhysicalCardId == attack.Card?.Id && r.OwnerSeat == f.OwnerSeat && r.DamageSourceSeat == (attack.IsSourceLess ? null : attack.SourceSeat) && r.Amount == before.Amount && r.Amount > 0 && r.EffectiveCardKind == kind && r.EffectiveSuit == suit && r.IsRed == red && r.MaxHpBefore > 0 && r.MaxHpAfter == (red ? checked(r.MaxHpBefore + r.Amount) : r.MaxHpBefore) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageCardColorHealthPaidEvent>().Count(e => e.Receipt == r) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == SkillProgramTriggerWindow.BeforeDamageApplied) == 1;
     }
@@ -109,7 +105,7 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
                 return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryRewardReturnMatches(recovery, moved, history);
         }
 
-        return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(index) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
+        return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(index) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
     }
 
     internal ProgramSkillFrame? DamageCardColorHealthObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => root.DamageCardColorHealth is not null && this.DamageCardColorHealthFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => this.DamageCardColorHealthObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));
@@ -125,5 +121,5 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 2403)]
     internal bool AdvanceDamageCardColorHealthChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DamageCardColorHealthObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    SkillProgramStepOutcome global::CardGame.Core.IDamageCardColorHealthHost.ResolveDamageCardColorHealth(ProgramSkillFrame frame) => ResolveDamageCardColorHealth(frame);
+    SkillProgramStepOutcome IDamageCardColorHealthHost.ResolveDamageCardColorHealth(ProgramSkillFrame frame) => ResolveDamageCardColorHealth(frame);
 }

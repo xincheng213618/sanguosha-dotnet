@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CharacterZhangJiOlRuntime
 {
     internal const string ZhangJiGainReason = "program.zhang-ji.lueming.gain";
     internal static bool IsZhangJiOp(SkillProgramEffectOp op) => (int)op is >= 23800 and <= 23801;
-    internal CardConversionSource ZhangJiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource ZhangJiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillProgramEffect? ZhangJiPausedEffect(ProgramSkillFrame f) => f.InstructionIndex < 1 ? null : ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 70)]
     internal bool CanActivateZhangJi(int owner, SkillProgramActivation a) => true;
@@ -179,5 +176,5 @@ internal sealed partial class CharacterZhangJiOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IZhangJiProgramHost.BeginZhangJiOperation(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhangJiOperation(f, op);
+    SkillProgramStepOutcome IZhangJiProgramHost.BeginZhangJiOperation(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhangJiOperation(f, op);
 }

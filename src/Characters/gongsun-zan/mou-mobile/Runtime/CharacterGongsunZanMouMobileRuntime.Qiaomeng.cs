@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGongsunZanMouMobileRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
             return null;
         var d = _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == id);
         var w = _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId);
-        return d is not null && d.SourceSeat == owner && d.Amount > 0 && w is { SourceCard: { } kind } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && w.ParentFrameId == d.Id ? d : null;
+        return d is not null && d.SourceSeat == owner && d.Amount > 0 && w is { SourceCard: { } kind } && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && w.ParentFrameId == d.Id ? d : null;
     }
 
     internal IEnumerable<MouGongsunZanMobileDistanceEvent> ActiveMouGszMobileDistance(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanMobileDistanceEvent>().Where(e => e.Source.OwnerSeat == owner && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<RoundEndedEvent>().Any(r => r.RoundNumber == e.Round));

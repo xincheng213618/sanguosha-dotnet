@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiFuRenOlRuntime
 {
     internal bool HasOrdinaryCaiFuRenCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveOrdinaryCaiFuRenXianzhou) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting);
 
-    internal static CardConversionSource OrdinaryCaiFuRenSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cai_fu_ren_ol_OrdinaryCaiFuRenXianzhou.OrdinaryCaiFuRenSource(f);
+    internal static CardConversionSource OrdinaryCaiFuRenSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cai_fu_ren_ol_OrdinaryCaiFuRenXianzhou.OrdinaryCaiFuRenSource(f);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 27595, SkillProgramEffectOp.ResolveOrdinaryCaiFuRenXianzhou)]
     internal bool CanActivateOrdinaryCaiFuRenXianzhou(ProgramActivationLegalityContext c) => c.Owner.IsAlive && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && c.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreEquipmentDonationProgramsOperations.HasPayableAllEquipmentDonation(c.OwnerSeat, c.Program.Id, "ordinary-xianzhou");
     internal bool IsIssuedOrdinaryCaiFuRenXianzhou(ProgramSkillFrame f)
     {
-        if (f.SkillId != "ol:xianzhou" || f.ActivationId != "all-equipment-donation" || f.TriggerId is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.EquipmentDonation is not { } r || r.InstructionIndex != 0 || r.Source != OrdinaryCaiFuRenSource(f) || r.GameplayHash != f.GameplayHash || r.UsageId != "ordinary-xianzhou" || r.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || f.SelectedTargetSeats is not [var recipient] || recipient != r.RecipientSeat || recipient == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) || r.PaidCardIds.Count == 0 || r.PaidCardIds.Distinct().Count() != r.PaidCardIds.Count || r.ActualDeliveredCount < 0 || r.ActualDeliveredCount > r.PaidCardIds.Count || r.SequenceBefore < 0 || r.SequenceAfter <= r.SequenceBefore || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || p.Activations is not [{ Id: "all-equipment-donation", Effects: [{ Op: SkillProgramEffectOp.ResolveOrdinaryCaiFuRenXianzhou, StateId: "ordinary-xianzhou" }] }] || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineEquipmentDonationProgramsRuntime.EquipmentDonationUsage(r.UsageId), SkillUsageScope.Game) != 1)
+        if (f.SkillId != "ol:xianzhou" || f.ActivationId != "all-equipment-donation" || f.TriggerId is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.EquipmentDonation is not { } r || r.InstructionIndex != 0 || r.Source != OrdinaryCaiFuRenSource(f) || r.GameplayHash != f.GameplayHash || r.UsageId != "ordinary-xianzhou" || r.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || f.SelectedTargetSeats is not [var recipient] || recipient != r.RecipientSeat || recipient == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) || r.PaidCardIds.Count == 0 || r.PaidCardIds.Distinct().Count() != r.PaidCardIds.Count || r.ActualDeliveredCount < 0 || r.ActualDeliveredCount > r.PaidCardIds.Count || r.SequenceBefore < 0 || r.SequenceAfter <= r.SequenceBefore || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || p.Activations is not [{ Id: "all-equipment-donation", Effects: [{ Op: SkillProgramEffectOp.ResolveOrdinaryCaiFuRenXianzhou, StateId: "ordinary-xianzhou" }] }] || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(f.OwnerSeat, f.SkillId, CoreGameEngineEquipmentDonationProgramsRuntime.EquipmentDonationUsage(r.UsageId), SkillUsageScope.Game) != 1)
             return false;
         if (_coreProgramEventHistoryOperations.ProgramEventHistory<EquipmentDonationPaidEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray()is not [var paid] || paid != new EquipmentDonationPaidEvent(f.Id, r.Source, r.GameplayHash, r.UsageId, r.TurnNumber, r.TurnOwnerSeat, recipient, r.PaidCardIds.Count, r.ActualDeliveredCount, r.SequenceBefore, r.SequenceAfter))
             return false;
@@ -37,8 +33,8 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IOrdinaryCaiFuRenHost.Xianzhou(ProgramSkillFrame f, string stateId) => _coreEquipmentDonationProgramsOperations.RunAllEquipmentDonation(f, stateId);
-    SkillProgramStepOutcome global::CardGame.Core.IOrdinaryCaiFuRenHost.Qieting(ProgramSkillFrame f) => BeginOrdinaryQieting(f);
+    SkillProgramStepOutcome IOrdinaryCaiFuRenHost.Xianzhou(ProgramSkillFrame f, string stateId) => _coreEquipmentDonationProgramsOperations.RunAllEquipmentDonation(f, stateId);
+    SkillProgramStepOutcome IOrdinaryCaiFuRenHost.Qieting(ProgramSkillFrame f) => BeginOrdinaryQieting(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveOrdinaryCaiFuRenXianzhou)]
     internal PromptChoice ChooseOrdinaryXianzhouAi(PendingDecision d, ProgramSkillFrame f) => _coreEquipmentDonationProgramsOperations.SelectAiEquipmentDonation(d, f);
 }

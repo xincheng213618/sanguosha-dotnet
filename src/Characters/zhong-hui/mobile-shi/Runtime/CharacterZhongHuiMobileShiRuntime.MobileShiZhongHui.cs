@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhongHuiMobileShiRuntime
 {
     internal const string ShiZhHuiSizi = ShiZhHuiComposition.SiziSkill, ShiZhHuiXiezhi = ShiZhHuiComposition.XiezhiSkill, ShiZhHuiYunan = ShiZhHuiComposition.YunanSkill;
-    internal static CardConversionSource ShiZhHuiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiZhHuiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasShiZhHuiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveShiZhHuiSizi);
 
     internal bool HasShiZhHuiKechang(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants.Any(grant => grant.IsEnabled && grant.SkillId == ShiZhHuiComposition.KeChangSkill) || _coreNationalSkillsOperations.EnabledContentSkillIds(_coreMatchParticipantsPlayersAccess._players[seat]).Contains(ShiZhHuiComposition.KeChangSkill, StringComparer.Ordinal);
@@ -27,10 +24,10 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
         return Array.AsReadOnly(new[] { _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat });
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IShiZhHuiHost.ResolveSizi(ProgramSkillFrame frame) => BeginShiZhHui(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiZhHuiHost.ResolveSiziEnding(ProgramSkillFrame frame) => BeginShiZhHui(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiZhHuiHost.ResolveXiezhi(ProgramSkillFrame frame) => BeginShiZhHui(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiZhHuiHost.ResolveYunan(ProgramSkillFrame frame) => BeginShiZhHui(frame);
+    SkillProgramStepOutcome IShiZhHuiHost.ResolveSizi(ProgramSkillFrame frame) => BeginShiZhHui(frame);
+    SkillProgramStepOutcome IShiZhHuiHost.ResolveSiziEnding(ProgramSkillFrame frame) => BeginShiZhHui(frame);
+    SkillProgramStepOutcome IShiZhHuiHost.ResolveXiezhi(ProgramSkillFrame frame) => BeginShiZhHui(frame);
+    SkillProgramStepOutcome IShiZhHuiHost.ResolveYunan(ProgramSkillFrame frame) => BeginShiZhHui(frame);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 67700, SkillProgramEffectOp.ResolveShiZhHuiSizi)]
     internal bool CanStartShiZhHuiSizi(CharacterState owner, string skill) => skill != ShiZhHuiSizi || ShiZhHuiCharge(owner.Seat) > 0;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 67700)]
@@ -137,7 +134,7 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     [ProgramAnswer(ShiZhHuiComposition.SiziProgramAction)]
     internal void AnswerShiZhHui(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiZhHui: { Operation: "sizi" } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiZhHuiSiziChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiZhHui: { Operation: "sizi" } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiZhHuiSiziChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Shi Zhong Hui choice lost its current frame, chooser or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -284,9 +281,9 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 67700)]
     internal bool ContinuePaidShiZhHui(ProgramSkillFrame f) => f.ShiZhHui is { Stage: > 0 };
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 67700)]
-    internal int ShiZhHuiSiziDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.CardAttackHandle card && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.EffectiveCardKind ?? CardKind.Slash) && ShiZhHuiSiziActive ? 1 : 0;
+    internal int ShiZhHuiSiziDamageBonus(GameEngine.IDamageAttempt attack) => attack is NativeOwners.CardAttackHandle card && CoreNativeCardClassificationsRuntime.IsSlashCard(card.EffectiveCardKind ?? CardKind.Slash) && ShiZhHuiSiziActive ? 1 : 0;
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 67700)]
-    internal bool DistanceCardUseExemption67700ShiZhHuiKechang(ProgramCardDistanceQuery query) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(query.Kind) && string.Equals(_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(query.Actor), "qun", StringComparison.Ordinal) && _coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && HasShiZhHuiKechang(player.Seat));
+    internal bool DistanceCardUseExemption67700ShiZhHuiKechang(ProgramCardDistanceQuery query) => CoreNativeCardClassificationsRuntime.IsSlashCard(query.Kind) && string.Equals(_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(query.Actor), "qun", StringComparison.Ordinal) && _coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && HasShiZhHuiKechang(player.Seat));
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShiZhHuiSizi)]
     internal PromptChoice ChooseShiZhHuiAi(PendingDecision decision, ProgramSkillFrame f)

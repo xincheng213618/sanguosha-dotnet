@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramTurnWindowEntryFacts(global::CardGame.Core.EngineStates.CoreMatchOutcomeState matchOutcomeState, global::CardGame.Core.EngineStates.CoreActualRoundProgressState actualRoundProgressState, global::CardGame.Core.EngineStates.CoreActualTurnProgressState actualTurnProgressState, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZhangShiPingOlEntries> getCharacterZhangShiPingOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineTableOrderEntries> getCoreGameEngineTableOrderRuntime) : IProgramTurnWindowEntryFacts
+internal sealed class ProgramTurnWindowEntryFacts(EngineStates.CoreMatchOutcomeState matchOutcomeState, EngineStates.CoreActualRoundProgressState actualRoundProgressState, EngineStates.CoreActualTurnProgressState actualTurnProgressState, Func<RuntimeEntries.CharacterZhangShiPingOlEntries> getCharacterZhangShiPingOlRuntime, Func<RuntimeEntries.CoreGameEngineTableOrderEntries> getCoreGameEngineTableOrderRuntime) : IProgramTurnWindowEntryFacts
 {
     public Winner Winner => matchOutcomeState.ReferenceToWinner;
     public int RoundNumber => actualRoundProgressState.ReferenceToRoundNumber;

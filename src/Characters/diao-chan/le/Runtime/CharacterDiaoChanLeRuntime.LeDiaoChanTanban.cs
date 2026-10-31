@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanLeRuntime
 {
     internal bool HasLeDiaoChanTanbanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeTanbanInitialEntities);
 
-    internal static CardConversionSource TanbanSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_diao_chan_le_LeDiaoChanTanban.TanbanSource(frame);
+    internal static CardConversionSource TanbanSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_diao_chan_le_LeDiaoChanTanban.TanbanSource(frame);
     // One shared binary mark belongs to each physical entity, not to a holder or
     // grant. Losing/reacquiring a source never restores an old initial mark.
     // Registration only; the query still belongs to legacy GameEngine.LeDiaoChanTanban.
@@ -63,8 +59,8 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         return frame.InstructionIndex == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<TanbanInitializedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var initialized] && initialized.Source == TanbanSource(frame) && initialized.GameplayHash == frame.GameplayHash;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeDiaoChanTanbanHost.InitializeTanban(ProgramSkillFrame frame) => InitializeTanban(frame);
-    SkillProgramStepOutcome global::CardGame.Core.ILeDiaoChanTanbanHost.SwapTanbanHandMarks(ProgramSkillFrame frame) => SwapTanbanHandMarks(frame);
+    SkillProgramStepOutcome ILeDiaoChanTanbanHost.InitializeTanban(ProgramSkillFrame frame) => InitializeTanban(frame);
+    SkillProgramStepOutcome ILeDiaoChanTanbanHost.SwapTanbanHandMarks(ProgramSkillFrame frame) => SwapTanbanHandMarks(frame);
     internal SkillProgramStepOutcome InitializeTanban(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

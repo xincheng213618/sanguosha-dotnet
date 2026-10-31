@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreHulaoEquipmentCoreEquipmentContentOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreHulaoEquipmentCoreEquipmentContentOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.EquipmentContentRegistry EquipmentRules { get; }
+    EquipmentContentRegistry EquipmentRules { get; }
 }

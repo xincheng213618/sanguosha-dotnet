@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineShanheQianlongRuntime
 {
-    private readonly global::CardGame.Core.EngineOwners.IKernelShanheMarketAccess _shanheMarketOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess _coreMatchDefinitionModeDefinitionOptionsAccess;
-    internal CoreGameEngineShanheQianlongRuntime(global::CardGame.Core.EngineOwners.IKernelShanheMarketAccess shanheMarketOperations, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess coreMatchDefinitionModeDefinitionOptionsAccess)
+    private readonly IKernelShanheMarketAccess _shanheMarketOperations;
+    private readonly EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess _coreMatchDefinitionModeDefinitionOptionsAccess;
+    internal CoreGameEngineShanheQianlongRuntime(IKernelShanheMarketAccess shanheMarketOperations, EngineStates.Contracts.ICoreMatchDefinitionModeDefinitionOptionsAccess coreMatchDefinitionModeDefinitionOptionsAccess)
     {
         this._shanheMarketOperations = shanheMarketOperations;
         this._coreMatchDefinitionModeDefinitionOptionsAccess = coreMatchDefinitionModeDefinitionOptionsAccess;

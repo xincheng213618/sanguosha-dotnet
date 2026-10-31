@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDeckEquipmentProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IDeckEquipmentProgramHost.UseRandomDeckEquipment(ProgramSkillFrame f, int seat, string bind) => UseProgramRandomDeckEquipment(f, seat, bind);
-    void global::CardGame.Core.IDeckEquipmentProgramHost.GrantRandomSkillAndSuitShield(ProgramSkillFrame f, int seat, IReadOnlyList<string> skills, Suit suit) => GrantProgramRandomSkillAndSuitShield(f, seat, skills, suit);
+    SkillProgramStepOutcome IDeckEquipmentProgramHost.UseRandomDeckEquipment(ProgramSkillFrame f, int seat, string bind) => UseProgramRandomDeckEquipment(f, seat, bind);
+    void IDeckEquipmentProgramHost.GrantRandomSkillAndSuitShield(ProgramSkillFrame f, int seat, IReadOnlyList<string> skills, Suit suit) => GrantProgramRandomSkillAndSuitShield(f, seat, skills, suit);
     internal bool IsShieldedRescueSelection(CharacterState owner, ProgramMultiCardViewAsSelection selection) => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HasBeneficiarySuitShield(owner.Seat, dying.VictimSeat, _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(selection) ? Suit.None : selection.Cards.Select(card => _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)).Distinct().ToArray()is [var suit] ? suit : null);
     internal bool HasBeneficiarySuitShield(int actor, int target, Suit? suit) => actor != target && suit is { } actual && (_coreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldSequenceBeneficiarySuitShieldsAccess._beneficiarySuitShields.Any(s => s.BeneficiarySeat == target && s.Suit == actual) || _characterDuXiOlOperations.IsDuXiSuitTargetProhibited(actor, target, actual));
     internal IReadOnlyList<LegalAction> FilterBeneficiarySuitShieldActions(CharacterState actor, IReadOnlyList<LegalAction> actions)
@@ -52,7 +48,7 @@ internal sealed partial class CoreGameEngineDeckEquipmentProgramsRuntime
         _coreProgramLifecycleOperations.SetProgramCardSet(frame.Id, bind, [card.Id], SkillProgramCardSetVisibility.Public, [CardLocation.DrawPile], _coreNativeCardAppearanceOperations.EffectiveSuit(target, card));
         active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { PendingMovementContinuation = new ProgramMovementContinuation(targetSeat, 0, null) });
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+        var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
         var id = _coreNativeCardUseOperations.BeginCardUse(card, targetSeat, [], conversionSource: source);
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Processing, CardMoveReasons.EquipmentUse);
         if (!_coreFinalizedCardTargetsOperations.TryBeginEquipmentTargetPrograms(target, card, id))
@@ -111,7 +107,7 @@ internal sealed partial class CoreGameEngineDeckEquipmentProgramsRuntime
         var target = effect.TargetReference?.Kind == ProgramParticipantRef.Owner ? parent.OwnerSeat : parent.SelectedTargetSeats.Count == 1 ? parent.SelectedTargetSeats[0] : -1;
         if (target < 0 || pending.SubjectSeat != target || action.ActorSeat != target || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(action.EffectiveKind) || parent.CardSetBindings.SingleOrDefault(b => b.Name == bind)is not { CardIds: [var cardId] } || cardId != equipment.CardId)
             return false;
-        return action.ConversionChain.Any(source => source.OwnerSeat == parent.OwnerSeat && source.SkillId == parent.SkillId && source.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent) && source.SkillInstanceId == parent.SkillInstanceId);
+        return action.ConversionChain.Any(source => source.OwnerSeat == parent.OwnerSeat && source.SkillId == parent.SkillId && source.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent) && source.SkillInstanceId == parent.SkillInstanceId);
     }
 
     internal bool ReturnedRandomEquipmentMovementMatches(ProgramSkillFrame parent, CardsMovedTriggerWindowFrame moved)
@@ -146,7 +142,7 @@ internal sealed partial class CoreGameEngineDeckEquipmentProgramsRuntime
     {
         if (frame.WindowContext?.Window != SkillProgramTriggerWindow.OwnerDied || frame.SelectedTargetSeats is not [var selected] || selected != targetSeat || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive)
             throw new InvalidOperationException("Random death bequest lost its living beneficiary.");
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+        var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
         var chosen = skills[_randomOperations._random.Next(skills.Count)];
         _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[targetSeat], $"bequest:{(frame.OwnerSeat)}:{(frame.SkillInstanceId)}:{(frame.Id)}", [chosen]);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RandomSkillGrantedEvent(targetSeat, chosen, source));

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreMatchDefinitionGeneralPoolAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreMatchDefinitionGeneralPoolAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.GeneralDefinition> _generalPool { get; }
+    ref readonly IReadOnlyList<GeneralDefinition> _generalPool { get; }
 }

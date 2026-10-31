@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXinXianYingMobileShiRuntime
@@ -179,7 +175,7 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
         if (r.Stage == ShiXinXianYingStage.Suit)
         {
             var same = ShiXxySameCamp(f.OwnerSeat, r.Actor);
-            var missing = global::CardGame.Core.EngineOwners.CharacterXinXianYingMobileShiDefinitions.ShiXxySuits.FirstOrDefault(s => r.Viewed.All(c => c.Suit != s));
+            var missing = CharacterXinXianYingMobileShiDefinitions.ShiXxySuits.FirstOrDefault(s => r.Viewed.All(c => c.Suit != s));
             var suit = same && missing != Suit.None ? missing : r.Viewed.GroupBy(c => c.Suit).OrderBy(g => g.Count()).FirstOrDefault()?.Key ?? Suit.Spade;
             return p.Choices.First(c => c.Parameters["branch"] == suit.ToString());
         }

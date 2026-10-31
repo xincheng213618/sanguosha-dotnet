@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCuiLieAnniversaryRuntime
 {
     internal const string CuiLieAction = "anniversary-cui-lie", CuiLieGive = "skill-program.anniversary:zijue.give", CuiLieDraw = "skill-program.anniversary:zijue.draw", CuiLieClaim = "skill-program.anniversary:chibi.claim", CuiLieContest = "anniversary-cui-lie-contest";
-    internal static CardConversionSource CuiLieSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource CuiLieSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool CuiLieDisabled(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuiLieDisabledEvent>().Any(d => d.Source.OwnerSeat == owner && d.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == d.Turn));
     internal bool IsAnniversaryCuiLieGrantQualified(CharacterState owner, SkillGrant grant) => grant.SkillId != AnniversaryCuiLieComposition.Chibi || !CuiLieDisabled(owner.Seat);
     internal long CaptureAnniversaryCuiLieQualificationStamp(long underlying)
@@ -27,7 +24,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         return long.MinValue / 128 + _characterCuiLieAnniversaryCuiLieQualificationInputsCuiLieQualificationStampAccess._cuiLieQualificationStamp;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryCuiLieHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCuiLie(f, op);
+    SkillProgramStepOutcome IAnniversaryCuiLieHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCuiLie(f, op);
     internal AnniversaryCuiLieLeaseEvent[] CuiLieLeases(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuiLieLeaseEvent>().Where(l => l.Source.OwnerSeat == owner && l.Amount is >= 2 and <= 4 && l.Source.SkillId == AnniversaryCuiLieComposition.Zijue && l.Source.BindingId == "declare-number" && _contentRegistryOperations._contentRegistry.GetSkill(l.Source.SkillId).Program?.GameplayHash == l.Hash && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Any(t => t.ActorSeat == owner && t.TurnNumber > l.Turn) && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuiLieGiftEvent>().Count(g => g.FrameId == l.FrameId && g.Count == l.Amount) == 1).ToArray();
     internal int AnniversaryCuiLiePindianBonus(int owner) => CuiLieLeases(owner).Sum(l => l.Amount);
     [ProgramDistanceRule(ProgramDistanceStage.IncomingContributions, 46900)]
@@ -43,7 +40,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 46900, SkillProgramEffectOp.ResolveAnniversaryCuiLieChibi, SkillProgramEffectOp.ResolveAnniversaryCuiLieZijuePindianDraw)]
     internal bool CanOfferCuiLie(ProgramTriggerLegalityContext c) => c.SkillId == AnniversaryCuiLieComposition.Chibi ? CuiLieUse(c.WindowContext)is { } u && CuiLieContestEligible(c.OwnerSeat, u) : CuiLieLeases(c.OwnerSeat).Any(l => l.Source.SkillInstanceId == c.Candidate.SkillInstanceId);
     internal CardUseFrame? CuiLieUse(ProgramSkillWindowContext? w) => w is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } id } && _coreCardUseLifecycleOperations.LifecycleCardUse(id.ParentCardUseFrameId)is { Action: { } a } u && a.ActionId == id.CardActionId ? u : null;
-    internal bool CuiLieContestEligible(int owner, CardUseFrame use) => use.Action is { Type: CardActionType.Use } a && a.ActorSeat != owner && _coreMatchParticipantsPlayersAccess._players[a.ActorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && !CuiLieDisabled(owner) && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[owner]) && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat]) && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(owner, a.ActorSeat) && global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationRuntime.OverflowPrimaryTargets(use.CardKind, a.EffectiveDesignatedTargetSeats).Any(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && _coreNativeRuleQueriesOperations.GetCombatDistance(a.ActorSeat, t) > 1);
+    internal bool CuiLieContestEligible(int owner, CardUseFrame use) => use.Action is { Type: CardActionType.Use } a && a.ActorSeat != owner && _coreMatchParticipantsPlayersAccess._players[a.ActorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && !CuiLieDisabled(owner) && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[owner]) && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat]) && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(owner, a.ActorSeat) && CoreGameEngineOverflowTargetCancellationRuntime.OverflowPrimaryTargets(use.CardKind, a.EffectiveDesignatedTargetSeats).Any(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && _coreNativeRuleQueriesOperations.GetCombatDistance(a.ActorSeat, t) > 1);
     internal SkillProgramStepOutcome BeginCuiLie(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -142,7 +139,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
     [ProgramAnswer(CuiLieAction)]
     internal void AnswerCuiLie(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryCuiLie: { } r } f || !ValidCuiLie(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != CuiLieChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], CuiLieChoices(f).Where(c => c.Id == answer.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryCuiLie: { } r } f || !ValidCuiLie(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != CuiLieChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], CuiLieChoices(f).Where(c => c.Id == answer.Id).ToArray()))
             throw new InvalidOperationException("Cui Lie rejects another participant, private cost or native target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

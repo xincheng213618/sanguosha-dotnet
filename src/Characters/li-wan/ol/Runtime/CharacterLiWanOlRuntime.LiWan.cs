@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiWanOlRuntime
 {
     internal const string LianjuGainReason = "skill-program.li-wan.lianju.gain", SilvDrawReason = "skill-program.li-wan.silv.draw", SilvRefundReason = "skill-program.li-wan.silv.refund";
-    SkillProgramStepOutcome global::CardGame.Core.ILiWanProgramHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginLiWan(frame, op);
+    SkillProgramStepOutcome ILiWanProgramHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginLiWan(frame, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26720)]
     internal bool CanOfferLiWan(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)
     {
@@ -23,7 +18,7 @@ internal sealed partial class CharacterLiWanOlRuntime
     internal SkillProgramStepOutcome BeginLiWan(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.LiWan is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanOfferLiWan(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
+        if (f.LiWan is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanOfferLiWan(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Li Wan requires her exact unissued native event candidate.");
         var r = new LiWanReceipt(LiWanSource(f), f.GameplayHash, op, f.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, LianjuEndingSerial, LiWanStage.Color);
         if (op == SkillProgramEffectOp.ResolveLianjuOppositeColorReturn)
@@ -117,7 +112,7 @@ internal sealed partial class CharacterLiWanOlRuntime
     [ProgramAnswer("li-wan")]
     internal void AnswerLiWan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiWan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !LiWanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiWan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !LiWanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Li Wan lost her exact public native draft.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];

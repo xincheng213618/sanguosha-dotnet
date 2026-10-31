@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuanTanYuanShangOlRuntime
@@ -14,9 +10,9 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
     internal bool HasNeifaCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GainThenDiscardAndArmNeifaActualTurn);
 
     internal NeifaTurnState? CurrentNeifa(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreMatchParticipantsPlayersAccess._players[seat].NeifaTurnState is { ActualTurn: var turn } state && turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber ? state : null;
-    internal int NeifaX(int seat, bool basicBranch) => Math.Min(5, _cardZonesOperations._cardZones.CardsAt(CardLocation.Hand(seat)).Count(c => basicBranch ? global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) != SkillProgramCardCategory.Basic : global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Basic));
+    internal int NeifaX(int seat, bool basicBranch) => Math.Min(5, _cardZonesOperations._cardZones.CardsAt(CardLocation.Hand(seat)).Count(c => basicBranch ? CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) != SkillProgramCardCategory.Basic : CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Basic));
     internal int NeifaSlashLimitBonus(int seat) => CurrentNeifa(seat)is { BasicBranch: true } ? NeifaX(seat, true) : 0;
-    internal int NeifaSlashTargetBonus(int seat, CardKind kind) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && CurrentNeifa(seat)is { BasicBranch: true } ? 1 : 0;
+    internal int NeifaSlashTargetBonus(int seat, CardKind kind) => CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && CurrentNeifa(seat)is { BasicBranch: true } ? 1 : 0;
     internal bool IsNeifaUseForbidden(int actor, CardKind kind, CardActionType type)
     {
         if (CurrentNeifa(actor)is not { } s)
@@ -24,7 +20,7 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
         var use = type == CardActionType.Use || type == CardActionType.Response && (kind == CardKind.Nullification || kind == CardKind.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[actor], kind));
         if (!use)
             return false;
-        var category = global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind);
+        var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind);
         return s.BasicBranch && category is SkillProgramCardCategory.Trick or SkillProgramCardCategory.Equipment || s.NonBasicBranch && category == SkillProgramCardCategory.Basic;
     }
 
@@ -45,7 +41,7 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.CaptureMovement, 30)]
     internal void CaptureNeifaPaymentBatch(CardMovementBatchContext batch)
     {
-        if (!HasNeifaCapability || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame { Action: { Type: CardActionType.Use } a } use || CurrentNeifa(a.ActorSeat)is not { NonBasicBranch: true } || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind) != SkillProgramCardCategory.Equipment || batch.ParentFrameId != use.Id || batch.ParentBatchId is not null || a.PhysicalCards.Count == 0 || batch.Movements.Count != a.PhysicalCards.Count)
+        if (!HasNeifaCapability || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame { Action: { Type: CardActionType.Use } a } use || CurrentNeifa(a.ActorSeat)is not { NonBasicBranch: true } || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind) != SkillProgramCardCategory.Equipment || batch.ParentFrameId != use.Id || batch.ParentBatchId is not null || a.PhysicalCards.Count == 0 || batch.Movements.Count != a.PhysicalCards.Count)
             return;
         for (var i = 0; i < a.PhysicalCards.Count; i++)
         {
@@ -62,9 +58,9 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
 
     internal void CaptureNeifaPaidEquipmentUse(long useId, CardActionContext action)
     {
-        if (!HasNeifaCapability || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Equipment || CurrentNeifa(action.ActorSeat)is not { NonBasicBranch: true } state || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { Action: { } actual } use)
+        if (!HasNeifaCapability || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Equipment || CurrentNeifa(action.ActorSeat)is not { NonBasicBranch: true } state || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { Action: { } actual } use)
             return;
-        if (action.Type != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action))
+        if (action.Type != CardActionType.Use || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action))
             throw new InvalidOperationException("Neifa equipment requires actual accepted native use.");
         if (use.NeifaEquipment is not null)
             return;
@@ -95,5 +91,5 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NeifaEquipmentUseQualifiedEvent(use.Id, action.ActionId, action.ActorSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, ordinal, q.RequestedDraw, q.Source, q.GameplayHash));
     }
 
-    internal bool ValidNeifaEquipment(NeifaEquipmentUseProof q, CardUseFrame use) => q.UseId == use.Id && q.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && q.Ordinal is 1 or 2 && q.RequestedDraw is >= 0 and <= 5 && use.Action is { } a && global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(a, q.Action) && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind) == SkillProgramCardCategory.Equipment && _coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, a) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<NeifaEquipmentUseQualifiedEvent>().Count(e => e == new NeifaEquipmentUseQualifiedEvent(use.Id, a.ActionId, a.ActorSeat, q.ActualTurn, q.Ordinal, q.RequestedDraw, q.Source, q.GameplayHash)) == 1;
+    internal bool ValidNeifaEquipment(NeifaEquipmentUseProof q, CardUseFrame use) => q.UseId == use.Id && q.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && q.Ordinal is 1 or 2 && q.RequestedDraw is >= 0 and <= 5 && use.Action is { } a && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(a, q.Action) && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(a.EffectiveKind) == SkillProgramCardCategory.Equipment && _coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, a) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<NeifaEquipmentUseQualifiedEvent>().Count(e => e == new NeifaEquipmentUseQualifiedEvent(use.Id, a.ActionId, a.ActorSeat, q.ActualTurn, q.Ordinal, q.RequestedDraw, q.Source, q.GameplayHash)) == 1;
 }

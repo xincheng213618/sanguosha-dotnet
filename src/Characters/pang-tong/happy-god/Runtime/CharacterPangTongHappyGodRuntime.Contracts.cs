@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICharacterPangTongHappyGodProgramLifecycleWindowOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterPangTongHappyGodProgramLifecycleWindowOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramLifecycleWindowRuntime Get();
+    ProgramLifecycleWindowRuntime Get();
 }

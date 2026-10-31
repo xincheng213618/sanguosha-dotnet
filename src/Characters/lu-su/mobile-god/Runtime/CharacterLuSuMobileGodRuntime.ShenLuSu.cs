@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuSuMobileGodRuntime
@@ -17,8 +12,8 @@ internal sealed partial class CharacterLuSuMobileGodRuntime
     internal int[] ShenLsGiveable(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat])).Where(c => !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Transfer)).Select(c => c.Id).ToArray();
     internal bool ShenLsDingzhouTarget(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && owner != target && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && ShenLsField(target).Length is> 0 and var count && ShenLsGiveable(owner).Length >= count;
     internal int[] ShenLsPeers(int owner, string skillId) => _coreTableOrderOperations.CurrentTableOrder().Where(s => s != owner && _coreMatchParticipantsPlayersAccess._players[s].IsAlive && (skillId == "happy:zhimeng" || !ShenLsTeam || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Count <= _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Count + 1)).ToArray();
-    SkillProgramStepOutcome global::CardGame.Core.IShenLuSuHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenLs(f, op);
-    bool global::CardGame.Core.IShenLuSuSelection.DingzhouTarget(int owner, int target) => ShenLsDingzhouTarget(owner, target);
+    SkillProgramStepOutcome IShenLuSuHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenLs(f, op);
+    bool IShenLuSuSelection.DingzhouTarget(int owner, int target) => ShenLsDingzhouTarget(owner, target);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 38900, SkillProgramEffectOp.ResolveShenLuSuTamo, SkillProgramEffectOp.ResolveShenLuSuZhimeng)]
     internal bool ShenLsEligible(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => ShenLsMode && (t.Effects[0].Op == SkillProgramEffectOp.ResolveShenLuSuTamo ? w.Window == SkillProgramTriggerWindow.GameStarting && _coreTableOrderOperations.CurrentTableOrder().Count - (_coreMatchDefinitionModeDefinitionPlayerCountAccess._modeDefinition.ModeKind == ContentModeKind.Identity ? 1 : 0) > 1 : w.Window == SkillProgramTriggerWindow.AfterTurnEnded && w.SourceSeat == c.OwnerSeat && ShenLsPeers(c.OwnerSeat, c.SkillId).Length > 0);
     internal SkillProgramStepOutcome BeginShenLs(ProgramSkillFrame supplied, SkillProgramEffectOp op)

@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhugeGuoLeRuntime
 {
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 30200, SkillProgramEffectOp.ResolveLeZhugeGuoChengyan)]
-    internal bool CanOfferLeChengyan(ProgramTriggerLegalityContext gate) => gate.Context.CardUse is { } a && a.ActorSeat == gate.Candidate.OwnerSeat && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind)) && a.DesignatedTargetSeats?.Any(s => s != a.ActorSeat) == true && !_coreProgramEventHistoryOperations.ProgramEventHistory<LeChengyanCompletedEvent>().Any(e => e.UseId == a.ParentCardUseFrameId);
+    internal bool CanOfferLeChengyan(ProgramTriggerLegalityContext gate) => gate.Context.CardUse is { } a && a.ActorSeat == gate.Candidate.OwnerSeat && (CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind)) && a.DesignatedTargetSeats?.Any(s => s != a.ActorSeat) == true && !_coreProgramEventHistoryOperations.ProgramEventHistory<LeChengyanCompletedEvent>().Any(e => e.UseId == a.ParentCardUseFrameId);
     internal SkillProgramStepOutcome StartLeChengyan(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != LeChengyan || f.ActivationId != f.TriggerId || f.TriggerId != "replace-use-effect" || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } a } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramCardTriggerWindowFrame w || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action.Type: CardActionType.Use } use || use.Action.ActionId != a.CardActionId || a.ActorSeat != f.OwnerSeat || !(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind)) || a.DesignatedTargetSeats?.Any(s => s != f.OwnerSeat) != true || f.LeChengyan is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<LeChengyanCompletedEvent>().Any(e => e.UseId == use.Id))
+        if (f.SkillId != LeChengyan || f.ActivationId != f.TriggerId || f.TriggerId != "replace-use-effect" || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } a } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramCardTriggerWindowFrame w || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action.Type: CardActionType.Use } use || use.Action.ActionId != a.CardActionId || a.ActorSeat != f.OwnerSeat || !(CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(a.EffectiveKind)) || a.DesignatedTargetSeats?.Any(s => s != f.OwnerSeat) != true || f.LeChengyan is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<LeChengyanCompletedEvent>().Any(e => e.UseId == use.Id))
             throw new InvalidOperationException("Chengyan requires its one real targeted Use and native finalized window.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LeChengyan = new(LeZhugeGuoSource(f), f.GameplayHash, use.Id, a.CardActionId) });
         return _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, 1, new(LeChengyanDrawReason));
@@ -88,7 +84,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
             return;
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
         {
             var use = _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId);
             if (use is null)

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWenYangOlRuntime
@@ -32,5 +28,5 @@ internal sealed partial class CharacterWenYangOlRuntime
     }
 
     [ProgramIssuedTrigger(370)]
-    internal bool IsIssuedWenYangQingjiaoEndingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && CurrentWenYangDebt(c, context)is { } debt && (!WenYangDebtConsumed(debt.FrameId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.WenYang is { Op: SkillProgramEffectOp.ResolveQingjiaoIssuedEndingDiscard } r && r.DebtId == debt.FrameId && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && f.WindowContext == context));
+    internal bool IsIssuedWenYangQingjiaoEndingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && CurrentWenYangDebt(c, context)is { } debt && (!WenYangDebtConsumed(debt.FrameId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.WenYang is { Op: SkillProgramEffectOp.ResolveQingjiaoIssuedEndingDiscard } r && r.DebtId == debt.FrameId && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && f.WindowContext == context));
 }

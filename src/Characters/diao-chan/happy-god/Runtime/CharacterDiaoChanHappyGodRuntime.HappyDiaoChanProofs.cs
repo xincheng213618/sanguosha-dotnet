@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanHappyGodRuntime
@@ -92,7 +88,7 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
         if (child is PindianFrame p)
             return r.Stage == HappyDiaoChanStage.Pindian && p.Id == r.PindianId && p.ParentFrameId == f.Id && p.SourceSeat == r.PairSource && p.OpponentSeat == r.PairOpponent && p.SkillId == f.SkillId && p.ProgramResultBind == HappyDcPindian;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return moved.ResumeProgramFrameId == f.Id && (IsHappyDiaoChanPindianSettlementBatch(f, moved.Batch) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved));
+            return moved.ResumeProgramFrameId == f.Id && (IsHappyDiaoChanPindianSettlementBatch(f, moved.Batch) || CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved));
         return false;
     }
 

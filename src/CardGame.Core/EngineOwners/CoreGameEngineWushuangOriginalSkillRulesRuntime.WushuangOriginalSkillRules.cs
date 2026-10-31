@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
             throw new InvalidOperationException("Qianxi requires its finalized judgment color and exact distance-one other target.");
         if (outcome.Suit is { } suit && suit != Suit.None)
         {
-            var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandColorRestriction(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, f.Id, f.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), target, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(suit));
+            var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandColorRestriction(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, f.Id, f.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), target, CoreNativeCardClassificationsRuntime.IsRedSuit(suit));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HandCardColorRestrictionGrantedEvent(grant));
         }
 
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
         if (c.Window == SkillProgramTriggerWindow.DrawPhaseStarting)
         {
             _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { ActualPhaseSubstitution = new(parent.Id, f.Id, f.OwnerSeat, f.SkillId, f.SkillInstanceId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, SkillProgramTurnPhase.Draw) });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, c.Window, SkillProgramTurnPhase.Draw));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, c.Window, SkillProgramTurnPhase.Draw));
         }
         else
             _coreProgramTurnPhaseOperations.SkipProgramTurnPhases(f, c.Window switch
@@ -54,7 +50,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
                 return c.MovementBatch is { } batch && c.MovementIndex is { } index && index >= 0 && index < batch.Movements.Count && new[]
                 {
                     batch.Movements[index]
-                }.Any(m => m.To == CardLocation.DiscardPile && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId))) && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is { OwnerSeat: var discardedOwner, Zone: CardZoneKind.Hand or CardZoneKind.Equipment } && discardedOwner == owner.Seat);
+                }.Any(m => m.To == CardLocation.DiscardPile && CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId))) && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is { OwnerSeat: var discardedOwner, Zone: CardZoneKind.Hand or CardZoneKind.Equipment } && discardedOwner == owner.Seat);
             case "wushuang:skill-3125":
                 return gate.Candidate.BindingId switch
                 {
@@ -66,7 +62,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
             case "wushuang:skill-3180":
                 return _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != owner.Seat && _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, p.Seat) == 1);
             case "wushuang:skill-3247":
-                return c.CardUse is { } action && _coreCardUseLifecycleOperations.LifecycleCardUse(action.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } use } frame && use.ActorSeat == owner.Seat && owner.Seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && global::CardGame.Core.EngineOwners.CharacterCaoYingOlRuntime.CaoYingDamageKind(use.EffectiveKind) && frame.TargetSeats.Any(t => _coreMatchParticipantsPlayersAccess._players[t].IsAlive);
+                return c.CardUse is { } action && _coreCardUseLifecycleOperations.LifecycleCardUse(action.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } use } frame && use.ActorSeat == owner.Seat && owner.Seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && CharacterCaoYingOlRuntime.CaoYingDamageKind(use.EffectiveKind) && frame.TargetSeats.Any(t => _coreMatchParticipantsPlayersAccess._players[t].IsAlive);
             case "wushuang:skill-3284":
                 return c.CardUse is { } card && _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)?.Action is { Type: CardActionType.Use } actual && actual.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && actual.ActorSeat != owner.Seat && _coreCurrentTurnUseKindsOperations.CapturedActualTurnActorUseOrdinal(actual) == 2 && CardUseCategoryCatalog.Get(actual.EffectiveKind)is CardUseCategories.Basic or CardUseCategories.InstantTrick && _coreGuanduGeneralsOperations.GuanduDiscardable(owner.Seat, owner.Seat).Length > 0;
             case "wushuang:skill-3083":
@@ -119,12 +115,12 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 61010)]
-    internal int WushuangOriginalDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int WushuangOriginalDamage(GameEngine.IDamageAttempt attack)
     {
         var bonus = 0;
         if (attack.EffectiveCardKind is { } kind && !attack.IsSourceLess && !attack.IsChainPropagation)
         {
-            if (attack.CardUserSeat == attack.SourceSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreWushuangOriginalSkillsOperations.WushuangOriginalEnabled(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], "wushuang:skill-3246"))
+            if (attack.CardUserSeat == attack.SourceSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreWushuangOriginalSkillsOperations.WushuangOriginalEnabled(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], "wushuang:skill-3246"))
                 bonus++;
             if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != attack.TargetSeat && CardCatalog.Get(kind).CategoryName == "锦囊牌" && _coreWushuangOriginalSkillsOperations.WushuangOriginalEnabled(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat], "wushuang:skill-3246"))
                 bonus++;
@@ -135,7 +131,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
         return bonus;
     }
 
-    internal global::CardGame.Core.GameEngine.ProgramCardIdentityMatch? WushuangChoufaIdentity(CharacterState owner, Card card)
+    internal GameEngine.ProgramCardIdentityMatch? WushuangChoufaIdentity(CharacterState owner, Card card)
     {
         var expired = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangChoufaExpiredEvent>().Select(e => e.ProducerId).ToHashSet();
         var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangChoufaRewrittenEvent>().LastOrDefault(e => e.Target == owner.Seat && e.CardIds.Contains(card.Id) && !expired.Contains(e.FrameId) && !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == card.Id && m.From == CardLocation.Hand(owner.Seat) && m.Sequence > e.MovementSequence));

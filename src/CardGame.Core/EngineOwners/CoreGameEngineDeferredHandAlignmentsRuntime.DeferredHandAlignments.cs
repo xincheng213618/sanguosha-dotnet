@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDeferredHandAlignmentsRuntime
 {
-    void global::CardGame.Core.IDeferredAlignmentProgramHost.ScheduleDeferredHandAlignment(ProgramSkillFrame frame, string continuationId) => ScheduleDeferredHandAlignment(frame, continuationId);
-    SkillProgramStepOutcome global::CardGame.Core.IDeferredAlignmentProgramHost.ResolveDeferredHandAlignment(ProgramSkillFrame frame) => ResolveDeferredHandAlignment(frame);
+    void IDeferredAlignmentProgramHost.ScheduleDeferredHandAlignment(ProgramSkillFrame frame, string continuationId) => ScheduleDeferredHandAlignment(frame, continuationId);
+    SkillProgramStepOutcome IDeferredAlignmentProgramHost.ResolveDeferredHandAlignment(ProgramSkillFrame frame) => ResolveDeferredHandAlignment(frame);
     internal void CleanupDeferredHandAlignments()
     {
         foreach (var due in _coreGameEngineDeferredHandAlignmentsDeferredHandAlignmentSequenceDeferredHandAlignmentsAccess._deferredHandAlignments.Where(d => _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[d.Source.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[d.TargetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[d.Source.OwnerSeat].SkillGrants.Grants.Any(g => g.SkillId == d.Source.SkillId && g.SkillInstanceId == d.Source.SkillInstanceId)).ToArray())

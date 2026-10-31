@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShownBoundGiftsRuntime
 {
 
-    SkillProgramStepOutcome global::CardGame.Core.IShownBoundGiftProgramHost.GiveShownBoundCardsAndGrantTurnHandLimit(ProgramSkillFrame f, string bind) => GiveProgramShownBoundGift(f, bind);
+    SkillProgramStepOutcome IShownBoundGiftProgramHost.GiveShownBoundCardsAndGrantTurnHandLimit(ProgramSkillFrame f, string bind) => GiveProgramShownBoundGift(f, bind);
     internal SkillProgramStepOutcome GiveProgramShownBoundGift(ProgramSkillFrame frame, string bind)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -32,14 +28,14 @@ internal sealed partial class CoreGameEngineShownBoundGiftsRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(source.CardIds, CardLocation.Hand(recipient), new($"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.GiveShownBoundCardsAndGrantTurnHandLimit)}"), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, source.CardIds, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batchId, movements) =>
         {
-            var actual = movements.Where(m => m.To == CardLocation.Hand(recipient) && m.From != m.To).Select(m => new ProgramShownGiftCard(m.CardId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(m.CardKind), m.Sequence, m.From, m.To)).ToArray();
+            var actual = movements.Where(m => m.To == CardLocation.Hand(recipient) && m.From != m.To).Select(m => new ProgramShownGiftCard(m.CardId, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(m.CardKind), m.Sequence, m.From, m.To)).ToArray();
             var x = actual.Select(c => c.Category).Distinct().Count();
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var receipt = new ProgramShownGiftReceipt(f.InstructionIndex - 1, batchId, recipient, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, Array.AsReadOnly(actual), null);
             _coreRuntimeOperations.ReplaceRuntimeTop(active with { ShownGiftReceipt = receipt });
             if (x > 0)
             {
-                var modifier = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(receipt.ActualTurnNumber, receipt.ActualTurnOwnerSeat, f.Id, receipt.InstructionIndex, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), SkillRuleQuery.HandLimit, SkillRuleOperation.Add, x, affectedSeat: receipt.ActualTurnOwnerSeat);
+                var modifier = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(receipt.ActualTurnNumber, receipt.ActualTurnOwnerSeat, f.Id, receipt.InstructionIndex, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), SkillRuleQuery.HandLimit, SkillRuleOperation.Add, x, affectedSeat: receipt.ActualTurnOwnerSeat);
                 _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { ShownGiftReceipt = receipt with { ModifierGrantSequence = modifier.GrantSequence } });
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnRuleModifierGrantedEvent(modifier));
             }

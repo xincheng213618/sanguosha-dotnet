@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoZhiLeRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal const string FuleInitialBinding = "mark-initial-entities";
     internal bool HasLeCaoZhiFuleCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeLeCaoZhiFule);
 
-    internal static CardConversionSource FuleSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cao_zhi_le_LeCaoZhiFule.FuleSource(f);
+    internal static CardConversionSource FuleSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cao_zhi_le_LeCaoZhiFule.FuleSource(f);
     internal FuEntityNameSnapshot? CaptureLeCaoZhiFuEntity(int cardId)
     {
         var completed = _coreProgramEventHistoryOperations.ProgramEventHistory<FuMarkingCompletedEvent>().Select(e => (e.FrameId, e.Origin)).ToHashSet();
@@ -89,7 +85,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal void MarkWenlanFuEntities(ProgramSkillFrame supplied, IReadOnlyList<int> ids, FuMarkOrigin origin)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || f.SkillId != "le:wenlan" || f.GameplayHash != supplied.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || origin is not (FuMarkOrigin.WenlanObtain or FuMarkOrigin.WenlanHandRewrite) || !IsExactWenlanFuMarking(f, ids, origin) || ids.Distinct().Count() != ids.Count || ids.Any(id => id <= 0 || (origin == FuMarkOrigin.WenlanObtain ? _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(f.OwnerSeat) : !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _cardZonesOperations._cardZones.GetLocation(id)))))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || f.SkillId != "le:wenlan" || f.GameplayHash != supplied.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || origin is not (FuMarkOrigin.WenlanObtain or FuMarkOrigin.WenlanHandRewrite) || !IsExactWenlanFuMarking(f, ids, origin) || ids.Distinct().Count() != ids.Count || ids.Any(id => id <= 0 || (origin == FuMarkOrigin.WenlanObtain ? _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(f.OwnerSeat) : !CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _cardZonesOperations._cardZones.GetLocation(id)))))
             throw new InvalidOperationException("Fu marking requires Wenlan's exact paid acquire or confirmed private Hand receipt.");
         AssignFuleEntities(f, ids, origin);
     }
@@ -123,7 +119,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         if (instance.SkillId != LeCaoZhiFuleSkill)
             return true;
         var program = _contentRegistryOperations._contentRegistry.GetSkill(instance.SkillId).Program;
-        if (!owner.IsAlive || program is null || !LeCaoZhiComposition.IsFuleProgram(program) || FulePureProviderFrontier(owner.Seat) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, instance.SkillId, instance.SkillInstanceId) || _coreActivityOrdinaryTricksOperations.ActivityRuntimeProgram(program).ViewAs.SingleOrDefault(view => view.Id == rule.Id) != rule || CaptureLeCaoZhiFuEntity(card.Id)is not { AliasKind: { } alias } || alias != rule.OutputKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(owner, _cardZonesOperations._cardZones.GetLocation(card.Id)))
+        if (!owner.IsAlive || program is null || !LeCaoZhiComposition.IsFuleProgram(program) || FulePureProviderFrontier(owner.Seat) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, instance.SkillId, instance.SkillInstanceId) || _coreActivityOrdinaryTricksOperations.ActivityRuntimeProgram(program).ViewAs.SingleOrDefault(view => view.Id == rule.Id) != rule || CaptureLeCaoZhiFuEntity(card.Id)is not { AliasKind: { } alias } || alias != rule.OutputKind || !CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(owner, _cardZonesOperations._cardZones.GetLocation(card.Id)))
             return false;
         if (requestedUseTarget is { } requested)
             return rule.OutputKind == CardKind.Peach && !forResponse && !dyingUse && _coreWenyiPeachSuppliesOperations.IsWenyiPeachSupplyQuery(owner, requested);
@@ -131,7 +127,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
             return _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == owner.Seat && (rule.OutputKind == CardKind.Peach || rule.OutputKind == CardKind.Alcohol && dying.VictimSeat == owner.Seat);
         if (!forResponse)
             return true;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind))
             return FuleTrueSlashUseFrontier(owner);
         return rule.OutputKind == CardKind.Nullification || rule.OutputKind == CardKind.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, CardKind.Dodge);
     }
@@ -140,14 +136,14 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal bool FulePureProviderFrontier(int actor) => _coreProgramNativeSlashQueriesOperations.IsNativePureProviderFrontier(actor);
     internal bool FuleTrueSlashUseFrontier(CharacterState owner) => _coreProgramNativeSlashQueriesOperations.IsNativeForcedSlashUseFrontier(owner);
     internal bool FuleSlashAliasAllowed(CharacterState owner, bool forResponse) => FuleTrueSlashUseFrontier(owner);
-    internal IReadOnlyList<SlashUseVariant> FulePhysicalSlashVariants(CharacterState owner, Card card) => global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => IsFulePhysicalSlashKind(owner, card, kind)).Select(kind => new SlashUseVariant(kind, null, false)).ToArray();
-    internal bool IsFulePhysicalSlashKind(CharacterState owner, Card card, CardKind kind) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, false).Any(source => IsFuleAliasSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind);
+    internal IReadOnlyList<SlashUseVariant> FulePhysicalSlashVariants(CharacterState owner, Card card) => CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => IsFulePhysicalSlashKind(owner, card, kind)).Select(kind => new SlashUseVariant(kind, null, false)).ToArray();
+    internal bool IsFulePhysicalSlashKind(CharacterState owner, Card card, CardKind kind) => CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, false).Any(source => IsFuleAliasSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind);
     internal bool FuleNativeConversionMatchesOutput(CharacterState owner, CardConversionSource source, CardKind kind) => !IsFuleAliasSource(source) || !FuleTrueSlashUseFrontier(owner) || _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind;
-    internal bool FuleAllowsUnspecifiedForcedSlash(CharacterState owner, Card card, CardKind kind) => !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !FuleTrueSlashUseFrontier(owner) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, kind) || FulePhysicalSlashVariants(owner, card).Count == 0;
+    internal bool FuleAllowsUnspecifiedForcedSlash(CharacterState owner, Card card, CardKind kind) => !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !FuleTrueSlashUseFrontier(owner) || CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, kind) || FulePhysicalSlashVariants(owner, card).Count == 0;
     internal CardKind FuleSelectedSlashKind(CharacterState owner, Card card, CardKind fallback, CardConversionSource? explicitSource = null)
     {
         var source = explicitSource ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion;
-        return source is not null && IsFuleAliasSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)is { } rule && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, rule.OutputKind, false).Contains(source) ? rule.OutputKind : fallback;
+        return source is not null && IsFuleAliasSource(source) && _corePlayCardHistoryOperations.ViewAsRule(source)is { } rule && CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind) && _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, rule.OutputKind, false).Contains(source) ? rule.OutputKind : fallback;
     }
 
     internal CardKind FuleForcedAiSlashKind(PendingDecision decision, Card card, CardKind fallback)
@@ -155,7 +151,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         var choices = decision.Choices.Where(choice => choice.Cards is [var id] && id == card.Id).ToArray();
         if (choices.Any(choice => choice.Parameters.GetValueOrDefault("response-card-kind") == fallback.ToString()))
             return fallback;
-        var alias = choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("conversion-skill-id") == LeCaoZhiFuleSkill && Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("response-card-kind"), out var kind) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind));
+        var alias = choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("conversion-skill-id") == LeCaoZhiFuleSkill && Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("response-card-kind"), out var kind) && CoreNativeCardClassificationsRuntime.IsSlashCard(kind));
         return alias is null ? fallback : Enum.Parse<CardKind>(alias.Parameters["response-card-kind"]);
     }
 
@@ -166,7 +162,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         {
             if (_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card))
                 continue;
-            foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
+            foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds)
                 foreach (var source in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, false).Where(source => source.SkillId == LeCaoZhiFuleSkill && _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind == kind))
                 {
                     actions.RemoveAll(action => action.CardId == card.Id && action.ConversionSource == source);
@@ -208,7 +204,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     }
 
     internal IEnumerable<Card> FuleDyingAlcoholGrainCards(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(owner).Where(card => _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.WoodenOxGrain(owner.Seat) && _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, CardKind.Alcohol, true, dyingUse: true).Any(IsFuleAliasSource));
-    SkillProgramStepOutcome global::CardGame.Core.ILeCaoZhiFuleHost.Initialize(ProgramSkillFrame frame) => InitializeLeCaoZhiFule(frame);
+    SkillProgramStepOutcome ILeCaoZhiFuleHost.Initialize(ProgramSkillFrame frame) => InitializeLeCaoZhiFule(frame);
     [ProgramCardLegality(ProgramCardLegalityStage.ConfiguredConversionBan, 30)]
     internal bool FuleConversionUnavailable(ProgramConfiguredViewAsQuery query) => !CanUseFuleAlias(query.Owner, query.Card, query.Instance, query.Rule, query.ForResponse, query.DyingUse, query.RequestedUseTarget);
 }

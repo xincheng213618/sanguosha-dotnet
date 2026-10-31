@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRedAdditionalTargetsRuntime
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineRedAdditionalTargetsRuntime
         foreach (var action in actions.ToArray().Where(a => a.CardId is not null && a.ProgramActivationId is null && a.Kind != LegalActionKind.Recast))
         {
             var(kind, suit) = _coreNextActualUseTargetAdjustmentsOperations.TargetAdjustmentAppearance(actor, action);
-            if (suit is not (Suit.Heart or Suit.Diamond) || (global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind) != SkillProgramCardCategory.Basic && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind)))
+            if (suit is not (Suit.Heart or Suit.Diamond) || (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind) != SkillProgramCardCategory.Basic && !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind)))
                 continue;
             var normal = action.Kind is LegalActionKind.DrawTwo or LegalActionKind.Peach or LegalActionKind.Alcohol ? new[]
             {
@@ -42,7 +38,7 @@ internal sealed partial class CoreGameEngineRedAdditionalTargetsRuntime
             {
                 normal = action.TargetSeats.ToArray();
                 var originalHolders = normal.Where((_, index) => index % 2 == 0).ToArray();
-                var pairs = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != actor.Seat && !originalHolders.Contains(p.Seat) && _coreNativeBorrowedSwordOperations.GetWeapon(p)is not null && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, p.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, suit)).SelectMany(p => _coreMatchParticipantsPlayersAccess._players.Where(v => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(p, v)).Select(v => new[] { p.Seat, v.Seat })).ToArray();
+                var pairs = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != actor.Seat && !originalHolders.Contains(p.Seat) && _coreNativeBorrowedSwordOperations.GetWeapon(p)is not null && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, p.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(suit)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, suit)).SelectMany(p => _coreMatchParticipantsPlayersAccess._players.Where(v => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(p, v)).Select(v => new[] { p.Seat, v.Seat })).ToArray();
                 foreach (var pair in pairs)
                     Add([..normal, ..pair]);
                 if (grant.Maximum == 2)

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuZhangOlRuntime
@@ -59,7 +55,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             return state.ResumeProgramFrameId == f.Id && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
         if (child is RecoveryReplacementFrame recovery)
             return IsLiuZhangRecoveryParent(f, recovery);
-        return child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsZonghuGiftMovement(f, m));
+        return child is CardsMovedTriggerWindowFrame moved && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsZonghuGiftMovement(f, m));
     }
 
     internal bool IsZonghuGiftMovement(ProgramSkillFrame f, CardMovementRecord m) => f.Zonghu is { Stage: ZonghuStage.CostChildren, Paid: { } paid } r && m.Sequence > r.Before && m.Sequence <= r.After && (paid.Gifts.Any(g => g.Sequence == m.Sequence && g.CardId == m.CardId && g.From == m.From && m.To == CardLocation.Hand(paid.RecipientSeat) && m.Reason.Value == ZonghuGiftReason) || r.GrainIds.Contains(m.CardId) && m.From == CardLocation.WoodenOxGrain(f.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard && paid.Gifts.Any(g => g.Kind == CardKind.WoodenOx && g.From == CardLocation.Equipment(f.OwnerSeat)));

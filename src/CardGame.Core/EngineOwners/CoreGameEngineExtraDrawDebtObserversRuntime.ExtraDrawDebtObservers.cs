@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineExtraDrawDebtObserversRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreGameEngineExtraDrawDebtObserversRuntime
     {
         for (var index = 1; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
         {
-            if (_resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame parent || parent.Window != SkillProgramTriggerWindow.DrawPhaseStarting || _resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.ExtraDrawReceipt is not { } paid || root.InstructionIndex != 1 || paid.InstructionIndex != 0 || paid.DrawWindowFrameId != parent.Id || paid.ActualTurnNumber != _coreActualTurnProgressTurnNumberAccess._turnNumber || paid.TurnOwnerSeat != root.OwnerSeat || parent.OwnerSeat != root.OwnerSeat || root.WindowContext is not { Window: SkillProgramTriggerWindow.DrawPhaseStarting } context || context.ParentFrameId != parent.Id || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, parent.Candidates[parent.CandidateIndex]) || root.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != root.OwnerSeat)
+            if (_resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame parent || parent.Window != SkillProgramTriggerWindow.DrawPhaseStarting || _resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.ExtraDrawReceipt is not { } paid || root.InstructionIndex != 1 || paid.InstructionIndex != 0 || paid.DrawWindowFrameId != parent.Id || paid.ActualTurnNumber != _coreActualTurnProgressTurnNumberAccess._turnNumber || paid.TurnOwnerSeat != root.OwnerSeat || parent.OwnerSeat != root.OwnerSeat || root.WindowContext is not { Window: SkillProgramTriggerWindow.DrawPhaseStarting } context || context.ParentFrameId != parent.Id || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, parent.Candidates[parent.CandidateIndex]) || root.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != root.OwnerSeat)
                 continue;
             var program = _contentRegistryOperations._contentRegistry.GetSkill(root.SkillId).Program;
             if (program is null || program.GameplayHash != root.GameplayHash || ProgramInstructionResolver.Default.Resolve(root, program).Instructions is not [{ Op: SkillProgramEffectOp.DrawExtraAndArmTurnDamageUseDebt } op] || op.StateId != paid.StateId)

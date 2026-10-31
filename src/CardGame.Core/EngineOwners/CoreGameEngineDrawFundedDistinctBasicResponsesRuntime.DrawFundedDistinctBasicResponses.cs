@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDrawFundedDistinctBasicResponsesRuntime
@@ -39,12 +35,12 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicResponsesRunt
         var receipt = use.DrawFundedDistinctBasicResponse ?? throw new InvalidOperationException("A paid Dodge lost its incoming-use receipt.");
         var p = receipt.Payment;
         var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Where(e => e.Action.ActionId == receipt.CardActionId).ToArray();
-        if (facts is not [var fact] || !_coreDrawFundedDistinctBasicUsesOperations.IsDrawFundedDistinctBasicIssued(receipt) || receipt.OwnerFrameId != use.Id || p.ParentFrameId != use.Id || p.Intent != DrawFundedDistinctBasicIntent.OwnSlashDodge || p.EffectiveKind != CardKind.Dodge || use.CardAttack is not { } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.TargetSeat != p.Source.OwnerSeat || attack.SuccessfulDodgeResponses != p.Cursor || p.TargetSeat != attack.SourceSeat || fact.Action is not { Type: CardActionType.Response, PhysicalCards.Count: 0, EffectiveKind: CardKind.Dodge, EffectiveSuit: Suit.None, EffectiveRank: 0, EffectiveIsRed: false } action || action.ParentActionId != use.Action?.ActionId || action.ParentActionId != p.ParentActionId || action.ActorSeat != p.Source.OwnerSeat || action.ProviderSeat != action.ActorSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || action.OpponentSeat != attack.SourceSeat || action.ConversionChain is not [var source] || source != p.Source || action.TargetSeats.Count != 0)
+        if (facts is not [var fact] || !_coreDrawFundedDistinctBasicUsesOperations.IsDrawFundedDistinctBasicIssued(receipt) || receipt.OwnerFrameId != use.Id || p.ParentFrameId != use.Id || p.Intent != DrawFundedDistinctBasicIntent.OwnSlashDodge || p.EffectiveKind != CardKind.Dodge || use.CardAttack is not { } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.TargetSeat != p.Source.OwnerSeat || attack.SuccessfulDodgeResponses != p.Cursor || p.TargetSeat != attack.SourceSeat || fact.Action is not { Type: CardActionType.Response, PhysicalCards.Count: 0, EffectiveKind: CardKind.Dodge, EffectiveSuit: Suit.None, EffectiveRank: 0, EffectiveIsRed: false } action || action.ParentActionId != use.Action?.ActionId || action.ParentActionId != p.ParentActionId || action.ActorSeat != p.Source.OwnerSeat || action.ProviderSeat != action.ActorSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || action.OpponentSeat != attack.SourceSeat || action.ConversionChain is not [var source] || source != p.Source || action.TargetSeats.Count != 0)
             throw new InvalidOperationException("A paid Dodge changed its unique accepted action, native owner or once-paid original cursor.");
         return fact.Action;
     }
 
-    internal void ClearDrawFundedDistinctBasicDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void ClearDrawFundedDistinctBasicDodgeResponse(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { DrawFundedDistinctBasicResponse: not null } use)
             return;
@@ -59,7 +55,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicResponsesRunt
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat].IsHuman)
             return false;
-        var choices = prompt.Choices.Where(global::CardGame.Core.EngineOwners.CoreGameEngineDrawFundedDistinctBasicOffersRuntime.IsDrawFundedDistinctBasicAnswer).ToArray();
+        var choices = prompt.Choices.Where(CoreGameEngineDrawFundedDistinctBasicOffersRuntime.IsDrawFundedDistinctBasicAnswer).ToArray();
         if (choices.Length == 0)
             return false;
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
@@ -72,17 +68,17 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicResponsesRunt
         }
         else if (prompt.Kind == DecisionKind.RescueDying && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying)
         {
-            var decision = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseProgramDyingRescue(_corePlayerViewProjectionOperations.CreateSnapshot(actor.Seat), dying.VictimSeat, _coreCardConversionsOperations.ProgramConversionName(global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choices[0])), ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
+            var decision = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseProgramDyingRescue(_corePlayerViewProjectionOperations.CreateSnapshot(actor.Seat), dying.VictimSeat, _coreCardConversionsOperations.ProgramConversionName(CoreGameEngineCardConversionsRuntime.RequireConversionSource(choices[0])), ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
             use = decision.UseRescue;
             _coreNativeAiDecisionsOperations.AddThought(decision.Thought);
         }
 
         if (!use || _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicContext(prompt)is not { } need)
             return false;
-        var choice = choices.FirstOrDefault(c => _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicResponseChoices(prompt, need).Any(current => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([current], [c])));
+        var choice = choices.FirstOrDefault(c => _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicResponseChoices(prompt, need).Any(current => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([current], [c])));
         if (choice is null || !Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("output-kind"), out var kind) || !int.TryParse(choice.Parameters.GetValueOrDefault("native-target-seat"), out var target))
             return false;
-        _coreDrawFundedDistinctBasicPaymentOperations.BeginDrawFundedDistinctBasic(actor, global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice), kind, (need.Intent is DrawFundedDistinctBasicIntent.OwnSlashDodge or DrawFundedDistinctBasicIntent.Dying) ? [target] : choice.Targets, prompt, need);
+        _coreDrawFundedDistinctBasicPaymentOperations.BeginDrawFundedDistinctBasic(actor, CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice), kind, (need.Intent is DrawFundedDistinctBasicIntent.OwnSlashDodge or DrawFundedDistinctBasicIntent.Dying) ? [target] : choice.Targets, prompt, need);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
         return true;
     }

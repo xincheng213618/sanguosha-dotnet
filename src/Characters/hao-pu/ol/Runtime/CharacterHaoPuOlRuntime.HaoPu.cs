@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHaoPuOlRuntime
 {
-    internal const string ZhenyingDiscardReason = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.ZhenyingDiscardReason, ZhenyingDrawReason = "skill-program.hao-pu.zhenying.draw";
-    internal static CardConversionSource ZhenyingSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hao_pu_ol_HaoPu.ZhenyingSource(f);
+    internal const string ZhenyingDiscardReason = RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.ZhenyingDiscardReason, ZhenyingDrawReason = "skill-program.hao-pu.zhenying.draw";
+    internal static CardConversionSource ZhenyingSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_hao_pu_ol_HaoPu.ZhenyingSource(f);
     internal ZhenyingHandPlan FreezeZhenyingHand(int seat)
     {
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]);
@@ -30,9 +27,9 @@ internal sealed partial class CharacterHaoPuOlRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal static ZhenyingHandPlan ZhenyingPlan(ZhenyingReceipt r) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hao_pu_ol_HaoPu.ZhenyingPlan(r);
-    internal static ZhenyingReceipt WithZhenyingPlan(ZhenyingReceipt r, ZhenyingHandPlan plan) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hao_pu_ol_HaoPu.WithZhenyingPlan(r, plan);
-    internal static int ZhenyingKeptCount(ZhenyingHandPlan p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hao_pu_ol_HaoPu.ZhenyingKeptCount(p);
+    internal static ZhenyingHandPlan ZhenyingPlan(ZhenyingReceipt r) => RuntimeSkills.RuntimeRules_hao_pu_ol_HaoPu.ZhenyingPlan(r);
+    internal static ZhenyingReceipt WithZhenyingPlan(ZhenyingReceipt r, ZhenyingHandPlan plan) => RuntimeSkills.RuntimeRules_hao_pu_ol_HaoPu.WithZhenyingPlan(r, plan);
+    internal static int ZhenyingKeptCount(ZhenyingHandPlan p) => RuntimeSkills.RuntimeRules_hao_pu_ol_HaoPu.ZhenyingKeptCount(p);
     internal IReadOnlyList<PromptChoice> ZhenyingChoices(ProgramSkillFrame f)
     {
         var r = f.Zhenying!;
@@ -84,7 +81,7 @@ internal sealed partial class CharacterHaoPuOlRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Zhenying lost its choice owner.");
         var r = f.Zhenying!;
         var p = ZhenyingPlan(r);
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != p.Seat || !ZhenyingChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != p.Seat || !ZhenyingChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zhenying requires the exact published chooser-owned private commitment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == ZhenyingStage.ChoosingCount)
@@ -222,8 +219,8 @@ internal sealed partial class CharacterHaoPuOlRuntime
             return prompt.Choices.Single(c => c.Parameters.GetValueOrDefault("count") == "2");
         // Only this chooser's original cards are examined; the other commitment
         // and private hand never affect the AI's sealed choice.
-        return prompt.Choices.OrderByDescending(c => c.Cards is [var id] && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardAttackStateOperations.GetAttackCard(id).Kind)).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+        return prompt.Choices.OrderByDescending(c => c.Cards is [var id] && CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardAttackStateOperations.GetAttackCard(id).Kind)).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHaoPuProgramHost.ResolveZhenying(ProgramSkillFrame f) => BeginZhenying(f);
+    SkillProgramStepOutcome IHaoPuProgramHost.ResolveZhenying(ProgramSkillFrame f) => BeginZhenying(f);
 }

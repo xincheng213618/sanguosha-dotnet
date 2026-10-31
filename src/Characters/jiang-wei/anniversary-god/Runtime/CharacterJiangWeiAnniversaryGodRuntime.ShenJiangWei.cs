@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
@@ -11,8 +7,8 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     internal static CardConversionSource ShenJwSource(ProgramSkillFrame f) => new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     internal bool HasShenJw => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShenJiangWeiTianren);
 
-    SkillProgramStepOutcome global::CardGame.Core.IShenJiangWeiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenJw(f, op);
-    bool global::CardGame.Core.IShenJiangWeiSelection.CanPay(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && _coreMatchParticipantsPlayersAccess._players[owner].MaxHp > 9 && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiPingxiangPaidEvent>().Any(p => p.Source.OwnerSeat == owner);
+    SkillProgramStepOutcome IShenJiangWeiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenJw(f, op);
+    bool IShenJiangWeiSelection.CanPay(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && _coreMatchParticipantsPlayersAccess._players[owner].MaxHp > 9 && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiPingxiangPaidEvent>().Any(p => p.Source.OwnerSeat == owner);
     // Capture while the native Use/response still owns its exact processing
     // invoice. Later discard windows can run after that native producer retires.
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.CaptureMovement, 38400)]
@@ -28,7 +24,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 38400)]
     internal int[]? SelectShenJwDiscards(CardMovementBatchContext b, ProgramTriggerCandidate c, ProgramInstructionFeatures features) => features.HasOperation(SkillProgramEffectOp.ResolveShenJiangWeiTianren) ? ShenJwDiscardIndexes(b) : null;
     internal ProgramCardTriggerWindowFrame? ShenJwActionParent(ProgramSkillWindowContext w) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)is ProgramCardTriggerWindowFrame p && w.CardUse?.CardActionId == p.Action.ActionId ? p : null;
-    internal static CardActionContext ShenJwCompletedAction(ProgramCardTriggerWindowFrame p) => p.ResponseCompletion is null ? p.Action : global::CardGame.Core.EngineOwners.CoreGameEngineResponseCompletionRuntime.ResponseCompletionActorAction(p);
+    internal static CardActionContext ShenJwCompletedAction(ProgramCardTriggerWindowFrame p) => p.ResponseCompletion is null ? p.Action : CoreGameEngineResponseCompletionRuntime.ResponseCompletionActorAction(p);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 38400)]
     internal void CaptureShenJwCompletedName(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> candidates)
     {
@@ -41,7 +37,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
                 continue;
             var cycle = history.LastOrDefault()is { } last ? last.Cycle + (last.DistinctCount == 9 ? 1 : 0) : 0;
             var names = history.Where(e => e.Cycle == cycle).Select(e => e.Name).ToHashSet();
-            var name = global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind);
+            var name = CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind);
             names.Add(name);
             var native = window == SkillProgramTriggerWindow.CardResponseCompleted ? _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().LastOrDefault(p => p.ResponseCompletion is not null && p.Action.ActionId == action.ActionId)?.Id : _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(u => u.Action?.ActionId == action.ActionId)?.Id;
             if (native is null)
@@ -273,7 +269,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     [ProgramAnswer(ShenJwAction)]
     internal void AnswerShenJw(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenJiangWei: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShenJwChoices(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenJiangWei: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShenJwChoices(f).Any(x => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
             throw new InvalidOperationException("Shen Jiang Wei requires an exact current native choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -352,7 +348,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
         if (f.ShenJiangWei!.Stage == ShenJiangWeiStage.JiufaOffer)
             return d.Choices.First(c => c.Parameters["option"] == "reveal");
         if (f.ShenJiangWei.Stage == ShenJiangWeiStage.RankChoice)
-            return d.Choices.MaxBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))!;
+            return d.Choices.MaxBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))!;
         return d.Choices.OrderByDescending(c => c.Targets.Count == 1 ? -_coreAiBrainsAiBrainsAccess._aiBrains[f.OwnerSeat].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(f.OwnerSeat), c.Targets[0], new(0, 0, 0, 1, 0, 0, false, false)) : 0).First();
     }
 }

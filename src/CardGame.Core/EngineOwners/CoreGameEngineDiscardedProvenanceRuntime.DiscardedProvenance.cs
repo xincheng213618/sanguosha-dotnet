@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDiscardedProvenanceRuntime
@@ -54,9 +50,9 @@ internal sealed partial class CoreGameEngineDiscardedProvenanceRuntime
         return batch.Movements.Select((m, i) => (m, i, origin: DiscardedProvenanceOrigin(m))).Where(x => x.origin is not null && x.m.To == CardLocation.DiscardPile && x.origin.SourceSeat != candidate.OwnerSeat && current.ContainsKey(x.m.CardId) && (trigger.Suits.Count == 0 || trigger.Suits.Contains(x.origin.EffectiveSuit))).Select(x => x.i).ToArray();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDiscardedProvenanceProgramHost.ClaimDiscardedEntityWithProvenance(ProgramSkillFrame frame, string provenanceId) => BeginDiscardedProvenanceClaim(frame, provenanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IDiscardedProvenanceProgramHost.OfferFaceUpForOutsideClaims(ProgramSkillFrame frame, string provenanceId) => OfferProvenanceFaceUp(frame, provenanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IDiscardedProvenanceProgramHost.UseVirtualAlcohol(ProgramSkillFrame frame) => _coreProvenanceVirtualAlcoholOperations.BeginProvenanceVirtualAlcohol(frame);
+    SkillProgramStepOutcome IDiscardedProvenanceProgramHost.ClaimDiscardedEntityWithProvenance(ProgramSkillFrame frame, string provenanceId) => BeginDiscardedProvenanceClaim(frame, provenanceId);
+    SkillProgramStepOutcome IDiscardedProvenanceProgramHost.OfferFaceUpForOutsideClaims(ProgramSkillFrame frame, string provenanceId) => OfferProvenanceFaceUp(frame, provenanceId);
+    SkillProgramStepOutcome IDiscardedProvenanceProgramHost.UseVirtualAlcohol(ProgramSkillFrame frame) => _coreProvenanceVirtualAlcoholOperations.BeginProvenanceVirtualAlcohol(frame);
     internal SkillProgramStepOutcome BeginDiscardedProvenanceClaim(ProgramSkillFrame input, string tag)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -78,7 +74,7 @@ internal sealed partial class CoreGameEngineDiscardedProvenanceRuntime
         {
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(active with { ProvenanceClaim = active.ProvenanceClaim!with { ClaimMovementSequence = claimed.Sequence } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDiscardedEntityClaimedEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), tag, card.Id, movement.Sequence, claimed.Sequence, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDiscardedEntityClaimedEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), tag, card.Id, movement.Sequence, claimed.Sequence, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat));
         });
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return SkillProgramStepOutcome.AwaitChild;
@@ -171,7 +167,7 @@ internal sealed partial class CoreGameEngineDiscardedProvenanceRuntime
         if (f.ProvenanceClaim is not { } r)
             return;
         var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions;
-        if (r.InstructionIndex < 1 || r.InstructionIndex >= plan.Count || plan[r.InstructionIndex - 1].Op != SkillProgramEffectOp.ClaimDiscardedEntityWithProvenance || plan[r.InstructionIndex - 1].SourceBind != r.ProvenanceId || plan[r.InstructionIndex].Op != SkillProgramEffectOp.OfferFaceUpForOutsideClaims || f.InstructionIndex != (r.Stage is ProgramProvenanceClaimStage.Claiming or ProgramProvenanceClaimStage.Claimed ? r.InstructionIndex : r.InstructionIndex + 1) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDiscardedEntityClaimedEvent>().Any(e => e.FrameId == f.Id && e.CardId == r.CardId && e.DiscardMovementSequence == r.DiscardMovementSequence && e.ClaimMovementSequence == r.ClaimMovementSequence && e.Origin == new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && e.ProvenanceId == r.ProvenanceId) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.ClaimMovementSequence && m.CardId == r.CardId && m.From == CardLocation.DiscardPile && m.To == CardLocation.Hand(f.OwnerSeat)))
+        if (r.InstructionIndex < 1 || r.InstructionIndex >= plan.Count || plan[r.InstructionIndex - 1].Op != SkillProgramEffectOp.ClaimDiscardedEntityWithProvenance || plan[r.InstructionIndex - 1].SourceBind != r.ProvenanceId || plan[r.InstructionIndex].Op != SkillProgramEffectOp.OfferFaceUpForOutsideClaims || f.InstructionIndex != (r.Stage is ProgramProvenanceClaimStage.Claiming or ProgramProvenanceClaimStage.Claimed ? r.InstructionIndex : r.InstructionIndex + 1) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDiscardedEntityClaimedEvent>().Any(e => e.FrameId == f.Id && e.CardId == r.CardId && e.DiscardMovementSequence == r.DiscardMovementSequence && e.ClaimMovementSequence == r.ClaimMovementSequence && e.Origin == new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && e.ProvenanceId == r.ProvenanceId) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.ClaimMovementSequence && m.CardId == r.CardId && m.From == CardLocation.DiscardPile && m.To == CardLocation.Hand(f.OwnerSeat)))
             throw new InvalidOperationException("A provenance claim lost its immutable exact entity receipt.");
         if (r.Stage == ProgramProvenanceClaimStage.Choosing && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != f.OwnerSeat || prompt.Choices.Count != 2 || prompt.Choices.Any(c => c.Cards.Count != 0 || c.Targets.Count != 0 || c.Parameters.GetValueOrDefault("program-action") != "provenance-face-up")))
             throw new InvalidOperationException("A provenance threshold lost its exact optional chooser.");

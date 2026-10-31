@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePrepDiscardEndingPromisesRuntime
@@ -79,7 +75,7 @@ internal sealed partial class CoreGameEnginePrepDiscardEndingPromisesRuntime
         return !begun || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PrepDiscardEndingConsumedEvent>().Any(e => e.Id == p.Id && e.Applied && e.ActualTurnNumber == p.ActualTurnNumber && e.ActualTurnOwnerSeat == p.ActualTurnOwnerSeat);
     }
 
-    internal bool MatchesPrepDiscardEnding(ProgramSkillFrame f) => f.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } boundary && boundary.ItemIndex >= 0 && boundary.ItemIndex < boundary.Items.Count && boundary.Items[boundary.ItemIndex].Candidate is { } c && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && MatchesPrepDiscardEnding(c, context, true);
+    internal bool MatchesPrepDiscardEnding(ProgramSkillFrame f) => f.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } boundary && boundary.ItemIndex >= 0 && boundary.ItemIndex < boundary.Items.Count && boundary.Items[boundary.ItemIndex].Candidate is { } c && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && MatchesPrepDiscardEnding(c, context, true);
     internal void ConsumePrepDiscardEndingAtBegin(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
         if (context.PrepDiscardPromise is not { } p)

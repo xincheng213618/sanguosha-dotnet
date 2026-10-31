@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_GainGiftPrograms
 {
     internal static bool OwnedLossZone(CardZoneKind zone) => zone is CardZoneKind.Hand or CardZoneKind.Equipment or

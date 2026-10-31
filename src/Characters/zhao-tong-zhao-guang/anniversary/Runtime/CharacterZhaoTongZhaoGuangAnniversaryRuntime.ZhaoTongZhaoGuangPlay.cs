@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
@@ -28,7 +24,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
                 ConversionSource = selection.Source,
                 SelectableCardIds = ids,
                 SelectableTargetSeats = Array.AsReadOnly(targets.ToArray()),
-                ProgramAiHint = new(0, kind == CardKind.Peach ? 1 : 0, 0, 0, 0, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0, false, false)
+                ProgramAiHint = new(0, kind == CardKind.Peach ? 1 : 0, 0, 0, 0, CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0, false, false)
                 {
                     ValueAdjustment = kind == CardKind.Alcohol ? 10 : 0
                 }
@@ -42,7 +38,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
         var ids = selection.Cards.Select(c => c.Id).ToArray();
         var suit = _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(owner, selection);
         var color = _coreGuanHaiBridgesOperations.ProgramMultiCardColor(owner, selection);
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, p, kind, physicalSuit: suit, effectiveColor: color, physicalCardIds: ids, conversionSource: selection.Source) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner.Seat, p.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, p.Seat, suit)).Select(p => p.Seat).ToArray();
         return kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(owner) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit) ? [owner.Seat] : [];
     }
@@ -106,7 +102,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
             throw new InvalidOperationException(invalid.Message);
         var kind = action.PlayedCardKind!.Value;
         var selection = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(owner, ids, kind, false, source)!;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             _coreNativeSlashUseOperations.ResolveSlashCore(owner, _coreMatchParticipantsPlayersAccess._players[targets[0]], selection.Cards[0], kind, owner.Seat, physicalCards: selection.Cards, conversionSource: source);
         else if (kind == CardKind.Peach)
             _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(owner, owner, selection.Cards[0], "桃", kind, conversionSource: source, physicalCards: selection.Cards);

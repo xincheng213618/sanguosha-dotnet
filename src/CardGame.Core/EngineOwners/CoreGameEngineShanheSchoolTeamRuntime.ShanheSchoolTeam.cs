@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
@@ -38,13 +35,13 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamRuntime
     internal ProgramSkillFrame RequireShanheTeamOpening(ProgramSkillFrame supplied, string skillId, string binding, bool requireActive = true)
     {
         var frame = requireActive ? _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id) : _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == supplied.Id) ?? throw new InvalidOperationException("A team privilege lost its original ancestor frame.");
-        if (frame.SkillId != skillId || frame.OwnerSeat != 0 || frame.TriggerId != binding || frame.InstructionIndex != 1 || _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id != ShanheBattleSetup.BattleModeId || _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } context || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, OwnerSeat: 0 } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]))
+        if (frame.SkillId != skillId || frame.OwnerSeat != 0 || frame.TriggerId != binding || frame.InstructionIndex != 1 || _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id != ShanheBattleSetup.BattleModeId || _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } context || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, OwnerSeat: 0 } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, parent.Candidates[parent.CandidateIndex]))
             throw new InvalidOperationException("A team privilege requires its exact original Shanhe opening instruction.");
         return frame;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSchoolTeamHost.ApplyTeamRank(ProgramSkillFrame frame) => BeginShanheSchoolTeamRank(frame);
-    void global::CardGame.Core.IShanheSchoolTeamHost.ApplyAlliedHealth(ProgramSkillFrame frame) => ApplyShanheAlliedHealth(frame);
+    SkillProgramStepOutcome IShanheSchoolTeamHost.ApplyTeamRank(ProgramSkillFrame frame) => BeginShanheSchoolTeamRank(frame);
+    void IShanheSchoolTeamHost.ApplyAlliedHealth(ProgramSkillFrame frame) => ApplyShanheAlliedHealth(frame);
     internal void ApplyShanheAlliedHealth(ProgramSkillFrame supplied)
     {
         var frame = RequireShanheTeamOpening(supplied, ShanheTeamRankPrograms.TeamHealthSkillId, "allied-health-privilege");
@@ -151,7 +148,7 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamRuntime
                     _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheTeamRank = state with { Stage = ShanheTeamRankStage.Next } });
                     if (!state.EntryApplied && bonuses.InitialHand > 0)
                     {
-                        _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, seat, bonuses.InitialHand, global::CardGame.Core.EngineOwners.CoreGameEngineShanheSchoolTeamDefinitions.ShanheTeamRankDrawReason);
+                        _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, seat, bonuses.InitialHand, CoreGameEngineShanheSchoolTeamDefinitions.ShanheTeamRankDrawReason);
                         return;
                     }
 
@@ -169,9 +166,9 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamRuntime
     internal void ReturnShanheSchoolTeamRankDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome)
     {
         var f = RequireShanheTeamOpening(supplied, ShanheSchoolEffects.TeamRankSkillId, "opening-team-rank");
-        if (f.ShanheTeamRank is not { EntryApplied: false, Stage: ShanheTeamRankStage.Next } state || f.NativeDraw is not null || state.Index >= state.Seats.Count || outcome.RecipientSeat != state.Seats[state.Index] || outcome.RequestedCount != ShanheGeneralRanks.GetBonuses(state.Rank).InitialHand || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.SequenceBefore > outcome.SequenceAfter || outcome.ActualDrawIds.Count > outcome.RequestedCount || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(outcome.RecipientSeat) && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineShanheSchoolTeamDefinitions.ShanheTeamRankDrawReason).OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
+        if (f.ShanheTeamRank is not { EntryApplied: false, Stage: ShanheTeamRankStage.Next } state || f.NativeDraw is not null || state.Index >= state.Seats.Count || outcome.RecipientSeat != state.Seats[state.Index] || outcome.RequestedCount != ShanheGeneralRanks.GetBonuses(state.Rank).InitialHand || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.SequenceBefore > outcome.SequenceAfter || outcome.ActualDrawIds.Count > outcome.RequestedCount || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(outcome.RecipientSeat) && m.Reason == CoreGameEngineShanheSchoolTeamDefinitions.ShanheTeamRankDrawReason).OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
             throw new InvalidOperationException("A shared rank draw lost its exact recipient, amount or original instruction.");
-        _coreProgramLifecycleOperations.CompleteProgramDrawCards(f.Id, outcome.RecipientSeat, null, SkillProgramCardSetVisibility.Private, global::CardGame.Core.EngineOwners.CoreGameEngineShanheSchoolTeamDefinitions.ShanheTeamRankDrawReason, 0, outcome.ActualDrawIds);
+        _coreProgramLifecycleOperations.CompleteProgramDrawCards(f.Id, outcome.RecipientSeat, null, SkillProgramCardSetVisibility.Private, CoreGameEngineShanheSchoolTeamDefinitions.ShanheTeamRankDrawReason, 0, outcome.ActualDrawIds);
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(f.Id, f.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }

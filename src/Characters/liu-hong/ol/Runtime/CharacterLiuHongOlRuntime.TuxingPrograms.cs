@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuHongOlRuntime
@@ -48,7 +44,7 @@ internal sealed partial class CharacterLiuHongOlRuntime
     internal bool IsTuxingDamageArmPending(int ownerSeat)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[ownerSeat];
-        if (!global::CardGame.Core.EngineOwners.CharacterLiuHongOlDefinitions.YujueSlotOrder.All(slot => owner.EquipmentSlotCapacity(slot) == 0))
+        if (!CharacterLiuHongOlDefinitions.YujueSlotOrder.All(slot => owner.EquipmentSlotCapacity(slot) == 0))
             return false;
         return !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramGameDamageBonusArmedEvent>().Any(fact => fact.OwnerSeat == ownerSeat && fact.SkillId == "ol:tuxing");
     }

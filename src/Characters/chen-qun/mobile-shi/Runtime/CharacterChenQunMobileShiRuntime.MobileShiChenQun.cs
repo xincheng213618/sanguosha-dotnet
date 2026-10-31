@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenQunMobileShiRuntime
@@ -48,7 +44,7 @@ internal sealed partial class CharacterChenQunMobileShiRuntime
 
     internal (ProgramCardTriggerWindowFrame Window, MobileShiChenQunUseRecordedEvent Use)? MobileShiChenQunCurrentUse(ProgramSkillWindowContext context)
     {
-        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCommitted || window.Action.ActionId != identity.CardActionId || context.SourceSeat != window.Action.ActorSeat || !_characterLiuZanMobileOperations.IsAlternateColorActualUse(window.Action))
+        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCommitted || window.Action.ActionId != identity.CardActionId || context.SourceSeat != window.Action.ActorSeat || !_characterLiuZanMobileOperations.IsAlternateColorActualUse(window.Action))
             return null;
         var use = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenQunUseRecordedEvent>().SingleOrDefault(fact => fact.ActionId == identity.CardActionId);
         return use is not null && use.ActorSeat == identity.ActorSeat && use.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && use.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat ? (window, use) : null;
@@ -122,7 +118,7 @@ internal sealed partial class CharacterChenQunMobileShiRuntime
     [ProgramAnswer("mobile-shi-faen")]
     internal void AnswerMobileShiChenQun(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiChenQunFaen: { Debt: null, Effect: null } } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MobileShiChenQunChoices(frame).Where(current => current.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiChenQunFaen: { Debt: null, Effect: null } } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MobileShiChenQunChoices(frame).Where(current => current.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Faen changed its current chooser or exact legal branch.");
         RequireMobileShiChenQunFrame(frame);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -162,7 +158,7 @@ internal sealed partial class CharacterChenQunMobileShiRuntime
         return Array.AsReadOnly(_coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(instance => instance.SkillId == skillId).Select(instance => new ProgramPublicRuleStateSnapshot(instance.SkillInstanceId, binding, ProgramPublicRuleStateKind.ActivationLimit, dingpin ? 1 : 2, _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, skillId, $"{(binding)}@{(instance.SkillInstanceId)}", scope), scope)).ToArray());
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiChenQunProgramHost.Claim(ProgramSkillFrame frame) => ClaimMobileShiChenQunFaenDebt(frame);
-    void global::CardGame.Core.IMobileShiChenQunProgramHost.Issue(ProgramSkillFrame frame) => IssueMobileShiChenQunFaenDebt(frame);
-    IReadOnlyList<int> global::CardGame.Core.IMobileShiChenQunSelectionQueries.MaximumLossSeats => MobileShiChenQunMaximumLossSeats();
+    SkillProgramStepOutcome IMobileShiChenQunProgramHost.Claim(ProgramSkillFrame frame) => ClaimMobileShiChenQunFaenDebt(frame);
+    void IMobileShiChenQunProgramHost.Issue(ProgramSkillFrame frame) => IssueMobileShiChenQunFaenDebt(frame);
+    IReadOnlyList<int> IMobileShiChenQunSelectionQueries.MaximumLossSeats => MobileShiChenQunMaximumLossSeats();
 }

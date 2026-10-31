@@ -2,5 +2,5 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreJudgmentCursorRuntimeEntries
 {
-    internal global::CardGame.Core.JudgmentFrame? ActiveJudgment { get => _resolve().ActiveJudgment; }
+    internal JudgmentFrame? ActiveJudgment { get => _resolve().ActiveJudgment; }
 }

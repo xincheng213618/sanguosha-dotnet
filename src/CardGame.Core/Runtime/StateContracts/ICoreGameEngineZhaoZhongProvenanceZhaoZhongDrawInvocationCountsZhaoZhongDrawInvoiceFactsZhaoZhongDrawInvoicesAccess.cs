@@ -1,10 +1,10 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineZhaoZhongProvenanceZhaoZhongDrawInvocationCountsZhaoZhongDrawInvoiceFactsZhaoZhongDrawInvoicesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineZhaoZhongProvenanceZhaoZhongDrawInvocationCountsZhaoZhongDrawInvoiceFactsZhaoZhongDrawInvoicesAccess : IProgramRuntimeOperations
 {
-    ref global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.NativeDrawInvocationRecordedEvent>? _zhaoZhongDrawInvoiceFacts { get; }
+    ref IReadOnlyList<NativeDrawInvocationRecordedEvent>? _zhaoZhongDrawInvoiceFacts { get; }
 
-    ref global::System.Collections.Generic.Dictionary<(int Turn, int Recipient), global::CardGame.Core.NativeDrawInvocationRecordedEvent[]> _zhaoZhongDrawInvoices { get; }
+    ref Dictionary<(int Turn, int Recipient), NativeDrawInvocationRecordedEvent[]> _zhaoZhongDrawInvoices { get; }
 
-    ref global::System.Collections.Generic.Dictionary<long, int> _zhaoZhongDrawInvocationCounts { get; }
+    ref Dictionary<long, int> _zhaoZhongDrawInvocationCounts { get; }
 }

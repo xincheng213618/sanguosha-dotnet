@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreWushuangModeProjectionRuntime
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangEntries _coreWushuangOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressStartedTurnNumberAccess _coreActualTurnProgressStartedTurnNumberAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
-    internal CoreWushuangModeProjectionRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineWushuangEntries coreWushuangOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressStartedTurnNumberAccess coreActualTurnProgressStartedTurnNumberAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, global::CardGame.Core.EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess)
+    private readonly RuntimeEntries.CoreGameEngineWushuangEntries _coreWushuangOperations;
+    private readonly EngineStates.Contracts.ICoreActualTurnProgressStartedTurnNumberAccess _coreActualTurnProgressStartedTurnNumberAccess;
+    private readonly EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess _coreMatchDefinitionOptionsAccess;
+    private readonly EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess _coreMatchOutcomeWinnerAccess;
+    private readonly EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess _coreMatchSetupSetupCompleteAccess;
+    internal CoreWushuangModeProjectionRuntime(RuntimeEntries.CoreGameEngineWushuangEntries coreWushuangOperations, EngineStates.Contracts.ICoreActualTurnProgressStartedTurnNumberAccess coreActualTurnProgressStartedTurnNumberAccess, EngineStates.Contracts.ICoreMatchDefinitionOptionsAccess coreMatchDefinitionOptionsAccess, EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess coreMatchOutcomeWinnerAccess, EngineStates.Contracts.ICoreMatchSetupSetupCompleteAccess coreMatchSetupSetupCompleteAccess)
     {
         this._coreWushuangOperations = coreWushuangOperations;
         this._coreActualTurnProgressStartedTurnNumberAccess = coreActualTurnProgressStartedTurnNumberAccess;

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
     internal const string AnniversaryHzLieqiong = "anniversary-god:lieqiong", AnniversaryHzZhanjue = "anniversary-god:zhanjue";
     internal bool HasAnniversaryHuangZhongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryHuangZhongLieqiong);
 
-    internal static CardConversionSource AnniversaryHzSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource AnniversaryHzSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal IEnumerable<AnniversaryHzBodyIssuedEvent> ActiveAnniversaryHzBody(int target, AnniversaryHzBody body) => !HasAnniversaryHuangZhongCapability ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzBodyIssuedEvent>().Where(e => e.Target == target && e.Body == body && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzStatusConsumedEvent>().Any(c => c.Id == e.Id) && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzStatusExpiredEvent>().Any(c => c.Id == e.Id));
     internal bool HasAnniversaryHzPendingInvalidation(int actor) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && ActiveAnniversaryHzBody(actor, AnniversaryHzBody.Zhongshu).Any();
     internal AnniversaryHzZhanjueIssuedEvent? ActiveAnniversaryHzZhanjue(int actor, int mode) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == actor && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualPhaseEndedEvent>().Any(e => e.Phase == phase) ? _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzZhanjueIssuedEvent>().LastOrDefault(e => e.Source.OwnerSeat == actor && e.Phase == phase && e.Mode == mode && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzZhanjueSpentEvent>().Any(c => c.Id == e.Id)) : null;
@@ -28,7 +25,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
     }
 
     internal AnniversaryHzZhanjueSpentEvent? AnniversaryHzRecoveryReservation(int actor, long? damageId) => damageId is null ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzZhanjueSpentEvent>().LastOrDefault(c => c.Origin == damageId && c.Amount > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzZhanjueIssuedEvent>().Any(e => e.Id == c.Id && e.Mode == 2 && e.Source.OwnerSeat == actor) && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzZhanjueRecoveredEvent>().Any(e => e.IssueId == c.Id));
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryHzHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryHz(f, op);
+    SkillProgramStepOutcome IAnniversaryHzHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryHz(f, op);
     internal SkillProgramStepOutcome BeginAnniversaryHz(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -114,7 +111,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.AnniversaryHuangZhong ?? throw new InvalidOperationException("Huang Zhong lost his original choice.");
-        if (r.Stage != AnniversaryHzStage.Choose || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !AnniversaryHzChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (r.Stage != AnniversaryHzStage.Choose || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !AnniversaryHzChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Huang Zhong requires the exact published source choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var option = choice.Parameters["option"];

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineForeignTurnContestsRuntime
@@ -56,7 +52,7 @@ internal sealed partial class CoreGameEngineForeignTurnContestsRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 80)]
-    internal bool ReturnRegisteredCompleteForeignTurnContestSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnRegisteredCompleteForeignTurnContestSlash(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.ForeignTurnContestSlashReturn is not { } returned)
             return false;
@@ -64,6 +60,6 @@ internal sealed partial class CoreGameEngineForeignTurnContestsRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IForeignTurnContestAidProgramHost.ResolveForeignTurnPindian(ProgramSkillFrame frame, string resultBind) => _foreignTurnContestOperations.Get().Resolve(frame, resultBind);
-    SkillProgramStepOutcome global::CardGame.Core.IForeignTurnContestAidProgramHost.OfferSameTypeDifferentNameOrExtraTarget(ProgramSkillFrame frame) => _coreSameTypeActualUseAidOperations.BeginSameTypeAid(frame);
+    SkillProgramStepOutcome IForeignTurnContestAidProgramHost.ResolveForeignTurnPindian(ProgramSkillFrame frame, string resultBind) => _foreignTurnContestOperations.Get().Resolve(frame, resultBind);
+    SkillProgramStepOutcome IForeignTurnContestAidProgramHost.OfferSameTypeDifferentNameOrExtraTarget(ProgramSkillFrame frame) => _coreSameTypeActualUseAidOperations.BeginSameTypeAid(frame);
 }

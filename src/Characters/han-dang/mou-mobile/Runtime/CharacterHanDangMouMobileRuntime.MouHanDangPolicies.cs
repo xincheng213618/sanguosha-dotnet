@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHanDangMouMobileRuntime
@@ -59,7 +55,7 @@ internal sealed partial class CharacterHanDangMouMobileRuntime
         if (a.Type == CardActionType.Response && _coreResponseEntityExchangeOperations.ActualRespondedAction(a)is { } addressed && addressed.ActorSeat != a.ActorSeat && a.ConversionChain.Count == 0 && a.PhysicalCards.Count == 1)
         {
             var grants = MouHanDangActionRestrictions(addressed.ActionId).ToArray();
-            if (grants.Length > 0 && (a.PhysicalCards is not [var cost] || cost.From != CardLocation.Hand(a.ProviderSeat) || cost.EffectiveIsRed is not { } color || grants.Any(g => g.Suit is not (Suit.Heart or Suit.Diamond or Suit.Spade or Suit.Club) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(g.Suit) != color)))
+            if (grants.Length > 0 && (a.PhysicalCards is not [var cost] || cost.From != CardLocation.Hand(a.ProviderSeat) || cost.EffectiveIsRed is not { } color || grants.Any(g => g.Suit is not (Suit.Heart or Suit.Diamond or Suit.Spade or Suit.Club) || CoreNativeCardClassificationsRuntime.IsRedSuit(g.Suit) != color)))
                 throw new InvalidOperationException("Gongqi only accepts genuine virtual cards or the matching-color original Hand response.");
         }
 

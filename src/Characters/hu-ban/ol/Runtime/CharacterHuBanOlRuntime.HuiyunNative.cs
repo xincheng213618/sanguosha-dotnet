@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuBanOlRuntime
@@ -37,7 +33,7 @@ internal sealed partial class CharacterHuBanOlRuntime
         if (a.Kind is not (LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage or LegalActionKind.PeachGarden or LegalActionKind.FiveGrains))
             return _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(kind, n.ActorSeat, a.TargetSeats);
         var offensive = a.Kind is LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage;
-        var seats = Enumerable.Range(offensive ? 1 : 0, _coreMatchDefinitionPlayerCountAccess._playerCount - (offensive ? 1 : 0)).Select(i => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(n.ActorSeat, i)]).Where(p => p.IsAlive && (!offensive || !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))).Select(p => p.Seat).ToArray();
+        var seats = Enumerable.Range(offensive ? 1 : 0, _coreMatchDefinitionPlayerCountAccess._playerCount - (offensive ? 1 : 0)).Select(i => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(n.ActorSeat, i)]).Where(p => p.IsAlive && (!offensive || !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))).Select(p => p.Seat).ToArray();
         if (!offensive)
             seats = _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(actor, seats).ToArray();
         if (a.Kind == LegalActionKind.FiveGrains)
@@ -58,7 +54,7 @@ internal sealed partial class CharacterHuBanOlRuntime
             ActionId = a.ActionId
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { Huiyun = r with { Stage = HuiyunStage.NativeUse, Native = bound } });
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { HuiyunFollowup = bound, UnlimitedUse = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || u.UnlimitedUse });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { HuiyunFollowup = bound, UnlimitedUse = CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || u.UnlimitedUse });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuiyunNativeIssuedEvent(bound));
     }
 
@@ -110,7 +106,7 @@ internal sealed partial class CharacterHuBanOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 27380)]
-    internal bool ReturnHuiyunAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnHuiyunAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Huiyun: { Stage: HuiyunStage.NativeUse, NativeCompleted: true, Native: { } n } } f || n.UseId != completion.ResolutionId)
             return false;

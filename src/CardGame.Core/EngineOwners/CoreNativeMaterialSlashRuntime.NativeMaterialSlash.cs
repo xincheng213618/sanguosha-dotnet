@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeMaterialSlashRuntime
 {
     internal void CompleteNativeMaterialSlash(long id, CharacterState owner, IReadOnlyList<Card> cards, CardKind kind, IReadOnlyList<int> seats, CardConversionSource? conversion, bool armor)
     {
-        global::CardGame.Core.GameEngine.NuzhanModifiers nuzhan = _coreCardConversionsOperations.GetNuzhanModifiers(id, owner);
+        GameEngine.NuzhanModifiers nuzhan = _coreCardConversionsOperations.GetNuzhanModifiers(id, owner);
         foreach (var card in cards)
             _corePhysicalMovementFacadesOperations.MoveCard(card, _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(owner, card), CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
@@ -43,7 +38,7 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
         var damage = (1 + owner.AlcoholDamageBonus) + nuzhan.DamageBonus;
         _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, owner);
         owner.HasAlcoholEffect = false;
-        global::CardGame.Core.NativeOwners.FangtianHalberdHandle pending = _kernelCoreMainOperations.CreateFangtianHalberdHandle(id, owner.Seat, cards[0], kind, armor, damage, seats, false, counted, conversion);
+        NativeOwners.FangtianHalberdHandle pending = _kernelCoreMainOperations.CreateFangtianHalberdHandle(id, owner.Seat, cards[0], kind, armor, damage, seats, false, counted, conversion);
         _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd = pending;
         if (conversion is not null)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramViewAsConvertedEvent(id, conversion.SkillId, conversion.BindingId, owner.Seat, Array.AsReadOnly(cards.Select(c => c.Id).ToArray()), kind, IsUse: true, seats));
@@ -62,7 +57,7 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
         var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards);
         var rank = _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(owner, cards);
         var legal = Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, target, CardKind.Slash, suit, color, rank, ids) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner.Seat, target.Seat, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.Slash, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, target.Seat, suit)).Select(target => target.Seat).ToArray());
-        var ordinary = Math.Max(1, global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateCardTargetCount(owner, CardKind.Slash)));
+        var ordinary = Math.Max(1, CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateCardTargetCount(owner, CardKind.Slash)));
         return (legal, ordinary, _coreProgramTargetRulesOperations.TargetRules.ExtraSlashTargetClaims(new(owner.Seat, CardKind.Slash, suit ?? Suit.None, legal, color)));
     }
 
@@ -137,7 +132,7 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
             issued = fire.OriginalAction;
         }
 
-        return global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveKind == use.CardKind && issued.EffectiveKind == CardKind.Slash && issued.ConversionChain.Count == 0 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().Any(e => e.ResolutionId == use.Id && e.TargetSeats.SequenceEqual(origin.TargetSeats)) && (!use.ProgramUseAccepted || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == origin.ActionId && e.Action.ActorSeat == origin.ActorSeat && e.Action.ProviderSeat == origin.ProviderSeat && e.Action.EffectiveKind == CardKind.Slash && e.Action.PhysicalCards.SequenceEqual(action.PhysicalCards) && e.Action.ConversionChain.Count == 0)) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhangbaSerpentSpearConvertedEvent>().Any(e => e.ResolutionId == use.Id && e.UserSeat == origin.ActorSeat && e.IsUse && e.PhysicalCardIds.SequenceEqual(ids));
+        return CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveKind == use.CardKind && issued.EffectiveKind == CardKind.Slash && issued.ConversionChain.Count == 0 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().Any(e => e.ResolutionId == use.Id && e.TargetSeats.SequenceEqual(origin.TargetSeats)) && (!use.ProgramUseAccepted || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == origin.ActionId && e.Action.ActorSeat == origin.ActorSeat && e.Action.ProviderSeat == origin.ProviderSeat && e.Action.EffectiveKind == CardKind.Slash && e.Action.PhysicalCards.SequenceEqual(action.PhysicalCards) && e.Action.ConversionChain.Count == 0)) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhangbaSerpentSpearConvertedEvent>().Any(e => e.ResolutionId == use.Id && e.UserSeat == origin.ActorSeat && e.IsUse && e.PhysicalCardIds.SequenceEqual(ids));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 33730)]

@@ -1,56 +1,52 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJuShouMouRuntime
 {
     internal MouJuShouRuntime MouJuShou => _mouJuShouOperations.Get();
 
-    int global::CardGame.Core.IMouJuShouFacts.Turn => _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber;
+    int IMouJuShouFacts.Turn => _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber;
 
-    long global::CardGame.Core.IMouJuShouFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+    long IMouJuShouFacts.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
-    bool global::CardGame.Core.IMouJuShouFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouJuShouFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    bool global::CardGame.Core.IMouJuShouFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
-    bool global::CardGame.Core.IMouJuShouFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
-    SkillProgram? global::CardGame.Core.IMouJuShouFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
-    IEnumerable<T> global::CardGame.Core.IMouJuShouFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    bool global::CardGame.Core.IMouJuShouFacts.Parent(ProgramSkillFrame f)
+    bool IMouJuShouFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
+    bool IMouJuShouFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
+    SkillProgram? IMouJuShouFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
+    IEnumerable<T> IMouJuShouFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    bool IMouJuShouFacts.Parent(ProgramSkillFrame f)
     {
         if (f.SkillId == MouJuShouRuntime.ZuoJun)
-            return f.TriggerId is null && f.ActivationId == "draw-and-choose" && f.WindowContext is null && f.ActivatingSeat is null && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats.Count == 1 && ((global::CardGame.Core.IMouJuShouFacts)this).History<ProgramSkillStartedEvent>().Count(x => x.FrameId == f.Id && x.OwnerSeat == f.OwnerSeat && x.SkillId == f.SkillId && x.ActivationId == f.ActivationId) == 1;
+            return f.TriggerId is null && f.ActivationId == "draw-and-choose" && f.WindowContext is null && f.ActivatingSeat is null && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats.Count == 1 && ((IMouJuShouFacts)this).History<ProgramSkillStartedEvent>().Count(x => x.FrameId == f.Id && x.OwnerSeat == f.OwnerSeat && x.SkillId == f.SkillId && x.ActivationId == f.ActivationId) == 1;
         return MouJsMovementParent(f);
     }
 
-    bool global::CardGame.Core.IMouJuShouFacts.InHand(int seat, int id) => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(seat);
-    IReadOnlyList<int> global::CardGame.Core.IMouJuShouFacts.Discardable(int seat) => !((global::CardGame.Core.IMouJuShouFacts)this).Alive(seat) ? [] : Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, seat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, new(z, seat), OwnedCardMoveIntent.Discard) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, new(z, seat), OwnedCardMoveIntent.Discard))).Select(c => c.Id).ToArray());
-    string global::CardGame.Core.IMouJuShouFacts.Label(int id) => _coreAdvancedLifecycleOperations.GetAdvancedCard(id).DisplayName;
-    IReadOnlyList<MouJsPlan> global::CardGame.Core.IMouJuShouFacts.Plans(ProgramSkillFrame f) => MouJsPlans(f);
-    IReadOnlyList<MouJsZuoJunGrant> global::CardGame.Core.IMouJuShouFacts.Grants(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsZuoJunGrants ?? [];
-    IReadOnlyList<MouJsFirstLoss> global::CardGame.Core.IMouJuShouFacts.Losses(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsFirstLosses ?? [];
-    IReadOnlyList<int> global::CardGame.Core.IMouJuShouFacts.Seats => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Select(p => p.Seat).ToArray());
+    bool IMouJuShouFacts.InHand(int seat, int id) => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(seat);
+    IReadOnlyList<int> IMouJuShouFacts.Discardable(int seat) => !((IMouJuShouFacts)this).Alive(seat) ? [] : Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, seat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, new(z, seat), OwnedCardMoveIntent.Discard) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, new(z, seat), OwnedCardMoveIntent.Discard))).Select(c => c.Id).ToArray());
+    string IMouJuShouFacts.Label(int id) => _coreAdvancedLifecycleOperations.GetAdvancedCard(id).DisplayName;
+    IReadOnlyList<MouJsPlan> IMouJuShouFacts.Plans(ProgramSkillFrame f) => MouJsPlans(f);
+    IReadOnlyList<MouJsZuoJunGrant> IMouJuShouFacts.Grants(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsZuoJunGrants ?? [];
+    IReadOnlyList<MouJsFirstLoss> IMouJuShouFacts.Losses(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsFirstLosses ?? [];
+    IReadOnlyList<int> IMouJuShouFacts.Seats => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Select(p => p.Seat).ToArray());
 
-    IReadOnlyList<(CardConversionSource Source, string Hash)> global::CardGame.Core.IMouJuShouFacts.MuwangSources(int seat) => !((global::CardGame.Core.IMouJuShouFacts)this).Alive(seat) ? [] : Array.AsReadOnly(_coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[seat]).Where(p => p.Id == MouJuShouRuntime.Muwang).Select(p => (new CardConversionSource(p.Id, "first-loss", seat, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[seat], p.Id)), p.GameplayHash)).ToArray());
-    bool global::CardGame.Core.IMouJuShouFacts.Eligible(int id)
+    IReadOnlyList<(CardConversionSource Source, string Hash)> IMouJuShouFacts.MuwangSources(int seat) => !((IMouJuShouFacts)this).Alive(seat) ? [] : Array.AsReadOnly(_coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[seat]).Where(p => p.Id == MouJuShouRuntime.Muwang).Select(p => (new CardConversionSource(p.Id, "first-loss", seat, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[seat], p.Id)), p.GameplayHash)).ToArray());
+    bool IMouJuShouFacts.Eligible(int id)
     {
         var kind = _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind;
-        return global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind) == SkillProgramCardCategory.Basic || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind);
+        return CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind) == SkillProgramCardCategory.Basic || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind);
     }
 
-    bool global::CardGame.Core.IMouJuShouFacts.InDiscard(int id) => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile;
-    bool global::CardGame.Core.IMouJuShouFacts.Reclaimable(MouJsFirstLoss loss, CardMovementRecord discarded) => MouJsReclaimable(loss, discarded);
-    bool global::CardGame.Core.IMouJuShouFacts.ReadyToReclaim(MouJsFirstLoss loss) => ((global::CardGame.Core.IMouJuShouFacts)this).InDiscard(loss.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == loss.CardId)is { } last && MouJsReclaimable(loss, last);
-    MouJsMuwangQueuedEvent? global::CardGame.Core.IMouJuShouFacts.MuwangOpportunity(ProgramSkillFrame f) => MouJsMuwangOpportunity(f);
-    void global::CardGame.Core.IMouJuShouNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
-    void global::CardGame.Core.IMouJuShouNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
-    bool global::CardGame.Core.IMouJuShouNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, f.MouJuShou?.Stage == MouJuShouStage.HealthChildren ? PostEventContinuation.Program : PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    SkillProgramStepOutcome global::CardGame.Core.IMouJuShouNative.LoseHp(ProgramSkillFrame f) => _corePrepPoisonOutcomesOperations.ApplyProgramHpLoss(f.Id, f.SkillId, f.MouJuShou!.Actor, 1);
-    void global::CardGame.Core.IMouJuShouNative.Use(ProgramSkillFrame f) => IssueMouJsUse(f);
-    void global::CardGame.Core.IMouJuShouNative.Discard(ProgramSkillFrame f)
+    bool IMouJuShouFacts.InDiscard(int id) => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile;
+    bool IMouJuShouFacts.Reclaimable(MouJsFirstLoss loss, CardMovementRecord discarded) => MouJsReclaimable(loss, discarded);
+    bool IMouJuShouFacts.ReadyToReclaim(MouJsFirstLoss loss) => ((IMouJuShouFacts)this).InDiscard(loss.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == loss.CardId)is { } last && MouJsReclaimable(loss, last);
+    MouJsMuwangQueuedEvent? IMouJuShouFacts.MuwangOpportunity(ProgramSkillFrame f) => MouJsMuwangOpportunity(f);
+    void IMouJuShouNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+    void IMouJuShouNative.Publish() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    bool IMouJuShouNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, f.MouJuShou?.Stage == MouJuShouStage.HealthChildren ? PostEventContinuation.Program : PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
+    SkillProgramStepOutcome IMouJuShouNative.LoseHp(ProgramSkillFrame f) => _corePrepPoisonOutcomesOperations.ApplyProgramHpLoss(f.Id, f.SkillId, f.MouJuShou!.Actor, 1);
+    void IMouJuShouNative.Use(ProgramSkillFrame f) => IssueMouJsUse(f);
+    void IMouJuShouNative.Discard(ProgramSkillFrame f)
     {
         if (!MouJuShou.Valid(f) || f.MouJuShou is not { Stage: MouJuShouStage.DiscardChildren or MouJuShouStage.PenaltyChildren } r || r.Discard.Any(id => !_characterJuShouMouOperations.CreateMouJuShouFacts().Discardable(r.Actor).Contains(id)))
             throw new InvalidOperationException("Mou Ju Shou requires actual payable bound leftovers or a selected penalty entity.");
@@ -66,7 +62,7 @@ internal sealed partial class CharacterJuShouMouRuntime
         });
     }
 
-    void global::CardGame.Core.IMouJuShouNative.Recover(ProgramSkillFrame f)
+    void IMouJuShouNative.Recover(ProgramSkillFrame f)
     {
         if (!MouJuShou.Valid(f) || f.MouJuShou is not { Stage: MouJuShouStage.RecoverChildren, Recover: true, CardId: > 0 } r || _characterJuShouMouOperations.CreateMouJuShouFacts().Losses(r.Actor).SingleOrDefault(l => l.Source == r.Source && l.Turn == r.Turn && l.CardId == r.CardId && l.FirstSequence == r.LossSequence)is not { } loss || !_characterJuShouMouOperations.CreateMouJuShouFacts().ReadyToReclaim(loss))
             throw new InvalidOperationException("Muwang requires the original tracked entity actually in Discard.");
@@ -82,8 +78,8 @@ internal sealed partial class CharacterJuShouMouRuntime
         });
     }
 
-    void global::CardGame.Core.IMouJuShouNative.SetGrants(int seat, IReadOnlyList<MouJsZuoJunGrant> grants) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsZuoJunGrants = Array.AsReadOnly(grants.ToArray());
-    void global::CardGame.Core.IMouJuShouNative.SetLosses(int seat, IReadOnlyList<MouJsFirstLoss> losses) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsFirstLosses = Array.AsReadOnly(losses.ToArray());
+    void IMouJuShouNative.SetGrants(int seat, IReadOnlyList<MouJsZuoJunGrant> grants) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsZuoJunGrants = Array.AsReadOnly(grants.ToArray());
+    void IMouJuShouNative.SetLosses(int seat, IReadOnlyList<MouJsFirstLoss> losses) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsFirstLosses = Array.AsReadOnly(losses.ToArray());
     internal void ObserveMouJsMovement(CardMovementRecord movement) => MouJuShou.ObserveMovement(movement);
     internal bool IsMouJsHandLimitExempt(int actor, int card) => MouJsHasGrant(actor, card);
     // Registration only; the query still belongs to legacy GameEngine.MouJuShouServices.
@@ -101,7 +97,7 @@ internal sealed partial class CharacterJuShouMouRuntime
             return true;
         if (_characterSimaYiMouOperations.IsMouSmPlayedActor(_coreMatchParticipantsPlayersAccess._players[actor]) || _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MouLuSuAnniversary: { Yin: true, Operation: SkillProgramEffectOp.ResolveMouLuSuMengmou } played } f && played.Other == actor && _characterLuSuMouOperations.MouLuSuAnniversary.Valid(f))
             return false;
-        return _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[actor], kind) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true } b && b.WeaponOwnerSeat == actor || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.SourceSeat == actor);
+        return _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[actor], kind) || CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true } b && b.WeaponOwnerSeat == actor || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.SourceSeat == actor);
     }
 
     [ProgramCardLegality(ProgramCardLegalityStage.MaterialUseBan, 36900)]

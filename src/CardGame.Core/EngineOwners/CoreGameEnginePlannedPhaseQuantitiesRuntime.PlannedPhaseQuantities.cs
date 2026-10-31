@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePlannedPhaseQuantitiesRuntime
@@ -18,5 +14,5 @@ internal sealed partial class CoreGameEnginePlannedPhaseQuantitiesRuntime
             _coreProgramLifecycleOperations.AdjustProgramNormalDraw(frame, count);
     }
 
-    internal int GetDiscardQuotaMultiplier(CharacterState owner) => global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(RuleQueryService.Evaluate(SkillRuleQuery.DiscardQuotaMultiplier, new RuleQueryBounds(1, 20), [new RuleQueryBaseTerm("phase:discard:default-quota-multiplier", 1)], _coreRuleQueriesOperations.CollectNumericRuleContributions(owner, SkillRuleQuery.DiscardQuotaMultiplier)));
+    internal int GetDiscardQuotaMultiplier(CharacterState owner) => CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(RuleQueryService.Evaluate(SkillRuleQuery.DiscardQuotaMultiplier, new RuleQueryBounds(1, 20), [new RuleQueryBaseTerm("phase:discard:default-quota-multiplier", 1)], _coreRuleQueriesOperations.CollectNumericRuleContributions(owner, SkillRuleQuery.DiscardQuotaMultiplier)));
 }

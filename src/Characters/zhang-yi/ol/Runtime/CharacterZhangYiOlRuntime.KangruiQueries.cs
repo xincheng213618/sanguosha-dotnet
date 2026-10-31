@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangYiOlRuntime
 {
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 100)]
-    internal int ZhangYiKangruiDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int ZhangYiKangruiDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (!HasZhangYiCapability || attack.IsSourceLess)
             return 0;
@@ -18,24 +14,24 @@ internal sealed partial class CharacterZhangYiOlRuntime
         return grants.Length;
     }
 
-    internal int ZhangYiChainCursor(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
-    internal void SetZhangYiChainAmount(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount)
+    internal int ZhangYiChainCursor(GameEngine.IDamageAttempt attack) => attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
+    internal void SetZhangYiChainAmount(GameEngine.IDamageAttempt attack, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !attack.IsChainPropagation || amount < 0)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !attack.IsChainPropagation || amount < 0)
             throw new InvalidOperationException("Kangrui can only restore its exact native chained damage instance.");
-        if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (attack is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, s => s with { DamageAmount = amount });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, s => s!with { DamageAmount = amount });
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 60)]
-    internal void PrepareZhangYiChainAdvance(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void PrepareZhangYiChainAdvance(GameEngine.IDamageAttempt attack)
     {
         if (!HasZhangYiCapability || !attack.IsChainPropagation || attack.IsSourceLess)
             return;
         var cursor = ZhangYiChainCursor(attack);
-        var remaining = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
+        var remaining = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
         if (remaining is null || !remaining.Skip(cursor).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive))
             return;
         var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiChainInstanceIssuedEvent>().SingleOrDefault(e => e.AttackFrameId == attack.ResolutionId && e.ChainCursor == cursor);
@@ -48,7 +44,7 @@ internal sealed partial class CharacterZhangYiOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 10)]
-    internal void ApplyZhangYiChainedDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void ApplyZhangYiChainedDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (!HasZhangYiCapability || !attack.IsChainPropagation || attack.IsSourceLess || !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiArmedEvent>().Any(g => g.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.RecipientSeat == attack.SourceSeat && g.DamageBonus && !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiDamageConsumedEvent>().Any(e => e.GrantFrameId == g.FrameId)))
             return;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNativeRecastInvocationsRuntime
@@ -47,7 +43,7 @@ internal sealed partial class CoreGameEngineNativeRecastInvocationsRuntime
             throw new InvalidOperationException("A native recast must complete its whole original participant group exactly once.");
         foreach (var material in draft.Materials)
         {
-            var paid = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > draft.SequenceBefore && m.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && m.CardId == material.CardId && m.CardKind == material.PrintedKind && m.From == material.From && m.Reason == draft.Reason && (m.To == CardLocation.DiscardPile || (material.IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId), material.From, m.To) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)) && m.To == CardLocation.OutsideGame)).ToArray();
+            var paid = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > draft.SequenceBefore && m.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && m.CardId == material.CardId && m.CardKind == material.PrintedKind && m.From == material.From && m.Reason == draft.Reason && (m.To == CardLocation.DiscardPile || (material.IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId), material.From, m.To) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)) && m.To == CardLocation.OutsideGame)).ToArray();
         }
 
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeRecastInvocationRecordedEvent(draft.InvocationId, draft.TurnNumber, draft.ActualTurnOwnerSeat, draft.InitiatorSeat, draft.ExecutorSeat, draft.Materials.Count, draft.Materials.Count, actualDrawCount, draft.ParentFrameId, draft.InstructionIndex, draft.ParticipantCursor, draft.SequenceBefore, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));

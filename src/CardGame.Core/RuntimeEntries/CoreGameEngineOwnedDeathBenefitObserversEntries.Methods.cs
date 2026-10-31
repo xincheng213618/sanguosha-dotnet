@@ -4,7 +4,7 @@ internal sealed partial class CoreGameEngineOwnedDeathBenefitObserversEntries
 {
     internal bool IsOwnedDeathBenefitProgramDying() => _resolve().IsOwnedDeathBenefitProgramDying();
     internal bool OwnedDeathBenefitDeadDyingEdge(int index) => _resolve().OwnedDeathBenefitDeadDyingEdge(index);
-    internal bool OwnedDeathBenefitObserverPrefix(global::CardGame.Core.ProgramSkillFrame root) => _resolve().OwnedDeathBenefitObserverPrefix(root);
-    internal global::CardGame.Core.ProgramSkillFrame? OwnedDeathBenefitObserverRoot() => _resolve().OwnedDeathBenefitObserverRoot();
+    internal bool OwnedDeathBenefitObserverPrefix(ProgramSkillFrame root) => _resolve().OwnedDeathBenefitObserverPrefix(root);
+    internal ProgramSkillFrame? OwnedDeathBenefitObserverRoot() => _resolve().OwnedDeathBenefitObserverRoot();
     internal bool TryAdvanceOwnedDeathBenefitSubtree() => _resolve().TryAdvanceOwnedDeathBenefitSubtree();
 }

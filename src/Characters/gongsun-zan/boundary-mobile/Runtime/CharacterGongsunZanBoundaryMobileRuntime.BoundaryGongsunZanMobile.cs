@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGongsunZanBoundaryMobileRuntime
@@ -19,12 +15,12 @@ internal sealed partial class CharacterGongsunZanBoundaryMobileRuntime
             terms.Add(new($"skill:{(query.Target.Seat)}:{(BoundaryMobileGszYicong)}:incoming", checked(query.Target.MaxHp - query.Target.Hp - 1)));
     }
 
-    internal static IReadOnlyList<CardZoneKind> DamageTargetMountZonesFor(string? skillId) => skillId == BoundaryMobileGszQiaomeng ? global::CardGame.Core.EngineOwners.CharacterGongsunZanBoundaryMobileDefinitions.BoundaryMobileGszEquipment : global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountProgramsDefinitions.DamageTargetMountZones;
+    internal static IReadOnlyList<CardZoneKind> DamageTargetMountZonesFor(string? skillId) => skillId == BoundaryMobileGszQiaomeng ? CharacterGongsunZanBoundaryMobileDefinitions.BoundaryMobileGszEquipment : CoreGameEngineDamageTargetMountProgramsDefinitions.DamageTargetMountZones;
     internal bool DamageTargetMountUseMatchesEdition(string? skillId, CardUseFrame? use)
     {
         if (skillId != BoundaryMobileGszQiaomeng)
             return true;
-        if (use?.Action is not { Type: CardActionType.Use, EffectiveIsRed: false } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
+        if (use?.Action is not { Type: CardActionType.Use, EffectiveIsRed: false } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
             return false;
         if (action.EffectiveSuit is Suit.Spade or Suit.Club)
             return true;

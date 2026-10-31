@@ -1,10 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineZhuijiProgramsRuntime
@@ -18,7 +14,7 @@ internal sealed partial class CoreGameEngineZhuijiProgramsRuntime
         if (option is not ("recover" or "draw"))
             throw new InvalidOperationException("Zhuiji lost its actual native choice.");
         var ending = _contentRegistryOperations._contentRegistry!.GetSkill(f.SkillId).Program!.Triggers.Single(t => t.Effects is [{ Op: SkillProgramEffectOp.SettleZhuijiActualPlayDebt }]);
-        var grant = new ZhuijiPlayGrant(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, option == "recover", ending.Id);
+        var grant = new ZhuijiPlayGrant(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, option == "recover", ending.Id);
         _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].ZhuijiPlayDebts.Add(grant);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ZhuijiInitialPaid = grant });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhuijiPlayGrantIssuedEvent(grant));

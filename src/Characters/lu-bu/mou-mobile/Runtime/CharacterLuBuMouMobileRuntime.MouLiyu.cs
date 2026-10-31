@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -27,7 +24,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal static int MouLbCategory(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_bu_mou_mobile_MouLiyu.MouLbCategory(kind);
+    internal static int MouLbCategory(CardKind kind) => RuntimeSkills.RuntimeRules_lu_bu_mou_mobile_MouLiyu.MouLbCategory(kind);
     internal IReadOnlyList<PromptChoice> MouLbChoices(ProgramSkillFrame f)
     {
         var r = f.MouLuBuLiyu!;
@@ -41,7 +38,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
         if (r.Stage == MouLuBuLiyuStage.ChoosingCard)
         {
             if (r.Selections < r.DamageAmount && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive)
-                choices.AddRange(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, r.VictimSeat, global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountProgramsDefinitions.DamageTargetMountZones, OwnedCardMoveIntent.Obtain).Select(c => c with { Parameters = new Dictionary<string, string>(c.Parameters) { ["program-action"] = "mou-lu-bu-liyu", ["branch"] = "take" } }));
+                choices.AddRange(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, r.VictimSeat, CoreGameEngineDamageTargetMountProgramsDefinitions.DamageTargetMountZones, OwnedCardMoveIntent.Obtain).Select(c => c with { Parameters = new Dictionary<string, string>(c.Parameters) { ["program-action"] = "mou-lu-bu-liyu", ["branch"] = "take" } }));
             choices.Add(new(new($"mou-liyu.{(f.Id)}.finish"), $"结束获得（已选{(r.Selections)}/{(r.DamageAmount)}张）", [], [], Params("finish")));
         }
         else if (r.Stage == MouLuBuLiyuStage.VictimChoice && _coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive)
@@ -81,7 +78,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
     [ProgramAnswer("mou-lu-bu-liyu")]
     internal void AnswerMouLb(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLuBuLiyu: { } r } f || !ValidMouLb(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouLuBuLiyuStage.VictimChoice ? r.VictimSeat : f.OwnerSeat) || !MouLbChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLuBuLiyu: { } r } f || !ValidMouLb(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouLuBuLiyuStage.VictimChoice ? r.VictimSeat : f.OwnerSeat) || !MouLbChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Liyu answer changed its actual chooser or concealed slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -185,7 +182,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
 
         if (r.Stage == MouLuBuLiyuStage.ObtainChildren)
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive || r.Selections >= r.DamageAmount || _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, r.VictimSeat, global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountProgramsDefinitions.DamageTargetMountZones, OwnedCardMoveIntent.Obtain).Count == 0)
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.VictimSeat].IsAlive || r.Selections >= r.DamageAmount || _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, r.VictimSeat, CoreGameEngineDamageTargetMountProgramsDefinitions.DamageTargetMountZones, OwnedCardMoveIntent.Obtain).Count == 0)
             {
                 FinishMouLbTaking(f);
                 return;
@@ -220,7 +217,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
         if (f.MouLuBuLiyu!.Stage == MouLuBuLiyuStage.ChoosingCard)
             return p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "take") ?? p.Choices.Single();
         // The actual victim chooses using public teams and actual legal targets.
-        return p.Choices.Where(c => c.Parameters["branch"] == "duel").FirstOrDefault(c => !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]) && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? p.Choices.Single(c => c.Parameters["branch"] == "wushuang");
+        return p.Choices.Where(c => c.Parameters["branch"] == "duel").FirstOrDefault(c => !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[p.PlayerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]) && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? p.Choices.Single(c => c.Parameters["branch"] == "wushuang");
     }
 
     internal void GrantMouLbWushuang(ProgramSkillFrame f)

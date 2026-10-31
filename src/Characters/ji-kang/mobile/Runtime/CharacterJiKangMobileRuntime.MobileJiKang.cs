@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiKangMobileRuntime
 {
-    internal static CardConversionSource MobileJiKangSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MobileJiKangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal const string MobileJiKangDiscard = "skill-program.mobile-ji-kang.discard";
-    SkillProgramStepOutcome global::CardGame.Core.IMobileJiKangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileJiKang(f, op);
+    SkillProgramStepOutcome IMobileJiKangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileJiKang(f, op);
     internal IReadOnlyList<PromptChoice> MobileJiKangCosts(long frame, int owner) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(frame, owner, owner, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard).Where(c => c.Cards.Count == 1).ToArray();
     internal bool MobileJiKangHasCost(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Any(card => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner.Seat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner.Seat, card, _cardZonesOperations._cardZones.GetLocation(card.Id), OwnedCardMoveIntent.Discard));
     internal bool MobileJiKangTargetAllowed(CardConversionSource source, int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && seat != source.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && (source.SkillId != "mobile:canyun" || !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileJiKangTargetIssuedEvent>().Any(e => e.Source == source && e.TargetSeat == seat));

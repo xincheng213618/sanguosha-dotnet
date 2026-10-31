@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuYuShengMobileShiRuntime
 {
     internal const string ShiLysRunweiSkill = "mobile:shi-runwei", ShiLysShuanghuaiSkill = "mobile:shi-shuanghuai";
-    internal static CardConversionSource ShiLysSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-    internal global::CardGame.Core.GameEngine.MobileShiLuYuShengTrack MobileShiLuYuShengTrackAt(int seat)
+    internal static CardConversionSource ShiLysSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    internal GameEngine.MobileShiLuYuShengTrack MobileShiLuYuShengTrackAt(int seat)
     {
         var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
         var all = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiGrantIssuedEvent>().Where(e => e.Source.OwnerSeat == seat && e.ActualTurn == _coreActualTurnProgressPhaseTurnNumberAccess._turnNumber).ToArray();
@@ -21,15 +18,15 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
         return new(phase, all.Where(e => e.GainedCount > 0).Select(e => e.TargetSeat).Distinct().ToArray(), marked, grant?.GainedCount ?? 0, progress, refunded);
     }
 
-    internal global::CardGame.Core.GameEngine.MobileShiLuYuShengTrack? PeekMobileShiLuYuSheng(int seat) => MobileShiLuYuShengTrackAt(seat);
+    internal GameEngine.MobileShiLuYuShengTrack? PeekMobileShiLuYuSheng(int seat) => MobileShiLuYuShengTrackAt(seat);
     internal MobileShiRunweiGrantIssuedEvent? ShiLysRunweiGrant(long id) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiGrantIssuedEvent>().SingleOrDefault(e => e.FrameId == id);
     internal IReadOnlyList<ActualPhaseEndItem> CollectShiLysPhaseEndCandidates(ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiGrantIssuedEvent>().Where(e => e.Phase == phase && e.TargetSeat == e.Source.OwnerSeat && e.GainedCount > 0 && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive).GroupBy(e => (e.Source.OwnerSeat, e.Source.SkillInstanceId)).Select(g => g.First()).Where(e => !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiPhaseEndConsumedEvent>().Any(c => c.GrantId == e.FrameId && c.Phase == phase)).Select(e => new ActualPhaseEndItem(new(e.Source.OwnerSeat, ShiLysRunweiSkill, MobileShiLuYuShengComposition.RunweiPhaseEndTrigger, e.Source.SkillInstanceId, e.GameplayHash, 0), e.FrameId)).ToArray();
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 67400)]
     internal bool IsIssuedShiLysPhaseEnd(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == ShiLysRunweiSkill && c.BindingId == MobileShiLuYuShengComposition.RunweiPhaseEndTrigger && _coreActualPhaseEndsOperations.IsExactActualPhaseEndCandidate(c, context) && context.ActualPhaseEnd is { } due && ShiLysRunweiGrant(due.EntitlementId)is { } grant && grant.Source.OwnerSeat == c.OwnerSeat && grant.Source.SkillInstanceId == c.SkillInstanceId && grant.GameplayHash == c.GameplayHash && grant.Phase == due.Phase && grant.TargetSeat == c.OwnerSeat && grant.GainedCount > 0;
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiLuYuShengProgramHost.ResolveRunweiGrant(ProgramSkillFrame frame) => BeginMobileShiRunweiGrant(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiLuYuShengProgramHost.ResolveRunweiLossDebt(ProgramSkillFrame frame) => ResolveMobileShiRunweiLossDebt(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiLuYuShengProgramHost.ResolveRunweiPhaseEnd(ProgramSkillFrame frame) => ResolveMobileShiRunweiPhaseEnd(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiLuYuShengProgramHost.ResolveShuanghuaiGuard(ProgramSkillFrame frame) => BeginMobileShiShuanghuaiGuard(frame);
+    SkillProgramStepOutcome IMobileShiLuYuShengProgramHost.ResolveRunweiGrant(ProgramSkillFrame frame) => BeginMobileShiRunweiGrant(frame);
+    SkillProgramStepOutcome IMobileShiLuYuShengProgramHost.ResolveRunweiLossDebt(ProgramSkillFrame frame) => ResolveMobileShiRunweiLossDebt(frame);
+    SkillProgramStepOutcome IMobileShiLuYuShengProgramHost.ResolveRunweiPhaseEnd(ProgramSkillFrame frame) => ResolveMobileShiRunweiPhaseEnd(frame);
+    SkillProgramStepOutcome IMobileShiLuYuShengProgramHost.ResolveShuanghuaiGuard(ProgramSkillFrame frame) => BeginMobileShiShuanghuaiGuard(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 67400)]
     internal bool CanOfferMobileShiLuYuSheng(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -285,7 +282,7 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
             "target" => ShiLysRunweiRecipientChoices(f, MobileShiRunweiRecipientSeats(f)),
             "color" => ShiLysRunweiColorChoices(f, ShiLysRunweiRevealedCards(f).Any(pair => ShiLysIsRed(pair.Card)), ShiLysRunweiRevealedCards(f).Any(pair => !ShiLysIsRed(pair.Card))),
             _ => throw new InvalidOperationException("Runwei choice lost its known native branch.")};
-        if (r.Stage != (branch == "count" ? 0 : branch == "target" ? 1 : 2) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], current.Where(choice => choice.Id == selected.Id).ToArray()))
+        if (r.Stage != (branch == "count" ? 0 : branch == "target" ? 1 : 2) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], current.Where(choice => choice.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Runwei choice lost its unpaid stage or legal candidates.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         switch (branch)
@@ -407,7 +404,7 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
     [ProgramAnswer("mobile-shi-shuanghuai")]
     internal void AnswerMobileShiShuanghuai(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiLuYuSheng: { Operation: "shuanghuai", Stage: 0 } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], ShiLysShuanghuaiChoices(f).Where(choice => choice.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiLuYuSheng: { Operation: "shuanghuai", Stage: 0 } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], ShiLysShuanghuaiChoices(f).Where(choice => choice.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Shuanghuai choice lost its original frame, chooser or legal option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         BindShiLysShuanghuaiOption(f, selected.Parameters["option"]);

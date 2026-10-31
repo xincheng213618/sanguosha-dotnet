@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCurrentTurnUseKindsRuntime
@@ -25,7 +20,7 @@ internal sealed partial class CoreGameEngineCurrentTurnUseKindsRuntime
                 // Defending against a Slash is a use of Dodge. Arrow Barrage and
                 // supplied cards remain responses, with no actual-use ordinal.
                 var defendingUse = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == response.ParentActionId && use.CardAttack?.TargetSeat == response.ActorSeat);
-                if (defendingUse?.CardAttack is not { EffectiveCardKind: { } incoming } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) || response.OpponentSeat != attack.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(response.ActorSeat))
+                if (defendingUse?.CardAttack is not { EffectiveCardKind: { } incoming } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) || response.OpponentSeat != attack.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(response.ActorSeat))
                     return;
                 if (_coreCurrentRoundActualUsesOperations.CurrentUseKindDeduplicationHistory().OfType<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.CardActionId == response.ActionId))
                     return;
@@ -85,7 +80,7 @@ internal sealed partial class CoreGameEngineCurrentTurnUseKindsRuntime
         if (_contentRegistryOperations._contentRegistry.ProgramDependencies.TracksEffectiveUseNames)
             _characterCaiYongLeOperations.CaptureFeibaiDeclaredName(frameId, action, effectiveKind, programInstructionIndex);
         var handSuit = action is { ProviderSeat: var provider } && provider == action.ActorSeat && action.PhysicalCards.Count > 0 && action.PhysicalCards.All(c => c.From == CardLocation.Hand(action.ActorSeat)) ? ActualTurnSuitBit(action.EffectiveSuit) : 0;
-        var category = global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(effectiveKind);
+        var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(effectiveKind);
         // Freeze declaration order, not completion order: nested uses may complete
         // before this one, and Action-null legacy virtual uses still occupy a slot.
         var ordinal = TracksActualTurnUseOrdinal && HasOngoingActualUseTurn ? checked(_corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent or TurnEndedEvent).OfType<CurrentTurnCardUseKindsRecordedEvent>().Count(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && e.ActorSeat == actorSeat) + 1) : (int? )null;
@@ -106,7 +101,7 @@ internal sealed partial class CoreGameEngineCurrentTurnUseKindsRuntime
         return fact.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && fact.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && fact.ActorSeat == action.ActorSeat && fact.IsNullificationUse == (action.Type == CardActionType.Response && action.EffectiveKind == CardKind.Nullification) ? fact.ActualTurnActorUseOrdinal : null;
     }
 
-    internal static int ActualTurnSuitBit(Suit? suit) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CurrentTurnUseKinds.ActualTurnSuitBit(suit);
+    internal static int ActualTurnSuitBit(Suit? suit) => RuntimeSkills.RuntimeRules_Core_CurrentTurnUseKinds.ActualTurnSuitBit(suit);
     internal (int HandSuits, int Categories) CurrentTurnUseKinds(int actorSeat)
     {
         if (!TracksCurrentTurnUseKinds)

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChenDengOlRuntime
@@ -35,7 +31,7 @@ internal sealed partial class CharacterChenDengOlRuntime
         var swapped = CurrentRoundFengjiOptions(active.OwnerSeat).Where(option => option.Accepted && option.RecipientSeat != active.OwnerSeat).ToArray();
         if (swapped.Length == 0)
             return SkillProgramStepOutcome.Continue;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramXuanhuiEffectsSwappedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualRoundProgressRoundNumberAccess._roundNumber, swapped.Length));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramXuanhuiEffectsSwappedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, _coreActualRoundProgressRoundNumberAccess._roundNumber, swapped.Length));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 旋回：与 {(_coreMatchParticipantsPlayersAccess._players[swapped[0].RecipientSeat].Name)} 等 {(swapped.Length)} 项丰积效果交换，【旋回】失效直到一名角色死亡。", active.OwnerSeat);
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return SkillProgramStepOutcome.Continue;

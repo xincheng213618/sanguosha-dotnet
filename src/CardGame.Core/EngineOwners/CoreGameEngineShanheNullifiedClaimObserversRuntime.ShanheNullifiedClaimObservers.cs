@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
@@ -16,7 +13,7 @@ internal sealed partial class CoreGameEngineShanheNullifiedClaimObserversRuntime
         if (_coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is null || _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id != ShanheBattleSetup.BattleModeId || !window.EffectNullified || !_coreShanheNullifiedTrickClaimsOperations.IsShanheNullifiedClaimAwaitingMovement(window))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == window.Id);
-        if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not CardsMovedTriggerWindowFrame root || root.ResumeShanheNullifiedClaimWindowId != window.Id || !global::CardGame.Core.EngineOwners.CoreGameEngineShanheNullifiedTrickClaimsRuntime.HasOnlyShanheNullifiedClaimMovementReturn(root) || !_coreShanheNullifiedTrickClaimsOperations.IsShanheNullifiedClaimMovement(window, root.Batch) || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Count(frame => frame.ResumeShanheNullifiedClaimWindowId == window.Id) != 1)
+        if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not CardsMovedTriggerWindowFrame root || root.ResumeShanheNullifiedClaimWindowId != window.Id || !CoreGameEngineShanheNullifiedTrickClaimsRuntime.HasOnlyShanheNullifiedClaimMovementReturn(root) || !_coreShanheNullifiedTrickClaimsOperations.IsShanheNullifiedClaimMovement(window, root.Batch) || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Count(frame => frame.ResumeShanheNullifiedClaimWindowId == window.Id) != 1)
             return false;
         if (window.ShanheDelayedNullifiedTrickClaim is { } delayed)
             _coreShanheDelayedNullifiedTrickClaimsOperations.ValidateShanheDelayedNullifiedTrickClaim(window, delayed);
@@ -43,21 +40,21 @@ internal sealed partial class CoreGameEngineShanheNullifiedClaimObserversRuntime
 
             if (parent is ProgramSkillFrame producer && child is CardsMovedTriggerWindowFrame moved)
             {
-                if (!global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(producer, moved) || global::CardGame.Core.EngineOwners.CoreGameEngineShanheNullifiedTrickClaimsRuntime.HasUnlistedShanheClaimMovementReturn(moved))
+                if (!CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(producer, moved) || CoreGameEngineShanheNullifiedTrickClaimsRuntime.HasUnlistedShanheClaimMovementReturn(moved))
                     return false;
                 continue;
             }
 
             if (parent is ProgramSkillFrame healthProducer && child is HpChangedTriggerWindowFrame hp)
             {
-                if (!global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(healthProducer, hp))
+                if (!CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(healthProducer, hp))
                     return false;
                 continue;
             }
 
             if (child is RecoveryReplacementFrame && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent))
                 continue;
-            if (child is CardsMovedTriggerWindowFrame recoveryMovement && parent is RecoveryReplacementFrame recovery && recoveryMovement.ResumeRecoveryReplacementFrameId == recovery.Id && recoveryMovement.ResumeProgramFrameId is null && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(recoveryMovement with { ResumeRecoveryReplacementFrameId = null }) && !global::CardGame.Core.EngineOwners.CoreGameEngineShanheNullifiedTrickClaimsRuntime.HasUnlistedShanheClaimMovementReturn(recoveryMovement) && _coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(child, parent))
+            if (child is CardsMovedTriggerWindowFrame recoveryMovement && parent is RecoveryReplacementFrame recovery && recoveryMovement.ResumeRecoveryReplacementFrameId == recovery.Id && recoveryMovement.ResumeProgramFrameId is null && !CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(recoveryMovement with { ResumeRecoveryReplacementFrameId = null }) && !CoreGameEngineShanheNullifiedTrickClaimsRuntime.HasUnlistedShanheClaimMovementReturn(recoveryMovement) && _coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(child, parent))
                 continue;
             if (child is HpChangedTriggerWindowFrame && parent is RecoveryReplacementFrame && _coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(child, parent))
                 continue;
@@ -82,11 +79,11 @@ internal sealed partial class CoreGameEngineShanheNullifiedClaimObserversRuntime
 
                 if (child is ProgramSkillFrame response && (_coreUnrespondableCounterspellsOperations.PolicyCounterspellDyingProgramRidesOn(response, dyingParent) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageDyingProgramMatches(response, dyingParent)))
                     continue;
-                if (global::CardGame.Core.EngineOwners.CoreParticipantHandDamageRidesRuntime.ParticipantHandDyingEntryRide(child, parent, dyingParent))
+                if (CoreParticipantHandDamageRidesRuntime.ParticipantHandDyingEntryRide(child, parent, dyingParent))
                     continue;
             }
 
-            if (index >= 2 && _resolutionStackOperations._resolutionStack[index - 2] is DyingFrame entryDying && global::CardGame.Core.EngineOwners.CoreParticipantHandDamageRidesRuntime.ParticipantHandDyingEntryRide(child, parent, entryDying) && child is ProgramSkillFrame entryProgram && parent is ProgramLifecycleTriggerWindowFrame entry && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(entryProgram, entry.Candidates[entry.CandidateIndex]))
+            if (index >= 2 && _resolutionStackOperations._resolutionStack[index - 2] is DyingFrame entryDying && CoreParticipantHandDamageRidesRuntime.ParticipantHandDyingEntryRide(child, parent, entryDying) && child is ProgramSkillFrame entryProgram && parent is ProgramLifecycleTriggerWindowFrame entry && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(entryProgram, entry.Candidates[entry.CandidateIndex]))
                 continue;
             if (_coreUnrespondableCounterspellsOperations.PolicyCounterspellDyingFaceEdge(index) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageDyingFaceEdge(index) || _coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(child, parent) || _corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(child, parent))
                 continue;
@@ -97,6 +94,6 @@ internal sealed partial class CoreGameEngineShanheNullifiedClaimObserversRuntime
         return true;
     }
 
-    internal bool ShanheClaimProgramHpLossDying(ProgramSkillFrame producer, DyingFrame dying) => dying.Continuation == DyingContinuationKind.ProgramSkill && dying.ParentFrameId == producer.Id && dying.KillerSeat is null && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(producer.SkillId)?.Program is { } program && program.GameplayHash == producer.GameplayHash && producer.InstructionIndex > 0 && ProgramInstructionResolver.Default.Resolve(producer, program).GetPausedInstruction(producer.InstructionIndex).Effect is { Op: SkillProgramEffectOp.LoseHp } effect && global::CardGame.Core.EngineOwners.CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(producer, effect.Target) == dying.VictimSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(fact => fact.FrameId == producer.Id && fact.SkillId == producer.SkillId && fact.TargetSeat == dying.VictimSeat && fact.Amount > 0 && fact.RemainingHp <= 0);
+    internal bool ShanheClaimProgramHpLossDying(ProgramSkillFrame producer, DyingFrame dying) => dying.Continuation == DyingContinuationKind.ProgramSkill && dying.ParentFrameId == producer.Id && dying.KillerSeat is null && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(producer.SkillId)?.Program is { } program && program.GameplayHash == producer.GameplayHash && producer.InstructionIndex > 0 && ProgramInstructionResolver.Default.Resolve(producer, program).GetPausedInstruction(producer.InstructionIndex).Effect is { Op: SkillProgramEffectOp.LoseHp } effect && CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(producer, effect.Target) == dying.VictimSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(fact => fact.FrameId == producer.Id && fact.SkillId == producer.SkillId && fact.TargetSeat == dying.VictimSeat && fact.Amount > 0 && fact.RemainingHp <= 0);
     internal int[] ShanheClaimProvenChildMaterials(int rootIndex) => _resolutionStackOperations._resolutionStack.Skip(rootIndex + 1).OfType<CardUseFrame>().Where(use => use.Action is { Type: CardActionType.Use } action && action.PhysicalCards.Select(cost => cost.CardId).SequenceEqual(use.PhysicalCardIds ?? [use.CardId])).SelectMany(use => use.Action!.PhysicalCards).Where(cost => _cardZonesOperations._cardZones.GetLocation(cost.CardId) == CardLocation.Processing).Select(cost => cost.CardId).Distinct().Order().ToArray();
 }

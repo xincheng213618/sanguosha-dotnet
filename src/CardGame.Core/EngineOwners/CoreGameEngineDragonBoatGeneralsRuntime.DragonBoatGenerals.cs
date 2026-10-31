@@ -1,21 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
 {
     internal bool DragonBoatAllies(int owner, int other) => _coreDragonBoatActivitiesOperations.IsDragonBoatActivity && _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(other) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[other].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].TeamId is { } team && _coreMatchParticipantsPlayersAccess._players[other].TeamId == team;
-    SkillProgramStepOutcome global::CardGame.Core.IDragonBoatGeneralHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation, int targetSeat) => BeginDragonBoatGeneral(frame, operation, targetSeat);
-    bool global::CardGame.Core.IDragonBoatAllyQuery.IsTeammate(int ownerSeat, int targetSeat) => ownerSeat != targetSeat && DragonBoatAllies(ownerSeat, targetSeat);
+    SkillProgramStepOutcome IDragonBoatGeneralHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation, int targetSeat) => BeginDragonBoatGeneral(frame, operation, targetSeat);
+    bool IDragonBoatAllyQuery.IsTeammate(int ownerSeat, int targetSeat) => ownerSeat != targetSeat && DragonBoatAllies(ownerSeat, targetSeat);
     internal void CaptureDragonBoatFinalizedUse(long useId, CardActionContext action)
     {
         if (!_coreDragonBoatActivitiesOperations.IsDragonBoatActivity || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1 || action.Type != CardActionType.Use || action.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)
             return;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { Action: { } actual } use || actual.ActionId != action.ActionId || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { Action: { } actual } use || actual.ActionId != action.ActionId || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action))
             throw new InvalidOperationException("Dragon Boat Lianpian requires its exact finalized native card use.");
         if (_coreProgramEventHistoryOperations.ProgramEventHistory<DragonBoatActualUseEvent>().Any(e => e.UseId == useId))
             return;
@@ -146,13 +141,13 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
     [ProgramAnswer("dragonboat-general")]
     internal void AnswerDragonBoatGeneral(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DragonBoatGeneral.Stage: DragonBoatGeneralStage.Choosing } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !DragonBoatGeneralChoices(frame).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DragonBoatGeneral.Stage: DragonBoatGeneralStage.Choosing } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !DragonBoatGeneralChoices(frame).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("The activity draw requires its exact published participant choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         IssueDragonBoatGeneralDraw(frame, choice.Targets.Single(), frame.SkillId == "dragonboat:tunjiang" ? 2 : 1);
     }
 
-    internal static CardMoveReason DragonBoatGeneralDrawReason(string skillId) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DragonBoatGenerals.DragonBoatGeneralDrawReason(skillId);
+    internal static CardMoveReason DragonBoatGeneralDrawReason(string skillId) => RuntimeSkills.RuntimeRules_Core_DragonBoatGenerals.DragonBoatGeneralDrawReason(skillId);
     internal void IssueDragonBoatGeneralDraw(ProgramSkillFrame frame, int recipient, int count)
     {
         if (frame.DragonBoatGeneral is not { Stage: DragonBoatGeneralStage.Choosing } receipt || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive)

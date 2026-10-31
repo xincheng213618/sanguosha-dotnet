@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramAllHandTrickPaymentsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineProgramAllHandTrickPaymentsRuntime> _resolve;
-    private CoreGameEngineProgramAllHandTrickPaymentsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineProgramAllHandTrickPaymentsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineProgramAllHandTrickPaymentsRuntime> _resolve;
+    private CoreGameEngineProgramAllHandTrickPaymentsEntries(Func<EngineOwners.CoreGameEngineProgramAllHandTrickPaymentsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineProgramAllHandTrickPaymentsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineProgramAllHandTrickPaymentsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineProgramAllHandTrickPaymentsEntries Create(Func<EngineOwners.CoreGameEngineProgramAllHandTrickPaymentsRuntime> resolve) => new(resolve);
 }

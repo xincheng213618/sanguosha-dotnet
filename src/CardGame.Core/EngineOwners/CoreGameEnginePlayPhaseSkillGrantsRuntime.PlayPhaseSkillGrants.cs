@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePlayPhaseSkillGrantsRuntime
 {
     internal bool HasPlayPhaseSkillGrantCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.GrantPlayPhaseSkills) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GrantPlayPhaseSkills) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.OfferRandomPlayPhaseSkill) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferRandomPlayPhaseSkill);
 
-    void global::CardGame.Core.IPlayPhaseSkillGrantHost.GrantPlayPhaseSkills(ProgramSkillFrame frame, IReadOnlyList<string> skillIds) => GrantProgramPlayPhaseSkills(frame, skillIds);
+    void IPlayPhaseSkillGrantHost.GrantPlayPhaseSkills(ProgramSkillFrame frame, IReadOnlyList<string> skillIds) => GrantProgramPlayPhaseSkills(frame, skillIds);
     internal void GrantProgramPlayPhaseSkills(ProgramSkillFrame supplied, IReadOnlyList<string> skillIds)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEnginePlayPhaseSkillGrantsRuntime
             var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(frame);
             PlayPhaseSkillGrantContract.ValidateTrigger(frame.SkillId, trigger);
             var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-            if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting } context || context.OwnerSeat != frame.OwnerSeat || context.SourceSeat != frame.OwnerSeat || context.TargetSeat != frame.OwnerSeat || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not PlayPhaseStartingBoundaryFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != frame.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex || context.Facts != (parent.Items[parent.ItemIndex].Facts ?? parent.Facts) || history.OfType<ProgramBindingStartedEvent>().Count(started => started.FrameId == frame.Id && started.OwnerSeat == frame.OwnerSeat && started.SkillId == frame.SkillId && started.SkillInstanceId == frame.SkillInstanceId && started.BindingId == frame.TriggerId && started.Window == context.Window) != 1)
+            if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting } context || context.OwnerSeat != frame.OwnerSeat || context.SourceSeat != frame.OwnerSeat || context.TargetSeat != frame.OwnerSeat || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not PlayPhaseStartingBoundaryFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != frame.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex] is not { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex || context.Facts != (parent.Items[parent.ItemIndex].Facts ?? parent.Facts) || history.OfType<ProgramBindingStartedEvent>().Count(started => started.FrameId == frame.Id && started.OwnerSeat == frame.OwnerSeat && started.SkillId == frame.SkillId && started.SkillInstanceId == frame.SkillInstanceId && started.BindingId == frame.TriggerId && started.Window == context.Window) != 1)
                 throw new InvalidOperationException("A play-phase skill grant lost its exact own phase-start parent or candidate.");
         }
 
@@ -43,7 +39,7 @@ internal sealed partial class CoreGameEnginePlayPhaseSkillGrantsRuntime
     internal void IssueProgramPhaseSkillGrants(ProgramSkillFrame frame, int recipientSeat, IReadOnlyList<string> skillIds, SkillGrantPhaseExpiry expiry)
     {
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory();
-        var bindingId = global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame);
+        var bindingId = CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame);
         var source = new CardConversionSource(frame.SkillId, bindingId, frame.OwnerSeat, frame.SkillInstanceId);
         var sourceId = $"phase:{(expiry.TurnNumber)}:{(expiry.PhaseActorSeat)}:{(expiry.PhaseInstanceId)}:" + $"donor:{(frame.OwnerSeat)}:{(frame.SkillId)}:{(frame.SkillInstanceId)}:{(bindingId)}:" + $"frame:{(frame.Id)}:effect:{(frame.InstructionIndex - 1)}";
         if (history.OfType<ProgramPlayPhaseSkillsGrantedEvent>().Any(issued => issued.FrameId == frame.Id && issued.Grants.Any(grant => grant.SourceId == sourceId)))

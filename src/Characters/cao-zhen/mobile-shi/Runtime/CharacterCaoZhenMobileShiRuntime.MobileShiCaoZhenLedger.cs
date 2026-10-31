@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoZhenMobileShiRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
     internal const string ShiCaoZTopReason = "skill.mobile-shi-cao-zhen.top", ShiCaoZPlaceReason = "skill.mobile-shi-cao-zhen.place", ShiCaoZRemoveReason = "skill.mobile-shi-cao-zhen.remove", ShiCaoZDiscardReason = "skill.mobile-shi-cao-zhen.discard", ShiCaoZObtainReason = "skill.mobile-shi-cao-zhen.obtain", ShiCaoZDeathReason = "skill.mobile-shi-cao-zhen.holder-death";
     internal bool HasShiCaoZ => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengPlace);
 
-    internal static CardConversionSource ShiCaoZSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiCaoZSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool ValidShiCaoZMaterial(ShiCaoZMaterial m) => m.Source.SkillId == ShiCaoZSifeng && m.Source.BindingId == "place-forecast" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(m.Source.OwnerSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(m.Holder) && m.Holder != m.Source.OwnerSeat && m.Index is >= 0 and < 3 && m.Location == new CardLocation(CardZoneKind.PrivatePersistentPile, m.Holder, $"shi-cao-zhen:{(m.PlacementId)}") && _contentRegistryOperations._contentRegistry.GetSkill(ShiCaoZSifeng).Program?.GameplayHash == m.Hash && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoZStartedEvent>().Count(e => e.FrameId == m.SetupId && e.Source == m.Source && e.Hash == m.Hash && e.Operation == SkillProgramEffectOp.ResolveMobileShiCaoZhenSifengPlace) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move => move.Sequence == m.Sequence && move.CardId == m.CardId && move.CardKind == m.Kind && move.From == CardLocation.Processing && move.To == m.Location && move.Reason.Value == ShiCaoZPlaceReason);
     internal ShiCaoZMaterial[] LiveShiCaoZMaterials() => !HasShiCaoZ ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoZPlacedEvent>().Select(e => e.Material).Where(m => ValidShiCaoZMaterial(m) && _cardZonesOperations._cardZones.GetLocation(m.CardId) == m.Location && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoZRemovedEvent>().Any(e => e.PlacementId == m.PlacementId)).OrderBy(m => m.PlacementId).ToArray();
     internal bool ShiCaoZSameSource(ShiCaoZMaterial m, int owner, string instance, string hash) => m.Source.OwnerSeat == owner && m.Source.SkillInstanceId == instance && m.Hash == hash;
@@ -19,7 +15,7 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
     {
         action = null !;
         origin = 0;
-        if (context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCompleted || window.Action is not { } a || a.ActionId != identity.CardActionId || a.ActorSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || a.ActorSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber)
+        if (context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCompleted || window.Action is not { } a || a.ActionId != identity.CardActionId || a.ActorSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || a.ActorSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber)
             return false;
         if (a.Type == CardActionType.Use)
         {

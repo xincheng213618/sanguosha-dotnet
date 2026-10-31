@@ -3,8 +3,8 @@ namespace CardGame.Core;
 // Actual per-match entry identity owner, not gameplay/pending state.
 internal sealed class DeferredRuntimeEntryCache
 {
-    private readonly global::System.Collections.Generic.Dictionary<global::System.Type, object> _entries = new();
-    internal object GetOrAdd(ProgramRuntimeEntryRegistration registration, global::System.Func<global::System.Type, object> resolve)
+    private readonly Dictionary<Type, object> _entries = new();
+    internal object GetOrAdd(ProgramRuntimeEntryRegistration registration, Func<Type, object> resolve)
     {
         if (_entries.TryGetValue(registration.Type, out var existing)) return existing;
         var entry = registration.Create(resolve);

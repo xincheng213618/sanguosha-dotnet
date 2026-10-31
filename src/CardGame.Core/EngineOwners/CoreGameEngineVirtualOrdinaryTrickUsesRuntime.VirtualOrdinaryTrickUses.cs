@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IVirtualOrdinaryTrickProgramHost.UseVirtualOrdinaryTrick(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginProgramVirtualOrdinaryTrick(frame, effect);
+    SkillProgramStepOutcome IVirtualOrdinaryTrickProgramHost.UseVirtualOrdinaryTrick(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginProgramVirtualOrdinaryTrick(frame, effect);
     internal bool IsExactOwnPlayEndingProgram(ProgramSkillFrame frame) => _closedProgramPhaseFrameQueriesSource.Get().IsExactOwnPlayEndingProgram(frame);
     internal bool IsExactOwnVirtualOrdinaryTrickProgram(ProgramSkillFrame frame)
     {
@@ -61,7 +58,7 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
         return candidate is not null && candidate.OwnerSeat == frame.OwnerSeat && candidate.SkillId == frame.SkillId && candidate.BindingId == frame.TriggerId && frame.ActivationId == frame.TriggerId && candidate.SkillInstanceId == frame.SkillInstanceId && candidate.GameplayHash == frame.GameplayHash && candidate.OccurrenceIndex == context.OccurrenceIndex;
     }
 
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> VirtualOrdinaryTrickOptions(ProgramSkillFrame frame, SkillProgramEffect effect)
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> VirtualOrdinaryTrickOptions(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         var actorSeat = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, effect.ActorReference!);
         var targetSeat = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, effect.TargetReference!);
@@ -99,7 +96,7 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal static PromptChoice VirtualOrdinaryTrickChoice(ProgramSkillFrame frame, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption option) => new(option.Id, option.Description, [], option.TargetSeats, new Dictionary<string, string> { ["program-action"] = "use-virtual-ordinary-trick", ["frame-id"] = frame.Id.ToString(CultureInfo.InvariantCulture) });
+    internal static PromptChoice VirtualOrdinaryTrickChoice(ProgramSkillFrame frame, GameEngine.ProgramOrdinaryTrickUseOption option) => new(option.Id, option.Description, [], option.TargetSeats, new Dictionary<string, string> { ["program-action"] = "use-virtual-ordinary-trick", ["frame-id"] = frame.Id.ToString(CultureInfo.InvariantCulture) });
     [ProgramAnswer("use-virtual-ordinary-trick")]
     internal void ResolveProgramVirtualOrdinaryTrickChoice(PromptChoice selected)
     {
@@ -115,7 +112,7 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
         IssueProgramVirtualOrdinaryTrick(frame, effect, option);
     }
 
-    internal void IssueProgramVirtualOrdinaryTrick(ProgramSkillFrame frame, SkillProgramEffect effect, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption option)
+    internal void IssueProgramVirtualOrdinaryTrick(ProgramSkillFrame frame, SkillProgramEffect effect, GameEngine.ProgramOrdinaryTrickUseOption option)
     {
         var actorSeat = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, effect.ActorReference!);
         var targetSeat = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, effect.TargetReference!);
@@ -188,10 +185,10 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
         return new Card(0, use.CardKind, Suit.None, 0);
     }
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 160)]
-    internal bool FinishProgramVirtualOrdinaryAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishProgramVirtualOrdinaryAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !ValidProgramVirtualOrdinaryTrickUse(use) || use.CardKind is not (CardKind.Duel or CardKind.FireAttack or CardKind.UnexpectedAssault or CardKind.QizhengXiangsheng) || attack.EffectiveCardKind != use.CardKind || attack.PhysicalCards.Count != 0 || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } current || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(current, attack))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !ValidProgramVirtualOrdinaryTrickUse(use) || use.CardKind is not (CardKind.Duel or CardKind.FireAttack or CardKind.UnexpectedAssault or CardKind.QizhengXiangsheng) || attack.EffectiveCardKind != use.CardKind || attack.PhysicalCards.Count != 0 || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } current || !CoreNativeDamageHandlesRuntime.SameAttackOwner(current, attack))
             return false;
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));

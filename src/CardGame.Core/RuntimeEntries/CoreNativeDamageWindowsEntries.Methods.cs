@@ -2,10 +2,10 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreNativeDamageWindowsEntries
 {
-    internal void AdvanceDamageTriggerCandidate(global::CardGame.Core.DamageTriggerWindowFrame window) => _resolve().AdvanceDamageTriggerCandidate(window);
-    internal void BeginDamageTriggerWindow(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageFrameId, global::CardGame.Core.SkillProgramTriggerWindow window, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.DamageTriggerCandidate> candidates) => _resolve().BeginDamageTriggerWindow(attack, damageFrameId, window, candidates);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.DamageTriggerCandidate> CollectDamageTriggerCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().CollectDamageTriggerCandidates(attack, window);
-    internal void CompleteDamageTriggerWindow(global::CardGame.Core.DamageTriggerWindowFrame window) => _resolve().CompleteDamageTriggerWindow(window);
+    internal void AdvanceDamageTriggerCandidate(DamageTriggerWindowFrame window) => _resolve().AdvanceDamageTriggerCandidate(window);
+    internal void BeginDamageTriggerWindow(GameEngine.IDamageAttempt attack, long damageFrameId, SkillProgramTriggerWindow window, IReadOnlyList<DamageTriggerCandidate> candidates) => _resolve().BeginDamageTriggerWindow(attack, damageFrameId, window, candidates);
+    internal IReadOnlyList<DamageTriggerCandidate> CollectDamageTriggerCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window) => _resolve().CollectDamageTriggerCandidates(attack, window);
+    internal void CompleteDamageTriggerWindow(DamageTriggerWindowFrame window) => _resolve().CompleteDamageTriggerWindow(window);
     internal void RunOneDamageTriggerStep() => _resolve().RunOneDamageTriggerStep();
-    internal bool TryBeginDamageTriggerWindow(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageFrameId, global::CardGame.Core.SkillProgramTriggerWindow window) => _resolve().TryBeginDamageTriggerWindow(attack, damageFrameId, window);
+    internal bool TryBeginDamageTriggerWindow(GameEngine.IDamageAttempt attack, long damageFrameId, SkillProgramTriggerWindow window) => _resolve().TryBeginDamageTriggerWindow(attack, damageFrameId, window);
 }

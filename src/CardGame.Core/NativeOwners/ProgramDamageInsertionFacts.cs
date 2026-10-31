@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramDamageInsertionFacts(global::System.Func<global::CardGame.Core.FrameStore> getFrameStore, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramChildResolutionEntries> getCoreGameEngineProgramChildResolutionRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries> getCoreGameEngineProgramAttackAttemptRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreDyingCursorRuntimeEntries> getCoreDyingCursorRuntimeRuntime) : IProgramDamageInsertionFacts
+internal sealed class ProgramDamageInsertionFacts(Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineProgramChildResolutionEntries> getCoreGameEngineProgramChildResolutionRuntime, Func<RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries> getCoreGameEngineProgramAttackAttemptRuntime, Func<RuntimeEntries.CoreDyingCursorRuntimeEntries> getCoreDyingCursorRuntimeRuntime) : IProgramDamageInsertionFacts
 {
     public int FrameCount => getFrameStore().Count;
 

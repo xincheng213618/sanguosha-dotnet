@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunXiuBoundaryMobileRuntime
 {
     internal const string BoundaryXingxueAction = "boundary-sun-xiu-xingxue", BoundaryXingxueDraw = "skill.boundary-sun-xiu.xingxue.draw", BoundaryXingxueTop = "skill.boundary-sun-xiu.xingxue.top", BoundaryXingxueGive = "skill.boundary-sun-xiu.xingxue.give";
-    internal static CardConversionSource BoundarySunXiuSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundarySunXiuHost.Resolve(ProgramSkillFrame frame) => BeginBoundaryXingxue(frame);
-    bool global::CardGame.Core.IBoundarySunXiuSelectionQuery.HasOwnedRegionCards(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat).Count + _cardZonesOperations._cardZones.CardsAt(CardLocation.Judgment(seat)).Count > 0;
+    internal static CardConversionSource BoundarySunXiuSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    SkillProgramStepOutcome IBoundarySunXiuHost.Resolve(ProgramSkillFrame frame) => BeginBoundaryXingxue(frame);
+    bool IBoundarySunXiuSelectionQuery.HasOwnedRegionCards(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat).Count + _cardZonesOperations._cardZones.CardsAt(CardLocation.Judgment(seat)).Count > 0;
     internal bool IsBoundarySunXiuFactionRangeTarget(int actorSeat, int targetSeat) => _coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && owner.Seat != actorSeat && _coreNationalSkillsOperations.HasRuntimeSkill(owner, BoundarySunXiuComposition.Zhaofu) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(owner, BoundarySunXiuComposition.Zhaofu, null, Role.Lord) && string.Equals(_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[actorSeat]), "wu", StringComparison.Ordinal) && _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, targetSeat) == 1);
     internal SkillProgramStepOutcome BeginBoundaryXingxue(ProgramSkillFrame supplied)
     {
@@ -83,7 +80,7 @@ internal sealed partial class CharacterSunXiuBoundaryMobileRuntime
     [ProgramAnswer(BoundaryXingxueAction)]
     internal void AnswerBoundaryXingxue(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundarySunXiu: { } receipt } frame || !ValidBoundaryXingxue(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != BoundaryXingxueChooser(frame) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], BoundaryXingxueChoices(frame).Where(c => c.Id == answer.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundarySunXiu: { } receipt } frame || !ValidBoundaryXingxue(frame) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != BoundaryXingxueChooser(frame) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], BoundaryXingxueChoices(frame).Where(c => c.Id == answer.Id).ToArray()))
             throw new InvalidOperationException("Xingxue requires its original participant chooser, current owned card and sealed recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -215,8 +212,8 @@ internal sealed partial class CharacterSunXiuBoundaryMobileRuntime
         var receipt = frame.BoundarySunXiu!;
         var chooser = BoundaryXingxueChooser(frame);
         if (receipt.Stage == BoundarySunXiuStage.Participants)
-            return pending.Choices.FirstOrDefault(c => c.Targets.Count == 1 && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[chooser], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? pending.Choices.Single(c => c.Parameters["branch"] == "finish");
-        var friendly = pending.Choices.Where(c => c.Parameters["branch"] == "give" && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[chooser], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).ToArray();
-        return (friendly.Length > 0 ? friendly : pending.Choices.Where(c => c.Parameters["branch"] == "top")).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[chooser])).First();
+            return pending.Choices.FirstOrDefault(c => c.Targets.Count == 1 && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[chooser], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? pending.Choices.Single(c => c.Parameters["branch"] == "finish");
+        var friendly = pending.Choices.Where(c => c.Parameters["branch"] == "give" && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[chooser], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).ToArray();
+        return (friendly.Length > 0 ? friendly : pending.Choices.Where(c => c.Parameters["branch"] == "top")).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[chooser])).First();
     }
 }

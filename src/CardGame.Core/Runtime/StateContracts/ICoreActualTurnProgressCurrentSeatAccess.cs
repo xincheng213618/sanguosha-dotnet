@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreActualTurnProgressCurrentSeatAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreActualTurnProgressCurrentSeatAccess : IProgramRuntimeOperations
 {
     ref int _currentSeat { get; }
 }

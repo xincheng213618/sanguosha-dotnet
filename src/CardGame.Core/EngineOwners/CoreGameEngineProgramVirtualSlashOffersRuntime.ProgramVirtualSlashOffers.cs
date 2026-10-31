@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramVirtualSlashOffersRuntime
@@ -111,7 +107,7 @@ internal sealed partial class CoreGameEngineProgramVirtualSlashOffersRuntime
         _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(frame);
         if (targetSeat != frame.OwnerSeat || cardKinds.Count == 0 || cardKinds.Any(kind => !GrantTurnCardEffectImmunityProgramOperationDescriptor.CardEffectImmunityKinds.Contains(kind)))
             throw new InvalidOperationException("The turn immunity grant has unsupported kinds or subject.");
-        var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), SkillRuleQuery.CardEffectImmunity, SkillRuleOperation.Set, 1, cardKinds);
+        var granted = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), SkillRuleQuery.CardEffectImmunity, SkillRuleOperation.Set, 1, cardKinds);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnRuleModifierGrantedEvent(granted));
     }
 }

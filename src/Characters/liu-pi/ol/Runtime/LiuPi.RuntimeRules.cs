@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_liu_pi_ol_LiuPi
 {
     internal static string LiuPiMovementReason(LiuPiExchangeStage stage) => stage switch {

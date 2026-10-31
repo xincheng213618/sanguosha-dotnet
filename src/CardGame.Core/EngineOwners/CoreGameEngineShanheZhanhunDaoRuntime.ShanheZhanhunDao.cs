@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheZhanhunDaoRuntime
 {
     internal const string ShanheZhanhunDaoSkill = "shanhe:zhanhun-dao";
-    SkillProgramStepOutcome global::CardGame.Core.IShanheZhanhunDaoProgramHost.ResolveShanheZhanhunDao(ProgramSkillFrame frame) => ResolveShanheZhanhunDao(frame);
+    SkillProgramStepOutcome IShanheZhanhunDaoProgramHost.ResolveShanheZhanhunDao(ProgramSkillFrame frame) => ResolveShanheZhanhunDao(frame);
     internal bool HasActiveShanheZhanhunDao(int ownerSeat, string skillId, string skillInstanceId) => skillId == ShanheZhanhunDaoSkill && _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Any(card => card.Kind == CardKind.ZhanhunDao && _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(ownerSeat, skillId, skillInstanceId, card));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 5754, SkillProgramEffectOp.ResolveShanheZhanhunDao)]
     internal bool CanOfferShanheZhanhunDao(ProgramTriggerLegalityContext gate) => HasActiveShanheZhanhunDao(gate.OwnerSeat, gate.SkillId, gate.Candidate.SkillInstanceId) && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsSourceLess: false } damage && damage.SourceSeat == gate.OwnerSeat && gate.WindowContext is { Window: SkillProgramTriggerWindow.BeforeDamageApplied, TargetSeat: { } targetSeat } && damage.TargetSeat == targetSeat && _coreMatchParticipantsPlayersAccess._players[targetSeat] is { IsAlive: true, HasHpValue: true } target && _coreTreatedWoundedOperations.IsRuleWounded(target);

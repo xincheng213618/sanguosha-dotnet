@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGrantedEntityPhasesRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IGrantedEntityPhaseProgramHost.InsertGrantedEntityPlayPhase(ProgramSkillFrame f) => BeginGrantedEntityPlayPhase(f);
-    SkillProgramStepOutcome global::CardGame.Core.IGrantedEntityPhaseProgramHost.ClaimGrantedPhaseSlash(ProgramSkillFrame f) => BeginGrantedPhaseSlashClaim(f);
+    SkillProgramStepOutcome IGrantedEntityPhaseProgramHost.InsertGrantedEntityPlayPhase(ProgramSkillFrame f) => BeginGrantedEntityPlayPhase(f);
+    SkillProgramStepOutcome IGrantedEntityPhaseProgramHost.ClaimGrantedPhaseSlash(ProgramSkillFrame f) => BeginGrantedPhaseSlashClaim(f);
     internal SkillProgramStepOutcome BeginGrantedEntityPlayPhase(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -16,7 +12,7 @@ internal sealed partial class CoreGameEngineGrantedEntityPhasesRuntime
             throw new InvalidOperationException("An inserted entity phase cannot be issued twice.");
         f = f with
         {
-            IssuedEntityPhase = new(new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, 0, GrantedEntityPhaseStage.Scheduled)
+            IssuedEntityPhase = new(new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, 0, GrantedEntityPhaseStage.Scheduled)
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f);
         return _coreProgramLifecycleOperations.ScheduleProgramPhase(f, TurnPhase.Play, SkillProgramPhaseContinuation.BeforeNormalPreparation);
@@ -67,10 +63,10 @@ internal sealed partial class CoreGameEngineGrantedEntityPhasesRuntime
         var choices = new List<PromptChoice>();
         PromptChoice Choice(string option, string text, IReadOnlyList<int>? ids = null) => new(new($"granted-phase-slash.{(f.Id)}.{(option)}"), text, ids ?? [], [], new Dictionary<string, string> { ["program-action"] = "granted-phase-slash", ["frame-id"] = f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture), ["option"] = option });
         // The deck offers only a source, never its unrevealed identity set.
-        if (_cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Any(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)))
+        if (_cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Any(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)))
             choices.Add(Choice("deck", "从牌堆获得一张杀"));
-        foreach (var card in _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)))
-            choices.Add(Choice("discard-" + card.Id, $"获得弃牌堆的【{(card.DisplayName)}】（{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}）", [card.Id]));
+        foreach (var card in _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)))
+            choices.Add(Choice("discard-" + card.Id, $"获得弃牌堆的【{(card.DisplayName)}】（{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}）", [card.Id]));
         choices.Add(Choice("skip", "不获得杀"));
         return Array.AsReadOnly(choices.ToArray());
     }
@@ -105,7 +101,7 @@ internal sealed partial class CoreGameEngineGrantedEntityPhasesRuntime
         }
 
         var from = choice.Parameters["option"] == "deck" ? CardLocation.DrawPile : CardLocation.DiscardPile;
-        var card = from == CardLocation.DrawPile ? _cardZonesOperations._cardZones.CardsAt(from).Reverse().FirstOrDefault(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)) : choice.Cards is [var id] ? _cardZonesOperations._cardZones.CardsAt(from).SingleOrDefault(c => c.Id == id && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)) : null;
+        var card = from == CardLocation.DrawPile ? _cardZonesOperations._cardZones.CardsAt(from).Reverse().FirstOrDefault(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)) : choice.Cards is [var id] ? _cardZonesOperations._cardZones.CardsAt(from).SingleOrDefault(c => c.Id == id && CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)) : null;
         if (card is null)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { GrantedPhaseSlashClaim = null });
@@ -198,8 +194,8 @@ internal sealed partial class CoreGameEngineGrantedEntityPhasesRuntime
             return false;
         if (!_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == sequence && m.CardId == id && m.To == CardLocation.Hand(owner.Seat)))
             return false;
-        var outside = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.CardId == id && m.Sequence > sequence && !global::CardGame.Core.EngineOwners.CoreGameEngineProvenanceCardPoliciesRuntime.IsProvenanceOwnedZone(m.To, owner.Seat)).ToArray();
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineProvenanceCardPoliciesRuntime.IsProvenanceOwnedZone(_cardZonesOperations._cardZones.GetLocation(id), owner.Seat))
+        var outside = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.CardId == id && m.Sequence > sequence && !CoreGameEngineProvenanceCardPoliciesRuntime.IsProvenanceOwnedZone(m.To, owner.Seat)).ToArray();
+        if (CoreGameEngineProvenanceCardPoliciesRuntime.IsProvenanceOwnedZone(_cardZonesOperations._cardZones.GetLocation(id), owner.Seat))
             return outside.Length == 0;
         // An already-paid successful declaration retains its exact original Hand
         // material; no unrelated Processing entity can revive the phase grant.
@@ -210,7 +206,7 @@ internal sealed partial class CoreGameEngineGrantedEntityPhasesRuntime
 
     internal void IssueGrantedPhaseEntityUseDistance(long frameId, CardActionContext? action)
     {
-        if (action is not { Type: CardActionType.Use } || action.ActorSeat != action.ProviderSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || !HasGrantedPhaseEntityDistance(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action.PhysicalCards.Select(c => c.CardId).ToArray()))
+        if (action is not { Type: CardActionType.Use } || action.ActorSeat != action.ProviderSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || !HasGrantedPhaseEntityDistance(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action.PhysicalCards.Select(c => c.CardId).ToArray()))
             return;
         var schedule = _programPhaseScheduleOperations._programPhaseSchedule!;
         var receipt = schedule.Frame.IssuedEntityPhase!;
@@ -219,7 +215,7 @@ internal sealed partial class CoreGameEngineGrantedEntityPhasesRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GrantedEntityDistanceUseIssuedEvent(policy));
     }
 
-    internal bool HasIssuedGrantedPhaseEntityDistance(long? useId, int actor) => useId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { GrantedEntityDistance: { } policy, Action: { } action } && policy.CardUseFrameId == id && action.ActorSeat == actor && action.ProviderSeat == actor && policy.Source.OwnerSeat == actor && action.ActionId == policy.CardActionId && action.PhysicalCards is [var cost] && cost.CardId == policy.CardId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind);
+    internal bool HasIssuedGrantedPhaseEntityDistance(long? useId, int actor) => useId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { GrantedEntityDistance: { } policy, Action: { } action } && policy.CardUseFrameId == id && action.ActorSeat == actor && action.ProviderSeat == actor && policy.Source.OwnerSeat == actor && action.ActionId == policy.CardActionId && action.PhysicalCards is [var cost] && cost.CardId == policy.CardId && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind);
     internal bool HasPotentialGrantedPhaseSlash(CharacterState owner) => IsGrantedEntityPhaseActive(owner.Seat) && _coreActionQueriesOperations.GetSlashUseCards(owner).Any(card => HasGrantedPhaseEntityDistance(owner, [card.Id]));
     internal long? GrantedEntityTrailerHealthOwner(IGameEvent payload)
     {

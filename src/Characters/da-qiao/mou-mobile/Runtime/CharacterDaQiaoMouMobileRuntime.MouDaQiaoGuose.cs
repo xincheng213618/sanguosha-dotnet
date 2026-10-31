@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoMouMobileRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
     internal bool HasMouDaQiao => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouDaQiaoGuose);
     internal int MouDaQiaoGuoseLimit => _coreMatchDefinitionModeDefinitionAccess._modeDefinition.ModeKind == ContentModeKind.Identity ? 4 : 2;
 
-    internal static CardConversionSource MouDaQiaoSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_da_qiao_mou_mobile_MouDaQiaoGuose.MouDaQiaoSource(f);
+    internal static CardConversionSource MouDaQiaoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_da_qiao_mou_mobile_MouDaQiaoGuose.MouDaQiaoSource(f);
     internal int MouDaQiaoGuoseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoGuoseReservedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Phase == phase);
     [ProgramPhaseUsedProjection(80)]
     internal int MouDaQiaoProjectedPhaseUses(int owner, string skill, int fallback) => skill == MouDaQiaoComposition.Guose && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p ? MouDaQiaoGuoseUses(owner, p) : fallback;
@@ -56,7 +52,7 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
     [ProgramAnswer("mou-da-qiao-guose")]
     internal void AnswerMouDaQiaoGuose(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDaQiaoGuose: { Stage: MouDaQiaoGuoseStage.Selecting } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouDaQiaoRemovalChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDaQiaoGuose: { Stage: MouDaQiaoGuoseStage.Selecting } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouDaQiaoRemovalChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Guose accepts only its current visible native judgment removal.");
         var id = choice.Cards.Single();
         var from = CardLocation.Judgment(r.TargetSeat);
@@ -117,11 +113,11 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouDaQiaoGuose, SkillProgramEffectOp.ResolveMouDaQiaoGuoseRemove)]
     internal PromptChoice AiMouDaQiaoGuose(PendingDecision p, ProgramSkillFrame f) => p.Choices[0];
-    SkillProgramStepOutcome global::CardGame.Core.IMouDaQiaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    SkillProgramStepOutcome IMouDaQiaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.ResolveMouDaQiaoGuose or SkillProgramEffectOp.ResolveMouDaQiaoGuoseRemove => BeginMouDaQiaoGuose(f),
         SkillProgramEffectOp.ResolveMouDaQiaoLiuliHeart => ResolveMouDaQiaoHeart(f),
         _ => BeginMouDaQiaoLiuliPhase(f)};
-    int global::CardGame.Core.IMouDaQiaoQuery.Limit() => MouDaQiaoGuoseLimit;
-    bool global::CardGame.Core.IMouDaQiaoQuery.Allows(int owner, int? card, int target, string branch) => MouDaQiaoGuoseTarget(owner, card, target, branch);
+    int IMouDaQiaoQuery.Limit() => MouDaQiaoGuoseLimit;
+    bool IMouDaQiaoQuery.Allows(int owner, int? card, int target, string branch) => MouDaQiaoGuoseTarget(owner, card, target, branch);
 }

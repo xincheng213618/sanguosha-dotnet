@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuZhiWeiOlRuntime
@@ -25,7 +21,7 @@ internal sealed partial class CharacterLuZhiWeiOlRuntime
             if (f.InstructionIndex != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayEnding, QingzhongDebt: { } issued } || f.TriggerId != issued.EndingBindingId || f.SkillId != issued.Source.SkillId || f.SkillInstanceId != issued.Source.SkillInstanceId || f.OwnerSeat != issued.Source.OwnerSeat || f.GameplayHash != issued.GameplayHash || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].QingzhongDebts.Contains(issued) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QingzhongDebtArmedEvent>().Count(e => e.Debt == issued) != 1)
                 return false;
             var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-            return i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is ProgramLifecycleTriggerWindowFrame w && w.Window == SkillProgramTriggerWindow.PlayEnding && w.QingzhongEndingPhase == issued.Phase && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!.Triggers.Single(t => t.Id == f.TriggerId).Effects is [{ Op: SkillProgramEffectOp.SettleQingzhongActualPlayDebt }];
+            return i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is ProgramLifecycleTriggerWindowFrame w && w.Window == SkillProgramTriggerWindow.PlayEnding && w.QingzhongEndingPhase == issued.Phase && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!.Triggers.Single(t => t.Id == f.TriggerId).Effects is [{ Op: SkillProgramEffectOp.SettleQingzhongActualPlayDebt }];
         }
 
         var p = f.Qingzhong!;
@@ -39,12 +35,12 @@ internal sealed partial class CharacterLuZhiWeiOlRuntime
             return false;
         if (p.Stage == QingzhongStage.DrawChildren)
         {
-            if (f.Id != d.ProgramFrameId || f.TriggerId != d.Source.BindingId || f.WindowContext?.QingzhongPhase != d.Phase || _resolutionStackOperations._resolutionStack[index - 1] is not PlayPhaseStartingBoundaryFrame w || w.Id != d.StartingWindowId || w.OwnerSeat != f.OwnerSeat || w.QingzhongStartingPhase != d.Phase || w.ItemIndex < 0 || w.ItemIndex >= w.Items.Count || w.Items[w.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
+            if (f.Id != d.ProgramFrameId || f.TriggerId != d.Source.BindingId || f.WindowContext?.QingzhongPhase != d.Phase || _resolutionStackOperations._resolutionStack[index - 1] is not PlayPhaseStartingBoundaryFrame w || w.Id != d.StartingWindowId || w.OwnerSeat != f.OwnerSeat || w.QingzhongStartingPhase != d.Phase || w.ItemIndex < 0 || w.ItemIndex >= w.Items.Count || w.Items[w.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
                 return false;
         }
         else
         {
-            if (f.TriggerId != d.EndingBindingId || f.WindowContext?.QingzhongDebt != d || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame w || w.QingzhongEndingPhase != d.Phase || w.Window != SkillProgramTriggerWindow.PlayEnding || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]))
+            if (f.TriggerId != d.EndingBindingId || f.WindowContext?.QingzhongDebt != d || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame w || w.QingzhongEndingPhase != d.Phase || w.Window != SkillProgramTriggerWindow.PlayEnding || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]))
                 return false;
             if (p.Stage == QingzhongStage.ChooseMinimum)
                 return f.PendingMovementContinuation is null && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].QingzhongDebts.Contains(d);

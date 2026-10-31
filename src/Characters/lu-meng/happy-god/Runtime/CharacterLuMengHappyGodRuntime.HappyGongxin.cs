@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuMengHappyGodRuntime
 {
-    internal static CardConversionSource HappyGongxinSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    void global::CardGame.Core.IHappyGongxinHost.Bind(ProgramSkillFrame f) => BindHappyGongxin(f);
+    internal static CardConversionSource HappyGongxinSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    void IHappyGongxinHost.Bind(ProgramSkillFrame f) => BindHappyGongxin(f);
     internal bool TryHappyGongxinCounterpart(int owner, string binding, ProgramSkillWindowContext context, out CardUseFrame use, out int target, out int other)
     {
         use = null !;

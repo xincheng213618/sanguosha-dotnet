@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaManOlRuntime
@@ -108,7 +104,7 @@ internal sealed partial class CharacterHuaManOlRuntime
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         var r = f.HuaMan!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HuaManChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HuaManChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Hua Man choice lost the actual owner and current physical payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == HuaManStage.MaleChoice)
@@ -218,5 +214,5 @@ internal sealed partial class CharacterHuaManOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHuaManProgramHost.ExecuteHuaMan(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteHuaMan(f, op);
+    SkillProgramStepOutcome IHuaManProgramHost.ExecuteHuaMan(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteHuaMan(f, op);
 }

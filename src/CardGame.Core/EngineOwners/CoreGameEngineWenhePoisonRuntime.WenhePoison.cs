@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWenhePoisonRuntime
@@ -16,7 +11,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
             throw new InvalidOperationException("Poison Fire Attack requires its exact newly paid discard boundary.");
         var after = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var batches = _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Where(batch => batch.ParentFrameId == use.Id && batch.Movements.Count > 0 && batch.Movements.All(move => move.CardId == cost.Id && move.Sequence > sequenceBefore && move.Sequence <= after)).OrderBy(batch => batch.Id).Select(batch => batch.Id).ToArray();
-        var payment = new WenhePoisonFireAttackPayment(cost.Id, global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use), revealed.Id, revealed.Suit, sequenceBefore, after, batches);
+        var payment = new WenhePoisonFireAttackPayment(cost.Id, CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use), revealed.Id, revealed.Suit, sequenceBefore, after, batches);
         _coreRuntimeOperations.ReplaceRuntimeTop(use with { WenhePoisonFireAttackPayment = payment, Step = ResolutionFrameStep.ResolvingEffect });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenhePoisonFireAttackPaidEvent(use.Id, cost.Id, payment.TargetSeat, revealed.Id, revealed.Suit, sequenceBefore, after));
         ContinueWenhePoisonFireAttackPayment(use.Id);
@@ -84,7 +79,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
     {
         var p = use.WenhePoisonFireAttackPayment!;
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > p.SequenceBefore && move.Sequence <= p.SequenceAfter).ToArray();
-        if (_coreMatchDefinitionModeDefinitionAccess._modeDefinition.WenheActivity is null || use.CardKind != CardKind.FireAttack || use.FireAttackSelection?.RevealedCardId != p.RevealedCardId || global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use) != p.TargetSeat || p.BatchIds is not System.Collections.IList { IsReadOnly: true } || p.BatchIds.Count != 2 || p.BatchIds.Distinct().Count() != 2 || p.BatchCursor < 0 || p.BatchCursor > p.BatchIds.Count || p.ActiveChildId is not null && p.BatchCursor >= p.BatchIds.Count || moves.Length != 2 || moves.Any(move => move.CardId != p.CostCardId) || moves[0].From != CardLocation.Hand(use.SourceSeat) || moves[0].To != CardLocation.Processing || moves[0].Reason != CardMoveReasons.FireAttackDiscard || moves[0].Disclosure != CardMovementDisclosure.FaceUp || moves[1].From != CardLocation.Processing || moves[1].To != CardLocation.DiscardPile || moves[1].Reason != CardMoveReasons.FireAttackDiscardFinished || _coreCardAttackStateOperations.GetAttackCard(p.CostCardId).Kind != CardKind.Peach || _coreProgramEventHistoryOperations.ProgramEventHistory<WenhePoisonFireAttackPaidEvent>().Count(e => e == new WenhePoisonFireAttackPaidEvent(use.Id, p.CostCardId, p.TargetSeat, p.RevealedCardId, p.RevealedSuit, p.SequenceBefore, p.SequenceAfter)) != 1)
+        if (_coreMatchDefinitionModeDefinitionAccess._modeDefinition.WenheActivity is null || use.CardKind != CardKind.FireAttack || use.FireAttackSelection?.RevealedCardId != p.RevealedCardId || CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use) != p.TargetSeat || p.BatchIds is not System.Collections.IList { IsReadOnly: true } || p.BatchIds.Count != 2 || p.BatchIds.Distinct().Count() != 2 || p.BatchCursor < 0 || p.BatchCursor > p.BatchIds.Count || p.ActiveChildId is not null && p.BatchCursor >= p.BatchIds.Count || moves.Length != 2 || moves.Any(move => move.CardId != p.CostCardId) || moves[0].From != CardLocation.Hand(use.SourceSeat) || moves[0].To != CardLocation.Processing || moves[0].Reason != CardMoveReasons.FireAttackDiscard || moves[0].Disclosure != CardMovementDisclosure.FaceUp || moves[1].From != CardLocation.Processing || moves[1].To != CardLocation.DiscardPile || moves[1].Reason != CardMoveReasons.FireAttackDiscardFinished || _coreCardAttackStateOperations.GetAttackCard(p.CostCardId).Kind != CardKind.Peach || _coreProgramEventHistoryOperations.ProgramEventHistory<WenhePoisonFireAttackPaidEvent>().Count(e => e == new WenhePoisonFireAttackPaidEvent(use.Id, p.CostCardId, p.TargetSeat, p.RevealedCardId, p.RevealedSuit, p.SequenceBefore, p.SequenceAfter)) != 1)
             throw new InvalidOperationException("Poison Fire Attack changed its exact paid discard or native effect continuation.");
     }
 
@@ -122,7 +117,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
         if (use.DyingResponse is not { } response || useIndex < 1 || _resolutionStackOperations._resolutionStack[useIndex - 1] is not DyingFrame dying || response.ResolutionId != dying.Id || response.ResponderSeat != use.SourceSeat || dying.ResponderSeat != use.SourceSeat || !(use.CardKind == CardKind.Peach && response.UsedPeach || use.CardKind == CardKind.Alcohol && response.UsedAlcohol))
             return false;
         var programIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == batch.AwaitingProgramFrameId);
-        return programIndex >= 0 && programIndex < useIndex - 1 && _resolutionStackOperations._resolutionStack[programIndex] is ProgramSkillFrame program && global::CardGame.Core.EngineOwners.CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(program) && batch.OriginOwnerSeat == program.OwnerSeat && batch.OriginSkillId == program.SkillId && batch.OriginSkillInstanceId == program.SkillInstanceId;
+        return programIndex >= 0 && programIndex < useIndex - 1 && _resolutionStackOperations._resolutionStack[programIndex] is ProgramSkillFrame program && CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(program) && batch.OriginOwnerSeat == program.OwnerSeat && batch.OriginSkillId == program.SkillId && batch.OriginSkillInstanceId == program.SkillInstanceId;
     }
 
     internal void CaptureWenhePoisonUsePayment(CardMovementBatchContext batch)
@@ -133,7 +128,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.LeadingTail, 20)]
-    internal bool HasWenhePoisonUsePaymentTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => continuation.Kind is RecoveryPaidCardUseKind.Trick or RecoveryPaidCardUseKind.Simple or RecoveryPaidCardUseKind.EquipmentUse && use.PaymentMovementReceipt is { } receipt && receipt.OwnerFrameId == use.Id && IsWenhePoisonUsePaymentBatch(use, receipt.Batch) && global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, receipt.Batch);
+    internal bool HasWenhePoisonUsePaymentTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => continuation.Kind is RecoveryPaidCardUseKind.Trick or RecoveryPaidCardUseKind.Simple or RecoveryPaidCardUseKind.EquipmentUse && use.PaymentMovementReceipt is { } receipt && receipt.OwnerFrameId == use.Id && IsWenhePoisonUsePaymentBatch(use, receipt.Batch) && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, receipt.Batch);
     internal bool IsPendingWenhePoisonWindow(CardsMovedTriggerWindowFrame frame) => HasWenhePoisonDepartures(frame.Batch) && frame.CandidateIndex == 0 && (frame.WenhePoisonLoss is null || frame.WenhePoisonLoss is { Stage: not WenhePoisonLossStage.Completed } receipt && receipt.Cursor >= 0 && receipt.Cursor < frame.Batch.WenhePoisonDepartures!.Count);
     internal bool IsCurrentWenhePoisonDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id)is var index && index > 0 && IsWenhePoisonDyingChild(_resolutionStackOperations._resolutionStack[index - 1], dying);
     internal bool IsOriginalDyingSuspendedByWenhePoison(DyingFrame original)
@@ -211,7 +206,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
             _coreNativeDyingOperations.ExposeHumanDyingPrompt();
     }
 
-    internal void ReturnWenhePoisonDying(global::CardGame.Core.GameEngine.DyingCompletionReceipt returned)
+    internal void ReturnWenhePoisonDying(GameEngine.DyingCompletionReceipt returned)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardsMovedTriggerWindowFrame frame || frame.Id != returned.ParentFrameId || returned.Continuation != DyingContinuationKind.WenhePoison || frame.WenhePoisonLoss is not { Stage: WenhePoisonLossStage.Dying } receipt || receipt.DyingFrameId != returned.FrameId || frame.Batch.WenhePoisonDepartures![receipt.Cursor].OwnerSeat != returned.VictimSeat)
             throw new InvalidOperationException("Poison dying returned to a different paid departure.");
@@ -245,7 +240,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
     internal bool IsWenhePoisonHealthChild(ResolutionFrame? parent, HpChangedTriggerWindowFrame child) => parent is CardsMovedTriggerWindowFrame { WenhePoisonLoss: { Stage: WenhePoisonLossStage.HealthChildren } receipt } frame && frame.Id == child.ResumeFrameId && child.Continuation == PostEventContinuation.WenhePoison && child.Change.ParentFrameId == frame.Id && child.Change.TargetSeat == frame.Batch.WenhePoisonDepartures![receipt.Cursor].OwnerSeat && child.Change.Kind == HpChangeKind.Loss && child.Change.HpBefore == receipt.HpBefore && child.Change.HpAfter == receipt.HpAfter;
     internal bool IsWenhePoisonDyingChild(ResolutionFrame? parent, DyingFrame child) => parent is CardsMovedTriggerWindowFrame { WenhePoisonLoss: { Stage: WenhePoisonLossStage.Dying } receipt } frame && child.ParentFrameId == frame.Id && child.Id == receipt.DyingFrameId && child.KillerSeat is null && child.Continuation == DyingContinuationKind.WenhePoison && child.VictimSeat == frame.Batch.WenhePoisonDepartures![receipt.Cursor].OwnerSeat && receipt.HpAfter == 0;
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MatchBatch, 20)]
-    internal bool HasIssuedWenhePoisonPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => IsWenhePoisonUsePaymentBatch(use, batch) && global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch);
+    internal bool HasIssuedWenhePoisonPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => IsWenhePoisonUsePaymentBatch(use, batch) && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch);
     [ProgramPipelineHook(ProgramPipelinePhase.BeginMovementBatch, 1200)]
     internal void CaptureMovementBatchStartWenhePoisonRound(CardMovementBatchBuilder batch) => batch.WenhePoisonRound = CaptureWenhePoisonRound();
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 300)]

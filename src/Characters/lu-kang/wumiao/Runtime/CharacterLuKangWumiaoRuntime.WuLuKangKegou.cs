@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -53,7 +50,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         if (f.SkillId != WuLuKangComposition.Kegou || f.InstructionIndex != 1 || f.TriggerId is null || f.ActivationId != f.TriggerId || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } c || c.OwnerSeat != f.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !WuLuKangComposition.IsKegou(p))
             return false;
         if (c.Window == SkillProgramTriggerWindow.PlayPhaseStarting && f.TriggerId == "play-start")
-            return _resolutionStackOperations._resolutionStack.OfType<PlayPhaseStartingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } w && w.OwnerSeat == f.OwnerSeat && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
+            return _resolutionStackOperations._resolutionStack.OfType<PlayPhaseStartingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } w && w.OwnerSeat == f.OwnerSeat && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
         if (c.Window == SkillProgramTriggerWindow.AfterTurnEnded && f.TriggerId is "used-own-turn-end" or "used-other-turn-end")
             return _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } ended && _coreAfterTurnEndedProgramsOperations.MatchesAfterTurnEndedChild(ended, f, c);
         return false;
@@ -132,7 +129,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.WuLuKangKegou!;
         var chooser = r.Stage == WuLuKangKegouStage.OpponentSlashChoice ? r.OpponentSeat!.Value : f.OwnerSeat;
-        if (!ValidWuLuKangKegou(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuLuKangKegouChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidWuLuKangKegou(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WuLuKangKegouChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Kegou requires the exact current participant's canonical choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = selected.Parameters["branch"];

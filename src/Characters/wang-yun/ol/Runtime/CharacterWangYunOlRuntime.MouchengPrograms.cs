@@ -1,11 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangYunOlRuntime
@@ -16,7 +9,7 @@ internal sealed partial class CharacterWangYunOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var c = f.WindowContext;
-        if (f.WangYunAwakening is not null || f.InstructionIndex != 1 || f.TriggerId is null || c is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || !CanAwakenWangYun(f.OwnerSeat, _coreProgramLifecycleOperations.GetProgramTrigger(f)) || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != f.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
+        if (f.WangYunAwakening is not null || f.InstructionIndex != 1 || f.TriggerId is null || c is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || !CanAwakenWangYun(f.OwnerSeat, _coreProgramLifecycleOperations.GetProgramTrigger(f)) || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != f.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
             throw new InvalidOperationException("Moucheng lost its actual issued plan Slash damage and own preparation.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangYunAwakening = new(WangYunSource(f), f.GameplayHash, c.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, 1) });
         _coreProgramSkillChangesOperations.GrantProgramSkills(f, ["ol:jingong"]);

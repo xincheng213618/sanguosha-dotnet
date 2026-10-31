@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_EndRefillNextTurn
 {
     internal static string EndRefillReason(ProgramSkillFrame f) => $"skill-program.{f.SkillId}.end-refill-next-turn.draw";

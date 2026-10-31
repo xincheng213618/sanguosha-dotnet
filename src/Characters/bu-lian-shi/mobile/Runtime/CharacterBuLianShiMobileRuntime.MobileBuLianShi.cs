@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBuLianShiMobileRuntime
 {
-    void global::CardGame.Core.IMobileBuLianShiAnxuHost.Prepare(ProgramSkillFrame frame) => PrepareMobileBuLianShiAnxu(frame);
+    void IMobileBuLianShiAnxuHost.Prepare(ProgramSkillFrame frame) => PrepareMobileBuLianShiAnxu(frame);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 72400)]
     internal void RecordMobileBuLianShiAnxuDelivery(CardMovedEvent fact)
     {

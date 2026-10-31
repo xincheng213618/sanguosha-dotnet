@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ActualPhaseEndFacts(global::CardGame.Core.EngineStates.CoreMatchOutcomeState matchOutcomeState, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZhongHuiAnniversaryGodEntries> getCharacterZhongHuiAnniversaryGodRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterSimaShiMouEntries> getCharacterSimaShiMouRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterHuCheErMouEntries> getCharacterHuCheErMouRuntime, global::System.Func<global::CardGame.Core.ModeRuleSet> getModeRuleSet, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterLuShiOlEntries> getCharacterLuShiOlRuntime) : IActualPhaseEndFacts
+internal sealed class ActualPhaseEndFacts(EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CharacterZhongHuiAnniversaryGodEntries> getCharacterZhongHuiAnniversaryGodRuntime, Func<RuntimeEntries.CharacterSimaShiMouEntries> getCharacterSimaShiMouRuntime, Func<RuntimeEntries.CharacterHuCheErMouEntries> getCharacterHuCheErMouRuntime, Func<ModeRuleSet> getModeRuleSet, Func<RuntimeEntries.CharacterLuShiOlEntries> getCharacterLuShiOlRuntime) : IActualPhaseEndFacts
 {
     public Winner Winner => matchOutcomeState.ReferenceToWinner;
     public bool HasLishiCapability => getCharacterZhongHuiAnniversaryGodRuntime().HasLishiCapability;

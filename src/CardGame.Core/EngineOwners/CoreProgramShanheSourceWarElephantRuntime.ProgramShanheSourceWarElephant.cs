@@ -1,9 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
@@ -17,18 +13,18 @@ internal sealed partial class CoreProgramShanheSourceWarElephantRuntime
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 24530)]
     internal bool ShanheWarElephantUnlimitedCardDistance(ProgramCardDistanceQuery query) => ShanheWarElephantHas(query.Actor, ShanheSourceShouyi673);
     internal bool ShanheWarElephantCannotTurnOver(CharacterState owner) => ShanheWarElephantHas(owner, ShanheSourceXiongshou1136);
-    SkillProgramStepOutcome global::CardGame.Core.IShanheWarElephantProgramHost.CounterSlash(ProgramSkillFrame frame) => UseShanheWarElephantCounterSlash(frame);
+    SkillProgramStepOutcome IShanheWarElephantProgramHost.CounterSlash(ProgramSkillFrame frame) => UseShanheWarElephantCounterSlash(frame);
     internal SkillProgramStepOutcome UseShanheWarElephantCounterSlash(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!IsShanheWarElephantMode || frame.SkillId != ShanheSourceXiongshou1136 || frame.ShanheWarElephantCounterSlash is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 1 } context || context.TargetSeat != frame.OwnerSeat || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.TriggerWindow != context.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
+        if (!IsShanheWarElephantMode || frame.SkillId != ShanheSourceXiongshou1136 || frame.ShanheWarElephantCounterSlash is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 1 } context || context.TargetSeat != frame.OwnerSeat || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.TriggerWindow != context.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("Source Xiongshou lost its actual first large-damage owner and original after-damage window.");
-        global::CardGame.Core.GameEngine.IDamageAttempt original = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+        GameEngine.IDamageAttempt original = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
         if (original.TargetSeat != frame.OwnerSeat || original.DamageAmount != context.Amount || context.SourceSeat != (original.IsSourceLess ? null : original.SourceSeat))
             throw new InvalidOperationException("Source Xiongshou cannot borrow another damage's source or amount.");
         // The first qualifying damage consumes this actual turn's trigger even if
         // it has no living legal source. Smaller hits do not consume the trigger.
-        if (context.SourceSeat is not { } source || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source) || source == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[source], new Card(0, CardKind.Slash, Suit.None, 0), new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), CardKind.Slash, noEffectiveRank: true, physicalCardIds: []))
+        if (context.SourceSeat is not { } source || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source) || source == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[source], new Card(0, CardKind.Slash, Suit.None, 0), new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), CardKind.Slash, noEffectiveRank: true, physicalCardIds: []))
             return SkillProgramStepOutcome.Continue;
         var attack = _coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.ResolutionId;
         var duel = _coreNativeCardContinuationCursorsOperations.ActiveDuel?.OwnerFrameId;
@@ -41,7 +37,7 @@ internal sealed partial class CoreProgramShanheSourceWarElephantRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 24530)]
-    internal bool RestoreShanheWarElephantCounterSlashParent(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool RestoreShanheWarElephantCounterSlashParent(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.ProgramFrameId is not { } parentId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheWarElephantCounterSlash: { } receipt } parent || parent.Id != parentId)
             return false;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreDirectedTurnCardPoliciesRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CoreDirectedTurnCardPoliciesRuntime
         if (actorSeat == targetSeat || effects == DirectedTurnCardPolicyEffect.None)
             throw new InvalidOperationException("A directed turn policy requires distinct participants and effects.");
         var effectIndex = frame.InstructionIndex - 1;
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame);
+        var source = CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame);
         var normalizedKinds = cardKinds.Distinct().Order().ToArray();
         var existing = _coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesDirectedTurnCardPolicySequenceAccess._directedTurnCardPolicies.SingleOrDefault(item => item.ParentFrameId == frame.Id && item.EffectIndex == effectIndex);
         if (existing is not null)

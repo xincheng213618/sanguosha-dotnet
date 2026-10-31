@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
 {
-    internal static CardConversionSource ShenHtSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShenHtSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal Card ShenHtCard(int id) => _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(c => c.Id == id);
-    SkillProgramStepOutcome global::CardGame.Core.IShenHuaTuoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenHuaTuo(f, op);
+    SkillProgramStepOutcome IShenHuaTuoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenHuaTuo(f, op);
     internal SkillProgramStepOutcome BeginShenHuaTuo(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -25,7 +22,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
             r = r with
             {
                 GiftId = card,
-                GiftKind = global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(ShenHtCard(card).Kind)
+                GiftKind = CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(ShenHtCard(card).Kind)
             };
         }
 
@@ -74,7 +71,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
     [ProgramAnswer("shen-hua-tuo")]
     internal void AnswerShenHt(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenHuaTuo: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == ShenHuaTuoStage.LuxinChoice ? f.OwnerSeat : r.TargetSeat) || !ShenHtChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenHuaTuo: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == ShenHuaTuoStage.LuxinChoice ? f.OwnerSeat : r.TargetSeat) || !ShenHtChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shen Hua Tuo requires its exact original chooser and current option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -133,7 +130,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
     internal void ArmShenHtLuxin(ProgramSkillFrame f, IReadOnlyList<int> ids)
     {
         var r = f.ShenHuaTuo!;
-        if (ids.Any(id => global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(ShenHtCard(id).Kind) == r.GiftKind))
+        if (ids.Any(id => CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(ShenHtCard(id).Kind) == r.GiftKind))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenHuaTuoLuxinArmedEvent(f.Id, f.OwnerSeat, r.TargetSeat, r.HpDelta));
     }
 

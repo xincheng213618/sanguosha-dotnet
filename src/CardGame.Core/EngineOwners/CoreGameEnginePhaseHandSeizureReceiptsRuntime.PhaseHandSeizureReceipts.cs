@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePhaseHandSeizureReceiptsRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureReceiptsRuntime
         var paid = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PhaseHandSeizurePaidEvent>().Where(e => e.FrameId == frame.Id).ToArray();
         if (paid is not [var fact] || fact != new PhaseHandSeizurePaidEvent(frame.Id, _corePhaseHandSeizureOperations.PhaseHandSeizureSource(frame), frame.GameplayHash, target, receipt.ActualTurnNumber, receipt.PhaseInstanceId, cost, receipt.CostFrom, receipt.CostBefore, receipt.CostAfter) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PhaseHandSeizurePaidEvent>().Count(e => e.Source.OwnerSeat == frame.OwnerSeat && e.Source.SkillId == frame.SkillId && e.ActualTurnNumber == receipt.ActualTurnNumber && e.PhaseInstanceId == receipt.PhaseInstanceId) != 1)
             return false;
-        var costs = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.CostBefore && m.Sequence <= receipt.CostAfter && m.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePhaseHandSeizureRuntime.PhaseHandSeizureReason(frame, "payment")).ToArray();
+        var costs = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.CostBefore && m.Sequence <= receipt.CostAfter && m.Reason.Value == CoreGameEnginePhaseHandSeizureRuntime.PhaseHandSeizureReason(frame, "payment")).ToArray();
         if (costs is not [var move] || move.CardId != cost || move.From != receipt.CostFrom || !(move.To == CardLocation.DiscardPile || move.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(cost).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(move))))
             return false;
         var flipped = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PhaseHandSeizureTurnedEvent>().Where(e => e.FrameId == frame.Id).ToArray();
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureReceiptsRuntime
         var same = target == frame.OwnerSeat;
         if (issued is not [var debt] || debt != new PhaseHandSeizureIssuedEvent(frame.Id, _corePhaseHandSeizureOperations.PhaseHandSeizureSource(frame), frame.GameplayHash, receipt.ContinuationId, target, receipt.ActualTurnNumber, receipt.PhaseInstanceId, same ? 0 : receipt.TakenCardIds.Count, same, receipt.TakeBefore, receipt.TakeAfter))
             return false;
-        var taken = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.TakeBefore && m.Sequence <= receipt.TakeAfter && m.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePhaseHandSeizureRuntime.PhaseHandSeizureReason(frame, "take")).ToArray();
+        var taken = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.TakeBefore && m.Sequence <= receipt.TakeAfter && m.Reason.Value == CoreGameEnginePhaseHandSeizureRuntime.PhaseHandSeizureReason(frame, "take")).ToArray();
         if (same)
             return receipt.TakeAfter == receipt.TakeBefore && taken.Length == 0;
         return taken.Length == receipt.TakenCardIds.Count && receipt.TakenCardIds.All(id => taken.Count(m => m.CardId == id && m.From == CardLocation.Hand(target) && m.To == CardLocation.Hand(frame.OwnerSeat)) == 1);
@@ -52,7 +48,7 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureReceiptsRuntime
             if (receipt.RequiredCount <= 0 || receipt.CardIds.Count >= receipt.RequiredCount || receipt.SequenceBefore != 0 || receipt.SequenceAfter != 0)
                 return false;
             if (_corePhaseHandSeizureOperations.PhaseHandSeizureTerminalState)
-                return settled is [var closed] && closed == new PhaseHandDebtSettledEvent(due.FrameId, 0, frame.OwnerSeat, due.TargetSeat, "game-end", 0, 0, 0, 0) && !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence > due.After && m.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePhaseHandSeizureRuntime.PhaseHandDebtReturnReason(frame) && m.From.OwnerSeat == frame.OwnerSeat);
+                return settled is [var closed] && closed == new PhaseHandDebtSettledEvent(due.FrameId, 0, frame.OwnerSeat, due.TargetSeat, "game-end", 0, 0, 0, 0) && !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence > due.After && m.Reason.Value == CoreGameEnginePhaseHandSeizureRuntime.PhaseHandDebtReturnReason(frame) && m.From.OwnerSeat == frame.OwnerSeat);
             return settled.Length == 0 && receipt.CardIds.Select((id, index) => (id, index)).All(p => _cardZonesOperations._cardZones.GetLocation(p.id) == receipt.Locations[p.index] && _corePhaseHandSeizureOperations.PhaseHandDebtCards(frame).Any(c => c.Id == p.id));
         }
 
@@ -61,7 +57,7 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureReceiptsRuntime
         var moving = receipt.CardIds.Select((id, index) => (id, from: receipt.Locations[index])).Where(p => p.from != CardLocation.Hand(receipt.TargetSeat)).ToArray();
         if (end != new PhaseHandDebtSettledEvent(due.FrameId, frame.Id, frame.OwnerSeat, due.TargetSeat, moving.Length == 0 ? "same-hand" : "returned", receipt.RequiredCount, moving.Length, receipt.SequenceBefore, receipt.SequenceAfter))
             return false;
-        var moved = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.SequenceBefore && m.Sequence <= receipt.SequenceAfter && m.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePhaseHandSeizureRuntime.PhaseHandDebtReturnReason(frame)).ToArray();
+        var moved = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > receipt.SequenceBefore && m.Sequence <= receipt.SequenceAfter && m.Reason.Value == CoreGameEnginePhaseHandSeizureRuntime.PhaseHandDebtReturnReason(frame)).ToArray();
         return moving.Length == 0 ? receipt.SequenceBefore == receipt.SequenceAfter && moved.Length == 0 : moved.Length == moving.Length && moving.All(p => moved.Count(m => m.CardId == p.id && m.From == p.from && m.To == CardLocation.Hand(receipt.TargetSeat)) == 1);
     }
     internal bool IsPhaseHandSeizureMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending.SubjectSeat == frame.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (effect?.Op == SkillProgramEffectOp.DiscardTurnOverAndTakeHand && frame.PhaseHandSeizure?.Stage is PhaseHandSeizureStage.PaymentChildren or PhaseHandSeizureStage.TakeChildren && ValidPhaseHandSeizureReceipt(frame) || effect?.Op == SkillProgramEffectOp.ReturnIssuedPhaseHandDebt && frame.PhaseHandDebtReturn?.Stage == PhaseHandDebtReturnStage.MovementChildren && ValidPhaseHandDebtReturnReceipt(frame));
@@ -87,5 +83,5 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureReceiptsRuntime
             throw new InvalidOperationException("A phase-hand paid receipt lost its exact source, original phase, entity movement or typed return.");
     }
 
-    internal bool IsPhaseHandDebtChoiceLegal(PromptChoice choice) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame frame && frame.PhaseHandDebtReturn is { Stage: PhaseHandDebtReturnStage.Choosing } receipt && ValidPhaseHandDebtReturnReceipt(frame) && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].IsAlive && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], _corePhaseHandSeizureOperations.PhaseHandDebtChoices(frame).Where(c => c.Id == choice.Id).ToArray());
+    internal bool IsPhaseHandDebtChoiceLegal(PromptChoice choice) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame frame && frame.PhaseHandDebtReturn is { Stage: PhaseHandDebtReturnStage.Choosing } receipt && ValidPhaseHandDebtReturnReceipt(frame) && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].IsAlive && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], _corePhaseHandSeizureOperations.PhaseHandDebtChoices(frame).Where(c => c.Id == choice.Id).ToArray());
 }

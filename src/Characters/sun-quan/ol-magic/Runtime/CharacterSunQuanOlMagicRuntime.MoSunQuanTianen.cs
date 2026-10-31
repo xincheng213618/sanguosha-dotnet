@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunQuanOlMagicRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     internal const string MoTianenObtainReason = "skill-program.mo-sun-quan.tianen.obtain";
     internal bool HasMoTianenCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMoSunQuanTianenUniqueUse);
 
-    internal static CardConversionSource MoTianenSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_quan_ol_magic_MoSunQuanTianen.MoTianenSource(f);
+    internal static CardConversionSource MoTianenSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_sun_quan_ol_magic_MoSunQuanTianen.MoTianenSource(f);
     internal bool MoTianenBranchSpent(int owner, int turn, int turnOwner, MoTianenBranch branch) => _coreProgramEventHistoryOperations.ProgramEventHistory<MoTianenBranchIssuedEvent>().Any(e => e.Source.OwnerSeat == owner && e.ActualTurn == turn && e.TurnOwner == turnOwner && e.Branch == branch);
     internal bool CanOfferMoTianen(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
@@ -26,7 +22,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28920, SkillProgramEffectOp.ResolveMoSunQuanTianenUniqueUse)]
     internal bool CanOfferMoTianenGate(ProgramTriggerLegalityContext gate) => CanOfferMoTianen(gate.Candidate, gate.Context);
-    SkillProgramStepOutcome global::CardGame.Core.IMoSunQuanTianenHost.Resolve(ProgramSkillFrame f) => BeginMoTianen(f);
+    SkillProgramStepOutcome IMoSunQuanTianenHost.Resolve(ProgramSkillFrame f) => BeginMoTianen(f);
     internal SkillProgramStepOutcome BeginMoTianen(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -61,7 +57,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.MoTianen!;
-        var card = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive ? _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)) : null;
+        var card = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive ? _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind)) : null;
         var material = card is null ? null : new MoTianenMaterial(card.Id, card.Kind, CardLocation.DrawPile);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MoTianen = r = r with { Material = material } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoTianenSlashObtainIssuedEvent(f.Id, material?.CardId, material?.PrintedKind, material?.From, r.Before));

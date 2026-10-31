@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramNativeReturnsRuntime))]
-internal sealed class CoreNativeCardUseCompletionCoreProgramNativeReturnsAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramNativeReturnsRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreNativeCardUseCompletionCoreProgramNativeReturnsOperations
+[Core.ProgramCapability(typeof(CoreProgramNativeReturnsRuntime))]
+internal sealed class CoreNativeCardUseCompletionCoreProgramNativeReturnsAdapter(Func<CoreProgramNativeReturnsRuntime> targetFactory) : ICoreNativeCardUseCompletionCoreProgramNativeReturnsOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramNativeReturnsRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramNativeReturns NativeReturns { get => this._targetFactory().NativeReturns; }
+    private readonly Func<CoreProgramNativeReturnsRuntime> _targetFactory = targetFactory;
+    public ProgramNativeReturns NativeReturns { get => this._targetFactory().NativeReturns; }
 }

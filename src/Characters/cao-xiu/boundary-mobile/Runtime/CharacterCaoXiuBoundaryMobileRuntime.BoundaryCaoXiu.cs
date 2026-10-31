@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoXiuBoundaryMobileRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryCaoXiuHost.BeginQingxi(ProgramSkillFrame frame) => BeginBoundaryCaoXiuQingxi(frame);
+    SkillProgramStepOutcome IBoundaryCaoXiuHost.BeginQingxi(ProgramSkillFrame frame) => BeginBoundaryCaoXiuQingxi(frame);
     internal SkillProgramStepOutcome BeginBoundaryCaoXiuQingxi(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -90,7 +86,7 @@ internal sealed partial class CharacterCaoXiuBoundaryMobileRuntime
         }
         else
             _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(frame, draft.TargetSeat, draft.SelectedIds, new CardMoveReason("skill-program.boundary-qingxi.discard"));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryCaoXiuQingxiResolvedEvent(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), draft.AttackId, draft.TargetSeat, draft.Distance, draft.RequiredCount, branch == "discard", window.Amount, after));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryCaoXiuQingxiResolvedEvent(frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), draft.AttackId, draft.TargetSeat, draft.Distance, draft.RequiredCount, branch == "discard", window.Amount, after));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }

@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaHuiOlRuntime
@@ -16,11 +11,11 @@ internal sealed partial class CharacterSimaHuiOlRuntime
         if (f.WindowContext is not { } c)
             return false;
         if (_resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } l)
-            return l.CandidateIndex >= 0 && l.CandidateIndex < l.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, l.Candidates[l.CandidateIndex]) && l.Window == c.Window && c.BeforeTurnPreludeProof == l.BeforeTurnPreludeProof && c.BeforeTurnPreludeProof is { } proof && _characterBeiMiHuOlOperations.ValidBeiMiHuBeforeTurnPrelude(proof);
+            return l.CandidateIndex >= 0 && l.CandidateIndex < l.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, l.Candidates[l.CandidateIndex]) && l.Window == c.Window && c.BeforeTurnPreludeProof == l.BeforeTurnPreludeProof && c.BeforeTurnPreludeProof is { } proof && _characterBeiMiHuOlOperations.ValidBeiMiHuBeforeTurnPrelude(proof);
         if (_resolutionStackOperations._resolutionStack.OfType<ProgramKillTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } k)
-            return k.CandidateIndex >= 0 && k.CandidateIndex < k.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, k.Candidates[k.CandidateIndex]) && k.VictimSeat == c.TargetSeat;
+            return k.CandidateIndex >= 0 && k.CandidateIndex < k.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, k.Candidates[k.CandidateIndex]) && k.VictimSeat == c.TargetSeat;
         if (_resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } d)
-            return d.CandidateIndex >= 0 && d.CandidateIndex < d.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, d.Candidates[d.CandidateIndex].ToProgramCandidate()) && d.ParentFrameId == c.DamageFrameId;
+            return d.CandidateIndex >= 0 && d.CandidateIndex < d.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, d.Candidates[d.CandidateIndex].ToProgramCandidate()) && d.ParentFrameId == c.DamageFrameId;
         return false;
     }
 

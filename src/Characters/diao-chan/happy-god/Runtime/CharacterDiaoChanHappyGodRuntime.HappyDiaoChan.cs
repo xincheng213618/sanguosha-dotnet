@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanHappyGodRuntime
 {
     internal const string HappyDcAction = "happy-diao-chan", HappyDcPindian = "happy-huoxin-pindian", HappyDcGive = "skill-program.happy:diao-chan.give", HappyDcTake = "skill-program.happy:diao-chan.take", HappyDcDiscard = "skill-program.happy:huoxin.cost";
-    SkillProgramStepOutcome global::CardGame.Core.IHappyDiaoChanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyDc(f, op);
-    internal CardConversionSource HappyDcSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IHappyDiaoChanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHappyDc(f, op);
+    internal CardConversionSource HappyDcSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal IEnumerable<(int Source, int Opponent)> HappyDcPairs(int? discarded = null)
     {
         var seats = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Any(c => c.Id != discarded)).Select(p => p.Seat).ToArray();
@@ -28,12 +25,12 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
     internal bool CanOfferHappyMeihun(ProgramTriggerLegalityContext gate) => gate.SkillId != HappyDiaoChanComposition.Meihun || gate.Trigger.Id != "first-slash-target" || gate.WindowContext is { } context && HappyDcFirstSlash(gate.OwnerSeat, context);
     internal bool HappyDcFirstSlash(int owner, ProgramSkillWindowContext context)
     {
-        if (context.CardUse is not { } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.EffectiveKind))
+        if (context.CardUse is not { } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.EffectiveKind))
             return false;
         var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var start = Array.FindLastIndex(facts, e => e is TurnStartedEvent);
         var since = facts.Skip(start + 1).ToArray();
-        var first = since.OfType<TargetsConfirmedEvent>().FirstOrDefault(e => e.TargetSeats.Contains(owner) && since.OfType<CardUseDeclaredEvent>().Any(d => d.ResolutionId == e.ResolutionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(d.CardKind)));
+        var first = since.OfType<TargetsConfirmedEvent>().FirstOrDefault(e => e.TargetSeats.Contains(owner) && since.OfType<CardUseDeclaredEvent>().Any(d => d.ResolutionId == e.ResolutionId && CoreNativeCardClassificationsRuntime.IsSlashCard(d.CardKind)));
         return first?.ResolutionId == use.ParentCardUseFrameId && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappyDiaoChanStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.ResolveHappyDiaoChanMeihun && e.Source.OwnerSeat == owner && e.Source.BindingId == "first-slash-target" && e.ParentId == context.ParentFrameId);
     }
 
@@ -69,7 +66,7 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
             }
 
             )
-                choices.Add(HappyDcChoice(f, "suit", $"声明{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(suit))}", value: suit.ToString()));
+                choices.Add(HappyDcChoice(f, "suit", $"声明{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(suit))}", value: suit.ToString()));
             if (r.Stage == HappyDiaoChanStage.HuoxinSuit)
                 choices.Add(HappyDcChoice(f, "decline", "不声明花色"));
         }
@@ -89,8 +86,8 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
                 choices.Add(HappyDcChoice(f, "pair", $"令{(_coreMatchParticipantsPlayersAccess._players[pair.Source].Name)}与{(_coreMatchParticipantsPlayersAccess._players[pair.Opponent].Name)}拼点", [pair.Source, pair.Opponent]));
         if (r.Stage == HappyDiaoChanStage.Nonwinner)
         {
-            choices.Add(HappyDcChoice(f, "give", $"交给貂蝉所有{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(r.Suit))}牌"));
-            choices.Add(HappyDcChoice(f, "charm", $"获得{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(r.Suit))}魅惑，至自己回合结束不能使用或打出该花色牌"));
+            choices.Add(HappyDcChoice(f, "give", $"交给貂蝉所有{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(r.Suit))}牌"));
+            choices.Add(HappyDcChoice(f, "charm", $"获得{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(r.Suit))}魅惑，至自己回合结束不能使用或打出该花色牌"));
         }
 
         return Array.AsReadOnly(choices.ToArray());
@@ -113,7 +110,7 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
     [ProgramAnswer(HappyDcAction)]
     internal void AnswerHappyDc(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyDiaoChan: { } r } f || !ValidHappyDc(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != HappyDcChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], HappyDcChoices(f).Where(c => c.Id == answer.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyDiaoChan: { } r } f || !ValidHappyDc(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != HappyDcChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([answer], HappyDcChoices(f).Where(c => c.Id == answer.Id).ToArray()))
             throw new InvalidOperationException("Diao Chan requires the exact current choice of its real participant.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

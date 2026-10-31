@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_yang_yi_ol_YangYiPrograms
 {
     // 仅指定唯一目标的普通锦囊牌：the card's targeting is exactly one other

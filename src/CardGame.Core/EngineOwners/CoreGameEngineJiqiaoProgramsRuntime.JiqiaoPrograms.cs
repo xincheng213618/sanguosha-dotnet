@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineJiqiaoProgramsRuntime
@@ -25,7 +20,7 @@ internal sealed partial class CoreGameEngineJiqiaoProgramsRuntime
         }
 
         var before = _coreCardMovementJournalMovementSequenceAccess._movementSequence;
-        var invoice = new JiqiaoPaidInvoice(new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, w.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, f.InstructionIndex, effect.SourceBind!, effect.ResultBind!, ids.Count, before, before);
+        var invoice = new JiqiaoPaidInvoice(new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, w.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, f.InstructionIndex, effect.SourceBind!, effect.ResultBind!, ids.Count, before, before);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { JiqiaoPaid = new(invoice, JiqiaoPaidStage.CostChildren, before, before, ids.Count), PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, ids, new(JiqiaoCostReason));
         invoice = invoice with

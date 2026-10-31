@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CoreGameEnginePairedHandRecastRuntime
 {
     internal long PairedHandRecastSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static PairedHandRecastParticipantReceipt CurrentPairedRecast(ProgramPairedHandRecastReceipt r) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PairedHandRecast.CurrentPairedRecast(r);
-    internal static ProgramPairedHandRecastReceipt WithCurrentPairedRecast(ProgramPairedHandRecastReceipt r, PairedHandRecastParticipantReceipt participant) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PairedHandRecast.WithCurrentPairedRecast(r, participant);
+    internal static PairedHandRecastParticipantReceipt CurrentPairedRecast(ProgramPairedHandRecastReceipt r) => RuntimeSkills.RuntimeRules_Core_PairedHandRecast.CurrentPairedRecast(r);
+    internal static ProgramPairedHandRecastReceipt WithCurrentPairedRecast(ProgramPairedHandRecastReceipt r, PairedHandRecastParticipantReceipt participant) => RuntimeSkills.RuntimeRules_Core_PairedHandRecast.WithCurrentPairedRecast(r, participant);
     internal PairedHandRecastMaterial[] PairedHandMaterials(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Select(card => new PairedHandRecastMaterial(card.Id, card.Kind, CardLocation.Hand(seat))).ToArray();
     internal bool PairedRecastMaterialStillOwned(PairedHandRecastParticipantReceipt participant) => participant.Material is { } m && m.From == CardLocation.Hand(participant.Seat) && _cardZonesOperations._cardZones.GetLocation(m.CardId) == m.From && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[participant.Seat]).Any(card => card.Id == m.CardId && card.Kind == m.PrintedKind);
     internal SkillProgramStepOutcome BeginPairedHandRecast(ProgramSkillFrame supplied, int partnerSeat)
@@ -24,7 +21,7 @@ internal sealed partial class CoreGameEnginePairedHandRecastRuntime
         var r = new ProgramPairedHandRecastReceipt
         {
             InstructionIndex = f.InstructionIndex,
-            Source = new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
+            Source = new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId),
             GameplayHash = f.GameplayHash,
             UsageGroup = activation.UsageGroup,
             ActualTurnNumber = _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber,
@@ -183,6 +180,6 @@ internal sealed partial class CoreGameEnginePairedHandRecastRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 640)]
     internal bool CanContinuePairedHandRecast(ProgramSkillFrame f) => f.PairedHandRecast is { Partner.Material: not null } && _corePairedHandRecastObserversOperations.ValidPairedHandRecastReceipt(f);
     [ProgramAiChoice(SkillProgramEffectOp.PairedHandRecast)]
-    internal PromptChoice SelectAiPairedHandRecast(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.PairedHandRecast!.Partner.Seat])).ThenBy(c => c.Cards.Single()).First();
-    SkillProgramStepOutcome global::CardGame.Core.IPairedHandRecastProgramHost.PairedHandRecast(ProgramSkillFrame f, int partnerSeat) => BeginPairedHandRecast(f, partnerSeat);
+    internal PromptChoice SelectAiPairedHandRecast(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.PairedHandRecast!.Partner.Seat])).ThenBy(c => c.Cards.Single()).First();
+    SkillProgramStepOutcome IPairedHandRecastProgramHost.PairedHandRecast(ProgramSkillFrame f, int partnerSeat) => BeginPairedHandRecast(f, partnerSeat);
 }

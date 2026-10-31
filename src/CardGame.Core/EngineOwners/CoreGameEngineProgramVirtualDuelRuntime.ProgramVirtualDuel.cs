@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramVirtualDuelRuntime
@@ -21,8 +17,8 @@ internal sealed partial class CoreGameEngineProgramVirtualDuelRuntime
         return instructionIndex;
     }
 
-    internal int? DamageProgramUseInstructionIndex(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.CardAttackHandle ? FrozenProgramDuelInstructionIndex(attack.ResolutionId) : null;
-    internal bool IsProgramVirtualDuelAttackConsistent(global::CardGame.Core.NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
+    internal int? DamageProgramUseInstructionIndex(GameEngine.IDamageAttempt attack) => attack is NativeOwners.CardAttackHandle ? FrozenProgramDuelInstructionIndex(attack.ResolutionId) : null;
+    internal bool IsProgramVirtualDuelAttackConsistent(NativeOwners.CardAttackHandle attack, IReadOnlyList<Card> processing)
     {
         if (processing.Count != 0 || attack.Card is not null || attack.PhysicalCards.Count != 0 || attack.ProgramSkillFrameId != attack.ResolutionId || attack.EffectiveCardKind != CardKind.Duel || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == attack.ResolutionId)is not ProgramSkillFrame owner || owner.CardAttack is not { Active: true } state || owner.Continuations.Duel is not { Active: true } || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(owner.SkillId)?.Program is not { } program || program.GameplayHash != owner.GameplayHash || owner.InstructionIndex < 1)
             return false;

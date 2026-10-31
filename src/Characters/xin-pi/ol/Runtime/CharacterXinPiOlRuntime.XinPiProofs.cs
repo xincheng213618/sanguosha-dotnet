@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXinPiOlRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterXinPiOlRuntime
     internal bool XinPiFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => HasXinPiCapability;
     internal bool HasXinPiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InvalidateRemainingActualDamageCardEffects) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ClaimCompletedUndamagedIncomingCardEntities) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.PreventYinjuDamageAndRecover) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawBothAfterYinjuActualTargetUse) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ArmYinjuActualTurnRelation);
 
-    internal static CardConversionSource XinPiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xin_pi_ol_XinPiProofs.XinPiSource(f);
+    internal static CardConversionSource XinPiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_xin_pi_ol_XinPiProofs.XinPiSource(f);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 540)]
     internal void ObserveXinPiEvent(IGameEvent payload)
     {
@@ -44,10 +40,10 @@ internal sealed partial class CharacterXinPiOlRuntime
         }
     }
 
-    internal static IReadOnlyList<int> XinPiMainTargets(CardUseFrame u) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xin_pi_ol_XinPiProofs.XinPiMainTargets(u);
+    internal static IReadOnlyList<int> XinPiMainTargets(CardUseFrame u) => RuntimeSkills.RuntimeRules_xin_pi_ol_XinPiProofs.XinPiMainTargets(u);
     internal CardUseFrame? ExactXinPiNativeWindow(ProgramSkillWindowContext w, bool completed)
     {
-        if (w.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame window || window.CompletedResponseReturn is not null || window.ParentFrameId != identity.ParentCardUseFrameId || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != (completed ? SkillProgramTriggerWindow.CardUseCompleted : SkillProgramTriggerWindow.CardUseTargetsFinalized) || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } u || a.ActionId != identity.CardActionId || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(a, window.Action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(u, a))
+        if (w.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame window || window.CompletedResponseReturn is not null || window.ParentFrameId != identity.ParentCardUseFrameId || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != (completed ? SkillProgramTriggerWindow.CardUseCompleted : SkillProgramTriggerWindow.CardUseTargetsFinalized) || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } u || a.ActionId != identity.CardActionId || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(a, window.Action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(u, a))
             return null;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == window.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != u.Id)
@@ -92,7 +88,7 @@ internal sealed partial class CharacterXinPiOlRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame parent)
             return null;
-        return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == id && m.Sequence <= origin.Before && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason.Value == $"skill-program.{(parent.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent))}.reveal");
+        return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == id && m.Sequence <= origin.Before && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason.Value == $"skill-program.{(parent.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent))}.reveal");
     }
 
     internal bool XinPiMaterialStillOriginal(CardUseFrame use, XinPiMaterialInvoice invoice)
@@ -112,7 +108,7 @@ internal sealed partial class CharacterXinPiOlRuntime
         return true;
     }
 
-    internal bool IsXinPiRemainingCardDamageIneffective(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.CardAttackHandle c && !c.IsProgramSkillDamage && !c.IsProgramJudgmentDamage && !c.IsDelayedJudgmentDamage && _coreCardUseLifecycleOperations.LifecycleCardUse(c.ResolutionId)is { } use && use.CardKind == c.EffectiveCardKind && _coreCompletedUndamagedTargetRevealOperations.CompletedUndamagedNativeUseActorMatches(use, c) && IsXinPiUseIneffective(use);
+    internal bool IsXinPiRemainingCardDamageIneffective(GameEngine.IDamageAttempt attack) => attack is NativeOwners.CardAttackHandle c && !c.IsProgramSkillDamage && !c.IsProgramJudgmentDamage && !c.IsDelayedJudgmentDamage && _coreCardUseLifecycleOperations.LifecycleCardUse(c.ResolutionId)is { } use && use.CardKind == c.EffectiveCardKind && _coreCompletedUndamagedTargetRevealOperations.CompletedUndamagedNativeUseActorMatches(use, c) && IsXinPiUseIneffective(use);
     internal bool IsXinPiPhysicalClaim(long useId, int cardId)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { XinPiClaim: { } p, Action: { } a, XinPiOrigin: { } origin } || p.UseId != useId || p.ActionId != a.ActionId || !p.Entities.Contains(cardId) || p.After is not { } after || p.BatchId is not { } batch || after <= p.Before || batch <= 0 || _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash != p.GameplayHash || !origin.Materials.Any(m => m.CardId == cardId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == p.FrameId && e.OwnerSeat == p.Source.OwnerSeat && e.SkillId == p.Source.SkillId && e.BindingId == p.Source.BindingId && e.SkillInstanceId == p.Source.SkillInstanceId && e.Window == SkillProgramTriggerWindow.CardUseCompleted) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChijieClaimIssuedEvent>().Count(e => e.FrameId == p.FrameId && e.UseId == useId && e.ActionId == a.ActionId && e.Source == p.Source && e.GameplayHash == p.GameplayHash && e.Before == p.Before && e.Count == p.Entities.Count) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChijieClaimPaidEvent>().Count(e => e == new ChijieClaimPaidEvent(p.FrameId, p.Source, useId, a.ActionId, p.Before, after, batch, p.Entities.Count)) != 1)

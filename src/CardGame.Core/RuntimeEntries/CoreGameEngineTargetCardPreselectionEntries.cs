@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineTargetCardPreselectionRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineTargetCardPreselectionRuntime))]
 internal sealed partial class CoreGameEngineTargetCardPreselectionEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTargetCardPreselectionRuntime> _resolve;
-    private CoreGameEngineTargetCardPreselectionEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTargetCardPreselectionRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineTargetCardPreselectionRuntime> _resolve;
+    private CoreGameEngineTargetCardPreselectionEntries(Func<EngineOwners.CoreGameEngineTargetCardPreselectionRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineTargetCardPreselectionEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTargetCardPreselectionRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineTargetCardPreselectionEntries Create(Func<EngineOwners.CoreGameEngineTargetCardPreselectionRuntime> resolve) => new(resolve);
 }

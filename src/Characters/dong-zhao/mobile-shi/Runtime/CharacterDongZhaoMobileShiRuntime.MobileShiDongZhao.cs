@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhaoMobileShiRuntime
 {
     internal const string ShiDzMiaolue = "mobile:shi-miaolue", ShiDzYingjia = "mobile:shi-yingjia";
     internal const string ShiDzGain = "skill-program.mobile-shi-dong-zhao.gain", ShiDzDraw = "skill-program.mobile-shi-dong-zhao.draw", ShiDzDiscard = "skill.mobile-shi-dong-zhao.discard";
-    internal static CardConversionSource ShiDzSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiDongZhaoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginShiDz(frame, op);
+    internal static CardConversionSource ShiDzSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMobileShiDongZhaoHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginShiDz(frame, op);
     internal int ShiDzSameNameMaximum(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnTrickUseRecordedEvent>().Where(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == seat).GroupBy(e => e.EffectiveKind).Select(g => g.Count()).DefaultIfEmpty(0).Max();
     internal IReadOnlyList<PromptChoice> ShiDzPayments(ProgramSkillFrame f) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand], OwnedCardMoveIntent.Discard, canSelect: (zone, card) => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, card, new(zone, f.OwnerSeat), OwnedCardMoveIntent.Discard));
     internal MobileShiDongZhaoExtraGrantedEvent? ShiDzPendingExtra(int beneficiary)
@@ -116,7 +112,7 @@ internal sealed partial class CharacterDongZhaoMobileShiRuntime
     [ProgramAnswer("mobile-shi-dong-zhao")]
     internal void AnswerShiDz(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiDongZhao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiDzChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiDongZhao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiDzChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shi Dong Zhao lost the exact current benefit, private payment or target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -235,8 +231,8 @@ internal sealed partial class CharacterDongZhaoMobileShiRuntime
     internal PromptChoice ChooseShiDzAi(PendingDecision p, ProgramSkillFrame f) => f.MobileShiDongZhao!.Stage switch
     {
         MobileShiDongZhaoStage.Benefit => p.Choices.First(c => c.Parameters["branch"] == "draw"),
-        MobileShiDongZhaoStage.Payment => p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First(),
-        _ => p.Choices.OrderByDescending(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenByDescending(c => _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()].Hp).First()};
+        MobileShiDongZhaoStage.Payment => p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First(),
+        _ => p.Choices.OrderByDescending(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenByDescending(c => _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()].Hp).First()};
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiDongZhaoPublicStates(CharacterState owner, string skillId)
     {
         if (skillId != ShiDzYingjia)

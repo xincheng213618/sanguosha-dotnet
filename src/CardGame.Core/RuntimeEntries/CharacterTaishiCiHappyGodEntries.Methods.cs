@@ -2,15 +2,15 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterTaishiCiHappyGodEntries
 {
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginHappyTsc(global::CardGame.Core.ProgramSkillFrame supplied, global::CardGame.Core.SkillProgramEffectOp op) => _resolve().BeginHappyTsc(supplied, op);
-    internal bool CanOfferHappyTaishiCi(global::CardGame.Core.ProgramTriggerLegalityContext g) => _resolve().CanOfferHappyTaishiCi(g);
-    internal global::CardGame.Core.PromptChoice ChooseHappyTaishiCiChongwei(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseHappyTaishiCiChongwei(p, f);
-    internal void CountHappyTaishiCiRemovedWei(global::CardGame.Core.PlayerMarkerChangedEvent fact) => _resolve().CountHappyTaishiCiRemovedWei(fact);
+    internal SkillProgramStepOutcome BeginHappyTsc(ProgramSkillFrame supplied, SkillProgramEffectOp op) => _resolve().BeginHappyTsc(supplied, op);
+    internal bool CanOfferHappyTaishiCi(ProgramTriggerLegalityContext g) => _resolve().CanOfferHappyTaishiCi(g);
+    internal PromptChoice ChooseHappyTaishiCiChongwei(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseHappyTaishiCiChongwei(p, f);
+    internal void CountHappyTaishiCiRemovedWei(PlayerMarkerChangedEvent fact) => _resolve().CountHappyTaishiCiRemovedWei(fact);
     internal bool HappyTscAwakened(int owner) => _resolve().HappyTscAwakened(owner);
     internal int HappyTscFieldWei() => _resolve().HappyTscFieldWei();
-    internal global::CardGame.Core.SkillProgramStepOutcome RecoverHappyTsc(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().RecoverHappyTsc(supplied);
+    internal SkillProgramStepOutcome RecoverHappyTsc(ProgramSkillFrame supplied) => _resolve().RecoverHappyTsc(supplied);
     internal bool ResumeHappyTsc(long id) => _resolve().ResumeHappyTsc(id);
-    internal bool RetainHappyTsc(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RetainHappyTsc(f);
-    internal void ReturnHappyTscDraw(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.NativeDrawOutcome outcome) => _resolve().ReturnHappyTscDraw(f, outcome);
-    internal bool ReturnHappyTscMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnHappyTscMovement(f);
+    internal bool RetainHappyTsc(ProgramSkillFrame f) => _resolve().RetainHappyTsc(f);
+    internal void ReturnHappyTscDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) => _resolve().ReturnHappyTscDraw(f, outcome);
+    internal bool ReturnHappyTscMovement(ProgramSkillFrame f) => _resolve().ReturnHappyTscMovement(f);
 }

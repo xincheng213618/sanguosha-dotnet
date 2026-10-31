@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,8 +8,8 @@ internal sealed partial class CharacterChengGongYingOlRuntime
     internal const string KuangxiangDrawReason = "skill-program.cheng-gong-ying.kuangxiang.draw", KuangxiangDiscardReason = "skill-program.cheng-gong-ying.kuangxiang.discard";
     internal bool HasChengGongYingCapability => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AdjustKuangxiangHandToFour) == true;
 
-    internal static CardConversionSource ChengGongYingSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cheng_gong_ying_ol_ChengGongYing.ChengGongYingSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IChengGongYingHost.Adjust(ProgramSkillFrame frame) => BeginChengGongYing(frame);
+    internal static CardConversionSource ChengGongYingSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cheng_gong_ying_ol_ChengGongYing.ChengGongYingSource(f);
+    SkillProgramStepOutcome IChengGongYingHost.Adjust(ProgramSkillFrame frame) => BeginChengGongYing(frame);
     internal bool ChengGongYingParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && c.OwnerSeat == candidate.OwnerSeat && c.SourceSeat == candidate.OwnerSeat && c.TargetSeat == candidate.OwnerSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == c.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } w && w.OwnerSeat == candidate.OwnerSeat && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && w.Candidates[w.CandidateIndex] == candidate;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27100)]
     internal bool CanOfferChengGongYing(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext c) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.AdjustKuangxiangHandToFour) || ChengGongYingParent(candidate, c);
@@ -63,7 +60,7 @@ internal sealed partial class CharacterChengGongYingOlRuntime
     [ProgramAnswer("cheng-gong-ying")]
     internal void AnswerChengGongYing(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ChengGongYing: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ChengGongYingChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ChengGongYingChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ChengGongYing: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != ChengGongYingChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ChengGongYingChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Kuangxiang lost its real chooser or selected original hand entities.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -112,7 +109,7 @@ internal sealed partial class CharacterChengGongYingOlRuntime
         var gains = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(payer) && m.Reason.Value == KuangxiangDrawReason).ToArray();
         foreach (var move in gains)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KuangxiangCardObtainedEvent(f.Id, r.Source, payer, move.CardId, move.Sequence, _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[payer], _coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId))));
-        var reds = _coreProgramEventHistoryOperations.ProgramEventHistory<KuangxiangCardObtainedEvent>().Count(e => e.FrameId == f.Id && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(e.EffectiveSuit));
+        var reds = _coreProgramEventHistoryOperations.ProgramEventHistory<KuangxiangCardObtainedEvent>().Count(e => e.FrameId == f.Id && CoreNativeCardClassificationsRuntime.IsRedSuit(e.EffectiveSuit));
         if (reds > 0)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KuangxiangRedDrawIssuedEvent(f.Id, payer, reds, _coreProgramEventHistoryOperations.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Select(e => e.Phase.Token).DefaultIfEmpty().Max()));
         ContinueChengGongYing(f.Id);

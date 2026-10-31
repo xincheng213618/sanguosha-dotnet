@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -89,10 +86,10 @@ internal sealed partial class CoreGameEngineRoundGainedTrickTargetsRuntime
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The round-gained trick lost its owning choice.");
         var draft = frame.RoundGainedTrickTargetDraft!;
         var choice = draft.Choices.SingleOrDefault(c => c.Id == selected.Id);
-        if (choice is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]))
+        if (choice is null || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]))
             throw new InvalidOperationException("A round-gained target answer changed its published choice.");
         RequireRoundGainedTrickTargetParent(frame, out var use);
-        if (!BuildRoundGainedTrickTargetChoices(frame, use).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (!BuildRoundGainedTrickTargetChoices(frame, use).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("The selected ordinary-trick target adjustment is no longer legal.");
         var branch = choice.Parameters["branch"];
         IReadOnlyList<int> added = branch == "add" ? choice.Targets : Array.AsReadOnly(Array.Empty<int>());
@@ -125,7 +122,7 @@ internal sealed partial class CoreGameEngineRoundGainedTrickTargetsRuntime
         bool Helpful(int target) => use.CardKind is CardKind.DrawTwo or CardKind.PeachGarden or CardKind.FiveGrains || use.CardKind == CardKind.IronChain && _coreMatchParticipantsPlayersAccess._players[target].IsChained;
         foreach (var choice in decision.Choices.Where(c => c.Parameters["branch"] != "decline"))
         {
-            var help = use.CardKind == CardKind.BorrowedSword ? !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[choice.Targets[1]]) : Helpful(choice.Targets[0]) == global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[choice.Targets[0]]);
+            var help = use.CardKind == CardKind.BorrowedSword ? !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[choice.Targets[1]]) : Helpful(choice.Targets[0]) == CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[choice.Targets[0]]);
             if (choice.Parameters["branch"] == "add" ? help : !help)
                 return choice;
         }
@@ -137,7 +134,7 @@ internal sealed partial class CoreGameEngineRoundGainedTrickTargetsRuntime
     {
         var q = fact.Qualification;
         var pairSize = use.CardKind == CardKind.BorrowedSword ? 2 : 1;
-        if (use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || !_coreRoundGainedSourceUsesOperations.ValidRoundGainedQualification(use, q) || q.CardUseFrameId != use.Id || q.ActionId != action.ActionId || fact.InstructionIndex != 1 || fact.Source.OwnerSeat != q.ActorSeat || fact.Source.SkillId != q.Source.SkillId || fact.Source.SkillInstanceId != q.Source.SkillInstanceId || !fact.OriginalTargetSeats.SequenceEqual(originalTargets) || originalTargets.Count % pairSize != 0 || originalTargets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || originalTargets.Where((_, i) => i % pairSize == 0).Distinct().Count() != originalTargets.Count / pairSize || fact.AddedTargetSeats.Count != 0 && fact.RemovedTargetSeats.Count != 0 || fact.AddedTargetSeats.Count != 0 && fact.AddedTargetSeats.Count != pairSize || fact.RemovedTargetSeats.Count != 0 && fact.RemovedTargetSeats.Count != pairSize || fact.AddedTargetSeats.Concat(fact.RemovedTargetSeats).Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program is not { } program || program.GameplayHash != q.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == fact.Source.BindingId)?.Effects is not [{ Op: SkillProgramEffectOp.AdjustOneRoundGainedOrdinaryTrickTarget }])
+        if (use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || !_coreRoundGainedSourceUsesOperations.ValidRoundGainedQualification(use, q) || q.CardUseFrameId != use.Id || q.ActionId != action.ActionId || fact.InstructionIndex != 1 || fact.Source.OwnerSeat != q.ActorSeat || fact.Source.SkillId != q.Source.SkillId || fact.Source.SkillInstanceId != q.Source.SkillInstanceId || !fact.OriginalTargetSeats.SequenceEqual(originalTargets) || originalTargets.Count % pairSize != 0 || originalTargets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || originalTargets.Where((_, i) => i % pairSize == 0).Distinct().Count() != originalTargets.Count / pairSize || fact.AddedTargetSeats.Count != 0 && fact.RemovedTargetSeats.Count != 0 || fact.AddedTargetSeats.Count != 0 && fact.AddedTargetSeats.Count != pairSize || fact.RemovedTargetSeats.Count != 0 && fact.RemovedTargetSeats.Count != pairSize || fact.AddedTargetSeats.Concat(fact.RemovedTargetSeats).Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s)) || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program is not { } program || program.GameplayHash != q.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == fact.Source.BindingId)?.Effects is not [{ Op: SkillProgramEffectOp.AdjustOneRoundGainedOrdinaryTrickTarget }])
             return false;
         var expected = originalTargets.ToList();
         if (fact.AddedTargetSeats.Count > 0)
@@ -165,6 +162,6 @@ internal sealed partial class CoreGameEngineRoundGainedTrickTargetsRuntime
 
     internal bool HasRoundGainedTrickTargetTail(CardUseFrame use) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundGainedTrickTargetResolvedEvent>().Any(e => e.AddedTargetSeats.Count > 0 && IsRoundGainedTrickTargetFact(use, e, e.OriginalTargetSeats) && use.Action!.TargetSeats.Count >= e.ResultTargetSeats.Count && use.Action.TargetSeats.Take(e.ResultTargetSeats.Count).SequenceEqual(e.ResultTargetSeats) && use.TargetSeats.SequenceEqual(use.Action.TargetSeats));
     internal bool HasRoundGainedTrickTargetCancellation(CardUseFrame use) => use.TargetSeats.Count == 0 && use.Action is { TargetSeats.Count: 0 } && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundGainedTrickTargetResolvedEvent>().Any(e => e.RemovedTargetSeats.Count > 0 && e.ResultTargetSeats.Count == 0 && IsRoundGainedTrickTargetFact(use, e, e.OriginalTargetSeats));
-    SkillProgramStepOutcome global::CardGame.Core.IRoundGainedSourceUseHost.AdjustOneRoundGainedOrdinaryTrickTarget(ProgramSkillFrame frame) => OfferRoundGainedTrickTarget(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IRoundGainedSourceUseHost.DrawForRoundGainedEquipmentUse(ProgramSkillFrame frame) => _coreRoundGainedEquipmentDrawsOperations.BeginRoundGainedEquipmentDraw(frame);
+    SkillProgramStepOutcome IRoundGainedSourceUseHost.AdjustOneRoundGainedOrdinaryTrickTarget(ProgramSkillFrame frame) => OfferRoundGainedTrickTarget(frame);
+    SkillProgramStepOutcome IRoundGainedSourceUseHost.DrawForRoundGainedEquipmentUse(ProgramSkillFrame frame) => _coreRoundGainedEquipmentDrawsOperations.BeginRoundGainedEquipmentDraw(frame);
 }

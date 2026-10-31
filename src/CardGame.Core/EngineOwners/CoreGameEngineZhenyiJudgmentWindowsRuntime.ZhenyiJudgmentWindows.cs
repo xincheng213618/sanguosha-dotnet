@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineZhenyiJudgmentWindowsRuntime
@@ -13,7 +8,7 @@ internal sealed partial class CoreGameEngineZhenyiJudgmentWindowsRuntime
         JudgmentContinuationKind.Lightning => suit == Suit.Spade && rank is >= 2 and <= 9,
         JudgmentContinuationKind.Indulgence => suit == Suit.Heart,
         JudgmentContinuationKind.SupplyShortage => suit == Suit.Club,
-        _ => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(suit)};
+        _ => CoreNativeCardClassificationsRuntime.IsRedSuit(suit)};
     internal SkillProgramTriggerWindow CurrentZhenyiJudgmentWindowKind(long judgmentId) => _resolutionStackOperations._resolutionStack.OfType<ProgramJudgmentTriggerWindowFrame>().LastOrDefault()is { ZhenyiBeforeResult: true } frame && frame.Judgment.JudgmentFrameId == judgmentId ? SkillProgramTriggerWindow.JudgmentBeforeResult : SkillProgramTriggerWindow.JudgmentFinalized;
     internal bool IsExactZhenyiBeforeResultProgramChild(ProgramJudgmentTriggerWindowFrame window, ProgramSkillFrame child)
     {
@@ -73,7 +68,7 @@ internal sealed partial class CoreGameEngineZhenyiJudgmentWindowsRuntime
         _coreNativeJudgmentOperations.ReplaceJudgmentFrame(pending);
         var completed = _coreNativeJudgmentOperations.FinalizeJudgment(pending);
         if (completed is { } result)
-            _coreNativeJudgmentOperations.ResumeCompletedJudgment(new global::CardGame.Core.GameEngine.JudgmentCompletionReceipt(GetJudgmentFrameOrCompletedZhenyi(pending), result));
+            _coreNativeJudgmentOperations.ResumeCompletedJudgment(new GameEngine.JudgmentCompletionReceipt(GetJudgmentFrameOrCompletedZhenyi(pending), result));
     }
 
     internal JudgmentFrame GetJudgmentFrameOrCompletedZhenyi(JudgmentFrame fallback) => _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(f => f.Id == fallback.Id) ?? fallback;

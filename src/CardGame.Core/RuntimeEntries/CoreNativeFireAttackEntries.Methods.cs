@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreNativeFireAttackEntries
 {
-    internal void BeginFireAttackDiscard(global::CardGame.Core.CardUseFrame pending, global::CardGame.Core.Card revealed) => _resolve().BeginFireAttackDiscard(pending, revealed);
-    internal void BeginFireAttackReveal(global::CardGame.Core.CardUseFrame pending) => _resolve().BeginFireAttackReveal(pending);
-    internal global::CardGame.Core.Card GetFireAttackEffectCard(global::CardGame.Core.CardUseFrame pending) => _resolve().GetFireAttackEffectCard(pending);
-    internal global::CardGame.Core.Card GetFireAttackRevealedCard(global::CardGame.Core.CardUseFrame pending) => _resolve().GetFireAttackRevealedCard(pending);
-    internal void ResolveFireAttackDiscard(global::CardGame.Core.CardUseFrame pending, int? selectedCardId) => _resolve().ResolveFireAttackDiscard(pending, selectedCardId);
-    internal void ResolveFireAttackReveal(global::CardGame.Core.CardUseFrame pending, int cardId) => _resolve().ResolveFireAttackReveal(pending, cardId);
-    internal global::CardGame.Core.CardUseFrame SetFireAttackSelection(long frameId, global::CardGame.Core.FireAttackSelectionState? selection) => _resolve().SetFireAttackSelection(frameId, selection);
+    internal void BeginFireAttackDiscard(CardUseFrame pending, Card revealed) => _resolve().BeginFireAttackDiscard(pending, revealed);
+    internal void BeginFireAttackReveal(CardUseFrame pending) => _resolve().BeginFireAttackReveal(pending);
+    internal Card GetFireAttackEffectCard(CardUseFrame pending) => _resolve().GetFireAttackEffectCard(pending);
+    internal Card GetFireAttackRevealedCard(CardUseFrame pending) => _resolve().GetFireAttackRevealedCard(pending);
+    internal void ResolveFireAttackDiscard(CardUseFrame pending, int? selectedCardId) => _resolve().ResolveFireAttackDiscard(pending, selectedCardId);
+    internal void ResolveFireAttackReveal(CardUseFrame pending, int cardId) => _resolve().ResolveFireAttackReveal(pending, cardId);
+    internal CardUseFrame SetFireAttackSelection(long frameId, FireAttackSelectionState? selection) => _resolve().SetFireAttackSelection(frameId, selection);
 }

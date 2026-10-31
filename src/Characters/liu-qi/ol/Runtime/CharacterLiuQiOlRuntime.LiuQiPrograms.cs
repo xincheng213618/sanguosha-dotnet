@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuQiOlRuntime
 {
     internal const string WenjiGiftReason = "skill-program.wenji.gift", TunjiangDrawReason = "skill-program.tunjiang.draw";
-    internal static CardConversionSource LiuQiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_qi_ol_LiuQiPrograms.LiuQiSource(f);
+    internal static CardConversionSource LiuQiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_liu_qi_ol_LiuQiPrograms.LiuQiSource(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 380)]
     internal bool CanOfferLiuQi(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -116,5 +112,5 @@ internal sealed partial class CharacterLiuQiOlRuntime
             throw new InvalidOperationException("Tunjiang draw lacks its exact native payment interval.");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILiuQiProgramHost.BeginLiuQi(ProgramSkillFrame f, SkillProgramEffect e) => BeginLiuQi(f, e);
+    SkillProgramStepOutcome ILiuQiProgramHost.BeginLiuQi(ProgramSkillFrame f, SkillProgramEffect e) => BeginLiuQi(f, e);
 }

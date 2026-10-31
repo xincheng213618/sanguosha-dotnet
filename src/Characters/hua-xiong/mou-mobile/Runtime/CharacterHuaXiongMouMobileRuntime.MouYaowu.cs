@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaXiongMouMobileRuntime
 {
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29101, SkillProgramEffectOp.ResolveMouHuaXiongYaowu)]
-    internal bool CanOfferMouYaowu(ProgramTriggerLegalityContext c) => c.Candidate.SkillId == MouYaowu && MouHuaXiongComposition.IsYaowu(c.Program) && c.Context.Window == SkillProgramTriggerWindow.BeforeDamageApplied && c.Context.TargetSeat == c.OwnerSeat && c.Context.Amount > 0 && c.Owner.IsAlive && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { EffectiveCardKind: { } kind } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
+    internal bool CanOfferMouYaowu(ProgramTriggerLegalityContext c) => c.Candidate.SkillId == MouYaowu && MouHuaXiongComposition.IsYaowu(c.Program) && c.Context.Window == SkillProgramTriggerWindow.BeforeDamageApplied && c.Context.TargetSeat == c.OwnerSeat && c.Context.Amount > 0 && c.Owner.IsAlive && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { EffectiveCardKind: { } kind } && CoreNativeCardClassificationsRuntime.IsSlashCard(kind);
     internal bool MouYaowuRoot(ProgramSkillFrame f)
     {
-        if (f.SkillId != MouYaowu || f.TriggerId != "slash-damage-benefit" || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || context.TargetSeat != f.OwnerSeat || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !MouHuaXiongComposition.IsYaowu(p) || _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == context.ParentFrameId)is not BeforeDamageProgramWindowFrame window || window.TargetSeat != f.OwnerSeat || window.Amount <= 0 || window.Prevented || window.RedirectedTargetSeat is not null || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].Candidate))
+        if (f.SkillId != MouYaowu || f.TriggerId != "slash-damage-benefit" || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || context.TargetSeat != f.OwnerSeat || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !MouHuaXiongComposition.IsYaowu(p) || _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == context.ParentFrameId)is not BeforeDamageProgramWindowFrame window || window.TargetSeat != f.OwnerSeat || window.Amount <= 0 || window.Prevented || window.RedirectedTargetSeat is not null || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].Candidate))
             return false;
         var i = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == f.Id);
         return i > 0 && _resolutionStackOperations._resolutionStack[i - 1].Id == window.Id;
@@ -21,7 +18,7 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
     internal SkillProgramStepOutcome ResolveMouYaowu(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!MouYaowuRoot(f) || f.InstructionIndex != 1 || f.MouHuaXiongYaowu is not null || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { EffectiveCardKind: { } kind } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuStartedEvent>().Any(e => e.FrameId == f.Id))
+        if (!MouYaowuRoot(f) || f.InstructionIndex != 1 || f.MouHuaXiongYaowu is not null || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { EffectiveCardKind: { } kind } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuStartedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Yaowu needs its exact positive native Slash damage-recipient window.");
         var action = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action;
         var red = action is not null ? action.EffectiveIsRed ?? (action.EffectiveSuit is Suit.Heart or Suit.Diamond) : attack.Card?.Suit is Suit.Heart or Suit.Diamond;
@@ -81,7 +78,7 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
     internal void AnswerMouYaowu(PromptChoice selected)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
-        if (!MouYaowuRoot(f) || f.InstructionIndex != 1 || f.MouHuaXiongYaowu is not { IsRed: true, Benefit: null, SourceSeat: { } source } || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true, Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != source || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouYaowuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!MouYaowuRoot(f) || f.InstructionIndex != 1 || f.MouHuaXiongYaowu is not { IsRed: true, Benefit: null, SourceSeat: { } source } || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true, Kind: DecisionKind.ProgramTrigger } prompt || prompt.PlayerSeat != source || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouYaowuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Yaowu only accepts its actual damage source's canonical available reward.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[source].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
@@ -97,7 +94,7 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouHuaXiongYaowu)]
     internal PromptChoice SelectAiMouYaowu(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("option-id") == "recover" && _coreMatchParticipantsPlayersAccess._players[f.MouHuaXiongYaowu!.SourceSeat!.Value].Hp <= 2) ?? p.Choices.Single(c => c.Parameters.GetValueOrDefault("option-id") == "draw");
-    internal bool ValidMouYaowuReceipt(ProgramSkillFrame f) => MouYaowuRoot(f) && f.MouHuaXiongYaowu is { } r && r.Source == MouHuaXiongSource(f) && r.GameplayHash == f.GameplayHash && r.OwnerSeat == f.OwnerSeat && r.WindowId == f.WindowContext!.ParentFrameId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.EffectiveKind) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuStartedEvent>().Count(e => e == new MouHuaXiongYaowuStartedEvent(f.Id, r.WindowId, r.AttackId, r.OwnerSeat, r.SourceSeat, r.EffectiveKind, r.IsRed)) == 1 && (r.Benefit is null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuBenefitChosenEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var chosen] && chosen.Benefit == r.Benefit && (r.Benefit switch
+    internal bool ValidMouYaowuReceipt(ProgramSkillFrame f) => MouYaowuRoot(f) && f.MouHuaXiongYaowu is { } r && r.Source == MouHuaXiongSource(f) && r.GameplayHash == f.GameplayHash && r.OwnerSeat == f.OwnerSeat && r.WindowId == f.WindowContext!.ParentFrameId && CoreNativeCardClassificationsRuntime.IsSlashCard(r.EffectiveKind) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuStartedEvent>().Count(e => e == new MouHuaXiongYaowuStartedEvent(f.Id, r.WindowId, r.AttackId, r.OwnerSeat, r.SourceSeat, r.EffectiveKind, r.IsRed)) == 1 && (r.Benefit is null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuaXiongYaowuBenefitChosenEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var chosen] && chosen.Benefit == r.Benefit && (r.Benefit switch
     {
         "owner-draw" => !r.IsRed && chosen.RecipientSeat == f.OwnerSeat,
         "source-draw" or "source-recover" => r.IsRed && r.SourceSeat is { } seat && chosen.RecipientSeat == seat,

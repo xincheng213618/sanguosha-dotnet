@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class QianZhaoCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterQianZhaoOlEntries> getCharacterQianZhaoOlRuntime) : IQianZhaoHost
+internal sealed class QianZhaoCapability(Func<RuntimeEntries.CharacterQianZhaoOlEntries> getCharacterQianZhaoOlRuntime) : IQianZhaoHost
 {
     public SkillProgramStepOutcome Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {

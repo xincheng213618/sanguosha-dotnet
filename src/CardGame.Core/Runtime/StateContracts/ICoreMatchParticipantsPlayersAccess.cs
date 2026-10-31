@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreMatchParticipantsPlayersAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreMatchParticipantsPlayersAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.CharacterState> _players { get; }
+    ref readonly List<CharacterState> _players { get; }
 }

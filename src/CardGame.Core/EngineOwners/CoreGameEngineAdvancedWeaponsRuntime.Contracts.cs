@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreAdvancedWeaponsCoreTrustedCardZoneDiagnosticsOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreAdvancedWeaponsCoreTrustedCardZoneDiagnosticsOperations : IProgramRuntimeOperations
 {
-    global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardZoneDiagnostic> CreateCardZoneDiagnostics();
+    IReadOnlyList<CardZoneDiagnostic> CreateCardZoneDiagnostics();
 }
 
-internal interface ICoreAdvancedWeaponsCoreEquipmentContentOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreAdvancedWeaponsCoreEquipmentContentOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.EquipmentContentRegistry EquipmentRules { get; }
+    EquipmentContentRegistry EquipmentRules { get; }
 }

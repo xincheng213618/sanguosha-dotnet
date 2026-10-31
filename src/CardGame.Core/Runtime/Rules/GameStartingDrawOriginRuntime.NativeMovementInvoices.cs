@@ -4,10 +4,10 @@ internal sealed partial class GameStartingDrawOriginRuntime
 {
 
     internal static bool SameGameStartingNativeMovementOrigin(GameStartingNativeMovementOrigin? left, GameStartingNativeMovementOrigin? right) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GameStartingNativeMovementInvoices.SameGameStartingNativeMovementOrigin(left,right);
+        RuntimeSkills.RuntimeRules_Core_GameStartingNativeMovementInvoices.SameGameStartingNativeMovementOrigin(left,right);
 
     internal static bool SameGameStartingMovementDrawOrigin(GameStartingMovementDrawOrigin? left, GameStartingMovementDrawOrigin? right) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GameStartingNativeMovementInvoices.SameGameStartingMovementDrawOrigin(left,right);
+        RuntimeSkills.RuntimeRules_Core_GameStartingNativeMovementInvoices.SameGameStartingMovementDrawOrigin(left,right);
 
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 26705)]
     internal void CaptureGameStartingNativeGift(DingShangWanMovementIssuedEvent issued)

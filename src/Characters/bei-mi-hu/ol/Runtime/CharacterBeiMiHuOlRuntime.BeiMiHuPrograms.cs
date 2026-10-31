@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBeiMiHuOlRuntime
 {
     internal const string BeiMiHuDrawReason = "program.bei-mi-hu.guju-draw";
-    internal static bool IsBeiMiHuOp(SkillProgramEffectOp op) => global::CardGame.Core.RuntimeSkills.RuntimeRules_bei_mi_hu_ol_BeiMiHuPrograms.IsBeiMiHuOp(op);
-    internal static SkillProgramEffectOp? BeiMiHuOperation(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_bei_mi_hu_ol_BeiMiHuPrograms.BeiMiHuOperation(t);
-    internal CardConversionSource BeiMiHuSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static bool IsBeiMiHuOp(SkillProgramEffectOp op) => RuntimeSkills.RuntimeRules_bei_mi_hu_ol_BeiMiHuPrograms.IsBeiMiHuOp(op);
+    internal static SkillProgramEffectOp? BeiMiHuOperation(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_bei_mi_hu_ol_BeiMiHuPrograms.BeiMiHuOperation(t);
+    internal CardConversionSource BeiMiHuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int BeiMiHuRound => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundStartedEvent>().LastOrDefault()?.RoundNumber ?? _coreActualRoundProgressRoundNumberAccess._roundNumber;
 
     internal int BeiMiHuReceiptTurn(ProgramSkillFrame f) => f.WindowContext?.BeforeTurnPreludeProof?.UpcomingTurnNumber ?? _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber;
@@ -33,7 +30,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     internal bool ExactBeiMiHuLifecycleParent(ProgramSkillFrame f)
     {
         var c = f.WindowContext;
-        return f.TriggerId is not null && c is not null && f.InstructionIndex == 1 && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is { } p && p.Window == c.Window && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && (c.Window is not (SkillProgramTriggerWindow.TurnBeforeStart or SkillProgramTriggerWindow.RoundStarting) || c.BeforeTurnPreludeProof is { } proof && proof == p.BeforeTurnPreludeProof && (c.Window != SkillProgramTriggerWindow.TurnBeforeStart || proof.UpcomingOwnerSeat == f.OwnerSeat) && ValidBeiMiHuBeforeTurnPrelude(proof));
+        return f.TriggerId is not null && c is not null && f.InstructionIndex == 1 && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is { } p && p.Window == c.Window && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && (c.Window is not (SkillProgramTriggerWindow.TurnBeforeStart or SkillProgramTriggerWindow.RoundStarting) || c.BeforeTurnPreludeProof is { } proof && proof == p.BeforeTurnPreludeProof && (c.Window != SkillProgramTriggerWindow.TurnBeforeStart || proof.UpcomingOwnerSeat == f.OwnerSeat) && ValidBeiMiHuBeforeTurnPrelude(proof));
     }
 
     internal BeiMiHuReceipt NewBeiMiHuReceipt(ProgramSkillFrame f, string stage) => new()
@@ -122,7 +119,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     [ProgramAnswer("bei-mi-hu")]
     internal void ResolveBeiMiHuChoice(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BeiMiHu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], BeiMiHuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BeiMiHu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], BeiMiHuChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Bei Mi Hu lost its actual chooser and frozen public candidates.");
         AssertBeiMiHu(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -215,5 +212,5 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IBeiMiHuProgramHost.BeginBeiMiHuOperation(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginBeiMiHuOperation(f, op);
+    SkillProgramStepOutcome IBeiMiHuProgramHost.BeginBeiMiHuOperation(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginBeiMiHuOperation(f, op);
 }

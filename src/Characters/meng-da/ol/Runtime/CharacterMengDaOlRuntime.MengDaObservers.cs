@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMengDaOlRuntime
@@ -24,7 +20,7 @@ internal sealed partial class CharacterMengDaOlRuntime
         if (child is CardUseFrame use)
             return r.Stage == GoudeStage.NativeSlash && use.GoudeSlash == r.NativeOrigin && IsGoudeSlashUse(use.Id);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return r.Stage == GoudeStage.MovementChildren && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (r.Option == GoudeOption.Draw ? m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == GoudeDrawReason || m.Reason == CardMoveReasons.Reshuffle : r.PaidMaterial is { } material && m.CardId == material.CardId && m.From == CardLocation.Hand(material.HolderSeat) && m.To == CardLocation.DiscardPile && m.Reason.Value == GoudeDiscardReason));
+            return r.Stage == GoudeStage.MovementChildren && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (r.Option == GoudeOption.Draw ? m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == GoudeDrawReason || m.Reason == CardMoveReasons.Reshuffle : r.PaidMaterial is { } material && m.CardId == material.CardId && m.From == CardLocation.Hand(material.HolderSeat) && m.To == CardLocation.DiscardPile && m.Reason.Value == GoudeDiscardReason));
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 

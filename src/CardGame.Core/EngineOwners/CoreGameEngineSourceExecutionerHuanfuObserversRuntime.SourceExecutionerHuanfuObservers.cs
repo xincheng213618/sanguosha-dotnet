@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSourceExecutionerHuanfuObserversRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreGameEngineSourceExecutionerHuanfuObserversRunt
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 62060)]
     internal void RecordSourceHuanfuDamage(DamageAppliedEvent applied)
     {
-        if (!_coreSourceExecutionerYishiOperations.SourceExecutionerMode || applied.SourceLess || applied.Amount <= 0 || applied.SourceCardUseResolutionId is not { } id || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { IsSourceLess: false, IsChainPropagation: false, EffectiveCardKind: { } kind } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || attack.ResolutionId != id || attack.SourceSeat != applied.SourceSeat || attack.TargetSeat != applied.TargetSeat || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == id)is not { SourceExecutionerHuanfuBets: { } bets } use || use.SourceSeat != applied.SourceSeat)
+        if (!_coreSourceExecutionerYishiOperations.SourceExecutionerMode || applied.SourceLess || applied.Amount <= 0 || applied.SourceCardUseResolutionId is not { } id || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { IsSourceLess: false, IsChainPropagation: false, EffectiveCardKind: { } kind } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || attack.ResolutionId != id || attack.SourceSeat != applied.SourceSeat || attack.TargetSeat != applied.TargetSeat || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == id)is not { SourceExecutionerHuanfuBets: { } bets } use || use.SourceSeat != applied.SourceSeat)
             return;
         AssertSourceHuanfuBets(use);
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { SourceExecutionerHuanfuBets = bets.Select(b => !b.Settled && use.TargetSeats.Contains(applied.TargetSeat) && (b.ActorWager || b.Source.OwnerSeat == applied.TargetSeat) ? b with { DamageTotal = checked(b.DamageTotal + applied.Amount) } : b).ToArray() });
@@ -21,7 +17,7 @@ internal sealed partial class CoreGameEngineSourceExecutionerHuanfuObserversRunt
     {
         if (use.SourceExecutionerHuanfuBets is not { } bets)
             return;
-        if (!_coreSourceExecutionerYishiOperations.SourceExecutionerMode || use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.SourceSeat != action.ActorSeat || action.EffectiveKind != use.CardKind || bets.Count == 0 || bets.Select(b => b.Source.OwnerSeat).Distinct().Count() != bets.Count)
+        if (!_coreSourceExecutionerYishiOperations.SourceExecutionerMode || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.SourceSeat != action.ActorSeat || action.EffectiveKind != use.CardKind || bets.Count == 0 || bets.Select(b => b.Source.OwnerSeat).Distinct().Count() != bets.Count)
             throw new InvalidOperationException("Huanfu wagers require independent owners on the same actual Slash Use.");
         foreach (var bet in bets)
         {

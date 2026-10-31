@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShenMaChaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenMaChao(f, op);
-    internal static CardConversionSource ShenMcSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IShenMaChaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenMaChao(f, op);
+    internal static CardConversionSource ShenMcSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal CardActionContext? HengwuAction(ProgramSkillWindowContext? context) => context is null ? null : _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)?.Action;
     internal bool CanHengwu(int owner, CardActionContext? a, SkillProgramTriggerWindow? window) => a is { EffectiveSuit: { } suit } && suit != Suit.None && window == (a.Type == CardActionType.Use ? SkillProgramTriggerWindow.CardUseCommitted : SkillProgramTriggerWindow.CardResponseAccepted) && (a.ActorSeat == owner || a.ProviderSeat == owner) && !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Any(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], c) == suit) && !_coreProgramEventHistoryOperations.ProgramEventHistory<HengwuDrawIssuedEvent>().Any(e => e.OwnerSeat == owner && e.ActionId == a.ActionId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 39000, SkillProgramEffectOp.DrawHengwuFieldSuitEquipment)]

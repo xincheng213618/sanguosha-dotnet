@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineQiaoquHaoduoRuntime
 {
-    internal int? BorrowedSwordSlashDamageModifierOwner(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int? BorrowedSwordSlashDamageModifierOwner(GameEngine.IDamageAttempt attack)
     {
-        if (attack is not global::CardGame.Core.NativeOwners.CardAttackHandle || attack.IsSourceLess || attack.IsChainPropagation || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } child || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(child.CardKind) || child.SourceSeat != action.ActorSeat || attack.CardUserSeat != action.ActorSeat)
+        if (attack is not NativeOwners.CardAttackHandle || attack.IsSourceLess || attack.IsChainPropagation || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } child || !CoreNativeCardClassificationsRuntime.IsSlashCard(child.CardKind) || child.SourceSeat != action.ActorSeat || attack.CardUserSeat != action.ActorSeat)
             return null;
         // The native continuation owns the exact forced child. RequesterSeat
         // instead describes card supply, and cannot identify the trick user.

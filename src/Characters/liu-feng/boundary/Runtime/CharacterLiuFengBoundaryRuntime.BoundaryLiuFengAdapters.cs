@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuFengBoundaryRuntime
@@ -117,7 +113,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         if (parent.WuJing is { } wu)
             return wu.Source == _characterWuJingOlOperations.WuJingSource(parent) && wu.Selection is { CardIds.Count: 0, Conversions: [var s], Kind: CardKind.Slash } && s == r.Source && wu.TargetSeat == target;
         if (parent.LvKuangLvXiang is { } qi)
-            return qi.Source == global::CardGame.Core.EngineOwners.CharacterLvKuangLvXiangOlRuntime.LvKuangLvXiangSource(parent) && qi.Actor == n.ActorSeat && qi.Target == target && qi.IssuingIds.Count == 0 && qi.IssuingKind == CardKind.Slash && qi.IssuingProvider == n.ActorSeat;
+            return qi.Source == CharacterLvKuangLvXiangOlRuntime.LvKuangLvXiangSource(parent) && qi.Actor == n.ActorSeat && qi.Target == target && qi.IssuingIds.Count == 0 && qi.IssuingKind == CardKind.Slash && qi.IssuingProvider == n.ActorSeat;
         if (parent.CaoChun is { Slash: { } cc })
             return cc.ParentFrameId == parent.Id && cc.Materials.Count == 0 && !cc.Ending && cc.TargetSeat == target && cc.ProviderSeat == n.ActorSeat && cc.Kind == CardKind.Slash;
         return parent.AnniversaryMaTie is { } mt && mt.Actors[mt.Cursor] == n.ActorSeat && mt.Target == target && mt.Materials.Count == 0 && mt.Provider == n.ActorSeat || n.Intent == BoundaryLiuFengIntent.GenericBasic && HasAcceptedBoundaryLiuFengKeAction(parent, parent.KeBiNengPingduan!.SelectedBasicAction!);

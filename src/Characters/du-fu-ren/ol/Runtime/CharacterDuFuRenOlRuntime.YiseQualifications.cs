@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDuFuRenOlRuntime
 {
     internal bool HasDuFuRenYise => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveYiseOwnedGain) == true;
 
-    internal static bool IsDuFuRenYiseTrigger(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_du_fu_ren_ol_Yise_Qualifications.IsDuFuRenYiseTrigger(t);
+    internal static bool IsDuFuRenYiseTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_du_fu_ren_ol_Yise_Qualifications.IsDuFuRenYiseTrigger(t);
     internal void CaptureDuFuRenOwnedOrigin(CardMovementRecord m)
     {
         if (!HasDuFuRenYise || !IsDuFuRenOwnedZone(m.From) || m.From == m.To || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenOwnedOriginEvent>().Any(p => p.MovementSequence == m.Sequence))

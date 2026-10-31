@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXueZongMobileRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CharacterXueZongMobileRuntime
             return _coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Nullification);
         if (!_coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Dodge))
             return false;
-        return _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } kind } attack } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat == action.ActorSeat;
+        return _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } kind } attack } && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat == action.ActorSeat;
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 80800)]
@@ -55,7 +51,7 @@ internal sealed partial class CharacterXueZongMobileRuntime
 
     internal bool HasMobileFunanUnansweredUse(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
-        if (candidate.SkillId != MobileXueZongComposition.Funan || candidate.BindingId != MobileXueZongComposition.Reward || context is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } card } || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCompleted || window.Action.ActionId != card.CardActionId || window.Action.ActorSeat != candidate.OwnerSeat || !IsMobileFunanActualUse(window.Action) || window.Action.Type == CardActionType.Response && (window.CompletedResponseReturn is not { IsCommitted: false } || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window)))
+        if (candidate.SkillId != MobileXueZongComposition.Funan || candidate.BindingId != MobileXueZongComposition.Reward || context is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } card } || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseCompleted || window.Action.ActionId != card.CardActionId || window.Action.ActorSeat != candidate.OwnerSeat || !IsMobileFunanActualUse(window.Action) || window.Action.Type == CardActionType.Response && (window.CompletedResponseReturn is not { IsCommitted: false } || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window)))
             return false;
         if (window.Action.Type == CardActionType.Response && window.Action.EffectiveKind == CardKind.Nullification && (_resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().SingleOrDefault(f => f.Id == window.ParentFrameId)?.MobileFunanCompletions is not { } deferred || deferred.ActiveActionId != window.Action.ActionId || deferred.Cursor < 1 || deferred.Cursor > deferred.Items.Count || deferred.Items[deferred.Cursor - 1] is not { } original || original.Action.ActionId != window.Action.ActionId || original.Source != new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId) || original.GameplayHash != candidate.GameplayHash))
             return false;

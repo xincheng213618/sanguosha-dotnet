@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterHuaTuoMobileGodMobileWulingCoursesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterHuaTuoMobileGodMobileWulingCoursesAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.Dictionary<long, global::CardGame.Core.MobileWulingCourse> _mobileWulingCourses { get; }
+    ref readonly Dictionary<long, MobileWulingCourse> _mobileWulingCourses { get; }
 }

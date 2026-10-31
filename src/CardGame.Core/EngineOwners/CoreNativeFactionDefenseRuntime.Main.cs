@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeFactionDefenseRuntime
 {
-    internal void BeginFactionDefenseRequest(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void BeginFactionDefenseRequest(NativeOwners.CardAttackHandle attack)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
         if (!_coreNativeEquipmentAndFactionQueriesOperations.CanRequestFactionDefense(owner, attack) || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null)
@@ -29,7 +25,7 @@ internal sealed partial class CoreNativeFactionDefenseRuntime
     internal void AdvanceFactionDefenseCandidate(bool keepCurrentRequest = false)
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense ?? throw new InvalidOperationException("There is no active FactionDefense request.");
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack))
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack))
         {
             throw new InvalidOperationException("The FactionDefense request no longer belongs to the active attack.");
         }
@@ -68,31 +64,31 @@ internal sealed partial class CoreNativeFactionDefenseRuntime
         _coreNativeDodgeOperations.PublishOwnerDodgeDecision(attack);
     }
 
-    internal IReadOnlyList<PromptChoice> CreateFactionDefenseResponseChoices(CharacterState provider, global::CardGame.Core.NativeOwners.FactionDefenseHandle pending, IReadOnlyList<Card> responseCards, bool includeBagua)
+    internal IReadOnlyList<PromptChoice> CreateFactionDefenseResponseChoices(CharacterState provider, NativeOwners.FactionDefenseHandle pending, IReadOnlyList<Card> responseCards, bool includeBagua)
     {
         var baitOnlyFirstIds = _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(provider, CardKind.Dodge, true).Where(_characterGuanHaiOlOperations.IsXieweiSelection).Select(selection => selection.Cards[0].Id).ToHashSet();
         var choices = responseCards.Where(card => !baitOnlyFirstIds.Contains(card.Id) || _coreNativeResponseMaterialQueriesOperations.CanUseCardAsResponse(provider, card, CardKind.Dodge)).SelectMany(card =>
         {
             var responseCardKind = _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(provider, card, CardKind.Dodge);
-            var responseDescription = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Dodge) ? "打出【闪】" : $"将【{(card.DisplayName)}】当作【闪】";
+            var responseDescription = CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Dodge) ? "打出【闪】" : $"将【{(card.DisplayName)}】当作【闪】";
             return _coreCardConversionsOperations.CreateConversionChoiceVariants(provider, card, responseCardKind, forResponse: true, $"faction-defense.dodge.card-{(card.Id)}", $"{(responseDescription)}，替 {(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat].Name)} 响应【{(_coreProgramFactionPoliciesOperations.FactionPolicyName(pending.Source))}】。", [card.Id], [pending.OwnerSeat], new Dictionary<string, string> { ["response"] = "faction-defense-dodge", ["response-card-kind"] = responseCardKind.ToString(), ["skill"] = pending.Source.SkillId });
         }).ToList();
         choices.AddRange(_coreProgramDodgeResponsesOperations.ProgramDodgeResponseChoices(provider));
-        choices.AddRange(_coreExtendedViewAsOperations.ExtendedViewAsResponseChoices(provider, CardKind.Dodge).Where(choice => global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source) && _characterGuanHaiOlOperations.IsXieweiSource(source)));
+        choices.AddRange(_coreExtendedViewAsOperations.ExtendedViewAsResponseChoices(provider, CardKind.Dodge).Where(choice => CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source) && _characterGuanHaiOlOperations.IsXieweiSource(source)));
         if (includeBagua)
         {
             choices.Add(new PromptChoice(new ChoiceId("faction-defense.bagua"), "发动【八卦阵】判定；若为红色，视为替求闪者打出【闪】。", [], [pending.OwnerSeat], new Dictionary<string, string> { ["response"] = "faction-defense-bagua", ["skill"] = pending.Source.SkillId, ["equipment"] = CardKind.BaguaFormation.ToString() }));
             if (provider.IsHuman)
-                choices.Add(global::CardGame.Core.EngineOwners.CoreGameEngineBaguaResponsesRuntime.BaguaSkipChoice(factionDefense: true));
+                choices.Add(CoreGameEngineBaguaResponsesRuntime.BaguaSkipChoice(factionDefense: true));
         }
 
         choices.Add(new PromptChoice(new ChoiceId("faction-defense.decline"), $"不响应【{(_coreProgramFactionPoliciesOperations.FactionPolicyName(pending.Source))}】。", [], [pending.OwnerSeat], new Dictionary<string, string> { ["response"] = "faction-defense-decline", ["skill"] = pending.Source.SkillId }));
         return choices;
     }
 
-    internal void ResolveFactionDefenseCandidateResponse(global::CardGame.Core.NativeOwners.FactionDefenseHandle pending, bool useDodge, bool useBagua, int? requestedCardId)
+    internal void ResolveFactionDefenseCandidateResponse(NativeOwners.FactionDefenseHandle pending, bool useDodge, bool useBagua, int? requestedCardId)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondDodge } decision || decision.PlayerSeat != pending.CurrentCandidateSeat || useDodge && useBagua)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense, pending) || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondDodge } decision || decision.PlayerSeat != pending.CurrentCandidateSeat || useDodge && useBagua)
         {
             throw new InvalidOperationException("The FactionDefense response is not the current continuation.");
         }
@@ -135,7 +131,7 @@ internal sealed partial class CoreNativeFactionDefenseRuntime
         AdvanceFactionDefenseCandidate();
     }
 
-    internal void CompleteFactionDefenseResponse(global::CardGame.Core.NativeOwners.FactionDefenseHandle pending, CharacterState provider, Card? selectedDodge, bool usedBagua, CardConversionSource? virtualResponseSource = null)
+    internal void CompleteFactionDefenseResponse(NativeOwners.FactionDefenseHandle pending, CharacterState provider, Card? selectedDodge, bool usedBagua, CardConversionSource? virtualResponseSource = null)
     {
         if (selectedDodge is not null && !_coreNativeResponseMaterialQueriesOperations.CanUseCardAsResponse(provider, selectedDodge, CardKind.Dodge) && _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(provider, CardKind.Dodge, true).FirstOrDefault(selection => _characterGuanHaiOlOperations.IsXieweiSelection(selection) && selection.Cards[0].Id == selectedDodge.Id)is { } baitResponse && _characterGuanHaiOlOperations.TryCompleteXieweiFactionDefense(pending, provider, baitResponse))
             return;
@@ -143,7 +139,7 @@ internal sealed partial class CoreNativeFactionDefenseRuntime
             return;
         var attack = pending.Attack;
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || provider.Seat != pending.CurrentCandidateSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense, pending) || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || provider.Seat != pending.CurrentCandidateSeat)
         {
             throw new InvalidOperationException("The completed FactionDefense response is not current.");
         }
@@ -178,7 +174,7 @@ internal sealed partial class CoreNativeFactionDefenseRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(-1, owner.Seat, attack.SourceSeat, CardKind.Dodge));
         }
 
-        if (_coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack } group && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(group.CurrentAttack, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack } group && CoreNativeDamageHandlesRuntime.SameAttackOwner(group.CurrentAttack, attack))
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GroupResponseEvent(group.ResolutionId, group.Card.Kind, CardKind.Dodge, owner.Seat, UsedResponse: true, ResponseCardId: selectedDodge?.Id, ResponseCardKind: CardKind.Dodge));
         }

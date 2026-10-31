@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineQinglongInsertionRuntime
 {
-    internal void SuspendFactionRequestForQinglongChoice(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void SuspendFactionRequestForQinglongChoice(NativeOwners.CardAttackHandle attack)
     {
-        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not { AwaitingProviders: false, ActiveAttack: { } supplied } request || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(supplied, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not { AwaitingProviders: false, ActiveAttack: { } supplied } request || !CoreNativeDamageHandlesRuntime.SameAttackOwner(supplied, attack))
             return;
         _coreCardAttackStateOperations.UpdateCardContinuations(attack.ResolutionId, state => state with { QinglongCrescentBlade = state.QinglongCrescentBlade!with { SuspendedFactionRequestOwnerId = request.OwnerFrameId } });
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = null;
@@ -23,18 +19,18 @@ internal sealed partial class CoreGameEngineQinglongInsertionRuntime
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(request);
     }
 
-    internal void SuspendContinuationForQinglongFollowup(long outerResolutionId, global::CardGame.Core.NativeOwners.FactionCardRequestHandle? followupRequest = null)
+    internal void SuspendContinuationForQinglongFollowup(long outerResolutionId, NativeOwners.FactionCardRequestHandle? followupRequest = null)
     {
         if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.ResolutionId != outerResolutionId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame original || original.Id != outerResolutionId || original.Continuations.QinglongFollowup is { Active: true })
             throw new InvalidOperationException("A Qinglong insertion requires its exact unfinished dodged Slash.");
         var request = _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest;
-        var savedRequest = original.Continuations.QinglongCrescentBlade?.SuspendedFactionRequestOwnerId ?? (request is not null && !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(request, followupRequest) ? request.OwnerFrameId : (long? )null);
+        var savedRequest = original.Continuations.QinglongCrescentBlade?.SuspendedFactionRequestOwnerId ?? (request is not null && !CoreNativeDamageHandlesRuntime.SameContinuationOwner(request, followupRequest) ? request.OwnerFrameId : (long? )null);
         var suspension = new QinglongFollowupState(outerResolutionId, null, _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd?.OwnerFrameId, EngineStatus.Running, BorrowedSwordOwnerId: _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword?.OwnerFrameId, FactionRequestOwnerId: savedRequest);
         _coreCardAttackStateOperations.UpdateCardContinuations(outerResolutionId, state => state with { QinglongFollowup = suspension, QinglongCrescentBlade = state.QinglongCrescentBlade is { } choice ? choice with { SuspendedFactionRequestOwnerId = null } : null });
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = null;
         _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd = null;
         _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword = null;
-        if (request is not null && !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(request, followupRequest))
+        if (request is not null && !CoreNativeDamageHandlesRuntime.SameContinuationOwner(request, followupRequest))
             _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = null;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreMatchOutcomeStatusAccess._status = EngineStatus.Running;
@@ -45,7 +41,7 @@ internal sealed partial class CoreGameEngineQinglongInsertionRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == child.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not CardUseFrame original || original.Continuations.QinglongFollowup is not { Active: true, FollowupUseId: null } suspension)
             return;
-        if (original.Action is not { } action || child.Action?.ParentActionId != action.ActionId || child.SourceSeat != original.SourceSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(child.CardKind) || original.CardAttack is not { } attack || !child.Action.TargetSeats.SequenceEqual([attack.TargetSeat]))
+        if (original.Action is not { } action || child.Action?.ParentActionId != action.ActionId || child.SourceSeat != original.SourceSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(child.CardKind) || original.CardAttack is not { } attack || !child.Action.TargetSeats.SequenceEqual([attack.TargetSeat]))
             throw new InvalidOperationException("A Qinglong inserted use changed its parent, actor, or exact dodging target.");
         _coreCardAttackStateOperations.UpdateCardContinuations(original.Id, state => state with { QinglongFollowup = suspension with { FollowupUseId = child.Id } });
     }

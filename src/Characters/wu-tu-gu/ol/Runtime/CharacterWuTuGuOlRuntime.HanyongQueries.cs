@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuTuGuOlRuntime
@@ -38,7 +34,7 @@ internal sealed partial class CharacterWuTuGuOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 170)]
-    internal int WuTuGuHanyongDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int WuTuGuHanyongDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (!HasWuTuGuCapability || attack.IsChainPropagation || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { WuTuGuHanyong: not null } use)
             return 0;

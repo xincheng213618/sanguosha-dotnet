@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_SourceFactionPreventions
 {
     internal static string SourceFactionPreventionUsage(string stateId, string faction) => $"source-faction:{stateId}:{faction}";

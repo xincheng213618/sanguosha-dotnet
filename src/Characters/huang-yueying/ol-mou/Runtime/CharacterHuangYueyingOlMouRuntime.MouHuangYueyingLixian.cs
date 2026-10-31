@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -23,7 +20,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         _ => false
     };
     internal IReadOnlyList<Card> MouLixianMaterials(int owner) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner])).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.WoodenOxGrain(owner))).DistinctBy(c => c.Id).Where(c => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(_coreMatchParticipantsPlayersAccess._players[owner], c) && !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner, [c.Id])).ToArray());
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> MouLixianOptions(ProgramSkillFrame f, Card card, CardKind kind) => _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], kind, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], card), enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], card), actualEffectiveColor: global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], card)), hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: true, conversionSource: MouHuangYueyingSource(f)).Where(o => o.ActionKind != LegalActionKind.Recast).ToArray();
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> MouLixianOptions(ProgramSkillFrame f, Card card, CardKind kind) => _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], kind, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], card), enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], card), actualEffectiveColor: CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], card)), hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: true, conversionSource: MouHuangYueyingSource(f)).Where(o => o.ActionKind != LegalActionKind.Recast).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28960)]
     internal bool CanOfferMouLixian(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -32,7 +29,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         if (candidate.SkillId != MouLixianSkill || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || !MouLixianWindowAvailable(candidate.OwnerSeat, context) || _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]).ProgramInstances.Where(i => i.SkillId == MouLixianSkill).OrderBy(i => i.SkillInstanceId, StringComparer.Ordinal).FirstOrDefault()?.SkillInstanceId != candidate.SkillInstanceId || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLixianStartedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Window == context.Window && e.OriginFrameId == context.ParentFrameId))
             return false;
         var owner = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat];
-        return MouLixianMaterials(owner.Seat).Any(card => MouLixianNames(owner.Seat).Any(kind => _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(owner, kind, _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card), enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card), actualEffectiveColor: global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)), hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: true, conversionSource: new(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId)).Any(o => o.ActionKind != LegalActionKind.Recast)));
+        return MouLixianMaterials(owner.Seat).Any(card => MouLixianNames(owner.Seat).Any(kind => _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(owner, kind, _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card), enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card), actualEffectiveColor: CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)), hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: true, conversionSource: new(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId)).Any(o => o.ActionKind != LegalActionKind.Recast)));
     }
 
     internal SkillProgramStepOutcome BeginMouLixian(ProgramSkillFrame supplied)
@@ -99,7 +96,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
     [ProgramAnswer("mou-lixian")]
     internal void AnswerMouLixian(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLixian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouLixianChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLixian: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouLixianChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Lixian cannot answer an unpublished source, material or target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         switch (choice.Parameters["branch"])

@@ -3,7 +3,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed class DingShangWanFrameProofRuntime(IProgramRuntimeFrames frames,INativeFrameRoutingFacts nativeFrames,    IDingShangWanNativeFacts facts,IProgramPhaseQueries phase,    IMatchParticipantStateAccess participants,IProgramEventHistoryQueries history,ICardMovementHistoryQueries movements) : IDingShangWanRuntimeQueries
 {
-    private const string DingShangWanDrawReason="skill-program.ding-shang-wan.draw",FudaoGiftReason="skill-program.ding-shang-wan.fudao.give",        FudaoDiscardReason=global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FudaoDiscardReason,FengyanGiftReason="skill-program.ding-shang-wan.fengyan.give",FengyanDiscardReason=global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FengyanDiscardReason;
+    private const string DingShangWanDrawReason="skill-program.ding-shang-wan.draw",FudaoGiftReason="skill-program.ding-shang-wan.fudao.give",        FudaoDiscardReason=RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FudaoDiscardReason,FengyanGiftReason="skill-program.ding-shang-wan.fengyan.give",FengyanDiscardReason=RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.FengyanDiscardReason;
     private long PhysicalMovementSequence=>movements.Last()?.Sequence??0;
     private IEnumerable<ResolutionFrame> AllFrames=>Enumerable.Range(0,nativeFrames.FrameCount).Select(nativeFrames.FrameAt);
     private static bool IsDingShangWanDrawStage(DingShangWanStage stage)=>RuntimeSkills.RuntimeRules_ding_shang_wan_ol_DingShangWan.IsDingShangWanDrawStage(stage);

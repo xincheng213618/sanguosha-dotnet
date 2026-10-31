@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterKongShuOlRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CharacterKongShuOlRuntime
     internal bool LeiluanNameUsed(int owner, CardKind kind)
     {
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        foreach (var e in history.OfType<TrueRoundCardNameUsedEvent>().Where(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(e.EffectiveKind) == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind)))
+        foreach (var e in history.OfType<TrueRoundCardNameUsedEvent>().Where(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(e.EffectiveKind) == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind)))
         {
             var actor = e.ActorSeat;
             var native = history.OfType<CurrentTurnCardUseKindsRecordedEvent>().SingleOrDefault(n => e.CardActionId is { } id ? n.CardActionId == id : n.CardActionId is null && n.OriginFrameId == e.OriginFrameId);
@@ -66,12 +62,12 @@ internal sealed partial class CharacterKongShuOlRuntime
             return[];
         var result = new List<ProgramMultiCardViewAsSelection>();
         foreach (var instance in _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances)
-            foreach (var rule in instance.Program.ViewAs.Where(r => r.LeiluanBasicUse is not null && (r.OutputKind == kind || !forResponse && kind == CardKind.Slash && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.OutputKind))))
+            foreach (var rule in instance.Program.ViewAs.Where(r => r.LeiluanBasicUse is not null && (r.OutputKind == kind || !forResponse && kind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(r.OutputKind))))
             {
                 if (LeiluanDisabled(owner.Seat, rule.LeiluanBasicUse!.StateId) || LeiluanNameUsed(owner.Seat, rule.OutputKind) || _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, rule.OutputKind, CardActionType.Use))
                     continue;
                 var source = new CardConversionSource(instance.SkillId, rule.Id, owner.Seat, instance.SkillInstanceId);
-                foreach (var cards in global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.EnumerateCardCombinations(candidates, x))
+                foreach (var cards in CoreGameEngineCardConversionsRuntime.EnumerateCardCombinations(candidates, x))
                 {
                     var ids = cards.Select(c => c.Id).ToArray();
                     if (forResponse ? !_coreRecordedSuitSlashOperations.IsRecordedSuitResponseAllowed(owner, cards, kind) || _characterCuiYanOlOperations.IsCuiYanNativeResponseForbidden(owner, kind, cards) : !ignoreSuitUseProhibition && (_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, ids) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(owner.Seat, ids, cards.Count == 1 ? _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards) : Suit.None)))

@@ -1,22 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineActionDiscardColorsRuntime
 {
     internal bool TracksActionDiscardColor => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RewardDiscardedActionColor) == true;
 
-    internal bool? CapturePhysicalCardColor(int seat, Card card) => _coreCardDeclarationsOperations.LiveDeclarationPayment(card.Id)is { } declared ? declared.Cost.EffectiveIsRed : _coreTurnRedSlashBenefitsOperations.CapturesActionColor || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.PayAndDrawWushuangJinzhi) ? global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], card)) : null;
+    internal bool? CapturePhysicalCardColor(int seat, Card card) => _coreCardDeclarationsOperations.LiveDeclarationPayment(card.Id)is { } declared ? declared.Cost.EffectiveIsRed : _coreTurnRedSlashBenefitsOperations.CapturesActionColor || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.PayAndDrawWushuangJinzhi) ? CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], card)) : null;
     internal bool? CaptureActionColor(IReadOnlyList<CardActionCost> costs, Suit? effectiveSuit = null)
     {
         if (!_coreTurnRedSlashBenefitsOperations.CapturesActionColor || costs.Count == 0)
             return null;
         if (effectiveSuit == Suit.None)
             return null;
-        if (global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(effectiveSuit)is { } declared)
+        if (CoreGameEnginePublicPileColorsRuntime.SuitColor(effectiveSuit)is { } declared)
             return declared;
         var colors = costs.Select(c => c.EffectiveIsRed).Distinct().ToArray();
         return colors.Length == 1 ? colors[0] : null;

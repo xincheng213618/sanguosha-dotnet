@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineOwnTrickDrawAlcoholObserversRuntime
 {
-    private readonly global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess _resolutionStackOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineHalfHandPhaseDebtDamageObserversEntries _coreHalfHandPhaseDebtDamageObserversOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineLegacyDyingAlcoholReturnsEntries _coreLegacyDyingAlcoholReturnsOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineOwnTrickDrawTargetsEntries _coreOwnTrickDrawTargetsOperations;
-    internal CoreGameEngineOwnTrickDrawAlcoholObserversRuntime(global::CardGame.Core.EngineOwners.IKernelFrameStoreAccess resolutionStackOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineHalfHandPhaseDebtDamageObserversEntries coreHalfHandPhaseDebtDamageObserversOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineLegacyDyingAlcoholReturnsEntries coreLegacyDyingAlcoholReturnsOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineOwnTrickDrawTargetsEntries coreOwnTrickDrawTargetsOperations)
+    private readonly IKernelFrameStoreAccess _resolutionStackOperations;
+    private readonly RuntimeEntries.CoreGameEngineHalfHandPhaseDebtDamageObserversEntries _coreHalfHandPhaseDebtDamageObserversOperations;
+    private readonly RuntimeEntries.CoreGameEngineLegacyDyingAlcoholReturnsEntries _coreLegacyDyingAlcoholReturnsOperations;
+    private readonly RuntimeEntries.CoreGameEngineOwnTrickDrawTargetsEntries _coreOwnTrickDrawTargetsOperations;
+    internal CoreGameEngineOwnTrickDrawAlcoholObserversRuntime(IKernelFrameStoreAccess resolutionStackOperations, RuntimeEntries.CoreGameEngineHalfHandPhaseDebtDamageObserversEntries coreHalfHandPhaseDebtDamageObserversOperations, RuntimeEntries.CoreGameEngineLegacyDyingAlcoholReturnsEntries coreLegacyDyingAlcoholReturnsOperations, RuntimeEntries.CoreGameEngineOwnTrickDrawTargetsEntries coreOwnTrickDrawTargetsOperations)
     {
         this._resolutionStackOperations = resolutionStackOperations;
         this._coreHalfHandPhaseDebtDamageObserversOperations = coreHalfHandPhaseDebtDamageObserversOperations;

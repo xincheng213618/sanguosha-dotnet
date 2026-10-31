@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiWenJiLeRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
     internal const string BeifenObtainReason = "skill-program.le-cai-wen-ji.beifen.obtain";
     internal bool HasLeCaiWenJiBeifenCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBeifenLostMarkedSuitGains);
 
-    internal static CardConversionSource BeifenSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource BeifenSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static bool IsBeifenLossTrigger(SkillProgramTrigger t) => t.Effects is [{ Op: SkillProgramEffectOp.ResolveBeifenLostMarkedSuitGains }];
     internal IReadOnlyList<BeifenLossSource> CaptureBeifenLossSources(IEnumerable<CardLocation> locations)
     {
@@ -45,7 +41,7 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
     internal bool IsIssuedBeifenCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => HasLeCaiWenJiBeifenCapability && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && BeifenMotherMatches(c, context) && !_coreProgramEventHistoryOperations.ProgramEventHistory<BeifenStartedEvent>().Any(e => e.LossBatchId == context.ParentFrameId && e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28420, SkillProgramEffectOp.ResolveBeifenLostMarkedSuitGains)]
     internal bool CanOfferBeifen(ProgramTriggerLegalityContext gate) => IsIssuedBeifenCandidate(gate.Candidate, gate.Context);
-    SkillProgramStepOutcome global::CardGame.Core.ILeCaiWenJiBeifenHost.Resolve(ProgramSkillFrame frame) => BeginBeifen(frame);
+    SkillProgramStepOutcome ILeCaiWenJiBeifenHost.Resolve(ProgramSkillFrame frame) => BeginBeifen(frame);
     internal SkillProgramStepOutcome BeginBeifen(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -58,7 +54,7 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
             throw new InvalidOperationException("Beifen lost its exact original source and marked HE loss qualification.");
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Where(c => HasShuangjiaEntityMark(c.Id)).ToArray();
         var heldSuits = hand.Select(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c)).ToHashSet();
-        var search = global::CardGame.Core.EngineOwners.CharacterCaiWenJiLeDefinitions.BeifenStandardSuits.Where(s => !heldSuits.Contains(s)).Select(s => new BeifenSearchedEntity(s, _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(c => c.Suit == s && !c.IsGeneralWeapon)?.Id)).ToArray();
+        var search = CharacterCaiWenJiLeDefinitions.BeifenStandardSuits.Where(s => !heldSuits.Contains(s)).Select(s => new BeifenSearchedEntity(s, _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(c => c.Suit == s && !c.IsGeneralWeapon)?.Id)).ToArray();
         var r = new BeifenReceipt(BeifenSource(f), f.GameplayHash, context.ParentFrameId, f.InstructionIndex, hand.Length, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
         {
             Stage = BeifenStage.ObtainChildren,
@@ -126,7 +122,7 @@ internal sealed partial class CharacterCaiWenJiLeRuntime
 
     internal bool ValidBeifenReceipt(ProgramSkillFrame f)
     {
-        if (f.Beifen is not { } r || f.SkillId != "le:beifen" || f.TriggerId != "lost-hujia-suits" || f.ActivationId != f.TriggerId || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || r.Source != BeifenSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 || r.Stage != BeifenStage.ObtainChildren || f.WindowContext?.ParentFrameId != r.LossBatchId || r.SequenceAfter < r.SequenceBefore || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Search is not System.Collections.IList { IsReadOnly: true } || r.Search.Count > 4 || r.Search.Select(e => e.Suit).Distinct().Count() != r.Search.Count || r.Search.Any(e => !global::CardGame.Core.EngineOwners.CharacterCaiWenJiLeDefinitions.BeifenStandardSuits.Contains(e.Suit)) || _coreProgramEventHistoryOperations.ProgramEventHistory<BeifenStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var started] || started.Source != r.Source || started.GameplayHash != r.GameplayHash || started.LossBatchId != r.LossBatchId || started.MarkedHandCount != r.MarkedHandCount || started.MissingSuitCount != r.Search.Count || started.SequenceBefore != r.SequenceBefore || !_coreProgramEventHistoryOperations.ProgramEventHistory<BeifenSuitSearchedEvent>().Where(e => e.FrameId == f.Id).Select(e => new BeifenSearchedEntity(e.Suit, e.CardId)).SequenceEqual(r.Search))
+        if (f.Beifen is not { } r || f.SkillId != "le:beifen" || f.TriggerId != "lost-hujia-suits" || f.ActivationId != f.TriggerId || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || r.Source != BeifenSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 || r.Stage != BeifenStage.ObtainChildren || f.WindowContext?.ParentFrameId != r.LossBatchId || r.SequenceAfter < r.SequenceBefore || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Search is not System.Collections.IList { IsReadOnly: true } || r.Search.Count > 4 || r.Search.Select(e => e.Suit).Distinct().Count() != r.Search.Count || r.Search.Any(e => !CharacterCaiWenJiLeDefinitions.BeifenStandardSuits.Contains(e.Suit)) || _coreProgramEventHistoryOperations.ProgramEventHistory<BeifenStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var started] || started.Source != r.Source || started.GameplayHash != r.GameplayHash || started.LossBatchId != r.LossBatchId || started.MarkedHandCount != r.MarkedHandCount || started.MissingSuitCount != r.Search.Count || started.SequenceBefore != r.SequenceBefore || !_coreProgramEventHistoryOperations.ProgramEventHistory<BeifenSuitSearchedEvent>().Where(e => e.FrameId == f.Id).Select(e => new BeifenSearchedEntity(e.Suit, e.CardId)).SequenceEqual(r.Search))
             return false;
         var obtained = _coreProgramEventHistoryOperations.ProgramEventHistory<BeifenObtainedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (r.ObtainBatchId == 0)

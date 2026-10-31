@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineInspectedHandSlashReturnsRuntime
@@ -79,7 +75,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashReturnsRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 40)]
-    internal bool ReturnRegisteredCompleteInspectedHandSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnRegisteredCompleteInspectedHandSlash(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.InspectedHandSlashReturn is null)
             return false;
@@ -87,7 +83,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashReturnsRuntime
         return true;
     }
 
-    internal void CompleteInspectedHandSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal void CompleteInspectedHandSlash(GameEngine.AttackCompletionReceipt completion)
     {
         var returned = completion.InspectedHandSlashReturn ?? throw new InvalidOperationException("Missing inspected Slash return.");
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != returned.ProgramFrameId || completion.ProgramFrameId != f.Id || completion.ResolutionId != returned.CardUseFrameId || !ValidInspectedHandSlash(f) || f.InspectedHandSlash?.SlashReturn != returned || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => u.Id == returned.CardUseFrameId) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Any(e => e.ResolutionId == returned.CardUseFrameId))
@@ -99,6 +95,6 @@ internal sealed partial class CoreGameEngineInspectedHandSlashReturnsRuntime
     internal RuleQueryEvaluation ApplyInspectedHandDistance(CharacterState actor, CharacterState target, RuleQueryEvaluation prior)
     {
         var grants = _turnCardUseEffectsOperations._turnCardUseEffects.InspectedHandDistances.Where(g => g.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && g.Source.OwnerSeat == actor.Seat && g.TargetSeat == target.Seat).ToArray();
-        return grants.Length == 0 ? prior : RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new RuleQueryBounds(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-paid-hand-inspection", global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(prior))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"paid-inspection:{(g.ProgramFrameId)}:{(g.GrantSequence)}", SkillRuleOperation.Set, 1)).ToArray());
+        return grants.Length == 0 ? prior : RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new RuleQueryBounds(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-paid-hand-inspection", CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(prior))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"paid-inspection:{(g.ProgramFrameId)}:{(g.GrantSequence)}", SkillRuleOperation.Set, 1)).ToArray());
     }
 }

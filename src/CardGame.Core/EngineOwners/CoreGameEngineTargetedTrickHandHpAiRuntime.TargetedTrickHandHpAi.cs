@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineTargetedTrickHandHpAiRuntime
@@ -35,6 +31,6 @@ internal sealed partial class CoreGameEngineTargetedTrickHandHpAiRuntime
     {
         if (effects.Any(e => e.Op == SkillProgramEffectOp.ResolveUnequalHandHpEnding))
             return _corePlayerViewProjectionOperations.CreateSnapshot(owner).Players.Where(p => p.IsAlive && p.HandCount != p.Hp).SelectMany(p => new[] { UnequalHandHpPublicChoiceScore(owner, p.Seat, true), UnequalHandHpPublicChoiceScore(owner, p.Seat, false) }).Append(0d).Max();
-        return context is not null && _coreTargetedOrdinaryTrickOperations.TryGetTargetedOrdinaryTrickUse(context, out var use, out _) ? _coreTargetedOrdinaryTrickOperations.TargetedTrickChoices(0, use, effects.Any(e => e.Op == SkillProgramEffectOp.AdjustTargetedOrdinaryTrick && global::CardGame.Core.EngineOwners.CoreGameEngineTargetedOrdinaryTrickRuntime.TargetedTrickRemovesTargets(e))).Select(c => TargetedTrickPublicChoiceScore(owner, use, c)).DefaultIfEmpty(0d).Max() : 0d;
+        return context is not null && _coreTargetedOrdinaryTrickOperations.TryGetTargetedOrdinaryTrickUse(context, out var use, out _) ? _coreTargetedOrdinaryTrickOperations.TargetedTrickChoices(0, use, effects.Any(e => e.Op == SkillProgramEffectOp.AdjustTargetedOrdinaryTrick && CoreGameEngineTargetedOrdinaryTrickRuntime.TargetedTrickRemovesTargets(e))).Select(c => TargetedTrickPublicChoiceScore(owner, use, c)).DefaultIfEmpty(0d).Max() : 0d;
     }
 }

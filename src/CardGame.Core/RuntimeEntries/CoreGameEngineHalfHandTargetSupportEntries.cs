@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineHalfHandTargetSupportRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineHalfHandTargetSupportRuntime))]
 internal sealed partial class CoreGameEngineHalfHandTargetSupportEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineHalfHandTargetSupportRuntime> _resolve;
-    private CoreGameEngineHalfHandTargetSupportEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineHalfHandTargetSupportRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineHalfHandTargetSupportRuntime> _resolve;
+    private CoreGameEngineHalfHandTargetSupportEntries(Func<EngineOwners.CoreGameEngineHalfHandTargetSupportRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineHalfHandTargetSupportEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineHalfHandTargetSupportRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineHalfHandTargetSupportEntries Create(Func<EngineOwners.CoreGameEngineHalfHandTargetSupportRuntime> resolve) => new(resolve);
 }

@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunJianMouOlRuntime
 {
-    internal static bool IsMouSunJianOlHulieKind(CardKind kind) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind == CardKind.Duel;
+    internal static bool IsMouSunJianOlHulieKind(CardKind kind) => CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind == CardKind.Duel;
     internal bool MouSunJianOlHulieAvailable(int owner, int turn, bool counter) => !_coreProgramEventHistoryOperations.ProgramEventHistory<MouSunJianOlHulieUsedEvent>().Any(e => e.OwnerSeat == owner && e.Turn == turn && e.Counter == counter);
     internal CardUseFrame? MouSunJianOlContextUse(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
     {
@@ -46,7 +43,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     internal SkillProgramStepOutcome BeginMouSunJianOlHulie(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
+        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
         if (f.MouSunJianOlHulie is not null || f.InstructionIndex != 1 || f.ActivationId != f.TriggerId || f.WindowContext is not { } w || !(op == SkillProgramEffectOp.OfferMouSunJianHulieDamage ? CanOfferMouSunJianOlHulie(c, w) : CanRunIssuedMouSunJianOlHulie(c, w)))
             throw new InvalidOperationException("Hulie requires its exact original accepted single-target native Use.");
         var use = MouSunJianOlContextUse(c, w)!;
@@ -98,7 +95,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     [ProgramAnswer("mou-sun-jian-hulie")]
     internal void AnswerMouSunJianOlHulie(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouSunJianOlHulie: { } r } f || !ValidMouSunJianOlHulie(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouSunJianOlHulieChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouSunJianOlHulie: { } r } f || !ValidMouSunJianOlHulie(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouSunJianOlHulieChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Hulie changed its exact published original-use decision.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -122,11 +119,11 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 32501)]
-    internal int MouSunJianOlHulieDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is global::CardGame.Core.NativeOwners.CardAttackHandle && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { MouSunJianOlHulieEntries: { } entries } use ? entries.Count(e => e.Boosted && ValidMouSunJianOlHulieEntry(use, e)) : 0;
+    internal int MouSunJianOlHulieDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { MouSunJianOlHulieEntries: { } entries } use ? entries.Count(e => e.Boosted && ValidMouSunJianOlHulieEntry(use, e)) : 0;
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 32501)]
-    internal bool RecordMouSunJianOlUseDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageId)
+    internal bool RecordMouSunJianOlUseDamage(GameEngine.IDamageAttempt attack, long damageId)
     {
-        if (attack is not global::CardGame.Core.NativeOwners.CardAttackHandle card || !card.DamageWasApplied || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouSunJianOlHulieEntries.Count: > 0 } use || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == damageId)is not DamageFrame { Amount: > 0 } damage || damage.ParentFrameId != use.Id)
+        if (attack is not NativeOwners.CardAttackHandle card || !card.DamageWasApplied || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouSunJianOlHulieEntries.Count: > 0 } use || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == damageId)is not DamageFrame { Amount: > 0 } damage || damage.ParentFrameId != use.Id)
             return false;
         if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouSunJianOlUseDamageEvent>().Any(e => e.DamageId == damageId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouSunJianOlUseDamageEvent(use.Id, damageId, damage.Amount));

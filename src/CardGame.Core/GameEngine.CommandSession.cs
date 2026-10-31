@@ -2,7 +2,7 @@ namespace CardGame.Core;
 public sealed partial class GameEngine
 {
     private readonly CommandSession _commandSession = new();
-    private global::CardGame.Core.NativeOwners.CommandSessionRuntime? _commandSessionRuntime;
+    private NativeOwners.CommandSessionRuntime? _commandSessionRuntime;
     private CommandEventJournal? _commandEventJournal;
     private ICommandSessionRuntime CommandRuntime => _commandSessionRuntime ??= this.ComposeNativeCommandSessionRuntime();
     private CommandEventJournal CommandEvents => _commandEventJournal ??= new(_events, _pendingEvents, _pendingNotifications);

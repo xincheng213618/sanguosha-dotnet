@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRicePileReceiptsRuntime
@@ -35,7 +31,7 @@ internal sealed partial class CoreGameEngineRicePileReceiptsRuntime
         {
             if (r.CardIds.Count != 0 || f.PendingMovementContinuation is not null || r.Selected.Count > r.StoreRequired || r.Selected.Any(id => !_coreRicePileOperations.RiceStorageCards(f).Any(c => c.Id == id)) || events.OfType<RicePilePaymentIssuedEvent>().Any(e => e.ProgramFrameId == f.Id))
                 throw new InvalidOperationException("Unpaid rice selection retained paid cards or lost current owned material.");
-            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && (prompt.Kind != DecisionKind.ProgramTrigger || prompt.PlayerSeat != r.BeneficiarySeat || prompt.TargetSeat != r.BeneficiarySeat || prompt.IsPrivate != (r.Operation == SkillProgramEffectOp.DrawAndStoreTwoPublicRice) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, r.Choices)))
+            if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } prompt && (prompt.Kind != DecisionKind.ProgramTrigger || prompt.PlayerSeat != r.BeneficiarySeat || prompt.TargetSeat != r.BeneficiarySeat || prompt.IsPrivate != (r.Operation == SkillProgramEffectOp.DrawAndStoreTwoPublicRice) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, r.Choices)))
                 throw new InvalidOperationException("Rice prompt lost its actual chooser or private owned-card boundary.");
             return;
         }

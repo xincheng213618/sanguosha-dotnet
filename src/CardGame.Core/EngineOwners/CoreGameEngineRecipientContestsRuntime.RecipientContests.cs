@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRecipientContestsRuntime
 {
-    internal static string RecipientContestGiftReason(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RecipientContests.RecipientContestGiftReason(f);
+    internal static string RecipientContestGiftReason(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_RecipientContests.RecipientContestGiftReason(f);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 10, SkillProgramEffectOp.GiveAllHandAndStartRecipientPindian)]
     internal bool CanStartRecipientContest(CharacterState owner) => owner.IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > 0;
     internal SkillProgramStepOutcome BeginRecipientContest(ProgramSkillFrame supplied, int recipient, string bind)
@@ -197,7 +194,7 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 70)]
-    internal bool ReturnRegisteredCompletePindianWinnerSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnRegisteredCompletePindianWinnerSlash(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.PindianWinnerSlashReturn is null)
             return false;
@@ -205,7 +202,7 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
         return true;
     }
 
-    internal void CompletePindianWinnerSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal void CompletePindianWinnerSlash(GameEngine.AttackCompletionReceipt completion)
     {
         var returned = completion.PindianWinnerSlashReturn ?? throw new InvalidOperationException("Missing recipient winner typed return.");
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(returned.ProgramFrameId);
@@ -217,7 +214,7 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IRecipientContestProgramHost.DiscardDrawPeer(ProgramSkillFrame f) => _coreUniqueHpPeerProgramsOperations.BeginUniqueHpPeer(f);
-    SkillProgramStepOutcome global::CardGame.Core.IRecipientContestProgramHost.GiveAllHandContest(ProgramSkillFrame f, int seat, string bind) => BeginRecipientContest(f, seat, bind);
-    SkillProgramStepOutcome global::CardGame.Core.IRecipientContestProgramHost.UseContestWinnerSlash(ProgramSkillFrame f, string bind) => UseRecipientContestWinner(f, bind);
+    SkillProgramStepOutcome IRecipientContestProgramHost.DiscardDrawPeer(ProgramSkillFrame f) => _coreUniqueHpPeerProgramsOperations.BeginUniqueHpPeer(f);
+    SkillProgramStepOutcome IRecipientContestProgramHost.GiveAllHandContest(ProgramSkillFrame f, int seat, string bind) => BeginRecipientContest(f, seat, bind);
+    SkillProgramStepOutcome IRecipientContestProgramHost.UseContestWinnerSlash(ProgramSkillFrame f, string bind) => UseRecipientContestWinner(f, bind);
 }

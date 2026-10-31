@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreEndingHandCountProgramsRuntime
 {
-    void global::CardGame.Core.IEndingHandCountProgramHost.RecordEndHandCountAndGrantMarker(ProgramSkillFrame frame, string stateId, PlayerMarkerKind marker) => RecordProgramEndingHandCount(frame, stateId, marker);
+    void IEndingHandCountProgramHost.RecordEndHandCountAndGrantMarker(ProgramSkillFrame frame, string stateId, PlayerMarkerKind marker) => RecordProgramEndingHandCount(frame, stateId, marker);
     internal IReadOnlyList<ProgramEndingHandCountHistory> GetProgramEndingHandCountHistoryDiagnostics() => Array.AsReadOnly(_coreEndingHandCountProgramsEndingHandCountHistoriesAccess._endingHandCountHistories.Values.OrderBy(s => s.OwnerSeat).ThenBy(s => s.SkillId, StringComparer.Ordinal).ThenBy(s => s.SkillInstanceId, StringComparer.Ordinal).ThenBy(s => s.StateId, StringComparer.Ordinal).Select(s => s with { Counts = Array.AsReadOnly(s.Counts.ToArray()) }).ToArray());
     internal void RecordProgramEndingHandCount(ProgramSkillFrame frame, string stateId, PlayerMarkerKind marker)
     {
@@ -31,7 +27,7 @@ internal sealed partial class CoreEndingHandCountProgramsRuntime
             owner.MarkerSourceCounts[source] = checked(owner.MarkerSourceCounts.GetValueOrDefault(source) + 1);
             var total = checked(owner.Markers.GetValueOrDefault(marker) + 1);
             owner.Markers[marker] = total;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(frame.Id, owner.Seat, marker, 1, total, owner.Seat, $"skill-program.{(frame.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame))}.marker"));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(frame.Id, owner.Seat, marker, 1, total, owner.Seat, $"skill-program.{(frame.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame))}.marker"));
         }
 
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramEndingHandCountRecordedEvent(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, stateId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, count, isNew));

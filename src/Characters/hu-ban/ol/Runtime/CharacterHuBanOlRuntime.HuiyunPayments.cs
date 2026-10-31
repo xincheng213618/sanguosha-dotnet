@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuBanOlRuntime
@@ -37,7 +33,7 @@ internal sealed partial class CharacterHuBanOlRuntime
         if (use.HuiyunOriginalPayment is not null)
             throw new InvalidOperationException("A Huiyun original use cannot issue another material payment tail.");
         var native = use.PaymentMovementReceipt;
-        if (native is not null && !global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch))
+        if (native is not null && !CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch))
             throw new InvalidOperationException("Huiyun cannot replace another native use's physical payment invoice.");
         native ??= new(use.Id, action.ActionId, move.Sequence - 1, move.Sequence)
         {
@@ -50,7 +46,7 @@ internal sealed partial class CharacterHuBanOlRuntime
 
     internal bool HuiyunOriginalPaymentProof(CardUseFrame use)
     {
-        if (use.HuiyunOriginalPayment is not { } r || use.PaymentMovementReceipt is not { } native || !TryGetHuiyunFirePayment(use, out var payment, out var before) || r.UseId != use.Id || r.ActionId != payment.ActionId || r.PrimaryBatchId != native.Batch.Id || r.Before != before || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<HuiyunOriginalPaymentIssuedEvent>().Count(e => e.Receipt == r) != 1 || !global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, native.Batch) || native.Batch.ParentFrameId != use.Id || native.Batch.ParentBatchId is not null || native.Batch.Movements is not [var paid])
+        if (use.HuiyunOriginalPayment is not { } r || use.PaymentMovementReceipt is not { } native || !TryGetHuiyunFirePayment(use, out var payment, out var before) || r.UseId != use.Id || r.ActionId != payment.ActionId || r.PrimaryBatchId != native.Batch.Id || r.Before != before || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<HuiyunOriginalPaymentIssuedEvent>().Count(e => e.Receipt == r) != 1 || !CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, native.Batch) || native.Batch.ParentFrameId != use.Id || native.Batch.ParentBatchId is not null || native.Batch.Movements is not [var paid])
             return false;
         return paid.CardId == payment.CardId && paid.From == payment.From && paid.To == payment.To && paid.Reason == CardMoveReasons.Use && paid.Sequence == payment.Sequence && paid.Sequence > r.Before && paid.Sequence <= r.After;
     }
@@ -63,7 +59,7 @@ internal sealed partial class CharacterHuBanOlRuntime
         if (!HuiyunOriginalPaymentProof(use) || use.Action is not { PhysicalCards: [var material] } a || use.HuiyunOriginalPayment is not { } r || use.PaymentMovementReceipt is not { } native)
             return false;
         if (batch.Id == r.PrimaryBatchId)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch);
+            return CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch);
         return material is { CardKind: CardKind.WoodenOx, From.Zone: CardZoneKind.Equipment } && batch.ParentFrameId == use.Id && batch.ParentBatchId == r.PrimaryBatchId && batch.AwaitingProgramFrameId is null && batch.NativeDrawInvocation is null && batch.NativeBuZhiDiscardInvocation is null && batch.TurnNumber == native.Batch.TurnNumber && batch.Movements.Count > 0 && batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > native.SequenceAfter && m.Sequence <= r.After && m.From == CardLocation.WoodenOxGrain(a.ProviderSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard);
     }
 

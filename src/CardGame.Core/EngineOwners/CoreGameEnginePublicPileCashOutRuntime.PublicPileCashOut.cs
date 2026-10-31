@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
 {
     internal long PublicPileCashOutSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static string PublicPileCashOutReason(ProgramSkillFrame frame, string step) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PublicPileCashOut.PublicPileCashOutReason(frame, step);
+    internal static string PublicPileCashOutReason(ProgramSkillFrame frame, string step) => RuntimeSkills.RuntimeRules_Core_PublicPileCashOut.PublicPileCashOutReason(frame, step);
     internal bool PublicPileStorageCard(int owner, string skill, string instance, Card card, CardLocation location) => location.OwnerSeat == owner && location.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && !card.IsGeneralWeapon && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, skill, instance, card) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, card, location, OwnedCardMoveIntent.Transfer);
     internal bool MatchesPublicPileStorageSelection(ProgramSkillFrame frame, string bind, Card card, CardLocation location)
     {
@@ -44,7 +40,7 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
             return false;
         if (op == SkillProgramEffectOp.StoreBoundCardsInPublicPile)
         {
-            if (context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.Amount <= 0 || context.OccurrenceIndex < 0 || context.OccurrenceIndex >= context.Amount || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || window.TriggerWindow != context.Window || window.TargetSeat != frame.OwnerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(damage => damage.Id == window.ParentFrameId)is not { } applied || context.DamageFrameId != applied.Id || applied.SourceSeat != window.SourceSeat || applied.TargetSeat != frame.OwnerSeat || applied.Amount != context.Amount)
+            if (context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.Amount <= 0 || context.OccurrenceIndex < 0 || context.OccurrenceIndex >= context.Amount || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || window.TriggerWindow != context.Window || window.TargetSeat != frame.OwnerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(damage => damage.Id == window.ParentFrameId)is not { } applied || context.DamageFrameId != applied.Id || applied.SourceSeat != window.SourceSeat || applied.TargetSeat != frame.OwnerSeat || applied.Amount != context.Amount)
                 return false;
             var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
             if (context.SourceSeat != (attack.IsSourceLess ? null : applied.SourceSeat))
@@ -52,7 +48,7 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
             return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageRequestedEvent>().Count(fact => fact.ResolutionId == applied.Id && fact.SourceSeat == applied.SourceSeat && fact.TargetSeat == applied.TargetSeat && fact.Amount == applied.Amount && fact.Nature == applied.Nature && fact.SourceLess == attack.IsSourceLess) == 1;
         }
 
-        return context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && frame.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && context.SourceSeat == frame.OwnerSeat && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame start && start.Window == context.Window && start.OwnerSeat == frame.OwnerSeat && start.Continuation == ProgramLifecycleContinuation.NormalTurnStart && start.CandidateIndex >= 0 && start.CandidateIndex < start.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, start.Candidates[start.CandidateIndex]);
+        return context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && frame.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && context.SourceSeat == frame.OwnerSeat && _resolutionStackOperations._resolutionStack[index - 1] is ProgramLifecycleTriggerWindowFrame start && start.Window == context.Window && start.OwnerSeat == frame.OwnerSeat && start.Continuation == ProgramLifecycleContinuation.NormalTurnStart && start.CandidateIndex >= 0 && start.CandidateIndex < start.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, start.Candidates[start.CandidateIndex]);
     }
 
     internal SkillProgramStepOutcome BeginPublicPileCashOut(SkillProgramEffect effect, ProgramSkillFrame input)
@@ -94,7 +90,7 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
         {
             InstructionIndex = frame.InstructionIndex,
             Operation = effect.Op,
-            Issuer = new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId),
+            Issuer = new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId),
             GameplayHash = frame.GameplayHash,
             ActualTurn = _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber,
             ParentId = frame.WindowContext!.ParentFrameId,
@@ -173,7 +169,7 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
 
     internal bool ValidPublicPileCashOut(ProgramSkillFrame frame)
     {
-        if (frame.PublicPileCashOut is not { } receipt || receipt.InstructionIndex != frame.InstructionIndex || receipt.GameplayHash != frame.GameplayHash || receipt.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || !Enum.IsDefined(receipt.Stage) || receipt.Issuer != new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || frame.WindowContext?.ParentFrameId != receipt.ParentId || !ExactPublicPileCashOutParent(frame, receipt.Operation) || receipt.Pile is not { } pile || pile.OwnerSeat != frame.OwnerSeat || pile.SkillId != frame.SkillId || pile.SkillInstanceId != frame.SkillInstanceId || pile.Capacity != int.MaxValue || receipt.FrozenCount <= 0 || receipt.FrozenCount != receipt.PaidCardIds.Count || receipt.PaidCardIds.Distinct().Count() != receipt.FrozenCount || receipt.PaidFrom.Count != receipt.FrozenCount || frame.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != frame.OwnerSeat || receipt.Before < 0 || receipt.After <= receipt.Before || receipt.After > PublicPileCashOutSequence)
+        if (frame.PublicPileCashOut is not { } receipt || receipt.InstructionIndex != frame.InstructionIndex || receipt.GameplayHash != frame.GameplayHash || receipt.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || !Enum.IsDefined(receipt.Stage) || receipt.Issuer != new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) || frame.WindowContext?.ParentFrameId != receipt.ParentId || !ExactPublicPileCashOutParent(frame, receipt.Operation) || receipt.Pile is not { } pile || pile.OwnerSeat != frame.OwnerSeat || pile.SkillId != frame.SkillId || pile.SkillInstanceId != frame.SkillInstanceId || pile.Capacity != int.MaxValue || receipt.FrozenCount <= 0 || receipt.FrozenCount != receipt.PaidCardIds.Count || receipt.PaidCardIds.Distinct().Count() != receipt.FrozenCount || receipt.PaidFrom.Count != receipt.FrozenCount || frame.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != frame.OwnerSeat || receipt.Before < 0 || receipt.After <= receipt.Before || receipt.After > PublicPileCashOutSequence)
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         if (history.OfType<PublicPileCashOutStartedEvent>().Where(fact => fact.FrameId == frame.Id).ToArray()is not [var started] || started != new PublicPileCashOutStartedEvent(frame.Id, receipt.Operation, receipt.Issuer, receipt.GameplayHash, receipt.ActualTurn, receipt.ParentId, pile, receipt.FrozenCount) || history.OfType<PublicPileCashOutPaidEvent>().Where(fact => fact.FrameId == frame.Id).ToArray()is not [var paid] || paid != new PublicPileCashOutPaidEvent(frame.Id, receipt.Operation, receipt.FrozenCount, receipt.Before, receipt.After) || history.OfType<PublicPileCashOutResolvedEvent>().Any(fact => fact.FrameId == frame.Id))
@@ -225,5 +221,5 @@ internal sealed partial class CoreGameEnginePublicPileCashOutRuntime
     internal ProgramSkillFrame? PublicPileCashOutObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.PublicPileCashOutFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 260)]
     internal bool IsPublicPileCashOutProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PublicPileCashOutObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
-    SkillProgramStepOutcome global::CardGame.Core.IPublicPileCashOutHost.ExecutePublicPileCashOut(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginPublicPileCashOut(effect, frame);
+    SkillProgramStepOutcome IPublicPileCashOutHost.ExecutePublicPileCashOut(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginPublicPileCashOut(effect, frame);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CorePlayerViewCardPaymentsRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CorePlayerViewCardPaymentsRuntime
         if (frame.ShenXuChu is { Stage: ShenXuChuStage.DiscardChoice } xuchu && decision.PlayerSeat == xuchu.TargetSeat && decision.Choices.All(choice => choice.Parameters.GetValueOrDefault("program-action") == "shen-xu-chu"))
             return ProjectCollectedOwnedCards(decision, frame, "shen-xu-chu-discard:" + xuchu.TargetIndex, xuchu.RequiredDiscards - xuchu.Selected.Count, selected: xuchu.Selected);
         if (frame.LianZhu is { Stage: LianZhuStage.SelectingDiscard } lianzhu && decision.Choices.All(choice => choice.Parameters.GetValueOrDefault("program-action") == "lianzhu"))
-            return ProjectCollectedOwnedCards(decision, frame, "lianzhu-discard", global::CardGame.Core.EngineOwners.CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(lianzhu) - lianzhu.Selected.Count, selected: lianzhu.Selected);
+            return ProjectCollectedOwnedCards(decision, frame, "lianzhu-discard", CoreGameEngineLianZhuCountsRuntime.LianZhuChoiceAmount(lianzhu) - lianzhu.Selected.Count, selected: lianzhu.Selected);
         if (frame.NamedTurnCountFlow is { Stage: "hand" } named && decision.Choices.All(choice => choice.Parameters.GetValueOrDefault("program-action") == "named-turn-flow"))
             return ProjectCollectedOwnedCards(decision, frame, "named-turn-hand", named.Required - named.SelectedIds.Count, selected: named.SelectedIds);
         if (frame.DrawAdviceReceipt is { Stage: DrawAdviceStage.ChoosingDiscard } advice && decision.Choices.All(choice => choice.Parameters.GetValueOrDefault("program-action") == "draw-advice-discard"))

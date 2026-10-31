@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramOwnedCardDistributionsRuntime
@@ -92,7 +88,7 @@ internal sealed partial class CoreGameEngineProgramOwnedCardDistributionsRuntime
         _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(card, CardLocation.Hand(targetSeat), expectedReason, _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, distribution.CardOwnerSeat, targetSeat, [cardId], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         var givenIds = distribution.GivenCardIds.Append(cardId).ToArray();
         var targetSeats = distribution.TargetSeats.Append(targetSeat).ToArray();
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramOwnedCardDistributedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), distribution.CardOwnerSeat, targetSeat, cardId, givenIds.Length, distribution.RequiredCount));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramOwnedCardDistributedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), distribution.CardOwnerSeat, targetSeat, cardId, givenIds.Length, distribution.RequiredCount));
         _coreMatchLogOperations.AddLog("SkillCardGiven", $"{(_coreMatchParticipantsPlayersAccess._players[distribution.CardOwnerSeat].Name)} 通过【{(_contentRegistryOperations._contentRegistry!.GetSkill(frame.SkillId).Name)}】交给 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 一张牌。", distribution.CardOwnerSeat, targetSeat);
         if (givenIds.Length >= distribution.RequiredCount)
         {
@@ -124,7 +120,7 @@ internal sealed partial class CoreGameEngineProgramOwnedCardDistributionsRuntime
         if (allies.Length == 0 && decline is not null)
             return decline;
         var candidates = allies.Length > 0 ? allies : giveChoices;
-        return candidates.OrderBy(choice => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(distribution.Zones.SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new CardLocation(zone, distribution.CardOwnerSeat))).Single(card => card.Id == choice.Cards.Single()), owner)).ThenBy(choice => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[choice.Targets.Single()]).Count).ThenBy(choice => choice.Targets.Single()).ThenBy(choice => choice.Cards.Single()).First();
+        return candidates.OrderBy(choice => CoreNativeAiDecisionsRuntime.GetKeepValue(distribution.Zones.SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new CardLocation(zone, distribution.CardOwnerSeat))).Single(card => card.Id == choice.Cards.Single()), owner)).ThenBy(choice => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[choice.Targets.Single()]).Count).ThenBy(choice => choice.Targets.Single()).ThenBy(choice => choice.Cards.Single()).First();
     }
 
     internal static bool AreProgramDistributionAllies(CharacterState owner, CharacterState target) => owner.TeamId is not null || target.TeamId is not null ? owner.TeamId is not null && owner.TeamId == target.TeamId : owner.Role switch
@@ -135,5 +131,5 @@ internal sealed partial class CoreGameEngineProgramOwnedCardDistributionsRuntime
         _ => false
     };
 
-    internal static string ProgramOwnedDistributionZoneName(CardZoneKind zone) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramOwnedCardDistributions.ProgramOwnedDistributionZoneName(zone);
+    internal static string ProgramOwnedDistributionZoneName(CardZoneKind zone) => RuntimeSkills.RuntimeRules_Core_ProgramOwnedCardDistributions.ProgramOwnedDistributionZoneName(zone);
 }

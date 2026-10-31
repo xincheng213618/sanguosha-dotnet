@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_DamageTargetMountObserver
 {
     internal static bool MountObserverCandidateMatches(ProgramSkillFrame p,ProgramTriggerCandidate c)=>

@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime
@@ -44,7 +39,7 @@ internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime
     internal ProgramSkillWindowContext CreateShanheChanrangContext(CardsMovedTriggerWindowFrame window, ProgramTriggerCandidate candidate) => new(SkillProgramTriggerWindow.CardsMoved, window.Id, candidate.OwnerSeat, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]), MovementBatch: window.Batch);
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 5434)]
     internal bool IsIssuedShanheChanrang(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => IsShanheChanrangCandidate(candidate) && context is { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } && context.OwnerSeat == candidate.OwnerSeat && ShanheChanrangRecipients(batch, candidate.OwnerSeat).Length != 0 && _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().LastOrDefault()is { } window && window.Id == context.ParentFrameId && window.Batch.Id == batch.Id && window.CandidateIndex < window.Candidates.Count && window.CandidateIndex >= 0 && window.Candidates[window.CandidateIndex] == candidate && ShanheChanrangEquipment(candidate.OwnerSeat, candidate.SkillInstanceId)is not null;
-    SkillProgramStepOutcome global::CardGame.Core.IShanheChanrangHost.Resolve(ProgramSkillFrame frame) => BeginShanheChanrang(frame);
+    SkillProgramStepOutcome IShanheChanrangHost.Resolve(ProgramSkillFrame frame) => BeginShanheChanrang(frame);
     internal SkillProgramStepOutcome BeginShanheChanrang(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -106,7 +101,7 @@ internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The edict lost its original frame.");
         var draft = frame.ShanheChanrang!;
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheChanrangChoices(frame).Where(candidate => candidate.Id == choice.Id).ToArray()))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheChanrangChoices(frame).Where(candidate => candidate.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("The edict choice is no longer its exact issued card or branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -131,7 +126,7 @@ internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime
         if (!_coreMatchParticipantsPlayersAccess._players[giver].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !ShanheChanrangCards(giver).Any(candidate => candidate.Id == card))
             throw new InvalidOperationException("The edict payment lost its actual giver, living recipient or owned entity.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheChanrang = draft with { Stage = "paid", PaidCardId = card, Choices = [] } });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card], CardLocation.Hand(recipient), global::CardGame.Core.EngineOwners.CoreGameEngineShanheChanrangEdictDefinitions.ShanheChanrangGiveReason, _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, giver, recipient, [card], _coreCardMovementJournalMovementSequenceAccess._movementSequence, (_, movements) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card], CardLocation.Hand(recipient), CoreGameEngineShanheChanrangEdictDefinitions.ShanheChanrangGiveReason, _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, giver, recipient, [card], _coreCardMovementJournalMovementSequenceAccess._movementSequence, (_, movements) =>
         {
             var move = movements.Single(item => item.CardId == card && item.To == CardLocation.Hand(recipient));
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -194,8 +189,8 @@ internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime
     {
         var draft = frame.ShanheChanrang!;
         if (draft.Stage == "card")
-            return decision.Choices.OrderBy(choice => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[draft.GiverSeat!.Value])).First();
-        var ally = global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[draft.Recipients[draft.Cursor]]);
+            return decision.Choices.OrderBy(choice => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[draft.GiverSeat!.Value])).First();
+        var ally = CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[draft.Recipients[draft.Cursor]]);
         return decision.Choices.FirstOrDefault(choice => choice.Parameters["branch"] == (ally ? "give" : "take")) ?? decision.Choices[0];
     }
 

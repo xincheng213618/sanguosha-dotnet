@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterCaoPiMouMouCaoPiControlsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterCaoPiMouMouCaoPiControlsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.MouCaoPiControl> _mouCaoPiControls { get; }
+    ref readonly List<MouCaoPiControl> _mouCaoPiControls { get; }
 }

@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTianChouOlRuntime
 {
     internal const string TianChouTopReason = "skill-program.tian-chou.shandao.top";
-    internal static CardConversionSource TianChouSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_tian_chou_ol_TianChou.TianChouSource(f);
+    internal static CardConversionSource TianChouSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_tian_chou_ol_TianChou.TianChouSource(f);
     internal bool TianChouHasCards(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat)).Any();
-    SkillProgramStepOutcome global::CardGame.Core.ITianChouHost.Resolve(ProgramSkillFrame f) => BeginTianChou(f);
+    SkillProgramStepOutcome ITianChouHost.Resolve(ProgramSkillFrame f) => BeginTianChou(f);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 27090, SkillProgramEffectOp.ResolveShandaoTopAndGlobalTricks)]
     internal bool CanActivateTianChou(CharacterState owner) => _coreMatchParticipantsPlayersAccess._players.Any(p => TianChouHasCards(p.Seat));
     internal SkillProgramStepOutcome BeginTianChou(ProgramSkillFrame supplied)
@@ -79,7 +76,7 @@ internal sealed partial class CharacterTianChouOlRuntime
     [ProgramAnswer("tian-chou-shandao")]
     internal void AnswerTianChou(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TianChouShandao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !TianChouChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TianChouShandao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !TianChouChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shandao requires the owner's exact currently published target or private card slot.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Tops.Count == 0 && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("An unpaid Shandao choice lost its living source.");
@@ -252,7 +249,7 @@ internal sealed partial class CharacterTianChouOlRuntime
         }
 
         // Visible equipment can deliberately be stripped; a foreign hand is only a blind slot.
-        return p.Choices.OrderBy(c => c.Cards is [var id] ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[r.Targets[r.Cursor]]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+        return p.Choices.OrderBy(c => c.Cards is [var id] ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[r.Targets[r.Cursor]]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     }
 
     [PublicHandRevealReturn("shandao-hand-top")]

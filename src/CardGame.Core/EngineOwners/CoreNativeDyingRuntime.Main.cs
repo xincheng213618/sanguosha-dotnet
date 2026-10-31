@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeDyingRuntime
 {
-    internal void BeginDying(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageFrameId, CharacterState victim, CharacterState killer)
+    internal void BeginDying(GameEngine.IDamageAttempt attack, long damageFrameId, CharacterState victim, CharacterState killer)
     {
         if (_coreDyingCursorRuntimeOperations.ActiveDying is not null)
         {
@@ -202,7 +198,7 @@ internal sealed partial class CoreNativeDyingRuntime
                     ["target-seat"] = victim.Seat.ToString(System.Globalization.CultureInfo.InvariantCulture)
                 };
                 if (source is not null)
-                    global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
+                    CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
                 if (source is null && _coreNativePublicPileOriginalCardsOperations.IsNativePublicPileOriginalChoice(responder, peach, CardKind.Peach, true))
                     parameters["native-original-public-pile"] = "true";
                 return new PromptChoice(new ChoiceId($"dying.peach.card-{(peach.Id)}.source-{(index)}"), source is null ? $"使用【桃】救援 {(victim.Name)}。" : $"发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(source!.SkillId).Name)}】，将【{(peach.DisplayName)}】当作【桃】救援 {(victim.Name)}。", [peach.Id], [], parameters);
@@ -350,7 +346,7 @@ internal sealed partial class CoreNativeDyingRuntime
             throw new InvalidOperationException("The completed dying continuation is not current.");
         }
 
-        var receipt = new global::CardGame.Core.GameEngine.DyingCompletionReceipt(dying.Id, dying.ParentFrameId, dying.VictimSeat, dying.Continuation);
+        var receipt = new GameEngine.DyingCompletionReceipt(dying.Id, dying.ParentFrameId, dying.VictimSeat, dying.Continuation);
         _coreDynamicDiscardDamagePaymentsOperations.CaptureDynamicDiscardDamageSurvival(receipt, survived);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DyingResolvedEvent(dying.FrameId, dying.VictimSeat, survived));
         _coreRuntimeOperations.PopResolutionFrame(dying.FrameId, ResolutionFrameKind.Dying);
@@ -361,7 +357,7 @@ internal sealed partial class CoreNativeDyingRuntime
         ContinueDyingAfterFactionRecoveryDebts(receipt, survived);
     }
 
-    internal void ContinueDyingAfterFactionRecoveryDebts(global::CardGame.Core.GameEngine.DyingCompletionReceipt dying, bool survived)
+    internal void ContinueDyingAfterFactionRecoveryDebts(GameEngine.DyingCompletionReceipt dying, bool survived)
     {
         if (dying.Continuation == DyingContinuationKind.SkillInvocation)
         {
@@ -390,7 +386,7 @@ internal sealed partial class CoreNativeDyingRuntime
         CompleteDamageAfterDying(dying);
     }
 
-    internal void CompleteDamageAfterDying(global::CardGame.Core.GameEngine.DyingCompletionReceipt dying)
+    internal void CompleteDamageAfterDying(GameEngine.DyingCompletionReceipt dying)
     {
         var victim = _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat];
         var attack = _coreNativeDamageHandlesOperations.GetCompletedDyingAttack(dying) ?? throw new InvalidOperationException("A damage dying continuation has no attack.");

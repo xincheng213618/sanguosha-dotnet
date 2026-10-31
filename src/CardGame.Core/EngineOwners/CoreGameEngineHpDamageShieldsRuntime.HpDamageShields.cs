@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -66,7 +63,7 @@ internal sealed partial class CoreGameEngineHpDamageShieldsRuntime
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The shield choice lost its owning program.");
         var draft = frame.HpDamageShieldDraft ?? throw new InvalidOperationException("The shield choice lost its unpaid draft.");
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [HpDamageShieldChoices(frame).Single(c => c.Id == choice.Id)]))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [HpDamageShieldChoices(frame).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("The shield choice differs from its frozen owning prompt.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -81,7 +78,7 @@ internal sealed partial class CoreGameEngineHpDamageShieldsRuntime
             throw new InvalidOperationException("The frozen shield targets exceed the affordable HP quantity.");
         var before = owner.Hp;
         owner.Hp -= requested;
-        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { HpDamageShieldDraft = null, HpDamageShieldReceipt = new(frame.InstructionIndex, draft.Marker, frame.OwnerSeat, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.GameplayHash, before, owner.Hp, before - owner.Hp, Array.AsReadOnly(choice.Targets.ToArray()), _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { HpDamageShieldDraft = null, HpDamageShieldReceipt = new(frame.InstructionIndex, draft.Marker, frame.OwnerSeat, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.GameplayHash, before, owner.Hp, before - owner.Hp, Array.AsReadOnly(choice.Targets.ToArray()), _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat) });
         _coreHpChangeProgramsOperations.RecordHpChange(frame.Id, null, owner.Seat, before, owner.Hp, HpChangeKind.Loss);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillHpLostEvent(frame.Id, frame.SkillId, owner.Seat, before - owner.Hp, owner.Hp));
         if (owner.Hp == 0)
@@ -128,7 +125,7 @@ internal sealed partial class CoreGameEngineHpDamageShieldsRuntime
         return false;
     }
 
-    internal bool TryConsumeOneUseDamageShield(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount)
+    internal bool TryConsumeOneUseDamageShield(GameEngine.IDamageAttempt attack, int amount)
     {
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
         if (amount <= 0 || target.OneUseDamageShields.FirstOrDefault()is not { } shield)
@@ -190,7 +187,7 @@ internal sealed partial class CoreGameEngineHpDamageShieldsRuntime
         return view.Players.Where(p => p.IsAlive && p.Seat != owner.Seat).Select(p => _coreAiBrainsAiBrainsAccess._aiBrains[owner.Seat].ScoreProgramTarget(view, p.Seat, hint)).DefaultIfEmpty(-1000d).Max();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHpDamageShieldProgramHost.PayHpToGrantOneUseDamageShield(ProgramSkillFrame frame, PlayerMarkerKind marker) => BeginHpDamageShieldPayment(frame, marker);
+    SkillProgramStepOutcome IHpDamageShieldProgramHost.PayHpToGrantOneUseDamageShield(ProgramSkillFrame frame, PlayerMarkerKind marker) => BeginHpDamageShieldPayment(frame, marker);
     [ProgramDamageHook(ProgramDamagePhase.BeforeProgramWindow, 20)]
-    internal ProgramDamageInterception InterceptOneUseDamageShield(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, DamageNature nature) => TryConsumeOneUseDamageShield(attack, amount) ? ProgramDamageInterception.Prevented : ProgramDamageInterception.Continue;
+    internal ProgramDamageInterception InterceptOneUseDamageShield(GameEngine.IDamageAttempt attack, int amount, DamageNature nature) => TryConsumeOneUseDamageShield(attack, amount) ? ProgramDamageInterception.Prevented : ProgramDamageInterception.Continue;
 }

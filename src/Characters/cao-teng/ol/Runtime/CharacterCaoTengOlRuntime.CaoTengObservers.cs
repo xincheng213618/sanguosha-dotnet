@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoTengOlRuntime
@@ -49,7 +45,7 @@ internal sealed partial class CharacterCaoTengOlRuntime
             return IsCaoTengRecoveryParent(f, recovery);
         if (child is CardsMovedTriggerWindowFrame moved)
         {
-            if (!global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || moved.ResumeProgramFrameId != f.Id || moved.Batch.Movements.Any(m => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || m.Sequence <= r.Before || m.Sequence > r.After))
+            if (!CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || moved.ResumeProgramFrameId != f.Id || moved.Batch.Movements.Any(m => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || m.Sequence <= r.Before || m.Sequence > r.After))
                 return false;
             var reason = r.Stage == CaoTengStage.JianxiongDrawChildren ? CaoTengJianxiongDrawReason : r.Stage == CaoTengStage.JianxiongClaimChildren ? CaoTengJianxiongClaimReason : r.Stage == CaoTengStage.YongzuChildren && r.Option == "draw" ? CaoTengYongzuDrawReason : null;
             var actor = r.Stage == CaoTengStage.YongzuChildren ? CaoTengChooser(f) : f.OwnerSeat;

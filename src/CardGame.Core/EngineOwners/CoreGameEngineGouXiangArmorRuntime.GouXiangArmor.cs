@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGouXiangArmorRuntime
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEngineGouXiangArmorRuntime
         if (context is not { Window: SkillProgramTriggerWindow.CardResponseCompleted, CardUse: { } useContext } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || _coreExtendedViewAsOperations.IsArmorIneffectiveForTurn(_coreMatchParticipantsPlayersAccess._players[ownerSeat]) || !_characterHuCheErMouOperations.KongwuEffectiveEquipment(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Any(card => card.Kind == CardKind.GouXiang && _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(ownerSeat, GouXiangArmorSkill, instanceId, card)))
             return false;
         var completed = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(window => window.ResponseCompletion?.ActionId == useContext.CardActionId);
-        if (completed is not { ResponseCompletion: { OriginalContinuation: ProgramCardContinuation.Dodge } returned, Action: { Type: CardActionType.Response, EffectiveKind: CardKind.Dodge } response } || response.ActorSeat != ownerSeat || response.ProviderSeat != ownerSeat || response.RequesterSeat is not null || returned.CompletionActorSeat != ownerSeat || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == returned.ParentFrameId)is not { Action: { } slash } original || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(slash.EffectiveKind) || response.ParentActionId != slash.ActionId || returned.AttackOwnerFrameId != original.Id || completed.AttackOwnerFrameId != original.Id || response.OpponentSeat != slash.ActorSeat || slash.ActorSeat == ownerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(slash.ActorSeat) || !_coreMatchParticipantsPlayersAccess._players[slash.ActorSeat].IsAlive || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[slash.ActorSeat]).Count == 0)
+        if (completed is not { ResponseCompletion: { OriginalContinuation: ProgramCardContinuation.Dodge } returned, Action: { Type: CardActionType.Response, EffectiveKind: CardKind.Dodge } response } || response.ActorSeat != ownerSeat || response.ProviderSeat != ownerSeat || response.RequesterSeat is not null || returned.CompletionActorSeat != ownerSeat || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == returned.ParentFrameId)is not { Action: { } slash } original || !CoreNativeCardClassificationsRuntime.IsSlashCard(slash.EffectiveKind) || response.ParentActionId != slash.ActionId || returned.AttackOwnerFrameId != original.Id || completed.AttackOwnerFrameId != original.Id || response.OpponentSeat != slash.ActorSeat || slash.ActorSeat == ownerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(slash.ActorSeat) || !_coreMatchParticipantsPlayersAccess._players[slash.ActorSeat].IsAlive || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[slash.ActorSeat]).Count == 0)
             return false;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(original.Id);
         if (attack.SourceSeat != slash.ActorSeat || attack.TargetSeat != ownerSeat || attack.IgnoresArmor || _coreDirectedCardPolicyQueriesOperations.HasDirectedCardArmorBypass(original.Id, ownerSeat) || !((response.EffectiveSuit is { } suit && suit != Suit.None && slash.EffectiveSuit == suit) || (response.EffectiveRank is> 0 && slash.EffectiveRank == response.EffectiveRank)))
@@ -39,7 +35,7 @@ internal sealed partial class CoreGameEngineGouXiangArmorRuntime
         return true;
     }
 
-    void global::CardGame.Core.IGouXiangArmorHost.ObtainAttackerHandCard(ProgramSkillFrame frame) => ObtainGouXiangAttackerHandCard(frame);
+    void IGouXiangArmorHost.ObtainAttackerHandCard(ProgramSkillFrame frame) => ObtainGouXiangAttackerHandCard(frame);
     internal void ObtainGouXiangAttackerHandCard(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

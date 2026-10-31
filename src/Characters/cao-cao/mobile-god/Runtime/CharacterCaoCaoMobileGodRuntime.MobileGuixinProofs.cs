@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoCaoMobileGodRuntime
@@ -22,10 +18,10 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
                 continue;
             }
 
-            if (payments is not [var p] || p.TargetSeat != r.OtherSeats[cursor] || p.From.OwnerSeat != p.TargetSeat || !global::CardGame.Core.EngineOwners.CharacterCaoCaoMobileGodDefinitions.MobileGuixinZones.Contains(p.From.Zone) || p.CardId <= 0 || p.BatchId <= 0 || p.Before < prior || p.Before < 0 || p.After <= p.Before || p.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || p.Movements is not [var movement] || movement.CardId != p.CardId || movement.From != p.From || movement.Sequence <= p.Before || !MobileGuixinPaymentTail(f, p, movement) || movement.Reason.Value != MobileGuixinReason || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m == movement) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileGuixinMovementPaidEvent>().Count(e => e == new MobileGuixinMovementPaidEvent(f.Id, cursor, p.TargetSeat, p.BatchId, 1, p.Before, p.After)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileGuixinSeatSkippedEvent>().Any(e => e.FrameId == f.Id && e.Cursor == cursor))
+            if (payments is not [var p] || p.TargetSeat != r.OtherSeats[cursor] || p.From.OwnerSeat != p.TargetSeat || !CharacterCaoCaoMobileGodDefinitions.MobileGuixinZones.Contains(p.From.Zone) || p.CardId <= 0 || p.BatchId <= 0 || p.Before < prior || p.Before < 0 || p.After <= p.Before || p.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || p.Movements is not [var movement] || movement.CardId != p.CardId || movement.From != p.From || movement.Sequence <= p.Before || !MobileGuixinPaymentTail(f, p, movement) || movement.Reason.Value != MobileGuixinReason || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m == movement) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileGuixinMovementPaidEvent>().Count(e => e == new MobileGuixinMovementPaidEvent(f.Id, cursor, p.TargetSeat, p.BatchId, 1, p.Before, p.After)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileGuixinSeatSkippedEvent>().Any(e => e.FrameId == f.Id && e.Cursor == cursor))
                 return false;
             var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(p.CardId);
-            var expected = card.IsGeneralWeapon && p.From.Zone == CardZoneKind.Equipment || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, p.From, CardLocation.Hand(f.OwnerSeat)) ? CardLocation.OutsideGame : CardLocation.Hand(f.OwnerSeat);
+            var expected = card.IsGeneralWeapon && p.From.Zone == CardZoneKind.Equipment || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, p.From, CardLocation.Hand(f.OwnerSeat)) ? CardLocation.OutsideGame : CardLocation.Hand(f.OwnerSeat);
             if (movement.To != _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(card, p.From, expected))
                 return false;
             prior = p.After;

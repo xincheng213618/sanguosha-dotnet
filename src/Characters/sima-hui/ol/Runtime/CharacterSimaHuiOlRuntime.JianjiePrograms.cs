@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaHuiOlRuntime
 {
     internal CardConversionSource SimaHuiIssuer(ProgramSkillFrame f) => new("ol:jianjie", "seals", f.OwnerSeat, f.SkillInstanceId);
-    internal static string SimaHuiSealSource(CardConversionSource issuer, PlayerMarkerKind marker) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sima_hui_ol_Jianjie_Programs.SimaHuiSealSource(issuer, marker);
+    internal static string SimaHuiSealSource(CardConversionSource issuer, PlayerMarkerKind marker) => RuntimeSkills.RuntimeRules_sima_hui_ol_Jianjie_Programs.SimaHuiSealSource(issuer, marker);
     internal int? SimaHuiHolder(CardConversionSource issuer, PlayerMarkerKind marker) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SimaHuiSealMovedEvent>().LastOrDefault(e => e.Issuer == issuer && e.Marker == marker)?.Holder;
     internal int SimaHuiOwnTurns(int owner) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Count(e => e.ActorSeat == owner);
     internal void SetSimaHuiSeal(ProgramSkillFrame f, CardConversionSource issuer, PlayerMarkerKind marker, int? from, int? to)
@@ -60,7 +55,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
         {
             var source = $"sima-hui:combined:{(p.Seat)}";
             var id = source + ":ol:yeyan-jianjie";
-            var both = global::CardGame.Core.EngineOwners.CharacterSimaHuiOlDefinitions.SimaHuiSeals.All(m => p.Markers.GetValueOrDefault(m) > 0);
+            var both = CharacterSimaHuiOlDefinitions.SimaHuiSeals.All(m => p.Markers.GetValueOrDefault(m) > 0);
             if (both)
                 p.SkillGrants.Grant(new(id, "ol:yeyan-jianjie", id, source));
             else

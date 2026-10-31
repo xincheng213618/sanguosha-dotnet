@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAdjacentDiscardStorageRuntime
@@ -11,10 +7,10 @@ internal sealed partial class CoreGameEngineAdjacentDiscardStorageRuntime
 
     internal CardKind? FreezeAdjacentDiscardPaymentIdentity(Card card, CardLocation from, CardLocation to, CardMoveReason reason)
     {
-        if (!TracksAdjacentDiscardStorage || from.OwnerSeat is not { } source || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment) || to != CardLocation.DiscardPile && to != CardLocation.Processing || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(reason))
+        if (!TracksAdjacentDiscardStorage || from.OwnerSeat is not { } source || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment) || to != CardLocation.DiscardPile && to != CardLocation.Processing || !CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(reason))
             return null;
         var kind = from.Zone == CardZoneKind.Hand ? _coreActionQueriesOperations.GetProgramCardIdentityMatches(_coreMatchParticipantsPlayersAccess._players[source], card).FirstOrDefault()?.Identity.OutputKind ?? card.Kind : card.Kind;
-        return global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(kind) ? kind : null;
+        return CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(kind) ? kind : null;
     }
 
     internal void CaptureAdjacentDiscardOrigin(Card card, CardMovementRecord move, CardKind? frozenIdentity)
@@ -34,7 +30,7 @@ internal sealed partial class CoreGameEngineAdjacentDiscardStorageRuntime
             return;
         }
 
-        if (move.From.OwnerSeat is not { } source || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || move.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment) || move.To != CardLocation.DiscardPile && move.To != CardLocation.Processing || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(move.Reason) || frozenIdentity is not { } kind || !global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(kind))
+        if (move.From.OwnerSeat is not { } source || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || move.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment) || move.To != CardLocation.DiscardPile && move.To != CardLocation.Processing || !CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(move.Reason) || frozenIdentity is not { } kind || !CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(kind))
             return;
         var living = _coreTableOrderOperations.CurrentTableOrder().Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive).ToArray();
         var index = Array.IndexOf(living, source);
@@ -53,11 +49,11 @@ internal sealed partial class CoreGameEngineAdjacentDiscardStorageRuntime
     }
 
     internal ProgramAdjacentDiscardOriginEvent? AdjacentDiscardOrigin(CardMovementRecord move) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramAdjacentDiscardOriginEvent>().SingleOrDefault(e => e.MovementSequence == move.Sequence && e.CardId == move.CardId);
-    internal int[] MatchingAdjacentDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => batch.Movements.Select((move, index) => (move, index, origin: AdjacentDiscardOrigin(move))).Where(x => x.move.To == CardLocation.DiscardPile && _cardZonesOperations._cardZones.GetLocation(x.move.CardId) == CardLocation.DiscardPile && x.origin is { } origin && global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(origin.EffectiveKind) && (candidate.OwnerSeat == origin.SourceSeat || candidate.OwnerSeat == origin.PreviousLivingSeat || candidate.OwnerSeat == origin.NextLivingSeat)).Select(x => x.index).ToArray();
-    SkillProgramStepOutcome global::CardGame.Core.IAdjacentDiscardAndRoundAlcoholHost.StoreAdjacentDiscardedSlash(ProgramSkillFrame frame, CardZoneKind zone) => BeginAdjacentDiscardStorage(frame, zone);
-    SkillProgramStepOutcome global::CardGame.Core.IAdjacentDiscardAndRoundAlcoholHost.OfferCurrentSlashFireAndExtraTarget(ProgramSkillFrame frame) => _coreCurrentSlashFireOffersOperations.BeginCurrentSlashFireOffer(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IAdjacentDiscardAndRoundAlcoholHost.PayCompletedUseDiscardOrLoseHp(ProgramSkillFrame frame) => _coreCompletedUsePaymentsOperations.BeginCompletedUsePayment(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IAdjacentDiscardAndRoundAlcoholHost.UseRoundPricedPileDyingAlcohol(ProgramSkillFrame frame, string stateId, CardZoneKind zone) => _coreRoundPricedPileAlcoholOperations.BeginRoundPileAlcohol(frame, stateId, zone);
+    internal int[] MatchingAdjacentDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => batch.Movements.Select((move, index) => (move, index, origin: AdjacentDiscardOrigin(move))).Where(x => x.move.To == CardLocation.DiscardPile && _cardZonesOperations._cardZones.GetLocation(x.move.CardId) == CardLocation.DiscardPile && x.origin is { } origin && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(origin.EffectiveKind) && (candidate.OwnerSeat == origin.SourceSeat || candidate.OwnerSeat == origin.PreviousLivingSeat || candidate.OwnerSeat == origin.NextLivingSeat)).Select(x => x.index).ToArray();
+    SkillProgramStepOutcome IAdjacentDiscardAndRoundAlcoholHost.StoreAdjacentDiscardedSlash(ProgramSkillFrame frame, CardZoneKind zone) => BeginAdjacentDiscardStorage(frame, zone);
+    SkillProgramStepOutcome IAdjacentDiscardAndRoundAlcoholHost.OfferCurrentSlashFireAndExtraTarget(ProgramSkillFrame frame) => _coreCurrentSlashFireOffersOperations.BeginCurrentSlashFireOffer(frame);
+    SkillProgramStepOutcome IAdjacentDiscardAndRoundAlcoholHost.PayCompletedUseDiscardOrLoseHp(ProgramSkillFrame frame) => _coreCompletedUsePaymentsOperations.BeginCompletedUsePayment(frame);
+    SkillProgramStepOutcome IAdjacentDiscardAndRoundAlcoholHost.UseRoundPricedPileDyingAlcohol(ProgramSkillFrame frame, string stateId, CardZoneKind zone) => _coreRoundPricedPileAlcoholOperations.BeginRoundPileAlcohol(frame, stateId, zone);
     internal SkillProgramStepOutcome BeginAdjacentDiscardStorage(ProgramSkillFrame input, CardZoneKind zone)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -65,7 +61,7 @@ internal sealed partial class CoreGameEngineAdjacentDiscardStorageRuntime
             throw new InvalidOperationException("Adjacent storage lost its exact original discarded entity.");
         var move = batch.Movements[index];
         var origin = AdjacentDiscardOrigin(move);
-        if (origin is null || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) || move.To != CardLocation.DiscardPile || !global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(origin.EffectiveKind) || f.OwnerSeat != origin.SourceSeat && f.OwnerSeat != origin.PreviousLivingSeat && f.OwnerSeat != origin.NextLivingSeat)
+        if (origin is null || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) || move.To != CardLocation.DiscardPile || !CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(origin.EffectiveKind) || f.OwnerSeat != origin.SourceSeat && f.OwnerSeat != origin.PreviousLivingSeat && f.OwnerSeat != origin.NextLivingSeat)
             throw new InvalidOperationException("Adjacent storage lost its frozen identity or neighbor proof.");
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _cardZonesOperations._cardZones.GetLocation(move.CardId) != CardLocation.DiscardPile)
         {
@@ -79,7 +75,7 @@ internal sealed partial class CoreGameEngineAdjacentDiscardStorageRuntime
         {
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(active with { AdjacentDiscardStorage = active.AdjacentDiscardStorage!with { StoreMovementSequence = stored.Sequence } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAdjacentDiscardStoredEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), card.Id, move.Sequence, stored.Sequence, zone));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAdjacentDiscardStoredEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), card.Id, move.Sequence, stored.Sequence, zone));
         });
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return SkillProgramStepOutcome.AwaitChild;
@@ -102,7 +98,7 @@ internal sealed partial class CoreGameEngineAdjacentDiscardStorageRuntime
         if (f.AdjacentDiscardStorage is not { } r)
             return;
         var paused = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        if (paused.Op != SkillProgramEffectOp.StoreAdjacentDiscardedSlash || r.InstructionIndex != f.InstructionIndex || paused.DestinationZone != r.Zone || f.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count || batch.Movements[index].Sequence != r.DiscardMovementSequence || batch.Movements[index].CardId != r.CardId || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.StoreMovementSequence && m.CardId == r.CardId && m.From == CardLocation.DiscardPile && m.To == new CardLocation(r.Zone, f.OwnerSeat) && m.Reason.Value == $"skill-program.{(f.SkillId)}.adjacent-discard-store") || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramAdjacentDiscardStoredEvent>().Any(e => e.ProgramFrameId == f.Id && e.Source == new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && e.CardId == r.CardId && e.DiscardMovementSequence == r.DiscardMovementSequence && e.StoreMovementSequence == r.StoreMovementSequence && e.Zone == r.Zone))
+        if (paused.Op != SkillProgramEffectOp.StoreAdjacentDiscardedSlash || r.InstructionIndex != f.InstructionIndex || paused.DestinationZone != r.Zone || f.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count || batch.Movements[index].Sequence != r.DiscardMovementSequence || batch.Movements[index].CardId != r.CardId || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.StoreMovementSequence && m.CardId == r.CardId && m.From == CardLocation.DiscardPile && m.To == new CardLocation(r.Zone, f.OwnerSeat) && m.Reason.Value == $"skill-program.{(f.SkillId)}.adjacent-discard-store") || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramAdjacentDiscardStoredEvent>().Any(e => e.ProgramFrameId == f.Id && e.Source == new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && e.CardId == r.CardId && e.DiscardMovementSequence == r.DiscardMovementSequence && e.StoreMovementSequence == r.StoreMovementSequence && e.Zone == r.Zone))
             throw new InvalidOperationException("Stored discard receipt lost its exact committed movement/source.");
     }
 

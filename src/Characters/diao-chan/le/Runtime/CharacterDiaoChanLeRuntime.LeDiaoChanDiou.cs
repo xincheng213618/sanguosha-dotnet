@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDiaoChanLeRuntime
 {
     internal const string DiouDrawReason = "skill-program.le-diao-chan.diou.draw";
-    SkillProgramStepOutcome global::CardGame.Core.ILeDiaoChanDiouHost.Resolve(ProgramSkillFrame frame) => BeginDiou(frame);
+    SkillProgramStepOutcome ILeDiaoChanDiouHost.Resolve(ProgramSkillFrame frame) => BeginDiou(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29042, SkillProgramEffectOp.ResolveDiouTanbanUse)]
     internal bool CanOfferDiou(ProgramTriggerLegalityContext gate) => IsIssuedDiouCandidate(gate.Candidate, gate.Context) && DiouShowableCards(gate.Candidate.OwnerSeat, new(gate.Candidate.SkillId, gate.Candidate.BindingId, gate.Candidate.OwnerSeat, gate.Candidate.SkillInstanceId)).Count > 0;
     internal SkillProgramStepOutcome BeginDiou(ProgramSkillFrame supplied)
@@ -74,7 +71,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     [ProgramAnswer("le-diou")]
     internal void AnswerDiou(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Diou: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DiouChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Diou: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DiouChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Diou cannot answer a changed original entity or unpublished native option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["branch"] == "cancel")
@@ -88,10 +85,10 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             var card = DiouShowableCards(f.OwnerSeat, DiouSource(f)).Single(c => c.Id == choice.Cards.Single());
             var kind = _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], card);
             var first = !DiouWasShownThisTurn(card.Id);
-            var same = global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind) == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.Claim.EffectiveKind);
+            var same = CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind) == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.Claim.EffectiveKind);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Diou = r with { Paid = true, ShownCardId = card.Id, ShownPrintedKind = card.Kind, OutputKind = kind, FirstShow = first, SameName = same, ActualTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, TurnOwner = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, ShowSequence = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Stage = DiouStage.UseChoice } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouShownEvent(f.Id, f.OwnerSeat, card.Id, card.Kind, kind, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, first, same));
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "diou-retained-hand", [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "diou-retained-hand", [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
             if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "diou-retained-hand"))
                 return;
             PublishDiou(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
@@ -194,7 +191,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             return seats.Sum(t =>
             {
                 var hint = new SkillProgramAiHint(0, 0, 0, 0, 0, 0, false, false);
-                if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind is CardKind.Duel or CardKind.FireAttack or CardKind.BarbarianAssault or CardKind.ArrowBarrage)
+                if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind is CardKind.Duel or CardKind.FireAttack or CardKind.BarbarianAssault or CardKind.ArrowBarrage)
                     hint = hint with
                     {
                         TargetDamage = 1,
@@ -248,7 +245,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             if (c.Cards is [var id] && own.ContainsKey(id))
             {
                 var plans = DiouNativePlans(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], kind, DiouSource(f));
-                var reward = !DiouWasShownThisTurn(id) || global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind) == global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(f.Diou!.Claim.EffectiveKind) ? 28 : 0;
+                var reward = !DiouWasShownThisTurn(id) || CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind) == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(f.Diou!.Claim.EffectiveKind) ? 28 : 0;
                 return plans.Select(plan => PlanValue(kind, plan.Targets)).DefaultIfEmpty(0).Max() + reward;
             }
 

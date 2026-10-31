@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterRuanHuiOlRuntime
 {
     internal bool HasRuanHuiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMingchaRevealDrawChoice) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmJingzhongNextActualPlay);
 
-    internal static CardConversionSource RuanHuiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ruan_hui_ol_RuanHuiLedger.RuanHuiSource(f);
+    internal static CardConversionSource RuanHuiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_ruan_hui_ol_RuanHuiLedger.RuanHuiSource(f);
     internal ActualDiscardRecoveryPhaseKey? RuanHuiPlay => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p ? p : null;
 
     internal ActualDiscardRecoveryPhaseKey? JingzhongDuePhase(JingzhongLeaseEvent lease) => _coreProgramEventHistoryOperations.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Select(e => e.Phase).FirstOrDefault(p => p.Token > lease.AfterPhaseToken && p.ActorSeat == lease.RecipientSeat && p.Kind == ActualDiscardRecoveryPhaseKind.Play);
@@ -105,7 +101,7 @@ internal sealed partial class CharacterRuanHuiOlRuntime
         if (!HasRuanHuiCapability)
             return;
         if (batch.DiscardRecoveryPhase is { Kind: ActualDiscardRecoveryPhaseKind.Discard } discard)
-            foreach (var m in batch.Movements.Where(m => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)?.OwnerSeat == discard.ActorSeat && global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[discard.ActorSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId))) == false))
+            foreach (var m in batch.Movements.Where(m => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)?.OwnerSeat == discard.ActorSeat && CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[discard.ActorSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId))) == false))
                 if (!_coreProgramEventHistoryOperations.ProgramEventHistory<JingzhongDiscardEvent>().Any(e => e.MovementSequence == m.Sequence))
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JingzhongDiscardEvent(discard.Token, discard.ActorSeat, m.Sequence, m.CardId));
         if (batch.DiscardRecoveryPhase is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase)

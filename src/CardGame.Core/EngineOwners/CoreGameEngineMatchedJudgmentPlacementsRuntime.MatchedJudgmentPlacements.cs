@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -80,7 +77,7 @@ internal sealed partial class CoreGameEngineMatchedJudgmentPlacementsRuntime
     [ProgramAnswer("matched-judgment-placement")]
     internal void ResolveMatchedJudgmentPlacement(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.MatchedJudgmentPlacement is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [MatchedJudgmentPlacementChoices(f).Single(c => c.Id == choice.Id)]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.MatchedJudgmentPlacement is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [MatchedJudgmentPlacementChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Judgment placement answer differs from its exact frozen result.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || r.Stage == MatchedJudgmentPlacementStage.ChoosingDestination && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
         {

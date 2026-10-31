@@ -1,8 +1,8 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineTableOrderCachedTableMovementCachedTableOrderAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineTableOrderCachedTableMovementCachedTableOrderAccess : IProgramRuntimeOperations
 {
-    ref global::System.Collections.Generic.IReadOnlyList<int>? _cachedTableOrder { get; }
+    ref IReadOnlyList<int>? _cachedTableOrder { get; }
 
-    ref global::CardGame.Core.TableSeatMovedEvent? _cachedTableMovement { get; }
+    ref TableSeatMovedEvent? _cachedTableMovement { get; }
 }

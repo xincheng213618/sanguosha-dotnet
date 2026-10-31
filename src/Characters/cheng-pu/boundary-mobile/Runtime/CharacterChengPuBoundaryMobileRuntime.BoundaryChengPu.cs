@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengPuBoundaryMobileRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryChengPuHost.Resolve(ProgramSkillFrame f) => BeginBoundaryChengPuLihuo(f);
+    SkillProgramStepOutcome IBoundaryChengPuHost.Resolve(ProgramSkillFrame f) => BeginBoundaryChengPuLihuo(f);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 56200)]
-    internal int BoundaryChengPuLihuoDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is global::CardGame.Core.NativeOwners.CardAttackHandle && !attack.IsDelayedJudgmentDamage && !attack.IsProgramJudgmentDamage && attack.EffectiveCardKind == CardKind.FireSlash && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat) && _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsChained && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action is { Type: CardActionType.Use, EffectiveKind: CardKind.FireSlash } action && action.ActorSeat == attack.CardUserSeat && action.ConversionChain.Any(s => s.SkillId == BoundaryChengPuComposition.Lihuo && s.BindingId == "ordinary-slash-to-fire-slash" && s.OwnerSeat == action.ActorSeat) ? 1 : 0;
+    internal int BoundaryChengPuLihuoDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && !attack.IsDelayedJudgmentDamage && !attack.IsProgramJudgmentDamage && attack.EffectiveCardKind == CardKind.FireSlash && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat) && _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsChained && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action is { Type: CardActionType.Use, EffectiveKind: CardKind.FireSlash } action && action.ActorSeat == attack.CardUserSeat && action.ConversionChain.Any(s => s.SkillId == BoundaryChengPuComposition.Lihuo && s.BindingId == "ordinary-slash-to-fire-slash" && s.OwnerSeat == action.ActorSeat) ? 1 : 0;
     internal int BoundaryChengPuPublicActionBonus(int actorSeat, LegalAction action, int targetSeat) => action.Kind == LegalActionKind.Slash && action.PlayedCardKind == CardKind.FireSlash && _coreMatchParticipantsPlayersAccess._players[targetSeat].IsChained && new[]
     {
         action.ConversionSource
@@ -28,7 +24,7 @@ internal sealed partial class CharacterChengPuBoundaryMobileRuntime
             return SkillProgramStepOutcome.Continue;
         var receipt = new BoundaryChengPuLihuoReceipt(use.Id, use.Action!.ActionId, total, loss, 0);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryChengPuLihuo = receipt });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryChengPuLihuoIssuedEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, use.Id, receipt.ActionId, total, loss, 0));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryChengPuLihuoIssuedEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, use.Id, receipt.ActionId, total, loss, 0));
         ContinueBoundaryChengPuLihuo(f.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }
@@ -76,7 +72,7 @@ internal sealed partial class CharacterChengPuBoundaryMobileRuntime
     {
         var r = f.BoundaryChengPuLihuo!;
         var use = BoundaryChengPuCompletedUse(f);
-        if (use is null || use.Id != r.UseId || use.Action!.ActionId != r.ActionId || r.TotalDamage != BoundaryChengPuDamageTotal(use.Id) || r.RequestedLoss != r.TotalDamage / 2 || r.RequestedLoss <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryChengPuLihuoIssuedEvent>().Count(e => e == new BoundaryChengPuLihuoIssuedEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, r.UseId, r.ActionId, r.TotalDamage, r.RequestedLoss, 0)) != 1)
+        if (use is null || use.Id != r.UseId || use.Action!.ActionId != r.ActionId || r.TotalDamage != BoundaryChengPuDamageTotal(use.Id) || r.RequestedLoss != r.TotalDamage / 2 || r.RequestedLoss <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryChengPuLihuoIssuedEvent>().Count(e => e == new BoundaryChengPuLihuoIssuedEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, r.UseId, r.ActionId, r.TotalDamage, r.RequestedLoss, 0)) != 1)
             throw new InvalidOperationException("Lihuo lost its exact completed Use, actual total or original payment source.");
         var payments = _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryChengPuLihuoPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (r.Paid ? payments is not [var paid] || paid != new BoundaryChengPuLihuoPaidEvent(f.Id, r.UseId, r.RequestedLoss, r.HpBefore, r.HpAfter) || r.HpAfter != r.HpBefore - r.RequestedLoss || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == f.OwnerSeat && e.Amount == r.RequestedLoss && e.RemainingHp == r.HpAfter && e.CompletedCardUseResolutionId == r.UseId) != 1 : payments.Length != 0)
@@ -103,7 +99,7 @@ internal sealed partial class CharacterChengPuBoundaryMobileRuntime
         if (child is DyingFrame dying)
             return dying.ParentFrameId == f.Id && dying.VictimSeat == f.OwnerSeat && dying.ResumesProgramSkill && dying.KillerSeat is null && r.HpAfter <= 0;
         if (child is HpChangedTriggerWindowFrame hp)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Kind == HpChangeKind.Loss && hp.Change.Amount == r.RequestedLoss;
+            return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Kind == HpChangeKind.Loss && hp.Change.Amount == r.RequestedLoss;
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange;
     }
 

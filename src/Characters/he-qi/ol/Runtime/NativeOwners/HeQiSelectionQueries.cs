@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class HeQiSelectionQueries(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterSunYuanOlEntries> getCharacterSunYuanOlRuntime, global::CardGame.Core.NativeOwners.KernelGetCombatDistanceCall getCombatDistance, global::CardGame.Core.NativeOwners.KernelGetAttackRangeCall getAttackRange, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState, global::System.Func<global::CardGame.Core.RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, global::System.Func<global::CardGame.Core.EquipmentContentRegistry> getEquipmentContentRegistry) : IHeQiSelectionQueries
+internal sealed class HeQiSelectionQueries(Func<RuntimeEntries.CharacterSunYuanOlEntries> getCharacterSunYuanOlRuntime, KernelGetCombatDistanceCall getCombatDistance, KernelGetAttackRangeCall getAttackRange, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<EquipmentContentRegistry> getEquipmentContentRegistry) : IHeQiSelectionQueries
 {
     public bool HasRoundRange(int sourceSeat, int targetSeat) => getCharacterSunYuanOlRuntime().HasSayingRoundRange(sourceSeat, targetSeat);
     public int CombatDistance(int sourceSeat, int targetSeat) => getCombatDistance(sourceSeat, targetSeat);

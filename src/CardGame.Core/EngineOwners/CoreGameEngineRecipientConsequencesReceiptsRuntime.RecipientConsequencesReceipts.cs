@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsRuntime
@@ -14,10 +10,10 @@ internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsRuntime
     internal bool CanRunRecipientConsequences(ProgramTriggerCandidate c, SkillProgramTrigger trigger) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.RaiseMaximumRecoverAndQualifyPrintedLord) || c.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && !PrintedLordGameIssued(c.OwnerSeat, c.SkillId, c.BindingId) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != c.OwnerSeat && p.Gender == GeneralGender.Male);
     internal bool ValidBlackGiftContest(ProgramSkillFrame f)
     {
-        if (f.BlackGiftContest is not { } r || r.InstructionIndex != 1 || f.InstructionIndex != 1 || r.Source != global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime.RecipientConsequencesSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.TurnOwnerSeat != f.OwnerSeat || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play && !RecipientConsequencesGameEnded()) || f.TriggerId is not null || f.WindowContext is not null || f.SelectedCardIds is not [var card] || card != r.GiftCardId || f.SelectedTargetSeats is not [var recipient] || recipient != r.RecipientSeat || recipient == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) || r.GiftSuit is not (Suit.Spade or Suit.Club) || r.GiftCardId <= 0 || r.GiftBefore < 0 || r.GiftAfter < r.GiftBefore || !Enum.IsDefined(r.Stage) || r.RequiredDiscards is < 0 or > 2 || r.SelectedDiscardIds.Count > r.RequiredDiscards || r.SelectedDiscardIds.Distinct().Count() != r.SelectedDiscardIds.Count || r.Stage != BlackGiftContestStage.ChoosingDiscard && r.SelectedDiscardIds.Count != 0 || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is not [{ Op: SkillProgramEffectOp.GiveBlackHandAndResolveRecipientContest }])
+        if (f.BlackGiftContest is not { } r || r.InstructionIndex != 1 || f.InstructionIndex != 1 || r.Source != CoreGameEngineBlackGiftContestsRuntime.RecipientConsequencesSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.TurnOwnerSeat != f.OwnerSeat || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play && !RecipientConsequencesGameEnded()) || f.TriggerId is not null || f.WindowContext is not null || f.SelectedCardIds is not [var card] || card != r.GiftCardId || f.SelectedTargetSeats is not [var recipient] || recipient != r.RecipientSeat || recipient == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) || r.GiftSuit is not (Suit.Spade or Suit.Club) || r.GiftCardId <= 0 || r.GiftBefore < 0 || r.GiftAfter < r.GiftBefore || !Enum.IsDefined(r.Stage) || r.RequiredDiscards is < 0 or > 2 || r.SelectedDiscardIds.Count > r.RequiredDiscards || r.SelectedDiscardIds.Distinct().Count() != r.SelectedDiscardIds.Count || r.Stage != BlackGiftContestStage.ChoosingDiscard && r.SelectedDiscardIds.Count != 0 || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is not [{ Op: SkillProgramEffectOp.GiveBlackHandAndResolveRecipientContest }])
             return false;
         var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var giftReason = new CardMoveReason(global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime.BlackGiftReason(f));
+        var giftReason = new CardMoveReason(CoreGameEngineBlackGiftContestsRuntime.BlackGiftReason(f));
         var giftMovements = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > r.GiftBefore && m.Sequence <= r.GiftAfter).ToArray();
         var retained = (f.HappyWeiYanRetainedGains ?? []).Where(item => item.InstructionIndex == r.InstructionIndex && item.Plan.CardId == card && item.Plan.RequestedTo == CardLocation.Hand(recipient) && item.Plan.Reason == giftReason && item.Plan.SequenceBefore == r.GiftBefore).ToArray();
         var giftSettled = retained is [var payment] ? giftMovements.Length == 0 && r.GiftAfter == r.GiftBefore && payment.Plan.From == CardLocation.Hand(f.OwnerSeat) && _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRetainedGainSettlement(payment, f.Id, card, CardLocation.Hand(recipient), r.GiftBefore) : retained.Length == 0 && giftMovements is [var movement] && movement.CardId == card && movement.From == CardLocation.Hand(f.OwnerSeat) && movement.Reason == giftReason && (movement.To == CardLocation.Hand(recipient) || _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(movement, CardLocation.Hand(recipient)));
@@ -38,7 +34,7 @@ internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsRuntime
                     return false;
                 if (_resolutionStackOperations._resolutionStack.OfType<PindianFrame>().SingleOrDefault(p => p.Id == pindian)is { } child)
                 {
-                    if (child.ParentFrameId != f.Id || child.SkillId != f.SkillId || child.SourceSeat != recipient || child.OpponentSeat != second || child.ProgramResultBind != global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime.BlackGiftResultBind(f) || child.ProgramResultVisibility != SkillProgramCardSetVisibility.Public)
+                    if (child.ParentFrameId != f.Id || child.SkillId != f.SkillId || child.SourceSeat != recipient || child.OpponentSeat != second || child.ProgramResultBind != CoreGameEngineBlackGiftContestsRuntime.BlackGiftResultBind(f) || child.ProgramResultVisibility != SkillProgramCardSetVisibility.Public)
                         return false;
                 }
                 else if (!_coreBlackGiftContestsOperations.BlackGiftResultMatches(f, out _))
@@ -50,11 +46,11 @@ internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsRuntime
 
         if (r.Discard is { } paid)
         {
-            if (r.Result is null || global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime.BlackGiftWinner(r.Result) != paid.WinnerSeat || paid.CardIds.Count != r.RequiredDiscards || paid.CardIds.Count is < 1 or > 2 || paid.CardIds.Count != paid.Locations.Count || paid.CardIds.Distinct().Count() != paid.CardIds.Count || paid.Locations.Any(l => l.OwnerSeat != paid.WinnerSeat || l.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || paid.Before < r.GiftAfter || paid.After <= paid.Before || facts.OfType<BlackGiftContestDiscardPaidEvent>().Count(e => e == new BlackGiftContestDiscardPaidEvent(f.Id, paid.WinnerSeat, paid.CardIds.Count, paid.Before, paid.After)) != 1)
+            if (r.Result is null || CoreGameEngineBlackGiftContestsRuntime.BlackGiftWinner(r.Result) != paid.WinnerSeat || paid.CardIds.Count != r.RequiredDiscards || paid.CardIds.Count is < 1 or > 2 || paid.CardIds.Count != paid.Locations.Count || paid.CardIds.Distinct().Count() != paid.CardIds.Count || paid.Locations.Any(l => l.OwnerSeat != paid.WinnerSeat || l.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || paid.Before < r.GiftAfter || paid.After <= paid.Before || facts.OfType<BlackGiftContestDiscardPaidEvent>().Count(e => e == new BlackGiftContestDiscardPaidEvent(f.Id, paid.WinnerSeat, paid.CardIds.Count, paid.Before, paid.After)) != 1)
                 return false;
             var records = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > paid.Before && m.Sequence <= paid.After).ToArray();
             foreach (var pair in paid.CardIds.Select((id, i) => (id, from: paid.Locations[i])))
-                if (records.Count(m => m.CardId == pair.id && m.From == pair.from && m.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime.BlackGiftDiscardReason(f) && (m.To == CardLocation.DiscardPile || pair.from == CardLocation.Equipment(paid.WinnerSeat) && m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(pair.id).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)))) != 1)
+                if (records.Count(m => m.CardId == pair.id && m.From == pair.from && m.Reason.Value == CoreGameEngineBlackGiftContestsRuntime.BlackGiftDiscardReason(f) && (m.To == CardLocation.DiscardPile || pair.from == CardLocation.Equipment(paid.WinnerSeat) && m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(pair.id).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)))) != 1)
                     return false;
             if (records.Where(m => !paid.CardIds.Contains(m.CardId)).Any(m => m.From != CardLocation.WoodenOxGrain(paid.WinnerSeat) || m.To != CardLocation.DiscardPile || m.Reason != CardMoveReasons.WoodenOxGrainDiscard || !records.Any(p => paid.CardIds.Contains(p.CardId) && p.CardKind == CardKind.WoodenOx && p.From == CardLocation.Equipment(paid.WinnerSeat))))
                 return false;
@@ -63,7 +59,7 @@ internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsRuntime
             return false;
         if (r.Result is { } p)
         {
-            var losers = global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime.BlackGiftLosers(p);
+            var losers = CoreGameEngineBlackGiftContestsRuntime.BlackGiftLosers(p);
             if (r.LossIndex < 0 || r.LossIndex > losers.Length || r.Losses.Select(l => l.Seat).Distinct().Count() != r.Losses.Count || r.Losses.Any(l => !losers.Contains(l.Seat) || l.BeforeHp <= 0 || l.AfterHp != Math.Max(0, l.BeforeHp - 1) || facts.OfType<BlackGiftContestLossPaidEvent>().Count(e => e.FrameId == f.Id && e.Index == Array.IndexOf(losers, l.Seat) && e.Loss == l) != 1 || facts.OfType<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == l.Seat && e.Amount == 1 && e.RemainingHp == l.AfterHp) != 1))
                 return false;
             if (r.Stage == BlackGiftContestStage.LossPaid && (r.LossIndex >= losers.Length || r.Losses.LastOrDefault()?.Seat != losers[r.LossIndex]))
@@ -80,8 +76,8 @@ internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsRuntime
             return false;
         if (!RecipientConsequencesGameEnded() && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && r.Stage is BlackGiftContestStage.ChoosingSecond or BlackGiftContestStage.ChoosingDiscard)
         {
-            var chooser = r.Stage == BlackGiftContestStage.ChoosingSecond ? f.OwnerSeat : global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime.BlackGiftWinner(r.Result!)!.Value;
-            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != chooser || prompt.TargetSeat != chooser || prompt.SkillPrompt?.SkillId != f.SkillId || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, _coreBlackGiftContestsOperations.BlackGiftChoices(f)))
+            var chooser = r.Stage == BlackGiftContestStage.ChoosingSecond ? f.OwnerSeat : CoreGameEngineBlackGiftContestsRuntime.BlackGiftWinner(r.Result!)!.Value;
+            if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != chooser || prompt.TargetSeat != chooser || prompt.SkillPrompt?.SkillId != f.SkillId || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, _coreBlackGiftContestsOperations.BlackGiftChoices(f)))
                 return false;
         }
 
@@ -90,7 +86,7 @@ internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsRuntime
 
     internal bool ValidPrintedLordBenefit(ProgramSkillFrame f)
     {
-        if (f.PrintedLordBenefit is not { } r || f.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != global::CardGame.Core.EngineOwners.CoreGameEngineBlackGiftContestsRuntime.RecipientConsequencesSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || !_corePrintedLordBenefitsOperations.ExactPrintedLordStart(f) || f.WindowContext!.ParentFrameId != r.WindowFrameId || !Enum.IsDefined(r.Stage) || f.PendingMovementContinuation is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
+        if (f.PrintedLordBenefit is not { } r || f.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != CoreGameEngineBlackGiftContestsRuntime.RecipientConsequencesSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || !_corePrintedLordBenefitsOperations.ExactPrintedLordStart(f) || f.WindowContext!.ParentFrameId != r.WindowFrameId || !Enum.IsDefined(r.Stage) || f.PendingMovementContinuation is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
             return false;
         var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         if (facts.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) != 1)
@@ -101,7 +97,7 @@ internal sealed partial class CoreGameEngineRecipientConsequencesReceiptsRuntime
                 return false;
             if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || RecipientConsequencesGameEnded())
                 return true;
-            return _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && p.SkillPrompt?.SkillId == f.SkillId && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, _corePrintedLordBenefitsOperations.PrintedLordChoices(f));
+            return _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && p.SkillPrompt?.SkillId == f.SkillId && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, _corePrintedLordBenefitsOperations.PrintedLordChoices(f));
         }
 
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.BeneficiarySeat) || r.BeneficiarySeat == f.OwnerSeat || r.MaximumBefore < 1 || r.MaximumAfter != r.MaximumBefore + 1 || r.RecoveryRequested is < 0 or > 1 || facts.OfType<PrintedLordMaximumPaidEvent>().Count(e => e == new PrintedLordMaximumPaidEvent(f.Id, r.BeneficiarySeat, r.MaximumBefore, r.MaximumAfter)) != 1 || facts.OfType<MaximumHpChangedEvent>().Count(e => e.PlayerSeat == r.BeneficiarySeat && e.Delta == 1 && e.MaximumHp == r.MaximumAfter && e.SkillId == f.SkillId) < 1 || r.PrintedQualifications.Select(q => q.GrantId).Distinct().Count() != r.PrintedQualifications.Count || r.PrintedQualifications.Any(q => q.BeneficiarySeat != r.BeneficiarySeat || q.ProgramFrameId != f.Id || q.Issuer != r.Source || q.GameplayHash != r.GameplayHash || q.TemplateSourceId is not (CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource) || string.IsNullOrWhiteSpace(q.GeneralId) || q.GrantId != $"{(q.TemplateSourceId)}:{(q.SkillId)}" || q.SkillInstanceId != q.GrantId || !_contentRegistryOperations._contentRegistry.GetSkill(q.SkillId).Tags.HasFlag(SkillTag.Lord) || !_contentRegistryOperations._contentRegistry.Generals.TryGetValue(q.GeneralId, out var general) || !general.SkillIds.Contains(q.SkillId)))

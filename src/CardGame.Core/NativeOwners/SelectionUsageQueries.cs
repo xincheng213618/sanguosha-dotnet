@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class SelectionUsageQueries(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineAppliedDamageBenefitsEntries> getCoreGameEngineAppliedDamageBenefitsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreProgramParticipantPhaseOperationsEntries> getCoreProgramParticipantPhaseOperationsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramCategoryTargetLedgerEntries> getCoreGameEngineProgramCategoryTargetLedgerRuntime) : ISelectionUsageQueries
+internal sealed class SelectionUsageQueries(Func<RuntimeEntries.CoreGameEngineAppliedDamageBenefitsEntries> getCoreGameEngineAppliedDamageBenefitsRuntime, Func<RuntimeEntries.CoreProgramParticipantPhaseOperationsEntries> getCoreProgramParticipantPhaseOperationsRuntime, Func<RuntimeEntries.CoreGameEngineProgramCategoryTargetLedgerEntries> getCoreGameEngineProgramCategoryTargetLedgerRuntime) : ISelectionUsageQueries
 {
     public bool CanUseDistinctTurnTarget(int ownerSeat, string skillId, string usageId, int targetSeat) => getCoreGameEngineAppliedDamageBenefitsRuntime().CanActivateDistinctTurnTarget(ownerSeat, skillId, usageId, targetSeat);
     public bool CanUsePhaseTarget(int ownerSeat, string skillId, string usageId, int targetSeat) => getCoreProgramParticipantPhaseOperationsRuntime().CanActivateTargetPhaseLedger(ownerSeat, skillId, usageId, targetSeat);

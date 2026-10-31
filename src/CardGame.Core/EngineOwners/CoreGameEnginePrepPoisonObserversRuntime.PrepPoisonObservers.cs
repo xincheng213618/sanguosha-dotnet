@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePrepPoisonObserversRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CoreGameEnginePrepPoisonObserversRuntime
         return child is HpChangedTriggerWindowFrame hp && hp.ResumeFrameId == root.Id && hp.Change.ParentFrameId == root.Id && hp.Change.TargetSeat == root.OwnerSeat && hp.Change.SourceSeat is null && hp.Change.Kind == HpChangeKind.Loss && hp.Change.HpBefore == r.HpBefore && hp.Change.HpAfter == r.HpAfter && hp.Change.Amount == r.ActualHpLoss && hp.Continuation == PostEventContinuation.Program;
     }
 
-    internal ProgramSkillFrame? PrepPoisonObserverRoot(long? rootId = null) => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.PrepPoisonFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossObserverEdge(child) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)), rootId);
+    internal ProgramSkillFrame? PrepPoisonObserverRoot(long? rootId = null) => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.PrepPoisonFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossObserverEdge(child) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)), rootId);
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 1248)]
     internal bool AdvancePrepPoisonObserver()
     {

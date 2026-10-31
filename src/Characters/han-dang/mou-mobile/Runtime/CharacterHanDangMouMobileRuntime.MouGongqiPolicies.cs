@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHanDangMouMobileRuntime
@@ -25,7 +21,7 @@ internal sealed partial class CharacterHanDangMouMobileRuntime
         if (!HasMouHanDangCapability || dyingUse || CurrentMouHanDangRespondedAction()is not { } original || original.ActorSeat == provider.Seat)
             return true;
         var grants = MouHanDangActionRestrictions(original.ActionId).ToArray();
-        return grants.Length == 0 || _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Hand(provider.Seat) && _coreActionDiscardColorsOperations.CapturePhysicalCardColor(provider.Seat, card)is { } red && grants.All(g => g.Suit is Suit.Heart or Suit.Diamond or Suit.Spade or Suit.Club && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(g.Suit) == red);
+        return grants.Length == 0 || _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Hand(provider.Seat) && _coreActionDiscardColorsOperations.CapturePhysicalCardColor(provider.Seat, card)is { } red && grants.All(g => g.Suit is Suit.Heart or Suit.Diamond or Suit.Spade or Suit.Club && CoreNativeCardClassificationsRuntime.IsRedSuit(g.Suit) == red);
     }
 
     internal bool IsMouHanDangResponseAvailable(CharacterState provider, CardKind kind, IReadOnlyList<int> ids, bool dyingUse = false) => !HasMouHanDangCapability || dyingUse || ids.Count != 1 || IsMouHanDangNativeResponseAllowed(provider, _coreAdvancedLifecycleOperations.GetAdvancedCard(ids[0])) || _coreCardConversionsOperations.GetProgramCardIdentitySources(provider, _coreAdvancedLifecycleOperations.GetAdvancedCard(ids[0]), kind, true).Count != 0 || _coreActionQueriesOperations.GetProgramViewAsConversions(provider, _coreAdvancedLifecycleOperations.GetAdvancedCard(ids[0]), kind, true).Count != 0;

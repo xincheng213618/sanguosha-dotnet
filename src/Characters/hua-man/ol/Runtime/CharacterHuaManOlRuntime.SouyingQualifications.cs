@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaManOlRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CharacterHuaManOlRuntime
         if (f.WindowContext is not { HuaManSouying: { } q, CardUse: { } context } w || q.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || q.DirectionOrdinal < 2 || f.OwnerSeat != q.ActorSeat && f.OwnerSeat != q.TargetSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(q.NativeUseId)is not { Action: { } action } actual || actual.HuaManSouyingQualification != q || context.ParentCardUseFrameId != actual.Id || context.CardActionId != action.ActionId || action.ActionId != q.ActionId || action.ActorSeat != q.ActorSeat || action.ProviderSeat != q.ProviderSeat || !action.EffectiveDesignatedTargetSeats.SequenceEqual([q.TargetSeat]))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame parent || parent.Id != w.ParentFrameId || parent.ParentFrameId != actual.Id || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(parent) != SkillProgramTriggerWindow.CardUseTargetsFinalized || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])))
+        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame parent || parent.Id != w.ParentFrameId || parent.ParentFrameId != actual.Id || CoreGameEngineCardActionsRuntime.GetCardActionWindow(parent) != SkillProgramTriggerWindow.CardUseTargetsFinalized || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])))
             return false;
         use = actual;
         return true;

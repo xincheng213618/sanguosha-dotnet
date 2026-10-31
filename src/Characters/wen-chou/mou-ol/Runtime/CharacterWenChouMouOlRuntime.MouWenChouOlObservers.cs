@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWenChouMouOlRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     {
         if (f.MouWenChouOl is not { } r || !ValidMouWenChouOl(f))
             return false;
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
+        if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
             return r.Stage == MouWenChouOlStage.Drawing && f.NativeDraw is not null;
         if (child is RecoveryReplacementFrame recovery)
             return IsMouWenChouRecoveryParent(f, recovery);
@@ -26,7 +22,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
         {
             if (IsMouWenChouNativeSettlementBatch(f, moved.Batch))
                 return moved.ResumeProgramFrameId == f.Id;
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         }
 
         if (r.Stage == MouWenChouOlStage.NativeUse && child is CardUseFrame native)
@@ -41,13 +37,13 @@ internal sealed partial class CharacterWenChouMouOlRuntime
         if (_resolutionStackOperations._resolutionStack[n - 1] is ProgramCardTriggerWindowFrame parent && _coreCardUseLifecycleOperations.LifecycleCardUse(parent.ParentFrameId)is { MouWenChouLunzhan: not null } native && IsMouWenChouDuel(native.Id) && _resolutionStackOperations._resolutionStack[n] is ProgramSkillFrame f && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count)
         {
             var c = parent.Candidates[parent.CandidateIndex];
-            return global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(c)) && f.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext2(parent, c);
+            return CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(c)) && f.WindowContext == _coreCardActionsOperations.CreateCardActionProgramContext2(parent, c);
         }
 
         return false;
     }
 
-    internal bool MouWenChouObserverEdge(int n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[n - 1], _resolutionStackOperations._resolutionStack[n]) || MouWenChouNativeEdge(n) || _resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame f && MouWenChouFirstChild(f, _resolutionStackOperations._resolutionStack[n]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]);
+    internal bool MouWenChouObserverEdge(int n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[n - 1], _resolutionStackOperations._resolutionStack[n]) || MouWenChouNativeEdge(n) || _resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame f && MouWenChouFirstChild(f, _resolutionStackOperations._resolutionStack[n]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]);
     internal bool MouWenChouObserverSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => this.MouWenChouObserverEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? MouWenChouObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.MouWenChouFirstChild(f, c), (n) => this.MouWenChouObserverSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 33100)]
@@ -56,5 +52,5 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     internal bool AdvanceMouWenChouChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouWenChouObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 33100)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 33100)]
-    internal bool ContinuePaidMouWenChou(ProgramSkillFrame f) => f.MouWenChouOl is { } r && ValidMouWenChouOl(f) && (r.Operation != SkillProgramEffectOp.UseMouWenChouLunzhan || r.Stage != MouWenChouOlStage.Targets) || f.MouWenChouOl is null && f.InstructionIndex is 0 or 1 && f.WindowContext is { } w && CanRunIssuedMouWenChou(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w);
+    internal bool ContinuePaidMouWenChou(ProgramSkillFrame f) => f.MouWenChouOl is { } r && ValidMouWenChouOl(f) && (r.Operation != SkillProgramEffectOp.UseMouWenChouLunzhan || r.Stage != MouWenChouOlStage.Targets) || f.MouWenChouOl is null && f.InstructionIndex is 0 or 1 && f.WindowContext is { } w && CanRunIssuedMouWenChou(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), w);
 }

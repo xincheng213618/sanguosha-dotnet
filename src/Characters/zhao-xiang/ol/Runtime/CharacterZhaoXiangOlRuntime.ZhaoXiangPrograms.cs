@@ -1,11 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoXiangOlRuntime
@@ -111,7 +104,7 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
         return r.Stage == "replacement-children" ? recovery.Length == 0 : recovery is [var request] && request.OwnerSeat == f.OwnerSeat && request.Requested == r.RecoveryRequested && r.RecoveryRequested is >= 0 and <= 1;
     }
 
-    void global::CardGame.Core.IZhaoXiangProgramHost.GainMeiYingAfterActualSlashDamage(ProgramSkillFrame f) => GainMeiYingAfterActualSlashDamage(f);
-    SkillProgramStepOutcome global::CardGame.Core.IZhaoXiangProgramHost.ExchangeFiveShuBySpentMeiYing(ProgramSkillFrame f) => ExchangeFiveShuBySpentMeiYing(f);
-    SkillProgramStepOutcome global::CardGame.Core.IZhaoXiangProgramHost.DrawAfterPaidMeiYingConversion(ProgramSkillFrame f) => DrawAfterPaidMeiYingConversion(f);
+    void IZhaoXiangProgramHost.GainMeiYingAfterActualSlashDamage(ProgramSkillFrame f) => GainMeiYingAfterActualSlashDamage(f);
+    SkillProgramStepOutcome IZhaoXiangProgramHost.ExchangeFiveShuBySpentMeiYing(ProgramSkillFrame f) => ExchangeFiveShuBySpentMeiYing(f);
+    SkillProgramStepOutcome IZhaoXiangProgramHost.DrawAfterPaidMeiYingConversion(ProgramSkillFrame f) => DrawAfterPaidMeiYingConversion(f);
 }

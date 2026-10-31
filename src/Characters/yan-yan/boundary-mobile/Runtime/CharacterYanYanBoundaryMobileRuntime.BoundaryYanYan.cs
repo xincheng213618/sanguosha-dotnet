@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanYanBoundaryMobileRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
     internal static SkillPolarity InitialBoundaryYanYanPolarity(CharacterState player, string skillId) => skillId == BoundaryYanYanComposition.Skill && player.General.FactionId == "shu" ? SkillPolarity.Yin : SkillPolarity.Yang;
     internal int BoundaryYanYanSlashBonus(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryYanYanChengshiGrantedEvent>().Count(e => e.OwnerSeat == owner);
     internal long BoundaryYanYanEpoch(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramConversionPolarityCommittedEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillId == BoundaryYanYanComposition.Skill)?.FrameId ?? 0;
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryYanYanHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    SkillProgramStepOutcome IBoundaryYanYanHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.PrepareBoundaryYanYanJuzhan => PrepareBoundaryYanYan(f),
         SkillProgramEffectOp.FinishBoundaryYanYanJuzhan => FinishBoundaryYanYan(f),
@@ -20,7 +16,7 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 54300)]
     internal void ObserveBoundaryYanYan(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> candidates)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
             return;
         if (window == SkillProgramTriggerWindow.CardUseCompleted)
         {
@@ -84,7 +80,7 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
     {
         occurrence = context.BoundaryYanYanOccurrence!;
         var captured = occurrence;
-        return occurrence is not null && occurrence.OwnerSeat == owner && occurrence.SkillInstanceId == instance && context.CardUse is { } info && info.ParentCardUseFrameId == occurrence.UseId && info.CardActionId == occurrence.ActionId && info.ActorSeat == occurrence.ActorSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(occurrence.UseId)is { Action: { } a } && a.ActionId == occurrence.ActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && (occurrence.Polarity == SkillPolarity.Yin ? context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized : context.Window == SkillProgramTriggerWindow.CardUseBeforeTargetEffects && context.TargetSeat == occurrence.TargetSeat && a.EffectiveDesignatedTargetSeats.Contains(occurrence.TargetSeat)) && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryYanYanOccurrenceRecordedEvent>().Count(e => e.Occurrence == captured) == 1;
+        return occurrence is not null && occurrence.OwnerSeat == owner && occurrence.SkillInstanceId == instance && context.CardUse is { } info && info.ParentCardUseFrameId == occurrence.UseId && info.CardActionId == occurrence.ActionId && info.ActorSeat == occurrence.ActorSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(occurrence.UseId)is { Action: { } a } && a.ActionId == occurrence.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && (occurrence.Polarity == SkillPolarity.Yin ? context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized : context.Window == SkillProgramTriggerWindow.CardUseBeforeTargetEffects && context.TargetSeat == occurrence.TargetSeat && a.EffectiveDesignatedTargetSeats.Contains(occurrence.TargetSeat)) && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryYanYanOccurrenceRecordedEvent>().Count(e => e.Occurrence == captured) == 1;
     }
 
     internal bool ValidBoundaryYanYanPrepared(ProgramSkillFrame f) => f.BoundaryYanYan is { } r && f.WindowContext is { } w && ValidBoundaryYanYanOccurrence(f.OwnerSeat, f.SkillInstanceId, w, out var o) && o == r.Occurrence && r.WindowId == w.ParentFrameId && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryYanYanPreparedEvent>().Count(e => e.FrameId == f.Id && e.WindowId == r.WindowId && e.Occurrence == o) == 1;
@@ -117,7 +113,7 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
         {
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not { Action: { } action } use || action.ActionId != o.ActionId || (use.BoundaryYanYanClaims ?? []).Any(c => c.ProducerFrameId == f.Id))
                 throw new InvalidOperationException("Chengshi requires one original, still resolving Slash Use.");
-            var claim = new BoundaryYanYanClaim(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, use.Id, action.ActionId);
+            var claim = new BoundaryYanYanClaim(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, use.Id, action.ActionId);
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { BoundaryYanYanClaims = (u.BoundaryYanYanClaims ?? []).Append(claim).ToArray() });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryYanYanChengshiGrantedEvent(f.Id, f.OwnerSeat, f.SkillInstanceId, use.Id, action.ActionId));
         }

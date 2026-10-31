@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineCharacterStateProgramsPendingCharacterStateChangesAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.CharacterStateChangeContext> _pendingCharacterStateChanges { get; }
+    ref readonly List<CharacterStateChangeContext> _pendingCharacterStateChanges { get; }
 }

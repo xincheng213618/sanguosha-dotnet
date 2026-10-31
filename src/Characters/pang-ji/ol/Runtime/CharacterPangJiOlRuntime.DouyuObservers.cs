@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangJiOlRuntime
@@ -30,7 +26,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         if (f.Douyu is not { DrawStarted: true } r)
             return false;
         if (r.Stage == DouyuStage.DrawWaiting)
-            return f.NativeDraw is not null && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
+            return f.NativeDraw is not null && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (r.Stage != DouyuStage.DrawChildren)
             return false;
         if (child is HpChangedTriggerWindowFrame hp)
@@ -39,14 +35,14 @@ internal sealed partial class CharacterPangJiOlRuntime
             return changed.ResumeProgramFrameId == f.Id && changed.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
             return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.Window == state.Window);
-        return child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => DouyuDrawMovement(f, m));
+        return child is CardsMovedTriggerWindowFrame moved && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => DouyuDrawMovement(f, m));
     }
 
     internal bool DouyuObserverEdge(int index)
     {
         var parent = _resolutionStackOperations._resolutionStack[index - 1];
         var child = _resolutionStackOperations._resolutionStack[index];
-        return _coreObserverSubtreesOperations.IsMovementObserverEdge(index) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || parent is ProgramLifecycleTriggerWindowFrame w && child is ProgramSkillFrame f && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && f.WindowContext is { } context && context.ParentFrameId == w.Id && context.Window == w.Window || parent is ProgramSkillFrame { Zenrun: not null } z && _characterSunHongOlOperations.ZenrunFirstChild(z, child) || parent is ProgramSkillFrame { Douyu: not null } own && DouyuFirstChild(own, child) || DouyuPindianChildRidesOn(child, parent) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(index);
+        return _coreObserverSubtreesOperations.IsMovementObserverEdge(index) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || parent is ProgramLifecycleTriggerWindowFrame w && child is ProgramSkillFrame f && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && f.WindowContext is { } context && context.ParentFrameId == w.Id && context.Window == w.Window || parent is ProgramSkillFrame { Zenrun: not null } z && _characterSunHongOlOperations.ZenrunFirstChild(z, child) || parent is ProgramSkillFrame { Douyu: not null } own && DouyuFirstChild(own, child) || DouyuPindianChildRidesOn(child, parent) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(index);
     }
 
     internal ProgramSkillFrame? DouyuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.DouyuFirstChild(f, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => this.DouyuObserverEdge(n), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying)));
@@ -55,7 +51,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         if (f.AttackAttempt is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || DouyuObserverRoot()is not { } root || root.Id == f.Id)
             return false;
         var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f);
-        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature && !sourceLess && target == (effect.TargetReference is { } participant ? _coreProgramCardPaymentsOperations.ResolveProgramParticipant(f, participant) : global::CardGame.Core.EngineOwners.CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(f, effect.Target));
+        return effect is { Op: SkillProgramEffectOp.Damage } && effect.Amount == amount && effect.ActorReference == source && effect.DamageNature == nature && !sourceLess && target == (effect.TargetReference is { } participant ? _coreProgramCardPaymentsOperations.ResolveProgramParticipant(f, participant) : CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(f, effect.Target));
     }
 
     internal bool IsDouyuRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.Douyu is { DrawStarted: true, Stage: DouyuStage.DrawChildren } && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;

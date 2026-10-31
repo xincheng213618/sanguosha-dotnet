@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_ProgramLifecycle
 {
     internal static string GetProgramBindingId(ProgramSkillFrame frame) =>
@@ -12,7 +12,7 @@ internal static class RuntimeRules_Core_ProgramLifecycle
         for (var index = 0; index < ids.Count; index++)
         {
             var rest = ids.Where((_, current) => current != index).ToArray();
-            foreach (var suffix in CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.EnumerateProgramCardOrders(rest))
+            foreach (var suffix in RuntimeRules_Core_ProgramLifecycle.EnumerateProgramCardOrders(rest))
                 yield return [ids[index], .. suffix];
         }
     }

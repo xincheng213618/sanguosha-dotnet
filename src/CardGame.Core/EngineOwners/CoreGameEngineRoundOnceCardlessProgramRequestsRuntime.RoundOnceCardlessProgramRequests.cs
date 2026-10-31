@@ -1,10 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRuntime
@@ -87,7 +83,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
                     ["target-seat"] = target.ToString(CultureInfo.InvariantCulture),
                     ["request-op"] = effect.Op.ToString()
                 };
-                global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
+                CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
                 result.Add(new(new ChoiceId($"round-cardless.request.{(frame.Id)}.{(frame.InstructionIndex)}.{(actorSeat)}.{(target)}.{(source.SkillInstanceId)}.{(source.BindingId)}"), $"发动【{(_coreCardConversionsOperations.ProgramConversionName(source))}】，视为对 {(_coreMatchParticipantsPlayersAccess._players[target].Name)} 使用【杀】。", [], [target], parameters));
             }
 
@@ -97,17 +93,17 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
     {
         if (choice.Parameters.GetValueOrDefault("program-action") != RoundOnceCardlessProgramMarker)
             return false;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || choice.Cards.Count != 0 || choice.Targets is not [var target] || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("instruction-index") != f.InstructionIndex.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("actor-seat") != prompt.PlayerSeat.ToString(CultureInfo.InvariantCulture))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || choice.Cards.Count != 0 || choice.Targets is not [var target] || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("instruction-index") != f.InstructionIndex.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("actor-seat") != prompt.PlayerSeat.ToString(CultureInfo.InvariantCulture))
             throw new InvalidOperationException("Cardless requested Slash changed its exact native prompt, actor, target or owning instruction.");
         var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f) ?? throw new InvalidOperationException("Cardless Slash lost its paused request effect.");
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
         var targets = RoundOnceCardlessProgramTargets(f, actor.Seat, effect.Op);
-        if (!RoundOnceCardlessProgramSlashChoices(f, actor.Seat, targets, effect.ResultBind).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (!RoundOnceCardlessProgramSlashChoices(f, actor.Seat, targets, effect.ResultBind).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Cardless Slash request lost its source qualification or current native allowed targets.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var payment = _coreRoundOnceCardlessBasicOperations.ConsumeRoundOnceCardlessBasic(source, false);
-        var receipt = new RoundOnceCardlessProgramRequestReceipt(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, f.InstructionIndex, effect.Op, actor.Seat, target, effect.ResultBind, prompt.PromptId, prompt.Revision, f.WindowContext?.ParentFrameId, payment);
+        var receipt = new RoundOnceCardlessProgramRequestReceipt(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, f.InstructionIndex, effect.Op, actor.Seat, target, effect.ResultBind, prompt.PromptId, prompt.Revision, f.WindowContext?.ParentFrameId, payment);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { RoundOnceCardlessProgramRequest = new(receipt) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoundOnceCardlessProgramRequestAcceptedEvent(receipt));
         _characterMaTieAnniversaryOperations.PrepareAnniversaryMaTieSuppliedSlash(f, actor.Seat, actor.Seat, target, CardKind.Slash, [], source);
@@ -173,7 +169,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
 
     internal bool ValidRoundOnceCardlessProgramReceipt(ProgramSkillFrame parent, RoundOnceCardlessProgramRequestReceipt r, bool requireBound = true)
     {
-        if (parent.Id != r.ProgramFrameId || parent.InstructionIndex != r.InstructionIndex || r.RequestSource != new CardConversionSource(parent.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId) || parent.GameplayHash != r.RequestGameplayHash || parent.WindowContext?.ParentFrameId != r.OriginalWindowId || r.Payment.Source.OwnerSeat != r.ActorSeat || !RoundOnceCardlessProgramActor(parent, r.RequestOp, r.ActorSeat) || r.OriginalPromptId.Value <= 0 || r.OriginalRevision < 0 || r.Payment.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(r.Payment.Source.SkillId).Program!.GameplayHash || _corePlayCardHistoryOperations.ViewAsRule(r.Payment.Source)is not { OutputKind: CardKind.Slash, ForPlay: true, ForResponse: false, RoundOnceCardlessBasic: { } } || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessBasicQuotaPaidEvent>().Count(e => e.Receipt == r.Payment) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessProgramRequestAcceptedEvent>().Count(e => e.Receipt == (r with { NativeUseId = 0, NativeActionId = 0 })) != 1)
+        if (parent.Id != r.ProgramFrameId || parent.InstructionIndex != r.InstructionIndex || r.RequestSource != new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId) || parent.GameplayHash != r.RequestGameplayHash || parent.WindowContext?.ParentFrameId != r.OriginalWindowId || r.Payment.Source.OwnerSeat != r.ActorSeat || !RoundOnceCardlessProgramActor(parent, r.RequestOp, r.ActorSeat) || r.OriginalPromptId.Value <= 0 || r.OriginalRevision < 0 || r.Payment.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(r.Payment.Source.SkillId).Program!.GameplayHash || _corePlayCardHistoryOperations.ViewAsRule(r.Payment.Source)is not { OutputKind: CardKind.Slash, ForPlay: true, ForResponse: false, RoundOnceCardlessBasic: { } } || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessBasicQuotaPaidEvent>().Count(e => e.Receipt == r.Payment) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessProgramRequestAcceptedEvent>().Count(e => e.Receipt == (r with { NativeUseId = 0, NativeActionId = 0 })) != 1)
             return false;
         var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(parent);
         if (effect?.ResultBind != r.ResultBind)

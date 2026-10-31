@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaXiongMouMobileRuntime
 {
     internal const string MouYaowu = MouHuaXiongComposition.Yaowu, MouYangwei = MouHuaXiongComposition.Yangwei;
-    internal static CardConversionSource MouHuaXiongSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_hua_xiong_mou_mobile_MouHuaXiongMobile.MouHuaXiongSource(f);
+    internal static CardConversionSource MouHuaXiongSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_hua_xiong_mou_mobile_MouHuaXiongMobile.MouHuaXiongSource(f);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29100)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29100)]
     internal bool KeepPaidMouHuaXiong(ProgramSkillFrame f)
@@ -24,7 +19,7 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
     {
         if (!MouHuaXiongPaidRoot(f))
             return false;
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, f))
+        if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, f))
             return true;
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
@@ -36,7 +31,7 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
         return moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(recipient!.Value) && m.Reason.Value == $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.Draw)}");
     }
 
-    internal bool MouHuaXiongObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame f && this.MouHuaXiongFirstChild(f, _resolutionStackOperations2._resolutionStack()[child]) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
+    internal bool MouHuaXiongObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame f && this.MouHuaXiongFirstChild(f, _resolutionStackOperations2._resolutionStack()[child]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? MouHuaXiongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.MouHuaXiongFirstChild(f, child), (index) => this.MouHuaXiongObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 800)]
     internal bool IsMouHuaXiongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouHuaXiongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
@@ -52,6 +47,6 @@ internal sealed partial class CharacterHuaXiongMouMobileRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 29100)]
     internal bool AdvanceMouHuaXiongChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouHuaXiongObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
-    SkillProgramStepOutcome global::CardGame.Core.IMouHuaXiongHost.Yangwei(ProgramSkillFrame f) => ResolveMouYangwei(f);
-    SkillProgramStepOutcome global::CardGame.Core.IMouHuaXiongHost.Yaowu(ProgramSkillFrame f) => ResolveMouYaowu(f);
+    SkillProgramStepOutcome IMouHuaXiongHost.Yangwei(ProgramSkillFrame f) => ResolveMouYangwei(f);
+    SkillProgramStepOutcome IMouHuaXiongHost.Yaowu(ProgramSkillFrame f) => ResolveMouYaowu(f);
 }

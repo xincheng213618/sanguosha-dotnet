@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuanHuanOlRuntime
 {
     internal const string DeruTakeReason = "skill-program.yuan-huan.deru.take", DeruFillReason = "skill-program.yuan-huan.deru.fill", DeruRecoverReason = "skill-program.yuan-huan.deru.recover", LinjieDiscardReason = "skill-program.yuan-huan.linjie.discard", LinjieDrawReason = "skill-program.yuan-huan.linjie.draw";
-    internal static CardConversionSource YuanHuanSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yuan_huan_ol_YuanHuan.YuanHuanSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IYuanHuanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYuanHuan(f, op);
+    internal static CardConversionSource YuanHuanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_yuan_huan_ol_YuanHuan.YuanHuanSource(f);
+    SkillProgramStepOutcome IYuanHuanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYuanHuan(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26920)]
     internal bool QualifyYuanHuan(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -102,7 +99,7 @@ internal sealed partial class CharacterYuanHuanOlRuntime
     [ProgramAnswer("yuan-huan")]
     internal void AnswerYuanHuan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YuanHuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == YuanHuanStage.Guess ? f.OwnerSeat : r.TargetSeat) || !YuanHuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YuanHuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == YuanHuanStage.Guess ? f.OwnerSeat : r.TargetSeat) || !YuanHuanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("YuanHuan requires the exact chooser's published private guess or owned hand discard.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == YuanHuanStage.Guess)
@@ -139,7 +136,7 @@ internal sealed partial class CharacterYuanHuanOlRuntime
     internal void IssueYuanHuanDraw(ProgramSkillFrame f, bool linjie)
     {
         var r = f.YuanHuan!;
-        var count = linjie ? (r.DiscardedKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0) : r.GuessMask == r.ActualMask ? Math.Max(0, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp - _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count) : 0;
+        var count = linjie ? (r.DiscardedKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? 1 : 0) : r.GuessMask == r.ActualMask ? Math.Max(0, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp - _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count) : 0;
         var reason = linjie ? LinjieDrawReason : DeruFillReason;
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { YuanHuan = r with { Stage = linjie ? YuanHuanStage.LinjieDrawChildren : YuanHuanStage.FillChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });

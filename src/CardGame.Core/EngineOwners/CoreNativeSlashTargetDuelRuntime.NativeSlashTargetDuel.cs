@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeSlashTargetDuelRuntime
 {
     internal void FreezeNativeSlashTargetDuelPlan(CardUseFrame use)
     {
-        if (use.NativeSlashTargetDuelPlanFrozen || use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.EffectiveKind != use.CardKind || action.ActorSeat != use.SourceSeat)
+        if (use.NativeSlashTargetDuelPlanFrozen || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.EffectiveKind != use.CardKind || action.ActorSeat != use.SourceSeat)
             return;
         var targets = use.TargetSeats.Select((target, index) => new NativeSlashTargetDuelTarget(index, target, _programPipelineHooksOperations._programPipelineHooks.SlashTargetDuelSource(use, target))).ToArray();
         var plan = targets.Any(target => target.Source is not null) ? new NativeSlashTargetDuelPlan(use.Id, action.ActionId, action.ActorSeat, action.ProviderSeat, use.CardKind)
@@ -22,8 +17,8 @@ internal sealed partial class CoreNativeSlashTargetDuelRuntime
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { NativeSlashTargetDuelPlanFrozen = true, NativeSlashTargetDuel = plan });
     }
 
-    internal bool ValidNativeSlashTargetDuelPlan(CardUseFrame use, NativeSlashTargetDuelPlan plan) => use.NativeSlashTargetDuelPlanFrozen && use.Id == plan.UseId && use.CardKind == plan.OriginalKind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(plan.OriginalKind) && use.Action is { Type: CardActionType.Use } action && action.ActionId == plan.ActionId && action.ActorSeat == plan.ActorSeat && use.SourceSeat == plan.ActorSeat && action.ProviderSeat == plan.ProviderSeat && action.EffectiveKind == plan.OriginalKind && plan.Targets.Count == use.TargetSeats.Count && plan.Targets.Select(target => target.TargetIndex).SequenceEqual(Enumerable.Range(0, use.TargetSeats.Count)) && plan.Targets.Select(target => target.TargetSeat).SequenceEqual(use.TargetSeats) && action.TargetSeats.SequenceEqual(use.TargetSeats);
-    internal bool TryBeginNativeSlashTargetDuel(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool ValidNativeSlashTargetDuelPlan(CardUseFrame use, NativeSlashTargetDuelPlan plan) => use.NativeSlashTargetDuelPlanFrozen && use.Id == plan.UseId && use.CardKind == plan.OriginalKind && CoreNativeCardClassificationsRuntime.IsSlashCard(plan.OriginalKind) && use.Action is { Type: CardActionType.Use } action && action.ActionId == plan.ActionId && action.ActorSeat == plan.ActorSeat && use.SourceSeat == plan.ActorSeat && action.ProviderSeat == plan.ProviderSeat && action.EffectiveKind == plan.OriginalKind && plan.Targets.Count == use.TargetSeats.Count && plan.Targets.Select(target => target.TargetIndex).SequenceEqual(Enumerable.Range(0, use.TargetSeats.Count)) && plan.Targets.Select(target => target.TargetSeat).SequenceEqual(use.TargetSeats) && action.TargetSeats.SequenceEqual(use.TargetSeats);
+    internal bool TryBeginNativeSlashTargetDuel(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { NativeSlashTargetDuel: { } plan } use)
             return false;
@@ -34,7 +29,7 @@ internal sealed partial class CoreNativeSlashTargetDuelRuntime
             return false;
         if (plan.Slice is { } old && old.TargetIndex == use.TargetIndex && !_coreExtraCardEffectRoundsOperations.IsExtraCardEffectRound(use.Id))
             throw new InvalidOperationException("A native Duel target cannot be started twice.");
-        if (target.TargetSeat != attack.TargetSeat || attack.CardUserSeat != plan.ActorSeat || attack.SourceSeat != plan.ActorSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? plan.OriginalKind) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != use.Id || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack))
+        if (target.TargetSeat != attack.TargetSeat || attack.CardUserSeat != plan.ActorSeat || attack.SourceSeat != plan.ActorSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? plan.OriginalKind) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != use.Id || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack))
             throw new InvalidOperationException("A native Duel slice requires its current original Slash target.");
         var hash = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash ?? throw new InvalidOperationException("A native target effect requires its original content binding.");
         _coreExtraCardEffectRoundsOperations.CaptureExtraCardEffectAttack(attack);
@@ -78,7 +73,7 @@ internal sealed partial class CoreNativeSlashTargetDuelRuntime
         }
 
         : null;
-        global::CardGame.Core.NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle(use.Id, plan.ActorSeat, slice.TargetSeat, card, damageAmount: _coreDamageTargetRegionObtainOperations.PrepareDamageTargetDuelDamage(use.Id, slice.TargetSeat), playedCardKind: CardKind.Duel, physicalCards: original.PhysicalCardIds.Select(_coreCardAttackStateOperations.GetAttackCard).ToArray(), programSkillCardUseFrameId: original.ProgramSkillCardUseFrameId, conversionSource: original.ConversionSource);
+        NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle(use.Id, plan.ActorSeat, slice.TargetSeat, card, damageAmount: _coreDamageTargetRegionObtainOperations.PrepareDamageTargetDuelDamage(use.Id, slice.TargetSeat), playedCardKind: CardKind.Duel, physicalCards: original.PhysicalCardIds.Select(_coreCardAttackStateOperations.GetAttackCard).ToArray(), programSkillCardUseFrameId: original.ProgramSkillCardUseFrameId, conversionSource: original.ConversionSource);
         _coreCardAttackStateOperations.UpdateCardAttackState(use.Id, state => state!with { AdjustedSlashReturn = original.AdjustedSlashReturn, ProgramUseInstructionIndex = original.ProgramUseInstructionIndex });
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreNativeCardContinuationCursorsOperations.ActiveDuel = _kernelCoreMainOperations.CreateDuelHandle(attack);
@@ -122,7 +117,7 @@ internal sealed partial class CoreNativeSlashTargetDuelRuntime
         return true;
     }
 
-    internal bool IsNativeSlashTargetDuelAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool IsNativeSlashTargetDuelAttack(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { NativeSlashTargetDuel: { Slice: { Stage: NativeSlashTargetDuelStage.Responding } slice } plan } use)
             return false;

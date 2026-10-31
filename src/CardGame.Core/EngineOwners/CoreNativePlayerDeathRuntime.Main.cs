@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativePlayerDeathRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CoreNativePlayerDeathRuntime
         BeginPlayerDeath(dying.FrameId, victim, killer, _coreNativeDamageHandlesOperations.GetDyingAttack(dying), dying);
     }
 
-    internal void BeginPlayerDeath(long parentFrameId, CharacterState victim, CharacterState? killer, global::CardGame.Core.GameEngine.IDamageAttempt? attack, DyingFrame? dying, long? causingProgramSkillFrameId = null, long? causingCardDamageReplacementId = null)
+    internal void BeginPlayerDeath(long parentFrameId, CharacterState victim, CharacterState? killer, GameEngine.IDamageAttempt? attack, DyingFrame? dying, long? causingProgramSkillFrameId = null, long? causingCardDamageReplacementId = null)
     {
         if (!victim.IsAlive)
         {

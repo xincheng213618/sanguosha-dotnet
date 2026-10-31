@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXieLingYuOlRuntime
 {
     internal const string YuandiDrawReason = "skill-program.xie-ling-yu.yuandi.draw", XinyouDrawReason = "skill-program.xie-ling-yu.xinyou.draw", XinyouDiscardReason = "skill-program.xie-ling-yu.xinyou.discard";
-    SkillProgramStepOutcome global::CardGame.Core.IXieLingYuHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginXieLingYu(frame, op);
+    SkillProgramStepOutcome IXieLingYuHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginXieLingYu(frame, op);
     internal SkillProgramStepOutcome BeginXieLingYu(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -113,7 +110,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
     [ProgramAnswer("xie-ling-yu")]
     internal void AnswerXieLingYu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XieLingYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !XieLingYuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XieLingYu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !XieLingYuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xie Ling Yu requires her exact current private cost or remaining-name choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -149,7 +146,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
         if (branch != "pay" || r.Selected.Count == 0 || r.PlayPhase is not { } phase || XinyouActualPlay(f.OwnerSeat) != phase || XinyouPhaseSpent(f.OwnerSeat, phase) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("Xinyou cannot pay a canceled, stale or already spent draft.");
         var current = XinyouCostCards(f.OwnerSeat);
-        var materials = r.Selected.Select(id => current.Single(c => c.Id == id)).Select(c => new XieLingYuMaterial(c.Id, c.Kind, global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c)), CardLocation.Hand(f.OwnerSeat))).ToArray();
+        var materials = r.Selected.Select(id => current.Single(c => c.Id == id)).Select(c => new XieLingYuMaterial(c.Id, c.Kind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c)), CardLocation.Hand(f.OwnerSeat))).ToArray();
         var mask = materials.Aggregate(0, (m, c) => m | XieLingYuNameBit(c.BasicName));
         var beforeSequence = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { XieLingYu = r with { Paid = true, Stage = XieLingYuStage.CostChildren, Materials = materials, NamesMask = mask, Before = beforeSequence, After = beforeSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -185,7 +182,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
             var m = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.FirstOrDefault(m => m.CardId == x.Id && m.Sequence > before && m.Sequence <= after && m.To == CardLocation.Hand(f.OwnerSeat) && m.From != m.To && (x.Replacement || m.From == CardLocation.DrawPile && m.Reason.Value == (r.Op == SkillProgramEffectOp.ResolveYuandiDiscardNames ? YuandiDrawReason : XinyouDrawReason))) ?? throw new InvalidOperationException("A draw outcome entity lacks its actual original gain movement.");
             return new XieLingYuGain(x.Id, m.CardKind, m.Sequence, x.Replacement);
         }).ToArray();
-        var stop = gains.Length == 0 || r.Requests >= 5 || gains.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.PrintedKind) == SkillProgramCardCategory.Basic && (XieLingYuNameBit(c.PrintedKind) & r.NamesMask) == 0);
+        var stop = gains.Length == 0 || r.Requests >= 5 || gains.Any(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.PrintedKind) == SkillProgramCardCategory.Basic && (XieLingYuNameBit(c.PrintedKind) & r.NamesMask) == 0);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { XieLingYu = r with { Stage = XieLingYuStage.DrawChildren, Before = outcome.SequenceBefore, After = outcome.SequenceAfter, Gains = gains, Outcome = outcome, Stop = stop }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         if (r.Op == SkillProgramEffectOp.ResolveXinyouBasicCycle)
             for (var i = 0; i < gains.Length; i++)
@@ -291,6 +288,6 @@ internal sealed partial class CharacterXieLingYuOlRuntime
     {
         if (f.XieLingYu!.Stage == XieLingYuStage.RemoveName)
             return prompt.Choices.First();
-        return prompt.Choices.FirstOrDefault(c => c.Parameters["branch"] == "pay") ?? prompt.Choices.Where(c => c.Parameters["branch"] == "cost").OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? prompt.Choices.Single(c => c.Parameters["branch"] == "cancel");
+        return prompt.Choices.FirstOrDefault(c => c.Parameters["branch"] == "pay") ?? prompt.Choices.Where(c => c.Parameters["branch"] == "cost").OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).FirstOrDefault() ?? prompt.Choices.Single(c => c.Parameters["branch"] == "cancel");
     }
 }

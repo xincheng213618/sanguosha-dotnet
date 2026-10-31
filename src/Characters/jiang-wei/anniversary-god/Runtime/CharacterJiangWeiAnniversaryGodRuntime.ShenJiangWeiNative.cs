@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
@@ -45,7 +41,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 38400)]
-    internal bool CompleteShenJwAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool CompleteShenJwAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ShenJiangWeiPingxiang: not null } use || !IsShenJwNativeSlash(use))
@@ -85,7 +81,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 38400)]
-    internal bool ReturnShenJwAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnShenJwAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenJiangWei: { Stage: ShenJiangWeiStage.NativeUse, NativeReturned: true } r } f || r.UseId != completion.ResolutionId)
             return false;

@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBaoSanNiangOlRuntime
 {
-    internal static bool IsBaoOperation(SkillProgramEffectOp op) => global::CardGame.Core.RuntimeSkills.RuntimeRules_bao_san_niang_ol_Bao2025.IsBaoOperation(op);
+    internal static bool IsBaoOperation(SkillProgramEffectOp op) => RuntimeSkills.RuntimeRules_bao_san_niang_ol_Bao2025.IsBaoOperation(op);
     internal CardConversionSource BaoSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
     internal bool BaoSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 320)]
@@ -125,7 +122,7 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
         RequireBao2025(f);
         var r = f.Bao2025!;
         var chooser = r.Stage == ProgramBao2025Stage.DyingRecipientChoice ? r.Recipient!.Value : f.OwnerSeat;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], BaoChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != chooser || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], BaoChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("The choice lost its exact chooser or current published opaque/card/target selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -220,7 +217,7 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
         var card = _cardZonesOperations._cardZones.CardsAt(from)[slot];
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Bao2025 = r with { Stage = ProgramBao2025Stage.GainChildren, GainedCardId = card.Id, GainedCardKind = card.Kind, GainedFrom = from, MovementBefore = before, MovementAfter = before, Choices = [] }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _corePhysicalMovementFacadesOperations.MoveCard(card, from, card.IsGeneralWeapon && zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : CardLocation.Hand(f.OwnerSeat), global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoGainReason);
+        _corePhysicalMovementFacadesOperations.MoveCard(card, from, card.IsGeneralWeapon && zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : CardLocation.Hand(f.OwnerSeat), CharacterBaoSanNiangOlDefinitions.BaoGainReason);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { Bao2025 = f.Bao2025!with { MovementAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramBao2025MovementIssuedEvent(f.Id, f.Bao2025!));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
@@ -233,7 +230,7 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
             throw new InvalidOperationException("Chosen assault lost its two actual unpaid HE costs or explicit legal targets.");
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Bao2025 = r with { Stage = ProgramBao2025Stage.AssaultCostChildren, MovementBefore = before, MovementAfter = before, Choices = [] }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, r.Cards, global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoCostReason);
+        _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, r.Cards, CharacterBaoSanNiangOlDefinitions.BaoCostReason);
         _coreProgramLifecycleOperations.ConsumeProgramTriggerUsage(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { Bao2025 = f.Bao2025!with { MovementAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramBao2025MovementIssuedEvent(f.Id, f.Bao2025!));
@@ -380,7 +377,7 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
                 {
                     var card = cards[_randomOperations._random.Next(cards.Length)];
                     discarded = card.Id;
-                    _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(f.OwnerSeat, target, card, _cardZonesOperations._cardZones.GetLocation(card.Id), global::CardGame.Core.EngineOwners.CharacterBaoSanNiangOlDefinitions.BaoOutcomeReason);
+                    _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(f.OwnerSeat, target, card, _cardZonesOperations._cardZones.GetLocation(card.Id), CharacterBaoSanNiangOlDefinitions.BaoOutcomeReason);
                 }
             }
             else if (!damaged && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive)
@@ -407,5 +404,5 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, completed);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IBao2025ProgramHost.BeginBao2025(ProgramSkillFrame f, SkillProgramEffect e) => BeginBao2025(f, e);
+    SkillProgramStepOutcome IBao2025ProgramHost.BeginBao2025(ProgramSkillFrame f, SkillProgramEffect e) => BeginBao2025(f, e);
 }

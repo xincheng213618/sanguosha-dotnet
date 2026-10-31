@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,13 +7,13 @@ internal sealed partial class CoreGameEngineShanheSourceBiriRuntime
 {
     internal const string ShanheSourceBiriSkill = "shanhe:source-biri-14039";
     internal const string ShanheSourceBiriDrawReason = "skill-program.shanhe-source-biri-14039.draw";
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceBiriHost.PreventFireRecoverDraw(ProgramSkillFrame frame) => BeginShanheSourceBiri(frame);
+    SkillProgramStepOutcome IShanheSourceBiriHost.PreventFireRecoverDraw(ProgramSkillFrame frame) => BeginShanheSourceBiri(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 62047, SkillProgramEffectOp.PreventShanheSourceFireRecoverDraw)]
     internal bool CanOfferShanheSourceBiri(ProgramTriggerLegalityContext context) => _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id == ShanheBattleSetup.BattleModeId && _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is not null && context.Owner.HasHpValue && context.WindowContext is { Window: SkillProgramTriggerWindow.BeforeDamageApplied, Amount: > 0, TargetSeat: { } target } && target == context.Owner.Seat;
     internal BeforeDamageProgramWindowFrame ExactShanheSourceBiriParent(ProgramSkillFrame frame)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == frame.Id);
-        if (_coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id != ShanheBattleSetup.BattleModeId || _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is null || frame.SkillId != ShanheSourceBiriSkill || frame.TriggerId != "prevent-fire" || frame.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not BeforeDamageProgramWindowFrame before || before.Id != context.ParentFrameId || before.TargetSeat != frame.OwnerSeat || context.TargetSeat != frame.OwnerSeat || context.OwnerSeat != frame.OwnerSeat || before.RedirectedTargetSeat is not null || before.Nature != DamageNature.Fire || before.Amount <= 0 || context.Amount != before.Amount || before.CandidateIndex < 0 || before.CandidateIndex >= before.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, before.Candidates[before.CandidateIndex].Candidate))
+        if (_coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id != ShanheBattleSetup.BattleModeId || _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is null || frame.SkillId != ShanheSourceBiriSkill || frame.TriggerId != "prevent-fire" || frame.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not BeforeDamageProgramWindowFrame before || before.Id != context.ParentFrameId || before.TargetSeat != frame.OwnerSeat || context.TargetSeat != frame.OwnerSeat || context.OwnerSeat != frame.OwnerSeat || before.RedirectedTargetSeat is not null || before.Nature != DamageNature.Fire || before.Amount <= 0 || context.Amount != before.Amount || before.CandidateIndex < 0 || before.CandidateIndex >= before.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, before.Candidates[before.CandidateIndex].Candidate))
             throw new InvalidOperationException("Source Biri lost its original owner fire-damage candidate.");
         return before;
     }
@@ -29,7 +26,7 @@ internal sealed partial class CoreGameEngineShanheSourceBiriRuntime
             throw new InvalidOperationException("Source Biri cannot prevent or pay a fire-damage attempt twice.");
         var amount = before.Amount;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheSourceBiri = new(frame.InstructionIndex, before.Id, before.ParentFrameId, attack.ResolutionId, amount, checked(amount * 2)) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceBiriIssuedEvent(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.InstructionIndex, before.Id, before.ParentFrameId, attack.ResolutionId, amount, checked(amount * 2)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceBiriIssuedEvent(frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.InstructionIndex, before.Id, before.ParentFrameId, attack.ResolutionId, amount, checked(amount * 2)));
         _coreDamagePreventionProgramsOperations.PreventProgramCurrentDamage(frame);
         // The shared recovery primitive owns modifiers, replacement and the real
         // RecoveryFrame. Its atomic result is captured below before HP children.

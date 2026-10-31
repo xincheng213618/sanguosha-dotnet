@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWeiYanHappyGodRuntime
 {
     internal const string HappyBoneEnter = "skill-program.happy:zigu.bone-enter", HappyBoneReplace = "skill-program.happy:zigu.bone-replace", HappyZiguGain = "skill-program.happy:zigu.damage-card";
-    internal static CardConversionSource HappyWeiYanSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IHappyWeiYanHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginHappyWeiYan(frame, operation);
-    bool global::CardGame.Core.IHappyWeiYanTargetQuery.Allows(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && owner != target && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && HappyBoneAvailableSlots(target).Any();
+    internal static CardConversionSource HappyWeiYanSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    SkillProgramStepOutcome IHappyWeiYanHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginHappyWeiYan(frame, operation);
+    bool IHappyWeiYanTargetQuery.Allows(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && owner != target && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && HappyBoneAvailableSlots(target).Any();
     internal HappyWeiYanBone? HappyBoneRecord(int id) => _coreMatchParticipantsPlayersAccess._players.SelectMany(p => p.HappyWeiYanBones).Where(b => b.CardId == id).OrderByDescending(b => b.Sequence).FirstOrDefault();
     internal HappyWeiYanBone? CurrentHappyBone(int cardId)
     {
@@ -150,7 +147,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
 
             if (receipt.Stage == HappyWeiYanStage.DamageCard)
             {
-                var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(c.Kind) || global::CardGame.Core.EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(c.Kind) || c.Kind == CardKind.Lightning).ToArray();
+                var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(c.Kind) || CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(c.Kind) || c.Kind == CardKind.Lightning).ToArray();
                 if (pool.Length == 0 || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
                 {
                     FinishHappyWeiYan(frame);
@@ -212,7 +209,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
     internal void AnswerHappyWeiYan(PromptChoice chosen)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Happy Wei Yan lost his original choice frame.");
-        if (!HappyWeiYanChoices(frame).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
+        if (!HappyWeiYanChoices(frame).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [chosen])))
             throw new InvalidOperationException("Happy Wei Yan requires the exact current published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -67,7 +64,7 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
     [ProgramAnswer(QiaoRuiAction)]
     internal void AnswerQiaoRui(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryQiaoRui: { Stage: AnniversaryQiaoRuiStage.SlashChoice } r } f || !ValidQiaoRui(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], QiaoRuiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryQiaoRui: { Stage: AnniversaryQiaoRuiStage.SlashChoice } r } f || !ValidQiaoRui(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], QiaoRuiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Saowei rejects another marked material, original target group or native permission.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -114,7 +111,7 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryQiaoRuiUseIssuedEvent(o));
     }
 
-    internal bool IsQiaoRuiNativeUse(CardUseFrame use) => use.AnniversaryQiaoRuiUse is { } o && use.Id == o.UseId && use.CardId == o.CardId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.Action is { Type: CardActionType.Use } a && a.ActionId == o.ActionId && a.ProviderSeat == o.Source.OwnerSeat && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat) && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == o.CardId && from == o.From && use.PhysicalCardIds is [var physical] && physical == id && a.ConversionChain.SequenceEqual([o.Source]) && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { AnniversaryQiaoRui: { Plan: { } p } r } f && ValidQiaoRui(f) && r.Source == o.Source && r.Hash == o.Hash && r.UseId == use.Id && r.ActionId == a.ActionId && p.CardId == o.CardId && p.From == o.From && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiUseIssuedEvent>().Count(e => e.Origin == o) == 1;
+    internal bool IsQiaoRuiNativeUse(CardUseFrame use) => use.AnniversaryQiaoRuiUse is { } o && use.Id == o.UseId && use.CardId == o.CardId && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.Action is { Type: CardActionType.Use } a && a.ActionId == o.ActionId && a.ProviderSeat == o.Source.OwnerSeat && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat) && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == o.CardId && from == o.From && use.PhysicalCardIds is [var physical] && physical == id && a.ConversionChain.SequenceEqual([o.Source]) && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { AnniversaryQiaoRui: { Plan: { } p } r } f && ValidQiaoRui(f) && r.Source == o.Source && r.Hash == o.Hash && r.UseId == use.Id && r.ActionId == a.ActionId && p.CardId == o.CardId && p.From == o.From && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiUseIssuedEvent>().Count(e => e.Origin == o) == 1;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 49401)]
     internal void ObserveQiaoRuiDamage(DamageAppliedEvent e)
     {

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
     internal const string BoundaryDanshouDiscard = "skill-program.boundary-zhu-ran.danshou.discard";
     internal bool HasBoundaryDanshou => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.PrepareBoundaryZhuRanDanshou);
 
-    internal static CardConversionSource BoundaryDanshouSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource BoundaryDanshouSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedAfterCategory, 53900)]
     internal bool BoundaryDanshouFinalizedTargetWindows(ProgramTargetCardWindowQuery query) => HasBoundaryDanshou;
     internal void CaptureBoundaryDanshouUse(CardUseFrame use)
@@ -93,11 +89,11 @@ internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
         return c.BindingId == BoundaryZhuRanComposition.Draw ? x == 0 : x > 0 && BoundaryDanshouMaterials(c.OwnerSeat).Length >= x;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryZhuRanHost.Prepare(ProgramSkillFrame f) => PrepareBoundaryDanshou(f);
+    SkillProgramStepOutcome IBoundaryZhuRanHost.Prepare(ProgramSkillFrame f) => PrepareBoundaryDanshou(f);
     internal SkillProgramStepOutcome PrepareBoundaryDanshou(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
+        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
         if (f.BoundaryDanshou is not null || f.InstructionIndex != 1 || f.WindowContext is not { } c || BoundaryDanshouMother(candidate, c)is not { } parent || !QualifyBoundaryDanshou(candidate, c))
             throw new InvalidOperationException("Danshou requires the original other role's Ending and its actual whole-use target history.");
         var cutoff = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Count();

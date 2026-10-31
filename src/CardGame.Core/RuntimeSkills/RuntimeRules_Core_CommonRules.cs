@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_CommonRules
 {
     internal static void ValidateOptions(GameOptions options, Action? validateAdapterOptions = null)
@@ -65,14 +65,14 @@ internal static class RuntimeRules_Core_CommonRules
             "、",
             mode.TeamCounts!
                 .OrderBy(entry => entry.Key, StringComparer.Ordinal)
-                .Select(entry => $"{entry.Value} {CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.GetTeamName(entry.Key, mode)}"));
+                .Select(entry => $"{entry.Value} {RuntimeRules_Core_CommonRules.GetTeamName(entry.Key, mode)}"));
 
     internal static string FormatFactionSummary(ContentModeDefinition mode) =>
         string.Join(
             "、",
             mode.FactionCounts!
                 .OrderBy(entry => entry.Key, StringComparer.Ordinal)
-                .Select(entry => $"{entry.Value} {CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.GetFactionName(entry.Key)}"));
+                .Select(entry => $"{entry.Value} {RuntimeRules_Core_CommonRules.GetFactionName(entry.Key)}"));
 
     internal static string GetTeamName(string teamId, ContentModeDefinition? mode = null) => teamId switch
     {
@@ -107,7 +107,7 @@ internal static class RuntimeRules_Core_CommonRules
         kind is CardKind.Indulgence or CardKind.SupplyShortage or CardKind.Lightning;
 
     internal static bool IsOrdinaryTrick(CardKind kind) =>
-        CardCatalog.Get(kind).CategoryName == "锦囊牌" && !CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsDelayedCard(kind);
+        CardCatalog.Get(kind).CategoryName == "锦囊牌" && !RuntimeRules_Core_CommonRules.IsDelayedCard(kind);
 
     internal static bool IsDelayedJudgmentContinuation(JudgmentContinuationKind continuation) =>
         continuation is JudgmentContinuationKind.Indulgence or
@@ -124,8 +124,8 @@ internal static class RuntimeRules_Core_CommonRules
         };
 
     internal static int GetFireAttackTargetSeat(CardUseFrame pending) =>
-        pending.TargetIndex >= 0 && pending.TargetIndex < CardGame.Core.RuntimeSkills.RuntimeRules_zhuge_guo_le_LeChengyanEffects.LeChengyanNativeTargets(pending).Count
-            ? CardGame.Core.RuntimeSkills.RuntimeRules_zhuge_guo_le_LeChengyanEffects.LeChengyanNativeTargets(pending)[pending.TargetIndex]
+        pending.TargetIndex >= 0 && pending.TargetIndex < RuntimeRules_zhuge_guo_le_LeChengyanEffects.LeChengyanNativeTargets(pending).Count
+            ? RuntimeRules_zhuge_guo_le_LeChengyanEffects.LeChengyanNativeTargets(pending)[pending.TargetIndex]
             : throw new InvalidOperationException("FireAttack lost its current target.");
 
     internal static string GetSuitDisplayName(Suit? suit) => suit switch
@@ -197,7 +197,7 @@ internal static class RuntimeRules_Core_CommonRules
             .Where(candidate => (candidate.PlayedCardKind ?? card.Kind) ==
                 (playedCardKind ?? card.Kind))
             .Where(candidate => candidate.ConversionSource == conversionSource)
-            .Where(candidate => CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.ConversionSourcesEqual(candidate.AdditionalConversionSources,
+            .Where(candidate => RuntimeRules_Core_CommonRules.ConversionSourcesEqual(candidate.AdditionalConversionSources,
                 additionalConversionSources))
             .ToArray();
         return matching.Length == 1 ? matching[0] : null;
@@ -213,7 +213,7 @@ internal static class RuntimeRules_Core_CommonRules
         kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash;
 
     internal static bool IsNativeResponseCard(Card responseCard, CardKind requiredCardKind) =>
-        CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.MatchesRequiredCard(responseCard.Kind, requiredCardKind);
+        RuntimeRules_Core_CommonRules.MatchesRequiredCard(responseCard.Kind, requiredCardKind);
 
     internal static CardKind? ReadResponseCardKind(PromptChoice choice) =>
         choice.Parameters.TryGetValue("response-card-kind", out var value) &&
@@ -222,7 +222,7 @@ internal static class RuntimeRules_Core_CommonRules
             : null;
 
     internal static bool MatchesRequiredCard(CardKind actual, CardKind required) =>
-        required == CardKind.Slash ? CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(actual) : actual == required;
+        required == CardKind.Slash ? RuntimeRules_Core_CommonRules.IsSlashCard(actual) : actual == required;
 
     internal static DamageNature GetDamageNature(CardKind kind) => kind switch
     {
@@ -257,7 +257,7 @@ internal static class RuntimeRules_Core_CommonRules
         {
             if (action.Kind == LegalActionKind.UseProgramSkill)
             {
-                choices.Add(CardGame.Core.RuntimeSkills.RuntimeRules_Core_SkillPrograms.CreateProgramPlayChoice(action));
+                choices.Add(RuntimeRules_Core_SkillPrograms.CreateProgramPlayChoice(action));
                 continue;
             }
             if (action.Kind == LegalActionKind.RevealGeneral)
@@ -384,7 +384,7 @@ internal static class RuntimeRules_Core_CommonRules
             }
             if (action.ConversionSource is { } conversionSource)
             {
-                CardGame.Core.RuntimeSkills.RuntimeRules_Core_CardConversions.AddConversionParameters(parameters, conversionSource);
+                RuntimeRules_Core_CardConversions.AddConversionParameters(parameters, conversionSource);
             }
             if (action.AdditionalConversionSources is { Count: > 0 } additionalConversionSources)
             {
@@ -422,7 +422,7 @@ internal static class RuntimeRules_Core_CommonRules
         physicalCards.All(card => card.Suit is Suit.Spade or Suit.Club);
 
     internal static bool CanYizhongNullify(IReadOnlyList<Card> physicalCards, bool hasArmor) =>
-        !hasArmor && CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsBlackCardUse(physicalCards);
+        !hasArmor && RuntimeRules_Core_CommonRules.IsBlackCardUse(physicalCards);
 
     internal static bool IsTrickCardDamage(CardKind kind) =>
         CardCatalog.Get(kind).CategoryName == "锦囊牌";
@@ -433,7 +433,7 @@ internal static class RuntimeRules_Core_CommonRules
         bool sourceHasWuyan,
         bool targetHasWuyan) =>
         isClassicIdentityMode &&
-        CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsTrickCardDamage(kind) &&
+        RuntimeRules_Core_CommonRules.IsTrickCardDamage(kind) &&
         (sourceHasWuyan || targetHasWuyan);
 
     internal static bool DamageObserverRidesOn(ResolutionFrame ride, ResolutionFrame beneath) =>
@@ -449,7 +449,7 @@ internal static class RuntimeRules_Core_CommonRules
     internal static bool ProgramMovementReturnMatches(ProgramSkillFrame producer, CardsMovedTriggerWindowFrame movement,
         bool allowFactionRequestCost = false) =>
         movement.Id == movement.Batch.Id && movement.Batch.ParentFrameId == producer.Id &&
-        !CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.HasAlternateProgramMovementReturn(movement, allowFactionRequestCost) &&
+        !RuntimeRules_Core_CommonRules.HasAlternateProgramMovementReturn(movement, allowFactionRequestCost) &&
         (movement.ResumeProgramFrameId is null || movement.ResumeProgramFrameId == producer.Id) &&
         (movement.Batch.AwaitingProgramFrameId is null || movement.Batch.AwaitingProgramFrameId == producer.Id) &&
         (allowFactionRequestCost || movement.ResumeProgramFrameId == producer.Id || movement.Batch.AwaitingProgramFrameId == producer.Id ||

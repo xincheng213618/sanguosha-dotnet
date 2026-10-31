@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouFeiLeRuntime
 {
     internal bool HasLeZhouFeiLingkongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeLingkongInitialEntities) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.MarkLingkongFirstOutsideDrawGain);
 
-    internal static CardConversionSource LingkongSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_fei_le_LeZhouFeiLingkong.LingkongSource(f);
-    internal static bool IsLingkongGainTrigger(SkillProgramTrigger t) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_fei_le_LeZhouFeiLingkong.IsLingkongGainTrigger(t);
+    internal static CardConversionSource LingkongSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhou_fei_le_LeZhouFeiLingkong.LingkongSource(f);
+    internal static bool IsLingkongGainTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_zhou_fei_le_LeZhouFeiLingkong.IsLingkongGainTrigger(t);
     // Registration only; the query still belongs to legacy GameEngine.LeZhouFeiLingkong.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 110)]
     internal void ProjectLingkongCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
@@ -204,8 +200,8 @@ internal sealed partial class CharacterZhouFeiLeRuntime
         return context.MovementBatch is { } batch && _resolutionStackOperations._resolutionStack[index - 1] is CardsMovedTriggerWindowFrame window && window.Batch == batch && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && window.Candidates[window.CandidateIndex] == candidate && ExactLingkongGainQualification(batch, LingkongSource(f), f.GameplayHash, out _) && _coreProgramEventHistoryOperations.ProgramEventHistory<LingkongGainMarkedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var marked] && marked.BatchId == batch.Id && marked.Source == LingkongSource(f) && marked.GameplayHash == f.GameplayHash;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeZhouFeiLingkongHost.InitializeLingkong(ProgramSkillFrame frame) => InitializeLingkong(frame);
-    SkillProgramStepOutcome global::CardGame.Core.ILeZhouFeiLingkongHost.MarkLingkongGain(ProgramSkillFrame frame) => MarkLingkongGain(frame);
+    SkillProgramStepOutcome ILeZhouFeiLingkongHost.InitializeLingkong(ProgramSkillFrame frame) => InitializeLingkong(frame);
+    SkillProgramStepOutcome ILeZhouFeiLingkongHost.MarkLingkongGain(ProgramSkillFrame frame) => MarkLingkongGain(frame);
     internal SkillProgramStepOutcome InitializeLingkong(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

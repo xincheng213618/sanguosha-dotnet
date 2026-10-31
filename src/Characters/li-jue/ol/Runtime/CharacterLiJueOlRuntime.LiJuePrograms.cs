@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiJueOlRuntime
 {
     internal const string YisuanGainReason = "skill-program.yisuan.actual-used-trick";
-    internal static CardConversionSource LiJueSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_li_jue_ol_LiJuePrograms.LiJueSource(f);
+    internal static CardConversionSource LiJueSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_li_jue_ol_LiJuePrograms.LiJueSource(f);
     internal bool LiJueCurrentSource(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].HasHpValue && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 440)]
     internal bool CanOfferLiJue(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
@@ -158,5 +154,5 @@ internal sealed partial class CharacterLiJueOlRuntime
             throw new InvalidOperationException("Yisuan cannot repeat a completed actual gain interval.");
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILiJueProgramHost.BeginLiJue(ProgramSkillFrame f, SkillProgramEffect e) => BeginLiJue(f, e);
+    SkillProgramStepOutcome ILiJueProgramHost.BeginLiJue(ProgramSkillFrame f, SkillProgramEffect e) => BeginLiJue(f, e);
 }

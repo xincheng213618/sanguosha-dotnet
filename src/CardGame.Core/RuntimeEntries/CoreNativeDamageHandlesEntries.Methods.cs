@@ -2,12 +2,12 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreNativeDamageHandlesEntries
 {
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? GetCompletedDyingAttack(global::CardGame.Core.GameEngine.DyingCompletionReceipt receipt) => _resolve().GetCompletedDyingAttack(receipt);
-    internal global::CardGame.Core.GameEngine.IDamageAttempt GetDamageTriggerAttack(global::CardGame.Core.DamageTriggerWindowFrame frame) => _resolve().GetDamageTriggerAttack(frame);
-    internal global::CardGame.Core.Card? GetDelayedJudgmentCard(global::CardGame.Core.JudgmentFrame frame) => _resolve().GetDelayedJudgmentCard(frame);
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? GetDyingAttack(global::CardGame.Core.DyingFrame frame) => _resolve().GetDyingAttack(frame);
-    internal global::CardGame.Core.NativeOwners.CardAttackHandle? GetJudgmentAttack(global::CardGame.Core.JudgmentFrame frame) => _resolve().GetJudgmentAttack(frame);
-    internal global::CardGame.Core.Card? GetJudgmentCard(global::CardGame.Core.JudgmentFrame frame) => _resolve().GetJudgmentCard(frame);
+    internal GameEngine.IDamageAttempt? GetCompletedDyingAttack(GameEngine.DyingCompletionReceipt receipt) => _resolve().GetCompletedDyingAttack(receipt);
+    internal GameEngine.IDamageAttempt GetDamageTriggerAttack(DamageTriggerWindowFrame frame) => _resolve().GetDamageTriggerAttack(frame);
+    internal Card? GetDelayedJudgmentCard(JudgmentFrame frame) => _resolve().GetDelayedJudgmentCard(frame);
+    internal GameEngine.IDamageAttempt? GetDyingAttack(DyingFrame frame) => _resolve().GetDyingAttack(frame);
+    internal NativeOwners.CardAttackHandle? GetJudgmentAttack(JudgmentFrame frame) => _resolve().GetJudgmentAttack(frame);
+    internal Card? GetJudgmentCard(JudgmentFrame frame) => _resolve().GetJudgmentCard(frame);
     internal bool IsClassicIdentityMode { get => _resolve().IsClassicIdentityMode; }
     internal bool IsDualGeneralMode { get => _resolve().IsDualGeneralMode; }
     internal bool IsNationalWarMode { get => _resolve().IsNationalWarMode; }

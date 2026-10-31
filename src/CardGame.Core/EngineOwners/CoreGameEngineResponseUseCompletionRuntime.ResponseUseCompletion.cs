@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineResponseUseCompletionRuntime
 {
-    internal bool IsCompletedResponseUse(CardActionContext action, ProgramCardContinuation continuation) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ResponseUseCompletion.IsCompletedResponseUse(action, continuation, _characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(action));
+    internal bool IsCompletedResponseUse(CardActionContext action, ProgramCardContinuation continuation) => RuntimeSkills.RuntimeRules_Core_ResponseUseCompletion.IsCompletedResponseUse(action, continuation, _characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(action));
     internal bool IsCompletedResponseParentConsistent(ProgramCardTriggerWindowFrame window)
     {
         if (window.CompletedResponseReturn?.Kind == ProgramCompletedResponseKind.Nullification)
@@ -26,16 +22,16 @@ internal sealed partial class CoreGameEngineResponseUseCompletionRuntime
         return use?.CardAttack is { } attack && window.Action.ActorSeat == attack.TargetSeat && window.Action.OpponentSeat == attack.SourceSeat && window.Action.ParentActionId == use.Action?.ActionId;
     }
 
-    internal bool IsCompletedResponseUse(CardActionContext action, ProgramCompletedResponseKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ResponseUseCompletion.IsCompletedResponseUse(action, kind, _characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(action));
+    internal bool IsCompletedResponseUse(CardActionContext action, ProgramCompletedResponseKind kind) => RuntimeSkills.RuntimeRules_Core_ResponseUseCompletion.IsCompletedResponseUse(action, kind, _characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(action));
     internal bool HasResponseUseCompletionObserver(CardActionContext action, ProgramCardContinuation continuation) => IsCompletedResponseUse(action, continuation) && (_programPipelineHooksOperations._programPipelineHooks.ObservesResponseUseCompletion(action) || _characterLiFengOlOperations.HasJiyunResponseCompletion(action, continuation) || _coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && (_coreNationalSkillsOperations.GetSkillBindingShard(owner)?.GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCompleted) ?? []).Any(binding => binding.Trigger.IncludeResponseUses)));
-    internal bool TryBeginCompletedResponseUsePrograms(global::CardGame.Core.NativeOwners.CardAttackHandle? attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal bool TryBeginCompletedResponseUsePrograms(NativeOwners.CardAttackHandle? attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         _characterCaoXiOlOperations.CompleteCaoXiNativeCounterspellBeforeUseCompleted(action, continuation);
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !HasResponseUseCompletionObserver(action, continuation))
             return false;
         // Arrow Barrage Dodge and supplied faction cards are response-only. A Dodge use
         // must be the responder's own defense against the actual Slash parent.
-        if (continuation == ProgramCardContinuation.Dodge && (attack is null || attack.EffectiveCardKind is not { } incomingKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) || attack.TargetSeat != action.ActorSeat))
+        if (continuation == ProgramCardContinuation.Dodge && (attack is null || attack.EffectiveCardKind is not { } incomingKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) || attack.TargetSeat != action.ActorSeat))
             return false;
         var kind = continuation == ProgramCardContinuation.Dodge ? ProgramCompletedResponseKind.Dodge : ProgramCompletedResponseKind.Nullification;
         return _coreCardActionsOperations.TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardUseCompleted, [], continuation: null, cardUseCausedDamage: false, completedResponseReturn: new(kind));
@@ -58,7 +54,7 @@ internal sealed partial class CoreGameEngineResponseUseCompletionRuntime
             _coreNativeNullificationOperations.ContinueNullificationWindow(_coreTieredRoundZeroResponsesOperations.ClearTieredRoundCounterspellResponse(_coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow ?? throw new InvalidOperationException("The completed counterspell lost its original chain.")));
     }
 
-    internal void ContinueCompletedResponseUse(global::CardGame.Core.NativeOwners.CardAttackHandle? attack, ProgramCardTriggerWindowFrame frame)
+    internal void ContinueCompletedResponseUse(NativeOwners.CardAttackHandle? attack, ProgramCardTriggerWindowFrame frame)
     {
         var completed = frame.CompletedResponseReturn ?? throw new InvalidOperationException("The completed response use lost its typed continuation.");
         if (!IsCompletedResponseUse(frame.Action, completed.Kind))

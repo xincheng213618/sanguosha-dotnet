@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePublicPileCollectionEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileCollectionRuntime> _resolve;
-    private CoreGameEnginePublicPileCollectionEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileCollectionRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEnginePublicPileCollectionRuntime> _resolve;
+    private CoreGameEnginePublicPileCollectionEntries(Func<EngineOwners.CoreGameEnginePublicPileCollectionRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEnginePublicPileCollectionEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileCollectionRuntime> resolve) => new(resolve);
+    internal static CoreGameEnginePublicPileCollectionEntries Create(Func<EngineOwners.CoreGameEnginePublicPileCollectionRuntime> resolve) => new(resolve);
 }

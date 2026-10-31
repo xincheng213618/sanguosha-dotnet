@@ -1,14 +1,14 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class CardAttackHandle : global::CardGame.Core.GameEngine.IDamageAttempt
+internal sealed class CardAttackHandle : GameEngine.IDamageAttempt
 {
-    private readonly global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime;
-    private readonly global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime;
-    private readonly global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime;
+    private readonly Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime;
+    private readonly Func<RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime;
+    private readonly Func<RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime;
     private CardAttackState State => getCoreGameEngineCardAttackStateRuntime().GetCardAttackState(ResolutionId);
 
     private void Update(Func<CardAttackState, CardAttackState> update) => getCoreGameEngineCardAttackStateRuntime().UpdateCardAttackState(ResolutionId, state => update(state ?? throw new InvalidOperationException("An attack handle lost its owned state.")));
-    internal CardAttackHandle(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime, long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = null, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = null, DamageNature? damageNatureOverride = null, IReadOnlyList<Card>? physicalCards = null, long? programJudgmentFrameId = null, long? programSkillFrameId = null, CardConversionSource? conversionSource = null, long? programSkillCardUseFrameId = null)
+    internal CardAttackHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, Func<RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime, Func<RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime, long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = null, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = null, DamageNature? damageNatureOverride = null, IReadOnlyList<Card>? physicalCards = null, long? programJudgmentFrameId = null, long? programSkillFrameId = null, CardConversionSource? conversionSource = null, long? programSkillCardUseFrameId = null)
     {
         this.getCoreGameEngineCardAttackStateRuntime = getCoreGameEngineCardAttackStateRuntime;
         this.getCharacterWuJingOlRuntime = getCharacterWuJingOlRuntime;
@@ -18,7 +18,7 @@ internal sealed class CardAttackHandle : global::CardGame.Core.GameEngine.IDamag
         getCoreGameEngineCardAttackStateRuntime().InitializeCardAttackState(resolutionId, new CardAttackState { Active = false, SourceSeat = sourceSeat, CardUserSeat = sourceSeat, TargetSeat = targetSeat, DamageAmount = damageAmount, IgnoresArmor = ignoresArmor, EffectiveCardKind = playedCardKind ?? card?.Kind, IsDelayedJudgmentDamage = isDelayedJudgmentDamage, IsSourceLess = isDelayedJudgmentDamage && (playedCardKind ?? card?.Kind) == CardKind.Lightning, ProgramJudgmentFrameId = programJudgmentFrameId, ProgramSkillFrameId = programSkillFrameId, ProgramSkillCardUseFrameId = programSkillCardUseFrameId, DelayedJudgmentSeat = delayedJudgmentSeat, DamageNatureOverride = damageNatureOverride, ConversionSource = conversionSource, CardId = card?.Id, AppearanceKind = card?.Kind, AppearanceSuit = card?.Suit, AppearanceRank = card?.Rank, PhysicalCardIds = Array.AsReadOnly((physicalCards ?? (card is null ? [] : [card])).Select(item => item.Id).ToArray()), });
     }
 
-    internal CardAttackHandle(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime, long ownerId)
+    internal CardAttackHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, Func<RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime, Func<RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime, long ownerId)
     {
         this.getCoreGameEngineCardAttackStateRuntime = getCoreGameEngineCardAttackStateRuntime;
         this.getCharacterWuJingOlRuntime = getCharacterWuJingOlRuntime;
@@ -69,7 +69,7 @@ internal sealed class CardAttackHandle : global::CardGame.Core.GameEngine.IDamag
     public bool PendingRedBladeDamageBonus { get => State.PendingRedBladeDamageBonus; set => Update(state => state with { PendingRedBladeDamageBonus = value }); }
     public bool DamageRedirected { get => State.DamageRedirected; private set => Update(state => state with { DamageRedirected = value }); }
     public bool BeforeDamageProgramsResolved { get => State.BeforeDamageProgramsResolved; private set => Update(state => state with { BeforeDamageProgramsResolved = value }); }
-    private global::CardGame.Core.GameEngine.ProgramDamageTransferFollowup? DamageTransferFollowup { get => State.DamageTransferFollowup is { } receipt ? new(receipt.SkillId, receipt.OwnerSeat, receipt.TargetSeat, receipt.DrawLostHp) : null; set => Update(state => state with { DamageTransferFollowup = value is { } receipt ? new(receipt.SkillId, receipt.OwnerSeat, receipt.TargetSeat, receipt.DrawLostHp) : null }); }
+    private GameEngine.ProgramDamageTransferFollowup? DamageTransferFollowup { get => State.DamageTransferFollowup is { } receipt ? new(receipt.SkillId, receipt.OwnerSeat, receipt.TargetSeat, receipt.DrawLostHp) : null; set => Update(state => state with { DamageTransferFollowup = value is { } receipt ? new(receipt.SkillId, receipt.OwnerSeat, receipt.TargetSeat, receipt.DrawLostHp) : null }); }
     public bool ProhibitsDodge { get => State.ProhibitsDodge; private set => Update(state => state with { ProhibitsDodge = value }); }
     public bool ProhibitsTargetHandResponses { get => State.ProhibitsTargetHandResponses; private set => Update(state => state with { ProhibitsTargetHandResponses = value }); }
     public IReadOnlyList<string> ResponseProhibitingSkillNames { get => State.ResponseProhibitingSkillNames; private set => Update(state => state with { ResponseProhibitingSkillNames = value }); }
@@ -127,7 +127,7 @@ internal sealed class CardAttackHandle : global::CardGame.Core.GameEngine.IDamag
     public void MarkDyingResolvedForDamage(long damageFrameId) => ResolvedDyingDamageFrameId = damageFrameId;
     public bool HasResolvedDyingForDamage(long damageFrameId) => ResolvedDyingDamageFrameId == damageFrameId;
     public void SetCardUseCausedDamage(bool value) => CardUseCausedDamage = value;
-    public void RedirectFinalizedDamageTarget(int targetSeat, global::CardGame.Core.GameEngine.ProgramDamageTransferFollowup followup)
+    public void RedirectFinalizedDamageTarget(int targetSeat, GameEngine.ProgramDamageTransferFollowup followup)
     {
         if (!DamageAmountFinalized || DamageRedirected || TargetSeat == targetSeat)
             throw new InvalidOperationException("Damage redirection requires a new recipient and a finalized amount.");
@@ -136,7 +136,7 @@ internal sealed class CardAttackHandle : global::CardGame.Core.GameEngine.IDamag
         DamageTransferFollowup = followup;
     }
 
-    public bool TryConsumeProgramDamageTransferFollowup(out global::CardGame.Core.GameEngine.ProgramDamageTransferFollowup followup)
+    public bool TryConsumeProgramDamageTransferFollowup(out GameEngine.ProgramDamageTransferFollowup followup)
     {
         followup = DamageTransferFollowup!;
         DamageTransferFollowup = null;

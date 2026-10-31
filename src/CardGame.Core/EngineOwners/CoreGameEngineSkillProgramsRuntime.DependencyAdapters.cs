@@ -1,63 +1,59 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramSelectionModulesRuntime))]
-internal sealed class CoreSkillProgramsCoreProgramSelectionModulesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramSelectionModulesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreSkillProgramsCoreProgramSelectionModulesOperations
+[Core.ProgramCapability(typeof(CoreProgramSelectionModulesRuntime))]
+internal sealed class CoreSkillProgramsCoreProgramSelectionModulesAdapter(Func<CoreProgramSelectionModulesRuntime> targetFactory) : ICoreSkillProgramsCoreProgramSelectionModulesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramSelectionModulesRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramSelectionRegistry ProgramSelections { get => this._targetFactory().ProgramSelections; }
+    private readonly Func<CoreProgramSelectionModulesRuntime> _targetFactory = targetFactory;
+    public ProgramSelectionRegistry ProgramSelections { get => this._targetFactory().ProgramSelections; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksRuntime))]
-internal sealed class CoreSkillProgramsCoreProgramRuntimeHooksAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreSkillProgramsCoreProgramRuntimeHooksOperations
+[Core.ProgramCapability(typeof(CoreProgramRuntimeHooksRuntime))]
+internal sealed class CoreSkillProgramsCoreProgramRuntimeHooksAdapter(Func<CoreProgramRuntimeHooksRuntime> targetFactory) : ICoreSkillProgramsCoreProgramRuntimeHooksOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramRuntimeHooksRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramRuntimeHooks RuntimeHooks { get => this._targetFactory().RuntimeHooks; }
+    private readonly Func<CoreProgramRuntimeHooksRuntime> _targetFactory = targetFactory;
+    public ProgramRuntimeHooks RuntimeHooks { get => this._targetFactory().RuntimeHooks; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineEquipmentContentRuntime))]
-internal sealed class CoreSkillProgramsCoreEquipmentContentAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineEquipmentContentRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreSkillProgramsCoreEquipmentContentOperations
+[Core.ProgramCapability(typeof(CoreGameEngineEquipmentContentRuntime))]
+internal sealed class CoreSkillProgramsCoreEquipmentContentAdapter(Func<CoreGameEngineEquipmentContentRuntime> targetFactory) : ICoreSkillProgramsCoreEquipmentContentOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineEquipmentContentRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.EquipmentContentRegistry EquipmentRules { get => this._targetFactory().EquipmentRules; }
+    private readonly Func<CoreGameEngineEquipmentContentRuntime> _targetFactory = targetFactory;
+    public EquipmentContentRegistry EquipmentRules { get => this._targetFactory().EquipmentRules; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ProgramCompletionRuntime))]
-internal sealed class CoreSkillProgramsProgramCompletionAdapter(global::System.Func<global::CardGame.Core.ProgramCompletionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreSkillProgramsProgramCompletionOperations
+[Core.ProgramCapability(typeof(ProgramCompletionRuntime))]
+internal sealed class CoreSkillProgramsProgramCompletionAdapter(Func<ProgramCompletionRuntime> targetFactory) : ICoreSkillProgramsProgramCompletionOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.ProgramCompletionRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramCompletionRuntime Get() => this._targetFactory();
+    private readonly Func<ProgramCompletionRuntime> _targetFactory = targetFactory;
+    public ProgramCompletionRuntime Get() => this._targetFactory();
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreProgramActionModulesRuntime))]
-internal sealed class CoreSkillProgramsCoreProgramActionModulesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramActionModulesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreSkillProgramsCoreProgramActionModulesOperations
+[Core.ProgramCapability(typeof(CoreProgramActionModulesRuntime))]
+internal sealed class CoreSkillProgramsCoreProgramActionModulesAdapter(Func<CoreProgramActionModulesRuntime> targetFactory) : ICoreSkillProgramsCoreProgramActionModulesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreProgramActionModulesRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramActionRouter ProgramActions { get => this._targetFactory().ProgramActions; }
+    private readonly Func<CoreProgramActionModulesRuntime> _targetFactory = targetFactory;
+    public ProgramActionRouter ProgramActions { get => this._targetFactory().ProgramActions; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime))]
-internal sealed class CoreSkillProgramsCoreNativeRuleQueriesAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreSkillProgramsCoreNativeRuleQueriesOperations
+[Core.ProgramCapability(typeof(CoreNativeRuleQueriesRuntime))]
+internal sealed class CoreSkillProgramsCoreNativeRuleQueriesAdapter(Func<CoreNativeRuleQueriesRuntime> targetFactory) : ICoreSkillProgramsCoreNativeRuleQueriesOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeRuleQueriesRuntime> _targetFactory = targetFactory;
+    private readonly Func<CoreNativeRuleQueriesRuntime> _targetFactory = targetFactory;
     public int GetCombatDistance(int sourceSeat, int targetSeat) => this._targetFactory().GetCombatDistance(sourceSeat, targetSeat);
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineProgramSelectionValidationRuntime))]
-internal sealed class CoreSkillProgramsCoreProgramSelectionValidationAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineProgramSelectionValidationRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreSkillProgramsCoreProgramSelectionValidationOperations
+[Core.ProgramCapability(typeof(CoreGameEngineProgramSelectionValidationRuntime))]
+internal sealed class CoreSkillProgramsCoreProgramSelectionValidationAdapter(Func<CoreGameEngineProgramSelectionValidationRuntime> targetFactory) : ICoreSkillProgramsCoreProgramSelectionValidationOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineProgramSelectionValidationRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramSelectionValidationRegistry ProgramSelectionValidators { get => this._targetFactory().ProgramSelectionValidators; }
+    private readonly Func<CoreGameEngineProgramSelectionValidationRuntime> _targetFactory = targetFactory;
+    public ProgramSelectionValidationRegistry ProgramSelectionValidators { get => this._targetFactory().ProgramSelectionValidators; }
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CoreWushuangModeProjectionRuntime))]
-internal sealed class CoreSkillProgramsCoreWushuangModeProjectionAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CoreWushuangModeProjectionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICoreSkillProgramsCoreWushuangModeProjectionOperations
+[Core.ProgramCapability(typeof(CoreWushuangModeProjectionRuntime))]
+internal sealed class CoreSkillProgramsCoreWushuangModeProjectionAdapter(Func<CoreWushuangModeProjectionRuntime> targetFactory) : ICoreSkillProgramsCoreWushuangModeProjectionOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreWushuangModeProjectionRuntime> _targetFactory = targetFactory;
+    private readonly Func<CoreWushuangModeProjectionRuntime> _targetFactory = targetFactory;
     public bool IsWushuangMode { get => this._targetFactory().IsWushuangMode; }
 }

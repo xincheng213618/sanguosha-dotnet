@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
@@ -112,7 +108,7 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
             if (choice.Parameters["request-option"] != "use" || choice.Cards.Count != 1)
                 return true;
             var card = _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(actor)).Single(item => item.Id == choice.Cards[0]);
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var conversion);
+            CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var conversion);
             var kind = Enum.Parse<CardKind>(choice.Parameters["effective-kind"]);
             return NearestSlashPaymentHasRange(actor, target, [card], conversion, kind) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], card, conversion, kind) && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && !_coreWuJingQueriesOperations.IsTurnSlashChoiceUseForbidden(actor.Seat, choice);
         }
@@ -123,7 +119,7 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
         // identity/view-as source supplies its own distance exemption.
         foreach (var card in _coreActionQueriesOperations.GetSlashUseCards(actor))
         {
-            var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(actor, card).FirstOrDefault(item => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(item.Identity.OutputKind));
+            var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(actor, card).FirstOrDefault(item => CoreNativeCardClassificationsRuntime.IsSlashCard(item.Identity.OutputKind));
             var baseKind = identity?.Identity.OutputKind ?? _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(actor, card);
             foreach (var kind in _coreNativeTargetLegalityOperations.GetSlashUseKinds(actor, baseKind))
             {
@@ -145,7 +141,7 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
     {
         if (frame.NearestLegalSlashRequest is not { AwaitingFaction: true, TargetSeat: { } target } draft || binding.Name != draft.ResultBind)
             return false;
-        if (!IsNearestLegalFactionOrigin(frame, draft.ActorSeat, target, binding.Name) || binding.ChooserSeat != draft.ActorSeat || binding.OptionId is not ("declined" or "used-slash") || !_coreCommandJournalStorageEventsPendingEventsAccess._events.Select(item => item.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents).OfType<ProgramOptionChosenEvent>().Any(fact => fact.FrameId == frame.Id && fact.SkillId == frame.SkillId && fact.BindingId == global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) && fact.OwnerSeat == frame.OwnerSeat && fact.ResultBind == binding.Name && fact.ChooserSeat == binding.ChooserSeat && fact.OptionId == binding.OptionId))
+        if (!IsNearestLegalFactionOrigin(frame, draft.ActorSeat, target, binding.Name) || binding.ChooserSeat != draft.ActorSeat || binding.OptionId is not ("declined" or "used-slash") || !_coreCommandJournalStorageEventsPendingEventsAccess._events.Select(item => item.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents).OfType<ProgramOptionChosenEvent>().Any(fact => fact.FrameId == frame.Id && fact.SkillId == frame.SkillId && fact.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) && fact.OwnerSeat == frame.OwnerSeat && fact.ResultBind == binding.Name && fact.ChooserSeat == binding.ChooserSeat && fact.OptionId == binding.OptionId))
             throw new InvalidOperationException("A nearest faction result changed its exact owning instruction, actor or committed fact.");
         return true;
     }
@@ -158,7 +154,7 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
         if (effect.Op != SkillProgramEffectOp.RequestLegalSlashByNearest || draft.AwaitingFaction || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.ActorSeat || !draft.NearestSeats.SequenceEqual(_coreProgramSlashRequestOperations.GetNearestLivingCharacterSeats(draft.ActorSeat)))
             throw new InvalidOperationException("Nearest legal Slash lost its exact instruction, actor or distance frontier.");
         var canonical = NearestLegalSlashChoices(frame).SingleOrDefault(choice => choice.Id == selected.Id) ?? throw new InvalidOperationException("Nearest legal Slash payment or target is no longer available.");
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [selected]))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([canonical], [selected]))
             throw new InvalidOperationException("Nearest legal Slash answer changed its frozen payload.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.ActorSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
@@ -193,7 +189,7 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
 
     internal bool NearestSlashPaymentHasRange(CharacterState actor, int target, IReadOnlyList<Card> cards, CardConversionSource? conversion, CardKind kind) => _coreAssistedPhysicalCardsOperations.AssistedSlashPaymentHasRange(actor, target, cards, conversion) || (_coreProvenanceCardPoliciesOperations.HasProvenanceUseDistance2(actor, cards.Select(c => c.Id).ToArray()) || _coreGrantedEntityPhasesOperations.HasGrantedPhaseEntityDistance(actor, cards.Select(c => c.Id).ToArray())) || _coreCardConversionsOperations.IgnoresProgramSlashDistance(actor, conversion) || _coreCardConversionsOperations.IgnoresSpGuanYuWushengDistance(actor, cards[0]) || _coreCurrentTurnShownCardBenefitsOperations.HasSlashUseDistanceBySuit(actor, kind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, cards[0])) || _coreTurnRedSlashBenefitsOperations.HasTurnRedSlashPolicy(actor.Seat, kind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, cards[0])) || _coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance(actor, cards[0]) || _coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(actor, _coreMatchParticipantsPlayersAccess._players[target], kind) || _coreCardConversionsOperations.IgnoresSlashUseDistance(actor);
     internal bool IsNearestLegalFactionOrigin(ProgramSkillFrame frame, int actor, int target, string? bind) => ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect.Op == SkillProgramEffectOp.RequestLegalSlashByNearest && frame.NearestLegalSlashRequest is { AwaitingFaction: true } draft && draft.ActorSeat == actor && draft.TargetSeat == target && draft.ResultBind == bind && draft.NearestSeats.Contains(target) && frame.SelectedTargetSeats.SequenceEqual([actor]) && actor != frame.OwnerSeat;
-    internal bool ValidateNearestLegalFactionParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame frame)
+    internal bool ValidateNearestLegalFactionParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame frame)
     {
         var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
         if (effect.Op != SkillProgramEffectOp.RequestLegalSlashByNearest)
@@ -247,7 +243,7 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Unlimited Slash parent disappeared.");
         var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
         var canonical = UnlimitedVirtualSlashChoices(frame).SingleOrDefault(choice => choice.Id == selected.Id) ?? throw new InvalidOperationException("Unlimited Slash target became unavailable.");
-        if (effect.Op != SkillProgramEffectOp.OfferUnlimitedVirtualSlash || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], [canonical]))
+        if (effect.Op != SkillProgramEffectOp.OfferUnlimitedVirtualSlash || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], [canonical]))
             throw new InvalidOperationException("Unlimited Slash answer lost its exact frame or target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
@@ -274,6 +270,6 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
     [ProgramAiChoice(SkillProgramEffectOp.OfferUnlimitedVirtualSlash)]
     internal PromptChoice SelectAiUnlimitedSlash(PendingDecision decision) => decision.Choices.Select(choice => (Choice: choice, Value: choice.Parameters["offer-option"] == "decline" ? 0d : _coreAiBrainsAiBrainsAccess._aiBrains[decision.PlayerSeat].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(decision.PlayerSeat), choice.Targets.Single(), new(0, 0, 0, 0, 0, 1, false, false)))).OrderByDescending(item => item.Value).ThenBy(item => item.Choice.Id.Value, StringComparer.Ordinal).First().Choice;
 
-    SkillProgramStepOutcome global::CardGame.Core.INearestLegalSlashProgramHost.RequestLegalNearestSlashes(SkillProgramEffect effect, ProgramSkillFrame frame) => RequestLegalNearestSlashes(effect, frame);
-    SkillProgramStepOutcome global::CardGame.Core.INearestLegalSlashProgramHost.OfferUnlimitedVirtualSlash(ProgramSkillFrame frame) => OfferUnlimitedVirtualSlash(frame);
+    SkillProgramStepOutcome INearestLegalSlashProgramHost.RequestLegalNearestSlashes(SkillProgramEffect effect, ProgramSkillFrame frame) => RequestLegalNearestSlashes(effect, frame);
+    SkillProgramStepOutcome INearestLegalSlashProgramHost.OfferUnlimitedVirtualSlash(ProgramSkillFrame frame) => OfferUnlimitedVirtualSlash(frame);
 }

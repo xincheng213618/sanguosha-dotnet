@@ -1,21 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangZuMobileShiRuntime
 {
     internal const string ShiHzChizhang = "mobile:shi-chizhang", ShiHzDuanyang = "mobile:shi-duanyang";
-    internal static CardConversionSource ShiHzSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiHzSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasShiHz => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiHuangZuStore);
 
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedAfterCategory, 47900)]
     internal bool ShiHzFinalizedTrickWindow(ProgramTargetCardWindowQuery q) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiHuangZuChizhang) && q.Category == SkillProgramCardCategory.Trick;
-    SkillProgramStepOutcome global::CardGame.Core.IShiHuangZuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiHz(f, op);
-    internal CardUseFrame? ShiHzHandDamage(ProgramSkillWindowContext c, int owner) => c.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && c.CardUse is { } identity && _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } a } use && use.CardKind != CardKind.Lightning && global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(use.CardKind) && a.ActionId == identity.CardActionId && a.ActorSeat == owner && a.ProviderSeat == owner && a.PhysicalCards.Count > 0 && a.PhysicalCards.All(m => m.From == CardLocation.Hand(owner)) ? use : null;
+    SkillProgramStepOutcome IShiHuangZuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiHz(f, op);
+    internal CardUseFrame? ShiHzHandDamage(ProgramSkillWindowContext c, int owner) => c.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && c.CardUse is { } identity && _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } a } use && use.CardKind != CardKind.Lightning && CoreGameEngineMouLuMengRuntime.IsDamageCardKind(use.CardKind) && a.ActionId == identity.CardActionId && a.ActorSeat == owner && a.ProviderSeat == owner && a.PhysicalCards.Count > 0 && a.PhysicalCards.All(m => m.From == CardLocation.Hand(owner)) ? use : null;
     internal CardMovementRecord[] ShiHzNonUseHandSlashes(ProgramSkillWindowContext? c, int owner)
     {
         return c?.MovementBatch is { } batch ? ShiHzNonUseHandSlashes(batch, owner) : [];
@@ -25,7 +22,7 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
     {
         if (batch.TurnNumber != _coreActualTurnProgressTurnNumberAccess._turnNumber)
             return[];
-        return batch.Movements.Where(m => m.To == CardLocation.DiscardPile && m.From != m.To && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(m.CardKind) && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile && !_coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(batch, m) && (m.From == CardLocation.Hand(owner) || m.From == CardLocation.Processing && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(p => p.CardId == m.CardId && p.Sequence < m.Sequence)is { } previous && previous.To == CardLocation.Processing && previous.From == CardLocation.Hand(owner))).DistinctBy(m => m.CardId).OrderBy(m => m.Sequence).ToArray();
+        return batch.Movements.Where(m => m.To == CardLocation.DiscardPile && m.From != m.To && CoreNativeCardClassificationsRuntime.IsSlashCard(m.CardKind) && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile && !_coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(batch, m) && (m.From == CardLocation.Hand(owner) || m.From == CardLocation.Processing && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(p => p.CardId == m.CardId && p.Sequence < m.Sequence)is { } previous && previous.To == CardLocation.Processing && previous.From == CardLocation.Hand(owner))).DistinctBy(m => m.CardId).OrderBy(m => m.Sequence).ToArray();
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 47900)]
@@ -53,7 +50,7 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
     internal bool IsIssuedShiHz(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => ShiHzIssued(c, context);
     internal CardUseFrame? ShiHzDamageUse(ProgramSkillWindowContext context, int owner)
     {
-        if (context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.SourceSeat != owner || context.Amount <= 0 || context.DamageFrameId is not { } id || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == id)is not { } damage || damage.SourceSeat != owner || damage.TargetSeat != context.TargetSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(damage.ParentFrameId)is not { ShiHuangZuUse: { } n } use || n.Source.OwnerSeat != owner || use.Action?.ActionId != n.ActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.SourceSeat != owner || context.Amount <= 0 || context.DamageFrameId is not { } id || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == id)is not { } damage || damage.SourceSeat != owner || damage.TargetSeat != context.TargetSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(damage.ParentFrameId)is not { ShiHuangZuUse: { } n } use || n.Source.OwnerSeat != owner || use.Action?.ActionId != n.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             return null;
         return use;
     }
@@ -85,7 +82,7 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
             var cost = _coreProgramLifecycleOperations.GetProgramCardSet(f, "chizhang-payment");
             if (cost.CardIds.Count != cost.SourceLocations.Count || cost.SourceLocations.Any(l => l != CardLocation.Hand(f.OwnerSeat)) || cost.CardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(f.OwnerSeat)))
                 throw new InvalidOperationException("Chizhang requires its original selected hand cost before its native movement children.");
-            var colors = cost.CardIds.Select(id => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(id)))).ToArray();
+            var colors = cost.CardIds.Select(id => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(id)))).ToArray();
             var grant = new ShiHzColorsBoundEvent(use.Id, use.Action!.ActionId, f.Id, f.OwnerSeat, colors.Contains(true), colors.Contains(false));
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { ShiHuangZuColors = grant });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(grant);
@@ -154,7 +151,7 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId);
         var kind = card.Kind;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, kind, CardActionType.Use) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, [card.Id]) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(owner.Seat, kind, [card.Id])))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, kind, CardActionType.Use) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, [card.Id]) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(owner.Seat, kind, [card.Id])))
             return[];
         return Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner.Seat && _coreNativeTargetLegalityOperations.CanUseSlashTarget(owner, p, card, effectiveKind: kind, physicalCardIds: [card.Id])).Select(p => p.Seat).ToArray());
     }
@@ -222,7 +219,7 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
     [ProgramAnswer("shi-huang-zu")]
     internal void AnswerShiHz(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiHuangZu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiHzChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiHuangZu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiHzChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Duanyang lost its original native target or opaque owned card slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -386,7 +383,7 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
     internal bool PaidShiHzContinues(ProgramSkillFrame f) => f.ShiHuangZu is { Stage: not (ShiHzStage.Finished or ShiHzStage.RecastChoice) };
     internal bool ShiHzMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation movement) => f.ShiHuangZu is { Stage: ShiHzStage.StoreChildren or ShiHzStage.RecastCostChildren or ShiHzStage.RecastDrawChildren or ShiHzStage.RewardChildren or ShiHzStage.ReturnedUse or ShiHzStage.CleanupChildren } && movement.BeforeCount == 0 && movement.CoverageResultBind is null && effect?.Op is SkillProgramEffectOp.ResolveMobileShiHuangZuStore or SkillProgramEffectOp.ResolveMobileShiHuangZuRecast or SkillProgramEffectOp.ResolveMobileShiHuangZuPhaseUse;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileShiHuangZuPhaseUse, SkillProgramEffectOp.ResolveMobileShiHuangZuRecast)]
-    internal PromptChoice ShiHzAi(PendingDecision p, ProgramSkillFrame f) => f.ShiHuangZu!.Stage == ShiHzStage.UseChoice ? p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).First() : p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "card") ?? p.Choices.Last();
+    internal PromptChoice ShiHzAi(PendingDecision p, ProgramSkillFrame f) => f.ShiHuangZu!.Stage == ShiHzStage.UseChoice ? p.Choices.OrderBy(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).First() : p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "card") ?? p.Choices.Last();
 
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiHuangZuPublicStates(CharacterState owner, string skillId)
     {

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunJianMouOlRuntime
@@ -52,13 +48,13 @@ internal sealed partial class CharacterSunJianMouOlRuntime
 
     internal bool IsMouSunJianOlCounterUse(CardUseFrame use)
     {
-        if (use.MouSunJianOlCounter is not { } o || use.CardId != 0 || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || o.UseId != use.Id || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouSunJianOlHulie: { Stage: MouSunJianOlHulieStage.NativeUse, Accepted: true, NativeReturned: false } r } parent || !ValidMouSunJianOlHulie(parent) || o.Source != MouSunJianOlSource(parent) || o.GameplayHash != parent.GameplayHash || r.UseId != use.Id || r.ActionId != a.ActionId || o.OriginalUseId != r.Entry.UseId || o.OriginalActionId != r.Entry.ActionId || o.ActorSeat != r.Entry.TargetSeat || o.TargetSeat != parent.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<MouSunJianOlCounterIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (use.MouSunJianOlCounter is not { } o || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || o.UseId != use.Id || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouSunJianOlHulie: { Stage: MouSunJianOlHulieStage.NativeUse, Accepted: true, NativeReturned: false } r } parent || !ValidMouSunJianOlHulie(parent) || o.Source != MouSunJianOlSource(parent) || o.GameplayHash != parent.GameplayHash || r.UseId != use.Id || r.ActionId != a.ActionId || o.OriginalUseId != r.Entry.UseId || o.OriginalActionId != r.Entry.ActionId || o.ActorSeat != r.Entry.TargetSeat || o.TargetSeat != parent.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<MouSunJianOlCounterIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) : use.SourceSeat == o.ActorSeat && a.ActorSeat == o.ActorSeat;
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 32501)]
-    internal bool FinishMouSunJianOlCounterAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishMouSunJianOlCounterAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouSunJianOlCounter: not null } use || !IsMouSunJianOlCounterUse(use))
@@ -98,7 +94,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 32501)]
-    internal bool ReturnMouSunJianOlCounterAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnMouSunJianOlCounterAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouSunJianOlHulie: { Stage: MouSunJianOlHulieStage.NativeUse, NativeReturned: true } r } f || r.UseId != completion.ResolutionId)
             return false;

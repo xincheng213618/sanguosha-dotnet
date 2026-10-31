@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.BeneficiarySuitShield> _beneficiarySuitShields { get; }
+    ref readonly List<BeneficiarySuitShield> _beneficiarySuitShields { get; }
 }

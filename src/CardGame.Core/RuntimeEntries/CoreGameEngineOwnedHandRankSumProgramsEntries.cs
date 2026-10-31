@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineOwnedHandRankSumProgramsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineOwnedHandRankSumProgramsRuntime))]
 internal sealed partial class CoreGameEngineOwnedHandRankSumProgramsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineOwnedHandRankSumProgramsRuntime> _resolve;
-    private CoreGameEngineOwnedHandRankSumProgramsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineOwnedHandRankSumProgramsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineOwnedHandRankSumProgramsRuntime> _resolve;
+    private CoreGameEngineOwnedHandRankSumProgramsEntries(Func<EngineOwners.CoreGameEngineOwnedHandRankSumProgramsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineOwnedHandRankSumProgramsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineOwnedHandRankSumProgramsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineOwnedHandRankSumProgramsEntries Create(Func<EngineOwners.CoreGameEngineOwnedHandRankSumProgramsRuntime> resolve) => new(resolve);
 }

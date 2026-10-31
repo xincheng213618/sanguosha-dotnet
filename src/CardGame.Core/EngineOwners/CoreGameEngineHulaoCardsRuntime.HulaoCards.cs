@@ -1,10 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineHulaoCardsRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CoreGameEngineHulaoCardsRuntime
     {
         if (!_coreNativeLegalActionsOperations.BuildLegalActions(source, selectedPhysicalCardId: card.Id).Any(action => action.Kind == LegalActionKind.AllianceFeast && action.CardId == card.Id && action.TargetSeat is null))
             throw new InvalidOperationException("Alliance feast became illegal before native resolution.");
-        var targets = _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(source, Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(source.Seat, offset)]).Where(target => target.IsAlive && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(source.Seat, target.Seat, CardKind.AllianceFeast) && !_coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ExcludeGlobalTarget, CardKind.AllianceFeast) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.AllianceFeast, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(source.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(source, card))).Select(target => target.Seat).ToArray());
+        var targets = _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(source, Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(source.Seat, offset)]).Where(target => target.IsAlive && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(source.Seat, target.Seat, CardKind.AllianceFeast) && !_coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ExcludeGlobalTarget, CardKind.AllianceFeast) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.AllianceFeast, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(source.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(source, card))).Select(target => target.Seat).ToArray());
         var id = _coreNativeCardUseOperations.BeginCardUse(card, source.Seat, targets);
         _corePhysicalMovementFacadesOperations.MoveCard(card, _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(source, card), CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(id, card, source.Seat, targets, LegalActionKind.AllianceFeast);
@@ -30,8 +26,8 @@ internal sealed partial class CoreGameEngineHulaoCardsRuntime
     internal void ResolveAllianceFeastEffect(NullificationWindowFrame pending)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ParentFrameId) ?? throw new InvalidOperationException("Alliance feast lost its native card use.");
-        var targetSeat = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Alliance feast requires one exact nullification target.");
-        if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.AllianceFeast || use.Action is not { } action || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != targetSeat || use.AllianceFeastChoice is not null)
+        var targetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Alliance feast requires one exact nullification target.");
+        if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.AllianceFeast || use.Action is not { } action || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != targetSeat || use.AllianceFeastChoice is not null)
             throw new InvalidOperationException("Alliance feast lost its native target cursor.");
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.ResolvingEffect);
         if (!_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive)
@@ -65,7 +61,7 @@ internal sealed partial class CoreGameEngineHulaoCardsRuntime
         _coreMatchOutcomeStatusAccess._status = _coreMatchParticipantsPlayersAccess._players[targetSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
 
-    internal bool HasHulaoAllianceFeastPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IncomingCard: CardKind.AllianceFeast } decision && _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { AllianceFeastChoice: { } choice } use && global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.AllianceFeast && use.TargetIndex == choice.TargetIndex && global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] == choice.TargetSeat && decision.PlayerSeat == choice.TargetSeat;
+    internal bool HasHulaoAllianceFeastPrompt() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IncomingCard: CardKind.AllianceFeast } decision && _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { AllianceFeastChoice: { } choice } use && CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.AllianceFeast && use.TargetIndex == choice.TargetIndex && CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] == choice.TargetSeat && decision.PlayerSeat == choice.TargetSeat;
     [ProgramAnswer("hulao-alliance-feast")]
     internal void ResolveHulaoAllianceFeastChoice(PromptChoice selected)
     {
@@ -80,7 +76,7 @@ internal sealed partial class CoreGameEngineHulaoCardsRuntime
         else if (target.IsAlive && target.HasHpValue && target.Hp < target.MaxHp && benefit == "recover")
         {
             var amount = _coreCardRecoveryModifiersOperations.ApplyIssuedCardRecoveryModifiers(use.Id, use.SourceSeat, target.Seat, 1);
-            if (!_coreRecoveryReplacementOperations.TryQueueRecoveryReplacement(use.Id, use.SourceSeat, target.Seat, amount, new(RecoveryAttemptProducer.CardUse, CardId: use.CardId, CardKind: global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), Policies: [])))
+            if (!_coreRecoveryReplacementOperations.TryQueueRecoveryReplacement(use.Id, use.SourceSeat, target.Seat, amount, new(RecoveryAttemptProducer.CardUse, CardId: use.CardId, CardKind: CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), Policies: [])))
             {
                 var recoveryId = _coreNativeRecoveryFramesOperations.BeginRecovery(use.Id, use.SourceSeat, target.Seat, amount);
                 try

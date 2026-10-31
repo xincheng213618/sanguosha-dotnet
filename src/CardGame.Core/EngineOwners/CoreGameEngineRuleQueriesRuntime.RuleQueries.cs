@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRuleQueriesRuntime
@@ -17,8 +13,8 @@ internal sealed partial class CoreGameEngineRuleQueriesRuntime
     internal RuleQueryEvaluation EvaluateCardTargetCount(CharacterState player, CardKind effectiveCardKind, long? declaredUseFrameId = null) => _matchCardTargetQueriesOperations.Get().TargetCount(_kernelCoreGameEngineRuleQueriesOperations.CreateCardTargetCountQueryFacts(player, effectiveCardKind, declaredUseFrameId));
     internal int GetCardUseDistanceLimit(CharacterState player, CardKind effectiveCardKind) => _matchCardTargetQueriesOperations.Get().UseDistanceLimit(_kernelCoreGameEngineRuleQueriesOperations.CreateCardUseDistanceQueryFacts(player, effectiveCardKind));
     internal IReadOnlyList<RuleQueryContribution> CollectNumericRuleContributions(CharacterState player, SkillRuleQuery query, CardKind? effectiveCardKind = null) => _programNumericContributionOperations.Get().Collect(_kernelCoreGameEngineRuleQueriesOperations.CreateNumericContributionQueryFacts(player, query), query, effectiveCardKind);
-    internal static void AddFiniteContribution(ICollection<RuleQueryContribution> contributions, string sourceId, int value) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RuleQueries.AddFiniteContribution(contributions, sourceId, value);
-    internal static int ConvertRuleValue(RuleQueryEvaluation evaluation) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RuleQueries.ConvertRuleValue(evaluation);
+    internal static void AddFiniteContribution(ICollection<RuleQueryContribution> contributions, string sourceId, int value) => RuntimeSkills.RuntimeRules_Core_RuleQueries.AddFiniteContribution(contributions, sourceId, value);
+    internal static int ConvertRuleValue(RuleQueryEvaluation evaluation) => RuntimeSkills.RuntimeRules_Core_RuleQueries.ConvertRuleValue(evaluation);
     internal int GetSlashUseLimit(CharacterState player, int? excludedEquipmentId = null, EquipmentSlot? excludedEquipmentSlot = null) => ConvertRuleValue(_coreActionQueriesOperations.EvaluateSlashUseLimit(player, excludedEquipmentId, excludedEquipmentSlot));
     internal bool CanSpendSlashUse(CharacterState player, CharacterState target, bool ignoresCount, CardKind effectiveKind = CardKind.Slash, Card? physicalCard = null, int? effectiveRank = null, int? excludedEquipmentId = null, IReadOnlyList<int>? physicalCardIds = null, EquipmentSlot? excludedEquipmentSlot = null, bool ignoreMoQuanyu = false, Suit? effectiveSuit = null) => !_coreCardUseModulesOperations.IsCardUseForbidden(player.Seat, effectiveKind, CardActionType.Use) && (physicalCard is null || !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(player.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(player, physicalCard))) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(player.Seat, target.Seat, effectiveKind) && (_coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play || player.Seat != _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat || ignoresCount || _characterDaQiaoXiaoQiaoHappyGodOperations.IsHappyQiaoShutuCardQuery(player, physicalCard?.Id) || _coreProgramTargetRulesOperations.TargetRules.HasSlashQuotaBeforeLimit(new(player, target, effectiveKind, physicalCard, effectiveRank, excludedEquipmentId, physicalCardIds, excludedEquipmentSlot, ignoreMoQuanyu, effectiveSuit)) || _coreCurrentTurnStatisticsSlashCountThisTurnAccess._slashCountThisTurn < GetSlashUseLimit(player, excludedEquipmentId, excludedEquipmentSlot) || _coreProgramTargetRulesOperations.TargetRules.HasSlashQuotaAfterLimit(new(player, target, effectiveKind, physicalCard, effectiveRank, excludedEquipmentId, physicalCardIds, excludedEquipmentSlot, ignoreMoQuanyu, effectiveSuit)));
 }

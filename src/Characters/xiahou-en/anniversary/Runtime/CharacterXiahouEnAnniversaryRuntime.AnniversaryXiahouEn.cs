@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouEnAnniversaryRuntime
 {
     internal const string XiahouEnGainReason = "skill-program.anniversary-shiwu.damage-card";
-    internal static CardConversionSource XiahouEnSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryXiahouEnHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginAnniversaryXiahouEn(f, operation);
+    internal static CardConversionSource XiahouEnSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryXiahouEnHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp operation) => BeginAnniversaryXiahouEn(f, operation);
     [ProgramPipelineHook(ProgramPipelinePhase.VirtualEquipment, 45000)]
     internal CardKind? XiahouEnVirtualQinggang(int seat, EquipmentSlot slot) => slot == EquipmentSlot.Weapon && _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[seat], AnniversaryXiahouEnComposition.Chijian) && !_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat]).Any(c => _coreEquipmentContentOperations.EquipmentRules.IsEquipment(c.Kind) && _coreEquipmentContentOperations.EquipmentRules.Get(c.Kind).Slot == EquipmentSlot.Weapon) ? CardKind.QinggangSword : null;
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeBaseTerms, 45000)]
@@ -88,7 +84,7 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiahouEnShiwuDamageBoundEvent(f.Id, damageOrigin, damageId, source, target, receipt.DamageAmount));
         if (source == f.OwnerSeat)
         {
-            var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(c.Kind) || global::CardGame.Core.EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(c.Kind) || c.Kind == CardKind.Lightning).ToArray();
+            var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(c.Kind) || CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(c.Kind) || c.Kind == CardKind.Lightning).ToArray();
             if (pool.Length > 0 && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
             {
                 var card = pool[_randomOperations._random.Next(pool.Length)];

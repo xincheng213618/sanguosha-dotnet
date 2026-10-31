@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNianRevivalRuntime
 {
     internal const string NianReviveSkill = "nian:revive";
-    SkillProgramStepOutcome global::CardGame.Core.INianRevivalHost.ReviveNianAlly(ProgramSkillFrame frame) => BeginNianRevival(frame);
-    IReadOnlyList<int> global::CardGame.Core.INianRevivalSelectionQuery.DeadAllies(int ownerSeat) => NianDeadAllies(ownerSeat);
+    SkillProgramStepOutcome INianRevivalHost.ReviveNianAlly(ProgramSkillFrame frame) => BeginNianRevival(frame);
+    IReadOnlyList<int> INianRevivalSelectionQuery.DeadAllies(int ownerSeat) => NianDeadAllies(ownerSeat);
     internal int NianUsedRevives => _coreNianChallengeHostOperations.NianFeature?.UsedRevives ?? 0;
 
     internal bool IsNianAlliedSeat(int seat) => _coreNianChallengeHostOperations.NianFeature?.IsAlliedSeat(seat) == true;
@@ -29,7 +24,7 @@ internal sealed partial class CoreGameEngineNianRevivalRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { NianRevival = new(f.InstructionIndex, targetSeat, ordinal, target.MaxHp, NianRevivalStage.DiscardChildren, before, before, 0) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NianRevivalPaidEvent(f.Id, f.OwnerSeat, targetSeat, ordinal, target.MaxHp));
         foreach (var group in cards)
-            _corePhysicalMovementFacadesOperations.MoveCards(group.Cards.Select(id => _coreCardAttackStateOperations.GetAttackCard(id)).ToArray(), group.Location, CardLocation.DiscardPile, global::CardGame.Core.EngineOwners.CoreGameEngineNianRevivalDefinitions.NianRevivalDiscard);
+            _corePhysicalMovementFacadesOperations.MoveCards(group.Cards.Select(id => _coreCardAttackStateOperations.GetAttackCard(id)).ToArray(), group.Location, CardLocation.DiscardPile, CoreGameEngineNianRevivalDefinitions.NianRevivalDiscard);
         CompleteNianSegment(f.Id, cards.Sum(g => g.Cards.Length));
         ContinueNianRevival(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
         return SkillProgramStepOutcome.AwaitChild;
@@ -53,7 +48,7 @@ internal sealed partial class CoreGameEngineNianRevivalRuntime
         if (f.NianRevival is not { } r || batch.ParentFrameId != f.Id || batch.AwaitingProgramFrameId is not null || batch.OriginOwnerSeat != f.OwnerSeat || batch.OriginSkillId != f.SkillId || batch.OriginSkillInstanceId != f.SkillInstanceId || batch.Movements.Count == 0 || r.Stage == NianRevivalStage.StateChildren)
             return false;
         RequireNianRevival(f);
-        return batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && (r.Stage == NianRevivalStage.DiscardChildren ? m.From.OwnerSeat == r.TargetSeat && m.To == CardLocation.DiscardPile && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineNianRevivalDefinitions.NianRevivalDiscard : m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineNianRevivalDefinitions.NianRevivalDraw));
+        return batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && (r.Stage == NianRevivalStage.DiscardChildren ? m.From.OwnerSeat == r.TargetSeat && m.To == CardLocation.DiscardPile && m.Reason == CoreGameEngineNianRevivalDefinitions.NianRevivalDiscard : m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason == CoreGameEngineNianRevivalDefinitions.NianRevivalDraw));
     }
 
     internal void ContinueNianRevival(ProgramSkillFrame input)
@@ -90,7 +85,7 @@ internal sealed partial class CoreGameEngineNianRevivalRuntime
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { NianRevival = r with { Stage = NianRevivalStage.DrawAttempt, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Count = 0 } });
             CompleteNianSegment(f.Id, 0);
-            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), target.Seat, 2, global::CardGame.Core.EngineOwners.CoreGameEngineNianRevivalDefinitions.NianRevivalDraw);
+            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), target.Seat, 2, CoreGameEngineNianRevivalDefinitions.NianRevivalDraw);
             return;
         }
 
@@ -106,7 +101,7 @@ internal sealed partial class CoreGameEngineNianRevivalRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         RequireNianRevival(frame);
-        if (frame.NativeDraw is not null || frame.NianRevival is not { Stage: NianRevivalStage.DrawAttempt } receipt || outcome.RecipientSeat != receipt.TargetSeat || outcome.RequestedCount != 2 || outcome.SequenceBefore < receipt.Before || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.ActualDrawIds.Count > 2 || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(receipt.TargetSeat) && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineNianRevivalDefinitions.NianRevivalDraw).OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
+        if (frame.NativeDraw is not null || frame.NianRevival is not { Stage: NianRevivalStage.DrawAttempt } receipt || outcome.RecipientSeat != receipt.TargetSeat || outcome.RequestedCount != 2 || outcome.SequenceBefore < receipt.Before || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.ActualDrawIds.Count > 2 || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(receipt.TargetSeat) && m.Reason == CoreGameEngineNianRevivalDefinitions.NianRevivalDraw).OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
             throw new InvalidOperationException("A Nian revival lost its exact actual draw or replacement return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { NianRevival = receipt with { Stage = NianRevivalStage.DrawChildren, Before = outcome.SequenceBefore, After = outcome.SequenceAfter, Count = outcome.ActualDrawIds.Count } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NianRevivalSegmentEvent(frame.Id, receipt.TargetSeat, NianRevivalStage.DrawChildren, outcome.SequenceBefore, outcome.SequenceAfter, outcome.ActualDrawIds.Count));
@@ -149,7 +144,7 @@ internal sealed partial class CoreGameEngineNianRevivalRuntime
         if (segment is not [var issued] || issued.TargetSeat != r.TargetSeat || issued.Before != r.Before || issued.After != r.After || issued.Count != r.Count)
             throw new InvalidOperationException("Nian revival lost its paid native movement segment.");
         var movements = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).ToArray();
-        if (r.Stage == NianRevivalStage.DiscardChildren && movements.Count(m => m.From.OwnerSeat == r.TargetSeat && m.To == CardLocation.DiscardPile && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineNianRevivalDefinitions.NianRevivalDiscard) != r.Count || r.Stage == NianRevivalStage.DrawChildren && movements.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineNianRevivalDefinitions.NianRevivalDraw) != r.Count)
+        if (r.Stage == NianRevivalStage.DiscardChildren && movements.Count(m => m.From.OwnerSeat == r.TargetSeat && m.To == CardLocation.DiscardPile && m.Reason == CoreGameEngineNianRevivalDefinitions.NianRevivalDiscard) != r.Count || r.Stage == NianRevivalStage.DrawChildren && movements.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason == CoreGameEngineNianRevivalDefinitions.NianRevivalDraw) != r.Count)
             throw new InvalidOperationException("Nian revival's physical discard/draw invoice changed while suspended.");
     }
 }

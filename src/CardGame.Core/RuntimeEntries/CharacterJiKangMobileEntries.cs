@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CharacterJiKangMobileRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CharacterJiKangMobileRuntime))]
 internal sealed partial class CharacterJiKangMobileEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterJiKangMobileRuntime> _resolve;
-    private CharacterJiKangMobileEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterJiKangMobileRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterJiKangMobileRuntime> _resolve;
+    private CharacterJiKangMobileEntries(Func<EngineOwners.CharacterJiKangMobileRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterJiKangMobileEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterJiKangMobileRuntime> resolve) => new(resolve);
+    internal static CharacterJiKangMobileEntries Create(Func<EngineOwners.CharacterJiKangMobileRuntime> resolve) => new(resolve);
 }

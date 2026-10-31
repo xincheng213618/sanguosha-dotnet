@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class CardMovementBatchFacts(global::CardGame.Core.EngineStates.CoreActualTurnProgressState actualTurnProgressState, global::CardGame.Core.EngineStates.CoreMatchSetupState matchSetupState, global::CardGame.Core.EngineStates.CoreMatchOutcomeState matchOutcomeState, global::System.Func<global::CardGame.Core.FrameStore> getFrameStore) : ICardMovementBatchFacts
+internal sealed class CardMovementBatchFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreMatchSetupState matchSetupState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<FrameStore> getFrameStore) : ICardMovementBatchFacts
 {
     public int TurnNumber => actualTurnProgressState.ReferenceToTurnNumber;
     public bool SetupComplete => matchSetupState.ReferenceToSetupComplete;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouJieAnniversaryRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
     {
         if (f.AnniversaryXiahouJie is not { } r)
             return false;
-        if (r.Stage == AnniversaryXiahouJieStage.Drawing && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
+        if (r.Stage == AnniversaryXiahouJieStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
             return true;
         if (child is DyingFrame dying)
             return r.Stage == AnniversaryXiahouJieStage.HpChildren && r.HpPaid && r.HpAfter <= 0 && dying.ParentFrameId == f.Id && dying.VictimSeat == f.OwnerSeat && dying.KillerSeat is null && dying.ResumesProgramSkill;

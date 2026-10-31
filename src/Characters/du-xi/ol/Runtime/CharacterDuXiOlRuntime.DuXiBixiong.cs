@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDuXiOlRuntime
 {
-    internal static int DuXiSuitBit(Suit suit) => global::CardGame.Core.RuntimeSkills.RuntimeRules_du_xi_ol_DuXiBixiong.DuXiSuitBit(suit);
+    internal static int DuXiSuitBit(Suit suit) => RuntimeSkills.RuntimeRules_du_xi_ol_DuXiBixiong.DuXiSuitBit(suit);
     internal IEnumerable<CardMovementRecord> DuXiBixiongMovements(CardMovementBatchContext batch, int owner)
     {
         if (batch.DiscardRecoveryPhase is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase || phase.ActorSeat != owner || phase.ActualTurnOwnerSeat != owner || phase.TurnNumber != batch.TurnNumber || batch.OriginOwnerSeat is { } producer && producer != owner)
             return[];
-        return batch.Movements.Where(m => m.From == CardLocation.Hand(owner) && m.To == CardLocation.DiscardPile && global::CardGame.Core.EngineOwners.CoreGameEngineProgramDiscardTopPlacementRuntime.IsDiscardMovementReason(m.Reason));
+        return batch.Movements.Where(m => m.From == CardLocation.Hand(owner) && m.To == CardLocation.DiscardPile && CoreGameEngineProgramDiscardTopPlacementRuntime.IsDiscardMovementReason(m.Reason));
     }
 
     internal void CaptureDuXiBixiongBatch(CardMovementBatchContext batch)

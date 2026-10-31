@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanPuOlRuntime
 {
-    internal static CardConversionSource YanPuSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource YanPuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool IsYanPuEndingCandidate(ProgramTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ResolveHuantuEnding }];
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeYanPuDrawObservers(CharacterState subject, IReadOnlyList<ProgramTriggerCandidate> existing)
     {
@@ -47,8 +43,8 @@ internal sealed partial class CharacterYanPuOlRuntime
     }
 
     internal bool CanRunYanPuEnding(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => CurrentYanPuEnding(c, context)is { } p && !YanPuPromiseConsumed(p.Id) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive;
-    internal ProgramTriggerCandidate? YanPuCurrentEndingFrameCandidate(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } context && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } w && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex].Candidate is { } c && context.OccurrenceIndex == c.OccurrenceIndex && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) ? c : null;
-    internal bool TryBeginYanPuDyingExit(global::CardGame.Core.GameEngine.DyingCompletionReceipt dying, bool survived)
+    internal ProgramTriggerCandidate? YanPuCurrentEndingFrameCandidate(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } context && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } w && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex].Candidate is { } c && context.OccurrenceIndex == c.OccurrenceIndex && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) ? c : null;
+    internal bool TryBeginYanPuDyingExit(GameEngine.DyingCompletionReceipt dying, bool survived)
     {
         if (!survived || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp <= 0 || !(_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawDyingExitRoundDistance) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveQingliuFactionChoice) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouJiangWeiFuzhan) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerWindow(SkillProgramTriggerWindow.DyingExited) || _coreWushuangModeProjectionOperations.IsWushuangMode))
             return false;
@@ -67,7 +63,7 @@ internal sealed partial class CharacterYanPuOlRuntime
         var ret = frame.YanPuDyingExit ?? throw new InvalidOperationException("YanPu exit lost its original completed Dying return.");
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != ret.DyingParentFrameId || ret.Round != _coreActualRoundProgressRoundNumberAccess._roundNumber || ret.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || ret.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)
             throw new InvalidOperationException("YanPu exit lost its exact paused native producer.");
-        var dying = new global::CardGame.Core.GameEngine.DyingCompletionReceipt(ret.DyingFrameId, ret.DyingParentFrameId, ret.VictimSeat, ret.Continuation);
+        var dying = new GameEngine.DyingCompletionReceipt(ret.DyingFrameId, ret.DyingParentFrameId, ret.VictimSeat, ret.Continuation);
         if (_coreDeferredBenefitsProgramsOperations.TryBeginFactionRecoveryDebts(dying, true))
             return;
         _coreNativeDyingOperations.ContinueDyingAfterFactionRecoveryDebts(dying, true);

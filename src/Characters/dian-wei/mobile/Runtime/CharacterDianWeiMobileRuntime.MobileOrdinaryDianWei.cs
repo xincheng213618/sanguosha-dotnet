@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDianWeiMobileRuntime
 {
     internal bool MobileOrdinaryQiangxiRange(int owner, int target, int? excludedWeapon, out int distance, out int range, out bool special)
     {
-        distance = global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target], excludedWeapon));
-        range = global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(_coreMatchParticipantsPlayersAccess._players[owner], excludedWeapon));
+        distance = CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target], excludedWeapon));
+        range = CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(_coreMatchParticipantsPlayersAccess._players[owner], excludedWeapon));
         special = _characterTaishiCiMobileGodOperations.HasShenTaishiCiPoweiRange(owner, target) || _characterSunYuanOlOperations.HasSayingRoundRange(owner, target) || _coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(owner, target);
         return special || distance <= range;
     }
@@ -77,5 +73,5 @@ internal sealed partial class CharacterDianWeiMobileRuntime
         return true;
     }
 
-    bool global::CardGame.Core.IMobileOrdinaryQiangxiQueries.AllowsWeaponTarget(int ownerSeat, int weaponId, int targetSeat) => AllowsMobileOrdinaryQiangxiWeaponTarget(ownerSeat, weaponId, targetSeat);
+    bool IMobileOrdinaryQiangxiQueries.AllowsWeaponTarget(int ownerSeat, int weaponId, int targetSeat) => AllowsMobileOrdinaryQiangxiWeaponTarget(ownerSeat, weaponId, targetSeat);
 }

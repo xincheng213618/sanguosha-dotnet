@@ -4,11 +4,11 @@ internal sealed partial class CharacterZhuRanMouMobileEntries
 {
     internal bool MouZhuRanAdvanceChildren() => _resolve().MouZhuRanAdvanceChildren();
     internal bool MouZhuRanDying() => _resolve().MouZhuRanDying();
-    internal bool MouZhuRanFirstNativeChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().MouZhuRanFirstNativeChild(f, child);
-    internal bool MouZhuRanMovementReturn(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.SkillProgramEffect? effect, global::CardGame.Core.ProgramMovementContinuation p) => _resolve().MouZhuRanMovementReturn(f, effect, p);
+    internal bool MouZhuRanFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MouZhuRanFirstNativeChild(f, child);
+    internal bool MouZhuRanMovementReturn(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => _resolve().MouZhuRanMovementReturn(f, effect, p);
     internal bool MouZhuRanNativeEdge(int i) => _resolve().MouZhuRanNativeEdge(i);
-    internal global::CardGame.Core.ProgramSkillFrame? MouZhuRanNativeRoot() => _resolve().MouZhuRanNativeRoot();
+    internal ProgramSkillFrame? MouZhuRanNativeRoot() => _resolve().MouZhuRanNativeRoot();
     internal bool MouZhuRanNativeSuffix(int n) => _resolve().MouZhuRanNativeSuffix(n);
-    internal bool MouZhuRanRecoveryParent(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.RecoveryReplacementFrame recovery) => _resolve().MouZhuRanRecoveryParent(f, recovery);
-    internal global::CardGame.Core.MouZhuRanRuntime MouZhuRan { get => _resolve().MouZhuRan; }
+    internal bool MouZhuRanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().MouZhuRanRecoveryParent(f, recovery);
+    internal MouZhuRanRuntime MouZhuRan { get => _resolve().MouZhuRan; }
 }

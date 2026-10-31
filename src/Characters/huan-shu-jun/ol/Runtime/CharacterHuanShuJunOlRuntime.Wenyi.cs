@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuanShuJunOlRuntime
@@ -178,7 +174,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         RestoreWenyiRecipient(f, true);
     }
 
-    internal static bool SameHuanShuJunAction(CardActionContext a, CardActionContext b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_huan_shu_jun_ol_Wenyi.SameHuanShuJunAction(a, b);
+    internal static bool SameHuanShuJunAction(CardActionContext a, CardActionContext b) => RuntimeSkills.RuntimeRules_huan_shu_jun_ol_Wenyi.SameHuanShuJunAction(a, b);
     [ProgramTriggerProof(ProgramTriggerProofPhase.HpChangeOwner, 50, ProgramTriggerProofMatch.Decision)]
     internal bool? ProveWenyiHealth(SkillProgramTrigger trigger, ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => IsWenyiHpTrigger(trigger) ? CanOfferWenyi(candidate, trigger, context) : null;
 }

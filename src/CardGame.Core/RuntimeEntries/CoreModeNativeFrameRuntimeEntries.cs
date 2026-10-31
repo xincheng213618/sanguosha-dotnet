@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreModeNativeFrameRuntimeEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreModeNativeFrameRuntimeRuntime> _resolve;
-    private CoreModeNativeFrameRuntimeEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreModeNativeFrameRuntimeRuntime> resolve)
+    private readonly Func<EngineOwners.CoreModeNativeFrameRuntimeRuntime> _resolve;
+    private CoreModeNativeFrameRuntimeEntries(Func<EngineOwners.CoreModeNativeFrameRuntimeRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreModeNativeFrameRuntimeEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreModeNativeFrameRuntimeRuntime> resolve) => new(resolve);
+    internal static CoreModeNativeFrameRuntimeEntries Create(Func<EngineOwners.CoreModeNativeFrameRuntimeRuntime> resolve) => new(resolve);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
             return SkillProgramStepOutcome.Continue;
         }
 
-        var slashes = _corePhysicalOwnedCardQueriesOperations.GetHand(user).Concat(_coreRequestedDeckBasicsOperations.SelectedRequestedDeckBasicCards(user)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(user)).Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && !_coreTurnHandCategoryRestrictionsOperations.IsTurnHandCategoryRestricted(user, card) && !_coreProgramCardLegalityOperations.IsProgramEntityPhysicalRestricted(user.Seat, card.Id)).ToArray();
+        var slashes = _corePhysicalOwnedCardQueriesOperations.GetHand(user).Concat(_coreRequestedDeckBasicsOperations.SelectedRequestedDeckBasicCards(user)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(user)).Where(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && !_coreTurnHandCategoryRestrictionsOperations.IsTurnHandCategoryRestricted(user, card) && !_coreProgramCardLegalityOperations.IsProgramEntityPhysicalRestricted(user.Seat, card.Id)).ToArray();
         var pairChoices = _coreRoundDistinctBasicRequestsOperations.RoundDistinctBasicRequestedSlashChoices(active, user.Seat, [frame.OwnerSeat], resultBind);
         var cardlessChoices = _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramSlashChoices(active, user.Seat, [frame.OwnerSeat], resultBind).Concat(_characterMaXiuMaTieOlOperations.KenshangProgramSlashChoices(active, user.Seat, [frame.OwnerSeat], resultBind)).Concat(_characterChengJiChengCuiOlOperations.TousuiProgramSlashChoices(active, user.Seat, [frame.OwnerSeat], resultBind)).ToList();
         if (!keepCurrentRequest && slashes.Length == 0 && pairChoices.Count == 0 && !_coreRequestedDeckBasicsOperations.HasRequestedDeckBasicSource(user, CardKind.Slash) && !_coreChainedStateBasicConversionsOperations.HasChainedStateBasicProgramSlash(user, [frame.OwnerSeat]) && !_coreDrawFundedDistinctBasicOffersOperations.HasDrawFundedDistinctBasicProgramSlash(user, [frame.OwnerSeat]) && !_coreRoundOnceCardlessProgramRequestsOperations.HasRoundOnceCardlessProgramSlash(user, [frame.OwnerSeat]) && !_characterMaXiuMaTieOlOperations.HasKenshangProgramSlash(user, [frame.OwnerSeat]) && !_characterChengJiChengCuiOlOperations.HasTousuiProgramSlash(user, [frame.OwnerSeat]) && !_characterGuoTuOlOperations.HasWeijieProgramSlash(user, [frame.OwnerSeat]) && !_characterLiuFengBoundaryOperations.HasBoundaryLiuFengProgramSlash(user, [frame.OwnerSeat]) && !(_characterLiuZhangOlOperations.HasZonghuProgramSlash(user, [frame.OwnerSeat]) || _characterHuanShuJunOlOperations.HasHuanpeiProgramSlash(user, [frame.OwnerSeat])))
@@ -94,7 +90,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
             throw new InvalidOperationException("The slash request answer is malformed.");
         var location = _cardZonesOperations._cardZones.GetLocation(cardId);
         var card = location.Zone == CardZoneKind.Hand && location.OwnerSeat == userSeat || _coreRequestedDeckBasicsOperations.IsSelectedRequestedDeckBasicMaterial(userSeat, cardId) || _coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(_coreMatchParticipantsPlayersAccess._players[userSeat]).Any(c => c.Id == cardId) ? _cardZonesOperations._cardZones.CardsAt(location).SingleOrDefault(item => item.Id == cardId) : null;
-        if (card is null || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || _coreTurnHandCategoryRestrictionsOperations.IsTurnHandCategoryRestricted(_coreMatchParticipantsPlayersAccess._players[userSeat], card) || _coreProgramCardLegalityOperations.IsProgramEntityPhysicalRestricted(userSeat, card.Id))
+        if (card is null || !CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || _coreTurnHandCategoryRestrictionsOperations.IsTurnHandCategoryRestricted(_coreMatchParticipantsPlayersAccess._players[userSeat], card) || _coreProgramCardLegalityOperations.IsProgramEntityPhysicalRestricted(userSeat, card.Id))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "所选【杀】已离开用牌者手牌，技能剩余结算已取消。");
             return;
@@ -134,7 +130,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
         if (_characterPangJiOlOperations.IsBiguoCategoryForbidden(participantSeat, CardKind.Slash))
             return _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(active.Id, active.SkillId, participantSeat, hpAmount);
         var nearest = GetNearestLivingCharacterSeats(participantSeat);
-        var slashes = _corePhysicalOwnedCardQueriesOperations.GetHand(participant).Concat(_coreRequestedDeckBasicsOperations.SelectedRequestedDeckBasicCards(participant)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(participant)).Where(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)).OrderBy(card => card.Id).ToArray();
+        var slashes = _corePhysicalOwnedCardQueriesOperations.GetHand(participant).Concat(_coreRequestedDeckBasicsOperations.SelectedRequestedDeckBasicCards(participant)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(participant)).Where(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)).OrderBy(card => card.Id).ToArray();
         var pairChoices = _coreRoundDistinctBasicRequestsOperations.RoundDistinctBasicRequestedSlashChoices(active, participantSeat, nearest);
         var cardlessChoices = _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramSlashChoices(active, participantSeat, nearest).Concat(_characterMaXiuMaTieOlOperations.KenshangProgramSlashChoices(active, participantSeat, nearest)).Concat(_characterChengJiChengCuiOlOperations.TousuiProgramSlashChoices(active, participantSeat, nearest)).ToList();
         if (nearest.Length == 0 || !keepCurrentRequest && slashes.Length == 0 && pairChoices.Count == 0 && !_coreRequestedDeckBasicsOperations.HasRequestedDeckBasicSource(participant, CardKind.Slash) && !_coreChainedStateBasicConversionsOperations.HasChainedStateBasicProgramSlash(participant, nearest) && !_coreDrawFundedDistinctBasicOffersOperations.HasDrawFundedDistinctBasicProgramSlash(participant, nearest) && !_coreRoundOnceCardlessProgramRequestsOperations.HasRoundOnceCardlessProgramSlash(participant, nearest) && !_characterMaXiuMaTieOlOperations.HasKenshangProgramSlash(participant, nearest) && !_characterChengJiChengCuiOlOperations.HasTousuiProgramSlash(participant, nearest) && !_characterGuoTuOlOperations.HasWeijieProgramSlash(participant, nearest) && !_characterLiuFengBoundaryOperations.HasBoundaryLiuFengProgramSlash(participant, nearest) && !(_characterLiuZhangOlOperations.HasZonghuProgramSlash(participant, nearest) || _characterHuanShuJunOlOperations.HasHuanpeiProgramSlash(participant, nearest)))
@@ -200,7 +196,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
             throw new InvalidOperationException("The nearest-character slash request answer is malformed.");
         var location = _cardZonesOperations._cardZones.GetLocation(cardId);
         var card = location == CardLocation.Hand(participantSeat) || _coreRequestedDeckBasicsOperations.IsSelectedRequestedDeckBasicMaterial(participantSeat, cardId) || _coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(_coreMatchParticipantsPlayersAccess._players[participantSeat]).Any(c => c.Id == cardId) ? _cardZonesOperations._cardZones.CardsAt(location).SingleOrDefault(item => item.Id == cardId) : null;
-        if (card is null || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || !GetNearestLivingCharacterSeats(participantSeat).Contains(targetSeat))
+        if (card is null || !CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || !GetNearestLivingCharacterSeats(participantSeat).Contains(targetSeat))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "所选【杀】或最近角色已失效，技能剩余结算已取消。");
             return;
@@ -215,6 +211,6 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { ChoiceBindings = Array.AsReadOnly(frame.ChoiceBindings.Append(new ProgramChoiceResultBinding(bind, optionId, chooserSeat)).ToArray()) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramOptionChosenEvent(frameId, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, bind, optionId, chooserSeat, label));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramOptionChosenEvent(frameId, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, bind, optionId, chooserSeat, label));
     }
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeDuelRuntime
@@ -20,9 +16,9 @@ internal sealed partial class CoreNativeDuelRuntime
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(resolutionId, duel, source.Seat, [target.Seat], LegalActionKind.Duel, playedCardKind: playedCardKind);
     }
 
-    internal void BeginDuelResponse(global::CardGame.Core.NativeOwners.DuelHandle duel, bool keepCurrentRequest = false)
+    internal void BeginDuelResponse(NativeOwners.DuelHandle duel, bool keepCurrentRequest = false)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveDuel, duel))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveDuel, duel))
         {
             throw new InvalidOperationException("The Duel response is not the current card resolution.");
         }
@@ -69,13 +65,13 @@ internal sealed partial class CoreNativeDuelRuntime
         _coreMatchOutcomeStatusAccess._status = responder.IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
 
-    internal void ResolveDuelResponse(global::CardGame.Core.NativeOwners.DuelHandle duel, CharacterState responder, Card? selectedSlash)
+    internal void ResolveDuelResponse(NativeOwners.DuelHandle duel, CharacterState responder, Card? selectedSlash)
     {
         if (selectedSlash is not null && _characterLiuQiOlOperations.IsWenjiResponseForbidden2(duel.ResolutionId, responder.Seat))
             throw new InvalidOperationException("Wenji forbids this exact Duel response.");
         if (selectedSlash is { } declaredSlash && _coreCardDeclarationsOperations.TryBeginCardDeclaration(responder, declaredSlash, CardKind.Slash, _coreCardDeclarationsOperations.PeekDeclarationConversion(responder, declaredSlash, CardKind.Slash, false), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Duel, responder.Seat), [duel.OpponentSeat]))
             return;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveDuel, duel) || responder.Seat != duel.ResponderSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveDuel, duel) || responder.Seat != duel.ResponderSeat)
         {
             throw new InvalidOperationException("The Duel response does not belong to the current responder.");
         }
@@ -91,7 +87,7 @@ internal sealed partial class CoreNativeDuelRuntime
             var responseCostIsRed = _coreActionDiscardColorsOperations.CapturePhysicalCardColor(responder.Seat, slash);
             _corePhysicalMovementFacadesOperations.MoveCard(slash, responseFrom, CardLocation.Processing, CardMoveReasons.Respond, disclosure: CardMovementDisclosure.FaceUp);
             var responseName = CardCatalog.Get(responseCardKind).DisplayName;
-            var responseDescription = _coreCardDeclarationsOperations.PublicDeclarationDescription(slash, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(slash, CardKind.Slash) ? $"打出【{(responseName)}】" : $"将【{(slash.DisplayName)}】当作【{(responseName)}】");
+            var responseDescription = _coreCardDeclarationsOperations.PublicDeclarationDescription(slash, CoreNativeCardClassificationsRuntime.IsNativeResponseCard(slash, CardKind.Slash) ? $"打出【{(responseName)}】" : $"将【{(slash.DisplayName)}】当作【{(responseName)}】");
             _coreMatchLogOperations.AddLog("CardResponded", $"{(responder.Name)} {(responseDescription)}应战【决斗】。", responder.Seat, duel.OpponentSeat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(slash.Id, responder.Seat, duel.OpponentSeat, responseCardKind));
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(responder.Seat, responseCardKind);
@@ -121,9 +117,9 @@ internal sealed partial class CoreNativeDuelRuntime
         }
     }
 
-    internal void ResolveDuelZhangbaResponse(global::CardGame.Core.NativeOwners.DuelHandle duel, CharacterState responder, IReadOnlyList<Card> pair)
+    internal void ResolveDuelZhangbaResponse(NativeOwners.DuelHandle duel, CharacterState responder, IReadOnlyList<Card> pair)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveDuel, duel) || responder.Seat != duel.ResponderSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveDuel, duel) || responder.Seat != duel.ResponderSeat)
         {
             throw new InvalidOperationException("The Zhangba Duel response does not belong to the current responder.");
         }
@@ -139,7 +135,7 @@ internal sealed partial class CoreNativeDuelRuntime
         ContinueDuelAfterSuccessfulSlash(duel, responder.Seat);
     }
 
-    internal void ContinueDuelAfterSuccessfulSlash(global::CardGame.Core.NativeOwners.DuelHandle duel, int responderSeat)
+    internal void ContinueDuelAfterSuccessfulSlash(NativeOwners.DuelHandle duel, int responderSeat)
     {
         _characterSimaYiMobileGodOperations.ClearMobileSimaRenjieResponse(duel.Attack);
         var skillOwner = _coreMatchParticipantsPlayersAccess._players[duel.OpponentSeat];

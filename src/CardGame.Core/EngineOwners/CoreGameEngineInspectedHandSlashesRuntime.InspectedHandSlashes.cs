@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -17,7 +14,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashesRuntime
     }
 
     internal const string InspectedHandDiscardReason = "program.hp-hand-inspection.discard";
-    internal CardConversionSource InspectedHandSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal CardConversionSource InspectedHandSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillProgramStepOutcome BeginInspectedHandSlash(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -113,7 +110,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashesRuntime
     [ProgramAnswer("inspected-hand-slash")]
     internal void ResolveInspectedHandChoice(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.InspectedHandSlash is not { Stage: InspectedHandSlashStage.Viewing } d || !_coreInspectedHandSlashReturnsOperations.ValidInspectedHandSlash(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != f.OwnerSeat || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], InspectedHandChoices(f).Where(c => c.Id == choice.Id).ToArray()) || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[d.TargetSeat]).Select(c => c.Id).SequenceEqual(d.ViewedCardIds))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.InspectedHandSlash is not { Stage: InspectedHandSlashStage.Viewing } d || !_coreInspectedHandSlashReturnsOperations.ValidInspectedHandSlash(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != f.OwnerSeat || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], InspectedHandChoices(f).Where(c => c.Id == choice.Id).ToArray()) || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[d.TargetSeat]).Select(c => c.Id).SequenceEqual(d.ViewedCardIds))
             throw new InvalidOperationException("The inspected hand choice must retain its private viewer, complete current hand and exact payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[d.TargetSeat].IsAlive)
@@ -157,5 +154,5 @@ internal sealed partial class CoreGameEngineInspectedHandSlashesRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IInspectedHandSlashProgramHost.PayHpInspectHandThenDiscardOrSlash(ProgramSkillFrame f) => BeginInspectedHandSlash(f);
+    SkillProgramStepOutcome IInspectedHandSlashProgramHost.PayHpInspectHandThenDiscardOrSlash(ProgramSkillFrame f) => BeginInspectedHandSlash(f);
 }

@@ -2,18 +2,18 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDyingSuitsAndHistoricalUseObserversEntries
 {
-    internal void AssertHistoricalEndingUse(global::CardGame.Core.CardUseFrame use) => _resolve().AssertHistoricalEndingUse(use);
-    internal global::CardGame.Core.DyingSuitsOriginalCursor CaptureDyingSuitsOriginalCursor(global::CardGame.Core.DyingFrame dying, global::CardGame.Core.ProgramLifecycleTriggerWindowFrame entry) => _resolve().CaptureDyingSuitsOriginalCursor(dying, entry);
-    internal bool DyingSuitsFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().DyingSuitsFirstChild(f, child);
-    internal global::CardGame.Core.ProgramSkillFrame? DyingSuitsObserverRoot() => _resolve().DyingSuitsObserverRoot();
-    internal bool DyingSuitsPaidPrefix(global::CardGame.Core.ProgramSkillFrame root) => _resolve().DyingSuitsPaidPrefix(root);
-    internal bool DyingSuitsStructuralEdge(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.ResolutionFrame child) => _resolve().DyingSuitsStructuralEdge(parent, child);
-    internal bool DyingSuitsStructuralPrefix(global::CardGame.Core.ProgramSkillFrame root) => _resolve().DyingSuitsStructuralPrefix(root);
-    internal bool ExactDyingSuitsOriginalCursor(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.DyingFrame dying, global::CardGame.Core.ProgramLifecycleTriggerWindowFrame entry) => _resolve().ExactDyingSuitsOriginalCursor(root, dying, entry);
+    internal void AssertHistoricalEndingUse(CardUseFrame use) => _resolve().AssertHistoricalEndingUse(use);
+    internal DyingSuitsOriginalCursor CaptureDyingSuitsOriginalCursor(DyingFrame dying, ProgramLifecycleTriggerWindowFrame entry) => _resolve().CaptureDyingSuitsOriginalCursor(dying, entry);
+    internal bool DyingSuitsFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().DyingSuitsFirstChild(f, child);
+    internal ProgramSkillFrame? DyingSuitsObserverRoot() => _resolve().DyingSuitsObserverRoot();
+    internal bool DyingSuitsPaidPrefix(ProgramSkillFrame root) => _resolve().DyingSuitsPaidPrefix(root);
+    internal bool DyingSuitsStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => _resolve().DyingSuitsStructuralEdge(parent, child);
+    internal bool DyingSuitsStructuralPrefix(ProgramSkillFrame root) => _resolve().DyingSuitsStructuralPrefix(root);
+    internal bool ExactDyingSuitsOriginalCursor(ProgramSkillFrame root, DyingFrame dying, ProgramLifecycleTriggerWindowFrame entry) => _resolve().ExactDyingSuitsOriginalCursor(root, dying, entry);
     internal bool HistoricalUseObserverEdge(int index) => _resolve().HistoricalUseObserverEdge(index);
     internal bool IsDyingSuitsProgramDying() => _resolve().IsDyingSuitsProgramDying();
-    internal bool IsOriginalDyingSuspendedByDyingSuits(global::CardGame.Core.DyingFrame dying) => _resolve().IsOriginalDyingSuspendedByDyingSuits(dying);
+    internal bool IsOriginalDyingSuspendedByDyingSuits(DyingFrame dying) => _resolve().IsOriginalDyingSuspendedByDyingSuits(dying);
     internal bool TryAdvanceDyingSuitsSubtree() => _resolve().TryAdvanceDyingSuitsSubtree();
-    internal bool ValidDyingSuitsPeachUse(global::CardGame.Core.CardUseFrame use, global::CardGame.Core.DyingSuitsPeachReturn ret) => _resolve().ValidDyingSuitsPeachUse(use, ret);
-    internal bool ValidDyingSuitsReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidDyingSuitsReceipt(f);
+    internal bool ValidDyingSuitsPeachUse(CardUseFrame use, DyingSuitsPeachReturn ret) => _resolve().ValidDyingSuitsPeachUse(use, ret);
+    internal bool ValidDyingSuitsReceipt(ProgramSkillFrame f) => _resolve().ValidDyingSuitsReceipt(f);
 }

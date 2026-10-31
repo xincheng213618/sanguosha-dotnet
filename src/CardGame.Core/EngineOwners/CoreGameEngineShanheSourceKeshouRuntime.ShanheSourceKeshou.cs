@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -14,7 +11,7 @@ internal sealed partial class CoreGameEngineShanheSourceKeshouRuntime
         foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetHand(player).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(player)))
         {
             var from = _cardZonesOperations._cardZones.GetLocation(card.Id);
-            if (global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(player, card))is { } red && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, card, from, OwnedCardMoveIntent.Discard))
+            if (CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(player, card))is { } red && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, card, from, OwnedCardMoveIntent.Discard))
                 yield return new(card.Id, from, red);
         }
     }
@@ -42,15 +39,15 @@ internal sealed partial class CoreGameEngineShanheSourceKeshouRuntime
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 62061, SkillProgramEffectOp.ResolveShanheSourceKeshou)]
     internal bool CanOfferSourceKeshou(ProgramTriggerLegalityContext c) => c.SkillId == SourceKeshouContract.SkillId && c.WindowContext is { Window: SkillProgramTriggerWindow.BeforeDamageApplied, Amount: > 0 } window && window.TargetSeat == c.OwnerSeat && c.Owner.IsAlive && HasSourceKeshouPair(c.OwnerSeat);
-    SkillProgramStepOutcome global::CardGame.Core.ISourceKeshouHost.Resolve(ProgramSkillFrame f, string step) => ResolveSourceKeshou(f, step);
+    SkillProgramStepOutcome ISourceKeshouHost.Resolve(ProgramSkillFrame f, string step) => ResolveSourceKeshou(f, step);
     internal SkillProgramStepOutcome ResolveSourceKeshou(ProgramSkillFrame supplied, string step)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (step == "select-cost")
         {
-            if (f.SourceKeshou is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not BeforeDamageProgramWindowFrame w || w.Id != context.ParentFrameId || w.TargetSeat != f.OwnerSeat || w.Prevented || w.Amount <= 0 || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].Candidate) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !HasSourceKeshouPair(f.OwnerSeat))
+            if (f.SourceKeshou is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } context || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not BeforeDamageProgramWindowFrame w || w.Id != context.ParentFrameId || w.TargetSeat != f.OwnerSeat || w.Prevented || w.Amount <= 0 || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].Candidate) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !HasSourceKeshouPair(f.OwnerSeat))
                 throw new InvalidOperationException("Source993 requires its original positive damage candidate and an unpaid same-colour pair.");
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SourceKeshou = new(w.Id, w.ContinuationAttackResolutionId ?? w.ParentFrameId, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, w.Amount, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence) });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SourceKeshou = new(w.Id, w.ContinuationAttackResolutionId ?? w.ParentFrameId, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, w.Amount, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence) });
             var choices = SourceKeshouChoices(f);
             var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
             _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, "弃置两张颜色相同的手牌或装备牌，令此伤害-1。", choices.SelectMany(c => c.Cards).Distinct().ToArray(), [], f.OwnerSeat)
@@ -92,11 +89,11 @@ internal sealed partial class CoreGameEngineShanheSourceKeshouRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShanheSourceKeshou)]
-    internal PromptChoice SelectAiSourceKeshou(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Cards.Sum(id => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
-    internal bool SourceKeshouWasPaid(ProgramSkillFrame f) => f.SourceKeshou is { Materials.Count: 2 } r && r.Materials.All(material => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.SequenceBefore && m.CardId == material.CardId && m.From == material.From && m.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceKeshouDefinitions.SourceKeshouCostReason && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)))));
+    internal PromptChoice SelectAiSourceKeshou(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Cards.Sum(id => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    internal bool SourceKeshouWasPaid(ProgramSkillFrame f) => f.SourceKeshou is { Materials.Count: 2 } r && r.Materials.All(material => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.SequenceBefore && m.CardId == material.CardId && m.From == material.From && m.Reason == CoreGameEngineShanheSourceKeshouDefinitions.SourceKeshouCostReason && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(m)))));
     internal bool ValidSourceKeshou(ProgramSkillFrame f)
     {
-        if (f.SourceKeshou is not { } r || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || f.WindowContext?.ParentFrameId != r.WindowId || r.OriginalAmount <= 0 || r.SequenceBefore < 0 || r.Materials is not System.Collections.IList { IsReadOnly: true } || r.Materials.Count is not (0 or 2) || r.Materials.Count == 2 && (r.Materials.Select(m => m.CardId).Distinct().Count() != 2 || r.Materials[0].IsRed != r.Materials[1].IsRed || r.Materials.Any(m => m.From.OwnerSeat != f.OwnerSeat || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))))
+        if (f.SourceKeshou is not { } r || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || f.WindowContext?.ParentFrameId != r.WindowId || r.OriginalAmount <= 0 || r.SequenceBefore < 0 || r.Materials is not System.Collections.IList { IsReadOnly: true } || r.Materials.Count is not (0 or 2) || r.Materials.Count == 2 && (r.Materials.Select(m => m.CardId).Distinct().Count() != 2 || r.Materials[0].IsRed != r.Materials[1].IsRed || r.Materials.Any(m => m.From.OwnerSeat != f.OwnerSeat || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is BeforeDamageProgramWindowFrame w && w.Id == r.WindowId && w.TargetSeat == f.OwnerSeat && (w.ContinuationAttackResolutionId ?? w.ParentFrameId) == r.AttackId;

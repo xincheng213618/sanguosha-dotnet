@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineJudgmentProgramsRuntime
@@ -65,7 +61,7 @@ internal sealed partial class CoreGameEngineJudgmentProgramsRuntime
                 _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.ProgramJudgmentTriggerWindow);
                 var completed = _coreNativeJudgmentOperations.CompleteFinalizedJudgment(pending, judgmentCard, succeeded);
                 if (completed is { } result)
-                    _coreNativeJudgmentOperations.ResumeCompletedJudgment(new global::CardGame.Core.GameEngine.JudgmentCompletionReceipt(pending, result));
+                    _coreNativeJudgmentOperations.ResumeCompletedJudgment(new GameEngine.JudgmentCompletionReceipt(pending, result));
                 return;
             }
 
@@ -116,7 +112,7 @@ internal sealed partial class CoreGameEngineJudgmentProgramsRuntime
         var completed = _coreNativeJudgmentOperations.CompleteFinalizedJudgment(pending, judgmentCard, succeeded);
         if (completed is { } result)
         {
-            _coreNativeJudgmentOperations.ResumeCompletedJudgment(new global::CardGame.Core.GameEngine.JudgmentCompletionReceipt(pending, result));
+            _coreNativeJudgmentOperations.ResumeCompletedJudgment(new GameEngine.JudgmentCompletionReceipt(pending, result));
         }
     }
 
@@ -124,7 +120,7 @@ internal sealed partial class CoreGameEngineJudgmentProgramsRuntime
     internal void ExposeProgramJudgmentPrompt(ProgramJudgmentTriggerWindowFrame frame, ProgramJudgmentTriggerCandidate candidate)
     {
         var skill = _contentRegistryOperations._contentRegistry!.Skills[candidate.SkillId];
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramJudgmentTrigger, candidate.OwnerSeat, frame.ZhenyiBeforeResult == true ? $"【{(skill.Name)}】：可在{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(frame.Judgment.Suit))} {(frame.Judgment.Rank)} 的判定结果生效前修改。" : $"【{(skill.Name)}】：{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(frame.Judgment.Suit))} {(frame.Judgment.Rank)} 的判定结果已生效。", [], [], SourceSeat: candidate.OwnerSeat, IncomingCard: frame.Judgment.CardKind)
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramJudgmentTrigger, candidate.OwnerSeat, frame.ZhenyiBeforeResult == true ? $"【{(skill.Name)}】：可在{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(frame.Judgment.Suit))} {(frame.Judgment.Rank)} 的判定结果生效前修改。" : $"【{(skill.Name)}】：{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(frame.Judgment.Suit))} {(frame.Judgment.Rank)} 的判定结果已生效。", [], [], SourceSeat: candidate.OwnerSeat, IncomingCard: frame.Judgment.CardKind)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             IsPrivate = true,
@@ -134,7 +130,7 @@ internal sealed partial class CoreGameEngineJudgmentProgramsRuntime
         _coreMatchOutcomeStatusWinnerAccess._status = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
 
-    internal static PromptChoice ProgramJudgmentChoice(string action, string label) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_JudgmentPrograms.ProgramJudgmentChoice(action, label);
+    internal static PromptChoice ProgramJudgmentChoice(string action, string label) => RuntimeSkills.RuntimeRules_Core_JudgmentPrograms.ProgramJudgmentChoice(action, label);
     internal CommandResult SubmitProgramJudgmentTriggerAnswer(int actorSeat, PromptId prompt, ChoiceId choice)
     {
         var error = _coreNativePromptBoundaryOperations.ValidateHumanPrompt(actorSeat, DecisionKind.ProgramJudgmentTrigger, prompt, CommandErrorCode.IllegalAction);

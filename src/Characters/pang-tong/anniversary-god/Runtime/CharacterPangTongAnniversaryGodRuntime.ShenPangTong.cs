@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangTongAnniversaryGodRuntime
 {
     internal const string ShenPangTongRemovalReason = "skill-program.anniversary:kunyu.remove-fire-card";
     internal static CardConversionSource ShenPtSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IShenPangTongHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenPt(f, op);
+    SkillProgramStepOutcome IShenPangTongHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenPt(f, op);
     internal CharacterState? ShenPtLuanOwner => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase is not (TurnPhase.NotStarted or TurnPhase.Finished) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat) && _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat], ShenPangTongComposition.Luansuo) ? _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat] : null;
 
     internal bool IsShenPangTongHandDiscardForbidden(int actor, Card card, CardLocation from, OwnedCardMoveIntent intent) => intent == OwnedCardMoveIntent.Discard && from.Zone == CardZoneKind.Hand && from.OwnerSeat is { } seat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _cardZonesOperations._cardZones.GetLocation(card.Id) == from && ShenPtLuanOwner is not null;
-    internal global::CardGame.Core.GameEngine.ProgramCardIdentityMatch? ShenPangTongLuansuoIdentity(CharacterState holder, Card card)
+    internal GameEngine.ProgramCardIdentityMatch? ShenPangTongLuansuoIdentity(CharacterState holder, Card card)
     {
         if (ShenPtLuanOwner is not { } owner || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Hand(holder.Seat))
             return null;

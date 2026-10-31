@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDuKuiAnniversaryRuntime
@@ -16,10 +12,10 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
             return false;
         if (r.Operation == SkillProgramEffectOp.ResolveAnniversaryDuKuiFanyin)
         {
-            if (f.SkillId != AnniversaryDuKuiComposition.Fanyin || w.Window != SkillProgramTriggerWindow.PlayPhaseStarting || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _resolutionStackOperations._resolutionStack[index - 1] is not PlayPhaseStartingBoundaryFrame p || p.Id != r.ParentId || p.OwnerSeat != f.OwnerSeat || p.ItemIndex < 0 || p.ItemIndex >= p.Items.Count || p.Items[p.ItemIndex].Candidate is not { } c || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) || r.Iteration is < 0 or > 4 || r.Moves != 0 || r.Iteration > 0 && (r.Rank is < 1 or > 13 || r.CardId <= 0) || r.Stage is DuKuiStage.MoveChoice or DuKuiStage.MoveChildren)
+            if (f.SkillId != AnniversaryDuKuiComposition.Fanyin || w.Window != SkillProgramTriggerWindow.PlayPhaseStarting || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _resolutionStackOperations._resolutionStack[index - 1] is not PlayPhaseStartingBoundaryFrame p || p.Id != r.ParentId || p.OwnerSeat != f.OwnerSeat || p.ItemIndex < 0 || p.ItemIndex >= p.Items.Count || p.Items[p.ItemIndex].Candidate is not { } c || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) || r.Iteration is < 0 or > 4 || r.Moves != 0 || r.Iteration > 0 && (r.Rank is < 1 or > 13 || r.CardId <= 0) || r.Stage is DuKuiStage.MoveChoice or DuKuiStage.MoveChildren)
                 return false;
         }
-        else if (r.Operation != SkillProgramEffectOp.ResolveAnniversaryDuKuiPeiqi || f.SkillId != AnniversaryDuKuiComposition.Peiqi || w.Window != SkillProgramTriggerWindow.AfterDamageApplied || w.TargetSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame d || d.Id != r.ParentId || d.TargetSeat != f.OwnerSeat || d.CandidateIndex < 0 || d.CandidateIndex >= d.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, d.Candidates[d.CandidateIndex].ToProgramCandidate()) || r.Moves is < 0 or > 2 || r.Stage is not (DuKuiStage.MoveChoice or DuKuiStage.MoveChildren))
+        else if (r.Operation != SkillProgramEffectOp.ResolveAnniversaryDuKuiPeiqi || f.SkillId != AnniversaryDuKuiComposition.Peiqi || w.Window != SkillProgramTriggerWindow.AfterDamageApplied || w.TargetSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame d || d.Id != r.ParentId || d.TargetSeat != f.OwnerSeat || d.CandidateIndex < 0 || d.CandidateIndex >= d.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, d.Candidates[d.CandidateIndex].ToProgramCandidate()) || r.Moves is < 0 or > 2 || r.Stage is not (DuKuiStage.MoveChoice or DuKuiStage.MoveChildren))
             return false;
         return true;
     }

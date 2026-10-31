@@ -1,23 +1,20 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuChengMouMobileRuntime
 {
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedBeforeActivity, 30)]
-    internal bool MouLiuChengFinalizedBeforeActivityTargetWindow(ProgramTargetCardWindowQuery query) => HasMouLiuChengCapability && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(query.Kind) || IsMouLiuChengNonDamageOrdinary(query.Kind));
+    internal bool MouLiuChengFinalizedBeforeActivityTargetWindow(ProgramTargetCardWindowQuery query) => HasMouLiuChengCapability && (CoreNativeCardClassificationsRuntime.IsSlashCard(query.Kind) || IsMouLiuChengNonDamageOrdinary(query.Kind));
     [ProgramTargetWindow(ProgramTargetWindowStage.ImplicitSelfDrawTwo, 10)]
     internal bool MouLiuChengImplicitSelfDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => HasMouLiuChengCapability;
     internal const string MouLiuChengDrawReason = "skill-program.mou-mobile:liu-cheng.draw";
-    internal static CardConversionSource MouLiuChengSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_cheng_mou_mobile_MouLiuChengCompletion.MouLiuChengSource(f);
+    internal static CardConversionSource MouLiuChengSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_liu_cheng_mou_mobile_MouLiuChengCompletion.MouLiuChengSource(f);
     internal bool HasMouLiuChengCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouLiuChengCompletion);
 
-    internal bool MouLiuChengKind(string skill, CardKind kind) => skill == MouLiuChengComposition.Lueying ? global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) : skill == MouLiuChengComposition.Yingwu && IsMouLiuChengNonDamageOrdinary(kind);
-    internal static bool IsMouLiuChengNonDamageOrdinary(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_cheng_mou_mobile_MouLiuChengCompletion.IsMouLiuChengNonDamageOrdinary(kind);
+    internal bool MouLiuChengKind(string skill, CardKind kind) => skill == MouLiuChengComposition.Lueying ? CoreNativeCardClassificationsRuntime.IsSlashCard(kind) : skill == MouLiuChengComposition.Yingwu && IsMouLiuChengNonDamageOrdinary(kind);
+    internal static bool IsMouLiuChengNonDamageOrdinary(CardKind kind) => RuntimeSkills.RuntimeRules_liu_cheng_mou_mobile_MouLiuChengCompletion.IsMouLiuChengNonDamageOrdinary(kind);
     internal bool MouLiuChengTrueUse(CardActionContext a) => a.Type == CardActionType.Use || a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Nullification && _coreResponseUseCompletionOperations.IsCompletedResponseUse(a, ProgramCardContinuation.NullificationResponse);
     internal void CaptureMouLiuChengCompletion(CardActionContext action, SkillProgramTriggerWindow window)
     {
@@ -43,7 +40,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     internal bool ValidMouLiuChengClaim(MouLiuChengUseClaim q, CardActionContext a) => MouLiuChengComposition.IsSkill(q.Source.SkillId) && q.Source.BindingId == "after-use" && q.Source.OwnerSeat == q.ActorSeat && q.ActionId == a.ActionId && q.ActorSeat == a.ActorSeat && q.ProviderSeat == a.ProviderSeat && q.EffectiveKind == a.EffectiveKind && MouLiuChengKind(q.Source.SkillId, a.EffectiveKind) && q.MovementSequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash == q.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengCompletionQualifiedEvent>().Count(e => e.Claim == q) == 1;
     internal MouLiuChengUseClaim? CompletedMouLiuChengClaim(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
     {
-        if (!MouLiuChengComposition.IsSkill(candidate.SkillId) || candidate.BindingId != "after-use" || c.Window != SkillProgramTriggerWindow.CardUseCompleted || c.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramCardTriggerWindowFrame window || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != c.Window || window.Action.ActionId != identity.CardActionId || window.Action.Type == CardActionType.Response && window.CompletedResponseReturn is not { IsCommitted: false } || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == window.ParentFrameId)?.MouLiuChengClaims is not { } claims)
+        if (!MouLiuChengComposition.IsSkill(candidate.SkillId) || candidate.BindingId != "after-use" || c.Window != SkillProgramTriggerWindow.CardUseCompleted || c.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramCardTriggerWindowFrame window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != c.Window || window.Action.ActionId != identity.CardActionId || window.Action.Type == CardActionType.Response && window.CompletedResponseReturn is not { IsCommitted: false } || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == window.ParentFrameId)?.MouLiuChengClaims is not { } claims)
             return null;
         return claims.SingleOrDefault(q => q.NativeParentId == window.ParentFrameId && q.ActionId == identity.CardActionId && q.Source == new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId) && q.GameplayHash == candidate.GameplayHash && ValidMouLiuChengClaim(q, window.Action));
     }
@@ -124,7 +121,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     [ProgramAnswer("mou-liu-cheng-use")]
     internal void AnswerMouLiuCheng(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLiuChengCompletion: { Stage: MouLiuChengStage.UseChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouLiuChengRootMatches(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouLiuChengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLiuChengCompletion: { Stage: MouLiuChengStage.UseChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouLiuChengRootMatches(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MouLiuChengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Liu Cheng accepts only its own current published native-use plan.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters["branch"] == "decline")
@@ -173,6 +170,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         return p.Choices.OrderByDescending(Score).ThenBy(c => c.Parameters["branch"] == "decline" ? 0 : 1).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouLiuChengHost.Accrue(ProgramSkillFrame f) => AccrueMouLiuCheng(f);
-    SkillProgramStepOutcome global::CardGame.Core.IMouLiuChengHost.Complete(ProgramSkillFrame f) => BeginMouLiuChengCompletion(f);
+    SkillProgramStepOutcome IMouLiuChengHost.Accrue(ProgramSkillFrame f) => AccrueMouLiuCheng(f);
+    SkillProgramStepOutcome IMouLiuChengHost.Complete(ProgramSkillFrame f) => BeginMouLiuChengCompletion(f);
 }

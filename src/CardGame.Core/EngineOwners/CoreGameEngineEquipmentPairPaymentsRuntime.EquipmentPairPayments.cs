@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEquipmentPairPaymentsRuntime
@@ -78,7 +74,7 @@ internal sealed partial class CoreGameEngineEquipmentPairPaymentsRuntime
         var before = _coreCardMovementJournalCardMovementsAccess._cardMovements.Count == 0 ? 0 : _coreCardMovementJournalCardMovementsAccess._cardMovements[^1].Sequence;
         var receipt = new ProgramEquipmentPairPaymentReceipt(0, first, second, a, b, lost, required, effect.ResultBind!, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, before);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { SelectedTargetSeats = Array.AsReadOnly(new[] { first, second }), EquipmentPairPayment = receipt });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramEquipmentPairPaymentFrozenEvent(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, first, second, a, b, lost, required, effect.ResultBind!, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, before));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramEquipmentPairPaymentFrozenEvent(frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, first, second, a, b, lost, required, effect.ResultBind!, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, before));
         var outcome = _coreProgramOwnedCardsOperations.SelectProgramOwnedCards(frame, frame.OwnerSeat, required, null, [CardZoneKind.Hand, CardZoneKind.Equipment], effect.ResultBind!, required, 0, [], []);
         if (outcome == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
@@ -96,7 +92,7 @@ internal sealed partial class CoreGameEngineEquipmentPairPaymentsRuntime
         var plan = ProgramInstructionResolver.Default.Resolve(frame, program);
         if (plan.Instructions.Count != 4 || plan.Instructions[0].Op != SkillProgramEffectOp.SelectEquipmentPairAndPayment || plan.Instructions[0].ResultBind != p.ResultBind)
             return false;
-        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramEquipmentPairPaymentFrozenEvent>().Any(e => e.FrameId == frame.Id && e.Source == new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) && e.GameplayHash == frame.GameplayHash && e.FirstSeat == p.FirstSeat && e.SecondSeat == p.SecondSeat && e.FirstEquipmentCount == p.FirstEquipmentCount && e.SecondEquipmentCount == p.SecondEquipmentCount && e.OwnerLostHp == p.OwnerLostHp && e.RequiredPaymentCount == p.RequiredPaymentCount && e.ResultBind == p.ResultBind && e.ActualTurnNumber == p.ActualTurnNumber && e.MovementSequenceBefore == p.MovementSequenceBefore);
+        return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramEquipmentPairPaymentFrozenEvent>().Any(e => e.FrameId == frame.Id && e.Source == new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId) && e.GameplayHash == frame.GameplayHash && e.FirstSeat == p.FirstSeat && e.SecondSeat == p.SecondSeat && e.FirstEquipmentCount == p.FirstEquipmentCount && e.SecondEquipmentCount == p.SecondEquipmentCount && e.OwnerLostHp == p.OwnerLostHp && e.RequiredPaymentCount == p.RequiredPaymentCount && e.ResultBind == p.ResultBind && e.ActualTurnNumber == p.ActualTurnNumber && e.MovementSequenceBefore == p.MovementSequenceBefore);
     }
 
     internal bool EquipmentPairCostIsPaid(ProgramSkillFrame frame)
@@ -126,5 +122,5 @@ internal sealed partial class CoreGameEngineEquipmentPairPaymentsRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.SelectEquipmentPairAndPayment)]
     internal PromptChoice SelectAiEquipmentPairPayment(PendingDecision decision, ProgramSkillFrame frame) => frame.OwnedCardSelection is not null ? _coreProgramLifecycleOperations.SelectAiProgramOwnedCards(decision, frame) : decision.Choices.OrderBy(c => Math.Abs(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets[0]]).Count - _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets[1]]).Count)).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
-    SkillProgramStepOutcome global::CardGame.Core.IEquipmentPairPaymentProgramHost.SelectEquipmentPairAndPayment(ProgramSkillFrame f, SkillProgramEffect e) => SelectEquipmentPairAndPayment(f, e);
+    SkillProgramStepOutcome IEquipmentPairPaymentProgramHost.SelectEquipmentPairAndPayment(ProgramSkillFrame f, SkillProgramEffect e) => SelectEquipmentPairAndPayment(f, e);
 }

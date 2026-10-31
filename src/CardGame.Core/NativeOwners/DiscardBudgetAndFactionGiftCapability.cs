@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class DiscardBudgetAndFactionGiftCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineDiscardBudgetAndFactionGiftsEntries> getCoreGameEngineDiscardBudgetAndFactionGiftsRuntime) : IDiscardBudgetAndFactionGiftHost
+internal sealed class DiscardBudgetAndFactionGiftCapability(Func<RuntimeEntries.CoreGameEngineDiscardBudgetAndFactionGiftsEntries> getCoreGameEngineDiscardBudgetAndFactionGiftsRuntime) : IDiscardBudgetAndFactionGiftHost
 {
     public SkillProgramStepOutcome ResolveDiscardBudgetParticipants(ProgramSkillFrame f) => getCoreGameEngineDiscardBudgetAndFactionGiftsRuntime().BeginDiscardBudget(f);
     public SkillProgramStepOutcome PreventOwnPlayOutsideTargetRangeDamage(ProgramSkillFrame f) => getCoreGameEngineDiscardBudgetAndFactionGiftsRuntime().PreventOwnPlayOutsideRange(f);

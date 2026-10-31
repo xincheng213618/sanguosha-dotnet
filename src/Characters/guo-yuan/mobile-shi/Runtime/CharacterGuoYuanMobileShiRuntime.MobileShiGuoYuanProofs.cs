@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoYuanMobileShiRuntime
@@ -21,13 +17,13 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
         if (f.ShiGuoYuan is not { } r || !ValidShiGy(f))
             return false;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == ShiGyStage.Drawing && draw.Context.RecipientSeat == r.Victim && draw.Context.RequestedCount == 2 && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == ShiGyStage.Drawing && draw.Context.RecipientSeat == r.Victim && draw.Context.RequestedCount == 2 && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
         if (child is CardUseFrame use)
             return r.Stage == ShiGyStage.NativeUse && IsShiGyNative(use);
         if (child is CardDeclarationFrame d)
             return MatchesShiGyDeclaration(f, d);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } p && ShiGyMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && (IsShiGyNativeSettlementBatch(f, moved.Batch) || moved.Batch.ParentFrameId == f.Id && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)));
+            return f.PendingMovementContinuation is { } p && ShiGyMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && (IsShiGyNativeSettlementBatch(f, moved.Batch) || moved.Batch.ParentFrameId == f.Id && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)));
         if (child is RecoveryReplacementFrame recovery)
             return recovery.ParentFrameId == f.Id && recovery.Return.ResumeFrameId == f.Id && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is HpChangedTriggerWindowFrame hp)

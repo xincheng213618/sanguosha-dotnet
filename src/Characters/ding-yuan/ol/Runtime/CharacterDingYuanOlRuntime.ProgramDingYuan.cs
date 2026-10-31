@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDingYuanOlRuntime
@@ -12,11 +7,11 @@ internal sealed partial class CharacterDingYuanOlRuntime
     internal bool TracksDingYuan => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.PrepareAdoptedChildAppointment) == true;
     internal int? AdoptedChildHolder => _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Markers.GetValueOrDefault(PlayerMarkerKind.AdoptedChild) > 0).Select(player => (int? )player.Seat).SingleOrDefault();
 
-    internal static string AdoptedChildGrantId(int seat) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ding_yuan_ol_ProgramDingYuan.AdoptedChildGrantId(seat);
-    void global::CardGame.Core.IDingYuanProgramHost.PrepareAdoptedChild(ProgramSkillFrame frame, bool transfer) => PrepareAdoptedChild(frame, transfer);
-    void global::CardGame.Core.IDingYuanProgramHost.AssignAdoptedChild(ProgramSkillFrame frame) => AssignAdoptedChild(frame);
-    void global::CardGame.Core.IDingYuanProgramHost.QualifyFirstRoundDamage(ProgramSkillFrame frame) => QualifyFirstRoundDamage(frame);
-    IReadOnlyList<AdoptedChildParticipant> global::CardGame.Core.IAdoptedChildSelectionQuery.Participants => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Select(player => new AdoptedChildParticipant(player.Seat, player.IsAlive, player.Markers.GetValueOrDefault(PlayerMarkerKind.AdoptedChild) > 0, _coreNationalSkillsOperations.HasRuntimeSkill(player, "ol:cixiao"))).ToArray());
+    internal static string AdoptedChildGrantId(int seat) => RuntimeSkills.RuntimeRules_ding_yuan_ol_ProgramDingYuan.AdoptedChildGrantId(seat);
+    void IDingYuanProgramHost.PrepareAdoptedChild(ProgramSkillFrame frame, bool transfer) => PrepareAdoptedChild(frame, transfer);
+    void IDingYuanProgramHost.AssignAdoptedChild(ProgramSkillFrame frame) => AssignAdoptedChild(frame);
+    void IDingYuanProgramHost.QualifyFirstRoundDamage(ProgramSkillFrame frame) => QualifyFirstRoundDamage(frame);
+    IReadOnlyList<AdoptedChildParticipant> IAdoptedChildSelectionQuery.Participants => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Select(player => new AdoptedChildParticipant(player.Seat, player.IsAlive, player.Markers.GetValueOrDefault(PlayerMarkerKind.AdoptedChild) > 0, _coreNationalSkillsOperations.HasRuntimeSkill(player, "ol:cixiao"))).ToArray());
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26020)]
     internal bool CanOfferDingYuan(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
@@ -93,7 +88,7 @@ internal sealed partial class CharacterDingYuanOlRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 26021)]
     internal void ObserveDingYuanNativeFacts(IGameEvent payload)
     {
-        if (TracksDingYuan && payload is CardUseDeclaredEvent declared && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && declared.SourceSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(declared.CardKind) && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { } use && use.SourceSeat == declared.SourceSeat && use.CardKind == declared.CardKind && use.AdoptedChildSlashUse is null)
+        if (TracksDingYuan && payload is CardUseDeclaredEvent declared && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && declared.SourceSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(declared.CardKind) && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { } use && use.SourceSeat == declared.SourceSeat && use.CardKind == declared.CardKind && use.AdoptedChildSlashUse is null)
             _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { AdoptedChildSlashUse = new(use.Id, use.SourceSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) });
         if (payload is DamageRequestedEvent requested && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } requestedAttack && _resolutionStackOperations._resolutionStack.LastOrDefault()is DamageFrame requestedFrame && requestedFrame.Id == requested.ResolutionId && requestedFrame.ParentFrameId == requestedAttack.ResolutionId && requestedFrame.AdoptedChildDamage is null && requestedFrame.TargetSeat == requested.TargetSeat && requestedFrame.SourceSeat == requested.SourceSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(requestedAttack.ResolutionId)?.AdoptedChildDamageIssue is { } issue && issue.CardUseFrameId == requestedAttack.ResolutionId && issue.ActorSeat == requested.SourceSeat && issue.TargetSeat == requested.TargetSeat && issue.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && issue.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId)
             _coreRuntimeOperations.ReplaceRuntimeFrame(requestedFrame.Id, requestedFrame with { AdoptedChildDamage = new(requestedFrame.Id, issue.CardUseFrameId, requested.SourceSeat, requested.TargetSeat, issue.ActualTurn, issue.PhaseInstance, issue.SkillInstanceId) });
@@ -108,7 +103,7 @@ internal sealed partial class CharacterDingYuanOlRuntime
         }
     }
 
-    internal void CaptureAdoptedChildSlashDamageIssue(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void CaptureAdoptedChildSlashDamageIssue(GameEngine.IDamageAttempt attack)
     {
         if (!TracksDingYuan || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use)
             return;
@@ -118,14 +113,14 @@ internal sealed partial class CharacterDingYuanOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 90)]
-    internal int AdoptedChildSlashDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.AdoptedChildDamageIssue is { } issue && issue.CardUseFrameId == attack.ResolutionId && issue.ActorSeat == attack.SourceSeat && issue.TargetSeat == attack.TargetSeat && issue.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && issue.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId ? 1 : 0;
-    internal bool IsAdoptedChildSlashDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, out AdoptedChildSlashUseReceipt origin)
+    internal int AdoptedChildSlashDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.AdoptedChildDamageIssue is { } issue && issue.CardUseFrameId == attack.ResolutionId && issue.ActorSeat == attack.SourceSeat && issue.TargetSeat == attack.TargetSeat && issue.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && issue.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId ? 1 : 0;
+    internal bool IsAdoptedChildSlashDamage(GameEngine.IDamageAttempt attack, out AdoptedChildSlashUseReceipt origin)
     {
         origin = null !;
         // OL's operator FAQ requires a direct Slash target. Elemental damage
         // still propagates its finalized amount, but a chained recipient cannot
         // acquire a second Panshi bonus or an independent end-Play consequence.
-        if (!TracksDingYuan || attack.IsSourceLess || attack.IsChainPropagation || attack.CardUserSeat != attack.SourceSeat || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat) || attack.SourceSeat == attack.TargetSeat || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], "ol:panshi") || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat], "ol:cixiao") || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { AdoptedChildSlashUse: { } stamp } use || use.SourceSeat != attack.SourceSeat || use.CardKind != kind || stamp.CardUseFrameId != use.Id || stamp.ActorSeat != attack.SourceSeat || stamp.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || stamp.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || stamp.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play)
+        if (!TracksDingYuan || attack.IsSourceLess || attack.IsChainPropagation || attack.CardUserSeat != attack.SourceSeat || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat) || attack.SourceSeat == attack.TargetSeat || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], "ol:panshi") || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat], "ol:cixiao") || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { AdoptedChildSlashUse: { } stamp } use || use.SourceSeat != attack.SourceSeat || use.CardKind != kind || stamp.CardUseFrameId != use.Id || stamp.ActorSeat != attack.SourceSeat || stamp.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || stamp.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || stamp.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play)
             return false;
         origin = stamp;
         return true;

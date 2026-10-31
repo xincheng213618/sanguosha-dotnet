@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineUniqueHpTargetAnnouncementsRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CoreGameEngineUniqueHpTargetAnnouncementsRuntime
     internal bool IsUniqueHpPeerCandidate(ProgramTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.DiscardDrawAndOfferUniqueHpPeer }];
     internal ActualUseTargetIdentity? FreezeUniqueHpPeerTarget(CardUseFrame use, int target)
     {
-        if (!HasUniqueHpPeerPrograms || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || target == use.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !use.TargetSeats.Contains(target))
+        if (!HasUniqueHpPeerPrograms || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || target == use.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !use.TargetSeats.Contains(target))
             return null;
         if (use.Action is { Type: CardActionType.Use } action && action.ActorSeat == use.SourceSeat && action.EffectiveKind == use.CardKind)
             return new(use.Id, action.ActionId, action.ActorSeat, action.ProviderSeat, use.CardKind, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, null);
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEngineUniqueHpTargetAnnouncementsRuntime
 
     internal void AppendUnannouncedUniqueHpTargets(CardUseFrame supplied, long windowId, List<(ProgramTriggerCandidate Candidate, ProgramSkillWindowContext Context)> entries)
     {
-        if (!HasUniqueHpPeerPrograms || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(supplied.CardKind))
+        if (!HasUniqueHpPeerPrograms || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !CoreNativeCardClassificationsRuntime.IsSlashCard(supplied.CardKind))
             return;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(supplied.Id) ?? throw new InvalidOperationException("The target announcement lost its real Slash.");
         var seen = (use.UniqueHpAnnouncedTargets ?? []).ToList();
@@ -64,7 +60,7 @@ internal sealed partial class CoreGameEngineUniqueHpTargetAnnouncementsRuntime
         return parent;
     }
 
-    internal bool TryBeginUnannouncedUniqueHpTargets(global::CardGame.Core.NativeOwners.CardAttackHandle attack, bool legacy)
+    internal bool TryBeginUnannouncedUniqueHpTargets(NativeOwners.CardAttackHandle attack, bool legacy)
     {
         if (!HasUniqueHpPeerPrograms || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use)
             return false;

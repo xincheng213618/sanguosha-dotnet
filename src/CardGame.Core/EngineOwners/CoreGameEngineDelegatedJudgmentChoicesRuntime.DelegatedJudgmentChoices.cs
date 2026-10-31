@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -64,7 +61,7 @@ internal sealed partial class CoreGameEngineDelegatedJudgmentChoicesRuntime
             return false;
         var j = _coreJudgmentCursorRuntimeOperations.ActiveJudgment ?? throw new InvalidOperationException("Delegated judgment lost its actual judgment.");
         var d = j.DelegatedReplacement ?? throw new InvalidOperationException("Delegated judgment has no owning draft.");
-        if (!ValidDelegatedJudgmentDraft(j, d) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != (d.Stage == DelegatedJudgmentStage.Offered ? d.Source.OwnerSeat : d.SubjectSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DelegatedJudgmentChoices(j).Where(c => c.Id == selected.Id).ToArray()))
+        if (!ValidDelegatedJudgmentDraft(j, d) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != (d.Stage == DelegatedJudgmentStage.Offered ? d.Source.OwnerSeat : d.SubjectSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DelegatedJudgmentChoices(j).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The delegated choice no longer matches its private chooser or material.");
         var candidate = _coreNativeJudgmentOperations.CurrentJudgmentCandidate(j)!;
         var(_, trigger) = _coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacement(candidate);
@@ -93,7 +90,7 @@ internal sealed partial class CoreGameEngineDelegatedJudgmentChoicesRuntime
     {
         if (j.DelegatedReplacement is not { Stage: DelegatedJudgmentStage.Offered or DelegatedJudgmentStage.Choosing } d || !ValidDelegatedJudgmentDraft(j, d) || p is not { IsPrivate: true, Kind: DecisionKind.ProgramJudgmentReplacement } || p.PlayerSeat != (d.Stage == DelegatedJudgmentStage.Offered ? d.Source.OwnerSeat : d.SubjectSeat) || p.SourceSeat != d.Source.OwnerSeat || p.TargetSeat != d.SubjectSeat)
             return false;
-        return p.ValidCardIds.SequenceEqual(d.Stage == DelegatedJudgmentStage.Choosing ? d.Material.Select(c => c.Id) : []) && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, DelegatedJudgmentChoices(j));
+        return p.ValidCardIds.SequenceEqual(d.Stage == DelegatedJudgmentStage.Choosing ? d.Material.Select(c => c.Id) : []) && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, DelegatedJudgmentChoices(j));
     }
 
     internal IEnumerable<CardSnapshot> DelegatedJudgmentPrivateCards(int viewer) => _coreJudgmentCursorRuntimeOperations.ActiveJudgment is { DelegatedReplacement: { Stage: DelegatedJudgmentStage.Choosing } d } j && d.SubjectSeat == viewer && IsDelegatedJudgmentPromptValid(j, _corePendingDecisionPolicyPipelineOperations._pendingDecision) ? d.HandView : Array.Empty<CardSnapshot>();

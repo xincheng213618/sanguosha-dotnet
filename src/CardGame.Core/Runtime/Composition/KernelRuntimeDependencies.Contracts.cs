@@ -1,891 +1,887 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-internal interface IKernelAcceptAndRejectOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelAcceptAndRejectOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.CommandResult Reject(CardGame.Core.CommandErrorCode code, string message);
-    CardGame.Core.CommandResult Accept(System.Action operation);
+    CommandResult Reject(CommandErrorCode code, string message);
+    CommandResult Accept(Action operation);
 }
 
-internal interface IKernelAcceptOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelAcceptOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.CommandResult Accept(System.Action operation);
+    CommandResult Accept(Action operation);
 }
 
-internal interface IKernelActiveCardMovementBatchIdsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelActiveCardMovementBatchIdsAccess : IProgramRuntimeOperations
 {
-    ref readonly System.Collections.Generic.Stack<long> _activeCardMovementBatchIds { get; }
+    ref readonly Stack<long> _activeCardMovementBatchIds { get; }
 }
 
-internal interface IKernelActivityRuleFlowFactories : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelActivityRuleFlowFactories : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ActivityBattleRulesHost CreateActivityBattleRulesHost();
-    CardGame.Core.NativeOwners.WenheRuleFlowHost CreateWenheRuleFlowHost();
-    CardGame.Core.NativeOwners.GuanduEventFlowHost CreateGuanduEventFlowHost();
+    NativeOwners.ActivityBattleRulesHost CreateActivityBattleRulesHost();
+    NativeOwners.WenheRuleFlowHost CreateWenheRuleFlowHost();
+    NativeOwners.GuanduEventFlowHost CreateGuanduEventFlowHost();
 }
 
-internal interface IKernelAdvanceEventRulesAndQueueFactOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelAdvanceEventRulesAndQueueFactOperations : IProgramRuntimeOperations
 {
-    void AdvanceEventRulesAndQueueFact(CardGame.Core.IGameEvent payload);
+    void AdvanceEventRulesAndQueueFact(IGameEvent payload);
 }
 
-internal interface IKernelAdvanceRulesAndPublishStateOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelAdvanceRulesAndPublishStateOperations : IProgramRuntimeOperations
 {
     void AdvanceRulesAndPublishState();
 }
 
-internal interface IKernelAdvanceToHumanBoundaryOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelAdvanceToHumanBoundaryOperations : IProgramRuntimeOperations
 {
     void AdvanceToHumanBoundary();
 }
 
-internal interface IKernelAllegiancePolicyAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelAllegiancePolicyAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.IMatchModeAllegiancePolicy? _allegiancePolicy { get; }
+    ref IMatchModeAllegiancePolicy? _allegiancePolicy { get; }
 }
 
-internal interface IKernelBindRuntimeHandlerOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelBindRuntimeHandlerOperations : IProgramRuntimeOperations
 {
-    System.Delegate BindRuntimeHandler(System.Reflection.MethodInfo method, System.Type delegateType);
+    Delegate BindRuntimeHandler(System.Reflection.MethodInfo method, Type delegateType);
 }
 
-internal interface IKernelCaoXianContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCaoXianContinuation : IProgramRuntimeOperations
 {
     bool CaoXianEdge(int i);
-    bool CaoXianFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool CaoXianFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool CaoXianSuffix(int n);
-    CardGame.Core.NativeOwners.CaoXianFacts CreateCaoXianFacts();
+    NativeOwners.CaoXianFacts CreateCaoXianFacts();
 }
 
-internal interface IKernelCardAttackAndFactionRequestHandlesFactory : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardAttackAndFactionRequestHandlesFactory : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, CardGame.Core.Card? card, int damageAmount = 1, CardGame.Core.CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, CardGame.Core.DamageNature? damageNatureOverride = default, System.Collections.Generic.IReadOnlyList<CardGame.Core.Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardGame.Core.CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
-    CardGame.Core.NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long resolutionId, CardGame.Core.FactionCardRequestPurpose purpose, int ownerSeat, System.Collections.Generic.IReadOnlyList<int> candidateSeats, string providerFactionId, CardGame.Core.NativeOwners.CardAttackHandle? responseAttack = default, int? targetSeat = default, long? programSkillFrameId = default, CardGame.Core.CardKind requiredKind = (CardGame.Core.CardKind)0, CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowedSword = default, CardGame.Core.NativeOwners.QinglongCrescentBladeHandle? qinglongCrescentBlade = default, CardGame.Core.FactionResponsePolicySource? policySource = default, string? assistedResultBind = default);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, DamageNature? damageNatureOverride = default, IReadOnlyList<Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
+    NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long resolutionId, FactionCardRequestPurpose purpose, int ownerSeat, IReadOnlyList<int> candidateSeats, string providerFactionId, NativeOwners.CardAttackHandle? responseAttack = default, int? targetSeat = default, long? programSkillFrameId = default, CardKind requiredKind = (CardKind)0, NativeOwners.BorrowedSwordHandle? borrowedSword = default, NativeOwners.QinglongCrescentBladeHandle? qinglongCrescentBlade = default, FactionResponsePolicySource? policySource = default, string? assistedResultBind = default);
 }
 
-internal interface IKernelCardAttackAndFactionRequestHandlesFactoryAndLookup : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardAttackAndFactionRequestHandlesFactoryAndLookup : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, CardGame.Core.Card? card, int damageAmount = 1, CardGame.Core.CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, CardGame.Core.DamageNature? damageNatureOverride = default, System.Collections.Generic.IReadOnlyList<CardGame.Core.Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardGame.Core.CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle2(long ownerId);
-    CardGame.Core.NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long resolutionId, CardGame.Core.FactionCardRequestPurpose purpose, int ownerSeat, System.Collections.Generic.IReadOnlyList<int> candidateSeats, string providerFactionId, CardGame.Core.NativeOwners.CardAttackHandle? responseAttack = default, int? targetSeat = default, long? programSkillFrameId = default, CardGame.Core.CardKind requiredKind = (CardGame.Core.CardKind)0, CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowedSword = default, CardGame.Core.NativeOwners.QinglongCrescentBladeHandle? qinglongCrescentBlade = default, CardGame.Core.FactionResponsePolicySource? policySource = default, string? assistedResultBind = default);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, DamageNature? damageNatureOverride = default, IReadOnlyList<Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle2(long ownerId);
+    NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long resolutionId, FactionCardRequestPurpose purpose, int ownerSeat, IReadOnlyList<int> candidateSeats, string providerFactionId, NativeOwners.CardAttackHandle? responseAttack = default, int? targetSeat = default, long? programSkillFrameId = default, CardKind requiredKind = (CardKind)0, NativeOwners.BorrowedSwordHandle? borrowedSword = default, NativeOwners.QinglongCrescentBladeHandle? qinglongCrescentBlade = default, FactionResponsePolicySource? policySource = default, string? assistedResultBind = default);
 }
 
-internal interface IKernelCardAttackAndFactionRequestHandlesLookup : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardAttackAndFactionRequestHandlesLookup : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
-    CardGame.Core.NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long ownerId);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
+    NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long ownerId);
 }
 
-internal interface IKernelCardAttackAndFangtianHandlesFactory : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardAttackAndFangtianHandlesFactory : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.FangtianHalberdHandle CreateFangtianHalberdHandle(long resolutionId, int sourceSeat, CardGame.Core.Card card, CardGame.Core.CardKind effectiveCardKind, bool ignoresArmor, int damageAmount, System.Collections.Generic.IReadOnlyList<int> targetSeats, bool usesFangtian, bool countedTowardSlashLimit, CardGame.Core.CardConversionSource? conversionSource = default);
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, CardGame.Core.Card? card, int damageAmount = 1, CardGame.Core.CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, CardGame.Core.DamageNature? damageNatureOverride = default, System.Collections.Generic.IReadOnlyList<CardGame.Core.Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardGame.Core.CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
+    NativeOwners.FangtianHalberdHandle CreateFangtianHalberdHandle(long resolutionId, int sourceSeat, Card card, CardKind effectiveCardKind, bool ignoresArmor, int damageAmount, IReadOnlyList<int> targetSeats, bool usesFangtian, bool countedTowardSlashLimit, CardConversionSource? conversionSource = default);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, DamageNature? damageNatureOverride = default, IReadOnlyList<Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
 }
 
-internal interface IKernelCardAttackAndFangtianHandlesLookup : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardAttackAndFangtianHandlesLookup : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.FangtianHalberdHandle CreateFangtianHalberdHandle(long ownerId);
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
+    NativeOwners.FangtianHalberdHandle CreateFangtianHalberdHandle(long ownerId);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
 }
 
-internal interface IKernelCardAttackHandleFactory : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardAttackHandleFactory : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, CardGame.Core.Card? card, int damageAmount = 1, CardGame.Core.CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, CardGame.Core.DamageNature? damageNatureOverride = default, System.Collections.Generic.IReadOnlyList<CardGame.Core.Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardGame.Core.CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, DamageNature? damageNatureOverride = default, IReadOnlyList<Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
 }
 
-internal interface IKernelCardAttackHandleLookup : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardAttackHandleLookup : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
 }
 
-internal interface IKernelCardContinuationHandleFactory : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardContinuationHandleFactory : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.DuelHandle CreateDuelHandle(long ownerId);
-    CardGame.Core.NativeOwners.GroupCardHandle CreateGroupCardHandle(long ownerId);
-    CardGame.Core.NativeOwners.BorrowedSwordHandle CreateBorrowedSwordHandle(long ownerId);
-    CardGame.Core.NativeOwners.StoneAxeHandle CreateStoneAxeHandle(long ownerId);
-    CardGame.Core.NativeOwners.CixiongDoubleSwordsHandle CreateCixiongDoubleSwordsHandle(long ownerId);
-    CardGame.Core.NativeOwners.QinglongCrescentBladeHandle CreateQinglongCrescentBladeHandle(long ownerId);
-    CardGame.Core.NativeOwners.QinglongFollowupHandle CreateQinglongFollowupHandle(long ownerId);
-    CardGame.Core.NativeOwners.IceSwordHandle CreateIceSwordHandle(long ownerId);
-    CardGame.Core.NativeOwners.QilinBowHandle CreateQilinBowHandle(long ownerId);
-    CardGame.Core.NativeOwners.FangtianHalberdHandle CreateFangtianHalberdHandle(long ownerId);
-    CardGame.Core.NativeOwners.FactionDefenseHandle CreateFactionDefenseHandle(long ownerId);
-    CardGame.Core.NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long ownerId);
+    NativeOwners.DuelHandle CreateDuelHandle(long ownerId);
+    NativeOwners.GroupCardHandle CreateGroupCardHandle(long ownerId);
+    NativeOwners.BorrowedSwordHandle CreateBorrowedSwordHandle(long ownerId);
+    NativeOwners.StoneAxeHandle CreateStoneAxeHandle(long ownerId);
+    NativeOwners.CixiongDoubleSwordsHandle CreateCixiongDoubleSwordsHandle(long ownerId);
+    NativeOwners.QinglongCrescentBladeHandle CreateQinglongCrescentBladeHandle(long ownerId);
+    NativeOwners.QinglongFollowupHandle CreateQinglongFollowupHandle(long ownerId);
+    NativeOwners.IceSwordHandle CreateIceSwordHandle(long ownerId);
+    NativeOwners.QilinBowHandle CreateQilinBowHandle(long ownerId);
+    NativeOwners.FangtianHalberdHandle CreateFangtianHalberdHandle(long ownerId);
+    NativeOwners.FactionDefenseHandle CreateFactionDefenseHandle(long ownerId);
+    NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long ownerId);
 }
 
-internal interface IKernelCardLegalityAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardLegalityAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramCardLegality? _cardLegality { get; }
+    ref ProgramCardLegality? _cardLegality { get; }
 }
 
-internal interface IKernelCardUsePaymentsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardUsePaymentsAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramCardUsePayments? _cardUsePayments { get; }
+    ref ProgramCardUsePayments? _cardUsePayments { get; }
 }
 
-internal interface IKernelCardZoneStoreAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCardZoneStoreAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.CardZoneStore _cardZones { get; }
+    ref readonly CardZoneStore _cardZones { get; }
 }
 
-internal interface IKernelCommandEventJournalAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCommandEventJournalAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.CommandEventJournal? _commandEventJournal { get; }
+    ref CommandEventJournal? _commandEventJournal { get; }
 }
 
-internal interface IKernelCommandRuntimeAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCommandRuntimeAccess : IProgramRuntimeOperations
 {
-    CardGame.Core.ICommandSessionRuntime CommandRuntime { get; }
+    ICommandSessionRuntime CommandRuntime { get; }
 }
 
-internal interface IKernelCommandRuntimeAndRevisionAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCommandRuntimeAndRevisionAccess : IProgramRuntimeOperations
 {
     long _revision { get; }
 
-    CardGame.Core.ICommandSessionRuntime CommandRuntime { get; }
+    ICommandSessionRuntime CommandRuntime { get; }
 }
 
-internal interface IKernelCommandSessionAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCommandSessionAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.CommandSession _commandSession { get; }
+    ref readonly CommandSession _commandSession { get; }
 }
 
-internal interface IKernelCompleteGameOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCompleteGameOperations : IProgramRuntimeOperations
 {
     void CompleteGame();
 }
 
-internal interface IKernelContentRegistryAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelContentRegistryAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.ContentRegistry _contentRegistry { get; }
+    ref readonly ContentRegistry _contentRegistry { get; }
 }
 
-internal interface IKernelCreateActionQueryScopeOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateActionQueryScopeOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ActionQueryScope CreateActionQueryScope(CardGame.Core.NativeOwners.ActionQuery? previous = default);
+    NativeOwners.ActionQueryScope CreateActionQueryScope(NativeOwners.ActionQuery? previous = default);
 }
 
-internal interface IKernelCreateActivePlayerEffectQueriesOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateActivePlayerEffectQueriesOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ActivePlayerEffectQueries CreateActivePlayerEffectQueries();
+    NativeOwners.ActivePlayerEffectQueries CreateActivePlayerEffectQueries();
 }
 
-internal interface IKernelCreateBorrowedSwordHandleAndCreateCardAttackHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateBorrowedSwordHandleAndCreateCardAttackHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.BorrowedSwordHandle CreateBorrowedSwordHandle(long ownerId);
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
+    NativeOwners.BorrowedSwordHandle CreateBorrowedSwordHandle(long ownerId);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
 }
 
-internal interface IKernelCreateCardActionTriggerWindowHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateCardActionTriggerWindowHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardActionTriggerWindowHost CreateCardActionTriggerWindowHost();
+    NativeOwners.CardActionTriggerWindowHost CreateCardActionTriggerWindowHost();
 }
 
-internal interface IKernelCreateCardAttackHandleAndCreateCardAttackHandle2AndCreateDuelHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateCardAttackHandleAndCreateCardAttackHandle2AndCreateDuelHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, CardGame.Core.Card? card, int damageAmount = 1, CardGame.Core.CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, CardGame.Core.DamageNature? damageNatureOverride = default, System.Collections.Generic.IReadOnlyList<CardGame.Core.Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardGame.Core.CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
-    CardGame.Core.NativeOwners.DuelHandle CreateDuelHandle(CardGame.Core.NativeOwners.CardAttackHandle attack);
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle2(long ownerId);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, DamageNature? damageNatureOverride = default, IReadOnlyList<Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
+    NativeOwners.DuelHandle CreateDuelHandle(NativeOwners.CardAttackHandle attack);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle2(long ownerId);
 }
 
-internal interface IKernelCreateCardAttackHandleAndCreateCardAttackHandle2Operations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateCardAttackHandleAndCreateCardAttackHandle2Operations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, CardGame.Core.Card? card, int damageAmount = 1, CardGame.Core.CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, CardGame.Core.DamageNature? damageNatureOverride = default, System.Collections.Generic.IReadOnlyList<CardGame.Core.Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardGame.Core.CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle2(long ownerId);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, DamageNature? damageNatureOverride = default, IReadOnlyList<Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle2(long ownerId);
 }
 
-internal interface IKernelCreateCardAttackHandleAndCreateDuelHandleAndCreateGroupCardHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateCardAttackHandleAndCreateDuelHandleAndCreateGroupCardHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.DuelHandle CreateDuelHandle(long ownerId);
-    CardGame.Core.NativeOwners.GroupCardHandle CreateGroupCardHandle(long ownerId);
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
+    NativeOwners.DuelHandle CreateDuelHandle(long ownerId);
+    NativeOwners.GroupCardHandle CreateGroupCardHandle(long ownerId);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
 }
 
-internal interface IKernelCreateCardAttackHandleAndCreateDuelHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateCardAttackHandleAndCreateDuelHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, CardGame.Core.Card? card, int damageAmount = 1, CardGame.Core.CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, CardGame.Core.DamageNature? damageNatureOverride = default, System.Collections.Generic.IReadOnlyList<CardGame.Core.Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardGame.Core.CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
-    CardGame.Core.NativeOwners.DuelHandle CreateDuelHandle(CardGame.Core.NativeOwners.CardAttackHandle attack);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, DamageNature? damageNatureOverride = default, IReadOnlyList<Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
+    NativeOwners.DuelHandle CreateDuelHandle(NativeOwners.CardAttackHandle attack);
 }
 
-internal interface IKernelCreateCardsMovedTriggerWindowHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateCardsMovedTriggerWindowHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardsMovedTriggerWindowHost CreateCardsMovedTriggerWindowHost();
+    NativeOwners.CardsMovedTriggerWindowHost CreateCardsMovedTriggerWindowHost();
 }
 
-internal interface IKernelCreateCixiongDoubleSwordsHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateCixiongDoubleSwordsHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CixiongDoubleSwordsHandle CreateCixiongDoubleSwordsHandle(CardGame.Core.NativeOwners.CardAttackHandle attack);
+    NativeOwners.CixiongDoubleSwordsHandle CreateCixiongDoubleSwordsHandle(NativeOwners.CardAttackHandle attack);
 }
 
-internal interface IKernelCreateDamageTriggerCapturedAttackOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateDamageTriggerCapturedAttackOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.DamageTriggerCapturedAttack CreateDamageTriggerCapturedAttack(CardGame.Core.GameEngine.IDamageAttempt attack);
+    NativeOwners.DamageTriggerCapturedAttack CreateDamageTriggerCapturedAttack(GameEngine.IDamageAttempt attack);
 }
 
-internal interface IKernelCreateDouyuTriggerWindowHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateDouyuTriggerWindowHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.DouyuTriggerWindowHost CreateDouyuTriggerWindowHost();
+    NativeOwners.DouyuTriggerWindowHost CreateDouyuTriggerWindowHost();
 }
 
-internal interface IKernelCreateFactionCardRequestHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateFactionCardRequestHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long resolutionId, CardGame.Core.FactionCardRequestPurpose purpose, int ownerSeat, System.Collections.Generic.IReadOnlyList<int> candidateSeats, string providerFactionId, CardGame.Core.NativeOwners.CardAttackHandle? responseAttack = default, int? targetSeat = default, long? programSkillFrameId = default, CardGame.Core.CardKind requiredKind = (CardGame.Core.CardKind)0, CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowedSword = default, CardGame.Core.NativeOwners.QinglongCrescentBladeHandle? qinglongCrescentBlade = default, CardGame.Core.FactionResponsePolicySource? policySource = default, string? assistedResultBind = default);
+    NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long resolutionId, FactionCardRequestPurpose purpose, int ownerSeat, IReadOnlyList<int> candidateSeats, string providerFactionId, NativeOwners.CardAttackHandle? responseAttack = default, int? targetSeat = default, long? programSkillFrameId = default, CardKind requiredKind = (CardKind)0, NativeOwners.BorrowedSwordHandle? borrowedSword = default, NativeOwners.QinglongCrescentBladeHandle? qinglongCrescentBlade = default, FactionResponsePolicySource? policySource = default, string? assistedResultBind = default);
 }
 
-internal interface IKernelCreateFactionDefenseHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateFactionDefenseHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.FactionDefenseHandle CreateFactionDefenseHandle(CardGame.Core.NativeOwners.CardAttackHandle attack, int ownerSeat, System.Collections.Generic.IReadOnlyList<int> candidateSeats, CardGame.Core.FactionResponsePolicySource source);
+    NativeOwners.FactionDefenseHandle CreateFactionDefenseHandle(NativeOwners.CardAttackHandle attack, int ownerSeat, IReadOnlyList<int> candidateSeats, FactionResponsePolicySource source);
 }
 
-internal interface IKernelCreateFangtianHalberdHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateFangtianHalberdHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.FangtianHalberdHandle CreateFangtianHalberdHandle(long resolutionId, int sourceSeat, CardGame.Core.Card card, CardGame.Core.CardKind effectiveCardKind, bool ignoresArmor, int damageAmount, System.Collections.Generic.IReadOnlyList<int> targetSeats, bool usesFangtian, bool countedTowardSlashLimit, CardGame.Core.CardConversionSource? conversionSource = default);
+    NativeOwners.FangtianHalberdHandle CreateFangtianHalberdHandle(long resolutionId, int sourceSeat, Card card, CardKind effectiveCardKind, bool ignoresArmor, int damageAmount, IReadOnlyList<int> targetSeats, bool usesFangtian, bool countedTowardSlashLimit, CardConversionSource? conversionSource = default);
 }
 
-internal interface IKernelCreateHellEncounterHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateHellEncounterHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.HellEncounterHost CreateHellEncounterHost();
+    NativeOwners.HellEncounterHost CreateHellEncounterHost();
 }
 
-internal interface IKernelCreateHpChangedTriggerWindowHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateHpChangedTriggerWindowHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.HpChangedTriggerWindowHost CreateHpChangedTriggerWindowHost();
+    NativeOwners.HpChangedTriggerWindowHost CreateHpChangedTriggerWindowHost();
 }
 
-internal interface IKernelCreateIceSwordHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateIceSwordHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.IceSwordHandle CreateIceSwordHandle(CardGame.Core.NativeOwners.CardAttackHandle attack, int preventedDamageAmount);
+    NativeOwners.IceSwordHandle CreateIceSwordHandle(NativeOwners.CardAttackHandle attack, int preventedDamageAmount);
 }
 
-internal interface IKernelCreateMoSimaYiFactsOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateMoSimaYiFactsOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.MoSimaYiFacts CreateMoSimaYiFacts();
+    NativeOwners.MoSimaYiFacts CreateMoSimaYiFacts();
 }
 
-internal interface IKernelCreateModeEncounterHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateModeEncounterHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ModeEncounterHost CreateModeEncounterHost();
+    NativeOwners.ModeEncounterHost CreateModeEncounterHost();
 }
 
-internal interface IKernelCreateModeNationalRevealHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateModeNationalRevealHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ModeNationalRevealHost CreateModeNationalRevealHost();
+    NativeOwners.ModeNationalRevealHost CreateModeNationalRevealHost();
 }
 
-internal interface IKernelCreateModeSetupEquipmentHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateModeSetupEquipmentHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ModeSetupEquipmentHost CreateModeSetupEquipmentHost();
+    NativeOwners.ModeSetupEquipmentHost CreateModeSetupEquipmentHost();
 }
 
-internal interface IKernelCreateMouGuanPingFactsOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateMouGuanPingFactsOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.MouGuanPingFacts CreateMouGuanPingFacts();
+    NativeOwners.MouGuanPingFacts CreateMouGuanPingFacts();
 }
 
-internal interface IKernelCreateMouHuangGaiFactsAndMouHgFirstChildOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateMouHuangGaiFactsAndMouHgFirstChildOperations : IProgramRuntimeOperations
 {
-    bool MouHgFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
-    CardGame.Core.NativeOwners.MouHuangGaiFacts CreateMouHuangGaiFacts();
+    bool MouHgFirstChild(ProgramSkillFrame f, ResolutionFrame child);
+    NativeOwners.MouHuangGaiFacts CreateMouHuangGaiFacts();
 }
 
-internal interface IKernelCreateMouSunShangxiangFactsOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateMouSunShangxiangFactsOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.MouSunShangxiangFacts CreateMouSunShangxiangFacts();
+    NativeOwners.MouSunShangxiangFacts CreateMouSunShangxiangFacts();
 }
 
-internal interface IKernelCreateMovementArmorOwnerOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateMovementArmorOwnerOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.MovementArmorOwner CreateMovementArmorOwner(CardGame.Core.CharacterState owner);
+    NativeOwners.MovementArmorOwner CreateMovementArmorOwner(CharacterState owner);
 }
 
-internal interface IKernelCreateNianChallengeHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateNianChallengeHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.NianChallengeHost CreateNianChallengeHost();
+    NativeOwners.NianChallengeHost CreateNianChallengeHost();
 }
 
-internal interface IKernelCreateParticipantSetupContextOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateParticipantSetupContextOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ParticipantSetupContext CreateParticipantSetupContext();
+    NativeOwners.ParticipantSetupContext CreateParticipantSetupContext();
 }
 
-internal interface IKernelCreateProgramAttackHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateProgramAttackHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ProgramAttackHandle CreateProgramAttackHandle(long ownerFrameId);
+    NativeOwners.ProgramAttackHandle CreateProgramAttackHandle(long ownerFrameId);
 }
 
-internal interface IKernelCreateProgramExpressionWorldOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateProgramExpressionWorldOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ProgramExpressionWorld CreateProgramExpressionWorld(CardGame.Core.ProgramSkillFrame frame);
+    NativeOwners.ProgramExpressionWorld CreateProgramExpressionWorld(ProgramSkillFrame frame);
 }
 
-internal interface IKernelCreateProgramHealthChildQueriesOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateProgramHealthChildQueriesOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ProgramHealthChildQueries CreateProgramHealthChildQueries();
+    NativeOwners.ProgramHealthChildQueries CreateProgramHealthChildQueries();
 }
 
-internal interface IKernelCreateProgramLegalityRouterOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateProgramLegalityRouterOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.ProgramLegalityRouter CreateProgramLegalityRouter(CardGame.Core.ProgramLegalityCatalog catalog, System.Func<System.Reflection.MethodInfo, object?>? resolveTarget = default);
+    ProgramLegalityRouter CreateProgramLegalityRouter(ProgramLegalityCatalog catalog, Func<System.Reflection.MethodInfo, object?>? resolveTarget = default);
 }
 
-internal interface IKernelCreateProgramSkillHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateProgramSkillHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ProgramSkillHost CreateProgramSkillHost();
+    NativeOwners.ProgramSkillHost CreateProgramSkillHost();
 }
 
-internal interface IKernelCreateProgramTriggerActionFactQueriesAndCreateProgramTriggerFactQueriesOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateProgramTriggerActionFactQueriesAndCreateProgramTriggerFactQueriesOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ProgramTriggerFactQueries CreateProgramTriggerFactQueries();
-    CardGame.Core.NativeOwners.ProgramTriggerActionFactQueries CreateProgramTriggerActionFactQueries();
+    NativeOwners.ProgramTriggerFactQueries CreateProgramTriggerFactQueries();
+    NativeOwners.ProgramTriggerActionFactQueries CreateProgramTriggerActionFactQueries();
 }
 
-internal interface IKernelCreateProgramTriggerFactQueriesOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateProgramTriggerFactQueriesOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ProgramTriggerFactQueries CreateProgramTriggerFactQueries();
+    NativeOwners.ProgramTriggerFactQueries CreateProgramTriggerFactQueries();
 }
 
-internal interface IKernelCreateProgramTriggerQueriesOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateProgramTriggerQueriesOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.ProgramTriggerQueries CreateProgramTriggerQueries();
+    NativeOwners.ProgramTriggerQueries CreateProgramTriggerQueries();
 }
 
-internal interface IKernelCreateQilinBowHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateQilinBowHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.QilinBowHandle CreateQilinBowHandle(CardGame.Core.NativeOwners.CardAttackHandle attack);
+    NativeOwners.QilinBowHandle CreateQilinBowHandle(NativeOwners.CardAttackHandle attack);
 }
 
-internal interface IKernelCreateQinglongCrescentBladeHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateQinglongCrescentBladeHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.QinglongCrescentBladeHandle CreateQinglongCrescentBladeHandle(CardGame.Core.NativeOwners.CardAttackHandle attack);
+    NativeOwners.QinglongCrescentBladeHandle CreateQinglongCrescentBladeHandle(NativeOwners.CardAttackHandle attack);
 }
 
-internal interface IKernelCreateRuleProgressionOperationsOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateRuleProgressionOperationsOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.RuleProgressionOperations CreateRuleProgressionOperations();
+    NativeOwners.RuleProgressionOperations CreateRuleProgressionOperations();
 }
 
-internal interface IKernelCreateSelectionQueriesOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateSelectionQueriesOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.SelectionQueries CreateSelectionQueries();
+    NativeOwners.SelectionQueries CreateSelectionQueries();
 }
 
-internal interface IKernelCreateStandardBattleHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateStandardBattleHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.StandardBattleHost CreateStandardBattleHost();
+    NativeOwners.StandardBattleHost CreateStandardBattleHost();
 }
 
-internal interface IKernelCreateStoneAxeHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateStoneAxeHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.StoneAxeHandle CreateStoneAxeHandle(CardGame.Core.NativeOwners.CardAttackHandle attack, System.Collections.Generic.IReadOnlyList<int> candidateCardIds);
+    NativeOwners.StoneAxeHandle CreateStoneAxeHandle(NativeOwners.CardAttackHandle attack, IReadOnlyList<int> candidateCardIds);
 }
 
-internal interface IKernelCreateWuLuKangWindowHostOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateWuLuKangWindowHostOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.WuLuKangWindowHost CreateWuLuKangWindowHost();
+    NativeOwners.WuLuKangWindowHost CreateWuLuKangWindowHost();
 }
 
-internal interface IKernelCreateYingboGiftHandleOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelCreateYingboGiftHandleOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.YingboGiftHandle CreateYingboGiftHandle(long ownerId);
+    NativeOwners.YingboGiftHandle CreateYingboGiftHandle(long ownerId);
 }
 
-internal interface IKernelDamageHooksAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelDamageHooksAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramDamageHooks? _damageHooks { get; }
+    ref ProgramDamageHooks? _damageHooks { get; }
 }
 
-internal interface IKernelDistanceRulesAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelDistanceRulesAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramDistanceRules? _distanceRules { get; }
+    ref ProgramDistanceRules? _distanceRules { get; }
 }
 
-internal interface IKernelDyingObserverPredicate : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelDyingObserverPredicate : IProgramRuntimeOperations
 {
-    bool Invoke(System.Func<int, CardGame.Core.DyingFrame, bool>? __nativeReceiver, int arg2, CardGame.Core.DyingFrame arg3);
+    bool Invoke(Func<int, DyingFrame, bool>? __nativeReceiver, int arg2, DyingFrame arg3);
 }
 
-internal interface IKernelEnsureSessionHealthyOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelEnsureSessionHealthyOperations : IProgramRuntimeOperations
 {
     void EnsureSessionHealthy();
 }
 
-internal interface IKernelEquipmentRulesAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelEquipmentRulesAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.EquipmentContentRegistry? _equipmentRules { get; }
+    ref EquipmentContentRegistry? _equipmentRules { get; }
 }
 
-internal interface IKernelFrameStoreAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelFrameStoreAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.FrameStore _resolutionStack { get; }
+    ref readonly FrameStore _resolutionStack { get; }
 }
 
-internal interface IKernelFrameStoreQuery : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelFrameStoreQuery : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.FrameStore _resolutionStack();
+    ref readonly FrameStore _resolutionStack();
 }
 
-internal interface IKernelMatchExecutionLoopAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMatchExecutionLoopAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.MatchExecutionLoop _matchExecutionLoop { get; }
+    ref readonly MatchExecutionLoop _matchExecutionLoop { get; }
 }
 
-internal interface IKernelMatchModeRulesAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMatchModeRulesAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.ModeRuleSet _modeRules { get; }
+    ref readonly ModeRuleSet _modeRules { get; }
 }
 
-internal interface IKernelMatchModeRuntimeAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMatchModeRuntimeAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.MatchModeRuntime _modeRuntime { get; }
+    ref readonly MatchModeRuntime _modeRuntime { get; }
 }
 
-internal interface IKernelMatchRandomAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMatchRandomAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.DeterministicRandom _random { get; }
+    ref readonly DeterministicRandom _random { get; }
 }
 
-internal interface IKernelMatchesOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMatchesOperations : IProgramRuntimeOperations
 {
-    bool Matches(CardGame.Core.NativeFrameAutomaticPhase phase, int index, CardGame.Core.ResolutionFrame frame);
+    bool Matches(NativeFrameAutomaticPhase phase, int index, ResolutionFrame frame);
 }
 
-internal interface IKernelMouCaoHongContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouCaoHongContinuation : IProgramRuntimeOperations
 {
     bool MouCaoHongEdge(int i);
-    bool MouCaoHongFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouCaoHongFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouCaoHongSuffix(int n);
-    CardGame.Core.NativeOwners.MouCaoHongFacts CreateMouCaoHongFacts();
-    bool CurrentMouCaoHongDebt(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ProgramSkillWindowContext w);
-    CardGame.Core.MouCaoHongXianjuIssuedEvent? CurrentMouCaoHongDebt2(CardGame.Core.ProgramTriggerCandidate c, CardGame.Core.ProgramSkillWindowContext w);
+    NativeOwners.MouCaoHongFacts CreateMouCaoHongFacts();
+    bool CurrentMouCaoHongDebt(ProgramSkillFrame f, ProgramSkillWindowContext w);
+    MouCaoHongXianjuIssuedEvent? CurrentMouCaoHongDebt2(ProgramTriggerCandidate c, ProgramSkillWindowContext w);
 }
 
-internal interface IKernelMouCaoShuangAnniversaryContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouCaoShuangAnniversaryContinuation : IProgramRuntimeOperations
 {
     bool MouCaoShuangAnniversaryEdge(int i);
-    bool MouCaoShuangAnniversaryFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouCaoShuangAnniversaryFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouCaoShuangAnniversarySuffix(int n);
-    CardGame.Core.NativeOwners.MouCaoShuangAnniversaryFacts CreateMouCaoShuangAnniversaryFacts();
+    NativeOwners.MouCaoShuangAnniversaryFacts CreateMouCaoShuangAnniversaryFacts();
 }
 
-internal interface IKernelMouChenLinContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouChenLinContinuation : IProgramRuntimeOperations
 {
     bool MouChenLinEdge(int i);
-    bool MouChenLinFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouChenLinFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouChenLinSuffix(int n);
-    CardGame.Core.NativeOwners.MouChenLinFacts CreateMouChenLinFacts();
+    NativeOwners.MouChenLinFacts CreateMouChenLinFacts();
 }
 
-internal interface IKernelMouDianWeiContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouDianWeiContinuation : IProgramRuntimeOperations
 {
     bool MouDianWeiEdge(int i);
-    bool MouDianWeiFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouDianWeiFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouDianWeiSuffix(int n);
-    CardGame.Core.NativeOwners.MouDianWeiFacts CreateMouDianWeiFacts();
+    NativeOwners.MouDianWeiFacts CreateMouDianWeiFacts();
 }
 
-internal interface IKernelMouDongChengContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouDongChengContinuation : IProgramRuntimeOperations
 {
     bool MouDcEdge(int i);
-    bool MouDcFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouDcFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouDcSuffix(int i);
-    CardGame.Core.NativeOwners.MouDongChengFacts CreateMouDongChengFacts();
-    CardGame.Core.NativeOwners.MouDcLightningFacts CreateMouDcLightningFacts();
+    NativeOwners.MouDongChengFacts CreateMouDongChengFacts();
+    NativeOwners.MouDcLightningFacts CreateMouDcLightningFacts();
 }
 
-internal interface IKernelMouDongZhuoOlContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouDongZhuoOlContinuation : IProgramRuntimeOperations
 {
     bool MouDongZhuoOlEdge(int i);
-    bool MouDongZhuoOlFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouDongZhuoOlFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouDongZhuoOlSuffix(int n);
-    CardGame.Core.NativeOwners.MouDongZhuoOlFacts CreateMouDongZhuoOlFacts();
+    NativeOwners.MouDongZhuoOlFacts CreateMouDongZhuoOlFacts();
 }
 
-internal interface IKernelMouGuoJiaContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouGuoJiaContinuation : IProgramRuntimeOperations
 {
     bool MouGjEdge(int i);
-    bool MouGjFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouGjFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouGjSuffix(int n);
-    CardGame.Core.NativeOwners.MouGuoJiaFacts CreateMouGuoJiaFacts();
+    NativeOwners.MouGuoJiaFacts CreateMouGuoJiaFacts();
 }
 
-internal interface IKernelMouHuCheErContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouHuCheErContinuation : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.MouHuCheErFacts CreateMouHuCheErFacts();
+    NativeOwners.MouHuCheErFacts CreateMouHuCheErFacts();
     bool MouHuCheErEdge(int i);
-    bool MouHuCheErFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouHuCheErFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouHuCheErSuffix(int n);
 }
 
-internal interface IKernelMouHuLieContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouHuLieContinuation : IProgramRuntimeOperations
 {
     bool MouHuLieEdge(int i);
-    bool MouHuLieFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouHuLieFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouHuLieSuffix(int n);
-    CardGame.Core.NativeOwners.MouHuLieFacts CreateMouHuLieFacts();
+    NativeOwners.MouHuLieFacts CreateMouHuLieFacts();
 }
 
-internal interface IKernelMouJiaXuContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouJiaXuContinuation : IProgramRuntimeOperations
 {
     bool MouJxEdge(int i);
-    bool MouJxFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouJxFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouJxSuffix(int n);
-    CardGame.Core.NativeOwners.MouJiaXuFacts CreateMouJiaXuFacts();
+    NativeOwners.MouJiaXuFacts CreateMouJiaXuFacts();
 }
 
-internal interface IKernelMouJiangJiContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouJiangJiContinuation : IProgramRuntimeOperations
 {
     bool MouJjEdge(int i);
-    bool MouJjFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouJjFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouJjSuffix(int n);
-    CardGame.Core.NativeOwners.MouJiangJiFacts CreateMouJiangJiFacts();
+    NativeOwners.MouJiangJiFacts CreateMouJiangJiFacts();
 }
 
-internal interface IKernelMouJiangWeiAnniversaryContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouJiangWeiAnniversaryContinuation : IProgramRuntimeOperations
 {
     bool MouJiangWeiAnniversaryEdge(int i);
-    bool MouJiangWeiAnniversaryFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouJiangWeiAnniversaryFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouJiangWeiAnniversarySuffix(int n);
-    CardGame.Core.NativeOwners.MouJiangWeiAnniversaryFacts CreateMouJiangWeiAnniversaryFacts();
+    NativeOwners.MouJiangWeiAnniversaryFacts CreateMouJiangWeiAnniversaryFacts();
 }
 
-internal interface IKernelMouJuShouContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouJuShouContinuation : IProgramRuntimeOperations
 {
     bool MouJsEdge(int i);
-    bool MouJsFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouJsFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouJsSuffix(int n);
-    CardGame.Core.NativeOwners.MouJuShouFacts CreateMouJuShouFacts();
+    NativeOwners.MouJuShouFacts CreateMouJuShouFacts();
 }
 
-internal interface IKernelMouLiuXieContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouLiuXieContinuation : IProgramRuntimeOperations
 {
     bool MouLiuXieNativeEdge(int i);
-    bool MouLiuXieFirstNativeChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouLiuXieFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouLiuXieNativeSuffix(int n);
-    CardGame.Core.NativeOwners.MouLiuXieFacts CreateMouLiuXieFacts();
+    NativeOwners.MouLiuXieFacts CreateMouLiuXieFacts();
 }
 
-internal interface IKernelMouLuSuAnniversaryContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouLuSuAnniversaryContinuation : IProgramRuntimeOperations
 {
     bool MouLuSuEdge(int i);
-    bool MouLuSuFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouLuSuFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouLuSuSuffix(int n);
-    CardGame.Core.NativeOwners.MouLuSuAnniversaryFacts CreateMouLuSuAnniversaryFacts();
+    NativeOwners.MouLuSuAnniversaryFacts CreateMouLuSuAnniversaryFacts();
 }
 
-internal interface IKernelMouSmContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouSmContinuation : IProgramRuntimeOperations
 {
     bool MouSmEdge(int i);
-    bool MouSmFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouSmFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouSmSuffix(int n);
-    CardGame.Core.NativeOwners.MouSmFacts CreateMouSmFacts();
+    NativeOwners.MouSmFacts CreateMouSmFacts();
 }
 
-internal interface IKernelMouXuShengContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouXuShengContinuation : IProgramRuntimeOperations
 {
     bool MouXuShengNativeEdge(int i);
-    bool MouXuShengFirstNativeChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouXuShengFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouXuShengNativeSuffix(int n);
-    CardGame.Core.NativeOwners.MouXuShengFacts CreateMouXuShengFacts();
+    NativeOwners.MouXuShengFacts CreateMouXuShengFacts();
 }
 
-internal interface IKernelMouXunYuAnniversaryContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouXunYuAnniversaryContinuation : IProgramRuntimeOperations
 {
     bool MouXyEdge(int i);
-    bool MouXyFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouXyFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouXySuffix(int n);
-    CardGame.Core.NativeOwners.MouXunYuAnniversaryFacts CreateMouXunYuAnniversaryFacts();
+    NativeOwners.MouXunYuAnniversaryFacts CreateMouXunYuAnniversaryFacts();
 }
 
-internal interface IKernelMouZhangHeContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouZhangHeContinuation : IProgramRuntimeOperations
 {
     bool MouQiaobianNativeEdge(int i);
-    bool MouQiaobianFirstNativeChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouQiaobianFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouQiaobianNativeSuffix(int n);
-    CardGame.Core.NativeOwners.MouZhangHeFacts CreateMouZhangHeFacts();
+    NativeOwners.MouZhangHeFacts CreateMouZhangHeFacts();
 }
 
-internal interface IKernelMouZhangXiuAnniversaryContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouZhangXiuAnniversaryContinuation : IProgramRuntimeOperations
 {
     bool MouZhangXiuAnniversaryEdge(int i);
-    bool MouZhangXiuAnniversaryFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouZhangXiuAnniversaryFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouZhangXiuAnniversarySuffix(int n);
-    CardGame.Core.NativeOwners.MouZhangXiuAnniversaryFacts CreateMouZhangXiuAnniversaryFacts();
+    NativeOwners.MouZhangXiuAnniversaryFacts CreateMouZhangXiuAnniversaryFacts();
 }
 
-internal interface IKernelMouZhouYuContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouZhouYuContinuation : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.MouZhouYuFacts CreateMouZhouYuFacts();
+    NativeOwners.MouZhouYuFacts CreateMouZhouYuFacts();
     bool MouZyEdge(int i);
-    bool MouZyFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouZyFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouZySuffix(int i);
 }
 
-internal interface IKernelMouZhuRanContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouZhuRanContinuation : IProgramRuntimeOperations
 {
     bool MouZhuRanNativeEdge(int i);
-    bool MouZhuRanFirstNativeChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouZhuRanFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouZhuRanNativeSuffix(int n);
-    CardGame.Core.NativeOwners.MouZhuRanFacts CreateMouZhuRanFacts();
+    NativeOwners.MouZhuRanFacts CreateMouZhuRanFacts();
 }
 
-internal interface IKernelMouZhugeJinContinuation : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelMouZhugeJinContinuation : IProgramRuntimeOperations
 {
     bool MouZhugeJinEdge(int i);
-    bool MouZhugeJinFirstChild(CardGame.Core.ProgramSkillFrame f, CardGame.Core.ResolutionFrame child);
+    bool MouZhugeJinFirstChild(ProgramSkillFrame f, ResolutionFrame child);
     bool MouZhugeJinSuffix(int n);
-    CardGame.Core.NativeOwners.MouZhugeJinFacts CreateMouZhugeJinFacts();
+    NativeOwners.MouZhugeJinFacts CreateMouZhugeJinFacts();
 }
 
-internal interface IKernelNativeReturnsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelNativeReturnsAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramNativeReturns? _nativeReturns { get; }
+    ref ProgramNativeReturns? _nativeReturns { get; }
 }
 
-internal interface IKernelObservedSkillGrantRevisionsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelObservedSkillGrantRevisionsAccess : IProgramRuntimeOperations
 {
-    ref readonly System.Collections.Generic.Dictionary<int, long> _observedSkillGrantRevisions { get; }
+    ref readonly Dictionary<int, long> _observedSkillGrantRevisions { get; }
 }
 
-internal interface IKernelObserverIndexPredicate : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelObserverIndexPredicate : IProgramRuntimeOperations
 {
-    bool Invoke(System.Func<int, bool> __nativeReceiver, int arg2);
+    bool Invoke(Func<int, bool> __nativeReceiver, int arg2);
 }
 
-internal interface IKernelObserversAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelObserversAccess : IProgramRuntimeOperations
 {
-    CardGame.Core.ObserverDispatcher Observers { get; }
+    ObserverDispatcher Observers { get; }
 }
 
-internal interface IKernelParticipantSetupAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelParticipantSetupAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.MatchParticipantSetup? _participantSetup { get; }
+    ref MatchParticipantSetup? _participantSetup { get; }
 }
 
-internal interface IKernelPendingCardsMovedBatchesAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelPendingCardsMovedBatchesAccess : IProgramRuntimeOperations
 {
-    ref readonly System.Collections.Generic.List<CardGame.Core.CardMovementBatchContext> _pendingCardsMovedBatches { get; }
+    ref readonly List<CardMovementBatchContext> _pendingCardsMovedBatches { get; }
 }
 
-internal interface IKernelPhaseUsedProjectionsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelPhaseUsedProjectionsAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramPhaseUsedProjections? _phaseUsedProjections { get; }
+    ref ProgramPhaseUsedProjections? _phaseUsedProjections { get; }
 }
 
-internal interface IKernelPlayerViewQueryFactories : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelPlayerViewQueryFactories : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.PlayerViewVisibilityQueries CreatePlayerViewVisibilityQueries();
-    CardGame.Core.NativeOwners.PlayerViewCardsQueries CreatePlayerViewCardsQueries();
-    CardGame.Core.NativeOwners.PlayerViewRulesQueries CreatePlayerViewRulesQueries();
-    CardGame.Core.NativeOwners.PlayerViewMatchQueries CreatePlayerViewMatchQueries();
+    NativeOwners.PlayerViewVisibilityQueries CreatePlayerViewVisibilityQueries();
+    NativeOwners.PlayerViewCardsQueries CreatePlayerViewCardsQueries();
+    NativeOwners.PlayerViewRulesQueries CreatePlayerViewRulesQueries();
+    NativeOwners.PlayerViewMatchQueries CreatePlayerViewMatchQueries();
 }
 
-internal interface IKernelProgramActionsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramActionsAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramActionRouter? _programActions { get; }
+    ref ProgramActionRouter? _programActions { get; }
 }
 
-internal interface IKernelProgramChildPredicate : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramChildPredicate : IProgramRuntimeOperations
 {
-    bool Invoke(System.Func<CardGame.Core.ProgramSkillFrame, CardGame.Core.ResolutionFrame, bool> __nativeReceiver, CardGame.Core.ProgramSkillFrame arg2, CardGame.Core.ResolutionFrame arg3);
+    bool Invoke(Func<ProgramSkillFrame, ResolutionFrame, bool> __nativeReceiver, ProgramSkillFrame arg2, ResolutionFrame arg3);
 }
 
-internal interface IKernelProgramHistoryAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramHistoryAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramEventHistoryIndex? _programHistory { get; }
+    ref ProgramEventHistoryIndex? _programHistory { get; }
 }
 
-internal interface IKernelProgramInteractionsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramInteractionsAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramInteractionRouter? _programInteractions { get; }
+    ref ProgramInteractionRouter? _programInteractions { get; }
 }
 
-internal interface IKernelProgramIssuedTriggersAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramIssuedTriggersAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramIssuedTriggerRuntime? _programIssuedTriggers { get; }
+    ref ProgramIssuedTriggerRuntime? _programIssuedTriggers { get; }
 }
 
-internal interface IKernelProgramLegalityAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramLegalityAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramLegalityRouter? _programLegality { get; }
+    ref ProgramLegalityRouter? _programLegality { get; }
 }
 
-internal interface IKernelProgramPhaseScheduleAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramPhaseScheduleAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramPhaseSchedule? _programPhaseSchedule { get; }
+    ref ProgramPhaseSchedule? _programPhaseSchedule { get; }
 }
 
-internal interface IKernelProgramPipelineHooksAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramPipelineHooksAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.ProgramPipelineHooks _programPipelineHooks { get; }
+    ref readonly ProgramPipelineHooks _programPipelineHooks { get; }
 }
 
-internal interface IKernelProgramRuleObserversAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramRuleObserversAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.ProgramRuleObservers _programRuleObservers { get; }
+    ref readonly ProgramRuleObservers _programRuleObservers { get; }
 }
 
-internal interface IKernelProgramSelectionQueriesAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramSelectionQueriesAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.IProgramSelectionQueries? _programSelectionQueries { get; }
+    ref IProgramSelectionQueries? _programSelectionQueries { get; }
 }
 
-internal interface IKernelProgramSelectionValidatorsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramSelectionValidatorsAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramSelectionValidationRegistry? _programSelectionValidators { get; }
+    ref ProgramSelectionValidationRegistry? _programSelectionValidators { get; }
 }
 
-internal interface IKernelProgramSelectionsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramSelectionsAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramSelectionRegistry? _programSelections { get; }
+    ref ProgramSelectionRegistry? _programSelections { get; }
 }
 
-internal interface IKernelProgramTargetResolversAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramTargetResolversAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramTargetResolverRegistry? _programTargetResolvers { get; }
+    ref ProgramTargetResolverRegistry? _programTargetResolvers { get; }
 }
 
-internal interface IKernelProgramTriggerProofsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramTriggerProofsAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramTriggerProofRuntime? _programTriggerProofs { get; }
+    ref ProgramTriggerProofRuntime? _programTriggerProofs { get; }
 }
 
-internal interface IKernelProgramWindowReturnOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelProgramWindowReturnOperations : IProgramRuntimeOperations
 {
-    void Return(CardGame.Core.ProgramWindowReturnCatalog __nativeReceiver, CardGame.Core.ProgramSkillFrame frame, bool completed);
+    void Return(ProgramWindowReturnCatalog __nativeReceiver, ProgramSkillFrame frame, bool completed);
 }
 
-internal interface IKernelPublicHandRevealReturnOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelPublicHandRevealReturnOperations : IProgramRuntimeOperations
 {
-    void Return(CardGame.Core.PublicHandRevealReturns __nativeReceiver, string key, CardGame.Core.ResolutionFrame parent);
+    void Return(PublicHandRevealReturns __nativeReceiver, string key, ResolutionFrame parent);
 }
 
-internal interface IKernelQinglongContinuationHandleFactory : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelQinglongContinuationHandleFactory : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long ownerId);
-    CardGame.Core.NativeOwners.FangtianHalberdHandle CreateFangtianHalberdHandle(long ownerId);
-    CardGame.Core.NativeOwners.BorrowedSwordHandle CreateBorrowedSwordHandle(long ownerId);
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
+    NativeOwners.FactionCardRequestHandle CreateFactionCardRequestHandle(long ownerId);
+    NativeOwners.FangtianHalberdHandle CreateFangtianHalberdHandle(long ownerId);
+    NativeOwners.BorrowedSwordHandle CreateBorrowedSwordHandle(long ownerId);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long ownerId);
 }
 
-internal interface IKernelRejectOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelRejectOperations : IProgramRuntimeOperations
 {
-    CardGame.Core.CommandResult Reject(CardGame.Core.CommandErrorCode code, string message);
+    CommandResult Reject(CommandErrorCode code, string message);
 }
 
-internal interface IKernelResolutionSchedulerAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelResolutionSchedulerAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.ResolutionScheduler _resolutionScheduler { get; }
+    ref readonly ResolutionScheduler _resolutionScheduler { get; }
 }
 
-internal interface IKernelResolveRuntimeHandlerTargetOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelResolveRuntimeHandlerTargetOperations : IProgramRuntimeOperations
 {
     object? ResolveRuntimeHandlerTarget(System.Reflection.MethodInfo method);
 }
 
-internal interface IKernelReturnOperationOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelReturnOperationOperations : IProgramRuntimeOperations
 {
-    void ReturnOperation(CardGame.Core.SkillProgramEffectOp operation, CardGame.Core.ProgramSkillFrame frame, CardGame.Core.NativeDrawOutcome outcome);
+    void ReturnOperation(SkillProgramEffectOp operation, ProgramSkillFrame frame, NativeDrawOutcome outcome);
 }
 
-internal interface IKernelRevisionAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelRevisionAccess : IProgramRuntimeOperations
 {
     long _revision { get; }
 }
 
-internal interface IKernelRuleProgressionOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelRuleProgressionOperations : IProgramRuntimeOperations
 {
     void AdvanceRulesAndPublishState();
-    void AdvanceEventRulesAndQueueFact(CardGame.Core.IGameEvent payload);
+    void AdvanceEventRulesAndQueueFact(IGameEvent payload);
 }
 
-internal interface IKernelRuleQueryFactFactories : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelRuleQueryFactFactories : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.DistanceQueryFacts CreateDistanceQueryFacts(CardGame.Core.CharacterState source, CardGame.Core.CharacterState target);
-    CardGame.Core.NativeOwners.AttackRangeQueryFacts CreateAttackRangeQueryFacts(CardGame.Core.CharacterState player);
-    CardGame.Core.NativeOwners.DrawCountQueryFacts CreateDrawCountQueryFacts(CardGame.Core.CharacterState player);
-    CardGame.Core.NativeOwners.SlashLimitQueryFacts CreateSlashLimitQueryFacts(CardGame.Core.CharacterState player);
-    CardGame.Core.NativeOwners.HandLimitQueryFacts CreateHandLimitQueryFacts(CardGame.Core.CharacterState player);
-    CardGame.Core.NativeOwners.CardTargetCountQueryFacts CreateCardTargetCountQueryFacts(CardGame.Core.CharacterState player, CardGame.Core.CardKind effectiveCardKind, long? declaredUseFrameId);
-    CardGame.Core.NativeOwners.CardUseDistanceQueryFacts CreateCardUseDistanceQueryFacts(CardGame.Core.CharacterState player, CardGame.Core.CardKind effectiveCardKind);
-    CardGame.Core.NativeOwners.NumericContributionQueryFacts CreateNumericContributionQueryFacts(CardGame.Core.CharacterState player, CardGame.Core.SkillRuleQuery ruleQuery);
+    NativeOwners.DistanceQueryFacts CreateDistanceQueryFacts(CharacterState source, CharacterState target);
+    NativeOwners.AttackRangeQueryFacts CreateAttackRangeQueryFacts(CharacterState player);
+    NativeOwners.DrawCountQueryFacts CreateDrawCountQueryFacts(CharacterState player);
+    NativeOwners.SlashLimitQueryFacts CreateSlashLimitQueryFacts(CharacterState player);
+    NativeOwners.HandLimitQueryFacts CreateHandLimitQueryFacts(CharacterState player);
+    NativeOwners.CardTargetCountQueryFacts CreateCardTargetCountQueryFacts(CharacterState player, CardKind effectiveCardKind, long? declaredUseFrameId);
+    NativeOwners.CardUseDistanceQueryFacts CreateCardUseDistanceQueryFacts(CharacterState player, CardKind effectiveCardKind);
+    NativeOwners.NumericContributionQueryFacts CreateNumericContributionQueryFacts(CharacterState player, SkillRuleQuery ruleQuery);
 }
 
-internal interface IKernelRuntimeHooksAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelRuntimeHooksAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramRuntimeHooks? _runtimeHooks { get; }
+    ref ProgramRuntimeHooks? _runtimeHooks { get; }
 }
 
-internal interface IKernelShanheMarketAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelShanheMarketAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.Campaigns.ShanheCampaignSession? _shanheMarket { get; }
+    ref Campaigns.ShanheCampaignSession? _shanheMarket { get; }
 }
 
-internal interface IKernelSkillBindingIndexAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelSkillBindingIndexAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.MatchSkillBindingIndex _skillBindingIndex { get; }
+    ref readonly MatchSkillBindingIndex _skillBindingIndex { get; }
 }
 
-internal interface IKernelSkillRuntimeStateAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelSkillRuntimeStateAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.SkillRuntimeStateStore _skillRuntimeState { get; }
+    ref readonly SkillRuntimeStateStore _skillRuntimeState { get; }
 }
 
-internal interface IKernelSuppressedCardMovedEventBatchIdsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelSuppressedCardMovedEventBatchIdsAccess : IProgramRuntimeOperations
 {
-    ref readonly System.Collections.Generic.Stack<long> _suppressedCardMovedEventBatchIds { get; }
+    ref readonly Stack<long> _suppressedCardMovedEventBatchIds { get; }
 }
 
-internal interface IKernelTargetRulesAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelTargetRulesAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramTargetRules? _targetRules { get; }
+    ref ProgramTargetRules? _targetRules { get; }
 }
 
-internal interface IKernelTargetWindowProtocolsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelTargetWindowProtocolsAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramTargetWindowProtocols? _targetWindowProtocols { get; }
+    ref ProgramTargetWindowProtocols? _targetWindowProtocols { get; }
 }
 
-internal interface IKernelTrickEffectHandleFactory : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelTrickEffectHandleFactory : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.GroupCardHandle CreateGroupCardHandle(long resolutionId, int sourceSeat, CardGame.Core.Card card, System.Collections.Generic.IReadOnlyList<int> targetSeats, CardGame.Core.GroupCardEffect effect, CardGame.Core.CardKind? requiredCardKind, System.Collections.Generic.IReadOnlyList<CardGame.Core.Card>? physicalCards = default);
-    CardGame.Core.NativeOwners.BorrowedSwordHandle CreateBorrowedSwordHandle(long resolutionId, int sourceSeat, int weaponOwnerSeat, int slashTargetSeat, CardGame.Core.Card card);
-    CardGame.Core.NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, CardGame.Core.Card? card, int damageAmount = 1, CardGame.Core.CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, CardGame.Core.DamageNature? damageNatureOverride = default, System.Collections.Generic.IReadOnlyList<CardGame.Core.Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardGame.Core.CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
-    CardGame.Core.NativeOwners.DuelHandle CreateDuelHandle(CardGame.Core.NativeOwners.CardAttackHandle attack);
+    NativeOwners.GroupCardHandle CreateGroupCardHandle(long resolutionId, int sourceSeat, Card card, IReadOnlyList<int> targetSeats, GroupCardEffect effect, CardKind? requiredCardKind, IReadOnlyList<Card>? physicalCards = default);
+    NativeOwners.BorrowedSwordHandle CreateBorrowedSwordHandle(long resolutionId, int sourceSeat, int weaponOwnerSeat, int slashTargetSeat, Card card);
+    NativeOwners.CardAttackHandle CreateCardAttackHandle(long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = default, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = default, DamageNature? damageNatureOverride = default, IReadOnlyList<Card>? physicalCards = default, long? programJudgmentFrameId = default, long? programSkillFrameId = default, CardConversionSource? conversionSource = default, long? programSkillCardUseFrameId = default);
+    NativeOwners.DuelHandle CreateDuelHandle(NativeOwners.CardAttackHandle attack);
 }
 
-internal interface IKernelTriggerWindowHostFactories : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelTriggerWindowHostFactories : IProgramRuntimeOperations
 {
-    CardGame.Core.NativeOwners.CardsMovedTriggerWindowHost CreateCardsMovedTriggerWindowHost();
-    CardGame.Core.NativeOwners.HpChangedTriggerWindowHost CreateHpChangedTriggerWindowHost();
-    CardGame.Core.NativeOwners.CardActionTriggerWindowHost CreateCardActionTriggerWindowHost();
+    NativeOwners.CardsMovedTriggerWindowHost CreateCardsMovedTriggerWindowHost();
+    NativeOwners.HpChangedTriggerWindowHost CreateHpChangedTriggerWindowHost();
+    NativeOwners.CardActionTriggerWindowHost CreateCardActionTriggerWindowHost();
 }
 
-internal interface IKernelTryAdvanceOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelTryAdvanceOperations : IProgramRuntimeOperations
 {
-    bool TryAdvance(CardGame.Core.ResolutionFrame frame);
+    bool TryAdvance(ResolutionFrame frame);
 }
 
-internal interface IKernelTryResumeOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelTryResumeOperations : IProgramRuntimeOperations
 {
-    bool TryResume(CardGame.Core.GameEngine.ProgramContinuationCatalog __nativeReceiver, long frameId);
+    bool TryResume(GameEngine.ProgramContinuationCatalog __nativeReceiver, long frameId);
 }
 
-internal interface IKernelTryReturnMovementOperations : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelTryReturnMovementOperations : IProgramRuntimeOperations
 {
-    bool TryReturnMovement(CardGame.Core.GameEngine.ProgramContinuationCatalog __nativeReceiver, CardGame.Core.ProgramSkillFrame frame, bool afterPayment = false);
+    bool TryReturnMovement(GameEngine.ProgramContinuationCatalog __nativeReceiver, ProgramSkillFrame frame, bool afterPayment = false);
 }
 
-internal interface IKernelTurnCardUseEffectsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelTurnCardUseEffectsAccess : IProgramRuntimeOperations
 {
-    ref readonly CardGame.Core.TurnCardUseEffectStore _turnCardUseEffects { get; }
+    ref readonly TurnCardUseEffectStore _turnCardUseEffects { get; }
 }
 
-internal interface IKernelViewContributorsAccess : CardGame.Core.IProgramRuntimeOperations
+internal interface IKernelViewContributorsAccess : IProgramRuntimeOperations
 {
-    ref CardGame.Core.ProgramViewContributors? _viewContributors { get; }
+    ref ProgramViewContributors? _viewContributors { get; }
 }

@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFriendEventsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IFriendEventProgramHost.ExecuteFriendEvent(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginFriendEvent(frame, operation);
+    SkillProgramStepOutcome IFriendEventProgramHost.ExecuteFriendEvent(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginFriendEvent(frame, operation);
     internal Card? UniqueMaximumHandCard(int seat)
     {
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]);
@@ -22,7 +19,7 @@ internal sealed partial class CoreGameEngineFriendEventsRuntime
     internal int AscendingHandRank(int seat, string skillId) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<AscendingHandRankPaidEvent>().Where(e => e.OwnerSeat == seat && e.SkillId == skillId).Select(e => e.Rank).DefaultIfEmpty(0).Max();
     internal int FriendSuitUseCount(int seat, string skillId) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<UsedSuitHandHeldEvent>().Count(e => e.OwnerSeat == seat && e.SkillId == skillId && e.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber);
     internal bool FriendSuitAllowed(int seat, Suit suit) => suit == Suit.Heart || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FriendEventConfiguredEvent>().Any(e => e.OwnerSeat == seat && e.SkillId == "friend:cui-jun-gongli" && e.Option == suit.ToString());
-    internal bool FriendDuelCategoryAllowed(int seat, CardKind kind) => !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FriendEventConfiguredEvent>().Any(e => e.OwnerSeat == seat && e.SkillId == "friend:shi-tao-gongli" && e.Option == global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind).ToString());
+    internal bool FriendDuelCategoryAllowed(int seat, CardKind kind) => !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FriendEventConfiguredEvent>().Any(e => e.OwnerSeat == seat && e.SkillId == "friend:shi-tao-gongli" && e.Option == CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind).ToString());
     internal void CaptureFriendMinimumHandUse(CardActionContext? action)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.HoldUsedSuitHandAndDraw) || action is not { PhysicalCards.Count: 1 } || !_coreFriendTrioOperations.IsFriendActualCardUse(action) || action.PhysicalCards[0].From != CardLocation.Hand(action.ActorSeat) || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], "friend:shunyi"))
@@ -294,7 +291,7 @@ internal sealed partial class CoreGameEngineFriendEventsRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 60)]
-    internal bool ReturnRegisteredCompleteFriendRecastDuelAttackReturn(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnRegisteredCompleteFriendRecastDuelAttackReturn(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.FriendRecastDuelReturn is null)
             return false;
@@ -302,7 +299,7 @@ internal sealed partial class CoreGameEngineFriendEventsRuntime
         return true;
     }
 
-    internal void CompleteFriendRecastDuelAttackReturn(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal void CompleteFriendRecastDuelAttackReturn(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.FriendRecastDuelReturn is not { AttackStarted: true } o || completion.ProgramFrameId != o.ProgramFrameId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FriendEventFlow.Stage: FriendEventFlowStage.DuelIssued } f || f.Id != o.ProgramFrameId || f.InstructionIndex != o.InstructionIndex || f.FriendEventFlow.UseFrameId != completion.ResolutionId || f.SkillId != o.SkillId || f.ActivationId != o.BindingId || f.SkillInstanceId != o.SkillInstanceId || f.GameplayHash != o.GameplayHash)
             throw new InvalidOperationException("Recast Duel lost its exact completed attack return.");

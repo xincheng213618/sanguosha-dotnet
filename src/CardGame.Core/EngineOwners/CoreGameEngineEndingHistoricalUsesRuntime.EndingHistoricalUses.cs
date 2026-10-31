@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,13 +9,13 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
 
     internal void RecordOwnPlayEligibleUse(CardActionContext action)
     {
-        if (!TracksOwnPlayHistory || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || action.Type != CardActionType.Use || action.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(action.EffectiveKind, [SkillProgramCardCategory.Basic, SkillProgramCardCategory.InstantTrick]) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OwnPlayEligibleUseRecordedEvent>().Any(e => e.CardActionId == action.ActionId))
+        if (!TracksOwnPlayHistory || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || action.Type != CardActionType.Use || action.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || !CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(action.EffectiveKind, [SkillProgramCardCategory.Basic, SkillProgramCardCategory.InstantTrick]) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OwnPlayEligibleUseRecordedEvent>().Any(e => e.CardActionId == action.ActionId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OwnPlayEligibleUseRecordedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, action.ActorSeat, action.ActionId, action.EffectiveKind));
     }
 
     internal IReadOnlyList<EndingHistoricalUseSlot> OwnPlayHistory(int owner) => Array.AsReadOnly(_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OwnPlayEligibleUseRecordedEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.TurnOwnerSeat == owner && e.ActorSeat == owner).Take(2).Select(e => new EndingHistoricalUseSlot(e.CardActionId, e.EffectiveKind, e.PhaseInstanceId)).ToArray());
-    internal bool ExactHistoricalEnding(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } c && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().LastOrDefault()is { } ending && c.ParentFrameId == ending.Id && ending.OwnerSeat == f.OwnerSeat && ending.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && f.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
+    internal bool ExactHistoricalEnding(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } c && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().LastOrDefault()is { } ending && c.ParentFrameId == ending.Id && ending.OwnerSeat == f.OwnerSeat && ending.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && f.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
     internal SkillProgramStepOutcome BeginEndingHistoricalUses(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -27,7 +24,7 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
             throw new InvalidOperationException("Historical uses require the original own Ending candidate.");
         if (slots.Count == 0)
             return SkillProgramStepOutcome.Continue;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { EndingHistoricalUses = new(1, global::CardGame.Core.EngineOwners.CoreGameEngineDyingSuitsPeachProgramsRuntime.DyingSuitsSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, f.WindowContext!.ParentFrameId, slots) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { EndingHistoricalUses = new(1, CoreGameEngineDyingSuitsPeachProgramsRuntime.DyingSuitsSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, f.WindowContext!.ParentFrameId, slots) });
         PublishHistoricalEndingChoice(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -45,8 +42,8 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
         foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Where(c => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, c) && !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, [c.Id])))
         {
             var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, card);
-            var color = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             {
                 var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, suit, color, card.Rank, [card.Id]) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, t.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, t.Seat, suit)).ToArray();
                 foreach (var target in targets)
@@ -58,12 +55,12 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
                 result.Add(new(LegalActionKind.Peach, card.Id, null, $"将【{(card.DisplayName)}】当【桃】使用", kind, TargetSeats: [actor.Seat]));
             else if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, suit))
                 result.Add(new(LegalActionKind.Alcohol, card.Id, null, $"将【{(card.DisplayName)}】当【酒】使用", kind, TargetSeats: [actor.Seat]));
-            else if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+            else if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
                 foreach (var option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: color, hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: true))
                     result.Add(new(option.ActionKind, card.Id, option.TargetSeats.Count == 1 ? option.TargetSeats[0] : null, $"将【{(card.DisplayName)}】{(option.Description)}", kind, option.TargetCardId, option.TargetSeats));
         }
 
-        var basicActions = result.Where(a => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(a.PlayedCardKind!.Value, [SkillProgramCardCategory.Basic])).ToList();
+        var basicActions = result.Where(a => CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardCategory(a.PlayedCardKind!.Value, [SkillProgramCardCategory.Basic])).ToList();
         var basicCount = basicActions.Count;
         _coreNextActualUseTargetAdjustmentsOperations.AddNextActualUseAdjustmentActions(basicActions, actor);
         result.AddRange(basicActions.Skip(basicCount));
@@ -128,10 +125,10 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
         var physical = _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Single(c => c.Id == action.CardId);
         var kind = action.PlayedCardKind!.Value;
         var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, physical);
-        var option = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) ? _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit), hasActualColor: true, physicalCardIds: [physical.Id], includeNextActualUseAdjustment: true).Single(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && o.TargetSeats.SequenceEqual(action.TargetSeats!)) : null;
+        var option = CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) ? _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: CoreGameEnginePublicPileColorsRuntime.SuitColor(suit), hasActualColor: true, physicalCardIds: [physical.Id], includeNextActualUseAdjustment: true).Single(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && o.TargetSeats.SequenceEqual(action.TargetSeats!)) : null;
         var adjustedBasic = action.ProgramActivationId == "next-actual-use-target-adjustment";
-        var fangtian = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action.TargetSeats.Count > 1 && _coreNativeDamageHandlesOperations.UsesFormalFangtianHalberd && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count == 1 && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.FangtianHalberd);
-        var programTargetCount = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action.TargetSeats.Count > 1 && _coreProgramCardUseRulesOperations.UsesProgramCardTargetCount(actor, physical, kind, action.TargetSeats.Count);
+        var fangtian = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action.TargetSeats.Count > 1 && _coreNativeDamageHandlesOperations.UsesFormalFangtianHalberd && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count == 1 && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.FangtianHalberd);
+        var programTargetCount = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action.TargetSeats.Count > 1 && _coreProgramCardUseRulesOperations.UsesProgramCardTargetCount(actor, physical, kind, action.TargetSeats.Count);
         if (option?.NextActualUseAdjusted == true)
             _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats = option.TargetSeats;
         else if (adjustedBasic)
@@ -194,7 +191,7 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
             return;
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
             var nuzhan = _coreCardConversionsOperations.GetNuzhanModifiers(id, actor);
@@ -247,7 +244,7 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 20)]
-    internal bool ReturnRegisteredCompleteHistoricalEndingAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnRegisteredCompleteHistoricalEndingAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.EndingHistoricalUseReturn is null)
             return false;
@@ -255,7 +252,7 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
         return true;
     }
 
-    internal void CompleteHistoricalEndingAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion) => FinishHistoricalEndingReturn(completion.EndingHistoricalUseReturn!);
+    internal void CompleteHistoricalEndingAttack(GameEngine.AttackCompletionReceipt completion) => FinishHistoricalEndingReturn(completion.EndingHistoricalUseReturn!);
     internal void FinishHistoricalEndingReturn(EndingHistoricalUseReturn ret)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(ret.ProgramFrameId);

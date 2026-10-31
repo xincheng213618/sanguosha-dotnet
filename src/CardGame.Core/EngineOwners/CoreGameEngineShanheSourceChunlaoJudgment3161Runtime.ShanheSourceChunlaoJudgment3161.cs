@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceChunlaoJudgment3161Runtime
@@ -10,7 +6,7 @@ internal sealed partial class CoreGameEngineShanheSourceChunlaoJudgment3161Runti
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeJudgmentPhase, 24921)]
     internal bool BeginShanheSourceChunlaoJudgmentDraw()
     {
-        if (_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipJudgmentPhase))
+        if (_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipJudgmentPhase))
             return false;
         var consumed = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceChunlaoJudgmentConsumedEvent>().Select(e => e.WineUseId).ToHashSet();
         var due = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramRoundPileAlcoholIssuedEvent>().Where(e => e.Source.SkillId == ShanheSourceJiangdongTrioIds.Chunlao && e.VictimSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && !consumed.Contains(e.CardUseFrameId)).ToArray();

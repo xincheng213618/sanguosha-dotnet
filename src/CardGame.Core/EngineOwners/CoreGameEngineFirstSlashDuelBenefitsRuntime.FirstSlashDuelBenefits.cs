@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
@@ -11,7 +6,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
     internal const string FirstSlashDuelDrawReason = "skill-program.first-slash-duel.draw";
     internal bool HasFirstSlashDuelBenefitCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit);
 
-    internal static bool IsFirstSlashDuelKind(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_FirstSlashDuelBenefits.IsFirstSlashDuelKind(kind);
+    internal static bool IsFirstSlashDuelKind(CardKind kind) => RuntimeSkills.RuntimeRules_Core_FirstSlashDuelBenefits.IsFirstSlashDuelKind(kind);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 260)]
     internal void ObserveFirstSlashDuelDeclaration(IGameEvent payload)
     {
@@ -33,7 +28,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
     {
         if (declaredKind == use.CardKind)
             return true;
-        if (use.CurrentSlashFirePolicy is not { Converted: true } policy || policy.OriginalKind != declaredKind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(declaredKind) || use.CardKind != CardKind.FireSlash)
+        if (use.CurrentSlashFirePolicy is not { Converted: true } policy || policy.OriginalKind != declaredKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(declaredKind) || use.CardKind != CardKind.FireSlash)
             return false;
         // Declaration order remains frozen. An exact existing committed kind
         // change belongs to the same use, rather than a second first-use slot.
@@ -88,14 +83,14 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
     }
 
     internal IReadOnlyList<PromptChoice> FirstSlashDuelChoices(ProgramSkillFrame f) => Array.AsReadOnly(new[] { FirstSlashDuelChoice(f, "draw", "摸X张牌"), FirstSlashDuelChoice(f, "damage", "令此牌伤害+X") });
-    internal static PromptChoice FirstSlashDuelChoice(ProgramSkillFrame f, string branch, string label) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_FirstSlashDuelBenefits.FirstSlashDuelChoice(f, branch, label);
+    internal static PromptChoice FirstSlashDuelChoice(ProgramSkillFrame f, string branch, string label) => RuntimeSkills.RuntimeRules_Core_FirstSlashDuelBenefits.FirstSlashDuelChoice(f, branch, label);
     [ProgramAnswer("first-slash-duel-benefit")]
     internal void ResolveFirstSlashDuelChoice(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The first-use choice lost its owning frame.");
         _coreFirstSlashDuelBenefitObserversOperations.RequireFirstSlashDuelBenefit(f);
         var r = f.FirstSlashDuelBenefit!;
-        if (r.SelectedBranch is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], FirstSlashDuelChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (r.SelectedBranch is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], FirstSlashDuelChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The first-use choice is stale or already settled.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = selected.Parameters["branch"];
@@ -156,7 +151,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
     [ProgramAiChoice(SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit)]
     internal PromptChoice SelectAiFirstSlashDuelBenefit(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.Single(c => c.Parameters["branch"] == (_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count < 3 ? "draw" : "damage"));
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 20)]
-    internal int FirstSlashDuelDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int FirstSlashDuelDamage(GameEngine.IDamageAttempt attack)
     {
         if (attack.IsChainPropagation || !IsFirstSlashDuelKind(attack.EffectiveCardKind ?? CardKind.Dodge) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { FirstSlashDuelDamageBonus: { } bonus } use)
             return 0;
@@ -166,5 +161,5 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
         return bonus;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IFirstSlashDuelBenefitHost.ChooseFirstSlashDuelDiamondBenefit(ProgramSkillFrame frame) => BeginFirstSlashDuelBenefit(frame);
+    SkillProgramStepOutcome IFirstSlashDuelBenefitHost.ChooseFirstSlashDuelDiamondBenefit(ProgramSkillFrame frame) => BeginFirstSlashDuelBenefit(frame);
 }

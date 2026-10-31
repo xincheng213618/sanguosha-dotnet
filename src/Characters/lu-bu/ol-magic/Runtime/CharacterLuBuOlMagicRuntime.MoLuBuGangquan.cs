@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuBuOlMagicRuntime
 {
-    internal static bool IsMoGangquanSource(CardConversionSource? s) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_bu_ol_magic_MoLuBuGangquan.IsMoGangquanSource(s);
+    internal static bool IsMoGangquanSource(CardConversionSource? s) => RuntimeSkills.RuntimeRules_lu_bu_ol_magic_MoLuBuGangquan.IsMoGangquanSource(s);
     internal bool CanUseMoGangquan(CharacterState owner, IndexedSkillProgramInstance instance, SkillProgramViewAs rule, bool forResponse, bool dyingUse)
     {
         if (instance.SkillId != MoLuBuComposition.Gangquan)

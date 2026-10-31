@@ -1,18 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
 {
-    internal HappyQiaoCardMaximumProof? PrepareHappyQiaoCardMaximumHp(global::CardGame.Core.GameEngine.IDamageAttempt attack, int newMaximum)
+    internal HappyQiaoCardMaximumProof? PrepareHappyQiaoCardMaximumHp(GameEngine.IDamageAttempt attack, int newMaximum)
     {
         if (!HasHappyQiaoHealth(attack.TargetSeat))
             return null;
-        if (attack is not global::CardGame.Core.NativeOwners.CardAttackHandle || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != attack.ResolutionId || attack.DamageWasApplied || attack.DamageAmountFinalized || attack.IsChainPropagation || _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).MaximumHpReplacement is not null || newMaximum < 0)
+        if (attack is not NativeOwners.CardAttackHandle || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != attack.ResolutionId || attack.DamageWasApplied || attack.DamageAmountFinalized || attack.IsChainPropagation || _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).MaximumHpReplacement is not null || newMaximum < 0)
             throw new InvalidOperationException("A Qiao card maximum replacement requires the real unpaid native attack.");
         var before = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].HappyQiaoHealth!;
         return new(before, before.WithMaximum(newMaximum));

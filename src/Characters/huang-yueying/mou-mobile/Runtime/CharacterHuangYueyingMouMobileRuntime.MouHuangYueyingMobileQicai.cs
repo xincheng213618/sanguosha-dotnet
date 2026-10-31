@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangYueyingMouMobileRuntime
@@ -41,7 +37,7 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
     [ProgramAnswer("mou-huang-yueying-qicai")]
     internal void AnswerMouHyQicai(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouHuangYueyingMobile: { Stage: MouHuangYueyingMobileStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], MouHyQicaiChoices(f).Where(p => p.Id == c.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouHuangYueyingMobile: { Stage: MouHuangYueyingMobileStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], MouHyQicaiChoices(f).Where(p => p.Id == c.Id).ToArray()))
             throw new InvalidOperationException("Qicai requires its current real Hand/public-discard entity and original recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
@@ -81,7 +77,7 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.PlaceMouHuangYueyingQicaiEquipment)]
-    internal PromptChoice AiMouHyQicai(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
+    internal PromptChoice AiMouHyQicai(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
     internal MouHuangYueyingQiGrantedEvent? CurrentMouHyQi(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGrantedEvent>().LastOrDefault(e => e.RecipientSeat == target);
     internal int MouHyQiRemaining(MouHuangYueyingQiGrantedEvent grant) => Math.Max(0, 3 - _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().Count(e => e.GrantId == grant.GrantId));
     internal void SyncMouHyQiMarker(long frame, int target)

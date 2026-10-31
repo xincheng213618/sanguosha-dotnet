@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
@@ -83,7 +79,7 @@ internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
     {
         if (action.PhysicalCards is not [var cost] || cost.From.Zone is not (CardZoneKind.Equipment or CardZoneKind.Judgment) || cost.From.OwnerSeat is not { } originalOwner || action.ConversionChain.SingleOrDefault(s => s.SkillId == ShenMaChaoComposition.Shouli)is not { } source || originalOwner == source.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<ShouliBorrowedMountEvent>().Any(e => e.ActionId == action.ActionId && e.Source == source))
             return;
-        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(originalOwner) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source.OwnerSeat) || _corePlayCardHistoryOperations.ViewAsRule(source)is not { FieldMountConversion: true } rule || !rule.InputKinds.Contains(cost.CardKind) || (rule.OutputKind == CardKind.Slash ? !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) : action.EffectiveKind != CardKind.Dodge) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cost.CardId && m.CardKind == cost.CardKind && m.From == cost.From && m.To == CardLocation.Processing && m.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && m.Reason == (action.Type == CardActionType.Use ? CardMoveReasons.Use : CardMoveReasons.Respond)))
+        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(originalOwner) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source.OwnerSeat) || _corePlayCardHistoryOperations.ViewAsRule(source)is not { FieldMountConversion: true } rule || !rule.InputKinds.Contains(cost.CardKind) || (rule.OutputKind == CardKind.Slash ? !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) : action.EffectiveKind != CardKind.Dodge) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cost.CardId && m.CardKind == cost.CardKind && m.From == cost.From && m.To == CardLocation.Processing && m.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && m.Reason == (action.Type == CardActionType.Use ? CardMoveReasons.Use : CardMoveReasons.Respond)))
             throw new InvalidOperationException("Shouli debt requires its exact accepted real field-mount conversion payment.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShouliBorrowedMountEvent(action.ActionId, source, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, cost.CardId, cost.From));
         if (!_coreMatchParticipantsPlayersAccess._players[originalOwner].IsAlive || _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionCurrentTurnSkillSuppressionsAccess._currentTurnSkillSuppressions.Any(s => s.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && s.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && s.TargetSeat == originalOwner))
@@ -96,7 +92,7 @@ internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
     }
 
     internal bool HasShouliDamageDebt(int target) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DealShouliStartingMounts) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShouliBorrowedMountEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && (e.Source.OwnerSeat == target || e.From.OwnerSeat == target));
-    internal DamageNature? ShouliThunderNature(global::CardGame.Core.GameEngine.IDamageAttempt attack) => HasShouliDamageDebt(attack.TargetSeat) ? DamageNature.Thunder : null;
+    internal DamageNature? ShouliThunderNature(GameEngine.IDamageAttempt attack) => HasShouliDamageDebt(attack.TargetSeat) ? DamageNature.Thunder : null;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 39000)]
-    internal int ShouliReceivedDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => HasShouliDamageDebt(attack.TargetSeat) ? 1 : 0;
+    internal int ShouliReceivedDamageBonus(GameEngine.IDamageAttempt attack) => HasShouliDamageDebt(attack.TargetSeat) ? 1 : 0;
 }

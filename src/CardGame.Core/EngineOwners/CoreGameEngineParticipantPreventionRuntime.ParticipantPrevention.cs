@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineParticipantPreventionRuntime
@@ -23,5 +19,5 @@ internal sealed partial class CoreGameEngineParticipantPreventionRuntime
     }
 
     internal bool IsParticipantPreventionDraw(ProgramSkillFrame f) => f.InstructionIndex > 0 && ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect.Op == SkillProgramEffectOp.PreventParticipantDamageDrawActualSource;
-    SkillProgramStepOutcome global::CardGame.Core.IParticipantPreventionHost.PreventParticipantDamageDrawActualSource(ProgramSkillFrame f) => PreventParticipantDamageDrawActualSource(f);
+    SkillProgramStepOutcome IParticipantPreventionHost.PreventParticipantDamageDrawActualSource(ProgramSkillFrame f) => PreventParticipantDamageDrawActualSource(f);
 }

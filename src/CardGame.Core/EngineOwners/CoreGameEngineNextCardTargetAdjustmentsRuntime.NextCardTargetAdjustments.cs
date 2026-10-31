@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNextCardTargetAdjustmentsRuntime
@@ -36,7 +32,7 @@ internal sealed partial class CoreGameEngineNextCardTargetAdjustmentsRuntime
         return true;
     }
 
-    void global::CardGame.Core.INextCardTargetAdjustmentProgramHost.GrantNextCardTargetAdjustment(ProgramSkillFrame frame) => GrantNextCardTargetAdjustment(frame);
+    void INextCardTargetAdjustmentProgramHost.GrantNextCardTargetAdjustment(ProgramSkillFrame frame) => GrantNextCardTargetAdjustment(frame);
     internal void GrantNextCardTargetAdjustment(ProgramSkillFrame frame)
     {
         _coreCardUseModulesOperations.ValidateProgramTurnEffectGrant(frame);
@@ -51,7 +47,7 @@ internal sealed partial class CoreGameEngineNextCardTargetAdjustmentsRuntime
             _coreGameEngineNextCardTargetAdjustmentsNextCardTargetAdjustmentOwnersAccess._nextCardTargetAdjustmentOwners.Clear();
             _coreGameEngineRedAdditionalTargetsRedAdditionalTargetGrantsAccess._redAdditionalTargetGrants.Clear();
         }
-        else if (payload is CardUseDeclaredEvent used && (!_coreGameEngineNextCardTargetAdjustmentsNextCardTargetAdjustmentOwnersAccess._nextCardTargetAdjustmentOwners.TryGetValue(used.SourceSeat, out var source) || source.SkillId != "classic:qiaoshui" || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(used.CardKind) == SkillProgramCardCategory.Basic || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(used.CardKind)))
+        else if (payload is CardUseDeclaredEvent used && (!_coreGameEngineNextCardTargetAdjustmentsNextCardTargetAdjustmentOwnersAccess._nextCardTargetAdjustmentOwners.TryGetValue(used.SourceSeat, out var source) || source.SkillId != "classic:qiaoshui" || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(used.CardKind) == SkillProgramCardCategory.Basic || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(used.CardKind)))
             _coreGameEngineNextCardTargetAdjustmentsNextCardTargetAdjustmentOwnersAccess._nextCardTargetAdjustmentOwners.Remove(used.SourceSeat);
     }
 
@@ -76,7 +72,7 @@ internal sealed partial class CoreGameEngineNextCardTargetAdjustmentsRuntime
             var kind = action.PlayedCardKind ?? _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(actor, action.CardId)!.Kind;
             if (kind == CardKind.BorrowedSword)
             {
-                foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != actor.Seat && player.Seat != action.TargetSeats[0] && _coreNativeBorrowedSwordOperations.GetWeapon(player)is not null && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, player.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(player, kind, action.CardId == 0 ? Suit.None : _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(actor, action.CardId)!.Suit, action.CardId == 0 ? null : global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(actor, action.CardId)!, action.ConversionSource))))))
+                foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != actor.Seat && player.Seat != action.TargetSeats[0] && _coreNativeBorrowedSwordOperations.GetWeapon(player)is not null && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, player.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(player, kind, action.CardId == 0 ? Suit.None : _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(actor, action.CardId)!.Suit, action.CardId == 0 ? null : CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(actor, action.CardId)!, action.ConversionSource))))))
                     foreach (var victim in _coreMatchParticipantsPlayersAccess._players.Where(player => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(owner, player)))
                         Add([..action.TargetSeats, owner.Seat, victim.Seat]);
                 continue;
@@ -89,14 +85,14 @@ internal sealed partial class CoreGameEngineNextCardTargetAdjustmentsRuntime
             var possible = action.Kind is LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage or LegalActionKind.PeachGarden or LegalActionKind.FiveGrains ? normal : _coreMatchParticipantsPlayersAccess._players.Where(player => CanBeExtraNextCardTarget(actor, player, action, kind)).Select(player => player.Seat).ToArray();
             foreach (var seat in possible.Except(normal))
                 Add(normal.Append(seat).ToArray());
-            if (normal.Length > 1 && !global::CardGame.Core.EngineOwners.CharacterDuKuiAnniversaryRuntime.IsDuKuiFanyinTargetGrant(source))
+            if (normal.Length > 1 && !CharacterDuKuiAnniversaryRuntime.IsDuKuiFanyinTargetGrant(source))
                 foreach (var seat in normal)
                     Add(normal.Where(item => item != seat).ToArray());
             void Add(IReadOnlyList<int> targets)
             {
                 if (targets.Count == 0 || actions.Any(item => item.CardId == action.CardId && item.Kind == action.Kind && item.PlayedCardKind == action.PlayedCardKind && item.ConversionSource == action.ConversionSource && item.TargetCardId == action.TargetCardId && item.TargetSeats.SequenceEqual(targets)))
                     return;
-                actions.Add(action with { TargetSeat = targets[0], TargetSeats = targets, ProgramSkillId = source.SkillId, ProgramActivationId = source.BindingId, Description = action.Description + (global::CardGame.Core.EngineOwners.CharacterDuKuiAnniversaryRuntime.IsDuKuiFanyinTargetGrant(source) ? "（下一张牌额外选择一个目标）" : "（下一张牌增减一个目标）") });
+                actions.Add(action with { TargetSeat = targets[0], TargetSeats = targets, ProgramSkillId = source.SkillId, ProgramActivationId = source.BindingId, Description = action.Description + (CharacterDuKuiAnniversaryRuntime.IsDuKuiFanyinTargetGrant(source) ? "（下一张牌额外选择一个目标）" : "（下一张牌增减一个目标）") });
             }
         }
     }
@@ -106,7 +102,7 @@ internal sealed partial class CoreGameEngineNextCardTargetAdjustmentsRuntime
         if (action.CardId == 0)
             return _coreNextActualUseTargetAdjustmentsOperations.CanBeExtraTargetAdjustmentTarget(actor, target, action, kind, Suit.None);
         var physical = _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(actor, action.CardId)!;
-        if (!target.IsAlive || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, effectiveUseSuit ?? physical.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(effectiveUseSuit ?? _coreNativeCardAppearanceOperations.EffectiveSuit(actor, _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, physical, action.ConversionSource)))) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, effectiveUseSuit ?? _coreNativeCardAppearanceOperations.EffectiveSuit(actor, _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, physical, action.ConversionSource))))
+        if (!target.IsAlive || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, effectiveUseSuit ?? physical.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(effectiveUseSuit ?? _coreNativeCardAppearanceOperations.EffectiveSuit(actor, _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, physical, action.ConversionSource)))) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, effectiveUseSuit ?? _coreNativeCardAppearanceOperations.EffectiveSuit(actor, _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, physical, action.ConversionSource))))
             return false;
         return action.Kind switch
         {

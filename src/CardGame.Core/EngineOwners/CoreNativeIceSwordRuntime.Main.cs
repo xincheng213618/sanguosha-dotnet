@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeIceSwordRuntime
 {
     internal int GetIceSwordTargetCardCount(CharacterState target, int actorSeat) => _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(actorSeat, card, CardLocation.Hand(target.Seat), OwnedCardMoveIntent.Discard)) + _corePhysicalOwnedCardQueriesOperations.GetEquipment(target).Count(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(actorSeat, card, CardLocation.Equipment(target.Seat), OwnedCardMoveIntent.Discard));
-    internal bool TryBeginIceSwordChoice(global::CardGame.Core.NativeOwners.CardAttackHandle attack, int preventedDamageAmount)
+    internal bool TryBeginIceSwordChoice(NativeOwners.CardAttackHandle attack, int preventedDamageAmount)
     {
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
@@ -29,9 +25,9 @@ internal sealed partial class CoreNativeIceSwordRuntime
         return true;
     }
 
-    internal void PublishIceSwordChoice(global::CardGame.Core.NativeOwners.IceSwordHandle pending)
+    internal void PublishIceSwordChoice(NativeOwners.IceSwordHandle pending)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveIceSword, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveIceSword, pending) || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack))
         {
             throw new InvalidOperationException("The Ice Sword choice has no current Slash continuation.");
         }
@@ -65,7 +61,7 @@ internal sealed partial class CoreNativeIceSwordRuntime
             choices.Add(new PromptChoice(new ChoiceId($"ice-sword.damage.resolution-{(attack.ResolutionId)}"), $"不发动【寒冰剑】，对 {(target.Name)} 造成 {(pending.PreventedDamageAmount)} 点伤害。", [], [], new Dictionary<string, string> { ["action"] = "ice-sword-damage" }));
         }
 
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.IceSword, source.Seat, pending.Activated ? pending.DiscardedCardIds.Count == 0 ? $"【寒冰剑】已发动，请选择弃置 {(target.Name)} 的第一张牌。" : $"【寒冰剑】已防止伤害，请继续弃置 {(target.Name)} 的第二张牌。" : $"你的【{(CardCatalog.Get(global::CardGame.Core.EngineOwners.CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack)).DisplayName)}】将对 {(target.Name)} 造成 {(pending.PreventedDamageAmount)} 点伤害，是否发动【寒冰剑】？", pending.Activated ? equipment.Select(card => card.Id).ToArray() : [], pending.Activated ? [target.Seat] : [], SourceSeat: source.Seat, IncomingCard: attack.EffectiveCardKind)
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.IceSword, source.Seat, pending.Activated ? pending.DiscardedCardIds.Count == 0 ? $"【寒冰剑】已发动，请选择弃置 {(target.Name)} 的第一张牌。" : $"【寒冰剑】已防止伤害，请继续弃置 {(target.Name)} 的第二张牌。" : $"你的【{(CardCatalog.Get(CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack)).DisplayName)}】将对 {(target.Name)} 造成 {(pending.PreventedDamageAmount)} 点伤害，是否发动【寒冰剑】？", pending.Activated ? equipment.Select(card => card.Id).ToArray() : [], pending.Activated ? [target.Seat] : [], SourceSeat: source.Seat, IncomingCard: attack.EffectiveCardKind)
         {
             PromptId = source.IsHuman ? _coreNativePromptBoundaryOperations.CreatePromptId() : default,
             IsPrivate = true,
@@ -79,7 +75,7 @@ internal sealed partial class CoreNativeIceSwordRuntime
     {
         var pending = _coreNativeCardContinuationCursorsOperations.ActiveIceSword ?? throw new InvalidOperationException("There is no Ice Sword choice to resolve.");
         var attack = pending.Attack;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.IceSword } decision || decision.PlayerSeat != attack.SourceSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.IceSword } decision || decision.PlayerSeat != attack.SourceSeat)
         {
             throw new InvalidOperationException("The Ice Sword choice is not the current Slash continuation.");
         }
@@ -169,9 +165,9 @@ internal sealed partial class CoreNativeIceSwordRuntime
         FinishIceSwordPrevention(pending);
     }
 
-    internal void FinishIceSwordPrevention(global::CardGame.Core.NativeOwners.IceSwordHandle pending)
+    internal void FinishIceSwordPrevention(NativeOwners.IceSwordHandle pending)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveIceSword, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) || !pending.Activated || pending.DiscardedCardIds.Count > 2)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveIceSword, pending) || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, pending.Attack) || !pending.Activated || pending.DiscardedCardIds.Count > 2)
         {
             throw new InvalidOperationException("The completed Ice Sword prevention is invalid.");
         }
@@ -187,7 +183,7 @@ internal sealed partial class CoreNativeIceSwordRuntime
         _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
 
-    internal void AppendIceSwordLogicalDiscard(global::CardGame.Core.NativeOwners.IceSwordHandle pending, Card material)
+    internal void AppendIceSwordLogicalDiscard(NativeOwners.IceSwordHandle pending, Card material)
     {
         if (!_coreNativeLogicalDiscardsOperations.TracksNativeLogicalDiscards)
             return;
@@ -216,7 +212,7 @@ internal sealed partial class CoreNativeIceSwordRuntime
         pending.LogicalDiscardInvocation = draft;
     }
 
-    internal void AssertIceSwordLogicalDiscard(global::CardGame.Core.NativeOwners.IceSwordHandle pending)
+    internal void AssertIceSwordLogicalDiscard(NativeOwners.IceSwordHandle pending)
     {
         var draft = pending.LogicalDiscardInvocation;
         if (draft is null)
@@ -227,7 +223,7 @@ internal sealed partial class CoreNativeIceSwordRuntime
         }
 
         var attack = pending.Attack;
-        if (!_coreNativeLogicalDiscardsOperations.TracksNativeLogicalDiscards || draft.InvocationId <= 0 || draft.InvocationId > _coreResolutionIdentityBoundaryOperations._resolutionSequence || draft.TurnNumber != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || draft.ActualTurnOwnerSeat != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || draft.InitiatorSeat != attack.SourceSeat || draft.ExecutorSeat != attack.SourceSeat || draft.ParentFrameId != pending.OwnerFrameId || draft.Reason != CardMoveReasons.IceSwordDiscard || !draft.Materials.Select(m => m.CardId).SequenceEqual(pending.DiscardedCardIds) || draft.Materials.Select(m => m.CardId).Distinct().Count() != draft.Materials.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(e => e.InvocationId == draft.InvocationId) || draft.Materials.Any(m => m.From.OwnerSeat != attack.TargetSeat || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(move => move.CardId == m.CardId && move.Sequence > draft.SequenceBefore && move.From == m.From && move.Reason == draft.Reason && (move.To == CardLocation.DiscardPile || m.From.Zone == CardZoneKind.Equipment && (_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId), m.From, move.To) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(move)) && move.To == CardLocation.OutsideGame))))
+        if (!_coreNativeLogicalDiscardsOperations.TracksNativeLogicalDiscards || draft.InvocationId <= 0 || draft.InvocationId > _coreResolutionIdentityBoundaryOperations._resolutionSequence || draft.TurnNumber != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || draft.ActualTurnOwnerSeat != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || draft.InitiatorSeat != attack.SourceSeat || draft.ExecutorSeat != attack.SourceSeat || draft.ParentFrameId != pending.OwnerFrameId || draft.Reason != CardMoveReasons.IceSwordDiscard || !draft.Materials.Select(m => m.CardId).SequenceEqual(pending.DiscardedCardIds) || draft.Materials.Select(m => m.CardId).Distinct().Count() != draft.Materials.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(e => e.InvocationId == draft.InvocationId) || draft.Materials.Any(m => m.From.OwnerSeat != attack.TargetSeat || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(move => move.CardId == m.CardId && move.Sequence > draft.SequenceBefore && move.From == m.From && move.Reason == draft.Reason && (move.To == CardLocation.DiscardPile || m.From.Zone == CardZoneKind.Equipment && (_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId), m.From, move.To) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(move)) && move.To == CardLocation.OutsideGame))))
             throw new InvalidOperationException("Ice Sword lost its exact source, target, paid primary prefix or once-only whole invocation.");
     }
 }

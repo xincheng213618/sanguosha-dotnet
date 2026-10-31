@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
@@ -12,7 +7,7 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
     internal const string OlMoRumoBinding = "no-damage-round-ending";
     internal bool HasOlMoRumoCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveOlMoRumoRoundPenalty);
 
-    internal static string OlMoRumoInstance(long entryId) => global::CardGame.Core.RuntimeSkills.RuntimeRules__shared_OlMoRumo.OlMoRumoInstance(entryId);
+    internal static string OlMoRumoInstance(long entryId) => RuntimeSkills.RuntimeRules__shared_OlMoRumo.OlMoRumoInstance(entryId);
     internal void EnterOlMoRumo(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -20,7 +15,7 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
             throw new InvalidOperationException("OL Rumo requires the exact paid Qiangang entry, not a generic operation or a live skill label.");
         if (_characterSharedGameEngineOlMoRumoProofsOperations.OlMoRumoEntry(frame.OwnerSeat)is not null)
             return;
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+        var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
         if (!(_characterSunQuanOlMagicOperations.IsPaidQiangangRumoOrigin(frame.Id, source, frame.GameplayHash) || _characterLuBuOlMagicOperations.IsPaidMoKuangmoOrigin(frame.Id, source, frame.GameplayHash) || _characterDiaoChanOlMagicOperations.IsPaidMoDcQingshiOrigin(frame.Id, source, frame.GameplayHash) || _programPipelineHooksOperations._programPipelineHooks.RumoOrigin(frame.Id, source, frame.GameplayHash)))
             throw new InvalidOperationException("OL Rumo lost the original irreversible entry payment.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OlMoRumoEnteredEvent(frame.Id, frame.OwnerSeat, source, frame.GameplayHash, _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat));
@@ -48,7 +43,7 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
 
     [ProgramIssuedTrigger(140)]
     internal bool IsIssuedOlMoRumoCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => HasOlMoRumoCapability && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && _characterSharedGameEngineOlMoRumoProofsOperations.OlMoRumoCandidateSource(candidate) && _coreRoundEndingOperations.IsExactRoundEndingCandidate(candidate, context) && !_coreProgramEventHistoryOperations.ProgramEventHistory<OlMoRumoRoundStartedEvent>().Any(fact => fact.OwnerSeat == candidate.OwnerSeat && fact.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
-    SkillProgramStepOutcome global::CardGame.Core.IOlMoRumoHost.Resolve(ProgramSkillFrame frame) => ResolveOlMoRumoRoundPenalty(frame);
+    SkillProgramStepOutcome IOlMoRumoHost.Resolve(ProgramSkillFrame frame) => ResolveOlMoRumoRoundPenalty(frame);
     internal SkillProgramStepOutcome ResolveOlMoRumoRoundPenalty(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -58,7 +53,7 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (frame.InstructionIndex != 1 || frame.WindowContext is not { } context || !IsIssuedOlMoRumoCandidate(global::CardGame.Core.EngineOwners.CharacterSharedGameEngineOlMoRumoProofsRuntime.OlMoRumoCandidate(frame), context) || _resolutionStackOperations._resolutionStack.FirstOrDefault()is not RoundEndingBoundaryFrame boundary || _characterSharedGameEngineOlMoRumoProofsOperations.OlMoRumoEntry(frame.OwnerSeat)is not { } entry)
+        if (frame.InstructionIndex != 1 || frame.WindowContext is not { } context || !IsIssuedOlMoRumoCandidate(CharacterSharedGameEngineOlMoRumoProofsRuntime.OlMoRumoCandidate(frame), context) || _resolutionStackOperations._resolutionStack.FirstOrDefault()is not RoundEndingBoundaryFrame boundary || _characterSharedGameEngineOlMoRumoProofsOperations.OlMoRumoEntry(frame.OwnerSeat)is not { } entry)
             throw new InvalidOperationException("OL Rumo lost its exact entered owner and old-round boundary.");
         // Read the entire current round at this effect's real start. Entry does
         // not erase earlier damage, and earlier round-end children can deal it.
@@ -125,7 +120,7 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
             return true;
         }
 
-        return frame.InstructionIndex is 0 or 1 && frame.WindowContext is { } context && IsIssuedOlMoRumoCandidate(global::CardGame.Core.EngineOwners.CharacterSharedGameEngineOlMoRumoProofsRuntime.OlMoRumoCandidate(frame), context);
+        return frame.InstructionIndex is 0 or 1 && frame.WindowContext is { } context && IsIssuedOlMoRumoCandidate(CharacterSharedGameEngineOlMoRumoProofsRuntime.OlMoRumoCandidate(frame), context);
     }
 
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 28940)]

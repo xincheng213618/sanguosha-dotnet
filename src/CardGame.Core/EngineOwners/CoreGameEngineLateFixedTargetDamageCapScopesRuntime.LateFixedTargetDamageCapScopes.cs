@@ -1,17 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineLateFixedTargetDamageCapScopesRuntime
 {
-    internal (IReadOnlyList<int> Targets, int Index, RecipientScopedDamageState? Scope) FixedDamageCapChain(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? (_coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats ?? [], _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex, _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).RecipientDamageScope) : (_coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats, _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex, _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).RecipientDamageScope);
-    internal static string FixedDamageCapChainHash(IReadOnlyList<int> targets) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_LateFixedTargetDamageCapScopes.FixedDamageCapChainHash(targets);
+    internal (IReadOnlyList<int> Targets, int Index, RecipientScopedDamageState? Scope) FixedDamageCapChain(GameEngine.IDamageAttempt attack) => attack is NativeOwners.ProgramAttackHandle ? (_coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats ?? [], _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex, _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).RecipientDamageScope) : (_coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats, _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex, _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).RecipientDamageScope);
+    internal static string FixedDamageCapChainHash(IReadOnlyList<int> targets) => RuntimeSkills.RuntimeRules_Core_LateFixedTargetDamageCapScopes.FixedDamageCapChainHash(targets);
     internal void CaptureLateFixedTargetDamageCapScope(DamageFrame damage)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasFixedTargetDamageCaps || _coreDamageArmorPaymentsOperations.DamageArmorPaymentOwner(damage)is not { } attack)
@@ -24,7 +17,7 @@ internal sealed partial class CoreGameEngineLateFixedTargetDamageCapScopesRuntim
             nextIndex++;
         if (nextIndex == chain.Targets.Count || _corePassiveDamageCapsOperations.FindPassiveProgramDamageCap(_coreMatchParticipantsPlayersAccess._players[chain.Targets[nextIndex]], null)is not { } cap)
             return;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault() != damage || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || damage.ParentFrameId != attack.ResolutionId || damage.SourceSeat != attack.SourceSeat || damage.TargetSeat != attack.TargetSeat || damage.Amount != attack.DamageAmount || damage.Amount <= 0 || !attack.DamageAmountFinalized || !attack.DamageWasApplied || _coreNativeCardClassificationsOperations.GetDamageNature(attack) != damage.Nature || damage.Nature is not (DamageNature.Fire or DamageNature.Thunder or DamageNature.Cold) || (!attack.IsChainPropagation ? chain.Index != 0 : chain.Index == 0 || chain.Targets[chain.Index - 1] != damage.TargetSeat))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault() != damage || !CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || damage.ParentFrameId != attack.ResolutionId || damage.SourceSeat != attack.SourceSeat || damage.TargetSeat != attack.TargetSeat || damage.Amount != attack.DamageAmount || damage.Amount <= 0 || !attack.DamageAmountFinalized || !attack.DamageWasApplied || _coreNativeCardClassificationsOperations.GetDamageNature(attack) != damage.Nature || damage.Nature is not (DamageNature.Fire or DamageNature.Thunder or DamageNature.Cold) || (!attack.IsChainPropagation ? chain.Index != 0 : chain.Index == 0 || chain.Targets[chain.Index - 1] != damage.TargetSeat))
             throw new InvalidOperationException("A late fixed damage cap requires the exact completed elemental damage segment and chain cursor.");
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var requested = Array.FindIndex(history, fact => fact is DamageRequestedEvent request && request.ResolutionId == damage.Id);
@@ -53,7 +46,7 @@ internal sealed partial class CoreGameEngineLateFixedTargetDamageCapScopesRuntim
             LateFixedTargetDamageCap = receipt,
             ProgramUseInstructionIndex = receipt.ProgramUseInstructionIndex
         };
-        if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (attack is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, state => state with { RecipientDamageScope = scope });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, state => state!with { RecipientDamageScope = scope });

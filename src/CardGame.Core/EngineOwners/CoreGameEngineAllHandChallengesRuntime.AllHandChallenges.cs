@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -87,7 +84,7 @@ internal sealed partial class CoreGameEngineAllHandChallengesRuntime
         void Add(string branch, string label, IReadOnlyList<int>? cards = null) => choices.Add(new(new ChoiceId($"all-hand-challenge.{(f.Id)}.{(d.Cursor)}.{(d.Stage)}.{(branch)}.{(cards?.FirstOrDefault() ?? 0)}"), label, cards ?? [], cards is null ? [] : [d.ChooserSeat], new Dictionary<string, string> { ["program-action"] = "sequential-discard", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["cursor"] = d.Cursor.ToString(CultureInfo.InvariantCulture), ["stage"] = d.Stage.ToString(), ["branch"] = branch }));
         if (d.Stage == ProgramSequentialDiscardStage.BranchChoice)
         {
-            if (!AllHandChallengeRing(d) && available.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Card.Kind) == SkillProgramCardCategory.Trick))
+            if (!AllHandChallengeRing(d) && available.Any(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Card.Kind) == SkillProgramCardCategory.Trick))
                 Add("primary", "弃置一张锦囊牌。");
             // All is one current-hand batch. A protected hand entity makes that option unavailable.
             if (available.Length == hand.Count)
@@ -96,7 +93,7 @@ internal sealed partial class CoreGameEngineAllHandChallengesRuntime
                 Add("damage", $"受到 {(AllHandChallengeDamage(f, d.ChooserSeat))} 点火焰伤害。");
         }
         else if (d.Stage == ProgramSequentialDiscardStage.CardChoice)
-            foreach (var item in available.Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Card.Kind) == SkillProgramCardCategory.Trick))
+            foreach (var item in available.Where(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Card.Kind) == SkillProgramCardCategory.Trick))
                 Add("card", $"弃置【{(item.Card.DisplayName)}】。", [item.Card.Id]);
         else
             throw new InvalidOperationException("An all-hand challenge cannot expose a paid child as a choice.");
@@ -132,7 +129,7 @@ internal sealed partial class CoreGameEngineAllHandChallengesRuntime
         var available = _coreSequentialDiscardProgramsOperations.SequentialDiscardCards(f, d.ChooserSeat, effect).ToArray();
         if (d.Stage == ProgramSequentialDiscardStage.CardChoice)
         {
-            if (branch != "card" || choice.Cards is not [var id] || choice.Targets is not [var chooser] || chooser != d.ChooserSeat || !available.Any(c => c.Card.Id == id && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Card.Kind) == SkillProgramCardCategory.Trick))
+            if (branch != "card" || choice.Cards is not [var id] || choice.Targets is not [var chooser] || chooser != d.ChooserSeat || !available.Any(c => c.Card.Id == id && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Card.Kind) == SkillProgramCardCategory.Trick))
                 throw new InvalidOperationException("The all-hand challenge requires its selected real hand trick.");
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreSequentialDiscardProgramsOperations.PaySequentialDiscard(f, [id], [CardLocation.Hand(d.ChooserSeat)]);
@@ -154,7 +151,7 @@ internal sealed partial class CoreGameEngineAllHandChallengesRuntime
             return;
         }
 
-        if (branch == "primary" && !AllHandChallengeRing(d) && available.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Card.Kind) == SkillProgramCardCategory.Trick))
+        if (branch == "primary" && !AllHandChallengeRing(d) && available.Any(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Card.Kind) == SkillProgramCardCategory.Trick))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SequentialDiscard = d with { PrimaryBranch = true, Remaining = 1, Stage = ProgramSequentialDiscardStage.CardChoice } });
@@ -198,11 +195,11 @@ internal sealed partial class CoreGameEngineAllHandChallengesRuntime
     {
         var d = f.SequentialDiscard!;
         if (d.Stage == ProgramSequentialDiscardStage.CardChoice)
-            return p.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[d.ChooserSeat]).Single(card => card.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[d.ChooserSeat])).ThenBy(c => c.Cards[0]).First();
+            return p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[d.ChooserSeat]).Single(card => card.Id == c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[d.ChooserSeat])).ThenBy(c => c.Cards[0]).First();
         if (!AllHandChallengeRing(d))
             return p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "primary") ?? p.Choices.First();
         var discard = p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch") == "all-hand");
-        var cost = _coreSequentialDiscardProgramsOperations.SequentialDiscardCards(f, d.ChooserSeat, effect).Sum(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(c.Card, _coreMatchParticipantsPlayersAccess._players[d.ChooserSeat]));
+        var cost = _coreSequentialDiscardProgramsOperations.SequentialDiscardCards(f, d.ChooserSeat, effect).Sum(c => CoreNativeAiDecisionsRuntime.GetKeepValue(c.Card, _coreMatchParticipantsPlayersAccess._players[d.ChooserSeat]));
         return discard is not null && cost <= AllHandChallengeDamage(f, d.ChooserSeat) * 20d ? discard : p.Choices.Single(c => c.Parameters.GetValueOrDefault("branch") == "damage");
     }
 }

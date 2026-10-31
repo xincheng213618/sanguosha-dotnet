@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDuFuRenOlRuntime
@@ -25,7 +21,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
             _ => throw new InvalidOperationException("Yise requires its owning native card attack.")});
     }
 
-    internal int DuFuRenDamageCursor(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex : -1;
+    internal int DuFuRenDamageCursor(GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex : -1;
     internal IReadOnlyList<DuFuRenBlackIssuedEvent> AvailableDuFuRenBlack(int target) => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenBlackIssuedEvent>().Where(g => g.RecipientSeat == target && !_coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenBlackConsumedEvent>().Any(c => c.GrantId == g.FrameId) && !_resolutionStackOperations._resolutionStack.Any(f => (f switch
     {
         CardUseFrame u => u.DuFuRenDamage,
@@ -34,9 +30,9 @@ internal sealed partial class CharacterDuFuRenOlRuntime
         _ => null
     })is { } r && r.GrantIds.Contains(g.FrameId))).ToArray());
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 120)]
-    internal int DuFuRenYiseDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int DuFuRenYiseDamageBonus(GameEngine.IDamageAttempt attack)
     {
-        if (!HasDuFuRenYise || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (!HasDuFuRenYise || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return 0;
         var cursor = DuFuRenDamageCursor(attack);
         if (DuFuRenDamageState(attack.ResolutionId)is { } previous && previous.TargetSeat == attack.TargetSeat && previous.ChainCursor == cursor)
@@ -66,7 +62,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuFuRenDamageTransferredEvent(moved.ResolutionId, original.TargetSeat, moved.TargetSeat, original.ChainCursor, window.Id, transfer.DamageAmount));
         }
 
-        if (!HasDuFuRenYise || payload is not DamageAppliedEvent { Amount: > 0 } e || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || damage.ParentFrameId != attack.ResolutionId || damage.TargetSeat != e.TargetSeat || damage.Amount != e.Amount || attack.TargetSeat != e.TargetSeat || DuFuRenDamageState(attack.ResolutionId)is not { } r || r.AttackId != attack.ResolutionId || (r.TransferredTargetSeat ?? r.TargetSeat) != e.TargetSeat || r.ChainCursor != DuFuRenDamageCursor(attack))
+        if (!HasDuFuRenYise || payload is not DamageAppliedEvent { Amount: > 0 } e || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || damage.ParentFrameId != attack.ResolutionId || damage.TargetSeat != e.TargetSeat || damage.Amount != e.Amount || attack.TargetSeat != e.TargetSeat || DuFuRenDamageState(attack.ResolutionId)is not { } r || r.AttackId != attack.ResolutionId || (r.TransferredTargetSeat ?? r.TargetSeat) != e.TargetSeat || r.ChainCursor != DuFuRenDamageCursor(attack))
             return;
         if (r.TransferredTargetSeat is { } recipient && (r.TransferWindowId is not { } windowId || !attack.DamageRedirected || _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenDamageTransferredEvent>().Count(x => x.AttackId == attack.ResolutionId && x.OriginalTargetSeat == r.TargetSeat && x.TargetSeat == recipient && x.ChainCursor == r.ChainCursor && x.WindowId == windowId && x.Amount == e.Amount) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageTransferredEvent>().Any(x => x.ResolutionId == attack.ResolutionId && x.TargetSeat == recipient && x.SourceSeat == attack.SourceSeat && x.DamageAmount == e.Amount)))
             throw new InvalidOperationException("Yise's transferred finalized amount lost its exact native original recipient invoice.");
@@ -78,15 +74,15 @@ internal sealed partial class CharacterDuFuRenOlRuntime
         }
     }
 
-    internal void SetDuFuRenChainDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount)
+    internal void SetDuFuRenChainDamage(GameEngine.IDamageAttempt attack, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !attack.IsChainPropagation || amount < 0)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !attack.IsChainPropagation || amount < 0)
             throw new InvalidOperationException("Yise can only rebase its exact native chained recipient.");
         _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, s => s!with { DamageAmount = amount });
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 40)]
-    internal void PrepareDuFuRenChainAdvance(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void PrepareDuFuRenChainAdvance(GameEngine.IDamageAttempt attack)
     {
         if (!HasDuFuRenYise || DuFuRenDamageState(attack.ResolutionId)is not { } r)
             return;
@@ -106,9 +102,9 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 20)]
-    internal void ApplyDuFuRenChainedDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void ApplyDuFuRenChainedDamageBonus(GameEngine.IDamageAttempt attack)
     {
-        if (!HasDuFuRenYise || !attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (!HasDuFuRenYise || !attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return;
         // Formal armor will run the ordinary finalizer for this recipient.
         // Legacy propagation is already finalized and needs just its new mark.

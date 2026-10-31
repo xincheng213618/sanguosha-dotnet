@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineActualTurnTrickUsesRuntime
@@ -22,7 +18,7 @@ internal sealed partial class CoreGameEngineActualTurnTrickUsesRuntime
             CardActionAcceptedEvent accepted when accepted.Action.Type == CardActionType.Response && accepted.Action.EffectiveKind == CardKind.Nullification && (accepted.Action.ActorSeat == accepted.Action.ProviderSeat || _characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(accepted.Action)) && accepted.Action.ResponderSeat == accepted.Action.ActorSeat && accepted.Action.RequesterSeat is null && _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().Any(window => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == window.ParentFrameId)?.Action?.ActionId == accepted.Action.ParentActionId) => accepted.Action,
             _ => null
         };
-        if (action is null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Trick || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ActualTurnTrickUseRecordedEvent>().Any(fact => fact.ActionId == action.ActionId))
+        if (action is null || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Trick || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ActualTurnTrickUseRecordedEvent>().Any(fact => fact.ActionId == action.ActionId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ActualTurnTrickUseRecordedEvent(_coreActualTurnProgressTurnNumberAccess._turnNumber, action.ActorSeat, action.ActionId, action.EffectiveKind));
     }

@@ -1,39 +1,35 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhuoMouOlRuntime
 {
     internal MouDongZhuoOlRuntime MouDongZhuoOl => _mouDongZhuoOlOperations.Get();
 
-    int global::CardGame.Core.IMouDongZhuoOlFacts.Turn => _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber;
+    int IMouDongZhuoOlFacts.Turn => _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber;
 
-    int global::CardGame.Core.IMouDongZhuoOlFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
+    int IMouDongZhuoOlFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
 
-    int global::CardGame.Core.IMouDongZhuoOlFacts.PlayerCount => _coreMatchDefinitionPlayerCountAccess._playerCount;
+    int IMouDongZhuoOlFacts.PlayerCount => _coreMatchDefinitionPlayerCountAccess._playerCount;
 
-    int global::CardGame.Core.IMouDongZhuoOlFacts.PhaseId => _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId;
+    int IMouDongZhuoOlFacts.PhaseId => _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId;
 
-    long global::CardGame.Core.IMouDongZhuoOlFacts.MovementSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+    long IMouDongZhuoOlFacts.MovementSequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
-    bool global::CardGame.Core.IMouDongZhuoOlFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouDongZhuoOlFacts.Finished => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    bool global::CardGame.Core.IMouDongZhuoOlFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
-    bool global::CardGame.Core.IMouDongZhuoOlFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
-    string global::CardGame.Core.IMouDongZhuoOlFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
-    int global::CardGame.Core.IMouDongZhuoOlFacts.Hp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Hp;
-    bool global::CardGame.Core.IMouDongZhuoOlFacts.Owns(int seat, string skill) => _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[seat], skill);
-    SkillProgram global::CardGame.Core.IMouDongZhuoOlFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    CardLocation global::CardGame.Core.IMouDongZhuoOlFacts.Location(int id) => _cardZonesOperations._cardZones.GetLocation(id);
-    IReadOnlyList<MouDongZhuoOlCard> global::CardGame.Core.IMouDongZhuoOlFacts.Discardable(int seat) => Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, seat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, new(z, seat), OwnedCardMoveIntent.Discard)).Select(c => new MouDongZhuoOlCard(c.Id, new(z, seat), _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], c)))).ToArray());
-    IReadOnlyList<MouDongZhuoOlCard> global::CardGame.Core.IMouDongZhuoOlFacts.CurrentDiscard() => Array.AsReadOnly(_cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == c.Id && m.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && m.To == CardLocation.DiscardPile)).Select(c => new MouDongZhuoOlCard(c.Id, CardLocation.DiscardPile, c.Suit)).ToArray());
-    IEnumerable<T> global::CardGame.Core.IMouDongZhuoOlFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    bool global::CardGame.Core.IMouDongZhuoOlFacts.ExactStart(ProgramSkillFrame f, SkillProgramEffectOp op)
+    bool IMouDongZhuoOlFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
+    bool IMouDongZhuoOlFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
+    string IMouDongZhuoOlFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
+    int IMouDongZhuoOlFacts.Hp(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Hp;
+    bool IMouDongZhuoOlFacts.Owns(int seat, string skill) => _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[seat], skill);
+    SkillProgram IMouDongZhuoOlFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
+    CardLocation IMouDongZhuoOlFacts.Location(int id) => _cardZonesOperations._cardZones.GetLocation(id);
+    IReadOnlyList<MouDongZhuoOlCard> IMouDongZhuoOlFacts.Discardable(int seat) => Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, seat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, new(z, seat), OwnedCardMoveIntent.Discard)).Select(c => new MouDongZhuoOlCard(c.Id, new(z, seat), _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], c)))).ToArray());
+    IReadOnlyList<MouDongZhuoOlCard> IMouDongZhuoOlFacts.CurrentDiscard() => Array.AsReadOnly(_cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == c.Id && m.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && m.To == CardLocation.DiscardPile)).Select(c => new MouDongZhuoOlCard(c.Id, CardLocation.DiscardPile, c.Suit)).ToArray());
+    IEnumerable<T> IMouDongZhuoOlFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    bool IMouDongZhuoOlFacts.ExactStart(ProgramSkillFrame f, SkillProgramEffectOp op)
     {
-        if (f.InstructionIndex != 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != op || ((global::CardGame.Core.IMouDongZhuoOlFacts)this).Program(f.SkillId).GameplayHash != f.GameplayHash || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
+        if (f.InstructionIndex != 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != op || ((IMouDongZhuoOlFacts)this).Program(f.SkillId).GameplayHash != f.GameplayHash || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
             return false;
         if (f.TriggerId is null)
             return op == SkillProgramEffectOp.ResolveMouDongZhuoFengshang && f.SkillId == MouDongZhuoOlRuntime.Fengshang && f.ActivationId == "distribute-pair" && f.WindowContext is null && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == f.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p) && MouDongZhuoOl.CanFengshang(f.OwnerSeat, false);
@@ -47,9 +43,9 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
         });
     }
 
-    bool global::CardGame.Core.IMouDongZhuoOlFacts.ParentMatches(ProgramSkillFrame f) => MouDongZhuoOlParent(f);
-    int global::CardGame.Core.IMouDongZhuoOlFacts.KeepValue(int seat, int id) => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[seat]);
-    bool global::CardGame.Core.IMouDongZhuoOlFacts.Friendly(int owner, int target) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), target, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
+    bool IMouDongZhuoOlFacts.ParentMatches(ProgramSkillFrame f) => MouDongZhuoOlParent(f);
+    int IMouDongZhuoOlFacts.KeepValue(int seat, int id) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[seat]);
+    bool IMouDongZhuoOlFacts.Friendly(int owner, int target) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), target, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
     internal bool MouDongZhuoOlParent(ProgramSkillFrame f)
     {
         if (f.TriggerId is null)
@@ -65,11 +61,11 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
             PlayPhaseStartingBoundaryFrame p when p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count => p.Items[p.ItemIndex].Candidate,
             _ => null
         };
-        return c is not null && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c);
+        return c is not null && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c);
     }
 
-    void global::CardGame.Core.IMouDongZhuoOlNative.SetGuanbian(ProgramSkillFrame f, int amount) => _coreStrategicProgramsOperations.SetStrategicMarker(f.OwnerSeat, PlayerMarkerKind.MouDongZhuoGuanbian, f.OwnerSeat, amount, f);
-    void global::CardGame.Core.IMouDongZhuoOlNative.LoseGuanbian(ProgramSkillFrame f)
+    void IMouDongZhuoOlNative.SetGuanbian(ProgramSkillFrame f, int amount) => _coreStrategicProgramsOperations.SetStrategicMarker(f.OwnerSeat, PlayerMarkerKind.MouDongZhuoGuanbian, f.OwnerSeat, amount, f);
+    void IMouDongZhuoOlNative.LoseGuanbian(ProgramSkillFrame f)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var enabled = owner.SkillGrants.Grants.Where(g => g.IsEnabled && g.SkillId == MouDongZhuoOlRuntime.Guanbian).ToArray();
@@ -81,9 +77,9 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhuoOlGuanbianEvent(f.Id, f.OwnerSeat, 0, true));
     }
 
-    bool global::CardGame.Core.IMouDongZhuoOlNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    void global::CardGame.Core.IMouDongZhuoOlNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
-    void global::CardGame.Core.IMouDongZhuoOlNative.Discard(ProgramSkillFrame f, int payer, MouDongZhuoOlCard card)
+    bool IMouDongZhuoOlNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
+    void IMouDongZhuoOlNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+    void IMouDongZhuoOlNative.Discard(ProgramSkillFrame f, int payer, MouDongZhuoOlCard card)
     {
         if (!MouDongZhuoOl.Valid(f) || f.MouDongZhuoOl is not { Paid: true } r || r.Payer != payer || !r.Materials.SequenceEqual([card]) || !_characterDongZhuoMouOlOperations.CreateMouDongZhuoOlFacts().Discardable(payer).Contains(card))
             throw new InvalidOperationException("Xiongni requires its actual payable HE entity.");
@@ -98,7 +94,7 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
         });
     }
 
-    void global::CardGame.Core.IMouDongZhuoOlNative.Give(ProgramSkillFrame f, int id, int recipient)
+    void IMouDongZhuoOlNative.Give(ProgramSkillFrame f, int id, int recipient)
     {
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), new(MouDongZhuoOlRuntime.GiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null), disclosure: CardMovementDisclosure.FaceUp);
@@ -109,11 +105,11 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhuoOlGiftEvent(f.Id, id, recipient, m.Sequence));
     }
 
-    void global::CardGame.Core.IMouDongZhuoOlNative.Damage(ProgramSkillFrame f, int target) => _coreSkillProgramsOperations.BeginProgramSkillDamage(f, target, 1);
-    bool global::CardGame.Core.IMouDongZhuoOlNative.BeginWine(ProgramSkillFrame f) => BeginMouDongZhuoOlWine(f);
-    void global::CardGame.Core.IMouDongZhuoOlNative.MaximumHp(ProgramSkillFrame f) => _coreProgramLifecycleOperations.ChangeProgramMaximumHp(f, 1);
-    void global::CardGame.Core.IMouDongZhuoOlNative.Recover(ProgramSkillFrame f) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, 1, null, null);
-    void global::CardGame.Core.IMouDongZhuoOlNative.Grant(ProgramSkillFrame f, string skill) => _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, [skill]);
+    void IMouDongZhuoOlNative.Damage(ProgramSkillFrame f, int target) => _coreSkillProgramsOperations.BeginProgramSkillDamage(f, target, 1);
+    bool IMouDongZhuoOlNative.BeginWine(ProgramSkillFrame f) => BeginMouDongZhuoOlWine(f);
+    void IMouDongZhuoOlNative.MaximumHp(ProgramSkillFrame f) => _coreProgramLifecycleOperations.ChangeProgramMaximumHp(f, 1);
+    void IMouDongZhuoOlNative.Recover(ProgramSkillFrame f) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, 1, null, null);
+    void IMouDongZhuoOlNative.Grant(ProgramSkillFrame f, string skill) => _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, [skill]);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 34700)]
     internal void ObserveMouDongZhuoOlUse(IGameEvent payload)
     {

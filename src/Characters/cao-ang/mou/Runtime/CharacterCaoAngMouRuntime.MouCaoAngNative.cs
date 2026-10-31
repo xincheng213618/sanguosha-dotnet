@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoAngMouRuntime
 {
-    internal static bool MouCaDamageKind(CardKind kind) => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(kind) || global::CardGame.Core.EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(kind) || kind == CardKind.Lightning;
+    internal static bool MouCaDamageKind(CardKind kind) => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(kind) || CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(kind) || kind == CardKind.Lightning;
     internal bool IsMouCaExactCardQuery(CharacterState actor, int? selected)
     {
         if (selected is not { } id || !actor.IsAlive || !_cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, id))
@@ -45,7 +41,7 @@ internal sealed partial class CharacterCaoAngMouRuntime
             return dragon;
         if (a.Kind is not (LegalActionKind.BarbarianAssault or LegalActionKind.ArrowBarrage))
             return _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(n.Kind, n.Actor, a.TargetSeats);
-        return Array.AsReadOnly(Enumerable.Range(1, _coreMatchDefinitionPlayerCountAccess._playerCount - 1).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(n.Actor, offset)]).Where(p => p.IsAlive && !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, n.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, n.Kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(n.Actor, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(n.Actor, p.Seat, n.Kind))).Select(p => p.Seat).ToArray());
+        return Array.AsReadOnly(Enumerable.Range(1, _coreMatchDefinitionPlayerCountAccess._playerCount - 1).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(n.Actor, offset)]).Where(p => p.IsAlive && !_coreProgramCardPoliciesOperations.HasCardPolicy(p, SkillProgramCardPolicyKind.ExcludeGlobalTarget, n.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, n.Kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(n.Actor, p.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && !_coreProgramTargetRulesOperations.TargetRules.IsDeclaredGlobalProhibited(new(n.Actor, p.Seat, n.Kind))).Select(p => p.Seat).ToArray());
     }
 
     internal void IssueMouCaUse(ProgramSkillFrame f)
@@ -105,9 +101,9 @@ internal sealed partial class CharacterCaoAngMouRuntime
         return true;
     }
 
-    internal void PrepareMouCaDamageSource(global::CardGame.Core.GameEngine.IDamageAttempt attempt)
+    internal void PrepareMouCaDamageSource(GameEngine.IDamageAttempt attempt)
     {
-        if (attempt is not global::CardGame.Core.NativeOwners.CardAttackHandle attack || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouCaoAngZhiwang: { } n } use || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.FrameId)is not { } parent || !MouCaUseRidesOn(use, parent))
+        if (attempt is not NativeOwners.CardAttackHandle attack || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouCaoAngZhiwang: { } n } use || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.FrameId)is not { } parent || !MouCaUseRidesOn(use, parent))
             return;
         // A chain target may reuse the preceding target's owned attack state.
         // Recompute for this actual victim, preserving native Lightning semantics.

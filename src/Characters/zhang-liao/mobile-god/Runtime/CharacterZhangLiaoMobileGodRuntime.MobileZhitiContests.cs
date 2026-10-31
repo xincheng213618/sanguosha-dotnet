@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangLiaoMobileGodRuntime
@@ -34,9 +30,9 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
         return ContinueMobileZhitiContest(parent.Id);
     }
 
-    internal bool TryBeginMobileZhitiDuelPrograms(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryBeginMobileZhitiDuelPrograms(NativeOwners.CardAttackHandle attack)
     {
-        if (!HasMobileShenZhangLiao || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { CardKind: CardKind.Duel } parent || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != parent.Id || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _coreNativeCardContinuationCursorsOperations.ActiveDuel is not { } duel || duel.ResponderSeat != attack.TargetSeat || duel.OpponentSeat != attack.SourceSeat)
+        if (!HasMobileShenZhangLiao || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { CardKind: CardKind.Duel } parent || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != parent.Id || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || _coreNativeCardContinuationCursorsOperations.ActiveDuel is not { } duel || duel.ResponderSeat != attack.TargetSeat || duel.OpponentSeat != attack.SourceSeat)
             return false;
         var failed = _coreProgramEventHistoryOperations.ProgramEventHistory<DuelResponseEvent>().Where(e => e.ResolutionId == parent.Id && !e.UsedSlash).ToArray();
         if (failed.Length == 0 || failed[^1].ResponderSeat != attack.TargetSeat)
@@ -140,7 +136,7 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
         return true;
     }
 
-    internal bool MobileZhitiProgramRidesOn(ProgramSkillFrame f, ResolutionFrame parent) => f.WindowContext is { } context && parent.MobileZhitiContest is { Finished: false } r && r.Cursor < r.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, r.Candidates[r.Cursor]) && MobileZhitiContestCandidateMatches(r.Candidates[r.Cursor], context);
+    internal bool MobileZhitiProgramRidesOn(ProgramSkillFrame f, ResolutionFrame parent) => f.WindowContext is { } context && parent.MobileZhitiContest is { Finished: false } r && r.Cursor < r.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, r.Candidates[r.Cursor]) && MobileZhitiContestCandidateMatches(r.Candidates[r.Cursor], context);
     internal bool IsMobileZhitiContestSubtree(ResolutionFrame parent)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == parent.Id);

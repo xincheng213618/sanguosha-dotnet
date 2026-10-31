@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunHaoOlRuntime
@@ -27,9 +23,9 @@ internal sealed partial class CharacterSunHaoOlRuntime
             _ => throw new InvalidOperationException("Chouhai requires the actual damage attempt's owning frame.")});
     }
 
-    internal int SunHaoDamageCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
+    internal int SunHaoDamageCursor(GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 180)]
-    internal int SunHaoChouhaiDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int SunHaoChouhaiDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (!HasSunHaoChouhaiCapability)
             return 0;
@@ -51,23 +47,23 @@ internal sealed partial class CharacterSunHaoOlRuntime
         return bonus;
     }
 
-    internal void SetSunHaoChainAmount(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount)
+    internal void SetSunHaoChainAmount(GameEngine.IDamageAttempt attack, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !attack.IsChainPropagation || amount < 0)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(attack, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !attack.IsChainPropagation || amount < 0)
             throw new InvalidOperationException("Chouhai can only restore its exact native chained recipient.");
-        if (attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (attack is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, s => s with { DamageAmount = amount });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, s => s!with { DamageAmount = amount });
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 30)]
-    internal void PrepareSunHaoChainAdvance(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void PrepareSunHaoChainAdvance(GameEngine.IDamageAttempt attack)
     {
         if (!HasSunHaoChouhaiCapability || SunHaoDamageState(attack.ResolutionId)is not { } r)
             return;
-        var seats = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
-        var next = attack is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
+        var seats = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
+        var next = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex;
         if (seats is null || !seats.Skip(next).Any(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive))
             return;
         if (attack.IsChainPropagation && r.Cursor == SunHaoDamageCursor(attack) && (r.TransferredTarget ?? r.TargetSeat) == attack.TargetSeat)
@@ -80,7 +76,7 @@ internal sealed partial class CharacterSunHaoOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 40)]
-    internal void ApplySunHaoChainedDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal void ApplySunHaoChainedDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (HasSunHaoChouhaiCapability && attack.IsChainPropagation && attack.DamageAmountFinalized)
             SetSunHaoChainAmount(attack, checked(attack.DamageAmount + SunHaoChouhaiDamageBonus(attack)));

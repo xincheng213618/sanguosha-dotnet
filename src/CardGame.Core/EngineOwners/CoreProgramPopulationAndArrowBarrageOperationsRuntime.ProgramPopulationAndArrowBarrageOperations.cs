@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Collections.ObjectModel;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramPopulationAndArrowBarrageOperationsRuntime
@@ -70,6 +65,6 @@ internal sealed partial class CoreProgramPopulationAndArrowBarrageOperationsRunt
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramArrowBarrageTargetRemovedEvent(use.Id, action.ActionId, active.OwnerSeat, active.SkillId, targetSeat));
     }
 
-    void global::CardGame.Core.IPopulationAndArrowBarrageProgramHost.GrantFactionPopulationMarker(ProgramSkillFrame frame, SkillProgramEffect effect) => GrantProgramFactionPopulationMarker(frame, effect);
-    void global::CardGame.Core.IPopulationAndArrowBarrageProgramHost.RemoveSelectedCurrentArrowBarrageTarget(ProgramSkillFrame frame) => RemoveProgramSelectedCurrentArrowBarrageTarget(frame);
+    void IPopulationAndArrowBarrageProgramHost.GrantFactionPopulationMarker(ProgramSkillFrame frame, SkillProgramEffect effect) => GrantProgramFactionPopulationMarker(frame, effect);
+    void IPopulationAndArrowBarrageProgramHost.RemoveSelectedCurrentArrowBarrageTarget(ProgramSkillFrame frame) => RemoveProgramSelectedCurrentArrowBarrageTarget(frame);
 }

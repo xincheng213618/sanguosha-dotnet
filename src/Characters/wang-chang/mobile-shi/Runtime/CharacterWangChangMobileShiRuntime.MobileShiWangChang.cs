@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,10 +7,10 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
 {
     internal const string ShiKaiji = "mobile:shi-kaiji", ShiShepan = "mobile:shi-shepan";
     internal const string ShiKaijiDraw = "skill-program.mobile:shi-kaiji.recipient-draw";
-    internal static CardConversionSource ShiWangChangSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShiWangChangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardKind ShiWangChangName(CardKind kind) => kind is CardKind.FireSlash or CardKind.ThunderSlash ? CardKind.Slash : kind;
     internal int ShiKaijiMaximum() => Math.Max(1, _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Select(e => e.VictimSeat).Distinct().Count(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive));
-    internal CardUseFrame? ShiShepanUse(ProgramSkillWindowContext c, int owner) => c is { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects, CardUse: { } identity } && _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } window && window.ParentFrameId == identity.ParentCardUseFrameId && window.Action.ActionId == identity.CardActionId && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { Action: { Type: CardActionType.Use } a } use && a.ActorSeat != owner && a.ActorSeat == c.SourceSeat && a.ActionId == identity.CardActionId && use.TargetSeats.Contains(owner) && c.TargetSeat == owner && global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(a.EffectiveKind) ? use : null;
+    internal CardUseFrame? ShiShepanUse(ProgramSkillWindowContext c, int owner) => c is { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects, CardUse: { } identity } && _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } window && window.ParentFrameId == identity.ParentCardUseFrameId && window.Action.ActionId == identity.CardActionId && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { Action: { Type: CardActionType.Use } a } use && a.ActorSeat != owner && a.ActorSeat == c.SourceSeat && a.ActionId == identity.CardActionId && use.TargetSeats.Contains(owner) && c.TargetSeat == owner && CoreGameEngineMouLuMengRuntime.IsDamageCardKind(a.EffectiveKind) ? use : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 47400)]
     internal bool CanOfferShiWangChang(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
@@ -22,7 +19,7 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
         return ShiShepanUse(context, candidate.OwnerSeat)is { } use && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiShepanChosenEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillInstanceId == candidate.SkillInstanceId && e.GameplayHash == candidate.GameplayHash && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.Name == ShiWangChangName(use.CardKind));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiWangChangHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => ResolveShiWangChang(frame, op);
+    SkillProgramStepOutcome IMobileShiWangChangHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => ResolveShiWangChang(frame, op);
     internal SkillProgramStepOutcome ResolveShiWangChang(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -115,7 +112,7 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
     [ProgramAnswer("shi-wang-chang")]
     internal void AnswerShiWangChang(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiWangChang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiWangChangChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiWangChang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiWangChangChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shi Wang Chang rejects a stale target or adjustment branch.");
         RequireShiWangChang(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -176,7 +173,7 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
     {
         if (f.MobileShiWangChang is not { Stage: MobileShiWangChangStage.Drawing, Draw: null } r || outcome.RequestedCount != 1 || r.Index >= r.Targets.Count || outcome.RecipientSeat != r.Targets[r.Index])
             throw new InvalidOperationException("Kaiji lost its original once-issued recipient draw.");
-        var nonBasic = outcome.ActualDrawIds.Concat(outcome.ReplacementGainedIds).Any(id => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind) != SkillProgramCardCategory.Basic);
+        var nonBasic = outcome.ActualDrawIds.Concat(outcome.ReplacementGainedIds).Any(id => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind) != SkillProgramCardCategory.Basic);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiWangChang = r with { Stage = MobileShiWangChangStage.DrawChildren, Draw = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter, NonBasicGained = r.NonBasicGained || nonBasic }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiKaijiDrawReturnedEvent(f.Id, r.Index, outcome.RecipientSeat, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, nonBasic, outcome.SequenceBefore, outcome.SequenceAfter));
         ContinueShiKaiji(f.Id);
@@ -204,7 +201,7 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
             return decision.Choices.FirstOrDefault(c => c.Parameters["branch"] == (own == actor - 1 ? "top" : "draw")) ?? decision.Choices[0];
         }
 
-        return decision.Choices.FirstOrDefault(c => c.Parameters["branch"] == "pick" && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? decision.Choices.Single(c => c.Parameters["branch"] == "done");
+        return decision.Choices.FirstOrDefault(c => c.Parameters["branch"] == "pick" && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])) ?? decision.Choices.Single(c => c.Parameters["branch"] == "done");
     }
 
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiWangChangPublicStates(CharacterState owner, string skillId)

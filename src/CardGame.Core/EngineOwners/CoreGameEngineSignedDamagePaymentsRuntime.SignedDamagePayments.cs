@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
     internal bool HasSignedDamagePayments => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DiscardOwnedCardToAdjustCurrentDamage);
 
     internal SkillProgramEffect SignedDamageEffect(ProgramSkillFrame f) => ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-    internal global::CardGame.Core.GameEngine.SignedDamageProfile CaptureSignedDamageProfile(int ownerSeat, int otherSeat, SkillProgramEffect effect)
+    internal GameEngine.SignedDamageProfile CaptureSignedDamageProfile(int ownerSeat, int otherSeat, SkillProgramEffect effect)
     {
         var p = effect.PublicDeathDamageCost!;
         var owner = _coreMatchParticipantsPlayersAccess._players[ownerSeat];
@@ -22,7 +19,7 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
         return new(owner.Hp, _coreMatchParticipantsPlayersAccess._players[otherSeat].Hp, enabled && roles.Any(p.WaiveHpDeadRoles.Contains), enabled && roles.Any(p.AnyColorDeadRoles.Contains), enabled && roles.Any(p.AllowEquipmentDeadRoles.Contains), roles.Aggregate(0, (mask, role) => mask | (1 << (int)role)), enabled ? _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(owner, p.QualifierSkillId) : null);
     }
 
-    internal IReadOnlyList<Card> SignedDamageCosts(int ownerSeat, string skillId, string instance, SkillProgramEffect e, global::CardGame.Core.GameEngine.SignedDamageProfile p) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Concat(p.AllowEquipment ? _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[ownerSeat]) : []).Where(c => (p.AnyColor || e.Suits.Contains(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[ownerSeat], c))) && !c.IsGeneralWeapon && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(ownerSeat, skillId, instance, c) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(ownerSeat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard)).ToArray();
+    internal IReadOnlyList<Card> SignedDamageCosts(int ownerSeat, string skillId, string instance, SkillProgramEffect e, GameEngine.SignedDamageProfile p) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Concat(p.AllowEquipment ? _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[ownerSeat]) : []).Where(c => (p.AnyColor || e.Suits.Contains(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[ownerSeat], c))) && !c.IsGeneralWeapon && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(ownerSeat, skillId, instance, c) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(ownerSeat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard)).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 880)]
     internal bool CanOfferSignedDamagePayment(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext c)
     {
@@ -54,7 +51,7 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal static global::CardGame.Core.GameEngine.SignedDamageProfile SignedDamageFrozenProfile(ProgramSignedDamagePaymentReceipt r) => new(r.OwnerHp, r.OtherHp, r.WaiveHp, r.AnyColor, r.AllowEquipment, r.PublicDeadRoleMask, r.QualifierInstanceId);
+    internal static GameEngine.SignedDamageProfile SignedDamageFrozenProfile(ProgramSignedDamagePaymentReceipt r) => new(r.OwnerHp, r.OtherHp, r.WaiveHp, r.AnyColor, r.AllowEquipment, r.PublicDeadRoleMask, r.QualifierInstanceId);
     internal IReadOnlyList<PromptChoice> SignedDamagePaymentChoices(ProgramSkillFrame f) => Array.AsReadOnly(SignedDamageCosts(f.OwnerSeat, f.SkillId, f.SkillInstanceId, SignedDamageEffect(f), SignedDamageFrozenProfile(f.SignedDamagePayment!)).Select(card => new PromptChoice(new($"signed-damage.{(f.Id)}.{(card.Id)}"), $"弃置【{(card.DisplayName)}】令此伤害{((f.SignedDamagePayment!.Delta > 0 ? "+1" : "-1"))}", Array.AsReadOnly(new[] { card.Id }), [], new Dictionary<string, string> { ["program-action"] = "signed-damage-payment", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture) })).ToArray());
     internal void PublishSignedDamagePayment(ProgramSkillFrame f)
     {
@@ -79,7 +76,7 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
     [ProgramAnswer("signed-damage-payment")]
     internal void ResolveSignedDamagePayment(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SignedDamagePayment.Stage: SignedDamagePaymentStage.ChoosingCost } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [SignedDamagePaymentChoices(f).Single(c => c.Id == choice.Id)]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SignedDamagePayment.Stage: SignedDamagePaymentStage.ChoosingCost } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [SignedDamagePaymentChoices(f).Single(c => c.Id == choice.Id)]))
             throw new InvalidOperationException("Signed damage answer lost its exact private cost choice.");
         var r = f.SignedDamagePayment!;
         var e = SignedDamageEffect(f);
@@ -157,7 +154,7 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
     internal PromptChoice SelectAiSignedDamagePayment(PendingDecision d, ProgramSkillFrame f) => d.Choices.OrderBy(c => CardCatalog.Get(_coreCardAttackStateOperations.GetAttackCard(c.Cards.Single()).Kind).HandKeepValue).ThenBy(c => c.Cards.Single()).First();
     internal bool IsValidSignedDamagePayment(ProgramSkillFrame f, bool requirePaid)
     {
-        if (f.SignedDamagePayment is not { } r || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } c || r.InstructionIndex != f.InstructionIndex || SignedDamageEffect(f).Op != SkillProgramEffectOp.DiscardOwnedCardToAdjustCurrentDamage || r.Delta != SignedDamageEffect(f).Amount || c.ParentFrameId != r.BeforeDamageFrameId || c.SourceSeat != r.SourceSeat || c.TargetSeat != r.TargetSeat || c.Amount != r.OriginalAmount || r.SourceSeat == r.TargetSeat || r.OriginalAmount <= 0 || f.OwnerSeat != (r.Delta > 0 ? r.SourceSeat : r.TargetSeat) || _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().SingleOrDefault(p => p.Id == r.BeforeDamageFrameId)is not { } w || (w.ContinuationAttackResolutionId ?? w.ParentFrameId) != r.OriginalAttackFrameId || w.SourceSeat != r.SourceSeat || w.TargetSeat != r.TargetSeat || w.Nature != r.Nature || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].Candidate) || !_resolutionStackOperations._resolutionStack.Any(p => p.Id == r.OriginalAttackFrameId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSignedDamageOfferedEvent>().Count(e => e.ProgramFrameId == f.Id && e.BeforeDamageFrameId == w.Id && e.OriginalAttackFrameId == r.OriginalAttackFrameId && e.OwnerSeat == f.OwnerSeat && e.SourceSeat == r.SourceSeat && e.TargetSeat == r.TargetSeat && e.Nature == r.Nature && e.Amount == r.OriginalAmount && e.Delta == r.Delta && e.OwnerHp == r.OwnerHp && e.OtherHp == r.OtherHp && e.WaiveHp == r.WaiveHp && e.AnyColor == r.AnyColor && e.AllowEquipment == r.AllowEquipment && e.PublicDeadRoleMask == r.PublicDeadRoleMask && e.QualifierInstanceId == r.QualifierInstanceId) != 1)
+        if (f.SignedDamagePayment is not { } r || f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied } c || r.InstructionIndex != f.InstructionIndex || SignedDamageEffect(f).Op != SkillProgramEffectOp.DiscardOwnedCardToAdjustCurrentDamage || r.Delta != SignedDamageEffect(f).Amount || c.ParentFrameId != r.BeforeDamageFrameId || c.SourceSeat != r.SourceSeat || c.TargetSeat != r.TargetSeat || c.Amount != r.OriginalAmount || r.SourceSeat == r.TargetSeat || r.OriginalAmount <= 0 || f.OwnerSeat != (r.Delta > 0 ? r.SourceSeat : r.TargetSeat) || _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().SingleOrDefault(p => p.Id == r.BeforeDamageFrameId)is not { } w || (w.ContinuationAttackResolutionId ?? w.ParentFrameId) != r.OriginalAttackFrameId || w.SourceSeat != r.SourceSeat || w.TargetSeat != r.TargetSeat || w.Nature != r.Nature || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].Candidate) || !_resolutionStackOperations._resolutionStack.Any(p => p.Id == r.OriginalAttackFrameId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSignedDamageOfferedEvent>().Count(e => e.ProgramFrameId == f.Id && e.BeforeDamageFrameId == w.Id && e.OriginalAttackFrameId == r.OriginalAttackFrameId && e.OwnerSeat == f.OwnerSeat && e.SourceSeat == r.SourceSeat && e.TargetSeat == r.TargetSeat && e.Nature == r.Nature && e.Amount == r.OriginalAmount && e.Delta == r.Delta && e.OwnerHp == r.OwnerHp && e.OtherHp == r.OtherHp && e.WaiveHp == r.WaiveHp && e.AnyColor == r.AnyColor && e.AllowEquipment == r.AllowEquipment && e.PublicDeadRoleMask == r.PublicDeadRoleMask && e.QualifierInstanceId == r.QualifierInstanceId) != 1)
             return false;
         var paid = r.Stage != SignedDamagePaymentStage.ChoosingCost;
         if (requirePaid && !paid || !paid && (r.CostCardId is not null || r.CostFrom is not null || r.CostEffectiveSuit is not null || r.CostMovementSequence != 0 || r.FinalAmount is not null))
@@ -171,5 +168,5 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ISignedDamagePaymentHost.DiscardOwnedCardToAdjustCurrentDamage(ProgramSkillFrame f) => BeginSignedDamagePayment(f);
+    SkillProgramStepOutcome ISignedDamagePaymentHost.DiscardOwnedCardToAdjustCurrentDamage(ProgramSkillFrame f) => BeginSignedDamagePayment(f);
 }

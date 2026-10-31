@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengYuMouOlRuntime
@@ -11,25 +7,25 @@ internal sealed partial class CharacterChengYuMouOlRuntime
     internal MouLidanRuntime MouLidan => _mouLidanOperations.Get();
     internal MouDanchiRuntime MouDanchi => _mouDanchiOperations.Get();
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouChengYuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouChengYuLidan ? MouLidan.Resolve(f) : MouDanchi.Resolve(f);
-    int global::CardGame.Core.IMouChengYuFacts.Turn => _coreActualTurnProgressTurnNumberAccess._turnNumber;
+    SkillProgramStepOutcome IMouChengYuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouChengYuLidan ? MouLidan.Resolve(f) : MouDanchi.Resolve(f);
+    int IMouChengYuFacts.Turn => _coreActualTurnProgressTurnNumberAccess._turnNumber;
 
-    bool global::CardGame.Core.IMouChengYuFacts.GameOver => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
+    bool IMouChengYuFacts.GameOver => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    bool global::CardGame.Core.IMouChengYuFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
-    bool global::CardGame.Core.IMouChengYuFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
-    IReadOnlyList<T> global::CardGame.Core.IMouChengYuFacts.History<T>() => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<T>().ToArray());
-    CardActionContext global::CardGame.Core.IMouChengYuFacts.Action(ProgramSkillFrame f) => MouChengYuAction(f);
-    CardUseFrame? global::CardGame.Core.IMouChengYuFacts.Use(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id);
-    CardUseFrame? global::CardGame.Core.IMouChengYuFacts.TargetUse(ProgramSkillFrame f) => f.SkillId == MouChengYuComposition.Lidan && f.TriggerId == "next-matching-targets" && ((global::CardGame.Core.IMouChengYuFacts)this).NativeParentMatches(f) && f.WindowContext?.CardUse is { } c ? _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId) : null;
-    MouDanchiDamage? global::CardGame.Core.IMouChengYuFacts.Damage(ProgramSkillFrame f) => MouChengYuDamage(f.OwnerSeat, f.WindowContext);
-    IReadOnlyList<MouChengYuTargetOption> global::CardGame.Core.IMouChengYuFacts.TargetOptions(long id, IReadOnlyList<int> selected)
+    bool IMouChengYuFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
+    bool IMouChengYuFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
+    IReadOnlyList<T> IMouChengYuFacts.History<T>() => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<T>().ToArray());
+    CardActionContext IMouChengYuFacts.Action(ProgramSkillFrame f) => MouChengYuAction(f);
+    CardUseFrame? IMouChengYuFacts.Use(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id);
+    CardUseFrame? IMouChengYuFacts.TargetUse(ProgramSkillFrame f) => f.SkillId == MouChengYuComposition.Lidan && f.TriggerId == "next-matching-targets" && ((IMouChengYuFacts)this).NativeParentMatches(f) && f.WindowContext?.CardUse is { } c ? _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId) : null;
+    MouDanchiDamage? IMouChengYuFacts.Damage(ProgramSkillFrame f) => MouChengYuDamage(f.OwnerSeat, f.WindowContext);
+    IReadOnlyList<MouChengYuTargetOption> IMouChengYuFacts.TargetOptions(long id, IReadOnlyList<int> selected)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { } a } use || !((global::CardGame.Core.IMouChengYuFacts)this).Alive(use.SourceSeat))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { } a } use || !((IMouChengYuFacts)this).Alive(use.SourceSeat))
             return[];
         // An entity-backed delayed placement has exactly one native Judgment
         // destination. Extra targeting must not clone its physical entity.
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(use.CardKind))
+        if (CoreNativeCardClassificationsRuntime.IsDelayedCard(use.CardKind))
             return[];
         var original = use.TargetSeats.Count == 0 && use.CardKind == CardKind.DrawTwo ? new[]
         {
@@ -46,20 +42,20 @@ internal sealed partial class CharacterChengYuMouOlRuntime
         return Array.AsReadOnly(_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidates(preview).Select(seats => new MouChengYuTargetOption(string.Join("、", seats.Select(s => _coreMatchParticipantsPlayersAccess._players[s].Name))) { Seats = seats }).ToArray());
     }
 
-    IReadOnlyList<int> global::CardGame.Core.IMouChengYuFacts.SlashTargets(int actor) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(t => CanMouDanchiSlash(actor, t.Seat)).Select(t => t.Seat).ToArray());
-    bool global::CardGame.Core.IMouChengYuFacts.NativeParentMatches(ProgramSkillFrame f) => MouChengYuParentMatches(f);
-    void global::CardGame.Core.IMouChengYuNative.FreezeLidan(CardUseFrame use, MouLidanUseReceipt receipt) => _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouLidan = receipt });
-    void global::CardGame.Core.IMouChengYuNative.ApplyTargets(ProgramSkillFrame f, MouLidanSelection selection) => ApplyMouLidanTargets(f, selection);
-    bool global::CardGame.Core.IMouChengYuNative.IssueReward(ProgramSkillFrame f, CardKind kind, int target) => IssueMouDanchiReward(f, kind, target);
-    bool global::CardGame.Core.IMouChengYuNative.DrainChildren(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id);
-    void global::CardGame.Core.IMouChengYuNative.Finish(ProgramSkillFrame f)
+    IReadOnlyList<int> IMouChengYuFacts.SlashTargets(int actor) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(t => CanMouDanchiSlash(actor, t.Seat)).Select(t => t.Seat).ToArray());
+    bool IMouChengYuFacts.NativeParentMatches(ProgramSkillFrame f) => MouChengYuParentMatches(f);
+    void IMouChengYuNative.FreezeLidan(CardUseFrame use, MouLidanUseReceipt receipt) => _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouLidan = receipt });
+    void IMouChengYuNative.ApplyTargets(ProgramSkillFrame f, MouLidanSelection selection) => ApplyMouLidanTargets(f, selection);
+    bool IMouChengYuNative.IssueReward(ProgramSkillFrame f, CardKind kind, int target) => IssueMouDanchiReward(f, kind, target);
+    bool IMouChengYuNative.DrainChildren(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id);
+    void IMouChengYuNative.Finish(ProgramSkillFrame f)
     {
         RestoreMouDanchiAttack(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
         _coreRuntimeOperations.ReplaceRuntimeTop(f);
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    void global::CardGame.Core.IMouChengYuNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
+    void IMouChengYuNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     internal CardActionContext MouChengYuAction(ProgramSkillFrame f) => f.WindowContext?.CardUse is { } c && _resolutionStackOperations._resolutionStack.SingleOrDefault(w => w.Id == f.WindowContext.ParentFrameId)is ProgramCardTriggerWindowFrame window && window.Action.ActionId == c.CardActionId ? window.Action : throw new InvalidOperationException("Mou Cheng Yu needs its exact native card window.");
     internal bool MouChengYuParentMatches(ProgramSkillFrame f)
     {
@@ -68,7 +64,7 @@ internal sealed partial class CharacterChengYuMouOlRuntime
             return false;
         if (_resolutionStackOperations._resolutionStack[i - 1] is ProgramCardTriggerWindowFrame window)
             return context.CardUse is { } c && c.CardActionId == window.Action.ActionId && window.Candidates.Any(n => n.OwnerSeat == f.OwnerSeat && n.SkillId == f.SkillId && n.SkillInstanceId == f.SkillInstanceId && n.TriggerId == f.TriggerId && n.GameplayHash == f.GameplayHash) && MouDanchiSuspensionMatches(f);
-        return _resolutionStackOperations._resolutionStack[i - 1] is DamageTriggerWindowFrame damage && context.Window == SkillProgramTriggerWindow.AfterDamageApplied && context.DamageFrameId == damage.ParentFrameId && damage.Candidates.Any(n => global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, n.ToProgramCandidate()));
+        return _resolutionStackOperations._resolutionStack[i - 1] is DamageTriggerWindowFrame damage && context.Window == SkillProgramTriggerWindow.AfterDamageApplied && context.DamageFrameId == damage.ParentFrameId && damage.Candidates.Any(n => CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, n.ToProgramCandidate()));
     }
 
     internal MouDanchiDamage? MouChengYuDamage(int owner, ProgramSkillWindowContext? c)
@@ -79,7 +75,7 @@ internal sealed partial class CharacterChengYuMouOlRuntime
         return new(c.ParentFrameId, damage.Id, damage.ParentFrameId, original?.Action?.ActionId, source, victim, c.Amount, _coreActualTurnProgressTurnNumberAccess._turnNumber);
     }
 
-    internal bool IsMouChengYuTrueUse(CardActionContext action) => action.Type == CardActionType.Use || _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.NullificationResponse) || _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.Dodge) && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.EffectiveCardKind is { } incoming && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == action.ActorSeat && action.ParentActionId == _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId && action.OpponentSeat == attack.SourceSeat;
+    internal bool IsMouChengYuTrueUse(CardActionContext action) => action.Type == CardActionType.Use || _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.NullificationResponse) || _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.Dodge) && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.EffectiveCardKind is { } incoming && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == action.ActorSeat && action.ParentActionId == _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId && action.OpponentSeat == attack.SourceSeat;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 34100)]
     internal void ObserveMouChengYuUse(IGameEvent fact)
     {
@@ -109,7 +105,7 @@ internal sealed partial class CharacterChengYuMouOlRuntime
             return MouChengYuDamage(candidate.OwnerSeat, context)is not null && MouDanchi.DamageAvailable(candidate.OwnerSeat);
         if (context.CardUse is not { } card || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || window.Action.ActionId != card.CardActionId || !IsMouChengYuTrueUse(window.Action))
             return false;
-        return candidate.SkillId == MouChengYuComposition.Lidan && trigger.Id == "alternating-use-permit" ? window.Action.ActorSeat == candidate.OwnerSeat && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(window.Action.EffectiveKind) || MouLidanRuntime.Trick(window.Action.EffectiveKind)) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLidanPermitEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.ActionId == card.CardActionId) : IsIssuedMouChengYu(candidate, context);
+        return candidate.SkillId == MouChengYuComposition.Lidan && trigger.Id == "alternating-use-permit" ? window.Action.ActorSeat == candidate.OwnerSeat && (CoreNativeCardClassificationsRuntime.IsSlashCard(window.Action.EffectiveKind) || MouLidanRuntime.Trick(window.Action.EffectiveKind)) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLidanPermitEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.ActionId == card.CardActionId) : IsIssuedMouChengYu(candidate, context);
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 34100)]
@@ -180,7 +176,7 @@ internal sealed partial class CharacterChengYuMouOlRuntime
         var original = slots.Where(e => !e.Added).OrderBy(e => e.Index).ToArray();
         var added = slots.Where(e => e.Added).OrderBy(e => e.Index).ToArray();
         var consumed = _coreProgramEventHistoryOperations.ProgramEventHistory<MouLidanConsumedEvent>().Where(e => e.UseId == use.Id && e.ActionId == action.ActionId).ToArray();
-        if (original.Length != r.Original.Count || added.Length != r.Added.Count || !original.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, original.Length)) || !added.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, added.Length)) || !original.Select(e => e.Seat).SequenceEqual(r.Original) || !added.Select(e => e.Seat).SequenceEqual(r.Added) || slots.Any(e => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(e.Seat)) || consumed.Length != r.Maximum || consumed.Any(c => c.ActorSeat != r.ActorSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLidanPermitEvent>().Any(p => p.FrameId == c.PermitFrameId && p.ActionId == c.PermitActionId && p.Source == c.Source && p.Source.OwnerSeat == r.ActorSeat && p.ForSlash == global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))))
+        if (original.Length != r.Original.Count || added.Length != r.Added.Count || !original.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, original.Length)) || !added.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, added.Length)) || !original.Select(e => e.Seat).SequenceEqual(r.Original) || !added.Select(e => e.Seat).SequenceEqual(r.Added) || slots.Any(e => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(e.Seat)) || consumed.Length != r.Maximum || consumed.Any(c => c.ActorSeat != r.ActorSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLidanPermitEvent>().Any(p => p.FrameId == c.PermitFrameId && p.ActionId == c.PermitActionId && p.Source == c.Source && p.Source.OwnerSeat == r.ActorSeat && p.ForSlash == CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))))
             return false;
         resultTargets = Array.AsReadOnly(r.Original.Concat(r.Added).ToArray());
         return true;

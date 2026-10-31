@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAdvancedLifecycleRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CoreGameEngineAdvancedLifecycleRuntime
         switch (effect.Op)
         {
             case SkillProgramEffectOp.BalanceHandAttackTricks:
-                var slashes = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Where(card => global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(AdvancedEffectiveHandKind(owner, card))).ToArray();
+                var slashes = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Where(card => CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(AdvancedEffectiveHandKind(owner, card))).ToArray();
                 var tricks = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Where(card => AdvancedIsOrdinaryTrick(AdvancedEffectiveHandKind(owner, card))).ToArray();
                 if (slashes.Length == tricks.Length)
                 {
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEngineAdvancedLifecycleRuntime
                     return SkillProgramStepOutcome.Continue;
                 return BeginAdvancedSelection(frame, effect, balancing.Select(card => card.Id.ToString()).ToArray(), Math.Abs(slashes.Length - tricks.Length));
             case SkillProgramEffectOp.ReplaceJudgmentPhase:
-                _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipJudgmentPhase;
+                _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= GameEngine.DelayedTurnEffects.SkipJudgmentPhase;
                 var polarity = _skillRuntimeStateOperations._skillRuntimeState.GetConversionState(owner.Seat, frame.SkillId);
                 _skillRuntimeStateOperations._skillRuntimeState.ToggleConversionState(owner.Seat, frame.SkillId);
                 return _coreProgramLifecycleOperations.ScheduleProgramPhase(frame, polarity == SkillPolarity.Yang ? TurnPhase.Draw : TurnPhase.Play, SkillProgramPhaseContinuation.BeforeNormalPreparation);
@@ -112,7 +108,7 @@ internal sealed partial class CoreGameEngineAdvancedLifecycleRuntime
 
     internal Card GetAdvancedCard(int id) => _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(card => card.Id == id);
     internal CardKind AdvancedEffectiveHandKind(CharacterState owner, Card card) => _coreActionQueriesOperations.GetProgramCardIdentityMatches(owner, card).FirstOrDefault()?.Identity.OutputKind ?? card.Kind;
-    internal static bool AdvancedIsOrdinaryTrick(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_AdvancedLifecycle.AdvancedIsOrdinaryTrick(kind);
+    internal static bool AdvancedIsOrdinaryTrick(CardKind kind) => RuntimeSkills.RuntimeRules_Core_AdvancedLifecycle.AdvancedIsOrdinaryTrick(kind);
     internal void SetEquipmentSlotCapacity(CharacterState player, EquipmentSlot slot, int capacity)
     {
         if (capacity < 0 || capacity > 5)

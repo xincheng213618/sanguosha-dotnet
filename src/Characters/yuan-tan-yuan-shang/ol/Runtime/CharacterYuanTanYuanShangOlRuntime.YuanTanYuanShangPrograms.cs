@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuanTanYuanShangOlRuntime
 {
     internal const string NeifaDrawReason = "skill-program.neifa.draw", NeifaFieldReason = "skill-program.neifa.field", NeifaDiscardReason = "skill-program.neifa.discard", NeifaEquipmentReason = "skill-program.neifa.equipment-draw";
-    internal static CardConversionSource NeifaSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yuan_tan_yuan_shang_ol_YuanTanYuanShangPrograms.NeifaSource(f);
+    internal static CardConversionSource NeifaSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_yuan_tan_yuan_shang_ol_YuanTanYuanShangPrograms.NeifaSource(f);
     internal bool NeifaSourceCurrent(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 520)]
     internal bool CanOfferNeifa(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
@@ -17,7 +13,7 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
         if (features.HasOperation(SkillProgramEffectOp.GainThenDiscardAndArmNeifaActualTurn))
             return c.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber > 0;
         if (features.HasOperation(SkillProgramEffectOp.AdjustNeifaOrdinaryTrickTargets))
-            return ExactNeifaCandidate(c, w, out var use) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind);
+            return ExactNeifaCandidate(c, w, out var use) && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind);
         if (features.HasOperation(SkillProgramEffectOp.DrawForFirstTwoPaidNeifaEquipmentUses))
             return ExactNeifaCandidate(c, w, out var eq) && eq.NeifaEquipment is { } q && ValidNeifaEquipment(q, eq) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<NeifaSegmentPaidEvent>().Any(e => e.WindowId == w.ParentFrameId && e.Segment == "equipment-draw");
         return true;
@@ -42,7 +38,7 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
             throw new InvalidOperationException("Neifa issued right lost its exact actor/native window.");
         if (effect.Op == SkillProgramEffectOp.AdjustNeifaOrdinaryTrickTargets)
         {
-            if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind))
+            if (!CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind))
                 throw new InvalidOperationException("Neifa target adjustment requires ordinary trick.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Neifa = r with { Stage = NeifaStage.Targets, UseId = use.Id, ActionId = use.Action!.ActionId, OriginalTargets = NeifaPrimaryShape(use) } });
             PublishNeifa(f);
@@ -108,7 +104,7 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         var r = f.Neifa!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], NeifaChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], NeifaChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Neifa changed its published exact payer/entity/target choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Segments.Count == 0 && r.Stage != NeifaStage.Targets && !NeifaSourceCurrent(f))
@@ -142,7 +138,7 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
         var discard = r.Stage == NeifaStage.Discard;
         if (discard ? (from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) : !NeifaFieldCards(f.OwnerSeat).Any(c => c.Id == id))
             throw new InvalidOperationException("Neifa cannot replace its exact legal field/payment entity.");
-        var category = discard ? global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind) : (SkillProgramCardCategory? )null;
+        var category = discard ? CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind) : (SkillProgramCardCategory? )null;
         var name = discard ? "discard" : "field";
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { Neifa = r with { Stage = discard ? NeifaStage.DiscardChildren : NeifaStage.GainChildren, DiscardCategory = category }, PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
@@ -221,5 +217,5 @@ internal sealed partial class CharacterYuanTanYuanShangOlRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.INeifaProgramHost.BeginNeifa(ProgramSkillFrame f, SkillProgramEffect e) => BeginNeifa(f, e);
+    SkillProgramStepOutcome INeifaProgramHost.BeginNeifa(ProgramSkillFrame f, SkillProgramEffect e) => BeginNeifa(f, e);
 }

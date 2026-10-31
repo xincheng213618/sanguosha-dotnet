@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPeiYuanShaoOlRuntime
@@ -39,7 +35,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == useId);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame { Fulue: { Stage: FulueStage.CounterRequest } } parent)
             return;
-        if (!HasIssuedFulueRequest(parent) || parent.InstructionIndex != 2 || parent.Fulue is not { } r || action.Type != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != r.TargetSeat || !action.EffectiveDesignatedTargetSeats.SequenceEqual([r.UserSeat]) || parent.ChoiceBindings.SingleOrDefault(b => b.Name == FulueCounterBind)is not { OptionId: "used-slash" } answer || answer.ChooserSeat != r.TargetSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { FulueCounter: null } use || use.Action?.ActionId != action.ActionId)
+        if (!HasIssuedFulueRequest(parent) || parent.InstructionIndex != 2 || parent.Fulue is not { } r || action.Type != CardActionType.Use || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != r.TargetSeat || !action.EffectiveDesignatedTargetSeats.SequenceEqual([r.UserSeat]) || parent.ChoiceBindings.SingleOrDefault(b => b.Name == FulueCounterBind)is not { OptionId: "used-slash" } answer || answer.ChooserSeat != r.TargetSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { FulueCounter: null } use || use.Action?.ActionId != action.ActionId)
             throw new InvalidOperationException("Fulue cannot attach its other option to an unrelated counter card or provider.");
         var invoice = _coreProgramEventHistoryOperations.ProgramEventHistory<FulueCounterRequestedEvent>().Single(e => e.ProgramFrameId == parent.Id).Invoice;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, u => u with { FulueCounter = invoice });
@@ -48,7 +44,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
 
     internal bool ValidFulueCounterInvoice(CardUseFrame use, FulueCounterInvoice r)
     {
-        if (use.FulueCounter != r || use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.ActorSeat, action.ProviderSeat) || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<FulueCounterUseIssuedEvent>().Where(e => e.UseId == use.Id).ToArray()is not [var issued] || issued.ActionId != action.ActionId || issued.Invoice != (r with
+        if (use.FulueCounter != r || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.ActorSeat, action.ProviderSeat) || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<FulueCounterUseIssuedEvent>().Where(e => e.UseId == use.Id).ToArray()is not [var issued] || issued.ActionId != action.ActionId || issued.Invoice != (r with
         {
             Applied = false
         }

@@ -1,10 +1,10 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess : IProgramRuntimeOperations
 {
-    ref global::CardGame.Core.EngineStatus _status { get; }
+    ref EngineStatus _status { get; }
 
-    ref global::CardGame.Core.Winner _winner { get; }
+    ref Winner _winner { get; }
 
     ref string? _winnerTeamId { get; }
 

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreMatchSetupAvailableGeneralsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreMatchSetupAvailableGeneralsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.GeneralDefinition> _availableGenerals { get; }
+    ref readonly List<GeneralDefinition> _availableGenerals { get; }
 }

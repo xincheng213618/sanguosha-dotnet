@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouJieAnniversaryRuntime
 {
     internal bool HasAnniversaryXiahouJie => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryXiahouJieZhuangdan);
 
-    internal static CardConversionSource AnniversaryXiahouJieSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource AnniversaryXiahouJieSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static ProgramTriggerCandidate AnniversaryXiahouJieCandidate(ProgramSkillFrame f) => new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
     internal bool IsAnniversaryXiahouJieGrantQualified(CharacterState owner, SkillGrant grant) => grant.SkillId != AnniversaryXiahouJieComposition.Liedan || !HasAnniversaryXiahouJie || !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Any(e => e.Source.OwnerSeat == owner.Seat && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieSuppressionExpiredEvent>().Any(x => x.FrameId == e.FrameId));
     internal long CaptureAnniversaryXiahouJieQualificationStamp(long underlying)
@@ -47,7 +43,7 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
         return t.Effects.Single().Op == SkillProgramEffectOp.ResolveAnniversaryXiahouJieLiedan ? w.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && (c.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.XiahouJieLie) >= 5) : w.Window == SkillProgramTriggerWindow.AfterTurnEnded && c.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && IsAnniversaryXiahouJieUniqueHand(c.OwnerSeat);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryXiahouJieHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryXiahouJie(f, op);
+    SkillProgramStepOutcome IAnniversaryXiahouJieHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryXiahouJie(f, op);
     internal SkillProgramStepOutcome BeginAnniversaryXiahouJie(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -55,7 +51,7 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
             throw new InvalidOperationException("Xiahou Jie lost his original unpaid preparation or actual foreign turn end.");
         if (operation == SkillProgramEffectOp.ResolveAnniversaryXiahouJieZhuangdan)
         {
-            if (_resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } ended || !_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(ended) || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(ended)))
+            if (_resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } ended || !_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(ended) || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(ended)))
                 throw new InvalidOperationException("Zhuangdan lost its actual end-of-turn candidate.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXiahouJieSuppressedEvent(f.Id, AnniversaryXiahouJieSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat));
             return SkillProgramStepOutcome.Continue;
@@ -67,7 +63,7 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXiahouJieStartedEvent(f.Id, r.Source, r.Hash, r.ParentId, r.ActualTurn, r.TurnOwner, own, r.DeathMarks));
         if (own)
         {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillCauseDeathDeclaredEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.OwnerSeat));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillCauseDeathDeclaredEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.OwnerSeat));
             _coreNativePlayerDeathOperations.BeginPlayerDeath(f.Id, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], null, null, null, causingProgramSkillFrameId: f.Id);
             return SkillProgramStepOutcome.AwaitChild;
         }
@@ -173,7 +169,7 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXiahouJieComparedEvent(id, comparison.Index, ownValue, otherValue));
             if (comparison.Greater == true)
             {
-                _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, 1, global::CardGame.Core.EngineOwners.CharacterXiahouJieAnniversaryDefinitions.AnniversaryXiahouJieDrawReason);
+                _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, 1, CharacterXiahouJieAnniversaryDefinitions.AnniversaryXiahouJieDrawReason);
                 return;
             }
         }

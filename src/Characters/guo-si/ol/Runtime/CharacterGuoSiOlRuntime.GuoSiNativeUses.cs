@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoSiOlRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var card = _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Single(c => c.Id == action.CardId);
         var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, card);
-        var option = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, CardKind.Snatch, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit), hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: false).Single(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && o.TargetSeats.SequenceEqual(action.TargetSeats));
+        var option = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, CardKind.Snatch, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: CoreGameEnginePublicPileColorsRuntime.SuitColor(suit), hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: false).Single(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && o.TargetSeats.SequenceEqual(action.TargetSeats));
         var id = _coreNativeCardUseOperations.BeginCardUse(card, f.OwnerSeat, action.TargetSeats, CardKind.Snatch, physicalCardIds: [card.Id], conversionSource: r.Source);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var native = new GuoSiNativeReceipt(f.Id, r.Source, r.GameplayHash, r.Turn, r.Phase, r.Instruction, id, use.Action!.ActionId, use.Action.ParentActionId ?? throw new InvalidOperationException("Sidao lost its original action parent."), card.Id, action.TargetSeats.Single(), action.Kind, action.TargetCardId, option.RequiredCardKind);

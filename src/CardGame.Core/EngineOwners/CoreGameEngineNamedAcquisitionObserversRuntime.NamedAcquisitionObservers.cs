@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNamedAcquisitionObserversRuntime
 {
-    internal bool NamedAcquisitionParentMatches(ProgramSkillFrame root) => root.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } c && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } parent && parent.OwnerSeat == root.OwnerSeat && parent.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && parent.ItemIndex >= 0 && parent.ItemIndex < parent.Items.Count && parent.Items[parent.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, candidate);
+    internal bool NamedAcquisitionParentMatches(ProgramSkillFrame root) => root.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } c && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } parent && parent.OwnerSeat == root.OwnerSeat && parent.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && parent.ItemIndex >= 0 && parent.ItemIndex < parent.Items.Count && parent.Items[parent.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, candidate);
     internal ProgramSkillFrame? NamedAcquisitionObserverRoot(long? damageWindowId = null)
     {
         for (var index = 1; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
         {
             if (_resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame { NamedCardAcquisition: { Stage: NamedCardAcquisitionStage.MovementChildren } d } root || !_coreNamedCardAcquisitionsOperations.ValidNamedCardAcquisition(root) || !NamedAcquisitionParentMatches(root) || root.PendingMovementContinuation is not { CoverageResultBind: null } pending || pending.SubjectSeat != root.OwnerSeat || damageWindowId is { } requested && !_resolutionStackOperations._resolutionStack.Skip(index + 1).Any(f => f.Id == requested))
                 continue;
-            var paid = _coreCardMovementJournalCardMovementsAccess._cardMovements.Single(m => m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter && m.CardId == d.CardId && m.From == d.From && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEngineNamedCardAcquisitionsRuntime.NamedAcquisitionReason(root));
+            var paid = _coreCardMovementJournalCardMovementsAccess._cardMovements.Single(m => m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter && m.CardId == d.CardId && m.From == d.From && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == CoreGameEngineNamedCardAcquisitionsRuntime.NamedAcquisitionReason(root));
             var first = _resolutionStackOperations._resolutionStack[index + 1];
             if (first is CardsMovedTriggerWindowFrame moved)
             {
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineNamedAcquisitionObserversRuntime
             }
             else if (first is RecoveryReplacementFrame recovery)
             {
-                if (paid.CardKind != CardKind.SilverLion || paid.From.Zone != CardZoneKind.Equipment || !_coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) || recovery.Return.Continuation != PostEventContinuation.AwaitedProgramMovement || recovery.Attempt.SourceSeat != paid.From.OwnerSeat || recovery.Attempt.TargetSeat != paid.From.OwnerSeat || recovery.Attempt.Amount != 1 || recovery.Attempt.Completion.Producer != RecoveryAttemptProducer.SilverLion || recovery.Attempt.Completion.MoveReason?.Value != global::CardGame.Core.EngineOwners.CoreGameEngineNamedCardAcquisitionsRuntime.NamedAcquisitionReason(root))
+                if (paid.CardKind != CardKind.SilverLion || paid.From.Zone != CardZoneKind.Equipment || !_coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) || recovery.Return.Continuation != PostEventContinuation.AwaitedProgramMovement || recovery.Attempt.SourceSeat != paid.From.OwnerSeat || recovery.Attempt.TargetSeat != paid.From.OwnerSeat || recovery.Attempt.Amount != 1 || recovery.Attempt.Completion.Producer != RecoveryAttemptProducer.SilverLion || recovery.Attempt.Completion.MoveReason?.Value != CoreGameEngineNamedCardAcquisitionsRuntime.NamedAcquisitionReason(root))
                     continue;
             }
             else

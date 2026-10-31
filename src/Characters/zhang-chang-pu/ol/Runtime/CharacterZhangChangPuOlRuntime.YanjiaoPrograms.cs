@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangChangPuOlRuntime
@@ -55,7 +51,7 @@ internal sealed partial class CharacterZhangChangPuOlRuntime
                 throw new InvalidOperationException("The chosen Yanjiao group has no equal-rank-sum partner.");
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             BindYanjiaoSubset(frame, effect, source, effect.OwnerBind!, selected.Cards, chooserSeat);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardSubsetSelectedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), effect.SourceBind!, effect.OwnerBind!, Array.AsReadOnly(selected.Cards.ToArray()), YanjiaoRankSum(cards, ownerMask)));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardSubsetSelectedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), effect.SourceBind!, effect.OwnerBind!, Array.AsReadOnly(selected.Cards.ToArray()), YanjiaoRankSum(cards, ownerMask)));
             var secondMasks = YanjiaoEqualSumSubsets(cards, ownerMask, ((1 << cards.Count) - 1) ^ ownerMask).ToArray();
             if (secondMasks.Length == 0)
                 throw new InvalidOperationException("The Yanjiao partner group vanished before its selection.");
@@ -73,11 +69,11 @@ internal sealed partial class CharacterZhangChangPuOlRuntime
         var leftoverIds = cards.Where((_, index) => ((chooserMask | ownerMask2) & (1 << index)) == 0).Select(card => card.Id).ToArray();
         BindYanjiaoSubset(frame, effect, source, effect.LeftoverBind!, leftoverIds, chooserSeat);
         YanjiaoApplyLeftoverPenalty(frame, leftoverIds.Length);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardSubsetSelectedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), effect.SourceBind!, effect.ChooserBind!, Array.AsReadOnly(selected.Cards.ToArray()), YanjiaoRankSum(cards, chooserMask)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardSubsetSelectedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), effect.SourceBind!, effect.ChooserBind!, Array.AsReadOnly(selected.Cards.ToArray()), YanjiaoRankSum(cards, chooserMask)));
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal List<global::CardGame.Core.GameEngine.YanjiaoCandidate> ReadYanjiaoBoundCards(ProgramSkillCardSetBinding source)
+    internal List<GameEngine.YanjiaoCandidate> ReadYanjiaoBoundCards(ProgramSkillCardSetBinding source)
     {
         if (source.CardIds.Count != source.SourceLocations.Count)
             throw new InvalidOperationException("A program card-set binding lost its source locations.");
@@ -87,12 +83,12 @@ internal sealed partial class CharacterZhangChangPuOlRuntime
             if (_cardZonesOperations._cardZones.GetLocation(cardId) != location)
                 throw new InvalidOperationException("A bound card left its frozen source before the Yanjiao split.");
             var card = _cardZonesOperations._cardZones.CardsAt(location).Single(current => current.Id == cardId);
-            return new global::CardGame.Core.GameEngine.YanjiaoCandidate(card.Id, card.Rank, location, card.DisplayName, card.RankText);
+            return new GameEngine.YanjiaoCandidate(card.Id, card.Rank, location, card.DisplayName, card.RankText);
         }).ToList();
     }
 
-    internal static int YanjiaoRankSum(List<global::CardGame.Core.GameEngine.YanjiaoCandidate> cards, int mask) => Enumerable.Range(0, cards.Count).Where(index => (mask & (1 << index)) != 0).Sum(index => cards[index].Rank);
-    internal static int YanjiaoMaskOf(List<global::CardGame.Core.GameEngine.YanjiaoCandidate> cards, IReadOnlyList<int> cardIds)
+    internal static int YanjiaoRankSum(List<GameEngine.YanjiaoCandidate> cards, int mask) => Enumerable.Range(0, cards.Count).Where(index => (mask & (1 << index)) != 0).Sum(index => cards[index].Rank);
+    internal static int YanjiaoMaskOf(List<GameEngine.YanjiaoCandidate> cards, IReadOnlyList<int> cardIds)
     {
         var mask = 0;
         foreach (var cardId in cardIds)
@@ -106,7 +102,7 @@ internal sealed partial class CharacterZhangChangPuOlRuntime
         return mask;
     }
 
-    internal static IEnumerable<int> YanjiaoEqualSumSubsets(List<global::CardGame.Core.GameEngine.YanjiaoCandidate> cards, int mask, int pool)
+    internal static IEnumerable<int> YanjiaoEqualSumSubsets(List<GameEngine.YanjiaoCandidate> cards, int mask, int pool)
     {
         var target = YanjiaoRankSum(cards, mask);
         for (var subset = pool; subset > 0; subset = (subset - 1) & pool)
@@ -114,7 +110,7 @@ internal sealed partial class CharacterZhangChangPuOlRuntime
                 yield return subset;
     }
 
-    internal static bool YanjiaoHasEqualSumPartner(List<global::CardGame.Core.GameEngine.YanjiaoCandidate> cards, int mask, int pool) => YanjiaoEqualSumSubsets(cards, mask, pool).Any();
+    internal static bool YanjiaoHasEqualSumPartner(List<GameEngine.YanjiaoCandidate> cards, int mask, int pool) => YanjiaoEqualSumSubsets(cards, mask, pool).Any();
     internal void YanjiaoApplyLeftoverPenalty(ProgramSkillFrame frame, int leftoverCount)
     {
         if (leftoverCount <= 1)
@@ -129,7 +125,7 @@ internal sealed partial class CharacterZhangChangPuOlRuntime
         _coreProgramLifecycleOperations.SetProgramCardSet(frame.Id, bind, cardIds, SkillProgramCardSetVisibility.Public, locations, selectionActorSeat: chooserSeat);
     }
 
-    internal void PresentYanjiaoGroupPrompt(ProgramSkillFrame frame, SkillProgramEffect effect, ProgramSkillCardSetBinding source, List<global::CardGame.Core.GameEngine.YanjiaoCandidate> cards, int chooserSeat, string stage, int[] masks)
+    internal void PresentYanjiaoGroupPrompt(ProgramSkillFrame frame, SkillProgramEffect effect, ProgramSkillCardSetBinding source, List<GameEngine.YanjiaoCandidate> cards, int chooserSeat, string stage, int[] masks)
     {
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(frame.SkillId);
         var ownerName = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Name;
@@ -145,7 +141,7 @@ internal sealed partial class CharacterZhangChangPuOlRuntime
         _coreMatchOutcomeStatusWinnerAccess._status = _coreMatchParticipantsPlayersAccess._players[chooserSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
 
-    internal static string YanjiaoStageText(List<global::CardGame.Core.GameEngine.YanjiaoCandidate> cards, string stage, int optionCount) => stage == "first" ? $"选出第一组（{(optionCount)} 种可行分组）" : $"选出点数和相等的另一组（{(optionCount)} 种）";
-    internal static IEnumerable<string> YanjiaoCardTexts(List<global::CardGame.Core.GameEngine.YanjiaoCandidate> cards, int mask) => Enumerable.Range(0, cards.Count).Where(index => (mask & (1 << index)) != 0).Select(index => $"【{(cards[index].DisplayName)}】{(cards[index].RankText)}");
-    internal static int[] YanjiaoCardIds(List<global::CardGame.Core.GameEngine.YanjiaoCandidate> cards, int mask) => Enumerable.Range(0, cards.Count).Where(index => (mask & (1 << index)) != 0).Select(index => cards[index].Id).ToArray();
+    internal static string YanjiaoStageText(List<GameEngine.YanjiaoCandidate> cards, string stage, int optionCount) => stage == "first" ? $"选出第一组（{(optionCount)} 种可行分组）" : $"选出点数和相等的另一组（{(optionCount)} 种）";
+    internal static IEnumerable<string> YanjiaoCardTexts(List<GameEngine.YanjiaoCandidate> cards, int mask) => Enumerable.Range(0, cards.Count).Where(index => (mask & (1 << index)) != 0).Select(index => $"【{(cards[index].DisplayName)}】{(cards[index].RankText)}");
+    internal static int[] YanjiaoCardIds(List<GameEngine.YanjiaoCandidate> cards, int mask) => Enumerable.Range(0, cards.Count).Where(index => (mask & (1 << index)) != 0).Select(index => cards[index].Id).ToArray();
 }

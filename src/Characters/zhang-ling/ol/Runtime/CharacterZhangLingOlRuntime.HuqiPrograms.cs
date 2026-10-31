@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangLingOlRuntime
@@ -36,7 +32,7 @@ internal sealed partial class CharacterZhangLingOlRuntime
             return SkillProgramStepOutcome.Continue;
         var suit = binding.FrozenRevealedSuit ?? throw new InvalidOperationException("Huqi requires its frozen actual final judgment suit.");
         var issued = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhangLingBindingIssuedEvent>().Single(e => e.FrameId == frame.Id);
-        if (suit is not (Suit.Heart or Suit.Diamond) || issued.DamageSourceSeat is not { } source || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source) || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || source == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[source], new Card(0, CardKind.Slash, Suit.None, 0), new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), CardKind.Slash, noEffectiveRank: true, physicalCardIds: []))
+        if (suit is not (Suit.Heart or Suit.Diamond) || issued.DamageSourceSeat is not { } source || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source) || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || source == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[source], new Card(0, CardKind.Slash, Suit.None, 0), new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), CardKind.Slash, noEffectiveRank: true, physicalCardIds: []))
             return SkillProgramStepOutcome.Continue;
         var attack = _coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.ResolutionId;
         var duel = _coreNativeCardContinuationCursorsOperations.ActiveDuel?.OwnerFrameId;
@@ -50,7 +46,7 @@ internal sealed partial class CharacterZhangLingOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 26050)]
-    internal bool RestoreHuqiSuspendedAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool RestoreHuqiSuspendedAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.ProgramFrameId is not { } parentId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuqiSlash: { } receipt } parent || parent.Id != parentId)
             return false;

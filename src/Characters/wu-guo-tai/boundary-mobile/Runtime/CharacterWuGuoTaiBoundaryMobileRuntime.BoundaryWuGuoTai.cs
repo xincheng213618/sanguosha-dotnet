@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuGuoTaiBoundaryMobileRuntime
 {
-    bool global::CardGame.Core.IBoundaryWuGuoTaiQueries.CanExchange(int owner, int first, int second) => IsBoundaryWuGuoTaiGanluPair(owner, first, second);
+    bool IBoundaryWuGuoTaiQueries.CanExchange(int owner, int first, int second) => IsBoundaryWuGuoTaiGanluPair(owner, first, second);
     internal bool IsBoundaryWuGuoTaiGanluPair(int ownerSeat, int firstSeat, int secondSeat)
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(firstSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(secondSeat) || firstSeat == secondSeat || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[firstSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[secondSeat].IsAlive)

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
 {
     internal int HappyGuardCount(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Markers.GetValueOrDefault(PlayerMarkerKind.HappyGuard);
     internal bool HappyGuardOnField() => _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && HappyGuardCount(p.Seat) > 0);
-    internal CardConversionSource HappyGuardSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? HappyGuardAttack(long id) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id) switch
+    internal CardConversionSource HappyGuardSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal GameEngine.IDamageAttempt? HappyGuardAttack(long id) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id) switch
     {
         ProgramSkillFrame { AttackAttempt: not null } => _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(id),
         CardUseFrame { CardAttack: not null } or ProgramSkillFrame { CardAttack: not null } or JudgmentFrame { CardAttack: not null } => _kernelCoreMainOperations.CreateCardAttackHandle(id),
@@ -33,7 +30,7 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
         _ => true
     };
     [ProgramDamageHook(ProgramDamagePhase.FactModifiers, 41980)]
-    internal IEnumerable<(CardUseEffectSource Source, int Amount)> HappyDianWeiKuangxi(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal IEnumerable<(CardUseEffectSource Source, int Amount)> HappyDianWeiKuangxi(GameEngine.IDamageAttempt attack)
     {
         if (attack.IsSourceLess || attack.IsChainPropagation || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive || !HappyGuardOnField())
             return[];
@@ -61,7 +58,7 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerMarkerChangedEvent(f.Id, target, PlayerMarkerKind.HappyGuard, count - before, total, f.OwnerSeat, "skill-program.happy:shenwei.guard"));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IHappyDianWeiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveHappyDianWei(f, op);
+    SkillProgramStepOutcome IHappyDianWeiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveHappyDianWei(f, op);
     internal SkillProgramStepOutcome ResolveHappyDianWei(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -165,7 +162,7 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
     [ProgramAnswer("happy-dian-guard")]
     internal void AnswerHappyGuard(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyGuard: { } r } f || !ValidHappyGuardFrame(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == HappyGuardStage.GuardChoice ? r.GuardedSeat : f.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HappyGuardChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyGuard: { } r } f || !ValidHappyGuardFrame(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == HappyGuardStage.GuardChoice ? r.GuardedSeat : f.OwnerSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], HappyGuardChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Guard choice lost its exact current chooser, native occurrence or unpaid source.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

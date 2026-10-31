@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -91,7 +88,7 @@ internal sealed partial class CharacterJiKangMobileRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Ji Kang answer lost its original program frame.");
         var r = f.MobileJiKang ?? throw new InvalidOperationException("Ji Kang answer lost its issued receipt.");
-        if (selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MobileJiKangChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MobileJiKangChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Ji Kang answer lost its current actual card, participant or exact selection stage.");
         var branch = selected.Parameters["branch"];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

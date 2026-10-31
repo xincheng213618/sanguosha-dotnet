@@ -1,26 +1,22 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineMouLuMengRuntime
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CharacterGuanYuRuntimeEntries _characterGuanYuRuntimeOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess _contentRegistryOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess _modeRulesOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelSkillRuntimeStateAccess _skillRuntimeStateOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineCharacterHostEntries _coreCharacterHostOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineRoundEndingEntries _coreRoundEndingOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineShanheSourceDifficultyEntries _coreShanheSourceDifficultyOperations;
-    private readonly global::CardGame.Core.RuntimeEntries.CoreMatchLogEntries _coreMatchLogOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberRoundTurnSeatsAccess _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess;
-    private readonly global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnProgressionAccess _coreActualTurnProgressTurnProgressionAccess;
-    internal CoreGameEngineMouLuMengRuntime(global::CardGame.Core.RuntimeEntries.CharacterGuanYuRuntimeEntries characterGuanYuRuntimeOperations, global::CardGame.Core.EngineOwners.IKernelContentRegistryAccess contentRegistryOperations, global::CardGame.Core.EngineOwners.IKernelMatchModeRulesAccess modeRulesOperations, global::CardGame.Core.EngineOwners.IKernelSkillRuntimeStateAccess skillRuntimeStateOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineCharacterHostEntries coreCharacterHostOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineRoundEndingEntries coreRoundEndingOperations, global::CardGame.Core.RuntimeEntries.CoreGameEngineShanheSourceDifficultyEntries coreShanheSourceDifficultyOperations, global::CardGame.Core.RuntimeEntries.CoreMatchLogEntries coreMatchLogOperations, global::CardGame.Core.EngineOwners.IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations, global::CardGame.Core.EngineStates.Contracts.ICoreActualRoundProgressRoundNumberRoundTurnSeatsAccess coreActualRoundProgressRoundNumberRoundTurnSeatsAccess, global::CardGame.Core.EngineStates.Contracts.ICoreActualTurnProgressTurnProgressionAccess coreActualTurnProgressTurnProgressionAccess)
+    private readonly RuntimeEntries.CharacterGuanYuRuntimeEntries _characterGuanYuRuntimeOperations;
+    private readonly IKernelContentRegistryAccess _contentRegistryOperations;
+    private readonly IKernelMatchModeRulesAccess _modeRulesOperations;
+    private readonly IKernelSkillRuntimeStateAccess _skillRuntimeStateOperations;
+    private readonly RuntimeEntries.CoreGameEngineCharacterHostEntries _coreCharacterHostOperations;
+    private readonly RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations;
+    private readonly RuntimeEntries.CoreGameEngineRoundEndingEntries _coreRoundEndingOperations;
+    private readonly RuntimeEntries.CoreGameEngineShanheSourceDifficultyEntries _coreShanheSourceDifficultyOperations;
+    private readonly RuntimeEntries.CoreMatchLogEntries _coreMatchLogOperations;
+    private readonly IKernelAdvanceEventRulesAndQueueFactOperations _kernelCoreGameEngineRuleProgressionOperations;
+    private readonly EngineStates.Contracts.ICoreActualRoundProgressRoundNumberRoundTurnSeatsAccess _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess;
+    private readonly EngineStates.Contracts.ICoreActualTurnProgressTurnProgressionAccess _coreActualTurnProgressTurnProgressionAccess;
+    internal CoreGameEngineMouLuMengRuntime(RuntimeEntries.CharacterGuanYuRuntimeEntries characterGuanYuRuntimeOperations, IKernelContentRegistryAccess contentRegistryOperations, IKernelMatchModeRulesAccess modeRulesOperations, IKernelSkillRuntimeStateAccess skillRuntimeStateOperations, RuntimeEntries.CoreGameEngineCharacterHostEntries coreCharacterHostOperations, RuntimeEntries.CoreGameEngineProgramEventHistoryEntries coreProgramEventHistoryOperations, RuntimeEntries.CoreGameEngineRoundEndingEntries coreRoundEndingOperations, RuntimeEntries.CoreGameEngineShanheSourceDifficultyEntries coreShanheSourceDifficultyOperations, RuntimeEntries.CoreMatchLogEntries coreMatchLogOperations, IKernelAdvanceEventRulesAndQueueFactOperations kernelCoreGameEngineRuleProgressionOperations, EngineStates.Contracts.ICoreActualRoundProgressRoundNumberRoundTurnSeatsAccess coreActualRoundProgressRoundNumberRoundTurnSeatsAccess, EngineStates.Contracts.ICoreActualTurnProgressTurnProgressionAccess coreActualTurnProgressTurnProgressionAccess)
     {
         this._characterGuanYuRuntimeOperations = characterGuanYuRuntimeOperations;
         this._contentRegistryOperations = contentRegistryOperations;

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineDeferredBenefitsProgramsProgramNextTurnRuleModifiersAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineDeferredBenefitsProgramsProgramNextTurnRuleModifiersAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.ProgramNextTurnRuleModifier> _programNextTurnRuleModifiers { get; }
+    ref readonly List<ProgramNextTurnRuleModifier> _programNextTurnRuleModifiers { get; }
 }

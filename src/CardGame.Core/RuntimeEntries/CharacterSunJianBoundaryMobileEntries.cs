@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterSunJianBoundaryMobileEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterSunJianBoundaryMobileRuntime> _resolve;
-    private CharacterSunJianBoundaryMobileEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterSunJianBoundaryMobileRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterSunJianBoundaryMobileRuntime> _resolve;
+    private CharacterSunJianBoundaryMobileEntries(Func<EngineOwners.CharacterSunJianBoundaryMobileRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterSunJianBoundaryMobileEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterSunJianBoundaryMobileRuntime> resolve) => new(resolve);
+    internal static CharacterSunJianBoundaryMobileEntries Create(Func<EngineOwners.CharacterSunJianBoundaryMobileRuntime> resolve) => new(resolve);
 }

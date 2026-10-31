@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
@@ -45,7 +41,7 @@ internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
                 parentAction = _coreDelayedNullificationOperations.NullificationParentActionId(counterspell) ?? 0;
                 provider = counterspellProvider;
             }
-            else if (parent is CardUseFrame { Action: { } incoming, CardAttack: { Active: true } attack } && move.Reason == CardMoveReasons.Respond && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && (move.From.OwnerSeat == attack.TargetSeat || move.From == CardLocation.DrawPile && parent.RequestedDeckBasicMaterial is { Claiming: true, Intent: RequestedDeckBasicIntent.Dodge } requested && requested.OwnerFrameId == parentId && requested.ActorSeat == attack.TargetSeat && requested.SelectedCardId == move.CardId && requested.SelectedKind == move.CardKind && requested.PaidMovementSequence == move.Sequence && _coreRequestedDeckBasicOwnershipOperations.HasValidRequestedDeckBasicMaterial(parent)) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
+            else if (parent is CardUseFrame { Action: { } incoming, CardAttack: { Active: true } attack } && move.Reason == CardMoveReasons.Respond && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && (move.From.OwnerSeat == attack.TargetSeat || move.From == CardLocation.DrawPile && parent.RequestedDeckBasicMaterial is { Claiming: true, Intent: RequestedDeckBasicIntent.Dodge } requested && requested.OwnerFrameId == parentId && requested.ActorSeat == attack.TargetSeat && requested.SelectedCardId == move.CardId && requested.SelectedKind == move.CardKind && requested.PaidMovementSequence == move.Sequence && _coreRequestedDeckBasicOwnershipOperations.HasValidRequestedDeckBasicMaterial(parent)) && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
             {
                 kind = NativeTrueUseDiscardKind.Dodge;
                 parentAction = incoming.ActionId;
@@ -57,7 +53,7 @@ internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
         }
     }
 
-    internal static bool IsNativeUseFinishReason(CardMoveReason reason) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_NativeUsedDiscardOrigins.IsNativeUseFinishReason(reason);
+    internal static bool IsNativeUseFinishReason(CardMoveReason reason) => RuntimeSkills.RuntimeRules_Core_NativeUsedDiscardOrigins.IsNativeUseFinishReason(reason);
     internal bool IsNativeTrueUseDiscardMovement(CardMovementBatchContext batch, CardMovementRecord move)
     {
         if (move.To != CardLocation.DiscardPile || move.From != CardLocation.Processing || batch.ParentFrameId is not { } parentId || !batch.Movements.Contains(move) || move.Sequence <= 0 || move.Sequence > _coreCardMovementJournalCardMovementsAccess._cardMovements.Count || _coreCardMovementJournalCardMovementsAccess._cardMovements[(int)move.Sequence - 1] != move)
@@ -72,7 +68,7 @@ internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
             if (fact.Kind == NativeTrueUseDiscardKind.Use)
                 return IsNativeUseFinishReason(move.Reason) && parent is CardUseFrame { Action: { Type: CardActionType.Use } action } use && action.ActionId == fact.ParentActionId && action.EffectiveKind == use.CardKind && action.ProviderSeat == fact.ProviderSeat && action.PhysicalCards.Any(cost => cost.CardId == move.CardId && cost.CardKind == move.CardKind && cost.From == entered.From);
             if (fact.Kind == NativeTrueUseDiscardKind.Dodge)
-                return move.Reason == CardMoveReasons.ResponseFinished && parent is CardUseFrame { Action: { } incoming, CardAttack: { Active: true } attack } && incoming.ActionId == fact.ParentActionId && attack.TargetSeat == fact.ProviderSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge);
+                return move.Reason == CardMoveReasons.ResponseFinished && parent is CardUseFrame { Action: { } incoming, CardAttack: { Active: true } attack } && incoming.ActionId == fact.ParentActionId && attack.TargetSeat == fact.ProviderSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge);
             return fact.Kind == NativeTrueUseDiscardKind.Nullification && (move.Reason == CardMoveReasons.NullificationFinished || entered.Reason == CardMoveReasons.Respond && move.Reason == CardMoveReasons.ResponseFinished) && parent is NullificationWindowFrame counterspell && _coreDelayedNullificationOperations.HasNullificationEffectOwner(counterspell) && (_coreDelayedNullificationOperations.NullificationParentActionId(counterspell) ?? 0) == fact.ParentActionId;
         }
 
@@ -86,7 +82,7 @@ internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
             return IsNativeUseFinishReason(move.Reason) && declared.EffectiveKind == declaredUse.CardKind && paid.ActorSeat == declared.ActorSeat && paid.ProviderSeat == declared.ProviderSeat && declared.ConversionChain.Contains(paid.Source);
         if (parent is NullificationWindowFrame pending)
             return paid.DeclaredKind == CardKind.Nullification && paid.ActorSeat == paid.ProviderSeat && move.Reason == CardMoveReasons.NullificationFinished && _coreDelayedNullificationOperations.HasNullificationEffectOwner(pending);
-        if (parent is not CardUseFrame { CardAttack: { Active: true } slash } || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(slash.EffectiveCardKind ?? CardKind.Dodge) || slash.TargetSeat != paid.ProviderSeat || paid.ActorSeat != paid.ProviderSeat || paid.DeclaredKind != CardKind.Dodge || move.Reason != CardMoveReasons.ResponseFinished)
+        if (parent is not CardUseFrame { CardAttack: { Active: true } slash } || !CoreNativeCardClassificationsRuntime.IsSlashCard(slash.EffectiveCardKind ?? CardKind.Dodge) || slash.TargetSeat != paid.ProviderSeat || paid.ActorSeat != paid.ProviderSeat || paid.DeclaredKind != CardKind.Dodge || move.Reason != CardMoveReasons.ResponseFinished)
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => _coreResponseUseCompletionOperations.IsCompletedResponseUse(e.Action, ProgramCardContinuation.Dodge) && e.Action.PhysicalCards.Contains(paid.Cost) && e.Action.ConversionChain.Contains(paid.Source) && _coreResponseCompletionOperations.IsResponseCompletionEntry(e.Action, ProgramCardContinuation.Dodge, parentId, paid.Cost, entered));
     }

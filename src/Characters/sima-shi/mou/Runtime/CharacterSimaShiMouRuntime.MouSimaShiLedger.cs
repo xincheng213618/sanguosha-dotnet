@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaShiMouRuntime
@@ -50,7 +46,7 @@ internal sealed partial class CharacterSimaShiMouRuntime
         foreach (var m in batch.Movements.Where(m => m.To == CardLocation.DiscardPile && m.From != m.To && _coreProgramEventHistoryOperations.ProgramEventHistory<MouSimaShiMarkedEvent>().Any(e => e.CardId == m.CardId)))
         {
             var previous = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(x => x.CardId == m.CardId && x.Sequence < m.Sequence);
-            var finish = m.From == CardLocation.Processing && (global::CardGame.Core.EngineOwners.CoreGameEngineNativeUsedDiscardOriginsRuntime.IsNativeUseFinishReason(m.Reason) || m.Reason == CardMoveReasons.ResponseFinished || m.Reason == CardMoveReasons.NullificationFinished);
+            var finish = m.From == CardLocation.Processing && (CoreGameEngineNativeUsedDiscardOriginsRuntime.IsNativeUseFinishReason(m.Reason) || m.Reason == CardMoveReasons.ResponseFinished || m.Reason == CardMoveReasons.NullificationFinished);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouSimaShiDiscardEvent(batch.TurnNumber, m.CardId, m.CardKind, m.Sequence, batch.ParentFrameId ?? 0, previous?.To == CardLocation.Processing ? previous.Sequence : 0, finish));
         }
     }
@@ -80,7 +76,7 @@ internal sealed partial class CharacterSimaShiMouRuntime
         var debt = _coreProgramEventHistoryOperations.ProgramEventHistory<MouSimaShiClaimIssuedEvent>().SingleOrDefault(d => d.Source.OwnerSeat == c.OwnerSeat && d.Source.SkillInstanceId == c.SkillInstanceId && d.GameplayHash == c.GameplayHash && ValidMouSimaShiDebt(d));
         if (debt is null)
             return null;
-        var paid = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.MouSimaShi?.DebtId == debt.FrameId && f.WindowContext == w && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c));
+        var paid = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.MouSimaShi?.DebtId == debt.FrameId && f.WindowContext == w && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c));
         if (c.BindingId == "remove-issued-entities" && w.Window == SkillProgramTriggerWindow.ActualPhaseEnded && w.ActualPhaseEnd is { } due && due.EntitlementId == debt.FrameId && due.Phase == debt.Phase && _coreActualPhaseEndsOperations.IsExactActualPhaseEndCandidate(c, w) && (paid || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouSimaShiPhaseSettledEvent>().Any(e => e.DebtId == debt.FrameId)))
             return debt;
         if (c.BindingId != "death-return-shuffle" || w.Window != SkillProgramTriggerWindow.OwnerDied || _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)is not ProgramDeathTriggerWindowFrame p || p.OwnerSeat != c.OwnerSeat || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || p.Candidates[p.CandidateIndex] != c || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == p.DeathFrameId)is not DeathFrame death || death.VictimSeat != c.OwnerSeat)

@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheCampaignsRuntime
 {
-    internal static GameOptions FreezeShanheBattleOptions(GameOptions options) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ShanheCampaigns.FreezeShanheBattleOptions(options);
+    internal static GameOptions FreezeShanheBattleOptions(GameOptions options) => RuntimeSkills.RuntimeRules_Core_ShanheCampaigns.FreezeShanheBattleOptions(options);
     internal void PlaceShanhePhysicalCard(ShanheStartingCard item, int seat, bool equipment)
     {
         var card = new Card(_coreTrustedCardZoneDiagnosticsOperations.CreateCardZoneDiagnostics().Select(c => c.CardId).DefaultIfEmpty(0).Max() + 1, item.Kind, item.Suit, item.Rank);

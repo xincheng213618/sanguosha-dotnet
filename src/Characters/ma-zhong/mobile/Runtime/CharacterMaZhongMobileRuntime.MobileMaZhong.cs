@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaZhongMobileRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CharacterMaZhongMobileRuntime
     internal const string MobileFumanGiftReason = "skill-program.mobile:fuman.MoveBoundCards";
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 78800, SkillProgramEffectOp.PrepareMobileMaZhongFuman)]
     internal bool CanOfferMobileFuman(ProgramActivationLegalityContext gate) => _corePhysicalOwnedCardQueriesOperations.GetHand(gate.Owner).Any(card => card.Kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash);
-    void global::CardGame.Core.IMobileMaZhongHost.Prepare(ProgramSkillFrame frame) => PrepareMobileMaZhongFuman(frame);
+    void IMobileMaZhongHost.Prepare(ProgramSkillFrame frame) => PrepareMobileMaZhongFuman(frame);
     internal void PrepareMobileMaZhongFuman(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -36,7 +32,7 @@ internal sealed partial class CharacterMaZhongMobileRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 78800)]
     internal void CollectMobileFumanUse(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> candidates)
     {
-        if (window != SkillProgramTriggerWindow.CardUseCommitted || action.Type != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != action.ProviderSeat || action.PhysicalCards is not [var material] || material.From != CardLocation.Hand(action.ActorSeat) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Action?.ActionId != action.ActionId)
+        if (window != SkillProgramTriggerWindow.CardUseCommitted || action.Type != CardActionType.Use || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != action.ProviderSeat || action.PhysicalCards is not [var material] || material.From != CardLocation.Hand(action.ActorSeat) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Action?.ActionId != action.ActionId)
             return;
         var payment = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(move => move.CardId == material.CardId && move.From == material.From && move.To == CardLocation.Processing && move.Reason == CardMoveReasons.Use);
         if (payment is null)
@@ -61,7 +57,7 @@ internal sealed partial class CharacterMaZhongMobileRuntime
 
     internal bool ExactMobileFumanUseCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
-        if (candidate.SkillId != MobileFuman || candidate.BindingId != MobileFumanReward || context is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } card } || context.OwnerSeat != candidate.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(MobileFuman).Program?.GameplayHash != candidate.GameplayHash || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != card.ParentCardUseFrameId || window.Action.ActionId != card.CardActionId || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == window.ParentFrameId)is not { Action: { Type: CardActionType.Use } action } use || action.ActionId != card.CardActionId || action.ActorSeat != card.ActorSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != action.ProviderSeat || action.PhysicalCards is not [var material] || material.From != CardLocation.Hand(action.ActorSeat) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
+        if (candidate.SkillId != MobileFuman || candidate.BindingId != MobileFumanReward || context is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } card } || context.OwnerSeat != candidate.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(MobileFuman).Program?.GameplayHash != candidate.GameplayHash || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != card.ParentCardUseFrameId || window.Action.ActionId != card.CardActionId || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == window.ParentFrameId)is not { Action: { Type: CardActionType.Use } action } use || action.ActionId != card.CardActionId || action.ActorSeat != card.ActorSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat != action.ProviderSeat || action.PhysicalCards is not [var material] || material.From != CardLocation.Hand(action.ActorSeat) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return false;
         var current = window.Candidates[window.CandidateIndex];
         if (current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.TriggerId != candidate.BindingId || current.SkillInstanceId != candidate.SkillInstanceId || current.GameplayHash != candidate.GameplayHash || _coreCardActionsOperations.CreateCardActionProgramContext2(window, current) != context)

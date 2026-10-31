@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunLuBanBoundaryMobileRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterSunLuBanBoundaryMobileRuntime
     [ProgramTargetWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, 54100)]
     internal bool BoundarySunLuBanTargetWindow(ProgramTargetCardWindowQuery query) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseBoundarySunLuBanZenhui);
     internal bool AllowsBoundarySunLuBanDrawTwoRoleTarget(CardUseFrame use) => use is { CardKind: CardKind.DrawTwo, Action: { Type: CardActionType.Use, EffectiveKind: CardKind.DrawTwo } action } && use.Step != ResolutionFrameStep.Completed && use.SourceSeat == action.ActorSeat && action.EffectiveDesignatedTargetSeats is [var self] && self == action.ActorSeat && (action.EffectiveIsRed == false || action.EffectiveIsRed is null && action.EffectiveSuit is Suit.Spade or Suit.Club) && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat == action.ActorSeat && ReferenceEquals(use, _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == use.Id)) && _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat]).Any(program => program.Id == BoundaryZenhui) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(declared => declared.ResolutionId == use.Id && declared.SourceSeat == action.ActorSeat && declared.CardId == use.CardId && declared.CardKind == CardKind.DrawTwo);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundarySunLuBanHost.Choose(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginBoundarySunLuBanChoice(frame, effect);
+    SkillProgramStepOutcome IBoundarySunLuBanHost.Choose(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginBoundarySunLuBanChoice(frame, effect);
     internal IReadOnlyList<PromptChoice> BoundarySunLuBanChoices(ProgramSkillFrame frame)
     {
         var use = _coreProgramCardUseRolesOperations.GetProgramRoleCardUse(frame);
@@ -49,7 +45,7 @@ internal sealed partial class CharacterSunLuBanBoundaryMobileRuntime
     [ProgramAnswer(BoundaryZenhuiAction)]
     internal void AnswerBoundarySunLuBanChoice(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.SkillId != BoundaryZenhui || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], BoundarySunLuBanChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.SkillId != BoundaryZenhui || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], BoundarySunLuBanChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Mobile Zenhui requires its exact published owner's choice on the original frame.");
         var use = _coreProgramCardUseRolesOperations.GetProgramRoleCardUse(frame);
         var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)!;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramOwnedCardsRuntime
@@ -130,7 +126,7 @@ internal sealed partial class CoreGameEngineProgramOwnedCardsRuntime
         effect = _coreHalfHandPhaseDebtProgramsOperations.PhaseHandDebtOwnedSelectionEffect(frame, _coreEquipmentPairPaymentsOperations.EquipmentPairOwnedSelectionEffect(frame, _coreTurnDrawDebtsOperations.TurnDrawDebtOwnedSelectionEffect(frame, effect)));
         var draft = frame.OwnedCardSelection ?? throw new InvalidOperationException("Missing owned-card draft.");
         var finish = selected.Parameters.GetValueOrDefault("program-action") == "finish-owned-cards";
-        if (effect.Op != SkillProgramEffectOp.SelectOwnedCards || draft.ResultBind != effect.ResultBind || draft.CardOwnerSeat != (effect.TargetReference is { } cardOwner ? _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, cardOwner) : global::CardGame.Core.EngineOwners.CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(frame, effect.Target)) || selected.Parameters.GetValueOrDefault("result-bind") != draft.ResultBind || selected.Parameters.GetValueOrDefault("selection-index") != draft.SelectedCardIds.Count.ToString(System.Globalization.CultureInfo.InvariantCulture) || selected.Targets.Count != 0 || (finish ? !draft.AllowEarlyFinish && !effect.AllowDecline || draft.SelectedCardIds.Count < draft.MinimumCount && !effect.AllowDecline || selected.Cards.Count != 0 : selected.Parameters.GetValueOrDefault("program-action") != "select-owned-cards" || selected.Cards.Count != 1 || !draft.CandidateCardIds.Contains(selected.Cards[0]) || draft.SelectedCardIds.Contains(selected.Cards[0])))
+        if (effect.Op != SkillProgramEffectOp.SelectOwnedCards || draft.ResultBind != effect.ResultBind || draft.CardOwnerSeat != (effect.TargetReference is { } cardOwner ? _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, cardOwner) : CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(frame, effect.Target)) || selected.Parameters.GetValueOrDefault("result-bind") != draft.ResultBind || selected.Parameters.GetValueOrDefault("selection-index") != draft.SelectedCardIds.Count.ToString(System.Globalization.CultureInfo.InvariantCulture) || selected.Targets.Count != 0 || (finish ? !draft.AllowEarlyFinish && !effect.AllowDecline || draft.SelectedCardIds.Count < draft.MinimumCount && !effect.AllowDecline || selected.Cards.Count != 0 : selected.Parameters.GetValueOrDefault("program-action") != "select-owned-cards" || selected.Cards.Count != 1 || !draft.CandidateCardIds.Contains(selected.Cards[0]) || draft.SelectedCardIds.Contains(selected.Cards[0])))
             throw new InvalidOperationException("The owned-card choice does not match its suspended instruction.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.CardOwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !_corePindianHandReturnsOperations.HasPaidPindianHandReturn(frame) || draft.CandidateCardIds.Where((id, index) => _cardZonesOperations._cardZones.GetLocation(id) != draft.CandidateLocations[index]).Any())

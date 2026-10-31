@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangQuanMobileShiRuntime
 {
     internal const string ShiQuanCuixian = ShiHuangQuanComposition.CuixianSkill, ShiQuanGushi = ShiHuangQuanComposition.GushiSkill;
-    SkillProgramStepOutcome global::CardGame.Core.IShiHuangQuanHost.ResolveCuixian(ProgramSkillFrame frame) => BeginShiQuanCuixian(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiHuangQuanHost.ResolveGushi(ProgramSkillFrame frame) => BeginShiQuanGushi(frame);
+    SkillProgramStepOutcome IShiHuangQuanHost.ResolveCuixian(ProgramSkillFrame frame) => BeginShiQuanCuixian(frame);
+    SkillProgramStepOutcome IShiHuangQuanHost.ResolveGushi(ProgramSkillFrame frame) => BeginShiQuanGushi(frame);
     internal bool HasShiQuan => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShiHqCuixian);
 
     internal bool IsShiQuanDuelUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ShiQuanDuelOrigin: not null, CardId: 0, CardKind: CardKind.Duel, PhysicalCardIds.Count: 0 };
@@ -201,7 +198,7 @@ internal sealed partial class CharacterHuangQuanMobileShiRuntime
     [ProgramAnswer(ShiHuangQuanComposition.ProgramAction)]
     internal void AnswerShiQuan(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiQuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || pending.PlayerSeat != f.OwnerSeat || !ShiQuanChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiQuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || pending.PlayerSeat != f.OwnerSeat || !ShiQuanChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Shi Huang Quan choice lost its current frame or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -323,7 +320,7 @@ internal sealed partial class CharacterHuangQuanMobileShiRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 61)]
-    internal bool ReturnShiQuanDuelAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnShiQuanDuelAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.ShiQuanDuelReturn is null)
             return false;

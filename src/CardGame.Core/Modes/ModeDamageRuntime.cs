@@ -31,7 +31,7 @@ internal sealed partial class MatchModeRuntime
         internal ModeDamagePorts(IEnumerable<object> features)
         {
             var installed = features.ToArray();
-            Rules = ModeDamageRuleComposition.Freeze(global::CardGame.Core.EngineOwners.CoreProgramDamageHooksRuntime.NativeDamageHookCatalog,
+            Rules = ModeDamageRuleComposition.Freeze(EngineOwners.CoreProgramDamageHooksRuntime.NativeDamageHookCatalog,
                 installed.OfType<IMatchModeDamageRuleProvider>().SelectMany(provider => provider.DamageRules ??
                     throw new InvalidOperationException("A mode damage rule provider returned no registrations.")));
             var nature = installed.OfType<IMatchModeDamageNaturePolicy>().OrderBy(policy => policy.Order).ToArray();

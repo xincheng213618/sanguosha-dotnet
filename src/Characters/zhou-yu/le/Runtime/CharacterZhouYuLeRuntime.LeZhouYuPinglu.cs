@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouYuLeRuntime
@@ -10,8 +6,8 @@ internal sealed partial class CharacterZhouYuLeRuntime
     internal const string PingluObtainReason = "skill-program.le-zhou-yu.pinglu.obtain";
     internal bool HasLeZhouYuPingluCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolvePingluInRangeRandomHands);
 
-    internal static CardConversionSource PingluSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_yu_le_LeZhouYuPinglu.PingluSource(frame);
-    SkillProgramStepOutcome global::CardGame.Core.ILeZhouYuPingluHost.Resolve(ProgramSkillFrame frame) => BeginPinglu(frame);
+    internal static CardConversionSource PingluSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_zhou_yu_le_LeZhouYuPinglu.PingluSource(frame);
+    SkillProgramStepOutcome ILeZhouYuPingluHost.Resolve(ProgramSkillFrame frame) => BeginPinglu(frame);
     internal ActualDiscardRecoveryPhaseKey? PingluPlay(int actor)
     {
         var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();

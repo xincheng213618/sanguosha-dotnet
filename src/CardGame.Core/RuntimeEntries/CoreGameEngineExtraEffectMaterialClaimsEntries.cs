@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectMaterialClaimsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineExtraEffectMaterialClaimsRuntime))]
 internal sealed partial class CoreGameEngineExtraEffectMaterialClaimsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectMaterialClaimsRuntime> _resolve;
-    private CoreGameEngineExtraEffectMaterialClaimsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectMaterialClaimsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineExtraEffectMaterialClaimsRuntime> _resolve;
+    private CoreGameEngineExtraEffectMaterialClaimsEntries(Func<EngineOwners.CoreGameEngineExtraEffectMaterialClaimsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineExtraEffectMaterialClaimsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectMaterialClaimsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineExtraEffectMaterialClaimsEntries Create(Func<EngineOwners.CoreGameEngineExtraEffectMaterialClaimsRuntime> resolve) => new(resolve);
 }

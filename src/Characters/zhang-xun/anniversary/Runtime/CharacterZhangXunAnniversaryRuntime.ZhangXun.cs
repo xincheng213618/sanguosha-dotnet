@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangXunAnniversaryRuntime
 {
     internal const string ZhangXunFollowupAction = "anniversary-zhang-xun-followup";
-    internal CardConversionSource ZhangXunFrameSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryZhangXunHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp operation) => operation == SkillProgramEffectOp.ArmAnniversaryZhangXunSuizheng ? ArmAnniversaryZhangXun(f) : ChooseAnniversaryZhangXunSlash(f);
+    internal CardConversionSource ZhangXunFrameSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryZhangXunHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp operation) => operation == SkillProgramEffectOp.ArmAnniversaryZhangXunSuizheng ? ArmAnniversaryZhangXun(f) : ChooseAnniversaryZhangXunSlash(f);
     internal SkillProgramStepOutcome ArmAnniversaryZhangXun(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != AnniversaryZhangXunComposition.Skill || f.TriggerId != AnniversaryZhangXunComposition.Arm || f.ActivationId != f.TriggerId || f.InstructionIndex != 2 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var recipient] || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not TurnEndingBoundaryFrame parent || parent.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || parent.OwnerSeat != f.OwnerSeat || parent.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || context.OwnerSeat != f.OwnerSeat || context.SourceSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex || context.Facts != (parent.Items[parent.ItemIndex].Facts ?? parent.Facts) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangXunSuizhengLeaseEvent>().Any(e => e.FrameId == f.Id))
+        if (f.SkillId != AnniversaryZhangXunComposition.Skill || f.TriggerId != AnniversaryZhangXunComposition.Arm || f.ActivationId != f.TriggerId || f.InstructionIndex != 2 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var recipient] || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not TurnEndingBoundaryFrame parent || parent.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || parent.OwnerSeat != f.OwnerSeat || parent.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || context.OwnerSeat != f.OwnerSeat || context.SourceSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || context.OccurrenceIndex != candidate.OccurrenceIndex || context.Facts != (parent.Items[parent.ItemIndex].Facts ?? parent.Facts) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangXunSuizhengLeaseEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Suizheng requires its exact original Ending candidate and native selected recipient.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive)
             return SkillProgramStepOutcome.Continue;
@@ -68,7 +64,7 @@ internal sealed partial class CharacterZhangXunAnniversaryRuntime
     [ProgramAnswer(ZhangXunFollowupAction)]
     internal void AnswerZhangXunFollowup(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangXunSuizheng: { SelectedTarget: null } r } f || !ValidZhangXunFollowup(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhangXunFollowupChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangXunSuizheng: { SelectedTarget: null } r } f || !ValidZhangXunFollowup(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ZhangXunFollowupChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Suizheng rejects another issuer's turn, damage victim or stale native target choice.");
         var target = choice.Targets.Single();
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

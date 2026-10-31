@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEnginePrivateWhirlRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEnginePrivateWhirlRuntime))]
 internal sealed partial class CoreGameEnginePrivateWhirlEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePrivateWhirlRuntime> _resolve;
-    private CoreGameEnginePrivateWhirlEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePrivateWhirlRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEnginePrivateWhirlRuntime> _resolve;
+    private CoreGameEnginePrivateWhirlEntries(Func<EngineOwners.CoreGameEnginePrivateWhirlRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEnginePrivateWhirlEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEnginePrivateWhirlRuntime> resolve) => new(resolve);
+    internal static CoreGameEnginePrivateWhirlEntries Create(Func<EngineOwners.CoreGameEnginePrivateWhirlRuntime> resolve) => new(resolve);
 }

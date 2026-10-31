@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuFuAnniversaryRuntime
@@ -42,13 +38,13 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
 
     internal bool IsWuFuUse(CardUseFrame use)
     {
-        if (use.AnniversaryWuFuSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { AnniversaryWuFu: { Stage: AnniversaryWuFuStage.NativeUse } r } f || !ValidWuFu(f) || o.Source != r.Source || o.Hash != f.GameplayHash || o.Cursor != r.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || o.Actor != WuFuTask(f).Actor || o.Target != WuFuTask(f).Target || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (use.AnniversaryWuFuSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { AnniversaryWuFu: { Stage: AnniversaryWuFuStage.NativeUse } r } f || !ValidWuFu(f) || o.Source != r.Source || o.Hash != f.GameplayHash || o.Cursor != r.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || o.Actor != WuFuTask(f).Actor || o.Target != WuFuTask(f).Target || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor);
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 46600)]
-    internal bool FinishWuFuAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishWuFuAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { AnniversaryWuFuSlash: not null } use || !IsWuFuUse(use))
@@ -88,7 +84,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 46600)]
-    internal bool ReturnWuFuAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt receipt)
+    internal bool ReturnWuFuAttack(GameEngine.AttackCompletionReceipt receipt)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryWuFu: { Stage: AnniversaryWuFuStage.NativeUse, Returned: true } r } f || r.UseId != receipt.ResolutionId)
             return false;

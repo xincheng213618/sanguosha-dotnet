@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_tao_qian_ol_Zhaohuo
 {
     internal static bool IsZhaohuoTrigger(SkillProgramTrigger trigger) =>

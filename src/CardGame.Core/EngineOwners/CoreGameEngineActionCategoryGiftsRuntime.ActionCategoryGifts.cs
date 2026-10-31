@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineActionCategoryGiftsRuntime
@@ -20,11 +16,11 @@ internal sealed partial class CoreGameEngineActionCategoryGiftsRuntime
     {
         if (provider == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[provider].IsAlive || frame.WindowContext?.CardUse is not { } use)
             throw new InvalidOperationException("A category gift requires a living other provider and the completed real action.");
-        var excluded = global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.EffectiveKind);
+        var excluded = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.EffectiveKind);
         var choices = new List<PromptChoice>();
         foreach (var zone in zones)
-            foreach (var card in _cardZonesOperations._cardZones.CardsAt(new CardLocation(zone, provider)).Where(card => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) != excluded).OrderBy(card => card.Id))
-                choices.Add(new PromptChoice(new ChoiceId($"action-category-gift.{(frame.Id)}.card-{(card.Id)}"), $"交给 {(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Name)} 【{(card.DisplayName)}】（{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}）", [card.Id], [], GiftChoiceParameters(frame, resultBind, "different-action-category-gift")));
+            foreach (var card in _cardZonesOperations._cardZones.CardsAt(new CardLocation(zone, provider)).Where(card => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) != excluded).OrderBy(card => card.Id))
+                choices.Add(new PromptChoice(new ChoiceId($"action-category-gift.{(frame.Id)}.card-{(card.Id)}"), $"交给 {(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Name)} 【{(card.DisplayName)}】（{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))} {(card.RankText)}）", [card.Id], [], GiftChoiceParameters(frame, resultBind, "different-action-category-gift")));
         choices.Add(new PromptChoice(new ChoiceId($"action-category-gift.{(frame.Id)}.decline"), "不交牌", [], [], GiftChoiceParameters(frame, resultBind, "different-action-category-decline")));
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId);
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, provider, $"【{(skill.Name)}】请选择与【{(CardCatalog.Get(use.EffectiveKind).DisplayName)}】类型不同的一张牌交给 {(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Name)}。", choices.SelectMany(choice => choice.Cards).ToArray(), [], SourceSeat: frame.OwnerSeat)
@@ -39,7 +35,7 @@ internal sealed partial class CoreGameEngineActionCategoryGiftsRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal static IReadOnlyDictionary<string, string> GiftChoiceParameters(ProgramSkillFrame frame, string resultBind, string action) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ActionCategoryGifts.GiftChoiceParameters(frame, resultBind, action);
+    internal static IReadOnlyDictionary<string, string> GiftChoiceParameters(ProgramSkillFrame frame, string resultBind, string action) => RuntimeSkills.RuntimeRules_Core_ActionCategoryGifts.GiftChoiceParameters(frame, resultBind, action);
     [ProgramAnswer("different-action-category-gift", "different-action-category-decline")]
     internal void ResolveDifferentActionCategoryGift(PromptChoice choice)
     {
@@ -60,7 +56,7 @@ internal sealed partial class CoreGameEngineActionCategoryGiftsRuntime
             if (location.Value.OwnerSeat != provider || !effect.Zones.Contains(location.Value.Zone))
                 throw new InvalidOperationException("The gift no longer belongs to the provider's allowed zone.");
             card = _cardZonesOperations._cardZones.CardsAt(location.Value).Single(item => item.Id == id);
-            if (global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) == global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.EffectiveKind))
+            if (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind) == CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.EffectiveKind))
                 throw new InvalidOperationException("The gift matches the used card's category.");
         }
         else if (action != "different-action-category-decline" || choice.Cards.Count != 0)

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCuiLieAnniversaryRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
     {
         var a = u.Action!;
         var target = _coreMatchParticipantsPlayersAccess._players[seat];
-        if (!target.IsAlive || u.TargetSeats.Contains(seat) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.HasTurnCardTargetRestriction(a.ActorSeat, SkillProgramCardTargetRestriction.SelfOnly) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(a.ActorSeat, seat, u.CardKind, u.Id) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, u.CardKind, a.EffectiveSuit ?? Suit.None, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(a)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(a.ActorSeat, seat, a.EffectiveSuit))
+        if (!target.IsAlive || u.TargetSeats.Contains(seat) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.HasTurnCardTargetRestriction(a.ActorSeat, SkillProgramCardTargetRestriction.SelfOnly) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(a.ActorSeat, seat, u.CardKind, u.Id) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, u.CardKind, a.EffectiveSuit ?? Suit.None, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(a)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(a.ActorSeat, seat, a.EffectiveSuit))
             return false;
         return u.CardKind switch
         {
@@ -29,7 +25,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
             CardKind.BorrowedSword => _coreNativeBorrowedSwordOperations.GetWeapon(target)is not null && _coreMatchParticipantsPlayersAccess._players.Any(p => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(target, p)),
             CardKind.Indulgence or CardKind.SupplyShortage or CardKind.Lightning => !target.JudgmentAreaAbolished && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(target, u.CardKind) && !_coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget),
             CardKind.BarbarianAssault or CardKind.ArrowBarrage or CardKind.PeachGarden or CardKind.FiveGrains => !_coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ExcludeGlobalTarget, u.CardKind),
-            _ => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || u.CardKind is CardKind.Peach or CardKind.Alcohol or CardKind.DrawTwo or CardKind.Duel or CardKind.IronChain
+            _ => CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || u.CardKind is CardKind.Peach or CardKind.Alcohol or CardKind.DrawTwo or CardKind.Duel or CardKind.IronChain
         };
     }
 
@@ -102,7 +98,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
             changed = changed with
             {
                 TargetIndex = 0,
-                SlashTargetsCancelled = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind),
+                SlashTargetsCancelled = CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind),
                 SequentialTrick = null,
                 PreparedTargetAttacks = use.PreparedTargetAttacks is not null ? Array.AsReadOnly(Array.Empty<CardAttackState>()) : null,
                 Continuations = use.Continuations with

@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuKangWumiaoRuntime
@@ -11,8 +6,8 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     internal const string WuLuKangDiscardReason = "skill-program.wu-lu-kang.shenduan.discard", WuLuKangReserveReason = "skill-program.wu-lu-kang.shenduan.reserve", WuLuKangBottomReason = "skill-program.wu-lu-kang.shenduan.bottom", WuLuKangDrawReason = "skill-program.wu-lu-kang.shenduan.draw";
     internal bool HasWuLuKangCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveWuLuKangShenduan) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveWuLuKangKegou) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveWuLuKangDixian);
 
-    internal static CardConversionSource WuLuKangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangPindian.WuLuKangSource(f);
-    internal static CardConversionSource WuLuKangSource(ProgramTriggerCandidate c) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangPindian.WuLuKangSource(c);
+    internal static CardConversionSource WuLuKangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangPindian.WuLuKangSource(f);
+    internal static CardConversionSource WuLuKangSource(ProgramTriggerCandidate c) => RuntimeSkills.RuntimeRules_lu_kang_wumiao_WuLuKangPindian.WuLuKangSource(c);
     internal bool CanWuLuKangDiscardForPindian(CharacterState owner) => owner.IsAlive && _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.PindianDiscardForMaximumDeck).Any(binding => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > 0 || _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Any(card => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner.Seat, card, CardLocation.Equipment(owner.Seat), OwnedCardMoveIntent.Discard) && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner.Seat, binding.Source.SkillId, binding.Source.SkillInstanceId, card)));
     internal bool HasWuLuKangPindianInput(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > 0 || CanWuLuKangDiscardForPindian(owner);
     internal ResolutionFrame WuLuKangParent(long id) => _resolutionStackOperations._resolutionStack.Single(f => f.Id == id && (f is PindianFrame || f is ProgramSkillFrame { SimultaneousPindian: not null }));
@@ -198,7 +193,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     [ProgramWindowReturn(SkillProgramTriggerWindow.WuLuKangPindian)]
     internal void ReturnWuLuKangBinding(ProgramSkillFrame f, bool completed)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not WuLuKangPindianFrame w || f.WindowContext?.WuLuKangPindian is not { } c || f.WindowContext.ParentFrameId != w.Id || c.ContestId != w.ParentFrameId || c.Stage != w.Stage || c.ComparisonIndex != w.ComparisonIndex || w.CandidateIndex >= w.Entries.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Entries[w.CandidateIndex].Candidate))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not WuLuKangPindianFrame w || f.WindowContext?.WuLuKangPindian is not { } c || f.WindowContext.ParentFrameId != w.Id || c.ContestId != w.ParentFrameId || c.Stage != w.Stage || c.ComparisonIndex != w.ComparisonIndex || w.CandidateIndex >= w.Entries.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Entries[w.CandidateIndex].Candidate))
             throw new InvalidOperationException("Shenduan returned to a different comparison or native participant.");
         _coreRuntimeOperations.ReplaceRuntimeTop(w with { CandidateIndex = w.CandidateIndex + 1 });
         ContinueWuLuKangWindow(w.Id);

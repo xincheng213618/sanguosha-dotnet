@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuYiBoundaryMobileRuntime
@@ -22,7 +18,7 @@ internal sealed partial class CharacterWuYiBoundaryMobileRuntime
 
     internal SkillProgramStepOutcome BeginBoundaryWuYiTargets(ProgramSkillFrame f)
     {
-        if (f.BoundaryWuYiTargets is not null || f.WindowContext is not { } context || !CanOfferBoundaryWuYiTargets(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), context))
+        if (f.BoundaryWuYiTargets is not null || f.WindowContext is not { } context || !CanOfferBoundaryWuYiTargets(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), context))
             throw new InvalidOperationException("Benxi cannot reopen an already-issued target choice.");
         var use = RequireBoundaryWuYiUse(f, out var window);
         if (use.CardKind == CardKind.DrawTwo && use.TargetSeats.Count == 0)
@@ -78,7 +74,7 @@ internal sealed partial class CharacterWuYiBoundaryMobileRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Benxi lost its target-selection frame.");
         AssertBoundaryWuYiTargets(f);
-        if (!BoundaryWuYiTargetChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (!BoundaryWuYiTargetChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Benxi must answer its currently published native target choice.");
         var draft = f.BoundaryWuYiTargets!;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -128,7 +124,7 @@ internal sealed partial class CharacterWuYiBoundaryMobileRuntime
         var offered = _coreProgramEventHistoryOperations.ProgramEventHistory<DesignatedExtraTargetOfferedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
         if (f.SkillId != BoundaryWuYiComposition.Skill || f.TriggerId != BoundaryWuYiComposition.Targets || f.InstructionIndex != 1 || draft.UseId != use.Id || draft.ActionId != use.Action!.ActionId || draft.WindowId != window.Id || draft.Grant != BoundaryWuYiIssuedGrant(use.Id, draft.ActionId, f.OwnerSeat, f.SkillInstanceId) || !draft.Original.SequenceEqual(use.TargetSeats) || primary.Length > draft.Grant.X || primary.Distinct().Count() != primary.Length || use.CardKind == CardKind.BorrowedSword && draft.Added.Count % 2 != 0 || offered is not [var fact] || fact.CardUseFrameId != use.Id || fact.ActionId != draft.ActionId || fact.Source != BoundaryWuYiSource(f) || fact.GameplayHash != f.GameplayHash || !fact.OriginalTargetSeats.SequenceEqual(draft.Original) || primary.Any(seat => seat == f.OwnerSeat || !fact.CandidateTargetSeats.Contains(seat)) || _coreProgramEventHistoryOperations.ProgramEventHistory<DesignatedExtraTargetResolvedEvent>().Any(e => e.ProgramFrameId == f.Id))
             throw new InvalidOperationException("Benxi lost its original first-use grant, target prefix or bounded extra-target draft.");
-        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: false } prompt || prompt.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, BoundaryWuYiTargetChoices(f))))
+        if (ReferenceEquals(f, _resolutionStackOperations._resolutionStack.LastOrDefault()) && (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: false } prompt || prompt.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(prompt.Choices, BoundaryWuYiTargetChoices(f))))
             throw new InvalidOperationException("Benxi must retain its owning actor's current public target menu.");
     }
 
@@ -149,6 +145,6 @@ internal sealed partial class CharacterWuYiBoundaryMobileRuntime
     {
         var kind = RequireBoundaryWuYiUse(f, out _).CardKind;
         var helpful = kind is CardKind.Peach or CardKind.Alcohol or CardKind.DrawTwo or CardKind.PeachGarden or CardKind.FiveGrains;
-        return decision.Choices.FirstOrDefault(c => c.Targets.Count > 0 && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) == helpful) ?? decision.Choices.Single(c => c.Targets.Count == 0);
+        return decision.Choices.FirstOrDefault(c => c.Targets.Count > 0 && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]]) == helpful) ?? decision.Choices.Single(c => c.Targets.Count == 0);
     }
 }

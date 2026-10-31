@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,10 +9,10 @@ internal sealed partial class CharacterTaoQianOlRuntime
     internal const string ZhaohuoGiftReason = "skill-program.tao-qian.zhaohuo.give";
     internal bool HasZhaohuoCapability => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZhaohuoFirstVictimGift) == true;
 
-    internal static bool IsZhaohuoTrigger(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_tao_qian_ol_Zhaohuo.IsZhaohuoTrigger(trigger);
+    internal static bool IsZhaohuoTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_tao_qian_ol_Zhaohuo.IsZhaohuoTrigger(trigger);
     internal bool ZhaohuoActualTurnOpen => _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
 
-    internal static CardConversionSource ZhaohuoSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_tao_qian_ol_Zhaohuo.ZhaohuoSource(f);
+    internal static CardConversionSource ZhaohuoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_tao_qian_ol_Zhaohuo.ZhaohuoSource(f);
     // DamageApplied precedes before-dying/recovery and other after-damage
     // children. Capture once here, including empty-Hand victims and turns in
     // which the current turn owner does not yet own Zhaohuo.
@@ -38,7 +35,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
 
     internal ZhaohuoFirstVictimDamageEvent? ZhaohuoFirst(long damageId) => _coreProgramEventHistoryOperations.ProgramEventHistory<ZhaohuoFirstVictimDamageEvent>().SingleOrDefault(e => e.DamageFrameId == damageId);
     internal bool ZhaohuoQualified(ProgramTriggerCandidate c, ZhaohuoFirstVictimDamageEvent first) => first.Amount > 0 && first.HandCount > 0 && c.OccurrenceIndex == 0 && c.OwnerSeat == first.TurnOwner && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(c.SkillId)?.Program is { } p && p.GameplayHash == c.GameplayHash && p.Triggers.Any(t => t.Id == c.BindingId && IsZhaohuoTrigger(t)) && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhaohuoQualifiedEvent>().Count(e => e.DamageFrameId == first.DamageFrameId && e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId) && e.GameplayHash == c.GameplayHash && e.ActualTurn == first.ActualTurn && e.TurnOwner == first.TurnOwner) == 1;
-    internal void AppendZhaohuoDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> candidates)
+    internal void AppendZhaohuoDamageCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> candidates)
     {
         candidates.RemoveAll(c => !string.IsNullOrEmpty(c.ProgramId) && IsZhaohuoTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c.ToProgramCandidate())));
         if (!HasZhaohuoCapability || window != SkillProgramTriggerWindow.AfterDamageApplied || !ZhaohuoActualTurnOpen || !_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat]).Count == 0)
@@ -72,7 +69,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
         return !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhaohuoStartedEvent>().Any(e => e.DamageFrameId == damageId && e.Source.OwnerSeat == candidate.OwnerSeat);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IZhaohuoHost.Resolve(ProgramSkillFrame frame) => ResolveZhaohuoFirstVictimGift(frame);
+    SkillProgramStepOutcome IZhaohuoHost.Resolve(ProgramSkillFrame frame) => ResolveZhaohuoFirstVictimGift(frame);
     internal SkillProgramStepOutcome ResolveZhaohuoFirstVictimGift(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -123,7 +120,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
     [ProgramAnswer("zhaohuo")]
     internal void AnswerZhaohuo(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zhaohuo: { Stage: ZhaohuoStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.VictimSeat || !ZhaohuoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Zhaohuo: { Stage: ZhaohuoStage.Choosing } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.VictimSeat || !ZhaohuoChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zhaohuo requires the damaged donor's exact private original Hand choice.");
         var card = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.VictimSeat]).Single(c => c.Id == choice.Cards.Single());
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

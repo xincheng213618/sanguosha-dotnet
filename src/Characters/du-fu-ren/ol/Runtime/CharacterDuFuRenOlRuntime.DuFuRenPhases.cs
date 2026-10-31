@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDuFuRenOlRuntime
 {
-    internal static SkillRuleQuery? DuFuRenPhaseQuery(ActualDiscardRecoveryPhaseKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_du_fu_ren_ol_DuFuRenPhases.DuFuRenPhaseQuery(kind);
+    internal static SkillRuleQuery? DuFuRenPhaseQuery(ActualDiscardRecoveryPhaseKind kind) => RuntimeSkills.RuntimeRules_du_fu_ren_ol_DuFuRenPhases.DuFuRenPhaseQuery(kind);
     internal bool DuFuRenGrantConsumed(long id, ActualDiscardRecoveryPhaseKind kind) => _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenPhaseIssuedEvent>().Any(e => e.GrantId == id && e.Phase.Kind == kind);
     internal void ConsumeDuFuRenPhase(ActualDiscardRecoveryPhaseKind kind, int ownerSeat)
     {

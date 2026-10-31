@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiAnniversaryGodRuntime
@@ -48,6 +44,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeAlcoholDebit, 38500)]
     internal bool ShenDaIssuedQuota(long id, int actor) => ShenDaHasIssuedDomain(id, actor, ShenDengAiDomain.Qingqu);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 38500)]
-    internal int ShenDaFengtianDamage(global::CardGame.Core.GameEngine.IDamageAttempt a) => !a.IsChainPropagation && !a.IsSourceLess && ShenDaHasIssuedDomain(a.ResolutionId, a.CardUserSeat, ShenDengAiDomain.Fengtian) ? 1 : 0;
+    internal int ShenDaFengtianDamage(GameEngine.IDamageAttempt a) => !a.IsChainPropagation && !a.IsSourceLess && ShenDaHasIssuedDomain(a.ResolutionId, a.CardUserSeat, ShenDengAiDomain.Fengtian) ? 1 : 0;
     internal int ApplyShenDengAiFengtianRecovery(long id, int actor, int target, int amount) => ShenDaHasIssuedDomain(id, actor, ShenDengAiDomain.Fengtian) ? checked(amount + 1) : amount;
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuBuMobileGodRuntime
@@ -17,7 +13,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
         {
             LegalActionKind.DrawTwo or LegalActionKind.SowBeans or LegalActionKind.BeamSwap or LegalActionKind.WenheChaos => [actor.Seat],
             LegalActionKind.ReturnSoul => _coreHellSoulCardsOperations.HellReturnSoulUseTargets(actor, card),
-            LegalActionKind.AllianceFeast => _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(actor, Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(actor.Seat, offset)]).Where(target => target.IsAlive && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(actor.Seat, target.Seat, card.Kind) && !_coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ExcludeGlobalTarget, card.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, card.Kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))).Select(target => target.Seat).ToArray()),
+            LegalActionKind.AllianceFeast => _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(actor, Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(actor.Seat, offset)]).Where(target => target.IsAlive && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(actor.Seat, target.Seat, card.Kind) && !_coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ExcludeGlobalTarget, card.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, card.Kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))).Select(target => target.Seat).ToArray()),
             _ => _coreDragonBoatCardsOperations.DragonBoatExpectedNativeTargets(actor, card, template) ?? _coreGuanduCardsOperations.GuanduExpectedNativeTargets(actor, card, template) ?? _coreDirectedCardPolicyQueriesOperations.GetDeclaredCardTargets(actor, template.Kind, template.TargetSeats).ToArray()};
         return Array.AsReadOnly(targets.Distinct().OrderBy(s => _coreTableOrderOperations.RelativeTableOrder(actor.Seat, s)).ToArray());
     }
@@ -33,7 +29,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
             foreach (var template in _coreActionQueriesOperations.BuildMobileWumouPrintedTargetActions(actor, card))
                 foreach (var variant in _coreProgramCardUseRulesOperations.GetSlashUseVariants(actor, card, CardKind.Slash, source))
                 {
-                    var targets = MobileWumouTemplateTargets(actor, card, template).Where(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, variant.EffectiveKind, CardActionType.Use) && !_coreProgramCardLegalityOperations.CardLegality.IsMaterialForbidden(new(actor.Seat, variant.EffectiveKind, [card.Id], false)) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, s, variant.EffectiveKind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[s], variant.EffectiveKind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, s, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && _coreRuleQueriesOperations.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[s], _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source), variant.EffectiveKind, card)).ToArray();
+                    var targets = MobileWumouTemplateTargets(actor, card, template).Where(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, variant.EffectiveKind, CardActionType.Use) && !_coreProgramCardLegalityOperations.CardLegality.IsMaterialForbidden(new(actor.Seat, variant.EffectiveKind, [card.Id], false)) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, s, variant.EffectiveKind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[s], variant.EffectiveKind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, s, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)) && _coreRuleQueriesOperations.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[s], _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source), variant.EffectiveKind, card)).ToArray();
                     if (targets.Length == 0)
                         continue;
                     var action = new LegalAction(LegalActionKind.Slash, card.Id, targets[0], $"【无谋】将【{(CardCatalog.Get(card.Kind).DisplayName)}】当【{(CardCatalog.Get(variant.EffectiveKind).DisplayName)}】使用，保留原锦囊目标", PlayedCardKind: variant.EffectiveKind, TargetSeats: targets)
@@ -48,13 +44,13 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
         return _coreDeckEquipmentProgramsOperations.FilterBeneficiarySuitShieldActions(actor, _coreCardUseModulesOperations.FilterTurnCardUseRestrictions(actor, result, nativeOriginalCard: null));
     }
 
-    internal static bool SameMobileWumouAction(LegalAction a, LegalAction b) => a.Kind == b.Kind && a.CardId == b.CardId && a.PlayedCardKind == b.PlayedCardKind && a.TargetSeats.SequenceEqual(b.TargetSeats) && a.ConversionSource == b.ConversionSource && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.ConversionSourcesEqual(a.AdditionalConversionSources, b.AdditionalConversionSources);
+    internal static bool SameMobileWumouAction(LegalAction a, LegalAction b) => a.Kind == b.Kind && a.CardId == b.CardId && a.PlayedCardKind == b.PlayedCardKind && a.TargetSeats.SequenceEqual(b.TargetSeats) && a.ConversionSource == b.ConversionSource && CoreNativeCardClassificationsRuntime.ConversionSourcesEqual(a.AdditionalConversionSources, b.AdditionalConversionSources);
     internal bool TryResolveMobileWumouUse(CharacterState actor, LegalAction action)
     {
         if (action.ConversionSource?.SkillId != MobileLbWumou)
             return false;
         var card = _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(actor, action.CardId) ?? throw new InvalidOperationException("Wumou lost its real ordinary-trick material.");
-        if (action.Kind != LegalActionKind.Slash || MobileWumouSource(actor, card) != action.ConversionSource || action.PlayedCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !ProjectMobileWumouActions(actor, [], card.Id).Any(a => SameMobileWumouAction(a, action)))
+        if (action.Kind != LegalActionKind.Slash || MobileWumouSource(actor, card) != action.ConversionSource || action.PlayedCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !ProjectMobileWumouActions(actor, [], card.Id).Any(a => SameMobileWumouAction(a, action)))
             throw new InvalidOperationException("Wumou must retain its exact native original-trick target template, Slash quota and conversion source.");
         if (action.TargetSeats.Count == 1)
         {

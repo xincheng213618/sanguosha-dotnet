@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuYongOlRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CharacterGuYongOlRuntime
     internal bool HasOrdinaryGuYongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveOrdinaryGuYongBingyi);
 
     internal bool IsOrdinaryGuYongBingyiTrigger(SkillProgramTrigger t) => t.Effects is [{ Op: SkillProgramEffectOp.ResolveOrdinaryGuYongBingyi }];
-    internal static CardConversionSource OrdinaryGuYongSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_gu_yong_ol_OrdinaryGuYong.OrdinaryGuYongSource(f);
+    internal static CardConversionSource OrdinaryGuYongSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_gu_yong_ol_OrdinaryGuYong.OrdinaryGuYongSource(f);
     internal bool OrdinaryBingyiPhaseSpent(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryBingyiShownEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == "ol:bingyi" && e.Phase == phase);
     internal bool IsOrdinaryBingyiDiscard(CardMovementRecord m, int owner) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is { OwnerSeat: { } seat, Zone: CardZoneKind.Hand or CardZoneKind.Equipment } && seat == owner;
     internal bool OrdinaryBingyiMovementRoot(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
@@ -33,5 +29,5 @@ internal sealed partial class CharacterGuYongOlRuntime
         return _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat]).Count > 0 && OrdinaryBingyiMovementRoot(c, context) && !OrdinaryBingyiPhaseSpent(c.OwnerSeat, context.MovementBatch!.DiscardRecoveryPhase!);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IOrdinaryGuYongHost.Bingyi(ProgramSkillFrame f) => BeginOrdinaryBingyi(f);
+    SkillProgramStepOutcome IOrdinaryGuYongHost.Bingyi(ProgramSkillFrame f) => BeginOrdinaryBingyi(f);
 }

@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICharacterZuoCiHappyGodCoreTrustedCardZoneDiagnosticsOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterZuoCiHappyGodCoreTrustedCardZoneDiagnosticsOperations : IProgramRuntimeOperations
 {
-    global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardZoneDiagnostic> CreateCardZoneDiagnostics();
+    IReadOnlyList<CardZoneDiagnostic> CreateCardZoneDiagnostics();
 }
 
-internal interface ICharacterZuoCiHappyGodProgramPhaseBoundaryOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterZuoCiHappyGodProgramPhaseBoundaryOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramPhaseBoundaryRuntime Get();
+    ProgramPhaseBoundaryRuntime Get();
 }

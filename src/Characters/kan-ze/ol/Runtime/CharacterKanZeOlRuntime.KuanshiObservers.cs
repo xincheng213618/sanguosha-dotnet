@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterKanZeOlRuntime
@@ -75,5 +71,5 @@ internal sealed partial class CharacterKanZeOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterEquipmentChoices, 10)]
-    internal ProgramDamageInterception InterceptKuanshiDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount, DamageNature nature) => TryPreventKuanshiDamage(attack.IsSourceLess || attack.IsDelayedJudgmentDamage ? null : attack.SourceSeat, attack.TargetSeat, amount, attack.ResolutionId) ? ProgramDamageInterception.Prevented : ProgramDamageInterception.Continue;
+    internal ProgramDamageInterception InterceptKuanshiDamage(GameEngine.IDamageAttempt attack, int amount, DamageNature nature) => TryPreventKuanshiDamage(attack.IsSourceLess || attack.IsDelayedJudgmentDamage ? null : attack.SourceSeat, attack.TargetSeat, amount, attack.ResolutionId) ? ProgramDamageInterception.Prevented : ProgramDamageInterception.Continue;
 }

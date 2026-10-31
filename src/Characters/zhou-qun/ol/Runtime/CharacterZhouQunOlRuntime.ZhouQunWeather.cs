@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouQunOlRuntime
 {
-    internal static (string Id, string Name) ZhouQunWeather(Suit suit) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_qun_ol_ZhouQunWeather.ZhouQunWeather(suit);
+    internal static (string Id, string Name) ZhouQunWeather(Suit suit) => RuntimeSkills.RuntimeRules_zhou_qun_ol_ZhouQunWeather.ZhouQunWeather(suit);
     internal bool TryReturnZhouQunPaidPreparation(ProgramLifecycleTriggerWindowFrame frame)
     {
         if (!HasZhouQunCapability || frame.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || frame.Continuation != ProgramLifecycleContinuation.NormalTurnStart || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || frame.CandidateIndex != frame.Candidates.Count || _resolutionStackOperations._resolutionStack.Count != 0 || _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)

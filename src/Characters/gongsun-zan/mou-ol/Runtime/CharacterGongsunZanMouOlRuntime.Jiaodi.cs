@@ -1,27 +1,24 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGongsunZanMouOlRuntime
 {
     internal const string MouGszObtainReason = "skill-program.mou-ol:jiaodi.obtain", MouGszDiscardReason = "skill-program.mou-ol:jiaodi.discard";
-    SkillProgramStepOutcome global::CardGame.Core.IMouGongsunZanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouGongsunZanJiaodi ? BeginMouGszJiaodi(f) : BeginMouGszBaojing(f);
-    internal CardConversionSource MouGszSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMouGongsunZanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouGongsunZanJiaodi ? BeginMouGszJiaodi(f) : BeginMouGszBaojing(f);
+    internal CardConversionSource MouGszSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 32700, SkillProgramEffectOp.ResolveMouGongsunZanJiaodi)]
     internal bool CanOfferMouGszJiaodi(ProgramTriggerLegalityContext gate)
     {
         if (gate.WindowContext?.CardUse is not { } c || _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } use)
             return false;
-        return a.ActorSeat == gate.Candidate.OwnerSeat && a.ActionId == c.CardActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && a.EffectiveDesignatedTargetSeats is [var target] && target != a.ActorSeat && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == a.ActorSeat);
+        return a.ActorSeat == gate.Candidate.OwnerSeat && a.ActionId == c.CardActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && a.EffectiveDesignatedTargetSeats is [var target] && target != a.ActorSeat && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == a.ActorSeat);
     }
 
     internal CardUseFrame? MouGszUse(ProgramSkillFrame f)
     {
-        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } c } context || f.TriggerId != "unique-slash" || f.ActivationId != f.TriggerId || f.SkillId != MouGongsunZanComposition.Jiaodi || _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } use || a.ActionId != c.CardActionId || a.ActorSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != use.Id || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex])))
+        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } c } context || f.TriggerId != "unique-slash" || f.ActivationId != f.TriggerId || f.SkillId != MouGongsunZanComposition.Jiaodi || _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } use || a.ActionId != c.CardActionId || a.ActorSeat != f.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != use.Id || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex])))
             return null;
         return use;
     }
@@ -91,7 +88,7 @@ internal sealed partial class CharacterGongsunZanMouOlRuntime
     [ProgramAnswer("mou-gongsun-zan")]
     internal void AnswerMouGsz(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouGongsunZan: { } r } f || !ValidMouGsz(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouGszChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouGongsunZan: { } r } f || !ValidMouGsz(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouGszChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Gongsun Zan requires the canonical current target/card/range choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -193,13 +190,13 @@ internal sealed partial class CharacterGongsunZanMouOlRuntime
         var r = f.MouGongsunZan!;
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         if (r.Stage == MouGongsunZanStage.RangeChoice)
-            return p.Choices.Single(c => c.Parameters["branch"] == (global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(owner, _coreMatchParticipantsPlayersAccess._players[r.OriginalTarget]) ? "increase" : "decrease"));
+            return p.Choices.Single(c => c.Parameters["branch"] == (CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(owner, _coreMatchParticipantsPlayersAccess._players[r.OriginalTarget]) ? "increase" : "decrease"));
         if (r.Stage == MouGongsunZanStage.ExtraTarget)
         {
             var view = _corePlayerViewProjectionOperations.CreateSnapshot(f.OwnerSeat);
             return p.Choices.OrderByDescending(c => _coreAiBrainsAiBrainsAccess._aiBrains[f.OwnerSeat].ScoreProgramTarget(view, c.Targets.Single(), new(0, 0, 0, 0, 0, 1, false, false))).First();
         }
 
-        return p.Choices.OrderByDescending(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[r.OriginalTarget]) : 0).First();
+        return p.Choices.OrderByDescending(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[r.OriginalTarget]) : 0).First();
     }
 }

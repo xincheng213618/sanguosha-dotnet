@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGhostActivityProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IGhostActivityProgramHost.ExecuteGhostActivity(ProgramSkillFrame frame, SkillProgramEffect effect) => ExecuteGhostActivity(frame, effect);
+    SkillProgramStepOutcome IGhostActivityProgramHost.ExecuteGhostActivity(ProgramSkillFrame frame, SkillProgramEffect effect) => ExecuteGhostActivity(frame, effect);
     internal SkillProgramStepOutcome ExecuteGhostActivity(ProgramSkillFrame input, SkillProgramEffect effect)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);

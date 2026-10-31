@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,10 +10,10 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal const string WenlanPlayedBinding = "after-pair-played";
     internal const string WenlanObtainReason = "skill-program.le-cao-zhi.wenlan.obtain";
     internal IReadOnlyList<int> WenlanHandLikeIds(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetWoodenOxGrain(_coreMatchParticipantsPlayersAccess._players[owner])).Select(card => card.Id).ToArray();
-    internal bool IsWenlanHandLike(int owner, int cardId) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(_coreMatchParticipantsPlayersAccess._players[owner], _cardZonesOperations._cardZones.GetLocation(cardId));
+    internal bool IsWenlanHandLike(int owner, int cardId) => CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(_coreMatchParticipantsPlayersAccess._players[owner], _cardZonesOperations._cardZones.GetLocation(cardId));
     internal bool HasLeCaoZhiWenlanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveLeCaoZhiWenlan);
 
-    internal static WenlanSource WenlanFrameSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cao_zhi_le_LeCaoZhiWenlan.WenlanFrameSource(f);
+    internal static WenlanSource WenlanFrameSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cao_zhi_le_LeCaoZhiWenlan.WenlanFrameSource(f);
     internal WenlanSource? CurrentWenlanSource(int owner, SkillProgramTriggerWindow window)
     {
         if (!HasLeCaoZhiWenlanCapability || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive)
@@ -176,7 +173,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     }
 
     internal CardUseFrame? LifecycleCardUseForWenlan(long actionId) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Action?.ActionId == actionId);
-    internal bool IsWenlanTrueUse(CardActionContext action) => action.Type == CardActionType.Use || _coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Nullification) || _coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } kind } attack } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat == action.ActorSeat;
+    internal bool IsWenlanTrueUse(CardActionContext action) => action.Type == CardActionType.Use || _coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Nullification) || _coreResponseUseCompletionOperations.IsCompletedResponseUse2(action, ProgramCompletedResponseKind.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } kind } attack } && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat == action.ActorSeat;
     internal void CaptureLeCaoZhiWenlanQualification(CardActionContext action, SkillProgramTriggerWindow window)
     {
         if (!HasLeCaoZhiWenlanCapability || window is not (SkillProgramTriggerWindow.CardUseCompleted or SkillProgramTriggerWindow.CardResponseCompleted))
@@ -199,14 +196,14 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal WenlanPairQualification? WenlanQualificationFor(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId != WenlanSkill ? null : context.CardUse is not { } use ? WenlanDirectQualificationFor(c, context) : _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanPairQualifiedEvent>().Select(e => e.Qualification).SingleOrDefault(q => q.ActionId == use.CardActionId && q.Source == new WenlanSource(new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash) && q.Window == context.Window);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29081, SkillProgramEffectOp.ResolveLeCaoZhiWenlan)]
     internal bool CanOfferLeCaoZhiWenlan(ProgramTriggerLegalityContext gate) => gate.Owner.IsAlive && WenlanQualificationFor(gate.Candidate, gate.Context)is { } q && !_coreProgramEventHistoryOperations.ProgramEventHistory<WenlanStartedEvent>().Any(e => e.Qualification.SecondEntryId == q.SecondEntryId);
-    internal static CardKind[] WenlanNames(WenlanActionAcceptedEvent entry) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cao_zhi_le_LeCaoZhiWenlan.WenlanNames(entry);
+    internal static CardKind[] WenlanNames(WenlanActionAcceptedEvent entry) => RuntimeSkills.RuntimeRules_cao_zhi_le_LeCaoZhiWenlan.WenlanNames(entry);
     internal WenlanActionAcceptedEvent WenlanEntry(long id)
     {
         var raw = _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanActionAcceptedEvent>().Single(e => e.EntryId == id);
         return WenlanEntries(raw.OwnerSeat).Single(e => e.EntryId == id);
     }
 
-    internal bool WenlanWindowMatches(ProgramCardTriggerWindowFrame window, WenlanPairQualification q) => q.DirectDuelEntryId is null && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) == q.Window && window.Action.ActionId == q.ActionId && (q.Window == SkillProgramTriggerWindow.CardUseCompleted ? window.Action.ActorSeat == q.Source.Source.OwnerSeat && IsWenlanTrueUse(window.Action) && (window.Action.Type != CardActionType.Response || window.CompletedResponseReturn is { IsCommitted: false } && _coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window)) : window.ResponseCompletion is { CostsDrained: true } response && response.CompletionActorSeat == q.Source.Source.OwnerSeat && _coreResponseCompletionOperations.ValidResponseCompletionWindow(window) && !IsWenlanTrueUse(window.Action));
+    internal bool WenlanWindowMatches(ProgramCardTriggerWindowFrame window, WenlanPairQualification q) => q.DirectDuelEntryId is null && CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) == q.Window && window.Action.ActionId == q.ActionId && (q.Window == SkillProgramTriggerWindow.CardUseCompleted ? window.Action.ActorSeat == q.Source.Source.OwnerSeat && IsWenlanTrueUse(window.Action) && (window.Action.Type != CardActionType.Response || window.CompletedResponseReturn is { IsCommitted: false } && _coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window)) : window.ResponseCompletion is { CostsDrained: true } response && response.CompletionActorSeat == q.Source.Source.OwnerSeat && _coreResponseCompletionOperations.ValidResponseCompletionWindow(window) && !IsWenlanTrueUse(window.Action));
     internal SkillProgramStepOutcome BeginLeCaoZhiWenlan(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -285,7 +282,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal void AnswerWenlanHand(PromptChoice choice)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
-        if (f.LeCaoZhiWenlan is not { Stage: WenlanStage.SelectingHand } r || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WenlanHandChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (f.LeCaoZhiWenlan is not { Stage: WenlanStage.SelectingHand } r || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WenlanHandChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Wenlan only accepts its currently published private Hand choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
@@ -425,10 +422,10 @@ internal sealed partial class CharacterCaoZhiLeRuntime
             return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
-        return child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => WenlanOperationMovement(f, m));
+        return child is CardsMovedTriggerWindowFrame moved && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => WenlanOperationMovement(f, m));
     }
 
-    internal bool WenlanObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame f && (this.WenlanFirstChild(f, _resolutionStackOperations2._resolutionStack()[child]) || f.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(f, _resolutionStackOperations2._resolutionStack()[child])) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
+    internal bool WenlanObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame f && (this.WenlanFirstChild(f, _resolutionStackOperations2._resolutionStack()[child]) || f.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(f, _resolutionStackOperations2._resolutionStack()[child])) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? WenlanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.WenlanFirstChild(f, child), (index) => this.WenlanObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 790)]
     internal bool IsWenlanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WenlanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
@@ -445,5 +442,5 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 29081)]
     internal bool AdvanceWenlanChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WenlanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeCaoZhiWenlanHost.Resolve(ProgramSkillFrame f) => BeginLeCaoZhiWenlan(f);
+    SkillProgramStepOutcome ILeCaoZhiWenlanHost.Resolve(ProgramSkillFrame f) => BeginLeCaoZhiWenlan(f);
 }

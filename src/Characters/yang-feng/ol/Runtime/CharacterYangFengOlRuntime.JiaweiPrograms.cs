@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYangFengOlRuntime
 {
-    internal static bool IsJiaweiDamageCard(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yang_feng_ol_Jiawei_Programs.IsJiaweiDamageCard(kind);
+    internal static bool IsJiaweiDamageCard(CardKind kind) => RuntimeSkills.RuntimeRules_yang_feng_ol_Jiawei_Programs.IsJiaweiDamageCard(kind);
     internal IReadOnlyList<YangFengMaterial> JiaweiDiscardCandidates(ProgramSkillFrame f, int target) => Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, target, [CardZoneKind.Hand, CardZoneKind.Equipment, CardZoneKind.Judgment], OwnedCardMoveIntent.Discard, canSelect: (zone, card) => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, card, new(zone, target), OwnedCardMoveIntent.Discard)).Select(c =>
     {
         var from = new CardLocation(Enum.Parse<CardZoneKind>(c.Parameters["source-zone"]), target);
@@ -38,7 +34,7 @@ internal sealed partial class CharacterYangFengOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { YangFeng = f.YangFeng!with { Revealed = entities } });
         for (var i = 0; i < entities.Length; i++)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiaweiEntityRevealedEvent(f.Id, i, entities[i]));
-        RecordYangFengMovement(f.Id, YangFengStage.RevealChildren, $"skill-program.{(f.SkillId)}.{(global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.reveal", before, entities.Length);
+        RecordYangFengMovement(f.Id, YangFengStage.RevealChildren, $"skill-program.{(f.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.reveal", before, entities.Length);
     }
 
     internal bool IsJiaweiOriginalProcessing(JiaweiRevealedEntity e) => _cardZonesOperations._cardZones.GetLocation(e.Material.CardId) == CardLocation.Processing && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == e.Material.CardId).Sequence == e.RevealSequence;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangTongHappyGodRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
             return false;
         return _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == context.ParentFrameId) switch
         {
-            ProgramLifecycleTriggerWindowFrame w => w.Window == context.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]),
+            ProgramLifecycleTriggerWindowFrame w => w.Window == context.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]),
             ProgramCardTriggerWindowFrame w => context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && context.CardUse?.CardActionId == w.Action.ActionId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && w.Candidates[w.CandidateIndex] is { } c && c.OwnerSeat == f.OwnerSeat && c.SkillId == f.SkillId && c.TriggerId == f.TriggerId && c.SkillInstanceId == f.SkillInstanceId && c.GameplayHash == f.GameplayHash,
             DeferredTurnEndFrame p => _coreAfterTurnEndedProgramsOperations.MatchesAfterTurnEndedChild(p, f, context),
             _ => false

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePrivateOfferReturnsRuntime
@@ -12,14 +8,14 @@ internal sealed partial class CoreGameEnginePrivateOfferReturnsRuntime
         if (f.PrivateOffer is not { } r || r.InstructionIndex != f.InstructionIndex || !_corePrivateCardOffersOperations.ValidPrivateOfferDeposit(r.Location, out var original) || original != r.CardId || r.Location.OwnerSeat != f.OwnerSeat || r.Location.PrivateTurnHold is not { DeferredOffer: { } o } hold || hold.SkillId != f.SkillId || hold.SkillInstanceId != f.SkillInstanceId || o.GameplayHash != f.GameplayHash || GetPausedPrivateOfferEffect(f)is not { } effect)
             return false;
         if (r.Stage == PrivateOfferStage.DepositChildren)
-            return effect.Op == SkillProgramEffectOp.DepositBoundPrivateCardOffer && f.Id == o.DepositFrameId && global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) == o.DepositBindingId && f.SelectedTargetSeats.SequenceEqual([o.TargetSeat]) && r.SequenceAfter > r.SequenceBefore && r.PaymentCardId is null && r.PaymentFrom is null;
+            return effect.Op == SkillProgramEffectOp.DepositBoundPrivateCardOffer && f.Id == o.DepositFrameId && CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) == o.DepositBindingId && f.SelectedTargetSeats.SequenceEqual([o.TargetSeat]) && r.SequenceAfter > r.SequenceBefore && r.PaymentCardId is null && r.PaymentFrom is null;
         if (effect.Op != SkillProgramEffectOp.ResolveDeferredPrivateCardOffer || _corePrivateCardOffersOperations.DeferredPrivateOfferParent(f) != r.Location || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PrivateCardOfferViewedEvent>().Count(e => e.FrameId == f.Id && e.DepositFrameId == hold.HoldId && e.TargetSeat == o.TargetSeat && e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber) != 1)
             return false;
         if (r.Stage == PrivateOfferStage.ChoosingExchange)
             return r.PaymentCardId is null && r.PaymentFrom is null && r.SequenceBefore == 0 && r.SequenceAfter == 0 && _cardZonesOperations._cardZones.GetLocation(r.CardId) == r.Location;
         if (r.PaymentCardId is { } paid)
         {
-            if (r.PaymentFrom != CardLocation.Hand(o.TargetSeat) || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(paid).Kind) != global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId).Kind) || !PrivateOfferSegmentMatches(f, PrivateOfferStage.ExchangeChildren, paid, r.PaymentFrom, CardLocation.Hand(f.OwnerSeat), "exchange"))
+            if (r.PaymentFrom != CardLocation.Hand(o.TargetSeat) || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(paid).Kind) != CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId).Kind) || !PrivateOfferSegmentMatches(f, PrivateOfferStage.ExchangeChildren, paid, r.PaymentFrom, CardLocation.Hand(f.OwnerSeat), "exchange"))
                 return false;
         }
         else if (r.Stage is PrivateOfferStage.ExchangeChildren or PrivateOfferStage.ObtainChildren)
@@ -40,7 +36,7 @@ internal sealed partial class CoreGameEnginePrivateOfferReturnsRuntime
         if (events is not [var fact] || fact.DepositFrameId != f.PrivateOffer!.Location.PrivateTurnHold!.HoldId || fact.Count != 1 || fact.After <= fact.Before)
             return false;
         var moves = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > fact.Before && m.Sequence <= fact.After).ToArray();
-        return moves is [var actual] && actual.CardId == id && actual.From == from && actual.To == to && actual.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePrivateCardOffersRuntime.PrivateOfferReason(f, reason);
+        return moves is [var actual] && actual.CardId == id && actual.From == from && actual.To == to && actual.Reason.Value == CoreGameEnginePrivateCardOffersRuntime.PrivateOfferReason(f, reason);
     }
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 330)]
@@ -102,7 +98,7 @@ internal sealed partial class CoreGameEnginePrivateOfferReturnsRuntime
                 throw new InvalidOperationException("A paid private exchange lost its deposited reward entity.");
             var before = _corePrivateCardOffersOperations.PrivateOfferSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PrivateOffer = r with { Stage = PrivateOfferStage.ObtainChildren, SequenceBefore = before, SequenceAfter = before }, PendingMovementContinuation = new(target, 0, null) });
-            _corePhysicalMovementFacadesOperations.MoveCard(_cardZonesOperations._cardZones.CardsAt(r.Location).Single(c => c.Id == r.CardId), r.Location, CardLocation.Hand(target), new(global::CardGame.Core.EngineOwners.CoreGameEnginePrivateCardOffersRuntime.PrivateOfferReason(f, "obtain")));
+            _corePhysicalMovementFacadesOperations.MoveCard(_cardZonesOperations._cardZones.CardsAt(r.Location).Single(c => c.Id == r.CardId), r.Location, CardLocation.Hand(target), new(CoreGameEnginePrivateCardOffersRuntime.PrivateOfferReason(f, "obtain")));
             _corePrivateCardOffersOperations.CommitPrivateOfferSegment(f.Id);
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             if (!_coreFireTargetBenefitsOperations.TryDrainFireTargetMovement(f))

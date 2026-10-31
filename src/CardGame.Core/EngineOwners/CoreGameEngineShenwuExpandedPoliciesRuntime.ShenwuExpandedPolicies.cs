@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShenwuExpandedPoliciesRuntime
@@ -37,9 +33,9 @@ internal sealed partial class CoreGameEngineShenwuExpandedPoliciesRuntime
         return start >= 0 && history.Skip(start + 1).OfType<CardUseDeclaredEvent>().Count(use => use.SourceSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat) <= 2;
     }
 
-    internal bool ShenwuJuyuanExtraTarget(CharacterState player, CardKind kind) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == player.Seat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ShenwuPreviousEndHealthSlashTarget) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShenwuTurnEndHealthEvent>().LastOrDefault(fact => fact.OwnerSeat == player.Seat)is { } previous && player.Hp < previous.Hp;
+    internal bool ShenwuJuyuanExtraTarget(CharacterState player, CardKind kind) => CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == player.Seat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ShenwuPreviousEndHealthSlashTarget) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShenwuTurnEndHealthEvent>().LastOrDefault(fact => fact.OwnerSeat == player.Seat)is { } previous && player.Hp < previous.Hp;
 
-    internal bool IsShenwuHonglianHandExempt(CharacterState owner, Card card) => _contentRegistryOperations._contentRegistry.Skills.ContainsKey("shenwu:honglian") && _coreShenwuNpcProgramsOperations.ShenwuEnabled(owner, "shenwu:honglian") && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card));
+    internal bool IsShenwuHonglianHandExempt(CharacterState owner, Card card) => _contentRegistryOperations._contentRegistry.Skills.ContainsKey("shenwu:honglian") && _coreShenwuNpcProgramsOperations.ShenwuEnabled(owner, "shenwu:honglian") && CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card));
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeTurnUseBan, 80)]
     internal bool ShenwuSipuCardUseForbidden(ProgramCardUseQuery query) => ShenwuSipuForbidsAction(query.ActorSeat);
 }

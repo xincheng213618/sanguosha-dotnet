@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDuKuiAnniversaryRuntime
 {
-    internal static CardConversionSource DuKuiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource DuKuiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static string DuKuiShownBind(DuKuiReceipt r) => "du-kui.shown-" + r.Iteration.ToString(CultureInfo.InvariantCulture);
     internal static bool IsDuKuiFanyinTargetGrant(CardConversionSource source) => source.SkillId == AnniversaryDuKuiComposition.Fanyin;
     internal bool DuKuiAllMutualRanges() => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).All(a => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != a.Seat).All(t => _coreNativeRuleQueriesOperations.GetCombatDistance(a.Seat, t.Seat) <= _coreNativeRuleQueriesOperations.GetAttackRange(a.Seat)));
@@ -198,7 +195,7 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
     [ProgramAnswer("anniversary-du-kui")]
     internal void AnswerDuKui(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuKui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DuKuiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DuKui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], DuKuiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Du Kui lost the original published entity and currently legal targets.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -257,5 +254,5 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryDuKuiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginDuKui(f, op);
+    SkillProgramStepOutcome IAnniversaryDuKuiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginDuKui(f, op);
 }

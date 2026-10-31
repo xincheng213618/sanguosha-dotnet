@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouLuMengCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterLuMengMouMobileEntries> getCharacterLuMengMouMobileRuntime) : IMouLuMengHost
+internal sealed class MouLuMengCapability(Func<RuntimeEntries.CharacterLuMengMouMobileEntries> getCharacterLuMengMouMobileRuntime) : IMouLuMengHost
 {
     public SkillProgramStepOutcome Keji(ProgramSkillFrame f) => getCharacterLuMengMouMobileRuntime().ResolveMouKeji(f);
     public SkillProgramStepOutcome Dujiang(ProgramSkillFrame f) => getCharacterLuMengMouMobileRuntime().ResolveMouDujiang(f);

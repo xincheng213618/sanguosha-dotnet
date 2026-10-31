@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangGuanOlRuntime
 {
     internal bool HasShiluCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShiluDrawRevealIdentity);
 
-    internal global::CardGame.Core.GameEngine.ProgramCardIdentityMatch? ShiluIdentity(CharacterState owner, Card card)
+    internal GameEngine.ProgramCardIdentityMatch? ShiluIdentity(CharacterState owner, Card card)
     {
         if (!HasShiluCapability || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Hand(owner.Seat) || _characterLuoXianOlOperations.CurrentHandEntry(owner.Seat, card.Id)is not { } entry)
             return null;

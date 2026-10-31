@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineNextSlashProgramsNamedNextSlashReservesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineNextSlashProgramsNamedNextSlashReservesAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.List<global::CardGame.Core.GameEngine.NamedNextSlashReserve> _namedNextSlashReserves { get; }
+    ref readonly List<GameEngine.NamedNextSlashReserve> _namedNextSlashReserves { get; }
 }

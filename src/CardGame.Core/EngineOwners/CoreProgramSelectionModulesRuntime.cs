@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreProgramSelectionModulesRuntime
 {
-    private readonly global::CardGame.Core.EngineOwners.IKernelProgramSelectionQueriesAccess _programSelectionQueriesOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelProgramSelectionsAccess _programSelectionsOperations;
-    private readonly global::CardGame.Core.EngineOwners.IKernelCreateSelectionQueriesOperations _kernelCoreProgramSelectionModulesOperations;
-    internal CoreProgramSelectionModulesRuntime(global::CardGame.Core.EngineOwners.IKernelProgramSelectionQueriesAccess programSelectionQueriesOperations, global::CardGame.Core.EngineOwners.IKernelProgramSelectionsAccess programSelectionsOperations, global::CardGame.Core.EngineOwners.IKernelCreateSelectionQueriesOperations kernelCoreProgramSelectionModulesOperations)
+    private readonly IKernelProgramSelectionQueriesAccess _programSelectionQueriesOperations;
+    private readonly IKernelProgramSelectionsAccess _programSelectionsOperations;
+    private readonly IKernelCreateSelectionQueriesOperations _kernelCoreProgramSelectionModulesOperations;
+    internal CoreProgramSelectionModulesRuntime(IKernelProgramSelectionQueriesAccess programSelectionQueriesOperations, IKernelProgramSelectionsAccess programSelectionsOperations, IKernelCreateSelectionQueriesOperations kernelCoreProgramSelectionModulesOperations)
     {
         this._programSelectionQueriesOperations = programSelectionQueriesOperations;
         this._programSelectionsOperations = programSelectionsOperations;

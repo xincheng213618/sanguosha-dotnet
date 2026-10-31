@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -18,7 +15,7 @@ internal sealed partial class CoreGameEngineWenyiPeachSuppliesRuntime
         if (materials.Any(card => _coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card)))
             return false;
         Suit? suit = materials.Count == 0 ? Suit.None : materials.Count == 1 ? _coreNativeCardAppearanceOperations.EffectiveSuit(actor, _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, materials[0], source)) : _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, materials);
-        var color = materials.Count == 0 ? null : materials.Count == 1 ? global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit!.Value) : _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, materials);
+        var color = materials.Count == 0 ? null : materials.Count == 1 ? CoreGameEnginePublicPileColorsRuntime.SuitColor(suit!.Value) : _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, materials);
         return !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actorSeat, targetSeat, suit) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[targetSeat], CardKind.Peach, suit, color) && (suit is null || !_coreProgramParticipantPhaseOperationsOperations.IsTurnSuitUseForbidden(actorSeat, suit.Value));
     }
 
@@ -40,7 +37,7 @@ internal sealed partial class CoreGameEngineWenyiPeachSuppliesRuntime
                 return;
             var args = Args(kind);
             if (source is not null)
-                global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
+                CoreGameEngineCardConversionsRuntime.AddConversionParameters(args, source);
             if (kind == "original-pile")
                 args["native-original-public-pile"] = "true";
             result.Add(new(new($"wenyi.peach.{(f.Id)}.{(kind)}.{(source?.SkillId)}.{(source?.BindingId)}.{(source?.SkillInstanceId)}.{(string.Join('-', cards.Select(c => c.Id)))}"), label, cards.Select(c => c.Id).ToArray(), [target], args));
@@ -91,11 +88,11 @@ internal sealed partial class CoreGameEngineWenyiPeachSuppliesRuntime
     {
         if (choice.Parameters.GetValueOrDefault("program-action") != WenyiPeachSupplyAction)
             return false;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !_characterHuanShuJunOlOperations.IsWenyiPeachRequest(f) || !_characterHuanShuJunOlOperations.TryGetWenyiPeachRequest(f, out var actorSeat, out var target) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != actorSeat || prompt.SkillPrompt?.SkillId != f.SkillId || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || !WenyiPeachSupplyChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !_characterHuanShuJunOlOperations.IsWenyiPeachRequest(f) || !_characterHuanShuJunOlOperations.TryGetWenyiPeachRequest(f, out var actorSeat, out var target) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != actorSeat || prompt.SkillPrompt?.SkillId != f.SkillId || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || !WenyiPeachSupplyChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Wenyi Peach changed its native parent, target, source or selected entities.");
         var actor = _coreMatchParticipantsPlayersAccess._players[actorSeat];
         var branch = choice.Parameters["wenyi-supply"];
-        global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source);
+        CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source);
         var cards = choice.Cards.Select(id => _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(id)).Single(c => c.Id == id)).ToArray();
         if (branch == "tiered-zero" && source is not null && _characterWoLongFengChuOlOperations.IsEquipmentSlotNamedSkill(source.SkillId))
         {
@@ -121,7 +118,7 @@ internal sealed partial class CoreGameEngineWenyiPeachSuppliesRuntime
 
     internal bool IsReservedWenyiPeachSupply(ProgramSkillFrame f, int actor, int target, CardConversionSource source) => _characterHuanShuJunOlOperations.TryGetWenyiPeachRequest(f, out var actualActor, out var actualTarget) && actualActor == actor && actualTarget == target && f.HuanShuJun is { Paid: true, Stage: HuanShuJunStage.NativeIssuing, Kind: CardKind.Peach, Materials.Count: 0 } r && r.Sources.SequenceEqual([source]) && source.OwnerSeat == actor && _coreProgramEventHistoryOperations.ProgramEventHistory<WenyiPaidEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == actor && e.TargetSeat == target && e.HealthWindowId == r.WindowId && e.Branch == "peach") == 1;
     internal bool WenyiDrawFundedParentMatches(ProgramSkillFrame f, DrawFundedDistinctBasicPayment p) => p.Intent == DrawFundedDistinctBasicIntent.WenyiPeach && p.EffectiveKind == CardKind.Peach && p.ParentFrameId == f.Id && p.RequestFrameId == f.Id && p.Cursor == f.InstructionIndex && p.TargetSeat is { } target && IsReservedWenyiPeachSupply(f, p.Source.OwnerSeat, target, p.Source);
-    internal void ReserveWenyiDrawFundedPeach(PendingDecision original, global::CardGame.Core.GameEngine.DrawFundedBasicNeed need, CardConversionSource source, CardKind kind)
+    internal void ReserveWenyiDrawFundedPeach(PendingDecision original, GameEngine.DrawFundedBasicNeed need, CardConversionSource source, CardKind kind)
     {
         if (kind != CardKind.Peach || need.Intent != DrawFundedDistinctBasicIntent.WenyiPeach || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame parent || parent.Id != need.ParentFrameId || need.RequestFrameId != parent.Id || parent.InstructionIndex != need.Cursor || !_characterHuanShuJunOlOperations.IsWenyiPeachRequest(parent) || !_characterHuanShuJunOlOperations.TryGetWenyiPeachRequest(parent, out var actor, out var target) || actor != source.OwnerSeat || original.PlayerSeat != actor || need.FixedTargetSeat != target || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PromptId != original.PromptId)
             throw new InvalidOperationException("Wenyi cannot reserve a changed draw-funded Peach request.");
@@ -161,12 +158,12 @@ internal sealed partial class CoreGameEngineWenyiPeachSuppliesRuntime
         _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[target], card, "桃", CardKind.Peach, physicalCards: [card]);
     }
 
-    internal bool WenyiEquipmentSlotPaymentRidesOn(ProgramSkillFrame f, ResolutionFrame child) => child is ProgramSkillFrame { EquipmentSlotNamedUse: { Intent: EquipmentSlotNamedUseIntent.WenyiPeach } d } slot && d.OriginalParentId == f.Id && slot.OwnerSeat == f.OwnerSeat && d.EffectiveKind == CardKind.Peach && d.ResponseChoice is { Cards.Count: 0, Targets: [var target] } choice && IsReservedWenyiPeachSupply(f, slot.OwnerSeat, target, d.Source) && d.TargetSignature == global::CardGame.Core.EngineOwners.CharacterWoLongFengChuOlRuntime.EquipmentSlotNamedTargetSignature(null, choice) && d.OriginalDecision.PlayerSeat == slot.OwnerSeat && d.OriginalDecision.SkillPrompt?.SkillId == f.SkillId && d.OriginalDecision.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice]));
+    internal bool WenyiEquipmentSlotPaymentRidesOn(ProgramSkillFrame f, ResolutionFrame child) => child is ProgramSkillFrame { EquipmentSlotNamedUse: { Intent: EquipmentSlotNamedUseIntent.WenyiPeach } d } slot && d.OriginalParentId == f.Id && slot.OwnerSeat == f.OwnerSeat && d.EffectiveKind == CardKind.Peach && d.ResponseChoice is { Cards.Count: 0, Targets: [var target] } choice && IsReservedWenyiPeachSupply(f, slot.OwnerSeat, target, d.Source) && d.TargetSignature == CharacterWoLongFengChuOlRuntime.EquipmentSlotNamedTargetSignature(null, choice) && d.OriginalDecision.PlayerSeat == slot.OwnerSeat && d.OriginalDecision.SkillPrompt?.SkillId == f.SkillId && d.OriginalDecision.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice]));
     internal bool ResumeWenyiEquipmentSlotPeach(EquipmentSlotNamedUseDraft draft)
     {
         if (draft.Intent != EquipmentSlotNamedUseIntent.WenyiPeach)
             return false;
-        if (draft.Payment is not { } paid || draft.OriginalParentId is not { } parentId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame parent || parent.Id != parentId || draft.ResponseChoice is not { Cards.Count: 0, Targets: [var target] } choice || !IsReservedWenyiPeachSupply(parent, paid.Source.OwnerSeat, target, paid.Source) || paid.Intent != draft.Intent || paid.EffectiveKind != CardKind.Peach || paid.Source != draft.Source || paid.GameplayHash != draft.GameplayHash || paid.OriginalParentId != parentId || paid.TargetSignature != draft.TargetSignature || paid.TargetSignature != global::CardGame.Core.EngineOwners.CharacterWoLongFengChuOlRuntime.EquipmentSlotNamedTargetSignature(null, choice) || _coreProgramEventHistoryOperations.ProgramEventHistory<EquipmentSlotNamedUsePaidEvent>().Count(e => e.Payment == paid) != 1)
+        if (draft.Payment is not { } paid || draft.OriginalParentId is not { } parentId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame parent || parent.Id != parentId || draft.ResponseChoice is not { Cards.Count: 0, Targets: [var target] } choice || !IsReservedWenyiPeachSupply(parent, paid.Source.OwnerSeat, target, paid.Source) || paid.Intent != draft.Intent || paid.EffectiveKind != CardKind.Peach || paid.Source != draft.Source || paid.GameplayHash != draft.GameplayHash || paid.OriginalParentId != parentId || paid.TargetSignature != draft.TargetSignature || paid.TargetSignature != CharacterWoLongFengChuOlRuntime.EquipmentSlotNamedTargetSignature(null, choice) || _coreProgramEventHistoryOperations.ProgramEventHistory<EquipmentSlotNamedUsePaidEvent>().Count(e => e.Payment == paid) != 1)
             throw new InvalidOperationException("Wenyi lost the exact completed equipment-slot supplier invoice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!WenyiPeachUseLegal(paid.Source.OwnerSeat, target, [], paid.Source))
@@ -192,7 +189,7 @@ internal sealed partial class CoreGameEngineWenyiPeachSuppliesRuntime
             return false;
         if (_characterHuanShuJunOlOperations.IsWenyiPeachRequest(parent))
             return true;
-        return _characterGuoTuOlOperations.ActiveWeijieDraft()is { Weijie: { Paid: { } paid } } && global::CardGame.Core.EngineOwners.CharacterGuoTuOlRuntime.SameWeijieNeed(paid.Need, need) && _characterHuanShuJunOlOperations.IsWenyiPeachRequestAfterPaidSupply(parent, paid);
+        return _characterGuoTuOlOperations.ActiveWeijieDraft()is { Weijie: { Paid: { } paid } } && CharacterGuoTuOlRuntime.SameWeijieNeed(paid.Need, need) && _characterHuanShuJunOlOperations.IsWenyiPeachRequestAfterPaidSupply(parent, paid);
     }
 
     internal void ExecuteWenyiWeijiePeach(WeijiePaidOrigin paid)

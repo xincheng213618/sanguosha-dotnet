@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeCardUseRuntime
@@ -16,7 +12,7 @@ internal sealed partial class CoreNativeCardUseRuntime
         _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats = null;
         var moGangquanSource = conversionSource ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion;
         targetSeats = _characterLuBuOlMagicOperations.MoGangquanNativeTargets(sourceSeat, card, playedCardKind ?? card.Kind, moGangquanSource, targetSeats);
-        if (global::CardGame.Core.EngineOwners.CharacterLuBuOlMagicRuntime.IsMoGangquanSource(moGangquanSource))
+        if (CharacterLuBuOlMagicRuntime.IsMoGangquanSource(moGangquanSource))
             designatedTargetSeats = targetSeats;
         targetSeats = _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(playedCardKind ?? card.Kind, sourceSeat, targetSeats);
         var targets = Array.AsReadOnly((adjustedTargets ?? targetSeats).ToArray());

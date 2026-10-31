@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 using CardGame.Core.Campaigns;
 
@@ -12,12 +9,12 @@ internal sealed partial class CoreGameEngineZhaoguMirrorRuntime
     internal const string ZhaoguMirrorSkill = "shanhe:zhaogu-mirror-6018";
     internal const string ZhaoguTemplateAction = "shanhe-zhaogu-template", ZhaoguUseAction = "shanhe-zhaogu-use";
     internal const string ZhaoguCancelAction = "shanhe-zhaogu-cancel", ZhaoguRevealKey = "shanhe-zhaogu-shown";
-    SkillProgramStepOutcome global::CardGame.Core.IZhaoguMirrorHost.Resolve(ProgramSkillFrame frame) => BeginZhaoguMirror(frame);
+    SkillProgramStepOutcome IZhaoguMirrorHost.Resolve(ProgramSkillFrame frame) => BeginZhaoguMirror(frame);
     internal bool IsZhaoguMode => _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id == ShanheBattleSetup.BattleModeId && _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is not null;
 
     internal static bool IsZhaoguTemplateKind(CardKind kind) => kind == CardKind.Nullification || CardUseCategoryCatalog.Get(kind)is CardUseCategories.Basic or CardUseCategories.InstantTrick;
     internal IEnumerable<Card> ZhaoguTemplates(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Where(card => IsZhaoguTemplateKind(card.Kind));
-    internal CardConversionSource ZhaoguSource(ProgramSkillFrame frame) => new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+    internal CardConversionSource ZhaoguSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 62057, SkillProgramEffectOp.ResolveShanheZhaoguMirror)]
     internal bool CanOfferZhaoguMirror(ProgramTriggerLegalityContext context) => IsZhaoguMode && context.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && context.WindowContext?.Window == SkillProgramTriggerWindow.PlayEnding && ZhaoguTemplates(context.OwnerSeat).Any();
     internal bool ValidZhaoguHeader(ProgramSkillFrame frame) => frame.ZhaoguMirror is { } receipt && IsZhaoguMode && frame.SkillId == ZhaoguMirrorSkill && frame.TriggerId == "show-hand-card-and-use" && receipt.Source == ZhaoguSource(frame) && receipt.GameplayHash == frame.GameplayHash && _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.GameplayHash == receipt.GameplayHash && receipt.InstructionIndex == frame.InstructionIndex && frame.InstructionIndex == 1 && receipt.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && receipt.LifecycleFrameId == frame.WindowContext?.ParentFrameId && _coreVirtualOrdinaryTrickUsesOperations.IsExactOwnPlayEndingProgram(frame);
@@ -34,7 +31,7 @@ internal sealed partial class CoreGameEngineZhaoguMirrorRuntime
     }
 
     internal PromptChoice ZhaoguChoice(ProgramSkillFrame frame, string action, string token, string label, IReadOnlyList<int> cards, IReadOnlyList<int> targets) => new(new($"{(action)}.{(frame.Id)}.{(token)}"), label, cards, targets, new Dictionary<string, string> { ["program-action"] = action, ["frame-id"] = frame.Id.ToString(CultureInfo.InvariantCulture), ["mirror-option"] = token });
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> ZhaoguTrickOptions(ProgramSkillFrame frame)
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> ZhaoguTrickOptions(ProgramSkillFrame frame)
     {
         if (frame.ZhaoguMirror?.Template is not { } template || CardUseCategoryCatalog.Get(template.Kind) != CardUseCategories.InstantTrick || template.Kind == CardKind.Nullification || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return[];

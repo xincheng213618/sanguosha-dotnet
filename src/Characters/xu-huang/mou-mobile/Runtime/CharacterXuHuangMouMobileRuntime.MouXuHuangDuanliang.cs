@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     internal const string MouXuHuangObtainReason = "skill-program.mou-mobile:duanliang.obtain";
     internal bool HasMouXuHuangCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouXuHuangDuanliang) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouXuHuangShipo);
 
-    internal static CardConversionSource MouXuHuangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_xu_huang_mou_mobile_MouXuHuangDuanliang.MouXuHuangSource(f);
+    internal static CardConversionSource MouXuHuangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_xu_huang_mou_mobile_MouXuHuangDuanliang.MouXuHuangSource(f);
     internal bool MouXuHuangPhaseSpent(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangMouyiStartedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == MouXuHuangComposition.Duanliang && e.Phase == phase);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 29500, SkillProgramEffectOp.ResolveMouXuHuangDuanliang)]
     internal bool CanStartMouXuHuangDuanliang(CharacterState owner) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == owner.Seat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) && !MouXuHuangPhaseSpent(owner.Seat, phase) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != owner.Seat);
@@ -56,7 +53,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouXuHuangDuanliang;
-        if (!MouXuHuangDuanliangRoot(f) || r is null || r.Stage is not (MouXuHuangDuanliangStage.AttackChoice or MouXuHuangDuanliangStage.DefenseChoice) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouXuHuangDuanliangStage.AttackChoice ? f.OwnerSeat : r.TargetSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXuHuangStrategyChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!MouXuHuangDuanliangRoot(f) || r is null || r.Stage is not (MouXuHuangDuanliangStage.AttackChoice or MouXuHuangDuanliangStage.DefenseChoice) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouXuHuangDuanliangStage.AttackChoice ? f.OwnerSeat : r.TargetSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXuHuangStrategyChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The strategy commitment must be its current participant's exact private published answer.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == MouXuHuangDuanliangStage.AttackChoice)
@@ -136,7 +133,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouXuHuangDuanliang!;
-        if (!MouXuHuangDuanliangRoot(f) || r.Stage != MouXuHuangDuanliangStage.ObtainChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXuHuangObtainChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!MouXuHuangDuanliangRoot(f) || r.Stage != MouXuHuangDuanliangStage.ObtainChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouXuHuangObtainChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Duanliang obtain lost its canonical private HEJ slot.");
         var from = new CardLocation(Enum.Parse<CardZoneKind>(selected.Parameters["source-zone"]), r.TargetSeat);
         var slot = int.Parse(selected.Parameters["slot-index"], CultureInfo.InvariantCulture);
@@ -184,5 +181,5 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
         return p.Choices.Single(c => c.Parameters["option-id"] == attack);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouXuHuangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouXuHuangDuanliang ? BeginMouXuHuangDuanliang(f) : BeginMouXuHuangShipo(f);
+    SkillProgramStepOutcome IMouXuHuangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveMouXuHuangDuanliang ? BeginMouXuHuangDuanliang(f) : BeginMouXuHuangShipo(f);
 }

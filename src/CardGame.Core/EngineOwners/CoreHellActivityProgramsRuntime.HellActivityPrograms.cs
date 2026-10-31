@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreHellActivityProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IHellActivityProgramHost.ExecuteHellActivity(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteHellActivity(f, op);
+    SkillProgramStepOutcome IHellActivityProgramHost.ExecuteHellActivity(ProgramSkillFrame f, SkillProgramEffectOp op) => ExecuteHellActivity(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 40110)]
     internal bool AllowsHellActivityTier(ProgramTriggerLegalityContext gate)
     {

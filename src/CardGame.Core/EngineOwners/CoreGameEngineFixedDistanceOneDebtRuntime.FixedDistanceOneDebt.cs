@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFixedDistanceOneDebtRuntime
@@ -19,7 +14,7 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtRuntime
         if (f.InstructionIndex != 1 || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || target == f.OwnerSeat || f.SelectedTargetSeats is not [var selected] || selected != target || f.SelectedCardIds.Count != 0 || activation.Effects is not [{ Op: SkillProgramEffectOp.GrantFixedDistanceOneTurnPolicy }] || FixedDistanceOneGrants().Any(g => g.ProgramFrameId == f.Id))
             throw new InvalidOperationException("Fixed distance requires its exact zero-cost actual Play activation.");
         var ending = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!.Triggers.Single(t => t.Effects is [{ Op: SkillProgramEffectOp.SettleFixedDistanceOneEndingDebt }]);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FixedDistanceOneTurnGrantedEvent(new(f.Id, f.InstructionIndex, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, target, ending.Id)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FixedDistanceOneTurnGrantedEvent(new(f.Id, f.InstructionIndex, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, target, ending.Id)));
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.DistanceProjection, 40)]
@@ -30,7 +25,7 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtRuntime
         var grants = FixedDistanceOneGrants().Where(g => g.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.ActualTurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && g.Source.OwnerSeat == source.Seat && g.TargetSeat == target.Seat && ValidFixedDistanceOneGrant(g)).ToArray();
         if (grants.Length == 0)
             return original;
-        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-fixed-one", global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"fixed-distance-one:{(g.ProgramFrameId)}", SkillRuleOperation.Set, 1)).ToArray());
+        return RuleQueryService.Evaluate(SkillRuleQuery.OutgoingDistance, new(1, int.MaxValue), [new RuleQueryBaseTerm("distance:before-fixed-one", CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(original))], grants.Select(g => (RuleQueryContribution)new FiniteRuleQueryContribution($"fixed-distance-one:{(g.ProgramFrameId)}", SkillRuleOperation.Set, 1)).ToArray());
     }
 
     internal void ConsumeFixedDistanceDebt(FixedDistanceOneTurnGrant g, bool required)
@@ -74,7 +69,7 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtRuntime
         return !begun || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FixedDistanceOneDebtConsumedEvent>().Count(e => e.Grant == g && e.RequiredDiscard) == 1;
     }
 
-    internal bool MatchesFixedDistanceDebt(ProgramSkillFrame f) => f.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } boundary && boundary.ItemIndex >= 0 && boundary.ItemIndex < boundary.Items.Count && boundary.Items[boundary.ItemIndex].Candidate is { } c && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && MatchesFixedDistanceDebt(c, context, true);
+    internal bool MatchesFixedDistanceDebt(ProgramSkillFrame f) => f.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } boundary && boundary.ItemIndex >= 0 && boundary.ItemIndex < boundary.Items.Count && boundary.Items[boundary.ItemIndex].Candidate is { } c && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && MatchesFixedDistanceDebt(c, context, true);
     [ProgramTriggerProof(ProgramTriggerProofPhase.InstanceException, 30)]
     internal bool HasIssuedFixedDistanceDebtCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => MatchesFixedDistanceDebt(c, context, false);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 690)]
@@ -138,7 +133,7 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtRuntime
         // against a lifted nullable instead of an impossible negated pattern.
         var debtCardId = choice.Cards is [var selected] ? selected : default(int? );
         var debtSelection = debtCardId is { } paid ? _cardZonesOperations._cardZones.GetLocation(paid) : (CardLocation? )null;
-        if (f.FixedDistanceDebtPayment is not { CardId: null } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FixedDistanceDebtChoices(f).Where(c => c.Id == choice.Id).ToArray()) || debtCardId is not { } id || debtSelection is not { OwnerSeat: { } owner } from || owner != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
+        if (f.FixedDistanceDebtPayment is not { CardId: null } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FixedDistanceDebtChoices(f).Where(c => c.Id == choice.Id).ToArray()) || debtCardId is not { } id || debtSelection is not { OwnerSeat: { } owner } from || owner != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
             throw new InvalidOperationException("The debt lost its exact owned physical selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
@@ -206,7 +201,7 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtRuntime
         if (f.FixedDistanceDebtPayment is not { } r || !MatchesFixedDistanceDebt(f) || r.Grant != f.WindowContext!.FixedDistanceDebt || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1)
             return false;
         if (r.CardId is null)
-            return r.From is null && r.SequenceBefore == 0 && r.SequenceAfter == 0 && f.PendingMovementContinuation is null && (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && p.SkillPrompt?.SkillId == f.SkillId && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, FixedDistanceDebtChoices(f)));
+            return r.From is null && r.SequenceBefore == 0 && r.SequenceAfter == 0 && f.PendingMovementContinuation is null && (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && p.PlayerSeat == f.OwnerSeat && p.TargetSeat == f.OwnerSeat && p.SkillPrompt?.SkillId == f.SkillId && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, FixedDistanceDebtChoices(f)));
         if (r.From is not { OwnerSeat: var owner } from || owner != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || r.SequenceBefore < 0 || r.SequenceAfter <= r.SequenceBefore || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != f.OwnerSeat)
             return false;
         var paid = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FixedDistanceOneDebtPaidEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();

@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineCappedConversionBenefitObserversEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineCappedConversionBenefitObserversRuntime> _resolve;
-    private CoreGameEngineCappedConversionBenefitObserversEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineCappedConversionBenefitObserversRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineCappedConversionBenefitObserversRuntime> _resolve;
+    private CoreGameEngineCappedConversionBenefitObserversEntries(Func<EngineOwners.CoreGameEngineCappedConversionBenefitObserversRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineCappedConversionBenefitObserversEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineCappedConversionBenefitObserversRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineCappedConversionBenefitObserversEntries Create(Func<EngineOwners.CoreGameEngineCappedConversionBenefitObserversRuntime> resolve) => new(resolve);
 }

@@ -1,8 +1,7 @@
-using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_sun_ru_ol_SunRuOlWeimian
 {
     internal static int SunRuOlBitCount(int mask) => System.Numerics.BitOperations.PopCount((uint)mask);

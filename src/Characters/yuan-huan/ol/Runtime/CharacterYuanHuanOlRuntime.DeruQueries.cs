@@ -1,14 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuanHuanOlRuntime
 {
-    internal static int DeruNameBit(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_yuan_huan_ol_Deru_Queries.DeruNameBit(kind);
+    internal static int DeruNameBit(CardKind kind) => RuntimeSkills.RuntimeRules_yuan_huan_ol_Deru_Queries.DeruNameBit(kind);
     internal int DeruActualNames(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Aggregate(0, (mask, card) => mask | DeruNameBit(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[seat], card)));
     internal void IssueDeruTake(ProgramSkillFrame f)
     {

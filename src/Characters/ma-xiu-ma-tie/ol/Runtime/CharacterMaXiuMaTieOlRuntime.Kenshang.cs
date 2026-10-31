@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaXiuMaTieOlRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
     internal const string KenshangDrawReason = "skill-program.ma-xiu-ma-tie.kenshang.draw";
     internal void IssueKenshangUse(long id, CardActionContext action)
     {
-        if (action.Type != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.PhysicalCards.Count < 2)
+        if (action.Type != CardActionType.Use || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.PhysicalCards.Count < 2)
             return;
         var source = action.ConversionChain.SingleOrDefault(s => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(s.SkillId)?.Program?.ViewAs.Any(r => r.Id == s.BindingId && r.KenshangUse == true) == true);
         if (source is null)
@@ -27,15 +23,15 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
 
     internal bool KenshangUseProof(CardUseFrame use)
     {
-        if (use.Kenshang is not { } r || use.Action is not { Type: CardActionType.Use } a || r.UseId != use.Id || r.ActionId != a.ActionId || r.Source.OwnerSeat != r.ActorSeat || r.ProviderSeat != r.ActorSeat || a.ProviderSeat != r.ProviderSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.EffectiveKind != use.CardKind || r.MaterialCount < 2 || a.PhysicalCards.Count != r.MaterialCount || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.ActorSeat, r.ProviderSeat) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program is not { } p || p.GameplayHash != r.GameplayHash || !p.ViewAs.Any(v => v.Id == r.Source.BindingId && v.KenshangUse == true) || !a.ConversionChain.Contains(r.Source) || _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangUseIssuedEvent>().Where(e => e.UseId == use.Id).ToArray()is not [var issued] || issued.ActionId != a.ActionId || issued.Source != r.Source || issued.GameplayHash != r.GameplayHash || issued.ActorSeat != r.ActorSeat || issued.ProviderSeat != r.ProviderSeat || issued.MaterialCount != r.MaterialCount)
+        if (use.Kenshang is not { } r || use.Action is not { Type: CardActionType.Use } a || r.UseId != use.Id || r.ActionId != a.ActionId || r.Source.OwnerSeat != r.ActorSeat || r.ProviderSeat != r.ActorSeat || a.ProviderSeat != r.ProviderSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.EffectiveKind != use.CardKind || r.MaterialCount < 2 || a.PhysicalCards.Count != r.MaterialCount || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.ActorSeat, r.ProviderSeat) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program is not { } p || p.GameplayHash != r.GameplayHash || !p.ViewAs.Any(v => v.Id == r.Source.BindingId && v.KenshangUse == true) || !a.ConversionChain.Contains(r.Source) || _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangUseIssuedEvent>().Where(e => e.UseId == use.Id).ToArray()is not [var issued] || issued.ActionId != a.ActionId || issued.Source != r.Source || issued.GameplayHash != r.GameplayHash || issued.ActorSeat != r.ActorSeat || issued.ProviderSeat != r.ProviderSeat || issued.MaterialCount != r.MaterialCount)
             return false;
         var costs = _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangMaterialEvent>().Where(e => e.UseId == use.Id).OrderBy(e => e.Index).ToArray();
         return costs.Length == r.MaterialCount && costs.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, r.MaterialCount)) && costs.Select(e => e.Cost).SequenceEqual(a.PhysicalCards) && a.PhysicalCards.All(c => c.From.OwnerSeat == r.ProviderSeat && c.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment) && use.PhysicalCardIds!.SequenceEqual(a.PhysicalCards.Select(c => c.CardId));
     }
 
-    internal void RecordKenshangDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageId, int amount)
+    internal void RecordKenshangDamage(GameEngine.IDamageAttempt attack, long damageId, int amount)
     {
-        if (amount <= 0 || !attack.DamageWasApplied || attack is not global::CardGame.Core.NativeOwners.CardAttackHandle card || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || card.IsProgramSkillDamage || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Kenshang: { } r } use)
+        if (amount <= 0 || !attack.DamageWasApplied || attack is not NativeOwners.CardAttackHandle card || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || card.IsProgramSkillDamage || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Kenshang: { } r } use)
             return;
         if (!KenshangUseProof(use) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame d || d.Id != damageId || d.ParentFrameId != use.Id || d.Amount != amount || d.SourceSeat != attack.SourceSeat || d.TargetSeat != attack.TargetSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangDamageEvent>().Any(e => e.DamageFrameId == damageId))
             throw new InvalidOperationException("Kenshang damage requires the exact once-applied native use damage, including its real chain propagation.");
@@ -50,7 +46,7 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
         // This is the target frontier of an already-issued Slash, whose quota and
         // equipment payment have completed. Rechecking a new Use quota here would
         // erase its own legal targets after the ordinary Slash debit.
-        return _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, t, new(-1, use.CardKind, action.EffectiveSuit ?? Suit.None, action.EffectiveRank ?? 0), action.ConversionChain.FirstOrDefault(), use.CardKind, existingUseFrameId: use.Id, specificEffectiveRank: action.EffectiveRank, physicalCardIds: action.PhysicalCards.Select(c => c.CardId).ToArray()) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, use.CardKind, action.EffectiveSuit, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(use.SourceSeat, t.Seat, action.EffectiveSuit) && !_coreHandComparisonOperations.IsSelfTargetForbiddenAction(actor, use.CardKind, [t.Seat])).Select(t => t.Seat).ToArray();
+        return _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, t, new(-1, use.CardKind, action.EffectiveSuit ?? Suit.None, action.EffectiveRank ?? 0), action.ConversionChain.FirstOrDefault(), use.CardKind, existingUseFrameId: use.Id, specificEffectiveRank: action.EffectiveRank, physicalCardIds: action.PhysicalCards.Select(c => c.CardId).ToArray()) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, use.CardKind, action.EffectiveSuit, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(use.SourceSeat, t.Seat, action.EffectiveSuit) && !_coreHandComparisonOperations.IsSelfTargetForbiddenAction(actor, use.CardKind, [t.Seat])).Select(t => t.Seat).ToArray();
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 12)]
@@ -78,7 +74,7 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27110)]
     internal bool QualifyKenshang(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => !t.Effects.Any(e => KenshangComposition.Handles(e.Op)) || CanRunIssuedKenshangCandidate(c, context);
-    SkillProgramStepOutcome global::CardGame.Core.IKenshangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginKenshang(f, op);
+    SkillProgramStepOutcome IKenshangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginKenshang(f, op);
     internal CardUseFrame RequireKenshangUse(ProgramSkillFrame f)
     {
         if (f.WindowContext?.CardUse is not { } card || _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is not { Kenshang: { } r } u || !KenshangUseProof(u) || r.Source.OwnerSeat != f.OwnerSeat || r.Source.SkillId != f.SkillId || r.Source.SkillInstanceId != f.SkillInstanceId || r.GameplayHash != f.GameplayHash || r.ActionId != card.CardActionId)
@@ -90,7 +86,7 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         var c = f.WindowContext;
-        if (f.Kenshang is not null || f.InstructionIndex != 1 || c is null || !CanRunIssuedKenshangCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex), c))
+        if (f.Kenshang is not null || f.InstructionIndex != 1 || c is null || !CanRunIssuedKenshangCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex), c))
             throw new InvalidOperationException("Kenshang must start at its exact unconsumed use candidate.");
         var u = RequireKenshangUse(f);
         var r = u.Kenshang!;
@@ -153,7 +149,7 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
     [ProgramAnswer("kenshang-target")]
     internal void AnswerKenshangTarget(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Kenshang: { Stage: KenshangProgramStage.Targets } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !KenshangTargetChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Kenshang: { Stage: KenshangProgramStage.Targets } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !KenshangTargetChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Kenshang needs its current exact target choice.");
         var u = RequireKenshangUse(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

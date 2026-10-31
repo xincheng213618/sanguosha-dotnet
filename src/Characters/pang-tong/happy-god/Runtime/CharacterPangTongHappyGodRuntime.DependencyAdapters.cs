@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.ProgramLifecycleWindowRuntime))]
-internal sealed class CharacterPangTongHappyGodProgramLifecycleWindowAdapter(global::System.Func<global::CardGame.Core.ProgramLifecycleWindowRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterPangTongHappyGodProgramLifecycleWindowOperations
+[Core.ProgramCapability(typeof(ProgramLifecycleWindowRuntime))]
+internal sealed class CharacterPangTongHappyGodProgramLifecycleWindowAdapter(Func<ProgramLifecycleWindowRuntime> targetFactory) : ICharacterPangTongHappyGodProgramLifecycleWindowOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.ProgramLifecycleWindowRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.ProgramLifecycleWindowRuntime Get() => this._targetFactory();
+    private readonly Func<ProgramLifecycleWindowRuntime> _targetFactory = targetFactory;
+    public ProgramLifecycleWindowRuntime Get() => this._targetFactory();
 }

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,8 +8,8 @@ internal sealed partial class CharacterLouGuiMobileShiRuntime
     internal const string ShiLgGuanSha = ShiLouGuiComposition.GuanShaSkill, ShiLgJiYu = ShiLouGuiComposition.JiYuSkill;
     internal bool HasShiLgCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShiLgGuanSha);
 
-    SkillProgramStepOutcome global::CardGame.Core.IShiLouGuiHost.ResolveGuanSha(ProgramSkillFrame frame) => BeginShiLgGuanSha(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiLouGuiHost.ResolveJiYu(ProgramSkillFrame frame) => BeginShiLgJiYu(frame);
+    SkillProgramStepOutcome IShiLouGuiHost.ResolveGuanSha(ProgramSkillFrame frame) => BeginShiLgGuanSha(frame);
+    SkillProgramStepOutcome IShiLouGuiHost.ResolveJiYu(ProgramSkillFrame frame) => BeginShiLgJiYu(frame);
     internal SkillProgramStepOutcome BeginShiLgGuanSha(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -45,7 +42,7 @@ internal sealed partial class CharacterLouGuiMobileShiRuntime
             var card = candidates[_randomOperations._random.Next(candidates.Length)];
             _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Hand(f.OwnerSeat), new(ShiLouGuiComposition.GuanShaGainReason));
             gained.Add(card.Id);
-            names.Add(global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(card.Kind));
+            names.Add(CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(card.Kind));
         }
 
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiLgGuanshaAppliedEvent(f.Id, f.OwnerSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, owned.Length, gained.Count, names.Count));
@@ -161,7 +158,7 @@ internal sealed partial class CharacterLouGuiMobileShiRuntime
     [ProgramAnswer(ShiLouGuiComposition.ProgramAction)]
     internal void AnswerShiLg(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiLouGui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiLgChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiLouGui: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiLgChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Shi Lou Gui choice lost its current frame or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

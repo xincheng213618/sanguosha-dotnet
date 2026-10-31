@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaWanOlRuntime
@@ -10,8 +6,8 @@ internal sealed partial class CharacterMaWanOlRuntime
     internal const string MaWanDrawReason = "skill-program.ma-wan.hunjiang.draw";
     internal bool HasMaWanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveHunjiangSimultaneousChoices);
 
-    internal CardConversionSource MaWanSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMaWanProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveHunjiangSimultaneousChoices ? BeginMaWanVotes(f) : BeginMaWanTargets(f);
+    internal CardConversionSource MaWanSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMaWanProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveHunjiangSimultaneousChoices ? BeginMaWanVotes(f) : BeginMaWanTargets(f);
     internal SkillProgramStepOutcome BeginMaWanVotes(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -67,7 +63,7 @@ internal sealed partial class CharacterMaWanOlRuntime
     [ProgramAnswer("ma-wan-hunjiang")]
     internal void AnswerMaWan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MaWanHunjiang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MaWanChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MaWanChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MaWanHunjiang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MaWanChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], MaWanChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Hunjiang lost its exact independent chooser or legal extra-target commitment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -166,7 +162,7 @@ internal sealed partial class CharacterMaWanOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26510)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26510)]
-    internal bool ContinuePaidMaWan(ProgramSkillFrame f) => f.MaWanHunjiang is null ? f.TriggerId is { } binding && f.InstructionIndex is 0 or 1 && f.WindowContext is { } issued && HasIssuedMaWanHunjiangCandidate(new(f.OwnerSeat, f.SkillId, binding, f.SkillInstanceId, f.GameplayHash, 0), issued) : f.MaWanHunjiang is { } r && (r.Stage == MaWanHunjiangStage.AppendTargets ? f.WindowContext is { } c && HasIssuedMaWanHunjiangCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), c) : _coreProgramEventHistoryOperations.ProgramEventHistory<MaWanHunjiangStartedEvent>().Any(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurnNumber == r.ActualTurnNumber && e.PhaseInstanceId == r.PhaseInstanceId));
+    internal bool ContinuePaidMaWan(ProgramSkillFrame f) => f.MaWanHunjiang is null ? f.TriggerId is { } binding && f.InstructionIndex is 0 or 1 && f.WindowContext is { } issued && HasIssuedMaWanHunjiangCandidate(new(f.OwnerSeat, f.SkillId, binding, f.SkillInstanceId, f.GameplayHash, 0), issued) : f.MaWanHunjiang is { } r && (r.Stage == MaWanHunjiangStage.AppendTargets ? f.WindowContext is { } c && HasIssuedMaWanHunjiangCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), c) : _coreProgramEventHistoryOperations.ProgramEventHistory<MaWanHunjiangStartedEvent>().Any(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurnNumber == r.ActualTurnNumber && e.PhaseInstanceId == r.PhaseInstanceId));
     [ProgramAiChoice(SkillProgramEffectOp.ResolveHunjiangSimultaneousChoices, SkillProgramEffectOp.OfferHunjiangPhaseSlashTargets)]
     internal PromptChoice AiMaWan(PendingDecision p, ProgramSkillFrame f)
     {
@@ -174,10 +170,10 @@ internal sealed partial class CharacterMaWanOlRuntime
         if (r.Stage == MaWanHunjiangStage.PrivateVotes)
         {
             var chooser = _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat];
-            var extra = !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(chooser, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && chooser.Hp >= 4;
+            var extra = !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(chooser, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) && chooser.Hp >= 4;
             return p.Choices.Single(c => c.Parameters["branch"] == (extra ? "extra" : "draw"));
         }
 
-        return p.Choices.FirstOrDefault(c => c.Targets.Count > 0 && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? p.Choices.Single(c => c.Parameters["branch"] == "finish");
+        return p.Choices.FirstOrDefault(c => c.Targets.Count > 0 && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? p.Choices.Single(c => c.Parameters["branch"] == "finish");
     }
 }

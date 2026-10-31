@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -18,7 +15,7 @@ internal sealed partial class CharacterBuZhiOlRuntime
         if (!gainLoss)
             return f.TriggerId is null && f.WindowContext is null && f.SelectedTargetSeats.Count == 1 && ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Activation is { } a && IsBuZhiActivation(a);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        return f.TriggerId is not null && f.ActivationId == f.TriggerId && f.SelectedTargetSeats.Count == 0 && f.WindowContext is { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } c && c.OwnerSeat == f.OwnerSeat && index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is CardsMovedTriggerWindowFrame parent && parent.Id == c.ParentFrameId && parent.Batch.Id == batch.Id && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) && BuZhiMovementQualifies(parent.Batch, f.OwnerSeat);
+        return f.TriggerId is not null && f.ActivationId == f.TriggerId && f.SelectedTargetSeats.Count == 0 && f.WindowContext is { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } c && c.OwnerSeat == f.OwnerSeat && index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is CardsMovedTriggerWindowFrame parent && parent.Id == c.ParentFrameId && parent.Batch.Id == batch.Id && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) && BuZhiMovementQualifies(parent.Batch, f.OwnerSeat);
     }
 
     internal SkillProgramStepOutcome ResolveBuZhi(ProgramSkillFrame supplied, bool gainLoss)
@@ -122,7 +119,7 @@ internal sealed partial class CharacterBuZhiOlRuntime
     [ProgramAnswer("bu-zhi")]
     internal void ResolveBuZhiChoice(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BuZhi: not null } f || !BuZhiCurrent(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != BuZhiChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], BuZhiChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BuZhi: not null } f || !BuZhiCurrent(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != BuZhiChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], BuZhiChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Bu Zhi choice lost its actual chooser and exact current candidates.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var r = f.BuZhi!;
@@ -275,5 +272,5 @@ internal sealed partial class CharacterBuZhiOlRuntime
         return p.Choices.Where(c => c.Targets.Count == 1).OrderByDescending(c => _coreAiBrainsAiBrainsAccess._aiBrains[f.OwnerSeat].ScoreProgramTarget(snapshot, c.Targets[0], hint)).FirstOrDefault() ?? p.Choices[^1];
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IBuZhiProgramHost.ResolveBuZhi(ProgramSkillFrame f, bool gainLoss) => ResolveBuZhi(f, gainLoss);
+    SkillProgramStepOutcome IBuZhiProgramHost.ResolveBuZhi(ProgramSkillFrame f, bool gainLoss) => ResolveBuZhi(f, gainLoss);
 }

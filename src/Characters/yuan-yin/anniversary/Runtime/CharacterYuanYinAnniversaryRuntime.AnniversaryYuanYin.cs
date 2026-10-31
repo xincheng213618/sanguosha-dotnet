@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuanYinAnniversaryRuntime
 {
-    internal static CardConversionSource YuanYinSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource YuanYinSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardMoveReason YuanYinDrawReason => new("skill-program.anniversary:moshou.draw");
 
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedBeforeActivity, 49300)]
     [ProgramTargetWindow(ProgramTargetWindowStage.ImplicitSelfDrawTwo, 49300)]
     [ProgramTargetWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, 49300)]
     internal bool YuanYinTargetWindows(ProgramTargetCardWindowQuery q) => _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(p).GetInstanceTriggers(SkillProgramTriggerWindow.CardUseTargetsFinalized).Any(b => b.SkillId == AnniversaryYuanYinComposition.Moshou));
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryYuanYinHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveAnniversaryYuanYinMoshou ? BeginYuanYinMoshou(f) : BeginYuanYinYunjiu(f);
+    SkillProgramStepOutcome IAnniversaryYuanYinHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolveAnniversaryYuanYinMoshou ? BeginYuanYinMoshou(f) : BeginYuanYinYunjiu(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 49300, SkillProgramEffectOp.ResolveAnniversaryYuanYinMoshou, SkillProgramEffectOp.ResolveAnniversaryYuanYinYunjiu)]
     internal bool CanOfferYuanYin(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {

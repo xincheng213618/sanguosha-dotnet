@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CoreGameEngineKuangfuRuntime
     internal const string KuangfuEquipmentReason = "skill-program.kuangfu.equipment-cost";
     internal const string KuangfuHandReason = "skill-program.kuangfu.no-damage-hand-cost";
     internal const string KuangfuDrawReason = "skill-program.kuangfu.own-equipment-draw";
-    internal static CardConversionSource KuangfuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_Kuangfu.KuangfuSource(f);
+    internal static CardConversionSource KuangfuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_Kuangfu.KuangfuSource(f);
     internal bool KuangfuGameEnded() => _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreMatchOutcomeStatusWinnerAccess._status == EngineStatus.Completed;
     internal bool KuangfuUnpaidSourceCurrent(ProgramSkillFrame f) => !KuangfuGameEnded() && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
     internal bool CanIssueKuangfuSlash(int actor, int target, int? excludedEquipmentId = null) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && actor != target && _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !KuangfuGameEnded() && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(actor, SkillProgramCardTargetRestriction.SelfOnly) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor, CardKind.Slash, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor, target, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(_coreMatchParticipantsPlayersAccess._players[target]) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None, null) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor, target, Suit.None) && _coreRuleQueriesOperations.CanSpendSlashUse(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[target], ignoresCount: false, CardKind.Slash, effectiveRank: null, excludedEquipmentId: excludedEquipmentId);
@@ -83,7 +80,7 @@ internal sealed partial class CoreGameEngineKuangfuRuntime
     [ProgramAnswer("kuangfu")]
     internal void ResolveKuangfuChoice(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !_coreKuangfuReceiptsOperations.ValidKuangfu(f) || f.Kuangfu is not { Stage: KuangfuStage.EquipmentChoice or KuangfuStage.SlashTargetChoice or KuangfuStage.HandDiscardChoice } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || p.IsPrivate != (r.Stage == KuangfuStage.HandDiscardChoice) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], KuangfuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !_coreKuangfuReceiptsOperations.ValidKuangfu(f) || f.Kuangfu is not { Stage: KuangfuStage.EquipmentChoice or KuangfuStage.SlashTargetChoice or KuangfuStage.HandDiscardChoice } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } p || p.PlayerSeat != f.OwnerSeat || p.IsPrivate != (r.Stage == KuangfuStage.HandDiscardChoice) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], KuangfuChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Equipment Slash choice lost its owning frame and exact published material.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (KuangfuGameEnded())
@@ -231,7 +228,7 @@ internal sealed partial class CoreGameEngineKuangfuRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 30)]
-    internal bool ReturnRegisteredCompleteKuangfuSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnRegisteredCompleteKuangfuSlash(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.KuangfuSlashReturn is null)
             return false;
@@ -239,7 +236,7 @@ internal sealed partial class CoreGameEngineKuangfuRuntime
         return true;
     }
 
-    internal void CompleteKuangfuSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal void CompleteKuangfuSlash(GameEngine.AttackCompletionReceipt completion)
     {
         var returned = completion.KuangfuSlashReturn ?? throw new InvalidOperationException("Missing equipment Slash return.");
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != returned.ProgramFrameId || completion.ProgramFrameId != f.Id || completion.ResolutionId != returned.CardUseFrameId || !_coreKuangfuReceiptsOperations.ValidKuangfu(f) || f.Kuangfu?.SlashReturn != returned || f.Kuangfu.Stage != KuangfuStage.SlashIssued || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => u.Id == returned.CardUseFrameId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == returned.CardUseFrameId) != 1)
@@ -308,5 +305,5 @@ internal sealed partial class CoreGameEngineKuangfuRuntime
         return p.Choices.OrderBy(c => c.Targets.Single() == f.OwnerSeat ? 1 : 0).ThenBy(c => c.Cards.Single()).First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IKuangfuProgramHost.DiscardEquipmentThenSlashAndOwnershipOutcome(ProgramSkillFrame f) => BeginKuangfu(f);
+    SkillProgramStepOutcome IKuangfuProgramHost.DiscardEquipmentThenSlashAndOwnershipOutcome(ProgramSkillFrame f) => BeginKuangfu(f);
 }

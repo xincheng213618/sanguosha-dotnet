@@ -1,8 +1,7 @@
 #nullable enable
-using System.Globalization;
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouZhangXiuOlCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterZhangXiuMouOlEntries> getCharacterZhangXiuMouOlRuntime) : IMouZhangXiuOlHost
+internal sealed class MouZhangXiuOlCapability(Func<RuntimeEntries.CharacterZhangXiuMouOlEntries> getCharacterZhangXiuMouOlRuntime) : IMouZhangXiuOlHost
 {
     public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {

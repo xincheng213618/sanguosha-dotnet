@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramTurnQueries(global::CardGame.Core.EngineStates.CoreActualTurnProgressState actualTurnProgressState) : IProgramTurnQueries
+internal sealed class ProgramTurnQueries(EngineStates.CoreActualTurnProgressState actualTurnProgressState) : IProgramTurnQueries
 {
     public int TurnNumber => actualTurnProgressState.ReferenceToTurnNumber;
     public int CurrentSeat => actualTurnProgressState.ReferenceToCurrentSeat;

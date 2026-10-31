@@ -1,19 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramPersistentCombatPoliciesRuntime
 {
-    void global::CardGame.Core.IPersistentCombatPolicyProgramHost.SetTurnHandLimitFromPlayDamage(ProgramSkillFrame frame) => SetProgramTurnHandLimitFromPlayDamage(frame);
-    void global::CardGame.Core.IPersistentCombatPolicyProgramHost.GrantGameFactionAttackRangeTargets(ProgramSkillFrame frame, string factionId) => GrantProgramGameFactionAttackRangeTargets(frame, factionId);
+    void IPersistentCombatPolicyProgramHost.SetTurnHandLimitFromPlayDamage(ProgramSkillFrame frame) => SetProgramTurnHandLimitFromPlayDamage(frame);
+    void IPersistentCombatPolicyProgramHost.GrantGameFactionAttackRangeTargets(ProgramSkillFrame frame, string factionId) => GrantProgramGameFactionAttackRangeTargets(frame, factionId);
     internal void SetProgramTurnHandLimitFromPlayDamage(ProgramSkillFrame frame)
     {
         if (frame.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || frame.WindowContext?.Window != SkillProgramTriggerWindow.PlayPhaseStarting)
             throw new InvalidOperationException("Damage-derived hand limit requires the owner's current play phase start.");
-        var state = new global::CardGame.Core.GameEngine.ProgramPlayDamageHandLimit(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, _coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerAccess._playPhaseDamageDealtByCurrentPlayer);
+        var state = new GameEngine.ProgramPlayDamageHandLimit(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, _coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerAccess._playPhaseDamageDealtByCurrentPlayer);
         _coreGameEngineProgramPersistentCombatPoliciesProgramGameFactionRangeTargetsProgramPlayDamageHandLimitsAccess._programPlayDamageHandLimits[frame.OwnerSeat] = state;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDamageHandLimitChangedEvent(state.OwnerSeat, state.SkillId, state.TurnNumber, state.PhaseInstanceId, state.DamageCount));
     }
@@ -40,7 +36,7 @@ internal sealed partial class CoreGameEngineProgramPersistentCombatPoliciesRunti
     {
         if (!_coreLordSkillProjectionsOperations.HasSkillRoleQualification(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId, Role.Lord) || frame.SelectedTargetSeats.Count is < 1 or > 2 || frame.SelectedTargetSeats.Distinct().Count() != frame.SelectedTargetSeats.Count || frame.SelectedTargetSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive))
             throw new InvalidOperationException("A game-long faction range grant requires a lord and one or two distinct living targets.");
-        var state = new global::CardGame.Core.GameEngine.ProgramGameFactionRangeTargets(frame.OwnerSeat, frame.SkillId, factionId, frame.SelectedTargetSeats.ToArray());
+        var state = new GameEngine.ProgramGameFactionRangeTargets(frame.OwnerSeat, frame.SkillId, factionId, frame.SelectedTargetSeats.ToArray());
         _coreGameEngineProgramPersistentCombatPoliciesProgramGameFactionRangeTargetsProgramPlayDamageHandLimitsAccess._programGameFactionRangeTargets.Add(state);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramGameFactionAttackRangeTargetsGrantedEvent(state.OwnerSeat, state.SkillId, state.FactionId, state.TargetSeats));
     }

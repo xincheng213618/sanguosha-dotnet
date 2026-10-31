@@ -35,12 +35,12 @@ internal sealed partial class HealthContinuationRuntime
         for (var rootIndex = 0; rootIndex + 1 < facts.FrameCount; rootIndex++)
         {
             if (facts.FrameAt(rootIndex) is not CardUseFrame use ||
-                !global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(use.CardKind) && !(use.Action is { } supplied && global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(supplied.EffectiveKind)) ||
+                !RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(use.CardKind) && !(use.Action is { } supplied && RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(supplied.EffectiveKind)) ||
                 facts.FrameAt(rootIndex + 1) is not CardsMovedTriggerWindowFrame payment ||
                 use.RecoveryPaidContinuation?.Kind != RecoveryPaidCardUseKind.CommittedSlash &&
                 !(use.PaymentMovementReceipt is { Batch: { } issued } &&
                   (payment.Id == issued.Id || payment.Batch.Id == issued.Id))) continue;
-            if (use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(action.EffectiveKind) ||
+            if (use.Action is not { Type: CardActionType.Use } action || !RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(action.EffectiveKind) ||
                 use.CardKind != action.EffectiveKind || use.SourceSeat != action.ActorSeat || use.ProgramUseCommitted ||
                 use.CardAttack is not { } attack || attack.SourceSeat != use.SourceSeat || attack.DamageWasApplied ||
                 attack.EffectiveCardKind is { } kind && kind != use.CardKind ||
@@ -92,7 +92,7 @@ internal sealed partial class HealthContinuationRuntime
         for (var rootIndex = 1; rootIndex < facts.FrameCount; rootIndex++)
         {
             if (facts.FrameAt(rootIndex) is not ProgramCardTriggerWindowFrame window ||
-                facts.FrameAt(rootIndex - 1) is not CardUseFrame native || !global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(native.CardKind) ||
+                facts.FrameAt(rootIndex - 1) is not CardUseFrame native || !RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(native.CardKind) ||
                 !(window.Continuation is ProgramCardContinuation.Dodge or ProgramCardContinuation.FactionDefenseDodge ||
                   window.ResponseCompletion?.OriginalContinuation is ProgramCardContinuation.Dodge or ProgramCardContinuation.FactionDefenseDodge ||
                   window.Action is { Type: CardActionType.Response, EffectiveKind: CardKind.Dodge })) continue;
@@ -229,7 +229,7 @@ internal sealed partial class HealthContinuationRuntime
     }
 
     internal static bool TypedPaidDyingEntryReturnMatches(DyingFrame dying, ProgramLifecycleTriggerWindowFrame entry) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_TypedRecoveryDamageCursor.TypedPaidDyingEntryReturnMatches(dying,entry);
+        RuntimeSkills.RuntimeRules_Core_TypedRecoveryDamageCursor.TypedPaidDyingEntryReturnMatches(dying,entry);
 
     internal bool TypedPaidDyingEntryObserverMatches(ProgramLifecycleTriggerWindowFrame entry, ProgramSkillFrame observer,
         IReadOnlyList<IGameEvent> history)
@@ -252,7 +252,7 @@ internal sealed partial class HealthContinuationRuntime
         if (hp.Continuation != PostEventContinuation.Program || hp.CardId is not null || hp.CardKind is not null ||
             change.Amount <= 0 || !facts.IsValidPlayerSeat(change.TargetSeat)) return false;
         if (effect.CompiledInstruction is LoseHpProgramInstruction loss)
-            return global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(producer, effect.Target) == change.TargetSeat && change.Kind == HpChangeKind.Loss &&
+            return RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(producer, effect.Target) == change.TargetSeat && change.Kind == HpChangeKind.Loss &&
                 change.SourceSeat is null && change.Amount == loss.IssuedAmount(producer) &&
                 (long)change.HpAfter == (long)change.HpBefore - loss.IssuedAmount(producer);
         if (effect.CompiledInstruction is not RecoverProgramInstruction recovery || change.Kind != HpChangeKind.Recovery ||
@@ -271,11 +271,11 @@ internal sealed partial class HealthContinuationRuntime
         if (recovery.Target == SkillProgramEffectTarget.SelectedTargets)
             return recovery.TargetReference is null && producer.SelectedTargetSeats.Contains(change.TargetSeat);
         return (recovery.TargetReference is { } reference ? facts.ResolveProgramParticipant(producer, reference) :
-            global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(producer, effect.Target)) == change.TargetSeat;
+            RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(producer, effect.Target)) == change.TargetSeat;
     }
 
     internal static bool IsTypedRecoveryTargetSupported(RecoverProgramInstruction instruction) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_TypedRecoveryDamageCursor.IsTypedRecoveryTargetSupported(instruction);
+        RuntimeSkills.RuntimeRules_Core_TypedRecoveryDamageCursor.IsTypedRecoveryTargetSupported(instruction);
 
     internal bool UnsupportedTypedRecoveryTargetIsMalformed(ProgramSkillFrame producer, RecoverProgramInstruction instruction, int actualTarget)
     {
@@ -414,7 +414,7 @@ internal sealed partial class HealthContinuationRuntime
               recovery.OriginalRecovered == 0 && TypedRecoveryChosenCandidateMatches(recovery, history));
 
     internal static bool IsRecoveryCursorPrimitive(ProgramSkillInstruction? instruction) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_TypedRecoveryDamageCursor.IsRecoveryCursorPrimitive(instruction);
+        RuntimeSkills.RuntimeRules_Core_TypedRecoveryDamageCursor.IsRecoveryCursorPrimitive(instruction);
 
     internal SkillProgramEffect? TypedRecoveryPausedEffect(ProgramSkillFrame producer)
     {
@@ -451,7 +451,7 @@ internal sealed partial class HealthContinuationRuntime
         if (instruction.Target == SkillProgramEffectTarget.SelectedTargets)
             return instruction.TargetReference is null && producer.SelectedTargetSeats.Contains(attempt.TargetSeat);
         var target = instruction.TargetReference is { } reference
-            ? facts.ResolveProgramParticipant(producer, reference) : global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(producer, effect.Target);
+            ? facts.ResolveProgramParticipant(producer, reference) : RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(producer, effect.Target);
         return target == attempt.TargetSeat;
     }
 
@@ -555,7 +555,7 @@ internal sealed partial class HealthContinuationRuntime
         var effect = TypedRecoveryPausedEffect(producer);
         if (effect?.CompiledInstruction is not LoseHpProgramInstruction instruction || dying.ParentFrameId != producer.Id ||
             dying.Continuation != DyingContinuationKind.ProgramSkill || dying.KillerSeat is not null ||
-            !facts.IsValidPlayerSeat(dying.VictimSeat) || global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(producer, effect.Target) != dying.VictimSeat ||
+            !facts.IsValidPlayerSeat(dying.VictimSeat) || RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(producer, effect.Target) != dying.VictimSeat ||
             dying.ResponderIndex < 0 || dying.ResponderIndex >= dying.ResponderSeats.Count ||
             dying.ResponderSeats.Count > facts.PlayerCount || dying.ResponderSeats.Distinct().Count() != dying.ResponderSeats.Count ||
             dying.ResponderSeats.Any(seat => !facts.IsValidPlayerSeat(seat))) return false;

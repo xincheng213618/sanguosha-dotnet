@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class DamageTriggerCompletion(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeCardClassificationsEntries> getCoreNativeCardClassificationsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeDyingEntries> getCoreNativeDyingRuntime, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeDamageWindowsEntries> getCoreNativeDamageWindowsRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeDamageCompletionEntries> getCoreNativeDamageCompletionRuntime, global::CardGame.Core.GameEngine.IDamageAttempt attack, CharacterState target) : IDamageTriggerCompletion
+internal sealed class DamageTriggerCompletion(Func<RuntimeEntries.CoreNativeCardClassificationsEntries> getCoreNativeCardClassificationsRuntime, Func<RuntimeEntries.CoreNativeDyingEntries> getCoreNativeDyingRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreNativeDamageWindowsEntries> getCoreNativeDamageWindowsRuntime, Func<RuntimeEntries.CoreNativeDamageCompletionEntries> getCoreNativeDamageCompletionRuntime, GameEngine.IDamageAttempt attack, CharacterState target) : IDamageTriggerCompletion
 {
     public int Hp => target.Hp;
     public bool IsAlive => target.IsAlive;

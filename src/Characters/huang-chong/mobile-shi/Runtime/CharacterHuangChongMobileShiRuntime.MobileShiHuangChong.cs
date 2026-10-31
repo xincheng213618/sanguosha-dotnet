@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,8 +8,8 @@ internal sealed partial class CharacterHuangChongMobileShiRuntime
     internal const string ShiHcCujun = ShiHuangChongComposition.CujunSkill, ShiHcSili = ShiHuangChongComposition.SiliSkill;
     internal bool HasShiHcCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShiHcCujun) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShiHcSili);
 
-    SkillProgramStepOutcome global::CardGame.Core.IShiHuangChongHost.ResolveCujun(ProgramSkillFrame frame) => BeginShiHcCujun(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiHuangChongHost.ResolveSili(ProgramSkillFrame frame) => BeginShiHcSili(frame);
+    SkillProgramStepOutcome IShiHuangChongHost.ResolveCujun(ProgramSkillFrame frame) => BeginShiHcCujun(frame);
+    SkillProgramStepOutcome IShiHuangChongHost.ResolveSili(ProgramSkillFrame frame) => BeginShiHcSili(frame);
     // ---- 促军: at the owner's discard phase start they may name any other
     // character; every living character inside that target's attack range
     // (excluding the target) simultaneously gives the target one hand card or
@@ -296,17 +293,17 @@ internal sealed partial class CharacterHuangChongMobileShiRuntime
     }
 
     internal bool DrainShiHc(long id) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(id, PostEventContinuation.Program);
-    internal global::CardGame.Core.NativeOwners.ShiHcLedgerView ShiHcLedger()
+    internal NativeOwners.ShiHcLedgerView ShiHcLedger()
     {
         if (!HasShiHcCapability)
-            return global::CardGame.Core.NativeOwners.ShiHcLedgerView.Empty;
+            return NativeOwners.ShiHcLedgerView.Empty;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var head = history.FirstOrDefault();
         var tail = history.LastOrDefault();
         if (_characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCache is not null && _characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCacheCount == history.Length && ReferenceEquals(_characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCacheHead, head) && ReferenceEquals(_characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCacheTail, tail))
             return _characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCache;
-        var grants = new List<global::CardGame.Core.GameEngine.ShiHcLedgerGrant>();
-        var playStarts = new List<global::CardGame.Core.GameEngine.ShiHcLedgerPlayStart>();
+        var grants = new List<GameEngine.ShiHcLedgerGrant>();
+        var playStarts = new List<GameEngine.ShiHcLedgerPlayStart>();
         var armedSlashes = new List<ShiHcSiliSlashArmedEvent>();
         var drawGrants = new List<ShiHcSiliDrawGrantedEvent>();
         var consumedDraws = new List<long>();
@@ -348,7 +345,7 @@ internal sealed partial class CharacterHuangChongMobileShiRuntime
             }
         }
 
-        _characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCache = new global::CardGame.Core.NativeOwners.ShiHcLedgerView(Array.AsReadOnly(grants.ToArray()), Array.AsReadOnly(playStarts.ToArray()), Array.AsReadOnly(armedSlashes.ToArray()), Array.AsReadOnly(drawGrants.ToArray()), Array.AsReadOnly(consumedDraws.ToArray()), Array.AsReadOnly(beishuiArmed.ToArray()), Array.AsReadOnly(consumedBeishui.ToArray()), Array.AsReadOnly(claims.ToArray()), Array.AsReadOnly(settledClaims.ToArray()));
+        _characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCache = new NativeOwners.ShiHcLedgerView(Array.AsReadOnly(grants.ToArray()), Array.AsReadOnly(playStarts.ToArray()), Array.AsReadOnly(armedSlashes.ToArray()), Array.AsReadOnly(drawGrants.ToArray()), Array.AsReadOnly(consumedDraws.ToArray()), Array.AsReadOnly(beishuiArmed.ToArray()), Array.AsReadOnly(consumedBeishui.ToArray()), Array.AsReadOnly(claims.ToArray()), Array.AsReadOnly(settledClaims.ToArray()));
         _characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCacheCount = history.Length;
         _characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCacheHead = head;
         _characterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess._shiHcLedgerCacheTail = tail;
@@ -363,7 +360,7 @@ internal sealed partial class CharacterHuangChongMobileShiRuntime
         return view.CujunGrants.Count(grant => grant.Grant.TargetSeat == seat && _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId > grant.Grant.GrantedPhaseInstanceId && view.PlayStarts.Count(play => play.Seat == seat && play.Index > grant.Index) == 1);
     }
 
-    internal bool IsShiHcSiliSlashUnrespondable(long frameId) => HasShiHcCapability && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { Action: { Type: CardActionType.Use } action, SourceSeat: var seat } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && action.PhysicalCards.Count == 1 && ShiHcLedger().IsSlashArmed(seat, action.PhysicalCards[0].CardId);
+    internal bool IsShiHcSiliSlashUnrespondable(long frameId) => HasShiHcCapability && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { Action: { Type: CardActionType.Use } action, SourceSeat: var seat } && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && action.PhysicalCards.Count == 1 && ShiHcLedger().IsSlashArmed(seat, action.PhysicalCards[0].CardId);
     internal string GetShiHcSkillName(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId).Name;
     internal PromptChoice MakeShiHcSeatChoice(ProgramSkillFrame f, string prefix, int seat, string label) => new(new($"shi-huang-chong.{(f.Id)}.{(prefix)}-{(seat)}"), label, [], [seat], new Dictionary<string, string> { ["program-action"] = ShiHuangChongComposition.ProgramAction, ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = $"{(prefix)}-{(seat)}", });
     internal PromptChoice MakeShiHcBranchChoice(ProgramSkillFrame f, string branch, string label) => new(new($"shi-huang-chong.{(f.Id)}.{(branch)}"), label, [], [], new Dictionary<string, string> { ["program-action"] = ShiHuangChongComposition.ProgramAction, ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = branch, });

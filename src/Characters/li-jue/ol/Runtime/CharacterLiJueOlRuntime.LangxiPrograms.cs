@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiJueOlRuntime
@@ -34,7 +30,7 @@ internal sealed partial class CharacterLiJueOlRuntime
     {
         var f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Last();
         RequireLiJue(f);
-        if (f.LiJue!.Stage != LiJueStage.ChoosingTarget || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LangxiChoices(f).Where(c => c.Id == choice.Id).ToArray()) || !LiJueCurrentSource(f))
+        if (f.LiJue!.Stage != LiJueStage.ChoosingTarget || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LangxiChoices(f).Where(c => c.Id == choice.Id).ToArray()) || !LiJueCurrentSource(f))
             throw new InvalidOperationException("Langxi changed its unpaid actual HP-qualified target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var target = choice.Targets.Single();

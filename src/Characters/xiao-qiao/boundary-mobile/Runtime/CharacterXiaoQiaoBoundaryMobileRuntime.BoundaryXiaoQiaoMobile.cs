@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiaoQiaoBoundaryMobileRuntime
@@ -31,7 +26,7 @@ internal sealed partial class CharacterXiaoQiaoBoundaryMobileRuntime
     internal bool IsExactBoundaryXiaoQiaoBeforeResultProgramChild(ProgramJudgmentTriggerWindowFrame w, ProgramSkillFrame f) => f.SkillId == BoundaryXiaoQiaoHongyan && w.ZhenyiBeforeResult == true && w.Activated && f.WindowContext is { Window: SkillProgramTriggerWindow.JudgmentBeforeResult, Judgment: { } j } c && c.ParentFrameId == w.Id && j == w.Judgment && _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is { ZhenyiBeforeResultCompleted: not true } pending && pending.Id == j.JudgmentFrameId && _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id == j.CardId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && w.Candidates[w.CandidateIndex] is { } b && b.OwnerSeat == f.OwnerSeat && b.SkillId == f.SkillId && b.TriggerId == f.TriggerId && b.SkillInstanceId == f.SkillInstanceId && b.GameplayHash == f.GameplayHash;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 66700)]
     internal bool QualifyBoundaryXiaoQiaoMobile(ProgramTriggerCandidate b, ProgramSkillWindowContext c) => b.SkillId != BoundaryXiaoQiaoHongyan || c is { Window: SkillProgramTriggerWindow.JudgmentBeforeResult, Judgment.Suit: Suit.Heart };
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryXiaoQiaoMobileHost.Rewrite(ProgramSkillFrame f) => BeginBoundaryXiaoQiaoJudgment(f);
+    SkillProgramStepOutcome IBoundaryXiaoQiaoMobileHost.Rewrite(ProgramSkillFrame f) => BeginBoundaryXiaoQiaoJudgment(f);
     internal SkillProgramStepOutcome BeginBoundaryXiaoQiaoJudgment(ProgramSkillFrame f)
     {
         if (f.WindowContext?.Judgment?.Suit != Suit.Heart)
@@ -60,7 +55,7 @@ internal sealed partial class CharacterXiaoQiaoBoundaryMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SkillId: BoundaryXiaoQiaoHongyan } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !BoundaryXiaoQiaoJudgmentChoices(f).Any(c => c.Id == choice.Id) || _resolutionStackOperations._resolutionStack.Count < 3 || _resolutionStackOperations._resolutionStack[^2] is not ProgramJudgmentTriggerWindowFrame w || !IsExactBoundaryXiaoQiaoBeforeResultProgramChild(w, f) || f.WindowContext?.Judgment is not { Suit: Suit.Heart } j || _coreJudgmentCursorRuntimeOperations.ActiveJudgment is not { } pending || pending.Id != j.JudgmentFrameId || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id != j.CardId || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("Mobile Hongyan choice must belong to the exact living source and unchanged native judgment.");
-        var r = new BoundaryXiaoQiaoJudgmentOverride(f.Id, pending.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, j.CardId, Enum.Parse<Suit>(choice.Parameters["suit"]));
+        var r = new BoundaryXiaoQiaoJudgmentOverride(f.Id, pending.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, j.CardId, Enum.Parse<Suit>(choice.Parameters["suit"]));
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeFrame(pending.Id, pending with { BoundaryXiaoQiaoOverride = r, Suit = r.Suit });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryXiaoQiaoJudgmentRewrittenEvent(r));

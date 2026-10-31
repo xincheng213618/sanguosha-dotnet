@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoZhiLeRuntime
@@ -18,7 +14,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || f.LeCaoZhiWenlanDirectDuel is not null || _coreProgramVirtualDuelOperations.FrozenProgramDuelInstructionIndex(f.Id) != f.InstructionIndex || f.CardAttack is not { Active: true, EffectiveCardKind: CardKind.Duel, CardId: null, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillFrameId != f.Id || attack.SourceSeat != source || attack.TargetSeat != target || f.Continuations.Duel is not { Active: true } || WenlanEntries(source).Any(e => e.NativeFrameId == f.Id && e.ProgramInstructionIndex == f.InstructionIndex))
             throw new InvalidOperationException("Wenlan direct-Duel acceptance requires the exact newly issued native instruction.");
-        var producer = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var producer = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var entry = new WenlanActionAcceptedEvent(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, source, NextWenlanOrdinal(source), 0, f.Id, CardActionType.Use, source, CardKind.Duel, new(owned, 0, null))
         {
             ProgramInstructionIndex = f.InstructionIndex
@@ -31,7 +27,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
 
     internal bool WenlanDirectProducerMatches(ProgramSkillFrame parent, WenlanDirectDuelReceipt r)
     {
-        if (parent.Id != r.ProducerFrameId || parent.InstructionIndex != r.InstructionIndex || parent.GameplayHash != r.ProducerGameplayHash || r.ProducerSource != new CardConversionSource(parent.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId) || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash || _coreProgramVirtualDuelOperations.FrozenProgramDuelInstructionIndex(parent.Id) != r.InstructionIndex || parent.CardAttack is not { EffectiveCardKind: CardKind.Duel, CardId: null, PhysicalCardIds.Count: 0 } state || state.ProgramSkillFrameId != parent.Id || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.SourceSeat == r.TargetSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanDirectDuelAcceptedEvent>().Count(e => e == new WenlanDirectDuelAcceptedEvent(parent.Id, r.InstructionIndex, r.EntryId, r.SourceSeat, r.TargetSeat, r.ProducerSource, r.ProducerGameplayHash)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanActionAcceptedEvent>().Where(e => e.EntryId == r.EntryId).ToArray()is not [var entry] || entry.OwnerSeat != r.SourceSeat || entry.NativeFrameId != parent.Id || entry.ProgramInstructionIndex != r.InstructionIndex || entry.ActionId != 0 || entry.EffectiveKind != CardKind.Duel || entry.ActionType != CardActionType.Use || entry.ProviderSeat != r.SourceSeat || entry.Capture.MaterialCount != 0 || entry.Capture.FuEntity is not null || entry.Capture.Source?.Source.OwnerSeat != r.SourceSeat)
+        if (parent.Id != r.ProducerFrameId || parent.InstructionIndex != r.InstructionIndex || parent.GameplayHash != r.ProducerGameplayHash || r.ProducerSource != new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId) || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash || _coreProgramVirtualDuelOperations.FrozenProgramDuelInstructionIndex(parent.Id) != r.InstructionIndex || parent.CardAttack is not { EffectiveCardKind: CardKind.Duel, CardId: null, PhysicalCardIds.Count: 0 } state || state.ProgramSkillFrameId != parent.Id || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.SourceSeat == r.TargetSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanDirectDuelAcceptedEvent>().Count(e => e == new WenlanDirectDuelAcceptedEvent(parent.Id, r.InstructionIndex, r.EntryId, r.SourceSeat, r.TargetSeat, r.ProducerSource, r.ProducerGameplayHash)) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanActionAcceptedEvent>().Where(e => e.EntryId == r.EntryId).ToArray()is not [var entry] || entry.OwnerSeat != r.SourceSeat || entry.NativeFrameId != parent.Id || entry.ProgramInstructionIndex != r.InstructionIndex || entry.ActionId != 0 || entry.EffectiveKind != CardKind.Duel || entry.ActionType != CardActionType.Use || entry.ProviderSeat != r.SourceSeat || entry.Capture.MaterialCount != 0 || entry.Capture.FuEntity is not null || entry.Capture.Source?.Source.OwnerSeat != r.SourceSeat)
             return false;
         if (parent.TriggerId is null)
             return parent.SelectedTargetSeats.SequenceEqual([r.SourceSeat, r.TargetSeat]);
@@ -39,7 +35,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 29081)]
-    internal bool ReturnWenlanDirectDuel(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnWenlanDirectDuel(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.ProgramFrameId is not { } parentId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LeCaoZhiWenlanDirectDuel: { } r } parent || parent.Id != parentId)
             return false;

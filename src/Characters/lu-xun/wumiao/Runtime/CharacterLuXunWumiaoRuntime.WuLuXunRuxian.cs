@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuXunWumiaoRuntime
 {
     internal bool HasWuLuXunRuxianCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveWuLuXunRuxian);
 
-    internal static CardConversionSource WuLuXunActionSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_lu_xun_wumiao_WuLuXunRuxian.WuLuXunActionSource(f);
+    internal static CardConversionSource WuLuXunActionSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lu_xun_wumiao_WuLuXunRuxian.WuLuXunActionSource(f);
     internal int WuLuXunRuxianUsage(int ownerSeat) => !HasWuLuXunRuxianCapability ? 0 : _skillRuntimeStateOperations._skillRuntimeState.GetUsage(ownerSeat, "wumiao:ruxian", _contentRegistryOperations._contentRegistry.GetSkill("wumiao:ruxian").Program!.Activations.Single().UsageGroup, SkillUsageScope.Game);
     internal bool WuLuXunRuxianSpent(int ownerSeat) => WuLuXunRuxianUsage(ownerSeat) > 0;
     internal WuLuXunRuxianActivatedEvent? WuLuXunActiveRuxian(int ownerSeat)

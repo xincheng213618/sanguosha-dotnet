@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
 {
-    internal bool IsAnniversaryBaiLingYunSlashSource(long? programId, int source, int target, Card card, CardKind kind, int provider, CardLocation from, IReadOnlyList<Card>? physical, bool counts) => from == CardLocation.Processing && counts && source == provider && (card.Kind == kind || card.Kind == CardKind.Slash && kind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[source])) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && (physical is null || physical is [var material] && material.Id == card.Id) && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryBly: { Stage: AnniversaryBlyStage.IssuingUse, Plan: { } p } } f && f.Id == programId && f.OwnerSeat == source && p.CardId == card.Id && p.Targets.Count > 0 && p.Targets[0] == target && _cardZonesOperations._cardZones.Contains(CardLocation.Processing, card.Id) && ValidAnniversaryBly(f) && AnniversaryBlyUsePaid(f);
+    internal bool IsAnniversaryBaiLingYunSlashSource(long? programId, int source, int target, Card card, CardKind kind, int provider, CardLocation from, IReadOnlyList<Card>? physical, bool counts) => from == CardLocation.Processing && counts && source == provider && (card.Kind == kind || card.Kind == CardKind.Slash && kind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[source])) && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && (physical is null || physical is [var material] && material.Id == card.Id) && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AnniversaryBly: { Stage: AnniversaryBlyStage.IssuingUse, Plan: { } p } } f && f.Id == programId && f.OwnerSeat == source && p.CardId == card.Id && p.Targets.Count > 0 && p.Targets[0] == target && _cardZonesOperations._cardZones.Contains(CardLocation.Processing, card.Id) && ValidAnniversaryBly(f) && AnniversaryBlyUsePaid(f);
     internal void IssueAnniversaryBlyUse(ProgramSkillFrame f)
     {
         var r = f.AnniversaryBly!;
@@ -20,7 +16,7 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryBly = r with { Stage = AnniversaryBlyStage.IssuingUse, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         if (a.ProgramActivationId is "next-card-target-adjustment" or "next-actual-use-target-adjustment")
             _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats = a.TargetSeats;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))
         {
             _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[a.TargetSeats[0]], card, p.Kind, actor.Seat, countsTowardSlashLimit: true, usesZhuqueFan: p.Kind == CardKind.FireSlash && card.Kind == CardKind.Slash && _coreNativeTargetLegalityOperations.HasZhuqueFan(actor), programSkillCardUseFrameId: f.Id, physicalSourceLocation: CardLocation.Processing);
             return;
@@ -50,7 +46,7 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
 
         if (card.Kind == CardKind.Lightning && !_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && _coreCardActionsOperations.TryBeginDelayedCardUsePrograms(id))
             return;
-        var required = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(card.Kind) ? _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, card.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), enforceUsePermission: true, actualEffectiveColor: _coreActionDiscardColorsOperations.CapturePhysicalCardColor(actor.Seat, card), hasActualColor: true, physicalCardIds: [card.Id]).FirstOrDefault(o => o.ActionKind == a.Kind && o.TargetCardId == a.TargetCardId && o.TargetSeats.SequenceEqual(a.TargetSeats))?.RequiredCardKind : null;
+        var required = CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(card.Kind) ? _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, card.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), enforceUsePermission: true, actualEffectiveColor: _coreActionDiscardColorsOperations.CapturePhysicalCardColor(actor.Seat, card), hasActualColor: true, physicalCardIds: [card.Id]).FirstOrDefault(o => o.ActionKind == a.Kind && o.TargetCardId == a.TargetCardId && o.TargetSeats.SequenceEqual(a.TargetSeats))?.RequiredCardKind : null;
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(id, card, actor.Seat, _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats, a.Kind, a.TargetCardId, required, card.Kind);
     }
 

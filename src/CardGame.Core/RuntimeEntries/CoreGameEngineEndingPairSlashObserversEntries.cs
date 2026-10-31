@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineEndingPairSlashObserversEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineEndingPairSlashObserversRuntime> _resolve;
-    private CoreGameEngineEndingPairSlashObserversEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineEndingPairSlashObserversRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineEndingPairSlashObserversRuntime> _resolve;
+    private CoreGameEngineEndingPairSlashObserversEntries(Func<EngineOwners.CoreGameEngineEndingPairSlashObserversRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineEndingPairSlashObserversEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineEndingPairSlashObserversRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineEndingPairSlashObserversEntries Create(Func<EngineOwners.CoreGameEngineEndingPairSlashObserversRuntime> resolve) => new(resolve);
 }

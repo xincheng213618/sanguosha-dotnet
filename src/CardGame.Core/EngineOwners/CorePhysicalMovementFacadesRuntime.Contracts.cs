@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-internal interface ICorePhysicalMovementFacadesMovementRecordOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICorePhysicalMovementFacadesMovementRecordOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MovementRecordRuntime Get();
+    MovementRecordRuntime Get();
 }
 
-internal interface ICorePhysicalMovementFacadesMovementEquipmentEffectsOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICorePhysicalMovementFacadesMovementEquipmentEffectsOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.MovementEquipmentEffectsRuntime Get();
+    MovementEquipmentEffectsRuntime Get();
 }

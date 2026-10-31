@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunJianBoundaryMobileRuntime
 {
     internal const string MobileSunJianPolu = "boundary:polu-mobile";
-    SkillProgramStepOutcome global::CardGame.Core.IMobileSunJianPoluHost.Draw(ProgramSkillFrame frame) => BeginMobileSunJianPolu(frame);
+    SkillProgramStepOutcome IMobileSunJianPoluHost.Draw(ProgramSkillFrame frame) => BeginMobileSunJianPolu(frame);
     internal int MobileSunJianInvocationCount(ProgramSkillFrame frame) => _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.SkillId == MobileSunJianPolu && e.OwnerSeat == frame.OwnerSeat && e.FrameId <= frame.Id);
     internal SkillProgramStepOutcome BeginMobileSunJianPolu(ProgramSkillFrame supplied)
     {
@@ -41,13 +37,13 @@ internal sealed partial class CharacterSunJianBoundaryMobileRuntime
             return;
         }
 
-        _coreProgramNativeDrawOperations.BeginOperationProgramDraw(frame, frame.SelectedTargetSeats[receipt.RecipientIndex], receipt.Count, global::CardGame.Core.EngineOwners.CharacterSunJianBoundaryMobileDefinitions.MobileSunJianPoluDraw);
+        _coreProgramNativeDrawOperations.BeginOperationProgramDraw(frame, frame.SelectedTargetSeats[receipt.RecipientIndex], receipt.Count, CharacterSunJianBoundaryMobileDefinitions.MobileSunJianPoluDraw);
     }
 
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMobileSunJianPolu)]
     internal void ReturnMobileSunJianPoluDraw(ProgramSkillFrame frame, NativeDrawOutcome outcome)
     {
-        if (!ValidMobileSunJianPolu(frame) || frame.MobileSunJianPolu is not { AwaitingMovement: false } r || r.RecipientIndex >= frame.SelectedTargetSeats.Count || outcome.RecipientSeat != frame.SelectedTargetSeats[r.RecipientIndex] || outcome.RequestedCount != r.Count || outcome.ActualDrawIds.Count > r.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(outcome.RecipientSeat) && m.Reason == global::CardGame.Core.EngineOwners.CharacterSunJianBoundaryMobileDefinitions.MobileSunJianPoluDraw).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
+        if (!ValidMobileSunJianPolu(frame) || frame.MobileSunJianPolu is not { AwaitingMovement: false } r || r.RecipientIndex >= frame.SelectedTargetSeats.Count || outcome.RecipientSeat != frame.SelectedTargetSeats[r.RecipientIndex] || outcome.RequestedCount != r.Count || outcome.ActualDrawIds.Count > r.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(outcome.RecipientSeat) && m.Reason == CharacterSunJianBoundaryMobileDefinitions.MobileSunJianPoluDraw).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
             throw new InvalidOperationException("Polu cannot accept a foreign or repeated native draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { MobileSunJianPolu = r with { AwaitingMovement = true, Draw = outcome }, PendingMovementContinuation = new(outcome.RecipientSeat, 0, null) });
         ContinueMobileSunJianPolu(frame.Id);

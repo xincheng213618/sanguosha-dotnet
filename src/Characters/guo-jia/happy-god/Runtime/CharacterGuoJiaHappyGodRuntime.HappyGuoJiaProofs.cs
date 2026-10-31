@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoJiaHappyGodRuntime
@@ -53,7 +49,7 @@ internal sealed partial class CharacterGuoJiaHappyGodRuntime
         if (child is DeathFrame death)
             return r.Stage == HappyGuoJiaStage.CostChildren && r.MaximumAfter == 0 && death.ParentFrameId == f.Id && death.VictimSeat == f.OwnerSeat && death.ReturnKind == DeathReturnKind.ProgramSkill;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (m.Reason == CardMoveReasons.Reshuffle || r.Stage == HappyGuoJiaStage.DrawChildren && m.Reason.Value == "skill-program.happy:huishi-gift.draw" && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.Target) || r.Cards.Contains(m.CardId) && m.From == CardLocation.Processing && (r.Target >= 0 && m.Reason.Value == "skill-program.happy:huishi.give" && m.To == CardLocation.Hand(r.Target) || m.To == CardLocation.DiscardPile && m.Reason.Value == "skill-program.happy:huishi.cleanup")));
+            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (m.Reason == CardMoveReasons.Reshuffle || r.Stage == HappyGuoJiaStage.DrawChildren && m.Reason.Value == "skill-program.happy:huishi-gift.draw" && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.Target) || r.Cards.Contains(m.CardId) && m.From == CardLocation.Processing && (r.Target >= 0 && m.Reason.Value == "skill-program.happy:huishi.give" && m.To == CardLocation.Hand(r.Target) || m.To == CardLocation.DiscardPile && m.Reason.Value == "skill-program.happy:huishi.cleanup")));
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 

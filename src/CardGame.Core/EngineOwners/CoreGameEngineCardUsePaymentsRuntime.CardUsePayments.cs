@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCardUsePaymentsRuntime
 {
-    internal static bool OwnsGenericSlashPaymentTail(CardUseFrame use) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CardUsePayments.OwnsGenericSlashPaymentTail(use);
+    internal static bool OwnsGenericSlashPaymentTail(CardUseFrame use) => RuntimeSkills.RuntimeRules_Core_CardUsePayments.OwnsGenericSlashPaymentTail(use);
     internal void PaySlashUseMaterials(IReadOnlyList<Card> cards, int providerSeat, CardLocation? sourceLocation)
     {
         if (_coreProgramCardUsePaymentsOperations.CardUsePayments.TryPayMaterials(cards, providerSeat, sourceLocation, CardMoveReasons.Use))
@@ -29,7 +25,7 @@ internal sealed partial class CoreGameEngineCardUsePaymentsRuntime
     internal void CaptureSlashUsePaymentBatch(CardMovementBatchContext batch)
     {
         _coreProgramCardUsePaymentsOperations.CardUsePayments.CaptureMovement(batch);
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || batch.ParentFrameId != use.Id || use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || !CardUsePaymentMaterialsMatch(use, batch))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || batch.ParentFrameId != use.Id || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || !CardUsePaymentMaterialsMatch(use, batch))
             return;
         if (use.PaymentMovementReceipt is not null)
             throw new InvalidOperationException("One card-use payment cannot issue its physical materials twice.");
@@ -38,10 +34,10 @@ internal sealed partial class CoreGameEngineCardUsePaymentsRuntime
 
     internal bool IsCardUsePaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => _coreProgramCardUsePaymentsOperations.CardUsePayments.MatchesBatch(use, batch) || CardUsePaymentBatchMatchesReceipt(use, batch) && CardUsePaymentMaterialsMatch(use, batch);
     internal bool IsPaidDestroyedGeneralWeaponUseMaterial(long useId, int cardId) => cardId > 0 && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && _coreAdvancedLifecycleOperations.GetAdvancedCard(cardId).IsGeneralWeapon && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { Type: CardActionType.Use } action, PaymentMovementReceipt: { Batch: { } batch } receipt } use && receipt.OwnerFrameId == useId && receipt.ActionId == action.ActionId && CardUsePaymentBatchMatchesReceipt(use, batch) && CardUsePaymentMaterialsMatch(use, batch) && action.PhysicalCards.SingleOrDefault(c => c.CardId == cardId)is { } material && material.From == CardLocation.Equipment(action.ProviderSeat) && batch.Movements.SingleOrDefault(m => m.CardId == cardId)is { } movement && movement.From == material.From && movement.CardKind == material.CardKind && movement.To == CardLocation.OutsideGame && movement.Reason == CardMoveReasons.Use && movement.Sequence > receipt.SequenceBefore && movement.Sequence <= receipt.SequenceAfter && _coreCardMovementJournalCardMovementsAccess._cardMovements.SingleOrDefault(m => m.Sequence == movement.Sequence) == movement;
-    internal static bool CardUsePaymentBatchMatchesReceipt(CardUseFrame use, CardMovementBatchContext batch, CardUsePaymentMovementReceipt? issuedReceipt = null) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CardUsePayments.CardUsePaymentBatchMatchesReceipt(use, batch, issuedReceipt);
+    internal static bool CardUsePaymentBatchMatchesReceipt(CardUseFrame use, CardMovementBatchContext batch, CardUsePaymentMovementReceipt? issuedReceipt = null) => RuntimeSkills.RuntimeRules_Core_CardUsePayments.CardUsePaymentBatchMatchesReceipt(use, batch, issuedReceipt);
     internal bool CardUsePaymentMaterialsMatch(CardUseFrame use, CardMovementBatchContext batch)
     {
-        if (!OwnsGenericSlashPaymentTail(use) || use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || use.CardKind != action.EffectiveKind || batch.ParentFrameId != use.Id || batch.ParentBatchId is not null || batch.AwaitingProgramFrameId is not null || batch.NativeDrawInvocation is not null || batch.NativeBuZhiDiscardInvocation is not null || batch.Movements.Count == 0 || batch.Movements.Count != action.PhysicalCards.Count || batch.Movements.Select(move => move.CardId).Distinct().Count() != batch.Movements.Count)
+        if (!OwnsGenericSlashPaymentTail(use) || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || use.CardKind != action.EffectiveKind || batch.ParentFrameId != use.Id || batch.ParentBatchId is not null || batch.AwaitingProgramFrameId is not null || batch.NativeDrawInvocation is not null || batch.NativeBuZhiDiscardInvocation is not null || batch.Movements.Count == 0 || batch.Movements.Count != action.PhysicalCards.Count || batch.Movements.Select(move => move.CardId).Distinct().Count() != batch.Movements.Count)
             return false;
         foreach (var move in batch.Movements)
         {
@@ -49,7 +45,7 @@ internal sealed partial class CoreGameEngineCardUsePaymentsRuntime
             if (cost is null || cost.From != move.From || cost.CardKind != move.CardKind || move.Reason != CardMoveReasons.Use || move.TurnNumber != batch.TurnNumber || move.Sequence <= 0 || move.Sequence > _coreCardMovementJournalCardMovementsAccess._cardMovements.Count || _coreCardMovementJournalCardMovementsAccess._cardMovements[move.Sequence - 1] != move)
                 return false;
             var card = _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(move.CardId)).Single(card => card.Id == move.CardId);
-            var destination = card.IsGeneralWeapon && cost.From.Zone == CardZoneKind.Equipment || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, cost.From, CardLocation.Processing) ? CardLocation.OutsideGame : _coreWushuangJinzhiOperations.IsWushuangJinzhiPaidMaterial(action, move.CardId) ? CardLocation.Processing : _coreAlternativeViewAsCostsOperations.IsProgramAlternativeCost(action, move.CardId) ? CardLocation.DrawPile : CardLocation.Processing;
+            var destination = card.IsGeneralWeapon && cost.From.Zone == CardZoneKind.Equipment || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, cost.From, CardLocation.Processing) ? CardLocation.OutsideGame : _coreWushuangJinzhiOperations.IsWushuangJinzhiPaidMaterial(action, move.CardId) ? CardLocation.Processing : _coreAlternativeViewAsCostsOperations.IsProgramAlternativeCost(action, move.CardId) ? CardLocation.DrawPile : CardLocation.Processing;
             destination = _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(card, cost.From, destination);
             if (move.To != destination || _characterDiaoChanLeOperations.IsDiouCarrier(card.Id) && destination == CardLocation.OutsideGame && !_coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(move))
                 return false;

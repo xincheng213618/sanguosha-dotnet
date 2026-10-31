@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
 {
     internal const string ShenTscPowei = "mobile-god:powei", ShenTscDulie = "mobile-god:dulie", ShenTscShenzhu = "mobile-god:shenzhu";
     internal const string ShenTscDiscard = "skill-program.shen-taishi-ci.powei.discard", ShenTscTake = "skill-program.shen-taishi-ci.powei.take";
-    internal static CardConversionSource ShenTscSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource ShenTscSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool ShenTscMissionOver(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiPoweiMissionEvent>().Any(e => e.OwnerSeat == owner);
     internal int ShenTscWei(int seat, int owner) => _coreMatchParticipantsPlayersAccess._players[seat].MarkerSourceCounts.GetValueOrDefault((PlayerMarkerKind.ShenTaishiCiWei, owner));
     internal bool HasShenTaishiCiPoweiRange(int actor, int target) => _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiPoweiRangeEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.AttackerSeat == actor && e.OwnerSeat == target) && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.ActorSeat == actor);
@@ -22,8 +19,8 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPaidWeaponSlash, 38200)]
     [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 38200)]
     internal bool ShenTscPoweiSlashRange(ProgramSlashDistanceQuery q) => HasShenTaishiCiPoweiRange(q.Actor.Seat, q.Target.Seat);
-    SkillProgramStepOutcome global::CardGame.Core.IShenTaishiCiHost.Powei(ProgramSkillFrame f) => ResolveShenTscPowei(f);
-    void global::CardGame.Core.IShenTaishiCiHost.Dulie(ProgramSkillFrame f) => ResolveShenTscDulie(f);
+    SkillProgramStepOutcome IShenTaishiCiHost.Powei(ProgramSkillFrame f) => ResolveShenTscPowei(f);
+    void IShenTaishiCiHost.Dulie(ProgramSkillFrame f) => ResolveShenTscDulie(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 38200)]
     internal bool CanOfferShenTaishiCi(ProgramTriggerLegalityContext gate)
     {
@@ -71,7 +68,7 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     internal SkillProgramStepOutcome ResolveShenTscPowei(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!global::CardGame.Core.EngineOwners.CharacterTaishiCiHappyGodRuntime.IsShenTscPoweiFamily(f.SkillId) || f.WindowContext is not { } c || f.ShenTaishiCiPowei is not null)
+        if (!CharacterTaishiCiHappyGodRuntime.IsShenTscPoweiFamily(f.SkillId) || f.WindowContext is not { } c || f.ShenTaishiCiPowei is not null)
             throw new InvalidOperationException("Powei requires its original owning trigger.");
         if (f.TriggerId == "initialize")
         {
@@ -162,7 +159,7 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     [ProgramAnswer("shen-taishi-ci-powei")]
     internal void AnswerShenTscPowei(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenTaishiCiPowei: { Stage: ShenTaishiCiPoweiStage.Choice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShenTscChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenTaishiCiPowei: { Stage: ShenTaishiCiPoweiStage.Choice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShenTscChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Powei requires its current chooser and private real card or opaque slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -272,13 +269,13 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShenTaishiCiPowei)]
     internal PromptChoice ChooseShenTscPowei(PendingDecision p, ProgramSkillFrame f)
     {
-        var enemy = !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.ShenTaishiCiPowei!.TargetSeat]);
+        var enemy = !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.ShenTaishiCiPowei!.TargetSeat]);
         return enemy ? p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "take") ?? p.Choices.First() : p.Choices.Last();
     }
 
     internal void ResolveShenTscDulie(ProgramSkillFrame f)
     {
-        if (f.SkillId is not (ShenTscDulie or "happy:dulie") || f.WindowContext?.CardUse is not { } c || _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is not { } use || use.Action?.ActionId != c.CardActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (f.SkillId is not (ShenTscDulie or "happy:dulie") || f.WindowContext?.CardUse is not { } c || _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is not { } use || use.Action?.ActionId != c.CardActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             throw new InvalidOperationException("Dulie lost its original incoming Slash.");
         if (f.JudgmentOutcomeBindings?.SingleOrDefault(b => b.Name == "dulie-outcome")?.Suit != Suit.Heart)
             return;
@@ -295,7 +292,7 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
 
     internal bool TryCompleteShenTaishiCiCancelledSlash(ProgramCardTriggerWindowFrame window)
     {
-        if (global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { } action } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiDulieCancelledEvent>().Any(e => e.UseId == use.Id && e.ActionId == action.ActionId))
+        if (CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { } action } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiDulieCancelledEvent>().Any(e => e.UseId == use.Id && e.ActionId == action.ActionId))
             return false;
         if (use.TargetSeats.Count > 0)
         {

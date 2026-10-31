@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGameDomainsRuntime
 {
     internal bool TracksFirstGameDomainCrossings => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveFirstGameDomainCrossing);
 
-    internal static bool IsRuleOutsideGame(CardLocation at) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GameDomains.IsRuleOutsideGame(at);
+    internal static bool IsRuleOutsideGame(CardLocation at) => RuntimeSkills.RuntimeRules_Core_GameDomains.IsRuleOutsideGame(at);
     internal void CaptureFirstGameDomainCrossings(long batchId, int turn, IReadOnlyList<CardMovementRecord> movements)
     {
         if (!TracksFirstGameDomainCrossings || turn < 1 || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Any(e => e.TurnNumber == turn))

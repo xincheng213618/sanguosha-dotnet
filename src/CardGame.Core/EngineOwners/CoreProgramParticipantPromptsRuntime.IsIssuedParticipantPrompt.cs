@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramParticipantPromptsRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CoreProgramParticipantPromptsRuntime
             return null;
         if (decision.PlayerSeat != actorSeat || decision.Kind != issued.Kind || decision.ParticipantFrameId != issued.ParticipantFrameId || decision.PromptId != issued.PromptId || decision.Revision != issued.Revision || decision.SourceSeat != issued.SourceSeat || decision.SkillPrompt != issued.SkillPrompt || !decision.IsPrivate)
             throw new InvalidOperationException("A participant projection must retain its issued prompt identity and actor privacy.");
-        return global::CardGame.Core.EngineOwners.CoreSnapshotValueProjectionRuntime.CloneDecision(decision);
+        return CoreSnapshotValueProjectionRuntime.CloneDecision(decision);
     }
 
     internal bool HasParticipantInputBoundary => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } issued && IsIssuedParticipantPrompt(issued);
@@ -34,7 +30,7 @@ internal sealed partial class CoreProgramParticipantPromptsRuntime
             return null;
         var key = state.Key;
         var owner = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == key.FrameId);
-        if (owner is null || key.PromptId.Value <= 0 || key.Source != new CardConversionSource(owner.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(owner), owner.OwnerSeat, owner.SkillInstanceId) || key.GameplayHash != owner.GameplayHash || state.RecipientSeat != owner.OwnerSeat || state.PendingNpcSeats.Distinct().Count() != state.PendingNpcSeats.Count || state.PendingNpcSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || _coreMatchParticipantsPlayersAccess._players[seat].IsHuman || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive))
+        if (owner is null || key.PromptId.Value <= 0 || key.Source != new CardConversionSource(owner.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(owner), owner.OwnerSeat, owner.SkillInstanceId) || key.GameplayHash != owner.GameplayHash || state.RecipientSeat != owner.OwnerSeat || state.PendingNpcSeats.Distinct().Count() != state.PendingNpcSeats.Count || state.PendingNpcSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || _coreMatchParticipantsPlayersAccess._players[seat].IsHuman || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive))
             throw new InvalidOperationException("Participant host state must retain its live owner and distinct pending NPCs.");
         var accepting = state.CanAcceptInput && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { } issued && IsIssuedParticipantPrompt(issued) && issued.ParticipantFrameId == key.FrameId && issued.PromptId == key.PromptId;
         return state with

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiangXingOlRuntime
@@ -33,7 +29,7 @@ internal sealed partial class CharacterLiangXingOlRuntime
         if (_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(selected, frame.OwnerSeat, CardKind.Slash) || _coreNativeDamagePoliciesOperations.IsSlashProhibited(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]) || _coreNativeRuleQueriesOperations.GetSeatDistance(selected, frame.OwnerSeat) > _coreNativeRuleQueriesOperations.GetAttackRange(selected))
             return SkillProgramStepOutcome.Continue;
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-        var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(resolutionId, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, selected, selected, null, selected, null, CardKind.Slash, [frame.OwnerSeat], [], Array.AsReadOnly(new[] { new CardConversionSource(active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), selected, active.SkillInstanceId) }), effectiveSuit: Suit.None, effectiveRank: 0));
+        var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(resolutionId, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, selected, selected, null, selected, null, CardKind.Slash, [frame.OwnerSeat], [], Array.AsReadOnly(new[] { new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), selected, active.SkillInstanceId) }), effectiveSuit: Suit.None, effectiveRank: 0));
         _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, selected, 0, CardKind.Slash, Array.AsReadOnly(new[] { frame.OwnerSeat }), PhysicalCardIds: Array.AsReadOnly(Array.Empty<int>())) { Action = action });
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
@@ -47,6 +43,6 @@ internal sealed partial class CharacterLiangXingOlRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ILiangXingProgramHost.GiveSelectedTargetHand(ProgramSkillFrame frame, int targetSeat) => GiveProgramSelectedTargetHand(frame, targetSeat);
-    SkillProgramStepOutcome global::CardGame.Core.ILuelveCounterSlashProgramHost.SelectedTargetVirtualSlashAgainstOwner(ProgramSkillFrame frame) => LuelveProgramCounterSlash(frame);
+    SkillProgramStepOutcome ILiangXingProgramHost.GiveSelectedTargetHand(ProgramSkillFrame frame, int targetSeat) => GiveProgramSelectedTargetHand(frame, targetSeat);
+    SkillProgramStepOutcome ILuelveCounterSlashProgramHost.SelectedTargetVirtualSlashAgainstOwner(ProgramSkillFrame frame) => LuelveProgramCounterSlash(frame);
 }

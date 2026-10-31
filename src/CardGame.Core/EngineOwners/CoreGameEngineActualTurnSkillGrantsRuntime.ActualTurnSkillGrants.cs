@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineActualTurnSkillGrantsRuntime
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEngineActualTurnSkillGrantsRuntime
         var granted = skillIds.Distinct(StringComparer.Ordinal).ToArray();
         foreach (var skillId in granted)
             _ = _contentRegistryOperations._contentRegistry.GetSkill(skillId);
-        var bindingId = global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active);
+        var bindingId = CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active);
         var sourceId = $"turn:{(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber)}:{(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat)}:donor:{(active.OwnerSeat)}:{(active.SkillId)}:" + $"{(active.SkillInstanceId)}:{(bindingId)}:frame:{(active.Id)}:effect:{(active.InstructionIndex - 1)}";
         var turnExpiry = expiry == SkillProgramTurnSkillExpiry.ActualTurnEnd ? new SkillGrantTurnExpiry(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat) : null;
         var nextStartExpiry = expiry == SkillProgramTurnSkillExpiry.RecipientNextActualTurnStart ? new SkillGrantNextActualTurnStartExpiry(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat, recipient.Seat) : null;
@@ -46,7 +42,7 @@ internal sealed partial class CoreGameEngineActualTurnSkillGrantsRuntime
 
     internal void ValidateTurnSkillGrantActor(ProgramSkillFrame frame, int targetSeat)
     {
-        if (_resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramCardTriggerWindowFrame parent || frame.WindowContext is not { CardUse: { } use } context || parent.Id != context.ParentFrameId || context.OwnerSeat != frame.OwnerSeat || context.Window != global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(parent) || use.ParentCardUseFrameId != parent.ParentFrameId || use.CardActionId != parent.Action.ActionId || use.ActorSeat != parent.Action.ActorSeat || use.EffectiveKind != parent.Action.EffectiveKind || targetSeat != use.ActorSeat || context.SourceSeat != use.ActorSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count)
+        if (_resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramCardTriggerWindowFrame parent || frame.WindowContext is not { CardUse: { } use } context || parent.Id != context.ParentFrameId || context.OwnerSeat != frame.OwnerSeat || context.Window != CoreGameEngineCardActionsRuntime.GetCardActionWindow(parent) || use.ParentCardUseFrameId != parent.ParentFrameId || use.CardActionId != parent.Action.ActionId || use.ActorSeat != parent.Action.ActorSeat || use.EffectiveKind != parent.Action.EffectiveKind || targetSeat != use.ActorSeat || context.SourceSeat != use.ActorSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count)
             throw new InvalidOperationException("A turn skill beneficiary requires its exact suspended card-action parent.");
         var candidate = parent.Candidates[parent.CandidateIndex];
     }

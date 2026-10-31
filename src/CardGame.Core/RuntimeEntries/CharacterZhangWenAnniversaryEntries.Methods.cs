@@ -2,25 +2,25 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterZhangWenAnniversaryEntries
 {
-    internal void AddZhangWenSibianStep(long id, global::CardGame.Core.ZhangWenSibianStage stage, int before) => _resolve().AddZhangWenSibianStep(id, stage, before);
+    internal void AddZhangWenSibianStep(long id, ZhangWenSibianStage stage, int before) => _resolve().AddZhangWenSibianStep(id, stage, before);
     internal bool AdvanceZhangWenSubtree() => _resolve().AdvanceZhangWenSubtree();
-    internal void AnswerZhangWenSibian(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerZhangWenSibian(answer);
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginZhangWenSibian(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginZhangWenSibian(supplied);
-    internal void CaptureZhangWenSongshu(global::CardGame.Core.ProgramSkillStartedEvent started) => _resolve().CaptureZhangWenSongshu(started);
-    internal global::CardGame.Core.PromptChoice ChooseZhangWenSibian(global::CardGame.Core.PendingDecision p, global::CardGame.Core.ProgramSkillFrame f) => _resolve().ChooseZhangWenSibian(p, f);
+    internal void AnswerZhangWenSibian(PromptChoice answer) => _resolve().AnswerZhangWenSibian(answer);
+    internal SkillProgramStepOutcome BeginZhangWenSibian(ProgramSkillFrame supplied) => _resolve().BeginZhangWenSibian(supplied);
+    internal void CaptureZhangWenSongshu(ProgramSkillStartedEvent started) => _resolve().CaptureZhangWenSongshu(started);
+    internal PromptChoice ChooseZhangWenSibian(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseZhangWenSibian(p, f);
     internal bool ContinueZhangWenSibian(long id) => _resolve().ContinueZhangWenSibian(id);
     internal bool DrainZhangWenSibian(long id) => _resolve().DrainZhangWenSibian(id);
-    internal bool KeepZhangWenAcceptedAfterSkillLoss(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepZhangWenAcceptedAfterSkillLoss(f);
-    internal bool KeepZhangWenSibianPayment(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepZhangWenSibianPayment(f);
-    internal void MoveZhangWenSibian(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ZhangWenSibianStage stage, global::System.Collections.Generic.IReadOnlyList<int> ids, global::CardGame.Core.CardLocation destination, global::CardGame.Core.CardMoveReason reason) => _resolve().MoveZhangWenSibian(f, stage, ids, destination, reason);
-    internal void PublishZhangWenSibian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().PublishZhangWenSibian(f);
-    internal void RefundZhangWenSongshu(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().RefundZhangWenSongshu(supplied);
-    internal void RequireZhangWenSibian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireZhangWenSibian(f);
-    internal bool ReturnZhangWenSibianMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnZhangWenSibianMovement(f);
-    internal bool ValidZhangWenSibian(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidZhangWenSibian(f);
-    internal bool ZhangWenEntityAvailable(global::CardGame.Core.ZhangWenSibianEntity entity) => _resolve().ZhangWenEntityAvailable(entity);
-    internal bool ZhangWenFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().ZhangWenFirstChild(f, child);
-    internal global::CardGame.Core.ProgramSkillFrame? ZhangWenObserverRoot() => _resolve().ZhangWenObserverRoot();
-    internal int[] ZhangWenRemainder(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangWenRemainder(f);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> ZhangWenSibianChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ZhangWenSibianChoices(f);
+    internal bool KeepZhangWenAcceptedAfterSkillLoss(ProgramSkillFrame f) => _resolve().KeepZhangWenAcceptedAfterSkillLoss(f);
+    internal bool KeepZhangWenSibianPayment(ProgramSkillFrame f) => _resolve().KeepZhangWenSibianPayment(f);
+    internal void MoveZhangWenSibian(ProgramSkillFrame f, ZhangWenSibianStage stage, IReadOnlyList<int> ids, CardLocation destination, CardMoveReason reason) => _resolve().MoveZhangWenSibian(f, stage, ids, destination, reason);
+    internal void PublishZhangWenSibian(ProgramSkillFrame f) => _resolve().PublishZhangWenSibian(f);
+    internal void RefundZhangWenSongshu(ProgramSkillFrame supplied) => _resolve().RefundZhangWenSongshu(supplied);
+    internal void RequireZhangWenSibian(ProgramSkillFrame f) => _resolve().RequireZhangWenSibian(f);
+    internal bool ReturnZhangWenSibianMovement(ProgramSkillFrame f) => _resolve().ReturnZhangWenSibianMovement(f);
+    internal bool ValidZhangWenSibian(ProgramSkillFrame f) => _resolve().ValidZhangWenSibian(f);
+    internal bool ZhangWenEntityAvailable(ZhangWenSibianEntity entity) => _resolve().ZhangWenEntityAvailable(entity);
+    internal bool ZhangWenFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().ZhangWenFirstChild(f, child);
+    internal ProgramSkillFrame? ZhangWenObserverRoot() => _resolve().ZhangWenObserverRoot();
+    internal int[] ZhangWenRemainder(ProgramSkillFrame f) => _resolve().ZhangWenRemainder(f);
+    internal IReadOnlyList<PromptChoice> ZhangWenSibianChoices(ProgramSkillFrame f) => _resolve().ZhangWenSibianChoices(f);
 }

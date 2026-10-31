@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_OwnerBatchEquipmentLoss
 {
     // This scalar is opt-in. Historical owner-batch bindings retain their exact
@@ -12,7 +12,7 @@ internal static class RuntimeRules_Core_OwnerBatchEquipmentLoss
         SkillProgramTrigger trigger,
         IReadOnlyList<int> matchingIndexes)
     {
-        if (!CardGame.Core.RuntimeSkills.RuntimeRules_Core_OwnerBatchEquipmentLoss.UsesOwnerBatchEquipmentLoss(trigger.Condition)) return facts;
+        if (!RuntimeRules_Core_OwnerBatchEquipmentLoss.UsesOwnerBatchEquipmentLoss(trigger.Condition)) return facts;
         if (trigger.Window != SkillProgramTriggerWindow.CardsMoved ||
             trigger.MovementOccurrence != SkillProgramMovementOccurrence.PerOwnerBatch ||
             trigger.MovementDiscardOnly || !trigger.SourceZones.Contains(CardZoneKind.Equipment))
@@ -27,5 +27,5 @@ internal static class RuntimeRules_Core_OwnerBatchEquipmentLoss
     internal static bool UsesOwnerBatchEquipmentLoss(SkillProgramTriggerCondition condition) =>
         condition.Left?.Kind == SkillProgramTriggerValueKind.MovedEquipmentCardCount ||
         condition.Right?.Kind == SkillProgramTriggerValueKind.MovedEquipmentCardCount ||
-        condition.Children.Any(CardGame.Core.RuntimeSkills.RuntimeRules_Core_OwnerBatchEquipmentLoss.UsesOwnerBatchEquipmentLoss);
+        condition.Children.Any(RuntimeRules_Core_OwnerBatchEquipmentLoss.UsesOwnerBatchEquipmentLoss);
 }

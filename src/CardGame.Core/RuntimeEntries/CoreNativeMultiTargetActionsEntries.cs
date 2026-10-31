@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreNativeMultiTargetActionsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreNativeMultiTargetActionsRuntime))]
 internal sealed partial class CoreNativeMultiTargetActionsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeMultiTargetActionsRuntime> _resolve;
-    private CoreNativeMultiTargetActionsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeMultiTargetActionsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreNativeMultiTargetActionsRuntime> _resolve;
+    private CoreNativeMultiTargetActionsEntries(Func<EngineOwners.CoreNativeMultiTargetActionsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreNativeMultiTargetActionsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreNativeMultiTargetActionsRuntime> resolve) => new(resolve);
+    internal static CoreNativeMultiTargetActionsEntries Create(Func<EngineOwners.CoreNativeMultiTargetActionsRuntime> resolve) => new(resolve);
 }

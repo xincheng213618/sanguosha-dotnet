@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeTargetLegalityRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreNativeTargetLegalityRuntime
     {
         if (!_coreProgramTargetRulesOperations.TargetRules.AllowsSlash(new(source, target, effectiveKind, conversionSource, physicalCardIds ?? [slashCard.Id])))
             return false;
-        ignoreDistance |= global::CardGame.Core.EngineOwners.CharacterLuBuOlMagicRuntime.IsMoGangquanSource(conversionSource);
+        ignoreDistance |= CharacterLuBuOlMagicRuntime.IsMoGangquanSource(conversionSource);
         slashCard = _characterWuJingOlOperations.WuJingLiubingUseCard(source, slashCard, effectiveKind, conversionSource, physicalCardIds, existingUseFrameId);
         if (existingUseFrameId is null && excludedEquipmentId is null && excludedEquipmentSlot is null)
             excludedEquipmentId = _coreLiYiNativeQueriesOperations.LiYiPaidSlashWeapon(source, physicalCardIds ?? [slashCard.Id]);
@@ -28,7 +24,7 @@ internal sealed partial class CoreNativeTargetLegalityRuntime
             return false;
         if (_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(source.Seat, effectiveKind, physicalCardIds ?? []))
             return false;
-        ignoreDistance |= global::CardGame.Core.EngineOwners.CharacterLuBuOlMagicRuntime.IsMoGangquanSource(conversionSource);
+        ignoreDistance |= CharacterLuBuOlMagicRuntime.IsMoGangquanSource(conversionSource);
         if (actualUnconvertedPhysical && conversionSource is null && physicalCardIds is [var physicalId])
         {
             var physical = _coreAdvancedLifecycleOperations.GetAdvancedCard(physicalId);
@@ -36,14 +32,14 @@ internal sealed partial class CoreNativeTargetLegalityRuntime
             if (appearance.Suit != physical.Suit)
             {
                 physicalSuit = _coreNativeCardAppearanceOperations.EffectiveSuit(source, appearance);
-                effectiveColor = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(physicalSuit);
+                effectiveColor = CoreGameEnginePublicPileColorsRuntime.SuitColor(physicalSuit);
             }
         }
 
         return _coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(source.Seat, effectiveKind, physicalCardIds ?? [], conversionSource)) && !_coreCardUseModulesOperations.IsCardUseForbidden(source.Seat, effectiveKind, CardActionType.Use) && _coreRuleQueriesOperations.CanSpendSlashUse(source, target, ignoresCount: !countsTowardLimit || _coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance2(source.Seat, physicalSuit), effectiveKind, effectiveRank: effectiveRank, physicalCardIds: physicalCardIds, effectiveSuit: physicalSuit) && (ignoreDistance || _coreProgramDistanceRulesOperations.DistanceRules.AllowsSlashDistance(ProgramDistanceStage.VirtualSlash, new(source, target, effectiveKind, Conversion: conversionSource, PhysicalCardIds: physicalCardIds, PhysicalSuit: physicalSuit, EffectiveColor: effectiveColor, EffectiveRank: effectiveRank))) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target);
     }
 
-    internal bool CanUseZhangbaSerpentSpear(CharacterState actor) => global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use)) && _coreNativeDamageHandlesOperations.UsesFormalZhangbaSerpentSpear && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.ZhangbaSerpentSpear) && _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Count(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && !_characterZhugeLiangWumiaoOperations.IsWuZglCopyBlocked(actor.Seat, card.Id)) >= 2;
+    internal bool CanUseZhangbaSerpentSpear(CharacterState actor) => CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use)) && _coreNativeDamageHandlesOperations.UsesFormalZhangbaSerpentSpear && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.ZhangbaSerpentSpear) && _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Count(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && !_characterZhugeLiangWumiaoOperations.IsWuZglCopyBlocked(actor.Seat, card.Id)) >= 2;
     internal bool HasZhuqueFan(CharacterState actor) => _coreNativeDamageHandlesOperations.UsesFormalZhuqueFan && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.ZhuqueFan);
     internal IReadOnlyList<CardKind> GetSlashUseKinds(CharacterState actor, CardKind baseEffectiveKind) => _coreProgramCardUseRulesOperations.GetSlashUseVariants2(actor, baseEffectiveKind).Select(variant => variant.EffectiveKind).Distinct().ToArray();
     internal bool IsZhuqueFanConversion(CharacterState actor, CardKind baseEffectiveKind, CardKind requestedEffectiveKind) => baseEffectiveKind == CardKind.Slash && requestedEffectiveKind == CardKind.FireSlash && HasZhuqueFan(actor);

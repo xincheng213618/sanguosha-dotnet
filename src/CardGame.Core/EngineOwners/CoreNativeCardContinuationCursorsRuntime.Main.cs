@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeCardContinuationCursorsRuntime
 {
-    internal global::CardGame.Core.NativeOwners.DuelHandle? ActiveDuel
+    internal NativeOwners.DuelHandle? ActiveDuel
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.Duel?.Active == true)is { } id ? _kernelCoreMainOperations.CreateDuelHandle(id) : null;
         set
@@ -18,7 +14,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.GroupCardHandle? ActiveGroupCard
+    internal NativeOwners.GroupCardHandle? ActiveGroupCard
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.GroupCard?.Active == true)is { } id ? _kernelCoreMainOperations.CreateGroupCardHandle(id) : null;
         set
@@ -29,7 +25,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.BorrowedSwordHandle? ActiveBorrowedSword
+    internal NativeOwners.BorrowedSwordHandle? ActiveBorrowedSword
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.BorrowedSword?.Active == true)is { } id ? _kernelCoreMainOperations.CreateBorrowedSwordHandle(id) : null;
         set
@@ -40,7 +36,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.StoneAxeHandle? ActiveStoneAxe
+    internal NativeOwners.StoneAxeHandle? ActiveStoneAxe
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.StoneAxe?.Active == true)is { } id ? _kernelCoreMainOperations.CreateStoneAxeHandle(id) : null;
         set
@@ -51,7 +47,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.CixiongDoubleSwordsHandle? ActiveCixiongDoubleSwords
+    internal NativeOwners.CixiongDoubleSwordsHandle? ActiveCixiongDoubleSwords
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.CixiongDoubleSwords?.Active == true)is { } id ? _kernelCoreMainOperations.CreateCixiongDoubleSwordsHandle(id) : null;
         set
@@ -62,7 +58,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle? ActiveQinglongCrescentBlade
+    internal NativeOwners.QinglongCrescentBladeHandle? ActiveQinglongCrescentBlade
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.QinglongCrescentBlade?.Active == true)is { } id ? _kernelCoreMainOperations.CreateQinglongCrescentBladeHandle(id) : null;
         set
@@ -73,7 +69,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.QinglongFollowupHandle? ActiveQinglongFollowup
+    internal NativeOwners.QinglongFollowupHandle? ActiveQinglongFollowup
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.QinglongFollowup?.Active == true)is { } id ? _kernelCoreMainOperations.CreateQinglongFollowupHandle(id) : null;
         set
@@ -84,7 +80,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.IceSwordHandle? ActiveIceSword
+    internal NativeOwners.IceSwordHandle? ActiveIceSword
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.IceSword?.Active == true)is { } id ? _kernelCoreMainOperations.CreateIceSwordHandle(id) : null;
         set
@@ -99,7 +95,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.QilinBowHandle? ActiveQilinBow
+    internal NativeOwners.QilinBowHandle? ActiveQilinBow
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.QilinBow?.Active == true)is { } id ? _kernelCoreMainOperations.CreateQilinBowHandle(id) : null;
         set
@@ -110,7 +106,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.FangtianHalberdHandle? ActiveFangtianHalberd
+    internal NativeOwners.FangtianHalberdHandle? ActiveFangtianHalberd
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.FangtianHalberd?.Active == true)is { } id ? _kernelCoreMainOperations.CreateFangtianHalberdHandle(id) : null;
         set
@@ -121,7 +117,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.FactionDefenseHandle? ActiveFactionDefense
+    internal NativeOwners.FactionDefenseHandle? ActiveFactionDefense
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.FactionDefense?.Active == true)is { } id ? _kernelCoreMainOperations.CreateFactionDefenseHandle(id) : null;
         set
@@ -132,7 +128,7 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
         }
     }
 
-    internal global::CardGame.Core.NativeOwners.FactionCardRequestHandle? ActiveFactionCardRequest
+    internal NativeOwners.FactionCardRequestHandle? ActiveFactionCardRequest
     {
         get => _coreCardAttackStateOperations.FindCardContinuationOwner(state => state.FactionCardRequest?.Active == true)is { } id ? _kernelCoreMainOperations.CreateFactionCardRequestHandle(id) : null;
         set

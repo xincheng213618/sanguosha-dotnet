@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineBoundDiscardSlashBenefitsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IBoundDiscardSlashBenefitsHost.DiscardBoundCardForTurnSlashBenefits(ProgramSkillFrame frame, string sourceBind) => BeginBoundDiscardSlashBenefits(frame.Id, sourceBind);
-    void global::CardGame.Core.IBoundDiscardSlashBenefitsHost.ScheduleFirstRoundGameUsageRefund(ProgramSkillFrame frame) => ScheduleProgramFirstRoundRefund(frame);
+    SkillProgramStepOutcome IBoundDiscardSlashBenefitsHost.DiscardBoundCardForTurnSlashBenefits(ProgramSkillFrame frame, string sourceBind) => BeginBoundDiscardSlashBenefits(frame.Id, sourceBind);
+    void IBoundDiscardSlashBenefitsHost.ScheduleFirstRoundGameUsageRefund(ProgramSkillFrame frame) => ScheduleProgramFirstRoundRefund(frame);
     internal SkillProgramStepOutcome BeginBoundDiscardSlashBenefits(long id, string bind)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -40,7 +36,7 @@ internal sealed partial class CoreGameEngineBoundDiscardSlashBenefitsRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && owner.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))
         {
-            var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame);
+            var source = CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame);
             var range = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, id, paid.InstructionIndex - 1, source, SkillRuleQuery.AttackRange, SkillRuleOperation.Unlimited, 0);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnRuleModifierGrantedEvent(range));
             var policy = _turnCardUseEffectsOperations._turnCardUseEffects.GrantSlashSuitAllowance(_coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, id, paid.InstructionIndex - 1, source, paid.EffectiveSuit);
@@ -73,7 +69,7 @@ internal sealed partial class CoreGameEngineBoundDiscardSlashBenefitsRuntime
             throw new InvalidOperationException("A limited refund requires the first instruction of the exact consumed game activation.");
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _coreActualRoundProgressRoundNumberAccess._roundNumber != 1)
             return;
-        var refund = _turnCardUseEffectsOperations._turnCardUseEffects.ScheduleGameUsageRefund(_coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, frame.Id, frame.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), activation.UsageGroup);
+        var refund = _turnCardUseEffectsOperations._turnCardUseEffects.ScheduleGameUsageRefund(_coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, frame.Id, frame.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), activation.UsageGroup);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FirstRoundGameUsageRefundScheduledEvent(refund));
     }
 

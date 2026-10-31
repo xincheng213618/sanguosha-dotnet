@@ -2,13 +2,13 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterYanLiangWenChouBoundaryMobileEntries
 {
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryYanLiangWenChouClaim(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryYanLiangWenChouClaim(supplied);
-    internal bool BoundaryYanLiangWenChouOriginalDuel(int owner, string instance, global::CardGame.Core.ProgramSkillWindowContext context, scoped out global::CardGame.Core.CardUseFrame use) => _resolve().BoundaryYanLiangWenChouOriginalDuel(owner, instance, context, out use);
-    internal global::System.Collections.Generic.IReadOnlyList<int> BoundaryYanLiangWenChouResponseEntities(global::CardGame.Core.CardUseFrame use, int owner) => _resolve().BoundaryYanLiangWenChouResponseEntities(use, owner);
+    internal SkillProgramStepOutcome BeginBoundaryYanLiangWenChouClaim(ProgramSkillFrame supplied) => _resolve().BeginBoundaryYanLiangWenChouClaim(supplied);
+    internal bool BoundaryYanLiangWenChouOriginalDuel(int owner, string instance, ProgramSkillWindowContext context, scoped out CardUseFrame use) => _resolve().BoundaryYanLiangWenChouOriginalDuel(owner, instance, context, out use);
+    internal IReadOnlyList<int> BoundaryYanLiangWenChouResponseEntities(CardUseFrame use, int owner) => _resolve().BoundaryYanLiangWenChouResponseEntities(use, owner);
     internal void ContinueBoundaryYanLiangWenChouClaim(long id) => _resolve().ContinueBoundaryYanLiangWenChouClaim(id);
-    internal bool KeepPaidBoundaryYanLiangWenChouClaim(global::CardGame.Core.ProgramSkillFrame f) => _resolve().KeepPaidBoundaryYanLiangWenChouClaim(f);
-    internal bool OfferBoundaryYanLiangWenChouClaim(global::CardGame.Core.ProgramTriggerLegalityContext c) => _resolve().OfferBoundaryYanLiangWenChouClaim(c);
+    internal bool KeepPaidBoundaryYanLiangWenChouClaim(ProgramSkillFrame f) => _resolve().KeepPaidBoundaryYanLiangWenChouClaim(f);
+    internal bool OfferBoundaryYanLiangWenChouClaim(ProgramTriggerLegalityContext c) => _resolve().OfferBoundaryYanLiangWenChouClaim(c);
     internal bool ResumeBoundaryYanLiangWenChouClaim(long id) => _resolve().ResumeBoundaryYanLiangWenChouClaim(id);
-    internal bool ReturnBoundaryYanLiangWenChouClaim(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnBoundaryYanLiangWenChouClaim(f);
-    internal bool ValidBoundaryYanLiangWenChouClaim(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidBoundaryYanLiangWenChouClaim(f);
+    internal bool ReturnBoundaryYanLiangWenChouClaim(ProgramSkillFrame f) => _resolve().ReturnBoundaryYanLiangWenChouClaim(f);
+    internal bool ValidBoundaryYanLiangWenChouClaim(ProgramSkillFrame f) => _resolve().ValidBoundaryYanLiangWenChouClaim(f);
 }

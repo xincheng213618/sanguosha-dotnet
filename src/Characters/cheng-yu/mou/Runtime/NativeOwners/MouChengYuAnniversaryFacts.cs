@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouChengYuAnniversaryFacts(global::CardGame.Core.EngineStates.CoreActualTurnProgressState actualTurnProgressState, global::CardGame.Core.EngineStates.CoreActualRoundProgressState actualRoundProgressState, global::CardGame.Core.EngineStates.CoreCardMovementJournalState cardMovementJournalState, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState, global::CardGame.Core.EngineStates.CoreMatchOutcomeState matchOutcomeState, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterChengYuMouEntries> getCharacterChengYuMouRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, global::System.Func<global::CardGame.Core.ContentRegistry> getContentRegistry, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, global::System.Func<global::CardGame.Core.FrameStore> getFrameStore, global::System.Func<global::CardGame.Core.CardZoneStore> getCardZoneStore) : IMouChengYuAnniversaryFacts
+internal sealed class MouChengYuAnniversaryFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreActualRoundProgressState actualRoundProgressState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, EngineStates.CoreMatchParticipantsState matchParticipantsState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CharacterChengYuMouEntries> getCharacterChengYuMouRuntime, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, Func<FrameStore> getFrameStore, Func<CardZoneStore> getCardZoneStore) : IMouChengYuAnniversaryFacts
 {
     public int Turn => actualTurnProgressState.ReferenceToTurnNumber;
     public int Round => actualRoundProgressState.ReferenceToRoundNumber;
@@ -13,7 +13,7 @@ internal sealed class MouChengYuAnniversaryFacts(global::CardGame.Core.EngineSta
     public bool Human(int s) => matchParticipantsState.ReferenceToPlayers[s].IsHuman;
     public bool OwnPlay(int s) => s == actualTurnProgressState.ReferenceToCurrentSeat && actualTurnProgressState.ReferenceToPhase == TurnPhase.Play;
     public string Name(int s) => matchParticipantsState.ReferenceToPlayers[s].Name;
-    public CardKind CardName(CardKind k) => global::CardGame.Core.EngineOwners.CoreGameEngineNamedAmbushRuntime.AmbushCardName(k);
+    public CardKind CardName(CardKind k) => EngineOwners.CoreGameEngineNamedAmbushRuntime.AmbushCardName(k);
     public SkillProgram? Program(string id) => getContentRegistry().Skills.GetValueOrDefault(id)?.Program;
     public IEnumerable<T> History<T>()
         where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>();
@@ -43,8 +43,8 @@ internal sealed class MouChengYuAnniversaryFacts(global::CardGame.Core.EngineSta
 
     public MouCyUse? Use(ProgramSkillWindowContext c) => getCharacterChengYuMouRuntime().MouCyUse(c);
     public bool At(int id, CardLocation location) => getCardZoneStore().GetLocation(id) == location;
-    public bool SameChoice(PromptChoice a, PromptChoice b) => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([a], [b]);
-    public bool DamageCard(CardKind k) => global::CardGame.Core.EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(k) || global::CardGame.Core.EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(k) || k == CardKind.Lightning;
+    public bool SameChoice(PromptChoice a, PromptChoice b) => EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([a], [b]);
+    public bool DamageCard(CardKind k) => EngineOwners.CoreGameEngineMouLuMengRuntime.IsDamageCardKind(k) || EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(k) || k == CardKind.Lightning;
     public SkillPromptPresentation Presentation(string id)
     {
         var s = getContentRegistry().GetSkill(id);

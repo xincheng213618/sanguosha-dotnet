@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDistinctFactionDiscardsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IDistinctFactionDiscardHost.BeginDistinctFactionDiscards(ProgramSkillFrame f) => BeginDistinctFactionDiscards(f);
+    SkillProgramStepOutcome IDistinctFactionDiscardHost.BeginDistinctFactionDiscards(ProgramSkillFrame f) => BeginDistinctFactionDiscards(f);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 20, SkillProgramEffectOp.DiscardDistinctFactionParticipants)]
     internal bool CanStartDistinctFactionDiscard(ProgramActivationLegalityContext gate) => HasPayableDistinctFactionOwnerHe(gate.Owner.Seat, gate.Program.Id, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(gate.Owner, gate.Program.Id));
     internal bool HasPayableDistinctFactionOwnerHe(int seat, string skillId, string instanceId) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count > 0 || _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat]).Any(c => !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(seat, skillId, instanceId, c));

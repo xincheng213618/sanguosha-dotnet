@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuJunOlRuntime
@@ -10,8 +6,8 @@ internal sealed partial class CharacterZhuJunOlRuntime
     internal const string ZhuJunDrawReason = "skill-program.zhu-jun.cuipo.draw";
     internal bool HasZhuJunCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveCuipoActualTurnUse);
 
-    internal static int ZhuJunCardNameLength(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhu_jun_ol_ZhuJun.ZhuJunCardNameLength(kind);
-    internal static bool IsZhuJunDamageCard(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhu_jun_ol_ZhuJun.IsZhuJunDamageCard(kind);
+    internal static int ZhuJunCardNameLength(CardKind kind) => RuntimeSkills.RuntimeRules_zhu_jun_ol_ZhuJun.ZhuJunCardNameLength(kind);
+    internal static bool IsZhuJunDamageCard(CardKind kind) => RuntimeSkills.RuntimeRules_zhu_jun_ol_ZhuJun.IsZhuJunDamageCard(kind);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27030)]
     internal void ObserveZhuJunActualUse(IGameEvent payload)
     {
@@ -73,7 +69,7 @@ internal sealed partial class CharacterZhuJunOlRuntime
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27030)]
     internal bool CanOfferZhuJun(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveCuipoActualTurnUse) || ZhuJunQualification(candidate, context)is not null;
-    SkillProgramStepOutcome global::CardGame.Core.IZhuJunHost.Resolve(ProgramSkillFrame f) => BeginZhuJunCuipo(f);
+    SkillProgramStepOutcome IZhuJunHost.Resolve(ProgramSkillFrame f) => BeginZhuJunCuipo(f);
     internal SkillProgramStepOutcome BeginZhuJunCuipo(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -132,7 +128,7 @@ internal sealed partial class CharacterZhuJunOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 160)]
-    internal int ZhuJunCuipoDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int ZhuJunCuipoDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (attack.IsChainPropagation || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ZhuJunCuipoDamage: { } state } use)
             return 0;

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangChangAnniversaryRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
         if (operation != SkillProgramEffectOp.ResolveAnniversaryWangChangPingxi || f.SkillId != AnniversaryWangChangComposition.Pingxi || f.ActivationId != "ending-discard-and-slashes" || f.TriggerId != f.ActivationId || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } c || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != f.OwnerSeat || c.TargetSeat != f.OwnerSeat)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame p && p.Id == c.ParentFrameId && p.OwnerSeat == f.OwnerSeat && p.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && p.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count && p.Items[p.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && c.OccurrenceIndex == candidate.OccurrenceIndex && c.Facts == (p.Items[p.ItemIndex].Facts ?? p.Facts);
+        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame p && p.Id == c.ParentFrameId && p.OwnerSeat == f.OwnerSeat && p.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && p.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count && p.Items[p.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && c.OccurrenceIndex == candidate.OccurrenceIndex && c.Facts == (p.Items[p.ItemIndex].Facts ?? p.Facts);
     }
 
     internal bool ValidWangChang(ProgramSkillFrame f)

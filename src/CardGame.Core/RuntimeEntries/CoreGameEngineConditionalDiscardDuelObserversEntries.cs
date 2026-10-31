@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineConditionalDiscardDuelObserversEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineConditionalDiscardDuelObserversRuntime> _resolve;
-    private CoreGameEngineConditionalDiscardDuelObserversEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineConditionalDiscardDuelObserversRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineConditionalDiscardDuelObserversRuntime> _resolve;
+    private CoreGameEngineConditionalDiscardDuelObserversEntries(Func<EngineOwners.CoreGameEngineConditionalDiscardDuelObserversRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineConditionalDiscardDuelObserversEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineConditionalDiscardDuelObserversRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineConditionalDiscardDuelObserversEntries Create(Func<EngineOwners.CoreGameEngineConditionalDiscardDuelObserversRuntime> resolve) => new(resolve);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuJiMobileShiRuntime
@@ -12,9 +8,9 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
     internal const string MobileShiFujiSuitGainMoveReason = "skill-program.mobile:shi-fuji.suit-gain";
     internal const string MobileShiFujiBonusDrawReason = "skill-program.mobile:shi-fuji.bonus-draw";
     internal const string MobileShiFujiDodgeDrawReason = "skill-program.mobile:shi-fuji.dodge-draw";
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiYuJiProgramHost.ResolveFujiGift(ProgramSkillFrame frame) => ResolveMobileShiFujiGiftProgram(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiYuJiProgramHost.ResolveFujiUseEffects(ProgramSkillFrame frame) => ResolveMobileShiFujiUseEffectsProgram(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShiYuJiProgramHost.ResolveFujiDodgeDraw(ProgramSkillFrame frame) => ResolveMobileShiFujiDodgeDrawProgram(frame);
+    SkillProgramStepOutcome IMobileShiYuJiProgramHost.ResolveFujiGift(ProgramSkillFrame frame) => ResolveMobileShiFujiGiftProgram(frame);
+    SkillProgramStepOutcome IMobileShiYuJiProgramHost.ResolveFujiUseEffects(ProgramSkillFrame frame) => ResolveMobileShiFujiUseEffectsProgram(frame);
+    SkillProgramStepOutcome IMobileShiYuJiProgramHost.ResolveFujiDodgeDraw(ProgramSkillFrame frame) => ResolveMobileShiFujiDodgeDrawProgram(frame);
     internal SkillProgramStepOutcome ResolveMobileShiFujiGiftProgram(ProgramSkillFrame frame)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -24,7 +20,7 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
         if (f.SelectedCardIds.Count == 0 || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, f.SkillId, f.SkillInstanceId))
             return SkillProgramStepOutcome.Continue;
         var program = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!;
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var recipientHand = CardLocation.Hand(recipient);
         var marked = 0;
         foreach (var cardId in f.SelectedCardIds)
@@ -149,9 +145,9 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
 
     // 符济【杀】基础伤害值+1：已结算的符济使用事实按 ActionId 归属本次攻击。
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 67210)]
-    internal int MobileShiFujiSlashDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int MobileShiFujiSlashDamageBonus(GameEngine.IDamageAttempt attack)
     {
-        if (attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action } || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<MobileShiFujiCardUsedEvent>().Any(item => item.ActionId == action.ActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(item.Kind)))
+        if (attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action } || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<MobileShiFujiCardUsedEvent>().Any(item => item.ActionId == action.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(item.Kind)))
             return 0;
         return 1;
     }

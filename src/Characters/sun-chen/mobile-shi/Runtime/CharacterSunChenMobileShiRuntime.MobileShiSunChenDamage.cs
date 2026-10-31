@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunChenMobileShiRuntime
@@ -25,11 +21,11 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
             _ => throw new InvalidOperationException("Nigu damage requires its original native attack frame.")});
     }
 
-    internal int ShiScDamageCursor(global::CardGame.Core.GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is global::CardGame.Core.NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
+    internal int ShiScDamageCursor(GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
     internal IEnumerable<ShiScArmedEvent> LiveShiScArms(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiScArmedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Count > 0 && _contentRegistryOperations._contentRegistry.Skills.TryGetValue(ShiScNigu, out var skill) && skill.Program?.GameplayHash == e.Hash && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiScStartedEvent>().Count(s => s.FrameId == e.FrameId && s.Source == e.Source && s.Hash == e.Hash && s.Op == SkillProgramEffectOp.ResolveMobileShiSunChenNigu && s.Turn == e.Turn && s.TurnOwner == e.TurnOwner) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiScCompletedEvent>().Count(c => c.FrameId == e.FrameId) == 1 && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(t => t.TurnNumber == e.Turn && t.ActorSeat == e.TurnOwner));
-    internal ShiScArmedEvent? AvailableShiScArm(global::CardGame.Core.GameEngine.IDamageAttempt a) => a.IsSourceLess ? null : LiveShiScArms(a.SourceSeat).FirstOrDefault(e => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiScDamageConsumedEvent>().Count(c => c.ArmId == e.FrameId) < e.Count);
+    internal ShiScArmedEvent? AvailableShiScArm(GameEngine.IDamageAttempt a) => a.IsSourceLess ? null : LiveShiScArms(a.SourceSeat).FirstOrDefault(e => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiScDamageConsumedEvent>().Count(c => c.ArmId == e.FrameId) < e.Count);
     [ProgramDamageHook(ProgramDamagePhase.FactModifiers, 49100)]
-    internal IEnumerable<(CardUseEffectSource Source, int Amount)> ShiScNextDamage(global::CardGame.Core.GameEngine.IDamageAttempt a)
+    internal IEnumerable<(CardUseEffectSource Source, int Amount)> ShiScNextDamage(GameEngine.IDamageAttempt a)
     {
         if (a.IsSourceLess || a.DamageAmount <= 0 || AvailableShiScArm(a)is not { } arm)
             return[];
@@ -55,18 +51,18 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiScDamageConsumedEvent(r.ArmId, attack.ResolutionId, damage.Id, applied.TargetSeat, r.ChainCursor));
     }
 
-    internal void SetShiScChainAmount(global::CardGame.Core.GameEngine.IDamageAttempt a, int amount)
+    internal void SetShiScChainAmount(GameEngine.IDamageAttempt a, int amount)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(a, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !a.IsChainPropagation || amount < 0)
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(a, _coreProgramAttackAttemptOperations.CurrentDamageAttempt) || !a.IsChainPropagation || amount < 0)
             throw new InvalidOperationException("Nigu may rebase only its exact current native chained recipient.");
-        if (a is global::CardGame.Core.NativeOwners.ProgramAttackHandle)
+        if (a is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(a.ResolutionId, s => s with { DamageAmount = amount });
         else
             _coreCardAttackStateOperations.UpdateCardAttackState(a.ResolutionId, s => s!with { DamageAmount = amount });
     }
 
     [ProgramDamageHook(ProgramDamagePhase.BeforeChainAdvance, 49100)]
-    internal void BeforeShiScChain(global::CardGame.Core.GameEngine.IDamageAttempt a)
+    internal void BeforeShiScChain(GameEngine.IDamageAttempt a)
     {
         if (ShiScDamageState(a.ResolutionId)is not { } r)
             return;
@@ -76,7 +72,7 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 49100)]
-    internal void AfterShiScChain(global::CardGame.Core.GameEngine.IDamageAttempt a)
+    internal void AfterShiScChain(GameEngine.IDamageAttempt a)
     {
         if (!a.IsChainPropagation || !a.DamageAmountFinalized)
             return;

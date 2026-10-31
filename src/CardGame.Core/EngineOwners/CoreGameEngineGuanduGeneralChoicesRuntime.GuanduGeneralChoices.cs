@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -50,7 +47,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralChoicesRuntime
     [ProgramAnswer("guandu-general")]
     internal void ResolveGuanduGeneralChoice(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuanduGeneral: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuanduGeneral: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } prompt || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Activity choice lost its exact published prompt.");
         var option = choice.Parameters["option"];
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -130,7 +127,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralChoicesRuntime
             var target = choice.Targets.Single();
             if (!r.Seats!.Contains(target) || target == f.OwnerSeat || !_coreGuanduActivitiesOperations.GuanduAllies(f.OwnerSeat, target))
                 throw new InvalidOperationException("Sushou changed its frozen allied recipient.");
-            f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r with { Seats = global::CardGame.Core.EngineOwners.CoreGameEngineGuanduGeneralsRuntime.FreezeGuanduSeats(r.Seats!.Where(s => s != target)) });
+            f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r with { Seats = CoreGameEngineGuanduGeneralsRuntime.FreezeGuanduSeats(r.Seats!.Where(s => s != target)) });
             GuanduGiveOne(f, choice.Cards.Single(), f.OwnerSeat, target);
             _coreGuanduGeneralsOperations.RunGuanduGeneral(f.Id);
             return;
@@ -144,7 +141,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralChoicesRuntime
                 return;
             }
 
-            f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r with { Stage = "xiying-target", Seats = global::CardGame.Core.EngineOwners.CoreGameEngineGuanduGeneralsRuntime.FreezeGuanduSeats(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat).Select(p => p.Seat)), Index = 0 });
+            f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r with { Stage = "xiying-target", Seats = CoreGameEngineGuanduGeneralsRuntime.FreezeGuanduSeats(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat).Select(p => p.Seat)), Index = 0 });
             GuanduDiscardOne(f, choice.Cards.Single(), f.OwnerSeat);
             _coreGuanduGeneralsOperations.RunGuanduGeneral(f.Id);
             return;

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,8 +8,8 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     internal const string MaMiDiDiscardReason = "skill-program.ma-mi-di.bingjie.discard";
     internal bool HasMaMiDiCapability => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GrowZhengdingMatchingResponse) == true;
 
-    internal static CardConversionSource MaMiDiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ma_mi_di_ol_MaMiDi.MaMiDiSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IMaMiDiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMaMiDi(f, op);
+    internal static CardConversionSource MaMiDiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_ma_mi_di_ol_MaMiDi.MaMiDiSource(f);
+    SkillProgramStepOutcome IMaMiDiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMaMiDi(f, op);
     internal bool ExactMaMiDiPlay(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.PlayPhaseStarting && c.OwnerSeat == candidate.OwnerSeat && c.SourceSeat == candidate.OwnerSeat && c.TargetSeat == candidate.OwnerSeat && candidate.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _resolutionStackOperations._resolutionStack.OfType<PlayPhaseStartingBoundaryFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } w && w.OwnerSeat == candidate.OwnerSeat && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex].Candidate == candidate;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27070)]
     internal bool CanOfferMaMiDi(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
@@ -127,7 +124,7 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     [ProgramAnswer("ma-mi-di")]
     internal void AnswerMaMiDi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MaMiDi: { Stage: MaMiDiStage.TargetChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MaMiDiCurrentTarget(r).Target || !MaMiDiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MaMiDi: { Stage: MaMiDiStage.TargetChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != MaMiDiCurrentTarget(r).Target || !MaMiDiChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Bingjie requires the actual target's current private physical discard.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var pair = MaMiDiCurrentTarget(r);
@@ -235,5 +232,5 @@ internal sealed partial class CharacterMaMiDiOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBingjieIssuedTargetDiscards)]
-    internal PromptChoice AiMaMiDi(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Cards is [var id] ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    internal PromptChoice AiMaMiDi(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Cards is [var id] ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 }

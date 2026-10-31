@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability]
-internal sealed class CoreNativeFrameRoutingRuntimeCoreModeNativeFrameRuntimeAdapter(global::CardGame.Core.GameEngine engine) : global::CardGame.Core.EngineOwners.ICoreNativeFrameRoutingRuntimeCoreModeNativeFrameRuntimeOperations
+[Core.ProgramCapability]
+internal sealed class CoreNativeFrameRoutingRuntimeCoreModeNativeFrameRuntimeAdapter(GameEngine engine) : ICoreNativeFrameRoutingRuntimeCoreModeNativeFrameRuntimeOperations
 {
-    public int StepCount(global::CardGame.Core.NativeFrameAutomaticPhase phase) => engine.GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreModeNativeFrameRuntimeRuntime>().ModeNativeFrames.Automatic[phase].Count;
-    public global::CardGame.Core.NativeFrameAutomaticStepMetadata StepAt(global::CardGame.Core.NativeFrameAutomaticPhase phase, int index) => engine.GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreModeNativeFrameRuntimeRuntime>().ModeNativeFrames.Automatic[phase][index].Step;
-    public bool Matches(global::CardGame.Core.NativeFrameAutomaticPhase phase, int index, global::CardGame.Core.ResolutionFrame frame) => engine.GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreModeNativeFrameRuntimeRuntime>().ModeNativeFrames.Automatic[phase][index].Matches(engine, frame);
-    public bool TryAdvance(global::CardGame.Core.ResolutionFrame frame) => engine.GetRuntimeModule<global::CardGame.Core.EngineOwners.CoreModeNativeFrameRuntimeRuntime>().ModeNativeFrames.TryAdvance(engine, frame);
+    public int StepCount(NativeFrameAutomaticPhase phase) => engine.GetRuntimeModule<CoreModeNativeFrameRuntimeRuntime>().ModeNativeFrames.Automatic[phase].Count;
+    public NativeFrameAutomaticStepMetadata StepAt(NativeFrameAutomaticPhase phase, int index) => engine.GetRuntimeModule<CoreModeNativeFrameRuntimeRuntime>().ModeNativeFrames.Automatic[phase][index].Step;
+    public bool Matches(NativeFrameAutomaticPhase phase, int index, ResolutionFrame frame) => engine.GetRuntimeModule<CoreModeNativeFrameRuntimeRuntime>().ModeNativeFrames.Automatic[phase][index].Matches(engine, frame);
+    public bool TryAdvance(ResolutionFrame frame) => engine.GetRuntimeModule<CoreModeNativeFrameRuntimeRuntime>().ModeNativeFrames.TryAdvance(engine, frame);
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineJudgmentOutcomeDamageEdgesRuntime
@@ -30,6 +26,6 @@ internal sealed partial class CoreGameEngineJudgmentOutcomeDamageEdgesRuntime
             return replace.ParentFrameId == root.Id && _coreProgramLifecycleOperations.IsValidProgramJudgmentContinuation(replace, root) && replacement.WindowContext is { Window: SkillProgramTriggerWindow.JudgmentReplacing, JudgmentReplacement: { } receipt } context && context.ParentFrameId == replace.Id && receipt.JudgmentFrameId == replace.Id && _coreNativeJudgmentOperations.CurrentJudgmentCandidate(replace)is { } candidate && candidate.OwnerSeat == replacement.OwnerSeat && candidate.ProgramId == replacement.SkillId && candidate.ProgramTriggerId == replacement.TriggerId && candidate.SkillInstanceId == replacement.SkillInstanceId && candidate.GameplayHash == replacement.GameplayHash;
         if (child is DyingFrame dying && parent is ProgramSkillFrame producer)
             return _coreDamageJudgmentSuitPaymentObserversOperations.IsDamageJudgmentHpLossDyingRide(dying, producer);
-        return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
+        return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
     }
 }

@@ -1,10 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangQuanOlRuntime
@@ -94,7 +88,7 @@ internal sealed partial class CharacterHuangQuanOlRuntime
         };
     }
 
-    internal bool CanOfferDianhuDamage(int owner, SkillProgramTrigger t, global::CardGame.Core.GameEngine.IDamageAttempt attack) => !IsDianhuDrawTrigger(t) || !attack.IsSourceLess && !attack.IsDelayedJudgmentDamage && attack.SourceSeat == owner && _coreMatchParticipantsPlayersAccess._players[owner].DianhuRelations.Any(g => g.TargetSeat == attack.TargetSeat && DianhuSourceEnabled(g) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DianhuQualifiedEvent>().Any(e => e.Receipt.Relation == g && e.Receipt.NativeParentId == attack.ResolutionId && !e.Receipt.Recovery && !DianhuConsumed(e.Receipt)));
+    internal bool CanOfferDianhuDamage(int owner, SkillProgramTrigger t, GameEngine.IDamageAttempt attack) => !IsDianhuDrawTrigger(t) || !attack.IsSourceLess && !attack.IsDelayedJudgmentDamage && attack.SourceSeat == owner && _coreMatchParticipantsPlayersAccess._players[owner].DianhuRelations.Any(g => g.TargetSeat == attack.TargetSeat && DianhuSourceEnabled(g) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DianhuQualifiedEvent>().Any(e => e.Receipt.Relation == g && e.Receipt.NativeParentId == attack.ResolutionId && !e.Receipt.Recovery && !DianhuConsumed(e.Receipt)));
     internal bool CanRunDianhu(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
         if (context.Dianhu is not { } r || r.Relation.Source.OwnerSeat != c.OwnerSeat || r.Relation.Source.SkillId != c.SkillId || r.Relation.Source.SkillInstanceId != c.SkillInstanceId || !DianhuSourceEnabled(r.Relation) || DianhuConsumed(r) || r != DianhuQualification(c, r.NativeChangeId))

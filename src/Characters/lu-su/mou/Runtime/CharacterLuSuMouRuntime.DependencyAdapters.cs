@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime))]
-internal sealed class CharacterLuSuMouCorePlayerViewProjectionAdapter(global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterLuSuMouCorePlayerViewProjectionOperations
+[Core.ProgramCapability(typeof(CorePlayerViewProjectionRuntime))]
+internal sealed class CharacterLuSuMouCorePlayerViewProjectionAdapter(Func<CorePlayerViewProjectionRuntime> targetFactory) : ICharacterLuSuMouCorePlayerViewProjectionOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
+    private readonly Func<CorePlayerViewProjectionRuntime> _targetFactory = targetFactory;
+    public GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false) => this._targetFactory().CreateSnapshot(viewerSeat, revealAll);
 }
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MouLuSuAnniversaryRuntime))]
-internal sealed class CharacterLuSuMouMouLuSuAnniversaryAdapter(global::System.Func<global::CardGame.Core.MouLuSuAnniversaryRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterLuSuMouMouLuSuAnniversaryOperations
+[Core.ProgramCapability(typeof(MouLuSuAnniversaryRuntime))]
+internal sealed class CharacterLuSuMouMouLuSuAnniversaryAdapter(Func<MouLuSuAnniversaryRuntime> targetFactory) : ICharacterLuSuMouMouLuSuAnniversaryOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MouLuSuAnniversaryRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MouLuSuAnniversaryRuntime Get() => this._targetFactory();
+    private readonly Func<MouLuSuAnniversaryRuntime> _targetFactory = targetFactory;
+    public MouLuSuAnniversaryRuntime Get() => this._targetFactory();
 }

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
@@ -19,7 +15,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
                 if (!SkillInvocationStructuralEdge(parent, current))
                     return false;
             }
-            else if (!global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(current, parent) && !_coreObserverSubtreesOperations.IsMovementObserverEdge(child))
+            else if (!CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(current, parent) && !_coreObserverSubtreesOperations.IsMovementObserverEdge(child))
                 return false;
         }
 
@@ -53,7 +49,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
         if (child is RecoveryReplacementFrame recovery)
             return IsSkillInvocationHealthChild(invocation, recovery);
         if (child is NativeDrawAttemptFrame draw)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, invocation) && invocation.Stage == SkillInvocationStage.Drawing && draw.Return.Kind == NativeDrawAttemptReturnKind.SkillInvocation;
+            return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, invocation) && invocation.Stage == SkillInvocationStage.Drawing && draw.Return.Kind == NativeDrawAttemptReturnKind.SkillInvocation;
         return child is DyingFrame dying && invocation.Stage == SkillInvocationStage.Children && dying.ParentFrameId == invocation.Id && dying.Id == invocation.DyingFrameId && dying.VictimSeat == invocation.ActorSeat && dying.Continuation == DyingContinuationKind.SkillInvocation && dying.KillerSeat is null;
     }
 

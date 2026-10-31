@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangTongFriendRuntime
 {
     internal bool HasFriendYangmingQuota(CharacterState owner) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { FriendPangTong.Stage: FriendPangTongStage.Use } frame && frame.OwnerSeat == owner.Seat;
-    internal static CardLocation FriendYangmingLocation(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_pang_tong_friend_FriendYangming.FriendYangmingLocation(frame);
+    internal static CardLocation FriendYangmingLocation(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_pang_tong_friend_FriendYangming.FriendYangmingLocation(frame);
     internal SkillProgramStepOutcome BeginFriendYangming(ProgramSkillFrame frame)
     {
         var suits = _corePlayCardHistoryOperations.EventsSinceLastBoundary(payload => payload is TurnStartedEvent).OfType<CardMovedEvent>().Where(move => move.To == CardLocation.DiscardPile && move.From != CardLocation.DiscardPile).Select(move => _coreCardAttackStateOperations.GetAttackCard(move.CardId).Suit).Where(suit => suit != Suit.None).Distinct().Count();
@@ -52,10 +47,10 @@ internal sealed partial class CharacterPangTongFriendRuntime
         {
             var kind = card.Kind;
             var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card);
-            var red = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
+            var red = CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
             if (_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) || _coreResponseEntityExchangeOperations.IsResponseEntityRestricted(actor.Seat, card.Id))
                 continue;
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
                 foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, target, card, effectiveKind: kind, physicalCardIds: [card.Id])))
                     actions.Add(new(LegalActionKind.Slash, card.Id, target.Seat, $"使用【{(card.DisplayName)}】对 {(target.Name)}", kind, TargetSeats: [target.Seat]));
             else if (kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, suit, red))
@@ -64,7 +59,7 @@ internal sealed partial class CharacterPangTongFriendRuntime
                 actions.Add(new(LegalActionKind.Alcohol, card.Id, null, "使用【酒】（无次数限制）", kind));
             else if (_coreEquipmentContentOperations.EquipmentRules.IsEquipment(kind) && actor.EquipmentSlotCapacity(_coreEquipmentContentOperations.EquipmentRules.Get(kind).Slot) > 0 && !_coreHandComparisonOperations.IsSelfTargetForbiddenAction(actor, kind, [actor.Seat]))
                 actions.Add(new(LegalActionKind.Equip, card.Id, null, $"使用【{(card.DisplayName)}】", kind));
-            else if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
+            else if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
                 foreach (var option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: red, hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: true))
                     actions.Add(new(option.ActionKind, card.Id, option.TargetSeats.Count == 1 ? option.TargetSeats[0] : null, $"使用【{(card.DisplayName)}】：{(option.Description)}", kind, option.TargetCardId, option.TargetSeats));
             else if (kind is CardKind.Indulgence or CardKind.SupplyShortage or CardKind.Lightning)
@@ -86,9 +81,9 @@ internal sealed partial class CharacterPangTongFriendRuntime
         var card = _coreCardAttackStateOperations.GetAttackCard(action.CardId!.Value);
         var kind = card.Kind;
         var receipt = frame.FriendPangTong!;
-        global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption? option = null;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
-            option = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), actualEffectiveColor: global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)), hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: true).Single(candidate => candidate.ActionKind == action.Kind && candidate.TargetCardId == action.TargetCardId && candidate.TargetSeats.SequenceEqual(action.TargetSeats));
+        GameEngine.ProgramOrdinaryTrickUseOption? option = null;
+        if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
+            option = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), enforceUsePermission: true, beneficiaryShieldSuit: _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), actualEffectiveColor: CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)), hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: true).Single(candidate => candidate.ActionKind == action.Kind && candidate.TargetCardId == action.TargetCardId && candidate.TargetSeats.SequenceEqual(action.TargetSeats));
         if (option?.NextActualUseAdjusted == true)
             _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats = action.TargetSeats;
         _coreCardConversionsOperations.SelectUseConversion(action);
@@ -118,7 +113,7 @@ internal sealed partial class CharacterPangTongFriendRuntime
             return;
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var target = _coreMatchParticipantsPlayersAccess._players[action.TargetSeats[0]];
             var damage = 1 + actor.AlcoholDamageBonus;

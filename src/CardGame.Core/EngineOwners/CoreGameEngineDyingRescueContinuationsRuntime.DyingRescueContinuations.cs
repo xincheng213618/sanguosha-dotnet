@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDyingRescueContinuationsRuntime
@@ -25,7 +21,7 @@ internal sealed partial class CoreGameEngineDyingRescueContinuationsRuntime
                 return true;
             if (fact is ProgramRecoveryAppliedEvent recovery && recovery.ProgramFrameId == frame.Id && recovery.Receipt.TargetSeat == dying.VictimSeat && recovery.Receipt.HpAfter > recovery.Receipt.HpBefore)
                 return true;
-            if (fact is ProgramRoundPileAlcoholIssuedEvent issued && issued.ProgramFrameId == frame.Id && issued.DyingFrameId == dying.Id && issued.VictimSeat == dying.VictimSeat && issued.Source == new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId))
+            if (fact is ProgramRoundPileAlcoholIssuedEvent issued && issued.ProgramFrameId == frame.Id && issued.DyingFrameId == dying.Id && issued.VictimSeat == dying.VictimSeat && issued.Source == new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId))
                 roundPileAlcoholUse = issued.CardUseFrameId;
             if (fact is CardUseFinishedEvent { CardKind: CardKind.Alcohol } finished && roundPileAlcoholUse == finished.ResolutionId)
                 return true;

@@ -2,17 +2,17 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSlashSuitDiscardEntries
 {
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginProgramSlashSuitDiscard(global::CardGame.Core.ProgramSkillFrame frame, global::CardGame.Core.SkillProgramEffect effect) => _resolve().BeginProgramSlashSuitDiscard(frame, effect);
-    internal void CaptureProgramSlashSuitJudgment(global::CardGame.Core.JudgmentFrame judgment, global::CardGame.Core.Suit suit) => _resolve().CaptureProgramSlashSuitJudgment(judgment, suit);
-    internal void FinishProgramSlashSuitDiscard(global::CardGame.Core.ProgramSkillFrame frame, bool paid) => _resolve().FinishProgramSlashSuitDiscard(frame, paid);
-    internal bool IsProgramSlashSuitDiscardChoiceLegal(global::CardGame.Core.PromptChoice choice) => _resolve().IsProgramSlashSuitDiscardChoiceLegal(choice);
-    internal bool IsSlashDodgeCancellationPrevented(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _resolve().IsSlashDodgeCancellationPrevented(attack);
-    internal void PublishProgramSlashSuitDiscard(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishProgramSlashSuitDiscard(frame);
-    internal void ResolveProgramSlashSuitDiscardChoice(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveProgramSlashSuitDiscardChoice(choice);
+    internal SkillProgramStepOutcome BeginProgramSlashSuitDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => _resolve().BeginProgramSlashSuitDiscard(frame, effect);
+    internal void CaptureProgramSlashSuitJudgment(JudgmentFrame judgment, Suit suit) => _resolve().CaptureProgramSlashSuitJudgment(judgment, suit);
+    internal void FinishProgramSlashSuitDiscard(ProgramSkillFrame frame, bool paid) => _resolve().FinishProgramSlashSuitDiscard(frame, paid);
+    internal bool IsProgramSlashSuitDiscardChoiceLegal(PromptChoice choice) => _resolve().IsProgramSlashSuitDiscardChoiceLegal(choice);
+    internal bool IsSlashDodgeCancellationPrevented(NativeOwners.CardAttackHandle attack) => _resolve().IsSlashDodgeCancellationPrevented(attack);
+    internal void PublishProgramSlashSuitDiscard(ProgramSkillFrame frame) => _resolve().PublishProgramSlashSuitDiscard(frame);
+    internal void ResolveProgramSlashSuitDiscardChoice(PromptChoice choice) => _resolve().ResolveProgramSlashSuitDiscardChoice(choice);
     internal bool ResumeProgramSlashSuitDiscard(long frameId) => _resolve().ResumeProgramSlashSuitDiscard(frameId);
-    internal global::CardGame.Core.PromptChoice SelectAiSlashSuitDiscard(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().SelectAiSlashSuitDiscard(decision, frame);
-    internal global::CardGame.Core.NativeOwners.CardAttackHandle SlashSuitDiscardAttack(global::CardGame.Core.ProgramSkillFrame frame, bool requireActive = true) => _resolve().SlashSuitDiscardAttack(frame, requireActive);
-    internal global::System.Collections.Generic.IEnumerable<global::CardGame.Core.Card> SlashSuitDiscardCards(global::CardGame.Core.ProgramSlashSuitDiscardDraft draft) => _resolve().SlashSuitDiscardCards(draft);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> SlashSuitDiscardChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().SlashSuitDiscardChoices(frame);
-    internal bool TryReturnProgramSlashSuitJudgment(global::CardGame.Core.JudgmentFrame judgment) => _resolve().TryReturnProgramSlashSuitJudgment(judgment);
+    internal PromptChoice SelectAiSlashSuitDiscard(PendingDecision decision, ProgramSkillFrame frame) => _resolve().SelectAiSlashSuitDiscard(decision, frame);
+    internal NativeOwners.CardAttackHandle SlashSuitDiscardAttack(ProgramSkillFrame frame, bool requireActive = true) => _resolve().SlashSuitDiscardAttack(frame, requireActive);
+    internal IEnumerable<Card> SlashSuitDiscardCards(ProgramSlashSuitDiscardDraft draft) => _resolve().SlashSuitDiscardCards(draft);
+    internal IReadOnlyList<PromptChoice> SlashSuitDiscardChoices(ProgramSkillFrame frame) => _resolve().SlashSuitDiscardChoices(frame);
+    internal bool TryReturnProgramSlashSuitJudgment(JudgmentFrame judgment) => _resolve().TryReturnProgramSlashSuitJudgment(judgment);
 }

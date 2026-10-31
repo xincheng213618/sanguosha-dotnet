@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBaOlRuntime
@@ -26,7 +22,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
     internal void PayTongduReturn(ProgramSkillFrame f)
     {
         var r = f.LiuBa!;
-        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext!.OccurrenceIndex);
+        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext!.OccurrenceIndex);
         var debt = CurrentTongduDebt(c, f.WindowContext!) ?? throw new InvalidOperationException("Tongdu lost its original issued entity debt.");
         var material = LiuBaOwnedEntities(f.OwnerSeat).Where(e => e.CardId == debt.CardId).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LiuBa = r with { DebtId = debt.FrameId } });

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterKanZeAnniversaryRuntime
@@ -13,9 +9,9 @@ internal sealed partial class CharacterKanZeAnniversaryRuntime
     internal void ArmAnniversaryKuanshi(ProgramSkillFrame supplied, int target)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != AnniversaryKanZeComposition.Kuanshi || f.TriggerId != AnniversaryKanZeComposition.Arm || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, SourceSeat: { } actor } w || actor != f.OwnerSeat || actor != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || f.SelectedTargetSeats is not [var selected] || selected != target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is not { } parent || parent.OwnerSeat != actor || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiArmedEvent>().Any(e => e.Grant.FrameId == f.Id))
+        if (f.SkillId != AnniversaryKanZeComposition.Kuanshi || f.TriggerId != AnniversaryKanZeComposition.Arm || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, SourceSeat: { } actor } w || actor != f.OwnerSeat || actor != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || f.SelectedTargetSeats is not [var selected] || selected != target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is not { } parent || parent.OwnerSeat != actor || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiArmedEvent>().Any(e => e.Grant.FrameId == f.Id))
             throw new InvalidOperationException("Anniversary Kuanshi lost its unpaid native own ending and actual living recipient.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryKuanshiArmedEvent(new(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, target)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryKuanshiArmedEvent(new(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, target)));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 42900)]
@@ -58,7 +54,7 @@ internal sealed partial class CharacterKanZeAnniversaryRuntime
         }
     }
 
-    internal void AppendAnniversaryKanZeDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> result)
+    internal void AppendAnniversaryKanZeDamageCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> result)
     {
         if (!HasAnniversaryKuanshi || window != SkillProgramTriggerWindow.AfterDamageApplied)
             return;
@@ -104,6 +100,6 @@ internal sealed partial class CharacterKanZeAnniversaryRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryKuanshiRecoveryBoundEvent(f.Id, receipt.Grant.FrameId, receipt.Damage.DamageFrameId, receipt.Damage.ActualTurn));
     }
 
-    void global::CardGame.Core.IAnniversaryKanZeHost.Arm(ProgramSkillFrame frame, int target) => ArmAnniversaryKuanshi(frame, target);
-    void global::CardGame.Core.IAnniversaryKanZeHost.Bind(ProgramSkillFrame frame) => BindAnniversaryKuanshiDamage(frame);
+    void IAnniversaryKanZeHost.Arm(ProgramSkillFrame frame, int target) => ArmAnniversaryKuanshi(frame, target);
+    void IAnniversaryKanZeHost.Bind(ProgramSkillFrame frame) => BindAnniversaryKuanshiDamage(frame);
 }

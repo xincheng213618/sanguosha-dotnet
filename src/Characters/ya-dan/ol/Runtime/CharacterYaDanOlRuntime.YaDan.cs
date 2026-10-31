@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYaDanOlRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IYaDanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYaDan(f, op);
+    SkillProgramStepOutcome IYaDanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYaDan(f, op);
     internal SkillProgramStepOutcome BeginYaDan(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext?.OccurrenceIndex ?? 0);
+        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, f.WindowContext?.OccurrenceIndex ?? 0);
         if (f.YaDan is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context)
             throw new InvalidOperationException("Qingya requires its exact original native instruction.");
         YaDanReceipt r;
@@ -86,7 +83,7 @@ internal sealed partial class CharacterYaDanOlRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal static Dictionary<string, string> YaDanArgs(string branch) => global::CardGame.Core.RuntimeSkills.RuntimeRules_ya_dan_ol_YaDan.YaDanArgs(branch);
+    internal static Dictionary<string, string> YaDanArgs(string branch) => RuntimeSkills.RuntimeRules_ya_dan_ol_YaDan.YaDanArgs(branch);
     internal IReadOnlyList<PromptChoice> YaDanChoices(ProgramSkillFrame f)
     {
         var r = f.YaDan!;
@@ -130,7 +127,7 @@ internal sealed partial class CharacterYaDanOlRuntime
     [ProgramAnswer("ya-dan-qingya")]
     internal void AnswerYaDan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YaDan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !YaDanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YaDan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !YaDanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Qingya requires its exact original private slot, side or native card action.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

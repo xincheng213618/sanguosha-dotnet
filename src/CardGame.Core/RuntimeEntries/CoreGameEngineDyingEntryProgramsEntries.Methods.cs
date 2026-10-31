@@ -2,6 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDyingEntryProgramsEntries
 {
-    internal void CompleteDyingEntryProgramWindow(global::CardGame.Core.ProgramLifecycleTriggerWindowFrame frame) => _resolve().CompleteDyingEntryProgramWindow(frame);
-    internal bool TryBeginDyingEntryProgramWindow(global::CardGame.Core.DyingFrame dying) => _resolve().TryBeginDyingEntryProgramWindow(dying);
+    internal void CompleteDyingEntryProgramWindow(ProgramLifecycleTriggerWindowFrame frame) => _resolve().CompleteDyingEntryProgramWindow(frame);
+    internal bool TryBeginDyingEntryProgramWindow(DyingFrame dying) => _resolve().TryBeginDyingEntryProgramWindow(dying);
 }

@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDianWeiHappyGodRuntime
@@ -28,11 +23,11 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
 
     [ProgramTriggerProof(ProgramTriggerProofPhase.NativeWindow, 50, SkillProgramTriggerWindow.HappyGuardRemoved)]
     internal bool IsHappyDianWeiElaiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == HappyDianWeiComposition.Elai && c.BindingId == "removed-guard" && context.Window == SkillProgramTriggerWindow.HappyGuardRemoved && context.OwnerSeat == c.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { Window: SkillProgramTriggerWindow.HappyGuardRemoved, Continuation: ProgramLifecycleContinuation.HappyGuardRemoved, HappyGuardRemoval: { } r } window && context.SourceSeat == r.RemovedSeat && context.TargetSeat == r.RemovedSeat && window.OwnerSeat == r.RemovedSeat && window.ResumeProgramFrameId == r.ParentId && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && window.Candidates[window.CandidateIndex] == c && HappyGuardRemovalIsPaid(r) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat], c.SkillId, c.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash == c.GameplayHash;
-    internal bool IsHappyDianWeiElaiContext(ProgramSkillFrame f) => f.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } window && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]) && IsHappyDianWeiElaiCandidate(window.Candidates[window.CandidateIndex], context);
+    internal bool IsHappyDianWeiElaiContext(ProgramSkillFrame f) => f.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is { } window && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex]) && IsHappyDianWeiElaiCandidate(window.Candidates[window.CandidateIndex], context);
     [ProgramWindowReturn(SkillProgramTriggerWindow.HappyGuardRemoved)]
     internal void ReturnHappyGuardElai(ProgramSkillFrame f, bool completed)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramLifecycleTriggerWindowFrame w || f.WindowContext?.ParentFrameId != w.Id || w.HappyGuardRemoval is not { } r || !HappyGuardRemovalIsPaid(r) || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramLifecycleTriggerWindowFrame w || f.WindowContext?.ParentFrameId != w.Id || w.HappyGuardRemoval is not { } r || !HappyGuardRemovalIsPaid(r) || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]))
             throw new InvalidOperationException("Elai lost its original paid removed-guard window.");
         _programLifecycleWindowOperations.Get().AdvanceCandidate(w, true, completed);
         _coreRuntimeOperations.AdvanceRuntimeTop<ProgramLifecycleTriggerWindowFrame>();
@@ -67,7 +62,7 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
         {
             if (attack.DamageRedirected)
                 throw new InvalidOperationException("The guard cannot replace a recipient after a different frozen redirection.");
-            attack.RedirectFinalizedDamageTarget(f.OwnerSeat, new global::CardGame.Core.GameEngine.ProgramDamageTransferFollowup(f.SkillId, f.OwnerSeat, f.OwnerSeat, false));
+            attack.RedirectFinalizedDamageTarget(f.OwnerSeat, new GameEngine.ProgramDamageTransferFollowup(f.SkillId, f.OwnerSeat, f.OwnerSeat, false));
             _coreRecipientScopedDamageOperations.UpdateRecipientScopedDamageRedirect(attack);
             _coreRuntimeOperations.ReplaceRuntimeFrame(window.Id, window with { RedirectedTargetSeat = f.OwnerSeat });
         }

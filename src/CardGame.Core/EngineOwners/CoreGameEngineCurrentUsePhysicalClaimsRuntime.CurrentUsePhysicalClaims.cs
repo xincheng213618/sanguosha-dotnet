@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCurrentUsePhysicalClaimsRuntime
 {
     internal CardUseFrame CurrentFinalTargetSlashOwner(ProgramSkillFrame frame)
     {
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } context, TargetSeat: { } target } || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == context.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } owner || action.ActionId != context.CardActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || frame.OwnerSeat != action.ActorSeat || context.ActorSeat != action.ActorSeat || !action.EffectiveDesignatedTargetSeats.Contains(target) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
+        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } context, TargetSeat: { } target } || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == context.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } owner || action.ActionId != context.CardActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || frame.OwnerSeat != action.ActorSeat || context.ActorSeat != action.ActorSeat || !action.EffectiveDesignatedTargetSeats.Contains(target) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
             throw new InvalidOperationException("A current-target operation lost its exact Slash use and target.");
         return owner;
     }
@@ -53,6 +49,6 @@ internal sealed partial class CoreGameEngineCurrentUsePhysicalClaimsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTargetSlashReceiptIssuedEvent(owner.Id, receipt));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ICurrentUsePhysicalClaimProgramHost.ClaimCurrentUsePhysicalCards(ProgramSkillFrame frame) => ClaimCurrentUsePhysicalCards(frame);
-    void global::CardGame.Core.ICurrentUsePhysicalClaimProgramHost.PreventCurrentTargetSlashCancellationByRule(ProgramSkillFrame frame) => PreventCurrentTargetSlashCancellationByRule(frame);
+    SkillProgramStepOutcome ICurrentUsePhysicalClaimProgramHost.ClaimCurrentUsePhysicalCards(ProgramSkillFrame frame) => ClaimCurrentUsePhysicalCards(frame);
+    void ICurrentUsePhysicalClaimProgramHost.PreventCurrentTargetSlashCancellationByRule(ProgramSkillFrame frame) => PreventCurrentTargetSlashCancellationByRule(frame);
 }

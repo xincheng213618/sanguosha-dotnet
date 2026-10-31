@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -67,7 +64,7 @@ internal sealed partial class CoreGameEngineSharedPhaseSkillsRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IRandomPhaseSkillHost.Offer(ProgramSkillFrame frame, SkillProgramEffect effect, int recipientSeat) => OfferRandomPhaseSkill(frame, effect, recipientSeat);
+    SkillProgramStepOutcome IRandomPhaseSkillHost.Offer(ProgramSkillFrame frame, SkillProgramEffect effect, int recipientSeat) => OfferRandomPhaseSkill(frame, effect, recipientSeat);
     internal bool IsLiveRandomPhaseSkillRecipient(ProgramSkillFrame frame, int recipientSeat, SkillGrantPhaseExpiry phase) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && CurrentSharedSkillPhase == phase && recipientSeat == phase.PhaseActorSeat && _coreMatchParticipantsPlayersAccess._players[recipientSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramPlayPhaseSkillBoundaryClosedEvent>().Any(item => item.Expiry == phase);
     internal SkillProgramStepOutcome OfferRandomPhaseSkill(ProgramSkillFrame supplied, SkillProgramEffect effect, int recipientSeat)
     {

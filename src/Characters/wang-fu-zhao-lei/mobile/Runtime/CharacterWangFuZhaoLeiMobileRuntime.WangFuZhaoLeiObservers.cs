@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
 {
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? XunyiOriginalAttack(XunyiDamageReceipt receipt) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == receipt.OriginalAttackId) switch
+    internal GameEngine.IDamageAttempt? XunyiOriginalAttack(XunyiDamageReceipt receipt) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == receipt.OriginalAttackId) switch
     {
         ProgramSkillFrame { AttackAttempt: not null } => _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(receipt.OriginalAttackId),
         CardUseFrame { CardAttack.Active: true } or ProgramSkillFrame { CardAttack.Active: true } or JudgmentFrame { CardAttack.Active: true } => _kernelCoreMainOperations.CreateCardAttackHandle(receipt.OriginalAttackId),
@@ -22,7 +18,7 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
         if (relation.Source.OwnerSeat != frame.OwnerSeat || relation.Source.SkillId != frame.SkillId || relation.Source.SkillInstanceId != frame.SkillInstanceId || relation.GameplayHash != frame.GameplayHash || frame.InstructionIndex != pending.InstructionIndex || pending.InstructionIndex != 1 || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || context.DamageFrameId != receipt.DamageFrameId || context.Amount != receipt.ActualAmount || context.TargetSeat != receipt.ActualTargetSeat || receipt.ActualAmount <= 0 || relation.HolderSeat == frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(relation.HolderSeat) || XunyiBranches(receipt)is < 1 or > 2 || pending.StepIndex < 0 || pending.StepIndex > XunyiStepCount(receipt) || !Enum.IsDefined(pending.Stage) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.Op != SkillProgramEffectOp.SettleXunyiDamagePoint || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XunyiRelationChangedEvent>().Count(e => e.Relation == relation) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XunyiDamageQualifiedEvent>().Count(e => e.Receipt == receipt) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XunyiDamageIssuedEvent>().Count(e => e.FrameId == frame.Id && e.Receipt == receipt && e.InstructionIndex == pending.InstructionIndex) != 1)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        if (index < 2 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.ParentFrameId != receipt.DamageFrameId || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack[index - 2] is not DamageFrame damage || damage.Id != receipt.DamageFrameId || damage.ParentFrameId != receipt.OriginalAttackId || damage.TargetSeat != receipt.ActualTargetSeat || damage.Amount != receipt.ActualAmount)
+        if (index < 2 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.ParentFrameId != receipt.DamageFrameId || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack[index - 2] is not DamageFrame damage || damage.Id != receipt.DamageFrameId || damage.ParentFrameId != receipt.OriginalAttackId || damage.TargetSeat != receipt.ActualTargetSeat || damage.Amount != receipt.ActualAmount)
             return false;
         var attack = XunyiOriginalAttack(receipt);
         if (attack is null || !attack.DamageWasApplied || attack.TargetSeat != receipt.ActualTargetSeat || attack.DamageAmount != receipt.ActualAmount || (attack.IsSourceLess || attack.IsDelayedJudgmentDamage ? (int? )null : attack.SourceSeat) != receipt.ActualSourceSeat)
@@ -60,12 +56,12 @@ internal sealed partial class CharacterWangFuZhaoLeiMobileRuntime
         var(seat, draw) = XunyiStep(pending);
         var reason = draw ? "skill-program.xunyi.draw" : "skill-program.xunyi.discard";
         if (child is CardsMovedTriggerWindowFrame moved)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > pending.Before && m.Sequence <= pending.After && m.Reason.Value == reason);
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > pending.Before && m.Sequence <= pending.After && m.Reason.Value == reason);
         if (draw || pending.CardId is not { } id || _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind != CardKind.SilverLion || pending.From != CardLocation.Equipment(seat))
             return false;
         if (child is RecoveryReplacementFrame recovery)
             return recovery.ParentFrameId == frame.Id && recovery.Attempt.SourceSeat == seat && recovery.Attempt.TargetSeat == seat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion is { Producer: RecoveryAttemptProducer.SilverLion, MoveReason: { } moveReason } && moveReason.Value == reason;
-        return child is HpChangedTriggerWindowFrame hp && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(frame, hp) && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.SourceSeat == seat && hp.Change.TargetSeat == seat && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1;
+        return child is HpChangedTriggerWindowFrame hp && CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(frame, hp) && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.SourceSeat == seat && hp.Change.TargetSeat == seat && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1;
     }
 
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 80)]

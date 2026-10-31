@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
 {
     internal long DrawAdviceSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
-    internal static string DrawAdviceReason(string skill, string action) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DrawAdvicePrograms.DrawAdviceReason(skill, action);
+    internal static string DrawAdviceReason(string skill, string action) => RuntimeSkills.RuntimeRules_Core_DrawAdvicePrograms.DrawAdviceReason(skill, action);
     internal bool ExactDrawAdviceParent(ProgramSkillFrame frame)
     {
         var program = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program;
@@ -18,7 +14,7 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
             return false;
         DrawAdviceContract.ValidateTrigger(frame.SkillId, trigger);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != frame.OwnerSeat || parent.Window != context.Window || parent.Continuation != ProgramLifecycleContinuation.CompleteDrawPhaseEnded || parent.DrawPhaseEndedDelayedEffects is not { } delayed || (delayed & (int)global::CardGame.Core.GameEngine.DelayedTurnEffects.SkipDrawPhase) != 0 || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count)
+        if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramLifecycleTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.OwnerSeat != frame.OwnerSeat || parent.Window != context.Window || parent.Continuation != ProgramLifecycleContinuation.CompleteDrawPhaseEnded || parent.DrawPhaseEndedDelayedEffects is not { } delayed || (delayed & (int)GameEngine.DelayedTurnEffects.SkipDrawPhase) != 0 || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count)
             return false;
         var candidate = parent.Candidates[parent.CandidateIndex];
         return candidate.OwnerSeat == frame.OwnerSeat && candidate.SkillId == frame.SkillId && candidate.BindingId == frame.TriggerId && candidate.SkillInstanceId == frame.SkillInstanceId && candidate.GameplayHash == frame.GameplayHash && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == frame.Id && e.OwnerSeat == frame.OwnerSeat && e.SkillId == frame.SkillId && e.BindingId == frame.TriggerId && e.SkillInstanceId == frame.SkillInstanceId && e.Window == context.Window) == 1;
@@ -254,5 +250,5 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
     internal ProgramSkillFrame? DrawAdviceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.DrawAdviceFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 280)]
     internal bool IsDrawAdviceProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DrawAdviceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
-    SkillProgramStepOutcome global::CardGame.Core.IDrawAdviceProgramHost.BeginDrawAdvice(ProgramSkillFrame frame, int recipientSeat) => BeginDrawAdvice(frame, recipientSeat);
+    SkillProgramStepOutcome IDrawAdviceProgramHost.BeginDrawAdvice(ProgramSkillFrame frame, int recipientSeat) => BeginDrawAdvice(frame, recipientSeat);
 }

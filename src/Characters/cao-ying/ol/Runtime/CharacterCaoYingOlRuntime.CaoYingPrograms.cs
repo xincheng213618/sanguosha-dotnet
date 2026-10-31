@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -106,7 +103,7 @@ internal sealed partial class CharacterCaoYingOlRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Cao Ying lost its owning frame.");
         RequireCaoYing(f);
         var r = f.CaoYing!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoYingChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoYingChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Cao Ying selection changed while suspended.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!CaoYingSourceCurrent(f))
@@ -125,7 +122,7 @@ internal sealed partial class CharacterCaoYingOlRuntime
         {
             var target = choice.Targets.Single();
             var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]);
-            var mask = (hand.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, SkillProgramCardCategory.Basic)) ? 1 : 0) | (hand.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, SkillProgramCardCategory.Trick)) ? 2 : 0) | (hand.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, SkillProgramCardCategory.Equipment)) ? 4 : 0);
+            var mask = (hand.Any(c => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, SkillProgramCardCategory.Basic)) ? 1 : 0) | (hand.Any(c => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, SkillProgramCardCategory.Trick)) ? 2 : 0) | (hand.Any(c => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, SkillProgramCardCategory.Equipment)) ? 4 : 0);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CaoYing = r with { Stage = CaoYingStage.Guess, Target = target, FrozenCategories = mask } });
             PublishCaoYingChoice(f);
             return;
@@ -226,5 +223,5 @@ internal sealed partial class CharacterCaoYingOlRuntime
     internal ProgramSkillFrame? CaoYingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.CaoYingFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 110)]
     internal bool TryAdvanceCaoYingSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && CaoYingObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
-    SkillProgramStepOutcome global::CardGame.Core.ICaoYingProgramHost.BeginCaoYing(ProgramSkillFrame f, SkillProgramEffect e) => BeginCaoYing(f, e);
+    SkillProgramStepOutcome ICaoYingProgramHost.BeginCaoYing(ProgramSkillFrame f, SkillProgramEffect e) => BeginCaoYing(f, e);
 }

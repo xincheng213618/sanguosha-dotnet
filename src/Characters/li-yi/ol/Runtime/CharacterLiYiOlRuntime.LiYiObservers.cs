@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiYiOlRuntime
 {
-    internal static bool ChanshuangChildren(ChanshuangStage s) => global::CardGame.Core.RuntimeSkills.RuntimeRules_li_yi_ol_LiYiObservers.ChanshuangChildren(s);
+    internal static bool ChanshuangChildren(ChanshuangStage s) => RuntimeSkills.RuntimeRules_li_yi_ol_LiYiObservers.ChanshuangChildren(s);
 
     internal bool IsLiYiPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
@@ -52,7 +48,7 @@ internal sealed partial class CharacterLiYiOlRuntime
             return state.ResumeProgramFrameId == f.Id && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
         if (child is not CardsMovedTriggerWindowFrame moved)
             return false;
-        return r.Stage == ChanshuangStage.NativeChildren ? moved.ResumeProgramFrameId == f.Id && IsChanshuangNativeSettlementBatch(f, moved.Batch) : global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsLiYiPaidMovement(f, m));
+        return r.Stage == ChanshuangStage.NativeChildren ? moved.ResumeProgramFrameId == f.Id && IsChanshuangNativeSettlementBatch(f, moved.Batch) : CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsLiYiPaidMovement(f, m));
     }
 
     internal ProgramSkillFrame? LiYiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.LiYiFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));

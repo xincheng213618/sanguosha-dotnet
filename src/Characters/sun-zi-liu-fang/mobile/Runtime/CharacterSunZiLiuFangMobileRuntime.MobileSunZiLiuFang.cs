@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunZiLiuFangMobileRuntime
@@ -13,8 +9,8 @@ internal sealed partial class CharacterSunZiLiuFangMobileRuntime
     internal IEnumerable<MobileJiyuInvokedEvent> MobileJiyuInvocations(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileJiyuInvokedEvent>().Where(e => e.Source.OwnerSeat == owner && ValidMobileJiyuInvocation(e));
     internal int MobileJiyuLimit(int owner) => MobileJiyuCurrentPlay(owner)is { } phase ? 1 + MobileJiyuInvocations(owner).Count(start => start.Phase == phase && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileJiyuCompletedEvent>().Any(done => done.FrameId == start.FrameId && done.EarnedExtraUse)) : 0;
     internal bool MobileJiyuMaySelect(int owner, int target, int usesBefore) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Count > 0 && (usesBefore == 0 || !MobileJiyuInvocations(owner).Any(e => e.Phase.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Target == target));
-    int global::CardGame.Core.IMobileJiyuSelection.PhaseLimit(int owner) => MobileJiyuLimit(owner);
-    bool global::CardGame.Core.IMobileJiyuSelection.MaySelect(int owner, int target) => MobileJiyuMaySelect(owner, target, _coreGameEngineSkillProgramsProgramPhaseUsesAccess._programPhaseUses.GetValueOrDefault((owner, MobileJiyu, MobileJiyuActivation)));
+    int IMobileJiyuSelection.PhaseLimit(int owner) => MobileJiyuLimit(owner);
+    bool IMobileJiyuSelection.MaySelect(int owner, int target) => MobileJiyuMaySelect(owner, target, _coreGameEngineSkillProgramsProgramPhaseUsesAccess._programPhaseUses.GetValueOrDefault((owner, MobileJiyu, MobileJiyuActivation)));
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 78300)]
     internal void CaptureMobileJiyuInvocation(ProgramSkillStartedEvent started)
     {

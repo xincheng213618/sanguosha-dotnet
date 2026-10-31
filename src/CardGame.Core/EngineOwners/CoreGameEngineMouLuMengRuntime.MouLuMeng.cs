@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineMouLuMengRuntime
 {
     internal const string RoundDamageCardHistorySkillId = "system:round-damage-card-history";
-    internal const string RoundDamageCardUsagePrefix = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_MouLuMeng.RoundDamageCardUsagePrefix;
+    internal const string RoundDamageCardUsagePrefix = RuntimeSkills.RuntimeRules_Core_MouLuMeng.RoundDamageCardUsagePrefix;
     internal bool UsesFormalMouLuMeng => _coreCharacterHostOperations.HasClassicGeneralPackage;
 
     internal void BeginRoundForTurn(CharacterState current)
@@ -30,6 +26,6 @@ internal sealed partial class CoreGameEngineMouLuMengRuntime
         _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Add(current.Seat);
     }
 
-    internal static bool IsDamageCardKind(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_MouLuMeng.IsDamageCardKind(kind);
-    internal static string GetRoundDamageCardUsageId(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_MouLuMeng.GetRoundDamageCardUsageId(kind);
+    internal static bool IsDamageCardKind(CardKind kind) => RuntimeSkills.RuntimeRules_Core_MouLuMeng.IsDamageCardKind(kind);
+    internal static string GetRoundDamageCardUsageId(CardKind kind) => RuntimeSkills.RuntimeRules_Core_MouLuMeng.GetRoundDamageCardUsageId(kind);
 }

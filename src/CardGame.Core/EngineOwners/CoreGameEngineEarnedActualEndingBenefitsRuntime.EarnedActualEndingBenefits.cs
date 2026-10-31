@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEarnedActualEndingBenefitsRuntime
@@ -88,7 +84,7 @@ internal sealed partial class CoreGameEngineEarnedActualEndingBenefitsRuntime
 
     internal bool MatchesLostHpOwnedGiftEnding(ProgramSkillFrame frame)
     {
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().LastOrDefault()is not { } ending || ending.Id != context.ParentFrameId || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || ending.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || ending.ItemIndex < 0 || ending.ItemIndex >= ending.Items.Count || ending.Items[ending.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate))
+        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().LastOrDefault()is not { } ending || ending.Id != context.ParentFrameId || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || ending.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || ending.ItemIndex < 0 || ending.ItemIndex >= ending.Items.Count || ending.Items[ending.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, candidate))
             return false;
         var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         return trigger.Effects is [{ Op: SkillProgramEffectOp.DrawLostHpThenOfferOwnedCardsUpTo }] && (trigger.TurnOwnerScope == SkillProgramTurnOwnerScope.Own && context.EarnedBenefit is null && frame.OwnerSeat == ending.OwnerSeat || trigger.TurnOwnerScope == SkillProgramTurnOwnerScope.EarnedActualEnding && MatchesEarnedActualEnding(candidate, context, true));

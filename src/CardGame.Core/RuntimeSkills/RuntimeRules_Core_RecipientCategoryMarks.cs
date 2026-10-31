@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_RecipientCategoryMarks
 {
     internal static RecipientCategoryMarkKind RecipientMarkKind(SkillProgramEffectOp op) => op switch {
@@ -16,7 +16,7 @@ internal static class RuntimeRules_Core_RecipientCategoryMarks
         RecipientCategoryMarkKind.Discard => PlayerMarkerKind.CategoryFu,
         _ => PlayerMarkerKind.CategorySong };
 
-    internal static CardConversionSource RecipientMarkSource(ProgramSkillFrame f) => new(f.SkillId, CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource RecipientMarkSource(ProgramSkillFrame f) => new(f.SkillId, RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
 
     internal static string RecipientMarkReason(ProgramSkillFrame f, string suffix) => $"skill-program.{f.SkillId}.recipient-category.{suffix}";
 

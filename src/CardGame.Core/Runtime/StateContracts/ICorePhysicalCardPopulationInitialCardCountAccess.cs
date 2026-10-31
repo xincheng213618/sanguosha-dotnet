@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICorePhysicalCardPopulationInitialCardCountAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICorePhysicalCardPopulationInitialCardCountAccess : IProgramRuntimeOperations
 {
     ref int _initialCardCount { get; }
 }

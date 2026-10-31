@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineActualTurnViewAsRuntime
 {
-    internal static string ActualTurnViewAsUsageId(SkillProgramViewAs rule) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ActualTurnViewAs.ActualTurnViewAsUsageId(rule);
+    internal static string ActualTurnViewAsUsageId(SkillProgramViewAs rule) => RuntimeSkills.RuntimeRules_Core_ActualTurnViewAs.ActualTurnViewAsUsageId(rule);
     internal bool CanUseActualTurnLimitedViewAs(IndexedSkillProgramInstance instance, SkillProgramViewAs rule, CharacterState owner) => rule.UsesPerActualTurn is not { } limit || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, instance.SkillId, ActualTurnViewAsUsageId(rule), SkillUsageScope.Turn) < limit;
     internal void ConsumeActualTurnLimitedViewAs(CardConversionSource source)
     {

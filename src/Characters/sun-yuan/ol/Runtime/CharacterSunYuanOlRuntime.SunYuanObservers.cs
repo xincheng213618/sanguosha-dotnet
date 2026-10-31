@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunYuanOlRuntime
 {
-    internal static bool SunYuanMovementStage(SunYuanStage s) => global::CardGame.Core.RuntimeSkills.RuntimeRules_sun_yuan_ol_SunYuanObservers.SunYuanMovementStage(s);
+    internal static bool SunYuanMovementStage(SunYuanStage s) => RuntimeSkills.RuntimeRules_sun_yuan_ol_SunYuanObservers.SunYuanMovementStage(s);
     internal bool IsSunYuanPaidMovement(ProgramSkillFrame f, CardMovementRecord m)
     {
         var r = f.SunYuan!;
@@ -55,7 +51,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
             return state.ResumeProgramFrameId == f.Id && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
         if (child is not CardsMovedTriggerWindowFrame moved)
             return false;
-        return r.Stage == SunYuanStage.NativeChildren ? moved.ResumeProgramFrameId == f.Id && IsSayingNativeSettlementBatch(f, moved.Batch) : SunYuanMovementStage(r.Stage) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsSunYuanPaidMovement(f, m));
+        return r.Stage == SunYuanStage.NativeChildren ? moved.ResumeProgramFrameId == f.Id && IsSayingNativeSettlementBatch(f, moved.Batch) : SunYuanMovementStage(r.Stage) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsSunYuanPaidMovement(f, m));
     }
 
     internal ProgramSkillFrame? SunYuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.SunYuanFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));

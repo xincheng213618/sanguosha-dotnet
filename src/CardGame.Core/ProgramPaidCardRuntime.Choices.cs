@@ -129,7 +129,7 @@ internal sealed partial class ProgramPaidCardRuntime
     }
 
     internal static int ResolveProgramEffectTarget(ProgramSkillFrame frame, SkillProgramEffectTarget target) =>
-        global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(frame,target);
+        RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(frame,target);
 
     internal int? TryCountChooserProgramBoundCards(ProgramSkillFrame frame, string bind, int chooserSeat)
     {

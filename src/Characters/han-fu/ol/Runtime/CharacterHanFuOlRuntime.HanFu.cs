@@ -1,23 +1,19 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHanFuOlRuntime
 {
     internal const string ShuziGiftReason = "skill-program.han-fu.shuzi.gift", ShuziReturnReason = "skill-program.han-fu.shuzi.return", ShuziBoardReason = "skill-program.han-fu.shuzi.board", KuangshouDrawReason = "skill-program.han-fu.kuangshou.draw", KuangshouDiscardReason = "skill-program.han-fu.kuangshou.discard";
-    internal static CardConversionSource HanFuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_han_fu_ol_HanFu.HanFuSource(f);
+    internal static CardConversionSource HanFuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_han_fu_ol_HanFu.HanFuSource(f);
     internal HanFuMaterial HanFuMaterialFor(int id)
     {
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
         var from = _cardZonesOperations._cardZones.GetLocation(id);
-        return new(id, card.Kind, global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(from is { Zone: CardZoneKind.Hand, OwnerSeat: { } owner } ? _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[owner], card) : from.Zone == CardZoneKind.Judgment ? _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(card) : card.Kind), from, card.IsGeneralWeapon);
+        return new(id, card.Kind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(from is { Zone: CardZoneKind.Hand, OwnerSeat: { } owner } ? _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[owner], card) : from.Zone == CardZoneKind.Judgment ? _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(card) : card.Kind), from, card.IsGeneralWeapon);
     }
 
     internal IReadOnlyList<HanFuMaterial> HanFuDiscardCards(ProgramSkillFrame f) => Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard).Select(c => HanFuMaterialFor(c.Cards.Single())).Where(m => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId), m.From, OwnedCardMoveIntent.Discard)).ToArray());
-    SkillProgramStepOutcome global::CardGame.Core.IHanFuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHanFu(f, op);
+    SkillProgramStepOutcome IHanFuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHanFu(f, op);
     internal SkillProgramStepOutcome BeginHanFu(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -153,7 +149,7 @@ internal sealed partial class CharacterHanFuOlRuntime
     [ProgramAnswer("han-fu")]
     internal void AnswerHanFu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HanFu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == HanFuStage.ReturnChoice ? r.TargetSeat : f.OwnerSeat) || !HanFuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HanFu: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == HanFuStage.ReturnChoice ? r.TargetSeat : f.OwnerSeat) || !HanFuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("HanFu requires the original chooser's exact published private physical-card or benefit choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];

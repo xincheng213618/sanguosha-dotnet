@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreParticipantHandDamageRidesRuntime
@@ -83,7 +79,7 @@ internal sealed partial class CoreParticipantHandDamageRidesRuntime
     {
         if (frame is HpChangedTriggerWindowFrame hp && parent.Id == rescue.Id && (hp.Change.ParentFrameId != rescue.Id || hp.ResumeFrameId != rescue.Id || hp.Continuation != PostEventContinuation.CardUse))
             return false;
-        return _coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(frame, parent) || ParticipantHandRescueCardWindowRide(frame, parent, rescue);
+        return _coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) || CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(frame, parent) || ParticipantHandRescueCardWindowRide(frame, parent, rescue);
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 380)]
     internal bool IsPaidHandRepaymentProgramDying()
@@ -105,7 +101,7 @@ internal sealed partial class CoreParticipantHandDamageRidesRuntime
         {
             var frame = _resolutionStackOperations._resolutionStack[index];
             var parent = _resolutionStackOperations._resolutionStack[index - 1];
-            if (!_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) && !ParticipantHandDyingRide(frame, parent) && !(paidSourceEntry && ParticipantHandDyingEntryRide(frame, parent, child)))
+            if (!_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(frame, parent) && !CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(frame, parent) && !ParticipantHandDyingRide(frame, parent) && !(paidSourceEntry && ParticipantHandDyingEntryRide(frame, parent, child)))
                 return false;
             index--;
         }

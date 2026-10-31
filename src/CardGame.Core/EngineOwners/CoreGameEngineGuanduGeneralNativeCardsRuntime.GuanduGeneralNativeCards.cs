@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGuanduGeneralNativeCardsRuntime
@@ -11,19 +6,19 @@ internal sealed partial class CoreGameEngineGuanduGeneralNativeCardsRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 44003)]
     internal void CaptureGuanduDamagingCards(IGameEvent payload)
     {
-        if (!_coreGuanduActivitiesOperations.IsGuanduActivity || payload is not DamageAppliedEvent { Amount: > 0 } applied || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || !attack.DamageWasApplied || attack.IsDelayedJudgmentDamage || damage.ParentFrameId != attack.ResolutionId || damage.TargetSeat != applied.TargetSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use || action.EffectiveKind != use.CardKind || (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind)) || _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduDamagingCardRecordedEvent>().Any(e => e.DamageFrameId == damage.Id))
+        if (!_coreGuanduActivitiesOperations.IsGuanduActivity || payload is not DamageAppliedEvent { Amount: > 0 } applied || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || !attack.DamageWasApplied || attack.IsDelayedJudgmentDamage || damage.ParentFrameId != attack.ResolutionId || damage.TargetSeat != applied.TargetSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use || action.EffectiveKind != use.CardKind || (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind)) || _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduDamagingCardRecordedEvent>().Any(e => e.DamageFrameId == damage.Id))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduDamagingCardRecordedEvent(damage.Id, use.Id, action.ActionId, applied.TargetSeat, use.CardKind));
     }
 
     internal CardKind? GuanduLastDamageCard(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduDamagingCardRecordedEvent>().LastOrDefault(e => e.TargetSeat == seat)?.Kind;
-    internal static string GuanduKindName(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GuanduGeneralNativeCards.GuanduKindName(kind);
+    internal static string GuanduKindName(CardKind kind) => RuntimeSkills.RuntimeRules_Core_GuanduGeneralNativeCards.GuanduKindName(kind);
 
     internal CardKind? GuanduChoulueFrozenBasicKind(ProgramSkillFrame f)
     {
         if (!_coreGuanduActivitiesOperations.IsGuanduActivity || f.SkillId != "guandu:choulue" || f.WindowContext?.Window != SkillProgramTriggerWindow.PlayPhaseStarting)
             return null;
-        var armed = _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduChoulueArmedEvent>().SingleOrDefault(e => e.ProgramFrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.InstanceId == f.SkillInstanceId && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseBoundaryId == f.WindowContext.ParentFrameId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(e.Kind));
+        var armed = _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduChoulueArmedEvent>().SingleOrDefault(e => e.ProgramFrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.InstanceId == f.SkillInstanceId && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseBoundaryId == f.WindowContext.ParentFrameId && CoreNativeCardClassificationsRuntime.IsSlashCard(e.Kind));
         return armed is not null && f.ChoiceBindings.Count(b => b.Name == "choulue-kind" && b.OptionId == GuanduKindName(armed.Kind) && b.ChooserSeat == f.OwnerSeat) == 1 ? armed.Kind : null;
     }
 
@@ -65,7 +60,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralNativeCardsRuntime
         _coreGuanduGeneralsOperations.FinishGuanduGeneral(f);
     }
 
-    internal bool IsGuanduChoulueVirtualOrdinaryProgram(ProgramSkillFrame f, SkillProgramEffect effect) => _coreGuanduActivitiesOperations.IsGuanduActivity && f.SkillId == "guandu:choulue" && effect.Op == SkillProgramEffectOp.UseVirtualOrdinaryTrick && effect.Condition is { Kind: SkillProgramConditionKind.ChoiceIs, SourceBind: "choulue-kind" } && effect.OutputKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && effect.ActorReference?.Kind == ProgramParticipantRef.Owner && effect.TargetReference?.Kind == ProgramParticipantRef.Owner && f.WindowContext?.Window == SkillProgramTriggerWindow.PlayPhaseStarting && f.ChoiceBindings.Count(b => b.Name == "choulue-kind" && b.OptionId == GuanduKindName(kind) && b.ChooserSeat == f.OwnerSeat) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduChoulueArmedEvent>().Count(e => e.ProgramFrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.InstanceId == f.SkillInstanceId && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseBoundaryId == f.WindowContext.ParentFrameId && e.Kind == kind) == 1;
+    internal bool IsGuanduChoulueVirtualOrdinaryProgram(ProgramSkillFrame f, SkillProgramEffect effect) => _coreGuanduActivitiesOperations.IsGuanduActivity && f.SkillId == "guandu:choulue" && effect.Op == SkillProgramEffectOp.UseVirtualOrdinaryTrick && effect.Condition is { Kind: SkillProgramConditionKind.ChoiceIs, SourceBind: "choulue-kind" } && effect.OutputKind is { } kind && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && effect.ActorReference?.Kind == ProgramParticipantRef.Owner && effect.TargetReference?.Kind == ProgramParticipantRef.Owner && f.WindowContext?.Window == SkillProgramTriggerWindow.PlayPhaseStarting && f.ChoiceBindings.Count(b => b.Name == "choulue-kind" && b.OptionId == GuanduKindName(kind) && b.ChooserSeat == f.OwnerSeat) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduChoulueArmedEvent>().Count(e => e.ProgramFrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.InstanceId == f.SkillInstanceId && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseBoundaryId == f.WindowContext.ParentFrameId && e.Kind == kind) == 1;
     internal IReadOnlyList<PromptChoice> GuanduGiftChoices(ProgramSkillFrame f, bool nonEquipment)
     {
         var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Where(c => !nonEquipment || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(c.Kind));

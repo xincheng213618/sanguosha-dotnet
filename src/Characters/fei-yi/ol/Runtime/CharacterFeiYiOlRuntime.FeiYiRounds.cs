@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFeiYiOlRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
 
     internal void BindFeiYiRankEffects(long id, ProgramTrickContinuation trick)
     {
-        if (!HasFeiYiHezhong || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { Type: CardActionType.Use } action } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || use.CardKind == CardKind.Nullification || action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind || action.EffectiveRank is not { } rank || use.FeiYiRounds is { Started: > 0 } || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != id)
+        if (!HasFeiYiHezhong || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { Type: CardActionType.Use } action } use || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || use.CardKind == CardKind.Nullification || action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind || action.EffectiveRank is not { } rank || use.FeiYiRounds is { Started: > 0 } || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != id)
             return;
         var acceptedActor = FeiYiAcceptedActor(use);
         if (acceptedActor is not { } originalActor)

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -16,8 +13,8 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
     internal string? ShenZfIssuedSkill(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) ? _coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhangFeiSentenceEvent>().LastOrDefault(e => e.TargetSeat == seat && ShenZfValidSentence(e))?.Source.SkillId : null;
     internal bool ShenZfIssued(int seat) => ShenZfIssuedSkill(seat)is not null;
     internal int ShenZfLimit(int seat) => Math.Min(5, 1 + _coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhangFeiXunshiEvent>().Count(e => e.Source.OwnerSeat == seat));
-    SkillProgramStepOutcome global::CardGame.Core.IShenZhangFeiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenZf(f, op);
-    int global::CardGame.Core.IShenZhangFeiSelection.Limit(int owner) => ShenZfLimit(owner);
+    SkillProgramStepOutcome IShenZhangFeiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenZf(f, op);
+    int IShenZhangFeiSelection.Limit(int owner) => ShenZfLimit(owner);
     internal SkillProgramStepOutcome BeginShenZf(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -153,12 +150,12 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
             _coreAttributedMarkerEventsOperations.MutateParticipantMarker(f, r.TargetSeat, PlayerMarkerKind.ShencaiSi, 1);
         else
         {
-            foreach (var m in global::CardGame.Core.EngineOwners.CharacterZhangFeiAnniversaryGodDefinitions.ShenZfFour)
+            foreach (var m in CharacterZhangFeiAnniversaryGodDefinitions.ShenZfFour)
                 if (ShenZfMark(r.TargetSeat, m)is> 0 and var count)
                     _coreAttributedMarkerEventsOperations.MutateParticipantMarker(f, r.TargetSeat, m, -count);
-            for (var index = 0; index < global::CardGame.Core.EngineOwners.CharacterZhangFeiAnniversaryGodDefinitions.ShenZfFour.Length; index++)
-                if (terms.HasFlag(global::CardGame.Core.EngineOwners.CharacterZhangFeiAnniversaryGodDefinitions.ShenZfTerms[index]))
-                    _coreAttributedMarkerEventsOperations.MutateParticipantMarker(f, r.TargetSeat, global::CardGame.Core.EngineOwners.CharacterZhangFeiAnniversaryGodDefinitions.ShenZfFour[index], 1);
+            for (var index = 0; index < CharacterZhangFeiAnniversaryGodDefinitions.ShenZfFour.Length; index++)
+                if (terms.HasFlag(CharacterZhangFeiAnniversaryGodDefinitions.ShenZfTerms[index]))
+                    _coreAttributedMarkerEventsOperations.MutateParticipantMarker(f, r.TargetSeat, CharacterZhangFeiAnniversaryGodDefinitions.ShenZfFour[index], 1);
         }
 
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenZhangFeiSentenceEvent(f.Id, r.Source, r.GameplayHash, r.TargetSeat, terms, ShenZfMark(r.TargetSeat, PlayerMarkerKind.ShencaiSi)));

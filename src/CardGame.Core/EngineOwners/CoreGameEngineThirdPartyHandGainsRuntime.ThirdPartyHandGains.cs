@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineThirdPartyHandGainsRuntime
 {
-    internal static bool IsThirdPartyHandGainTrigger(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ThirdPartyHandGains.IsThirdPartyHandGainTrigger(trigger);
+    internal static bool IsThirdPartyHandGainTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_ThirdPartyHandGains.IsThirdPartyHandGainTrigger(trigger);
     internal IEnumerable<ProgramTriggerCandidate> CollectThirdPartyHandGainCandidates(CardMovementBatchContext batch)
     {
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive))
@@ -33,7 +29,7 @@ internal sealed partial class CoreGameEngineThirdPartyHandGainsRuntime
             }
     }
 
-    internal static bool IsOwnerSourceHandGainTrigger(SkillProgramTrigger trigger) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ThirdPartyHandGains.IsOwnerSourceHandGainTrigger(trigger);
+    internal static bool IsOwnerSourceHandGainTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_ThirdPartyHandGains.IsOwnerSourceHandGainTrigger(trigger);
     internal IEnumerable<ProgramTriggerCandidate> CollectOwnerSourceHandGainCandidates(CardMovementBatchContext batch)
     {
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive))

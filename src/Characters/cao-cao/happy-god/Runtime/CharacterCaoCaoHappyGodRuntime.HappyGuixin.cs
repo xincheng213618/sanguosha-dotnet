@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoCaoHappyGodRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterCaoCaoHappyGodRuntime
     internal const string HappyGuixinReason = "skill-program.happy:guixin.obtain";
     internal static CardConversionSource HappyGuixinSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
     internal static int HappyGuixinActualObtained(ProgramSkillFrame f) => f.HappyGuixin!.Payments.Sum(p => p.Movement.Movements.Count(m => m.To == CardLocation.Hand(f.OwnerSeat)));
-    SkillProgramStepOutcome global::CardGame.Core.IHappyGuixinHost.Resolve(ProgramSkillFrame f) => BeginHappyGuixin(f);
+    SkillProgramStepOutcome IHappyGuixinHost.Resolve(ProgramSkillFrame f) => BeginHappyGuixin(f);
     internal SkillProgramStepOutcome BeginHappyGuixin(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

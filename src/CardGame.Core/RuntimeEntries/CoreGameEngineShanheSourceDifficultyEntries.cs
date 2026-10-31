@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceDifficultyRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineShanheSourceDifficultyRuntime))]
 internal sealed partial class CoreGameEngineShanheSourceDifficultyEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceDifficultyRuntime> _resolve;
-    private CoreGameEngineShanheSourceDifficultyEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceDifficultyRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineShanheSourceDifficultyRuntime> _resolve;
+    private CoreGameEngineShanheSourceDifficultyEntries(Func<EngineOwners.CoreGameEngineShanheSourceDifficultyRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineShanheSourceDifficultyEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceDifficultyRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineShanheSourceDifficultyEntries Create(Func<EngineOwners.CoreGameEngineShanheSourceDifficultyRuntime> resolve) => new(resolve);
 }

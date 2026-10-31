@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineIdentityConcealmentRuntime
 {
-    internal const string IdentityConcealedGeneralId = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_IdentityConcealment.IdentityConcealedGeneralId;
-    internal static GeneralDefinition IdentityConcealedGeneral() => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_IdentityConcealment.IdentityConcealedGeneral();
+    internal const string IdentityConcealedGeneralId = RuntimeSkills.RuntimeRules_Core_IdentityConcealment.IdentityConcealedGeneralId;
+    internal static GeneralDefinition IdentityConcealedGeneral() => RuntimeSkills.RuntimeRules_Core_IdentityConcealment.IdentityConcealedGeneral();
     internal bool GeneralHasIdentityConcealment(GeneralDefinition general) => _coreModeAllegianceOperations.ModeAllegiancePolicy.AllowsIdentityConcealment && general.Skills.Select(s => s.ContentId).OfType<string>().Any(id => _contentRegistryOperations._contentRegistry!.Skills.GetValueOrDefault(id)?.Program?.Triggers.Any(t => t.Window == SkillProgramTriggerWindow.IdentityGeneralAppeared && t.Effects.Any(e => e.Op == SkillProgramEffectOp.AfterActualIdentityAppearanceRecover)) == true);
     internal void InitializeSelectedIdentityConcealment(CharacterState player)
     {
@@ -33,7 +28,7 @@ internal sealed partial class CoreGameEngineIdentityConcealmentRuntime
         return true;
     }
 
-    internal bool TryBeginIdentityAppearanceForDamage(global::CardGame.Core.GameEngine.IDamageAttempt attack, int amount)
+    internal bool TryBeginIdentityAppearanceForDamage(GameEngine.IDamageAttempt attack, int amount)
     {
         if (amount <= 0 || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IdentityConcealed)
             return false;
@@ -54,7 +49,7 @@ internal sealed partial class CoreGameEngineIdentityConcealmentRuntime
         return true;
     }
 
-    internal void BeginIdentityAppearance(CharacterState player, IdentityAppearanceEntry entry, long? parent, int deduction, int? damageSource, CardKind? cardKind, global::CardGame.Core.GameEngine.IDamageAttempt? attack = null)
+    internal void BeginIdentityAppearance(CharacterState player, IdentityAppearanceEntry entry, long? parent, int deduction, int? damageSource, CardKind? cardKind, GameEngine.IDamageAttempt? attack = null)
     {
         var state = player.IdentityConcealment ?? throw new InvalidOperationException("Identity appearance cannot repeat.");
         if (state.GeneralId != player.General.Id)
@@ -132,10 +127,10 @@ internal sealed partial class CoreGameEngineIdentityConcealmentRuntime
             throw new InvalidOperationException("Identity appearance cannot close another native attack.");
         switch (attack)
         {
-            case global::CardGame.Core.NativeOwners.CardAttackHandle card:
+            case NativeOwners.CardAttackHandle card:
                 _coreNativeAttackCompletionOperations.CompleteAttack(card);
                 break;
-            case global::CardGame.Core.NativeOwners.ProgramAttackHandle program:
+            case NativeOwners.ProgramAttackHandle program:
                 _coreProgramAttackAttemptOperations.CompleteProgramAttack(program);
                 break;
             default:
@@ -152,7 +147,7 @@ internal sealed partial class CoreGameEngineIdentityConcealmentRuntime
         _coreActualTurnsOperations.ContinueTurnAfterHengye(player);
     }
 
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? IdentityAppearanceAttack(long id) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id) switch
+    internal GameEngine.IDamageAttempt? IdentityAppearanceAttack(long id) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id) switch
     {
         ProgramSkillFrame { AttackAttempt: not null } => _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(id),
         ProgramSkillFrame { CardAttack.Active: true } => _kernelCoreMainOperations.CreateCardAttackHandle(id),
@@ -178,7 +173,7 @@ internal sealed partial class CoreGameEngineIdentityConcealmentRuntime
             throw new InvalidOperationException("Identity appearance lost its frozen native source, amount, nature, action or typed parent cursor.");
     }
 
-    internal bool IdentityAppearanceAttackMatches(IdentityAppearanceReceipt r, global::CardGame.Core.GameEngine.IDamageAttempt a) => a.ResolutionId == r.ParentFrameId && a.TargetSeat == r.OwnerSeat && a.SourceSeat == r.NativeSourceSeat && a.IsSourceLess == r.SourceLess && a.DamageAmount == r.ObservedAttackAmount && a.EffectiveCardKind == r.CardKind && _coreNativeCardClassificationsOperations.GetDamageNature(a) == r.Nature && (a.IsSourceLess ? null : (int? )a.SourceSeat) == r.DamageSourceSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)?.Action?.ActionId == r.NativeActionId;
+    internal bool IdentityAppearanceAttackMatches(IdentityAppearanceReceipt r, GameEngine.IDamageAttempt a) => a.ResolutionId == r.ParentFrameId && a.TargetSeat == r.OwnerSeat && a.SourceSeat == r.NativeSourceSeat && a.IsSourceLess == r.SourceLess && a.DamageAmount == r.ObservedAttackAmount && a.EffectiveCardKind == r.CardKind && _coreNativeCardClassificationsOperations.GetDamageNature(a) == r.Nature && (a.IsSourceLess ? null : (int? )a.SourceSeat) == r.DamageSourceSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)?.Action?.ActionId == r.NativeActionId;
     internal SkillProgramStepOutcome ArmGaolingRecovery(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);

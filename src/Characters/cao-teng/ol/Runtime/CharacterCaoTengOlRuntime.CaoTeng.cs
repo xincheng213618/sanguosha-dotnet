@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoTengOlRuntime
@@ -12,8 +8,8 @@ internal sealed partial class CharacterCaoTengOlRuntime
     internal const string CaoTengJianxiongClaimReason = "skill-program.cao-teng.jianxiong.claim";
     internal bool HasCaoTengCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveQingliuFactionChoice) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveYongzuDistinctBenefits) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveCaoTengJianxiongDrawAndClaim);
 
-    internal static CardConversionSource CaoTengSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cao_teng_ol_CaoTeng.CaoTengSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.ICaoTengHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCaoTeng(f, op);
+    internal static CardConversionSource CaoTengSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cao_teng_ol_CaoTeng.CaoTengSource(f);
+    SkillProgramStepOutcome ICaoTengHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCaoTeng(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27300)]
     internal bool CanOfferCaoTeng(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => !t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveQingliuFactionChoice) || context.Window == SkillProgramTriggerWindow.GameStarting || IsCaoTengQingliuDyingExitContext(c, context);
     internal bool CaoTengParentMatches(ProgramSkillFrame f)
@@ -21,8 +17,8 @@ internal sealed partial class CharacterCaoTengOlRuntime
         if (f.TriggerId is null || f.ActivationId != f.TriggerId || f.WindowContext is not { } c || c.OwnerSeat != f.OwnerSeat)
             return false;
         if (c.Window == SkillProgramTriggerWindow.AfterDamageApplied)
-            return c.Amount > 0 && c.TargetSeat == f.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } w && w.ParentFrameId == c.DamageFrameId && w.TargetSeat == f.OwnerSeat && w.TriggerWindow == c.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate());
-        if (_resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } p || p.Window != c.Window || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]))
+            return c.Amount > 0 && c.TargetSeat == f.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } w && w.ParentFrameId == c.DamageFrameId && w.TargetSeat == f.OwnerSeat && w.TriggerWindow == c.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate());
+        if (_resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } p || p.Window != c.Window || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]))
             return false;
         return c.Window switch
         {
@@ -136,7 +132,7 @@ internal sealed partial class CharacterCaoTengOlRuntime
     [ProgramAnswer("cao-teng")]
     internal void AnswerCaoTeng(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoTeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != CaoTengChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoTengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoTeng: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != CaoTengChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoTengChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Cao Teng lost the actual private chooser or original distinct choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -238,7 +234,7 @@ internal sealed partial class CharacterCaoTengOlRuntime
                         {
                             var claimed = group.DamageClaimedPhysicalCardIds.ToHashSet();
                             foreach (var card in cards)
-                                global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.RecordClaimedGroupPhysicalCard(claimed, group.ResolutionId, group.PhysicalCards, attack.ResolutionId, card.Id);
+                                RuntimeSkills.RuntimeRules_Core_CommonRules.RecordClaimedGroupPhysicalCard(claimed, group.ResolutionId, group.PhysicalCards, attack.ResolutionId, card.Id);
                             group.SetClaimedPhysicalCards(claimed.ToArray());
                         }
 

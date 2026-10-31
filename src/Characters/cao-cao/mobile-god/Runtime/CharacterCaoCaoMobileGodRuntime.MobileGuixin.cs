@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Collections.ObjectModel;
 using System.Globalization;
 
@@ -11,7 +8,7 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
 {
     internal const string MobileGuixinReason = "skill-program.mobile:guixin.obtain";
     internal static CardConversionSource MobileGuixinSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileGuixinHost.Resolve(ProgramSkillFrame f) => BeginMobileGuixin(f);
+    SkillProgramStepOutcome IMobileGuixinHost.Resolve(ProgramSkillFrame f) => BeginMobileGuixin(f);
     internal SkillProgramStepOutcome BeginMobileGuixin(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -98,7 +95,7 @@ internal sealed partial class CharacterCaoCaoMobileGodRuntime
         if (r.Stage != MobileGuixinStage.Choosing || r.Cursor >= r.OtherSeats.Count)
             return[];
         var target = r.OtherSeats[r.Cursor];
-        return Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, target, global::CardGame.Core.EngineOwners.CharacterCaoCaoMobileGodDefinitions.MobileGuixinZones, OwnedCardMoveIntent.Obtain).Where(c => c.Parameters.GetValueOrDefault("source-zone") != "Judgment" || !c.Cards.Any(id => _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().Any(j => j.TargetSeat == target && j.CardId == id))).Select(c => c with { Id = new("mobile-guixin." + f.Id + "." + r.Cursor + "." + c.Id.Value), Parameters = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(c.Parameters) { ["program-action"] = "mobile-guixin", ["cursor"] = r.Cursor.ToString(CultureInfo.InvariantCulture) }) }).ToArray());
+        return Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, target, CharacterCaoCaoMobileGodDefinitions.MobileGuixinZones, OwnedCardMoveIntent.Obtain).Where(c => c.Parameters.GetValueOrDefault("source-zone") != "Judgment" || !c.Cards.Any(id => _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().Any(j => j.TargetSeat == target && j.CardId == id))).Select(c => c with { Id = new("mobile-guixin." + f.Id + "." + r.Cursor + "." + c.Id.Value), Parameters = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(c.Parameters) { ["program-action"] = "mobile-guixin", ["cursor"] = r.Cursor.ToString(CultureInfo.InvariantCulture) }) }).ToArray());
     }
 
     [ProgramAnswer("mobile-guixin")]

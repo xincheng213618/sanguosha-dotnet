@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_zhu_ling_ol_ZhuLingPrograms
 {
     internal static string ZhanyiCategoryName(SkillProgramCardCategory category) => category switch

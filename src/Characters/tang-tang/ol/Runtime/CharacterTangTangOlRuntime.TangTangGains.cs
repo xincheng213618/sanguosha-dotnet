@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTangTangOlRuntime
 {
-    internal static bool IsTangTangOwnedZone(CardLocation from) => global::CardGame.Core.RuntimeSkills.RuntimeRules_tang_tang_ol_TangTangGains.IsTangTangOwnedZone(from);
+    internal static bool IsTangTangOwnedZone(CardLocation from) => RuntimeSkills.RuntimeRules_tang_tang_ol_TangTangGains.IsTangTangOwnedZone(from);
     internal IReadOnlyList<TangTangOwnedOrigin>? CaptureTangTangOwnedOrigins(IEnumerable<CardLocation> sources) => !HasTangTangZhiyi ? null : Array.AsReadOnly(sources.Where(IsTangTangOwnedZone).Distinct().SelectMany(from => _cardZonesOperations._cardZones.CardsAt(from).Select(c => new TangTangOwnedOrigin(c.Id, from.OwnerSeat!.Value, from, _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[from.OwnerSeat.Value], c)))).ToArray());
     internal void RecordTangTangOwnedTransferProducer(CardMovementRecord m, int recipientSeat, long producerId)
     {
@@ -58,7 +54,7 @@ internal sealed partial class CharacterTangTangOlRuntime
             {
                 if (effective == Suit.None || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive)
                     return;
-                var witness = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Where(c => !excluded.Contains(c.Id)).Select(c => (Card: c, Suit: _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[ownerSeat], c))).FirstOrDefault(c => c.Suit != Suit.None && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) == global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(effective));
+                var witness = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Where(c => !excluded.Contains(c.Id)).Select(c => (Card: c, Suit: _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[ownerSeat], c))).FirstOrDefault(c => c.Suit != Suit.None && CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) == CoreNativeCardClassificationsRuntime.IsRedSuit(effective));
                 if (witness.Card is null)
                     return;
                 var gain = new TangTangGain(batch.Id, ownerSeat, recipient, m.CardId, foreign, effective, entrySequence, m.Sequence, from, witness.Card.Id, witness.Suit);
@@ -101,7 +97,7 @@ internal sealed partial class CharacterTangTangOlRuntime
             var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[proof.OwnerSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId));
             if (suit == Suit.None)
                 continue;
-            var witness = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[proof.OwnerSeat]).Where(c => !acquired.Contains(c.Id)).Select(c => (Card: c, Suit: _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[proof.OwnerSeat], c))).FirstOrDefault(c => c.Suit != Suit.None && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) == global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(suit));
+            var witness = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[proof.OwnerSeat]).Where(c => !acquired.Contains(c.Id)).Select(c => (Card: c, Suit: _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[proof.OwnerSeat], c))).FirstOrDefault(c => c.Suit != Suit.None && CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) == CoreNativeCardClassificationsRuntime.IsRedSuit(suit));
             if (witness.Card is null)
                 continue;
             var gain = new TangTangGain(batch.Id, proof.OwnerSeat, proof.OwnerSeat, material.CardId, false, suit, material.MovementSequence, material.MovementSequence, CardLocation.DrawPile, witness.Card.Id, witness.Suit, proof.InvocationId);

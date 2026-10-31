@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePublicPersistentPilesRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IPublicPersistentPileProgramHost.ExecutePublicPile(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecutePublicPile(effect, frame);
+    SkillProgramStepOutcome IPublicPersistentPileProgramHost.ExecutePublicPile(SkillProgramEffect effect, ProgramSkillFrame frame) => ExecutePublicPile(effect, frame);
     internal SkillProgramStepOutcome ExecutePublicPile(SkillProgramEffect effect, ProgramSkillFrame frame)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
@@ -62,11 +58,11 @@ internal sealed partial class CoreGameEnginePublicPersistentPilesRuntime
         if (frame.WindowContext?.Facts is not { } facts || frame.TriggerId is not { } triggerId)
             return true;
         var trigger = ProgramInstructionResolver.Default.FindTrigger(_contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!, triggerId)!;
-        var count = facts.PublicPersistentPileCounts?.GetValueOrDefault(global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(source.SkillId, source.SkillInstanceId)) ?? _corePublicPileSourcesOperations.PublicPileCards(source).Count;
+        var count = facts.PublicPersistentPileCounts?.GetValueOrDefault(CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(source.SkillId, source.SkillInstanceId)) ?? _corePublicPileSourcesOperations.PublicPileCards(source).Count;
         return trigger.Condition.Evaluate(facts with { PublicPersistentPileCounts = null, OwnedZoneCounts = facts.OwnedZoneCounts with { PublicPersistentPile = count } }, frame.SkillId, frame.SkillInstanceId);
     }
 
-    internal static string PublicPileCardLabel(Card card) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PublicPersistentPiles.PublicPileCardLabel(card);
+    internal static string PublicPileCardLabel(Card card) => RuntimeSkills.RuntimeRules_Core_PublicPersistentPiles.PublicPileCardLabel(card);
     internal void PublishPublicPileChoice(ProgramSkillFrame frame)
     {
         var draft = frame.PublicPileDraft!;
@@ -77,18 +73,18 @@ internal sealed partial class CoreGameEnginePublicPersistentPilesRuntime
         {
             var paused = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
             foreach (var source in _corePublicPileSourcesOperations.ReferencedPublicPileSources(draft.OwnerSeat, draft.SourceSkillId, frame.SkillInstanceId).Where(s => (paused.Op == SkillProgramEffectOp.ExchangePublicPileHand || s.Capacity == paused.Amount) && _corePublicPileSourcesOperations.PublicPileCards(s).Count > 0 && PublicPileSourceSatisfiesFrozenTrigger(frame, s)))
-                Add("source-" + global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(source.SkillId, source.SkillInstanceId), (_contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).ProgramPresentation?.AuthorityName ?? "公开牌堆") + " · " + string.Join("、", _corePublicPileSourcesOperations.PublicPileCards(source).Take(3).Select(PublicPileCardLabel)) + " · " + _corePublicPileSourcesOperations.PublicPileCards(source).Count + "张", [], []);
+                Add("source-" + CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(source.SkillId, source.SkillInstanceId), (_contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).ProgramPresentation?.AuthorityName ?? "公开牌堆") + " · " + string.Join("、", _corePublicPileSourcesOperations.PublicPileCards(source).Take(3).Select(PublicPileCardLabel)) + " · " + _corePublicPileSourcesOperations.PublicPileCards(source).Count + "张", [], []);
         }
         else if (draft.Stage == "owned")
         {
             if (draft.OwnedIds.Count < _corePublicPileSourcesOperations.PublicPileDraftCards(draft).Count)
                 foreach (var card in PublicPileExchangeOwnedCards(frame).Where(card => !draft.OwnedIds.Contains(card.Id)))
-                    Add("card-" + card.Id, "换入【" + card.DisplayName + " " + global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit) + card.RankText + "】", [card.Id], []);
+                    Add("card-" + card.Id, "换入【" + card.DisplayName + " " + CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit) + card.RankText + "】", [card.Id], []);
             Add("finish", draft.OwnedIds.Count == 0 ? (handOnly ? "不交换" : "不交换，检查公开牌堆花色") : "完成换入牌选择", [], []);
         }
         else if (draft.Stage == "pile")
             foreach (var card in _corePublicPileSourcesOperations.PublicPileDraftCards(draft).Where(card => !draft.PileIds.Contains(card.Id)))
-                Add("card-" + card.Id, "取出【" + card.DisplayName + " " + global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit) + card.RankText + "】", [card.Id], []);
+                Add("card-" + card.Id, "取出【" + card.DisplayName + " " + CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit) + card.RankText + "】", [card.Id], []);
         else
             foreach (var id in draft.RemainingIds)
                 foreach (var seat in _coreBoundPublicPileProgramsOperations.PublicPileDistributionTargets(frame))
@@ -116,7 +112,7 @@ internal sealed partial class CoreGameEnginePublicPersistentPilesRuntime
             throw new InvalidOperationException("Public pile choice lost its suspended stage.");
         if (draft.Stage == "source")
         {
-            var source = _corePublicPileSourcesOperations.ReferencedPublicPileSources(draft.OwnerSeat, draft.SourceSkillId, frame.SkillInstanceId).Single(s => "source-" + global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(s.SkillId, s.SkillInstanceId) == selected.Parameters.GetValueOrDefault("token"));
+            var source = _corePublicPileSourcesOperations.ReferencedPublicPileSources(draft.OwnerSeat, draft.SourceSkillId, frame.SkillInstanceId).Single(s => "source-" + CoreGameEnginePublicPileSourcesRuntime.PublicPileIdentity(s.SkillId, s.SkillInstanceId) == selected.Parameters.GetValueOrDefault("token"));
             if (!PublicPileSourceSatisfiesFrozenTrigger(frame, source) || _corePublicPileSourcesOperations.PublicPileCards(source).Count == 0 || selected.Cards.Count != 0 || selected.Targets.Count != 0)
                 throw new InvalidOperationException("Public pile source selection lost its frozen qualification.");
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -236,16 +232,16 @@ internal sealed partial class CoreGameEnginePublicPersistentPilesRuntime
             return decision.Choices[0];
         if (draft.Stage == "owned")
         {
-            var available = decision.Choices.Where(choice => choice.Cards.Count == 1).OrderBy(choice => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(PublicPileExchangeOwnedCards(frame).Single(card => card.Id == choice.Cards[0]), owner)).ThenBy(choice => choice.Cards[0]).FirstOrDefault();
+            var available = decision.Choices.Where(choice => choice.Cards.Count == 1).OrderBy(choice => CoreNativeAiDecisionsRuntime.GetKeepValue(PublicPileExchangeOwnedCards(frame).Single(card => card.Id == choice.Cards[0]), owner)).ThenBy(choice => choice.Cards[0]).FirstOrDefault();
             if (available is null || draft.OwnedIds.Count > 0)
                 return decision.Choices.Single(choice => choice.Cards.Count == 0);
             var payment = PublicPileExchangeOwnedCards(frame).Single(card => card.Id == available.Cards[0]);
-            return _corePublicPileSourcesOperations.PublicPileDraftCards(draft).Any(card => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(card, owner) > global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(payment, owner)) ? available : decision.Choices.Single(choice => choice.Cards.Count == 0);
+            return _corePublicPileSourcesOperations.PublicPileDraftCards(draft).Any(card => CoreNativeAiDecisionsRuntime.GetKeepValue(card, owner) > CoreNativeAiDecisionsRuntime.GetKeepValue(payment, owner)) ? available : decision.Choices.Single(choice => choice.Cards.Count == 0);
         }
 
         if (draft.Stage == "pile")
-            return decision.Choices.OrderByDescending(choice => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_corePublicPileSourcesOperations.PublicPileDraftCards(draft).Single(card => card.Id == choice.Cards[0]), owner)).ThenBy(choice => choice.Cards[0]).First();
-        return decision.Choices.OrderByDescending(choice => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(owner, _coreMatchParticipantsPlayersAccess._players[choice.Targets[0]])).ThenBy(choice => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[choice.Targets[0]]).Count).ThenBy(choice => choice.Targets[0]).ThenBy(choice => choice.Cards[0]).First();
+            return decision.Choices.OrderByDescending(choice => CoreNativeAiDecisionsRuntime.GetKeepValue(_corePublicPileSourcesOperations.PublicPileDraftCards(draft).Single(card => card.Id == choice.Cards[0]), owner)).ThenBy(choice => choice.Cards[0]).First();
+        return decision.Choices.OrderByDescending(choice => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(owner, _coreMatchParticipantsPlayersAccess._players[choice.Targets[0]])).ThenBy(choice => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[choice.Targets[0]]).Count).ThenBy(choice => choice.Targets[0]).ThenBy(choice => choice.Cards[0]).First();
     }
 
     internal void AssertPublicPileDraft(ProgramSkillFrame frame, SkillProgramEffect paused)

@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_rui_ji_ol_Qiaoli_Programs
 {
     internal static int QiaoliWeaponRange(IReadOnlyList<Card> physicalCards)

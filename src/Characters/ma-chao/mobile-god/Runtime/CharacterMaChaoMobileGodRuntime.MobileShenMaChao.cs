@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,12 +8,12 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
     internal const string MobileMaChaoYuli = "mobile-god:yuli", MobileMaChaoTingwei = "mobile-god:tingwei", MobileMaChaoJimie = "mobile-god:jimie";
     internal bool HasMobileShenMaChao => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShenMaChaoTingwei);
 
-    internal static CardConversionSource MobileMaChaoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal DamageNature MobileMaChaoYuliNature(global::CardGame.Core.GameEngine.IDamageAttempt attack, DamageNature priorNature) => !attack.IsSourceLess && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], MobileMaChaoYuli) ? DamageNature.Thunder : priorNature;
+    internal static CardConversionSource MobileMaChaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal DamageNature MobileMaChaoYuliNature(GameEngine.IDamageAttempt attack, DamageNature priorNature) => !attack.IsSourceLess && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], MobileMaChaoYuli) ? DamageNature.Thunder : priorNature;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 40625)]
-    internal int MobileMaChaoSourceDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && !attack.IsChainPropagation && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], MobileMaChaoYuli) && _coreNativeDamagePoliciesOperations.GetDamageNatureBeforeMobileMaChao(attack) == DamageNature.Thunder ? 1 : 0;
+    internal int MobileMaChaoSourceDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && !attack.IsChainPropagation && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], MobileMaChaoYuli) && _coreNativeDamagePoliciesOperations.GetDamageNatureBeforeMobileMaChao(attack) == DamageNature.Thunder ? 1 : 0;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 40626)]
-    internal int MobileTingweiCardDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? 0 : (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MobileTingweiBoosts ?? []).Count(b => b.Target == attack.TargetSeat && b.UseId == attack.ResolutionId && _coreCardUseLifecycleOperations.LifecycleCardUse(b.UseId)?.Action?.ActionId == b.ActionId);
+    internal int MobileTingweiCardDamageBonus(GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? 0 : (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MobileTingweiBoosts ?? []).Count(b => b.Target == attack.TargetSeat && b.UseId == attack.ResolutionId && _coreCardUseLifecycleOperations.LifecycleCardUse(b.UseId)?.Action?.ActionId == b.ActionId);
     internal bool IsMobileMaChaoTingweiGrantQualified(CharacterState owner, SkillGrant grant) => !HasMobileShenMaChao || _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileTingweiSuppressedEvent>().Any(e => e.Target == owner.Seat && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileTingweiExpiredEvent>().Any(x => x.FrameId == e.FrameId));
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 40625)]
     internal void ExpireMobileTingwei(IGameEvent fact)
@@ -51,13 +48,13 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
         if (op == SkillProgramEffectOp.ResolveMobileShenMaChaoJimie)
             return CanMobileJimie(g.OwnerSeat) && g.Owner.Markers.GetValueOrDefault(PlayerMarkerKind.MobileShenMaChaoTing) >= 8;
         if (op == SkillProgramEffectOp.ResolveMobileShenMaChaoTingwei)
-            return MobileMaChaoAction(g.WindowContext)is { Type: CardActionType.Use } a && a.ActorSeat == g.OwnerSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && a.TargetSeats.Any(t => _coreMatchParticipantsPlayersAccess._players[t].IsAlive);
+            return MobileMaChaoAction(g.WindowContext)is { Type: CardActionType.Use } a && a.ActorSeat == g.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && a.TargetSeats.Any(t => _coreMatchParticipantsPlayersAccess._players[t].IsAlive);
         if (op != SkillProgramEffectOp.ResolveMobileShenMaChaoYuli)
             return true;
         return g.WindowContext is { Amount: > 0 } && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } damage && (g.Trigger.Id == "source-thunder" ? !damage.IsSourceLess && damage.SourceSeat == g.OwnerSeat : damage.TargetSeat == g.OwnerSeat && _coreNativeCardClassificationsOperations.GetDamageNature(damage) == DamageNature.Thunder);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMobileShenMaChaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileMaChao(f, op);
+    SkillProgramStepOutcome IMobileShenMaChaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileMaChao(f, op);
     internal SkillProgramStepOutcome BeginMobileMaChao(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -158,7 +155,7 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
     [ProgramAnswer("mobile-ma-chao")]
     internal void AnswerMobileMaChao(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShenMaChao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MobileMaChaoStage.Target ? f.OwnerSeat : r.Target) || !MobileMaChaoChoices(f).Any(x => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShenMaChao: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MobileMaChaoStage.Target ? f.OwnerSeat : r.Target) || !MobileMaChaoChoices(f).Any(x => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
             throw new InvalidOperationException("Mobile Ma Chao requires the exact frozen target, subset or genuine equipment payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

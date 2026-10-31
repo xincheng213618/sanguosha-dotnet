@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRoundOnceCardlessNativeResponsesRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeResponsesRunt
     {
         if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || kind != CardKind.Dodge || _coreIssuedPlayUsePoliciesOperations.HasIssuedPlayPhaseUseBan(actor.Seat) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
             return false;
-        return _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is null && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } slash && slash.TargetSeat == actor.Seat && slash.EffectiveCardKind is { } incoming && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming);
+        return _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is null && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } slash && slash.TargetSeat == actor.Seat && slash.EffectiveCardKind is { } incoming && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming);
     }
 
     internal IReadOnlyList<PromptChoice> RoundOnceCardlessResponseChoices(CharacterState actor, CardKind kind)
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeResponsesRunt
                 ["output-kind"] = kind.ToString(),
                 ["original-frame-id"] = originalId.ToString(System.Globalization.CultureInfo.InvariantCulture)
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
             return new PromptChoice(new ChoiceId($"round-cardless.{(originalId)}.{(kind)}.{(source.SkillId)}.{(source.BindingId)}.{(source.SkillInstanceId)}"), $"发动【{(_coreCardConversionsOperations.ProgramConversionName(source))}】，视为使用【{(CardCatalog.Get(kind).DisplayName)}】。", [], [], parameters);
         }).ToArray());
     }
@@ -37,11 +33,11 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeResponsesRunt
     {
         if (choice.Parameters.GetValueOrDefault("response") != "round-once-cardless-basic")
             return false;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !prompt.Choices.Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || choice.Cards.Count != 0 || choice.Targets.Count != 0 || !Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("output-kind"), out var kind) || kind != CardKind.Dodge || prompt.Kind != DecisionKind.RespondDodge)
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !prompt.Choices.Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || choice.Cards.Count != 0 || choice.Targets.Count != 0 || !Enum.TryParse<CardKind>(choice.Parameters.GetValueOrDefault("output-kind"), out var kind) || kind != CardKind.Dodge || prompt.Kind != DecisionKind.RespondDodge)
             throw new InvalidOperationException("Cardless response changed its current native published producer or zero-material tuple.");
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
-        if (!RoundOnceCardlessResponseChoices(actor, kind).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
+        if (!RoundOnceCardlessResponseChoices(actor, kind).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Cardless response lost its exact current native use qualification or unpaid shared round allowance.");
         _coreRoundOnceCardlessBasicOperations.ConsumeRoundOnceCardlessBasic(source, true);
         ResolveRoundOnceCardlessDodge(actor, source);
@@ -90,7 +86,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeResponsesRunt
             _coreNativeDodgeOperations.CompleteSuccessfulDodgeResponse(attack);
     }
 
-    internal static RoundOnceCardlessBasicUseReceipt? RoundOnceCardlessResponseReceipt(ResolutionFrame owner) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RoundOnceCardlessNativeResponses.RoundOnceCardlessResponseReceipt(owner);
+    internal static RoundOnceCardlessBasicUseReceipt? RoundOnceCardlessResponseReceipt(ResolutionFrame owner) => RuntimeSkills.RuntimeRules_Core_RoundOnceCardlessNativeResponses.RoundOnceCardlessResponseReceipt(owner);
     internal bool IsIssuedRoundOnceCardlessResponse(ResolutionFrame owner, CardActionContext action)
     {
         if (!_coreRoundOnceCardlessBasicOperations.IsIssuedRoundOnceCardlessBasicUse(RoundOnceCardlessResponseReceipt(owner), owner, action) || action.Type != CardActionType.Response || action.TargetSeats.Count != 0 || action.ActorSeat != action.ResponderSeat)
@@ -106,7 +102,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeResponsesRunt
         };
         if (attack is null)
             return false;
-        return action.EffectiveKind == CardKind.Dodge && attack.EffectiveCardKind is { } incoming && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == action.ActorSeat && attack.SourceSeat == action.OpponentSeat;
+        return action.EffectiveKind == CardKind.Dodge && attack.EffectiveCardKind is { } incoming && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == action.ActorSeat && attack.SourceSeat == action.OpponentSeat;
     }
 
     internal CardActionContext RequireRoundOnceCardlessResponseAction(ResolutionFrame owner)
@@ -140,7 +136,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeResponsesRunt
             _ => throw new InvalidOperationException("Unexpected cardless response owner.")});
     }
 
-    internal void ClearRoundOnceCardlessDodgeResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void ClearRoundOnceCardlessDodgeResponse(NativeOwners.CardAttackHandle attack)
     {
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == attack.ResolutionId)is { } owner && RoundOnceCardlessResponseReceipt(owner)is not null)
         {

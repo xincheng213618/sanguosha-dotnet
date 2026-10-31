@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineColorFireAttacksRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CoreGameEngineColorFireAttacksRuntime
             return false;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != pending.Id || pending.Action?.ActionId != issued.ActionId || pending.FireAttackSelection?.RevealedCardId is not null || issued.PaidCardId is not null)
             throw new InvalidOperationException("Random color Fire Attack lost its issued use.");
-        var target = _coreMatchParticipantsPlayersAccess._players[global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending)];
+        var target = _coreMatchParticipantsPlayersAccess._players[CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending)];
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !target.IsAlive || _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count == 0)
         {
             CompleteColorFireAttackWithoutDamage(pending);
@@ -35,19 +31,19 @@ internal sealed partial class CoreGameEngineColorFireAttacksRuntime
             TargetSeat = target.Seat,
             RevealedCardId = revealed.Id,
             RevealedSuit = revealed.Suit,
-            RevealedIsRed = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(target, revealed))
+            RevealedIsRed = CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(target, revealed))
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(pending with { ColorFireAttack = receipt });
         _coreNativeFireAttackOperations.ResolveFireAttackReveal((CardUseFrame)_resolutionStackOperations._resolutionStack.Last(), revealed.Id);
         return true;
     }
 
-    internal IReadOnlyList<Card> ColorFireAttackCosts(CardUseFrame pending) => pending.ColorFireAttack is { RevealedIsRed: { } isRed } && _coreMatchParticipantsPlayersAccess._players[pending.SourceSeat].IsAlive ? _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[pending.SourceSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[pending.SourceSeat])).Where(card => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[pending.SourceSeat], card)) == isRed).OrderBy(card => card.Id).ToArray() : [];
+    internal IReadOnlyList<Card> ColorFireAttackCosts(CardUseFrame pending) => pending.ColorFireAttack is { RevealedIsRed: { } isRed } && _coreMatchParticipantsPlayersAccess._players[pending.SourceSeat].IsAlive ? _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[pending.SourceSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[pending.SourceSeat])).Where(card => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[pending.SourceSeat], card)) == isRed).OrderBy(card => card.Id).ToArray() : [];
     internal bool TryBeginColorFireAttackDiscard(CardUseFrame pending, Card revealed)
     {
         if (pending.ColorFireAttack is not { } receipt)
             return false;
-        if (receipt.RevealedCardId != revealed.Id || receipt.TargetSeat != global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending) || pending.FireAttackSelection?.RevealedCardId != revealed.Id || receipt.PaidCardId is not null)
+        if (receipt.RevealedCardId != revealed.Id || receipt.TargetSeat != CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending) || pending.FireAttackSelection?.RevealedCardId != revealed.Id || receipt.PaidCardId is not null)
             throw new InvalidOperationException("Color Fire Attack lost its frozen reveal.");
         var costs = ColorFireAttackCosts(pending);
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || costs.Count == 0 || !_coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat!.Value].IsAlive)
@@ -82,7 +78,7 @@ internal sealed partial class CoreGameEngineColorFireAttacksRuntime
         var cost = ColorFireAttackCosts(pending).SingleOrDefault(card => card.Id == selectedCardId) ?? throw new InvalidOperationException("Color Fire Attack requires one current same-color HE card.");
         var source = _coreMatchParticipantsPlayersAccess._players[pending.SourceSeat];
         var from = _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(source, cost);
-        var color = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, cost))!.Value;
+        var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(source, cost))!.Value;
         receipt = receipt with
         {
             PaidCardId = cost.Id,
@@ -140,7 +136,7 @@ internal sealed partial class CoreGameEngineColorFireAttacksRuntime
         if (pending.ColorFireAttack is not { RevealedIsRed: { } red } || decision.Kind != DecisionKind.FireAttackDiscard)
             return false;
         var actor = _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat];
-        var(id, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseColorFireAttackDiscard(_corePlayerViewProjectionOperations.CreateSnapshot(actor.Seat), global::CardGame.Core.EngineOwners.CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending), red, decision.ValidCardIds, ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
+        var(id, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseColorFireAttackDiscard(_corePlayerViewProjectionOperations.CreateSnapshot(actor.Seat), CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending), red, decision.ValidCardIds, ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
         _coreNativeAiDecisionsOperations.AddThought(thought);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreNativeFireAttackOperations.ResolveFireAttackDiscard(pending, id);

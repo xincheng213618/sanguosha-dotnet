@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterDengAiBoundaryMobileEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CharacterDengAiBoundaryMobileRuntime> _resolve;
-    private CharacterDengAiBoundaryMobileEntries(global::System.Func<global::CardGame.Core.EngineOwners.CharacterDengAiBoundaryMobileRuntime> resolve)
+    private readonly Func<EngineOwners.CharacterDengAiBoundaryMobileRuntime> _resolve;
+    private CharacterDengAiBoundaryMobileEntries(Func<EngineOwners.CharacterDengAiBoundaryMobileRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CharacterDengAiBoundaryMobileEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CharacterDengAiBoundaryMobileRuntime> resolve) => new(resolve);
+    internal static CharacterDengAiBoundaryMobileEntries Create(Func<EngineOwners.CharacterDengAiBoundaryMobileRuntime> resolve) => new(resolve);
 }

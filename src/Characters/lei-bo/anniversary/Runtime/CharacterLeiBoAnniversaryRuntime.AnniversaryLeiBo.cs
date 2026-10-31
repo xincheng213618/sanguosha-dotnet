@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLeiBoAnniversaryRuntime
 {
     internal const string LeiBoAction = "anniversary-lei-bo";
-    internal static CardConversionSource LeiBoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource LeiBoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal int LeiBoMarkedSeat(int owner)
     {
         var holders = _coreMatchParticipantsPlayersAccess._players.Where(p => p.MarkerSourceCounts.GetValueOrDefault((PlayerMarkerKind.AnniversaryLeiBoSilei, owner)) > 0).ToArray();
@@ -45,7 +42,7 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
     }
 
     internal bool LeiBoDamage(ProgramSkillWindowContext c) => c is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, TargetSeat: { } victim, DamageFrameId: { } id } && _coreTableSeatQueriesOperations.IsValidPlayerSeat(victim) && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } w && w.ParentFrameId == id && w.TargetSeat == victim && w.SourceSeat == c.SourceSeat && w.TriggerWindow == c.Window && _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == id)is { } damage && damage.TargetSeat == victim && damage.SourceSeat == c.SourceSeat && damage.Amount == c.Amount && _coreDamageZoneAcquisitionOperations.DamageAcquisitionHasExactOwningAttack(damage, w);
-    internal bool LeiBoDamageParent(ProgramSkillFrame f) => f.WindowContext is { } c && LeiBoDamage(c) && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Single(w => w.Id == c.ParentFrameId)is { } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex].ToProgramCandidate());
+    internal bool LeiBoDamageParent(ProgramSkillFrame f) => f.WindowContext is { } c && LeiBoDamage(c) && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Single(w => w.Id == c.ParentFrameId)is { } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex].ToProgramCandidate());
     internal bool LeiBoLoot(int owner, ProgramSkillWindowContext c) => LeiBoDamage(c) && c.SourceSeat is { } source && c.TargetSeat is { } victim && source != victim && LeiBoMarkedSeat(owner) == source && _coreMatchParticipantsPlayersAccess._players[victim].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[victim]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[victim]).Count > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLeiBoLootInvokedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Turn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Victim == victim);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 49800)]
     internal bool CanOfferLeiBo(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext c) => candidate.SkillId != AnniversaryLeiBoComposition.Silei || (trigger.Id switch
@@ -58,7 +55,7 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
     internal bool CanLeiBoShuaijie(int owner) => LeiBoMarkedSeat(owner)is var marked && marked >= 0 && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && (!_coreMatchParticipantsPlayersAccess._players[marked].IsAlive || _coreMatchParticipantsPlayersAccess._players[owner].Hp > _coreMatchParticipantsPlayersAccess._players[marked].Hp && _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner]).Count > _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[marked]).Count);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 49800, SkillProgramEffectOp.BeginAnniversaryLeiBoShuaijie)]
     internal bool CanActivateLeiBo(ProgramActivationLegalityContext c) => CanLeiBoShuaijie(c.OwnerSeat);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryLeiBoHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    SkillProgramStepOutcome IAnniversaryLeiBoHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.InitializeAnniversaryLeiBoSilei => InitializeLeiBo(f),
         SkillProgramEffectOp.RecordAnniversaryLeiBoSileiLoot => RecordLeiBoLoot(f),
@@ -105,7 +102,7 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 49800)]
     internal void ObserveLeiBoSlash(CardUseDeclaredEvent fact)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(fact.ResolutionId)is not { Action: { Type: CardActionType.Use } a } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(fact.ResolutionId)is not { Action: { Type: CardActionType.Use } a } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind))
             return;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == use.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame { AnniversaryLeiBo: { Stage: AnniversaryLeiBoStage.SlashRequest } r } f || !IsAnniversaryLeiBoFixedSlash(f))
@@ -221,7 +218,7 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
     [ProgramAnswer(LeiBoAction)]
     internal void AnswerLeiBo(PromptChoice answer)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryLeiBo: { } r } f || !ValidLeiBo(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !LeiBoChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [answer])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryLeiBo: { } r } f || !ValidLeiBo(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !LeiBoChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [answer])))
             throw new InvalidOperationException("Lei Bo choice changed its original owner, source or canonical entity slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

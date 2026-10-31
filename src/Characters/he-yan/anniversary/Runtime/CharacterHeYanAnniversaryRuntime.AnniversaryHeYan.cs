@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -14,7 +11,7 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
     internal HeYanHandPlan HeYanFreezeHand(int seat) => new(seat, _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Select(c => new HeYanHandCard(c.Id, c.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], c))).ToArray());
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 44200, SkillProgramEffectOp.ResolveAnniversaryHeYanYachai)]
     internal bool CanOfferHeYan(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => context is { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } source, DamageFrameId: not null, Amount: > 0 } && context.TargetSeat == c.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(source) && _coreMatchParticipantsPlayersAccess._players[source].IsAlive;
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryHeYanHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHeYan(f, op);
+    SkillProgramStepOutcome IAnniversaryHeYanHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginHeYan(f, op);
     internal SkillProgramStepOutcome BeginHeYan(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -103,7 +100,7 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
     [ProgramAnswer("anniversary-he-yan")]
     internal void AnswerHeYan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHeYan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != HeYanChooser(r, f.OwnerSeat) || !HeYanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHeYan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != HeYanChooser(r, f.OwnerSeat) || !HeYanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("He Yan rejects a stale or foreign private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -204,7 +201,7 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
         foreach (var p in r.Plans)
         {
             var shown = (y ? p.Cards : p.Cards.Where(c => c.Id == p.SelectedId)).Select(c => _closedHandCardViewQueriesSource.Get().Project(_coreMatchParticipantsPlayersAccess._players[p.Seat], _coreAdvancedLifecycleOperations.GetAdvancedCard(c.Id))).ToArray();
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), p.Seat, "he-yan-shown", Array.AsReadOnly(shown)));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), p.Seat, "he-yan-shown", Array.AsReadOnly(shown)));
         }
 
         if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, HeYanRevealReturn))
@@ -338,7 +335,7 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
             return p.Choices.First(c => c.Parameters["branch"] == "ban");
         if (r.Stage == AnniversaryHeYanStage.SuitChoice && r.Operation == SkillProgramEffectOp.ResolveAnniversaryHeYanQingtan)
             return p.Choices.First(c => c.Parameters["branch"] != "decline");
-        return p.Choices.OrderBy(c => c.Cards.Count == 1 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).First();
+        return p.Choices.OrderBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).First();
     }
 
     internal void FinishHeYan(ProgramSkillFrame f)

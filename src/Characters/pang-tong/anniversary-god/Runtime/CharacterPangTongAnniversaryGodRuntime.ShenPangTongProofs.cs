@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangTongAnniversaryGodRuntime
@@ -56,7 +52,7 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
             if (moved.Batch.ParentFrameId != f.Id || moved.Batch.OriginOwnerSeat != f.OwnerSeat || moved.Batch.OriginSkillId != f.SkillId || moved.Batch.OriginSkillInstanceId != f.SkillInstanceId)
                 return false;
             if (r.Stage == ShenPangTongStage.RemovalChildren)
-                return f.PendingMovementContinuation is { } p && ShenPtMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Id == r.BatchId && moved.Batch.Movements is [var m] && m.CardId == r.RemovedCardId && m.Sequence == r.After;
+                return f.PendingMovementContinuation is { } p && ShenPtMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Id == r.BatchId && moved.Batch.Movements is [var m] && m.CardId == r.RemovedCardId && m.Sequence == r.After;
             return r.Stage == ShenPangTongStage.DrawChildren && moved.ResumeProgramFrameId == f.Id && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason.Value == "skill-program.anniversary:fengliao.draw");
         }
 

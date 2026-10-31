@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoYouZhiMouMobileRuntime
 {
     internal const string MouGyzGiftReason = "skill-program.mou-mobile:bique.give", MouGyzDrawReason = "skill-program.mou-mobile:bique.draw", MouGyzDiscardReason = "skill-program.mou-mobile:bique.discard", MouGyzObtainReason = "skill-program.mou-mobile:zhongchun.obtain";
-    SkillProgramStepOutcome global::CardGame.Core.IMouGuoYouZhiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouGyz(f, op);
-    internal CardConversionSource MouGyzSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMouGuoYouZhiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouGyz(f, op);
+    internal CardConversionSource MouGyzSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillProgramStepOutcome BeginMouGyz(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -111,7 +108,7 @@ internal sealed partial class CharacterGuoYouZhiMouMobileRuntime
     [ProgramAnswer("mou-guo-you-zhi")]
     internal void AnswerMouGyz(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouGuoYouZhi: { } r } f || !ValidMouGyz(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouGuoYouZhiStage.UseChoice ? r.ActorSeat : f.OwnerSeat) || !MouGyzChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouGuoYouZhi: { } r } f || !ValidMouGyz(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouGuoYouZhiStage.UseChoice ? r.ActorSeat : f.OwnerSeat) || !MouGyzChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Guo You Zhi requires its actual chooser and unchanged published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

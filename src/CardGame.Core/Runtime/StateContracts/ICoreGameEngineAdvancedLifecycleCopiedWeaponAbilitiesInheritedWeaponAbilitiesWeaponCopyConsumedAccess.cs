@@ -1,10 +1,10 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineAdvancedLifecycleCopiedWeaponAbilitiesInheritedWeaponAbilitiesWeaponCopyConsumedAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.HashSet<int> _weaponCopyConsumed { get; }
+    ref readonly HashSet<int> _weaponCopyConsumed { get; }
 
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind>> _copiedWeaponAbilities { get; }
+    ref readonly Dictionary<int, IReadOnlyList<CardKind>> _copiedWeaponAbilities { get; }
 
-    ref readonly global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.CardKind>> _inheritedWeaponAbilities { get; }
+    ref readonly Dictionary<int, IReadOnlyList<CardKind>> _inheritedWeaponAbilities { get; }
 }

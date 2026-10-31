@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoHuaiMouMobileRuntime
 {
     internal const string MouGhStore = "skill-program.mou-mobile:jingce.store", MouGhPlace = "skill-program.mou-mobile:jingce.place", MouGhDraw = "skill-program.mou-mobile:jingce.draw";
-    SkillProgramStepOutcome global::CardGame.Core.IMouGuoHuaiMobileHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouGh(f, op);
+    SkillProgramStepOutcome IMouGuoHuaiMobileHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMouGh(f, op);
     internal SkillProgramStepOutcome BeginMouGh(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -42,7 +39,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
         }
         else
         {
-            var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
+            var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
             var q = MouGuoHuaiGainQualification(candidate, c) ?? throw new InvalidOperationException("Jingce gain reward lost the first actual Hand gain.");
             if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == q.PredictionId))
                 return SkillProgramStepOutcome.Continue;
@@ -105,7 +102,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
     [ProgramAnswer("mou-guo-huai")]
     internal void AnswerMouGh(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouGuoHuai: { } r } f || !ValidMouGh(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouGhChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouGuoHuai: { } r } f || !ValidMouGh(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouGhChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Jingce prediction changed its real owning frame or public original entity.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

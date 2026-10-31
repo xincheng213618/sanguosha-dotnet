@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuanHuanOlRuntime
@@ -32,7 +28,7 @@ internal sealed partial class CharacterYuanHuanOlRuntime
             return false;
         var m = r.Movements[^1];
         if (child is CardsMovedTriggerWindowFrame moved)
-            return global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(move => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move) && move.Sequence > m.Before && move.Sequence <= m.After && (move.Reason.Value == m.Reason || move.Reason == CardMoveReasons.Reshuffle));
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(move => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move) && move.Sequence > m.Before && move.Sequence <= m.After && (move.Reason.Value == m.Reason || move.Reason == CardMoveReasons.Reshuffle));
         if (child is RecoveryReplacementFrame replacement)
             return IsYuanHuanRecoveryParent(f, replacement);
         if (child is HpChangedTriggerWindowFrame hp)

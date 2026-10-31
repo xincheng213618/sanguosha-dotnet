@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
@@ -31,7 +27,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.ResumeFrameId == frame.Id && hp.Change.ParentFrameId == frame.Id && (receipt.Stage == HappyQiaoStage.HealChildren && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.TargetSeat == frame.OwnerSeat || receipt.Stage == HappyQiaoStage.DiscardChildren && hp.Change.TargetSeat == frame.OwnerSeat) && hp.Continuation is PostEventContinuation.Program or PostEventContinuation.AwaitedProgramMovement;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return receipt.Stage is HappyQiaoStage.GainChildren or HappyQiaoStage.DiscardChildren && frame.PendingMovementContinuation is { } continuation && HappyQiaoBoundMovement(frame, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame), continuation) && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => m.Sequence > receipt.Before && m.Sequence <= receipt.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+            return receipt.Stage is HappyQiaoStage.GainChildren or HappyQiaoStage.DiscardChildren && frame.PendingMovementContinuation is { } continuation && HappyQiaoBoundMovement(frame, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame), continuation) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => m.Sequence > receipt.Before && m.Sequence <= receipt.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == frame.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 

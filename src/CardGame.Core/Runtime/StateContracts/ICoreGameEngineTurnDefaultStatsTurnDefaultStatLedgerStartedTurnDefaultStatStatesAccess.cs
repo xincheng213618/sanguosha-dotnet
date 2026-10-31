@@ -1,8 +1,8 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreGameEngineTurnDefaultStatsTurnDefaultStatLedgerStartedTurnDefaultStatStatesAccess : IProgramRuntimeOperations
 {
     ref bool _turnDefaultStatLedgerStarted { get; }
 
-    ref readonly global::System.Collections.Generic.Dictionary<global::CardGame.Core.GameEngine.TurnDefaultStatKey, global::CardGame.Core.GameEngine.TurnDefaultStatState> _turnDefaultStatStates { get; }
+    ref readonly Dictionary<GameEngine.TurnDefaultStatKey, GameEngine.TurnDefaultStatState> _turnDefaultStatStates { get; }
 }

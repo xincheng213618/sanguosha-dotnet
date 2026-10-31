@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CorePrintedLordSkillQualificationsRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CorePrintedLordSkillQualificationsRuntime
     internal IReadOnlyList<PrintedLordSkillQualification> CapturePrintedLordQualifications(ProgramSkillFrame f, int seat)
     {
         var target = _coreMatchParticipantsPlayersAccess._players[seat];
-        var issuer = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var issuer = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         return Array.AsReadOnly(target.SkillGrants.Grants.Where(g => g.SourceId is CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource && g.LordProjection is null && g.GeneralLibraryProjection is null && _contentRegistryOperations._contentRegistry.GetSkill(g.SkillId).Tags.HasFlag(SkillTag.Lord)).Select(g => new PrintedLordSkillQualification(seat, (g.SourceId == CharacterState.PrimarySkillSource ? target.General : target.SecondaryGeneral)!.Id, g.SourceId, g.GrantId, g.SkillId, g.SkillInstanceId, f.Id, issuer, f.GameplayHash)).ToArray());
     }
 

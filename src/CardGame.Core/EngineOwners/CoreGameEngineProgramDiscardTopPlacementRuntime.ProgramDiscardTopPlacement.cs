@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramDiscardTopPlacementRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IProgramDiscardTopPlacementHost.PutDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame) => PutProgramDiscardedCardsOnDrawPileTop(frame);
+    SkillProgramStepOutcome IProgramDiscardTopPlacementHost.PutDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame) => PutProgramDiscardedCardsOnDrawPileTop(frame);
 
-    internal static bool IsDiscardMovementReason(CardMoveReason reason) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.IsDiscardMovementReason(reason);
+    internal static bool IsDiscardMovementReason(CardMoveReason reason) => RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.IsDiscardMovementReason(reason);
     internal SkillProgramStepOutcome PutProgramDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);

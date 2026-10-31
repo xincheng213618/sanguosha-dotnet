@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineExtraEffectMaterialClaimsRuntime
 {
-    internal void CaptureExtraEffectMaterialClaims(ProgramSkillFrame producer, global::CardGame.Core.GameEngine.IDamageAttempt attack, IReadOnlyList<Card> cards, long before, CardMoveReason reason)
+    internal void CaptureExtraEffectMaterialClaims(ProgramSkillFrame producer, GameEngine.IDamageAttempt attack, IReadOnlyList<Card> cards, long before, CardMoveReason reason)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action } use || _characterFeiYiOlOperations.NativeExtraEffectState(use)is not { } extra)
             return;
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEngineExtraEffectMaterialClaimsRuntime
         return _cardZonesOperations._cardZones.GetLocation(cardId).Zone is CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile;
     }
 
-    internal void RestoreExtraEffectGroupMaterialClaims(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal void RestoreExtraEffectGroupMaterialClaims(NativeOwners.GroupCardHandle group)
     {
         var ids = (_coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)is { } use ? _characterFeiYiOlOperations.NativeExtraEffectState(use) : null)?.MaterialClaims.Select(c => c.CardId).Where(id => HasExtraEffectMaterialClaim(group.ResolutionId, id)).ToArray();
         if (ids is { Length: > 0 })

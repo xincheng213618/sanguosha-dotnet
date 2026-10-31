@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCheZhouAnniversaryRuntime
@@ -76,10 +72,10 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
         return _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCheZhouUseAgeCapturedEvent>().Where(e => e.UseId == use.Id).ToArray()is [var issued] && issued == new AnniversaryCheZhouUseAgeCapturedEvent(use.Id, r.ActionId, r.Actor, r.Round, r.Cutoff, r.Materials, r.Age);
     }
 
-    internal bool TryGetAnniversaryCheZhouDamageReplacement(global::CardGame.Core.GameEngine.IDamageAttempt attack, out int amount)
+    internal bool TryGetAnniversaryCheZhouDamageReplacement(GameEngine.IDamageAttempt attack, out int amount)
     {
         amount = 0;
-        if (!HasAnniversaryCheZhouContent || attack is not global::CardGame.Core.NativeOwners.CardAttackHandle || attack.IsSourceLess || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.EffectiveCardKind is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.CardUserSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat))
+        if (!HasAnniversaryCheZhouContent || attack is not NativeOwners.CardAttackHandle || attack.IsSourceLess || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.EffectiveCardKind is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.CardUserSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat))
             return false;
         var user = _coreMatchParticipantsPlayersAccess._players[attack.CardUserSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
@@ -95,7 +91,7 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
         return true;
     }
 
-    internal void RecordAnniversaryCheZhouDamageReplacement(global::CardGame.Core.GameEngine.IDamageAttempt attack, int previousAmount, int replacement)
+    internal void RecordAnniversaryCheZhouDamageReplacement(GameEngine.IDamageAttempt attack, int previousAmount, int replacement)
     {
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryCheZhouDamageReplacedEvent(attack.ResolutionId, attack.CardUserSeat, attack.TargetSeat, previousAmount, replacement));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"【慑伏】令本次牌造成的伤害改为 {(replacement)}。", attack.CardUserSeat, attack.TargetSeat);

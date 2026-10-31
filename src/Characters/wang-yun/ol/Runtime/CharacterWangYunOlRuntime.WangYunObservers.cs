@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangYunOlRuntime
 {
-    internal static bool WangYunOriginsEqual(WangYunNativeUseOrigin a, WangYunNativeUseOrigin b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_yun_ol_WangYunObservers.WangYunOriginsEqual(a, b);
+    internal static bool WangYunOriginsEqual(WangYunNativeUseOrigin a, WangYunNativeUseOrigin b) => RuntimeSkills.RuntimeRules_wang_yun_ol_WangYunObservers.WangYunOriginsEqual(a, b);
     internal void BindWangYunNativeUse(long useId)
     {
         if (!HasWangYunPlanCapability && !HasWangYunTrickCapability)
@@ -140,7 +136,7 @@ internal sealed partial class CharacterWangYunOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 10)]
-    internal void ValidateWangYunNativeAttackReturn(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal void ValidateWangYunNativeAttackReturn(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame frame && completion.ProgramFrameId is { } frameId && frame.WangYunPlan is { NativeUse: { Kind: "slash" } origin } plan && (!plan.NativeReturned || origin.ProgramFrameId != frameId || origin.UseId != completion.ResolutionId || !CanContinueWangYun(frame)))
             throw new InvalidOperationException("A Wang Yun Slash completion lost its exact once-returned native use.");

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterKongRongMouOlRuntime
@@ -73,7 +69,7 @@ internal sealed partial class CharacterKongRongMouOlRuntime
             throw new InvalidOperationException("Liwen changed its exact native actor, source or selected real materials.");
         var origin = new MouKrLiwenNativeOrigin(f.Id, r.Cursor, r.Source, r.GameplayHash, use.Id, a.ActionId, a.ActorSeat, a.ProviderSeat);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MouKrLiwen = r with { Stage = MouKrLiwenStage.NativeUse, UseId = use.Id, ActionId = a.ActionId } });
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouKrLiwenOrigin = origin, UnlimitedUse = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || u.UnlimitedUse });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouKrLiwenOrigin = origin, UnlimitedUse = CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || u.UnlimitedUse });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouKrLiwenNativeIssuedEvent(f.Id, r.Cursor, use.Id, a.ActionId, a.ActorSeat, a.ProviderSeat));
     }
 

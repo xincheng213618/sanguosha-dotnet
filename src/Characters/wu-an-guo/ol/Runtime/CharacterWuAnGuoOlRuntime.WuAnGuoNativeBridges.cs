@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuAnGuoOlRuntime
@@ -31,7 +27,7 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 27010)]
-    internal bool ReturnWuAnGuoLiyongAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnWuAnGuoLiyongAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.WuAnGuoLiyong is not { } origin)
             return false;

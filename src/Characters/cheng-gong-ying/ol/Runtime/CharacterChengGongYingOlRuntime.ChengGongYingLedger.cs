@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterChengGongYingOlRuntime
@@ -44,7 +40,7 @@ internal sealed partial class CharacterChengGongYingOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 110)]
-    internal int ChengGongYingKuangxiangDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int ChengGongYingKuangxiangDamageBonus(GameEngine.IDamageAttempt attack)
     {
         // The first recipient's finalized amount is the native propagation base.
         // Subsequent chained recipients inherit it rather than paying a second +1.

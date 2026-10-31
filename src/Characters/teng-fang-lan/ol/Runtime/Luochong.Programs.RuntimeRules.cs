@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_teng_fang_lan_ol_Luochong_Programs
 {
     internal static string LuochongOptionDisplayName(string optionId) => optionId switch

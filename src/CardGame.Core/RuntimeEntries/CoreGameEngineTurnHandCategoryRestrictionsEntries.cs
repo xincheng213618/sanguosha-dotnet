@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineTurnHandCategoryRestrictionsRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineTurnHandCategoryRestrictionsRuntime))]
 internal sealed partial class CoreGameEngineTurnHandCategoryRestrictionsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnHandCategoryRestrictionsRuntime> _resolve;
-    private CoreGameEngineTurnHandCategoryRestrictionsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnHandCategoryRestrictionsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineTurnHandCategoryRestrictionsRuntime> _resolve;
+    private CoreGameEngineTurnHandCategoryRestrictionsEntries(Func<EngineOwners.CoreGameEngineTurnHandCategoryRestrictionsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineTurnHandCategoryRestrictionsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineTurnHandCategoryRestrictionsRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineTurnHandCategoryRestrictionsEntries Create(Func<EngineOwners.CoreGameEngineTurnHandCategoryRestrictionsRuntime> resolve) => new(resolve);
 }

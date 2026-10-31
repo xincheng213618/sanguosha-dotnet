@@ -1,18 +1,15 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangRenMobileShiRuntime
 {
     internal const string ShiZrFuan = ShiZhangRenComposition.FuanSkill, ShiZrYinXian = ShiZhangRenComposition.YinXianSkill;
-    internal static CardConversionSource ShiZrSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IShiZhangRenHost.ResolveFuan(ProgramSkillFrame frame) => BeginShiZrFuan(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiZhangRenHost.ResolveFuanStrike(ProgramSkillFrame frame) => BeginShiZrFuanStrike(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IShiZhangRenHost.ResolveYinXian(ProgramSkillFrame frame) => ResolveShiZrYinXian(frame);
+    internal static CardConversionSource ShiZrSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IShiZhangRenHost.ResolveFuan(ProgramSkillFrame frame) => BeginShiZrFuan(frame);
+    SkillProgramStepOutcome IShiZhangRenHost.ResolveFuanStrike(ProgramSkillFrame frame) => BeginShiZrFuanStrike(frame);
+    SkillProgramStepOutcome IShiZhangRenHost.ResolveYinXian(ProgramSkillFrame frame) => ResolveShiZrYinXian(frame);
     internal SkillProgramStepOutcome BeginShiZrFuan(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -211,7 +208,7 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
     [ProgramAnswer(ShiZhangRenComposition.ProgramAction)]
     internal void AnswerShiZr(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiZhangRen: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiZrChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiZhangRen: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } pending || !ShiZrChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected])))
             throw new InvalidOperationException("Shi Zhang Ren choice lost its current frame or legal branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_Core_AlcoholIdentityPolicies
 {
     internal static bool HasDyingAlcoholProducer(SkillProgramTrigger trigger) =>

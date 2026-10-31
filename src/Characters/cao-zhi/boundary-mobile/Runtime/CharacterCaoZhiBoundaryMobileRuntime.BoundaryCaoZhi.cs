@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoZhiBoundaryMobileRuntime
@@ -28,17 +24,17 @@ internal sealed partial class CharacterCaoZhiBoundaryMobileRuntime
     internal int BoundaryCaoZhiGameDamage(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Sum(e => (e.TargetSeat == owner ? e.Amount : 0) + (!e.SourceLess && e.SourceSeat == owner ? e.Amount : 0));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 56701, SkillProgramEffectOp.UpgradeBoundaryCaoZhiJiushi)]
     internal bool QualifyBoundaryCaoZhiChengzhang(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == BoundaryCaoZhiComposition.Chengzhang && context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && context.OwnerSeat == c.OwnerSeat && _coreActualTurnProgressCurrentSeatAccess._currentSeat == c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && BoundaryCaoZhiGameDamage(c.OwnerSeat) >= 7;
-    void global::CardGame.Core.IBoundaryCaoZhiHost.SelectTrick(ProgramSkillFrame frame, string bind) => SelectBoundaryCaoZhiTrick(frame, bind);
-    void global::CardGame.Core.IBoundaryCaoZhiHost.Upgrade(ProgramSkillFrame frame) => UpgradeBoundaryCaoZhiJiushi(frame);
+    void IBoundaryCaoZhiHost.SelectTrick(ProgramSkillFrame frame, string bind) => SelectBoundaryCaoZhiTrick(frame, bind);
+    void IBoundaryCaoZhiHost.Upgrade(ProgramSkillFrame frame) => UpgradeBoundaryCaoZhiJiushi(frame);
     internal void SelectBoundaryCaoZhiTrick(ProgramSkillFrame supplied, string bind)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Trick).ToArray();
+        var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == SkillProgramCardCategory.Trick).ToArray();
         var before = _randomOperations._random.State;
         int? index = pool.Length == 0 ? null : _randomOperations._random.Next(pool.Length);
         var selected = index is { } at ? pool[at] : null;
         _coreProgramLifecycleOperations.SetProgramCardSet(f.Id, bind, selected is null ? [] : [selected.Id], SkillProgramCardSetVisibility.Private, selected is null ? [] : [CardLocation.DrawPile]);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryCaoZhiTrickSelectedEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, f.InstructionIndex, pool.Length, index, selected?.Id, before, _randomOperations._random.State));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryCaoZhiTrickSelectedEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, f.InstructionIndex, pool.Length, index, selected?.Id, before, _randomOperations._random.State));
     }
 
     internal void UpgradeBoundaryCaoZhiJiushi(ProgramSkillFrame supplied)
@@ -47,6 +43,6 @@ internal sealed partial class CharacterCaoZhiBoundaryMobileRuntime
         if (f.SkillId != BoundaryCaoZhiComposition.Chengzhang || f.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || f.InstructionIndex != 3 || BoundaryCaoZhiGameDamage(f.OwnerSeat) < 7)
             throw new InvalidOperationException("Chengzhang requires its original once-game preparation frame after native recovery and draw.");
         _coreProgramSkillChangesOperations.ReplaceProgramSkills(f, [BoundaryCaoZhiComposition.Jiushi], [BoundaryCaoZhiComposition.Upgraded], ProgramSkillSourceRemoval.Enabled, acquireFirst: false, announceAwakening: true);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryCaoZhiJiushiUpgradedEvent(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), BoundaryCaoZhiGameDamage(f.OwnerSeat)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryCaoZhiJiushiUpgradedEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), BoundaryCaoZhiGameDamage(f.OwnerSeat)));
     }
 }

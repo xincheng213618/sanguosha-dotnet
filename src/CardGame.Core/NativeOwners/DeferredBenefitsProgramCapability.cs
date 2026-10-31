@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class DeferredBenefitsProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineDeferredBenefitsProgramsEntries> getCoreGameEngineDeferredBenefitsProgramsRuntime) : IDeferredBenefitsProgramHost
+internal sealed class DeferredBenefitsProgramCapability(Func<RuntimeEntries.CoreGameEngineDeferredBenefitsProgramsEntries> getCoreGameEngineDeferredBenefitsProgramsRuntime) : IDeferredBenefitsProgramHost
 {
     public SkillProgramStepOutcome RequestFactionRecovery(ProgramSkillFrame frame, string factionId) => getCoreGameEngineDeferredBenefitsProgramsRuntime().RequestProgramFactionRecovery(frame, factionId);
     public void SetNextTurnRuleModifier(ProgramSkillFrame frame, int targetSeat, SkillRuleQuery query, int amount) => getCoreGameEngineDeferredBenefitsProgramsRuntime().QueueProgramNextTurnRuleModifier(frame, targetSeat, query, amount);

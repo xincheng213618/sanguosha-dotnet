@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunCeBoundaryMobileRuntime
@@ -58,7 +53,7 @@ internal sealed partial class CharacterSunCeBoundaryMobileRuntime
         return true;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IBoundarySunCeMobileHost.Challenge(ProgramSkillFrame f) => BeginBoundarySunCeMobileChallenge(f);
+    SkillProgramStepOutcome IBoundarySunCeMobileHost.Challenge(ProgramSkillFrame f) => BeginBoundarySunCeMobileChallenge(f);
     internal SkillProgramStepOutcome BeginBoundarySunCeMobileChallenge(ProgramSkillFrame f)
     {
         if (f.BoundarySunCeChallenge is not { Stage: "request" } r)

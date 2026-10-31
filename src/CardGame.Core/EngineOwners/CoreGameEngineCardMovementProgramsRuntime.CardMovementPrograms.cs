@@ -1,30 +1,26 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineCardMovementProgramsRuntime
 {
     internal CardMovementTiming? CaptureMovementTiming() => !(_coreProgramShanheSourceZhaoranOperations.HasShanheSourceZhaoranRules || _characterSimaYiOlGod2016Operations.HasOl2016SimaRenjie || _characterZhouFeiLeOperations.HasLeZhouFeiLingkongCapability || _characterZhaoZhongOlOperations.HasZhaoZhongCapability || _characterFaZhengMouMobileOperations.HasMouFaZhengCapability || _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesGainPhaseQualification || _coreGainGiftProgramsOperations.TracksRedOwnedLoss || _coreActualHandGainProgramsOperations.HasActualHandGainCapability || _coreShanheChanrangEdictOperations.HasShanheChanrangCapability || _characterHuCheErAnniversaryOperations.HasAnniversaryHuCheErRules || _characterQiaoRuiAnniversaryOperations.HasAnniversaryQiaoRuiCapability || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GiveAfterBatchGain) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.BindOwnTurnEnemyHandGain) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GainHappyHuaTuoMedicine) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryMuShunShizhao) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveGuyingAtomicLossChoice)) && !_coreJudgedRankSlashPoliciesOperations.HasOtherActualBasicDiscardCapability ? null : _programPhaseScheduleOperations._programPhaseSchedule is { Phase: TurnPhase.Draw } scheduled ? new(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, TurnPhase.Draw, scheduled.Frame.ZhangShiPingHongji is { Stage: HongjiStage.ExtraPhase } hongji ? hongji.RecipientSeat : scheduled.Frame.OwnerSeat) : new(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat);
-    internal static bool IsGainPhaseQualified(SkillProgramTrigger trigger, int ownerSeat, CardMovementTiming? timing) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CardMovementPrograms.IsGainPhaseQualified(trigger, ownerSeat, timing);
+    internal static bool IsGainPhaseQualified(SkillProgramTrigger trigger, int ownerSeat, CardMovementTiming? timing) => RuntimeSkills.RuntimeRules_Core_CardMovementPrograms.IsGainPhaseQualified(trigger, ownerSeat, timing);
     internal CardMovementBatchBuilder BeginCardMovementBatch(IEnumerable<CardLocation> sources, IEnumerable<CardLocation> destinations) => _cardMovementBatchCoordinatorOperations.Get().Begin(sources, destinations);
     internal void CompleteCardMovementBatch(CardMovementBatchBuilder batch, IReadOnlyList<CardMovementRecord> movements, bool committed) => _cardMovementBatchCoordinatorOperations.Get().Complete(batch, movements, committed);
-    int global::CardGame.Core.ICardMovementBatchFacts.TurnNumber => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber;
+    int ICardMovementBatchFacts.TurnNumber => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber;
 
-    bool global::CardGame.Core.ICardMovementBatchFacts.SetupComplete => _coreMatchSetupSetupCompleteAccess._setupComplete;
+    bool ICardMovementBatchFacts.SetupComplete => _coreMatchSetupSetupCompleteAccess._setupComplete;
 
-    Winner global::CardGame.Core.ICardMovementBatchFacts.Winner => _coreMatchOutcomeStatusWinnerAccess._winner;
+    Winner ICardMovementBatchFacts.Winner => _coreMatchOutcomeStatusWinnerAccess._winner;
 
-    EngineStatus global::CardGame.Core.ICardMovementBatchFacts.Status => _coreMatchOutcomeStatusWinnerAccess._status;
+    EngineStatus ICardMovementBatchFacts.Status => _coreMatchOutcomeStatusWinnerAccess._status;
 
-    ProgramSkillFrame? global::CardGame.Core.ICardMovementBatchFacts.LastProgram => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault();
+    ProgramSkillFrame? ICardMovementBatchFacts.LastProgram => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault();
 
-    void global::CardGame.Core.ICardMovementBatchPipeline.Begin(CardMovementBatchBuilder batch) => _programPipelineHooksOperations._programPipelineHooks.BeginMovementBatch(batch);
-    void global::CardGame.Core.ICardMovementBatchPipeline.ObserveCommitted(CardMovementBatchBuilder batch, CardMovementRecord movement) => _programPipelineHooksOperations._programPipelineHooks.ObserveCommittedMovement(batch, movement);
-    void global::CardGame.Core.ICardMovementBatchPipeline.CaptureFacts(CardMovementBatchBuilder batch, IReadOnlyList<CardMovementRecord> movements) => _programPipelineHooksOperations._programPipelineHooks.CaptureMovementBatchFacts(batch, movements);
-    CardMovementBatchContext global::CardGame.Core.ICardMovementBatchPipeline.Complete(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _programPipelineHooksOperations._programPipelineHooks.CompleteMovementBatch(batch, completed);
+    void ICardMovementBatchPipeline.Begin(CardMovementBatchBuilder batch) => _programPipelineHooksOperations._programPipelineHooks.BeginMovementBatch(batch);
+    void ICardMovementBatchPipeline.ObserveCommitted(CardMovementBatchBuilder batch, CardMovementRecord movement) => _programPipelineHooksOperations._programPipelineHooks.ObserveCommittedMovement(batch, movement);
+    void ICardMovementBatchPipeline.CaptureFacts(CardMovementBatchBuilder batch, IReadOnlyList<CardMovementRecord> movements) => _programPipelineHooksOperations._programPipelineHooks.CaptureMovementBatchFacts(batch, movements);
+    CardMovementBatchContext ICardMovementBatchPipeline.Complete(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _programPipelineHooksOperations._programPipelineHooks.CompleteMovementBatch(batch, completed);
     internal bool TryBeginCardsMovedProgramWindow(long? instructionFrameId = null, int? subjectSeat = null) => _cardsMovedWindowOperations.Get().TryBeginCardsMovedProgramWindow(instructionFrameId, subjectSeat);
     internal IReadOnlyList<ProgramTriggerCandidate> CollectCardsMovedProgramCandidates(CardMovementBatchContext batch) => _cardsMovedWindowOperations.Get().CollectCardsMovedProgramCandidates(batch);
     internal IReadOnlyList<ProgramTriggerCandidate> CollectDiscardPileReceivedCandidates(CardMovementBatchContext batch) => _cardsMovedWindowOperations.Get().CollectDiscardPileReceivedCandidates(batch);

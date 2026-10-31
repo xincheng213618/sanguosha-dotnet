@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramWindowCandidateQueries(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineNationalSkillsEntries> getCoreGameEngineNationalSkillsRuntime, global::System.Func<global::CardGame.Core.ProgramTriggerFactProjector> getProgramTriggerFactProjector, global::CardGame.Core.NativeOwners.ProgramTriggerFactQueriesFactory createProgramTriggerFactQueries, global::System.Func<global::CardGame.Core.ProgramTriggerRuntime> getProgramTriggerRuntime, global::CardGame.Core.NativeOwners.ProgramTriggerQueriesFactory createProgramTriggerQueries, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterYuanJiOlEntries> getCharacterYuanJiOlRuntime) : IProgramWindowCandidateQueries
+internal sealed class ProgramWindowCandidateQueries(Func<RuntimeEntries.CoreGameEngineNationalSkillsEntries> getCoreGameEngineNationalSkillsRuntime, Func<ProgramTriggerFactProjector> getProgramTriggerFactProjector, ProgramTriggerFactQueriesFactory createProgramTriggerFactQueries, Func<ProgramTriggerRuntime> getProgramTriggerRuntime, ProgramTriggerQueriesFactory createProgramTriggerQueries, Func<RuntimeEntries.CharacterYuanJiOlEntries> getCharacterYuanJiOlRuntime) : IProgramWindowCandidateQueries
 {
     public SkillBindingShard Shard(CharacterState owner) => getCoreGameEngineNationalSkillsRuntime().GetSkillBindingShard(owner);
     public SkillProgramTriggerFacts Capture(CharacterState owner) => getProgramTriggerFactProjector().Capture(createProgramTriggerFactQueries(), owner);

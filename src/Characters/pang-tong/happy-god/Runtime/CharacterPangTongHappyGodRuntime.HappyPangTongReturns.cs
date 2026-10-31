@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangTongHappyGodRuntime
@@ -42,7 +38,7 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
     [ProgramWindowReturn(SkillProgramTriggerWindow.HappyPlanSettled)]
     internal void ReturnHappyPtWindow(ProgramSkillFrame child, bool completed)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramLifecycleTriggerWindowFrame window || child.WindowContext?.ParentFrameId != window.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(child, window.Candidates[window.CandidateIndex]) || !HappyPtSettlementPaid(window))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramLifecycleTriggerWindowFrame window || child.WindowContext?.ParentFrameId != window.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(child, window.Candidates[window.CandidateIndex]) || !HappyPtSettlementPaid(window))
             throw new InvalidOperationException("Lanhai/reissued Lunce lost its original settled-plan return.");
         _programLifecycleWindowOperations.Get().AdvanceCandidate(window, true, completed);
         _coreRuntimeOperations.AdvanceRuntimeTop<ProgramLifecycleTriggerWindowFrame>();
@@ -71,7 +67,7 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
 
     internal string HappyPtUpperBind(ProgramSkillFrame f) => "happy-upper-" + f.HappyPangTong!.CurrentPlanId.ToString(System.Globalization.CultureInfo.InvariantCulture);
     internal bool IsHappyPangTongFactionOrigin(ProgramSkillFrame frame, int actor, int target, string? bind) => frame.HappyPangTong is { Stage: HappyPangTongStage.UpperUse, FactionPending: true } r && frame.OwnerSeat == actor && r.SlashTarget == target && bind == HappyPtUpperBind(frame) && ValidHappyPt(frame) && _coreAssistedPhysicalCardsOperations.AssistedPhysicalSlashTargets(actor).Contains(target) && _coreAssistedFactionSlashOperations.CanRequestAssistedProgramFactionSlash(actor, target);
-    internal bool ValidateHappyPangTongFactionParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle request, ProgramSkillFrame frame)
+    internal bool ValidateHappyPangTongFactionParent(NativeOwners.FactionCardRequestHandle request, ProgramSkillFrame frame)
     {
         if (frame.HappyPangTong is not { FactionPending: true })
             return false;
@@ -88,7 +84,7 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == use.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame { HappyPangTong: { Stage: HappyPangTongStage.UpperUse, NativeUseId: 0 } r } root)
             return;
-        if (root.OwnerSeat != use.SourceSeat || action.ActorSeat != root.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !use.TargetSeats.Contains(r.SlashTarget) || !ValidHappyPt(root))
+        if (root.OwnerSeat != use.SourceSeat || action.ActorSeat != root.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !use.TargetSeats.Contains(r.SlashTarget) || !ValidHappyPt(root))
             throw new InvalidOperationException("Upper plan must bind its actual owner's native Slash exactly once.");
         var ret = new HappyPangTongUpperReturn(root.Id, r.CurrentPlanId, use.Id, action.ActionId);
         _coreRuntimeOperations.ReplaceRuntimeFrame(root.Id, root with { HappyPangTong = r with { NativeUseId = use.Id, NativeActionId = action.ActionId } });
@@ -116,5 +112,5 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyPangTongUpperReturnedEvent(root.Id, r.CurrentPlanId, completed.Id, ret.ActionId));
     }
 
-    internal bool HappyPtUpperRidesOn(CardUseFrame use, ProgramSkillFrame root) => use.HappyPangTongUpper is { } ret && root.HappyPangTong is { } r && ret.RootId == root.Id && ret.PlanId == r.CurrentPlanId && ret.UseId == use.Id && ret.ActionId == use.Action?.ActionId && r.NativeUseId == use.Id && r.NativeActionId == ret.ActionId && use.SourceSeat == root.OwnerSeat && use.Action is { Type: CardActionType.Use } action && action.ActorSeat == root.OwnerSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Contains(r.SlashTarget) && use.CardAttack?.ProgramSkillCardUseFrameId == root.Id && ValidHappyPt(root) && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongUpperBoundEvent>().Count(e => e == new HappyPangTongUpperBoundEvent(root.Id, r.CurrentPlanId, use.Id, ret.ActionId)) == 1;
+    internal bool HappyPtUpperRidesOn(CardUseFrame use, ProgramSkillFrame root) => use.HappyPangTongUpper is { } ret && root.HappyPangTong is { } r && ret.RootId == root.Id && ret.PlanId == r.CurrentPlanId && ret.UseId == use.Id && ret.ActionId == use.Action?.ActionId && r.NativeUseId == use.Id && r.NativeActionId == ret.ActionId && use.SourceSeat == root.OwnerSeat && use.Action is { Type: CardActionType.Use } action && action.ActorSeat == root.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Contains(r.SlashTarget) && use.CardAttack?.ProgramSkillCardUseFrameId == root.Id && ValidHappyPt(root) && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongUpperBoundEvent>().Count(e => e == new HappyPangTongUpperBoundEvent(root.Id, r.CurrentPlanId, use.Id, ret.ActionId)) == 1;
 }

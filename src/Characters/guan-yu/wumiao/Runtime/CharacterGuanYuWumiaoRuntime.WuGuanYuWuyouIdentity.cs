@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuanYuWumiaoRuntime
@@ -15,11 +11,11 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
         return lease is not null && ValidWuyouLease(lease) && !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence > lease.MovementCutoff && m.From == CardLocation.Hand(holder) && m.To != m.From) ? lease : null;
     }
 
-    internal global::CardGame.Core.GameEngine.ProgramCardIdentityMatch? WuyouIdentity(CharacterState holder, Card card) => ActiveWuyouLease(holder.Seat, card.Id)is { } lease ? new(_contentRegistryOperations._contentRegistry.GetSkill(lease.Source.SkillId).Program!, new SkillProgramCardIdentity(lease.Source.BindingId, [CardZoneKind.Hand], [], [], lease.EffectiveKind, new(SkillProgramConditionKind.Always, 0, [])), lease.Source) : null;
+    internal GameEngine.ProgramCardIdentityMatch? WuyouIdentity(CharacterState holder, Card card) => ActiveWuyouLease(holder.Seat, card.Id)is { } lease ? new(_contentRegistryOperations._contentRegistry.GetSkill(lease.Source.SkillId).Program!, new SkillProgramCardIdentity(lease.Source.BindingId, [CardZoneKind.Hand], [], [], lease.EffectiveKind, new(SkillProgramConditionKind.Always, 0, [])), lease.Source) : null;
     internal bool IsWuyouIdentityMaterial(CharacterState holder, Card card, CardKind kind, CardConversionSource? source) => ActiveWuyouLease(holder.Seat, card.Id)is { } lease && source == lease.Source && (lease.EffectiveKind == kind || lease.EffectiveKind == CardKind.Slash && kind == CardKind.FireSlash && _coreNativeTargetLegalityOperations.HasZhuqueFan(holder));
     internal bool IsWuyouIdentityKind(CharacterState holder, Card card, CardKind kind) => ActiveWuyouLease(holder.Seat, card.Id)?.EffectiveKind == kind;
     internal IReadOnlyList<CardConversionSource> WuyouIdentitySources(CharacterState holder, Card card, CardKind kind) => ActiveWuyouLease(holder.Seat, card.Id)is { } lease && lease.EffectiveKind == kind ? [lease.Source] : [];
-    internal bool WuyouNativeProvider(int actor, int provider, CardKind kind) => actor == provider || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { } request && global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(request) && request.OwnerSeat == actor && request.CurrentCandidateSeat == provider;
+    internal bool WuyouNativeProvider(int actor, int provider, CardKind kind) => actor == provider || CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { } request && CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(request) && request.OwnerSeat == actor && request.CurrentCandidateSeat == provider;
     internal WuyouHandLease? WuyouPreUseLease(CharacterState actor, CardKind kind, IReadOnlyList<int>? materialIds)
     {
         if (!HasWuyouCapability || materialIds is not [var id])
@@ -38,12 +34,12 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     }
 
     internal bool HasWuyouMaterialPrivilege(CharacterState actor, CardKind kind, IReadOnlyList<int>? materialIds, long? existingUseFrameId = null) => existingUseFrameId is { } use ? HasIssuedWuyouUse(use, actor.Seat) : WuyouPreUseLease(actor, kind, materialIds)is not null;
-    internal bool HasWuyouPotentialSlash(CharacterState actor) => HasWuyouCapability && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Any(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && ActiveWuyouLease(actor.Seat, card.Id)is { } lease && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(lease.EffectiveKind) || global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, false).Count != 0)));
+    internal bool HasWuyouPotentialSlash(CharacterState actor) => HasWuyouCapability && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Any(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && ActiveWuyouLease(actor.Seat, card.Id)is { } lease && (CoreNativeCardClassificationsRuntime.IsSlashCard(lease.EffectiveKind) || CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, false).Count != 0)));
     internal bool HasPublicWuyouContributionPotential(CharacterState actor) => HasWuyouCapability && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<WuyouStartedEvent>().Any(started => started.DonorSeat == actor.Seat);
-    internal bool HasPotentialWuyouFactionSlash(CharacterState actor, CardKind kind) => HasWuyouCapability && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(actor, CardKind.Slash)is { } policy && _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actor.Seat, policy.FactionId).Any(seat => HasPublicWuyouContributionPotential(_coreMatchParticipantsPlayersAccess._players[seat]));
-    internal bool IsWuyouFactionPaymentLegal(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CardKind kind, IReadOnlyList<Card> cards, bool isTrueZhangba = false)
+    internal bool HasPotentialWuyouFactionSlash(CharacterState actor, CardKind kind) => HasWuyouCapability && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(actor, CardKind.Slash)is { } policy && _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actor.Seat, policy.FactionId).Any(seat => HasPublicWuyouContributionPotential(_coreMatchParticipantsPlayersAccess._players[seat]));
+    internal bool IsWuyouFactionPaymentLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind, IReadOnlyList<Card> cards, bool isTrueZhangba = false)
     {
-        if (!HasWuyouCapability || !global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(pending) || pending.TargetSeat is not { } targetSeat || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !HasPotentialWuyouFactionSlash(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat], kind))
+        if (!HasWuyouCapability || !CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(pending) || pending.TargetSeat is not { } targetSeat || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !HasPotentialWuyouFactionSlash(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat], kind))
             return true;
         var providerSeat = pending.CurrentCandidateSeat;
         var actor = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
@@ -81,7 +77,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     internal bool HasIssuedWuyouUse(long useId, int actor)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { WuyouUse: { } r, Action: { Type: CardActionType.Use } action } use || r.UseId != use.Id || r.ActionId != action.ActionId || action.ActorSeat != actor || use.SourceSeat != actor || !WuyouIssuedActorMatches(use, r) || r.ProviderSeat != action.ProviderSeat || action.PhysicalCards is not [var material] || material != r.Material || r.Lease.HolderSeat != r.ProviderSeat || r.Lease.CardId != material.CardId || material.From != CardLocation.Hand(r.ProviderSeat) || !ValidWuyouLease(r.Lease) || !(use.CardKind == r.EffectiveKind || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(r.EffectiveKind) && use.CardKind == CardKind.FireSlash && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use)))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { WuyouUse: { } r, Action: { Type: CardActionType.Use } action } use || r.UseId != use.Id || r.ActionId != action.ActionId || action.ActorSeat != actor || use.SourceSeat != actor || !WuyouIssuedActorMatches(use, r) || r.ProviderSeat != action.ProviderSeat || action.PhysicalCards is not [var material] || material != r.Material || r.Lease.HolderSeat != r.ProviderSeat || r.Lease.CardId != material.CardId || material.From != CardLocation.Hand(r.ProviderSeat) || !ValidWuyouLease(r.Lease) || !(use.CardKind == r.EffectiveKind || CoreNativeCardClassificationsRuntime.IsSlashCard(r.EffectiveKind) && use.CardKind == CardKind.FireSlash && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use)))
             return false;
         return _coreProgramEventHistoryOperations.ProgramEventHistory<WuyouUseAcceptedEvent>().Where(e => e.Receipt.UseId == useId).ToArray()is [var accepted] && accepted.Receipt == r;
     }
@@ -124,14 +120,14 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             var kind = lease.EffectiveKind;
             var source = lease.Source;
             var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card);
-            var color = global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
+            var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
             if (kind == CardKind.IronChain)
                 actions.Add(new(LegalActionKind.Recast, card.Id, null, "武佑：重铸【铁索连环】", kind) { ConversionSource = source });
             if (_characterHouChengAnniversaryOperations.IsAnniversaryHouChengWineCard(card.Id))
                 continue;
             if (_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
                 continue;
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
+            if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
             {
                 foreach (var option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: color, hasActualColor: true, physicalCardIds: [card.Id], conversionSource: source))
                     actions.Add(new(option.ActionKind, card.Id, option.TargetSeats.Count == 1 ? option.TargetSeats[0] : null, "武佑：" + option.Description, kind, option.TargetCardId, option.TargetSeats) { ConversionSource = source });
@@ -151,11 +147,11 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     internal bool TryExecuteWuyouIdentityUse(CharacterState actor, Card card, LegalAction action)
     {
-        if (action.Kind == LegalActionKind.Recast || action.PlayedCardKind is not { } kind || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) || kind == CardKind.Nullification || !IsWuyouIdentityMaterial(actor, card, kind, action.ConversionSource))
+        if (action.Kind == LegalActionKind.Recast || action.PlayedCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) || kind == CardKind.Nullification || !IsWuyouIdentityMaterial(actor, card, kind, action.ConversionSource))
             return false;
         var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card);
         var adjusted = _coreRedAdditionalTargetsOperations.IsTargetAdjustmentAction(actor, action) && _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats?.SequenceEqual(action.TargetSeats) == true;
-        var option = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(suit), hasActualColor: true, physicalCardIds: [card.Id], conversionSource: action.ConversionSource).Where(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && (o.TargetSeats.SequenceEqual(action.TargetSeats) || adjusted)).OrderByDescending(o => o.TargetSeats.Count).FirstOrDefault() ?? throw new InvalidOperationException("Wuyou's original named entity lost its native trick targets.");
+        var option = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: CoreGameEnginePublicPileColorsRuntime.SuitColor(suit), hasActualColor: true, physicalCardIds: [card.Id], conversionSource: action.ConversionSource).Where(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && (o.TargetSeats.SequenceEqual(action.TargetSeats) || adjusted)).OrderByDescending(o => o.TargetSeats.Count).FirstOrDefault() ?? throw new InvalidOperationException("Wuyou's original named entity lost its native trick targets.");
         var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, option.TargetSeats, kind, conversionSource: action.ConversionSource, designatedTargetSeats: kind == CardKind.BorrowedSword && adjusted && action.TargetSeats.Count >= 4 ? action.TargetSeats.Where((_, index) => index % 2 == 0).ToArray() : null);
         var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(actor.Seat), CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);

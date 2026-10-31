@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNativePublicPileEquipmentChildrenRuntime
@@ -41,7 +36,7 @@ internal sealed partial class CoreGameEngineNativePublicPileEquipmentChildrenRun
         if (use.RecoveryPaidContinuation is not { NativeOriginalEquipmentMovements: { } receipts } continuation || !HasNativePublicPileEquipmentTail(use, continuation))
             return false;
         var issued = receipts.SingleOrDefault(receipt => receipt.Batch.Id == batch.Id);
-        return issued is not null && global::CardGame.Core.EngineOwners.CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch, issued) && NativePublicPileEquipmentMovementsMatch(use, continuation, batch, receipts.Select(receipt => receipt.Batch).ToArray());
+        return issued is not null && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch, issued) && NativePublicPileEquipmentMovementsMatch(use, continuation, batch, receipts.Select(receipt => receipt.Batch).ToArray());
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 27589)]

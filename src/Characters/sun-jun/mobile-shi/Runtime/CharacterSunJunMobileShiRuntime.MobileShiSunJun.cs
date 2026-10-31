@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CharacterSunJunMobileShiRuntime
 {
     internal const string ShiSjXiongtu = "mobile:shi-xiongtu", ShiSjXianshuai = "mobile:shi-xianshuai";
     internal const string ShiSjDiscard = "skill.mobile-shi-sun-jun.discard", ShiSjDraw = "skill-program.mobile-shi-sun-jun.draw";
-    internal static CardConversionSource ShiSjSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IShiSunJunHost.Resolve(ProgramSkillFrame f, bool benefit) => BeginShiSj(f, benefit);
+    internal static CardConversionSource ShiSjSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IShiSunJunHost.Resolve(ProgramSkillFrame f, bool benefit) => BeginShiSj(f, benefit);
     internal int ShiSjPhaseLimit(int owner) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == owner && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiSunJunBenefitIssuedEvent>().Any(e => e.Owner == owner && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.Phase == phase) ? 2 : 1;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 49200, SkillProgramEffectOp.ResolveMobileShiXiongtu)]
     internal bool AllowsShiSjActivation(ProgramActivationLegalityContext gate) => _coreGameEngineSkillProgramsProgramPhaseUsesAccess._programPhaseUses.GetValueOrDefault((gate.OwnerSeat, gate.SkillId, gate.Activation.UsageGroup)) < ShiSjPhaseLimit(gate.OwnerSeat);
@@ -91,7 +88,7 @@ internal sealed partial class CharacterSunJunMobileShiRuntime
     [ProgramAnswer("mobile-shi-sun-jun")]
     internal void AnswerShiSj(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiSunJun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiSjChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiSunJun: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !ShiSjChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Xiongtu lost its exact private slot, frozen branch or actual cost choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangCanOlRuntime
@@ -21,8 +17,8 @@ internal sealed partial class CharacterWangCanOlRuntime
             var incoming = (batch.NativeDrawInvocation is { } draw && draw.OwnerSeat == owner.Seat ? draw.Materials.Select(m => m.CardId) : batch.Movements.Where(m => m.To == CardLocation.Hand(owner.Seat) && m.From != m.To).Select(m => m.CardId)).Distinct().ToHashSet();
             if (incoming.Count == 0)
                 continue;
-            var old = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Where(c => !incoming.Contains(c.Id)).Select(c => new SanwenNamedEntity(c.Id, global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(owner, c)))).ToArray();
-            var gained = incoming.Select(id => new SanwenNamedEntity(id, global::CardGame.Core.EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(owner, _coreAdvancedLifecycleOperations.GetAdvancedCard(id))))).Where(c => old.Any(w => w.Name == c.Name)).ToArray();
+            var old = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Where(c => !incoming.Contains(c.Id)).Select(c => new SanwenNamedEntity(c.Id, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(owner, c)))).ToArray();
+            var gained = incoming.Select(id => new SanwenNamedEntity(id, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(owner, _coreAdvancedLifecycleOperations.GetAdvancedCard(id))))).Where(c => old.Any(w => w.Name == c.Name)).ToArray();
             if (gained.Length == 0)
                 continue;
             result.Add(new(batch.Id, batch.TurnNumber, owner.Seat, gained, old.Where(w => gained.Any(g => g.Name == w.Name)).ToArray()));

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreMatchSetupRuntime
@@ -25,7 +21,7 @@ internal sealed partial class CoreMatchSetupRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GameStartedEvent(_coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._playerCount, _coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._modeDefinition.Id));
             foreach (var player in _coreMatchParticipantsPlayersAccess._players.Where(player => player.ChosenFactionId is not null).OrderBy(player => player.Seat))
             {
-                _coreMatchLogOperations.AddLog("GodFactionSelected", $"{(player.Name)} 为神势力武将 {(player.General.Name)} 选择了{(global::CardGame.Core.EngineOwners.CoreMatchPresentationRuntime.GetFactionName(player.ChosenFactionId!))}势力。", player.Seat);
+                _coreMatchLogOperations.AddLog("GodFactionSelected", $"{(player.Name)} 为神势力武将 {(player.General.Name)} 选择了{(CoreMatchPresentationRuntime.GetFactionName(player.ChosenFactionId!))}势力。", player.Seat);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GodFactionSelectedEvent(player.Seat, player.ChosenFactionId!));
             }
         }

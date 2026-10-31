@@ -1,8 +1,8 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICharacterZhugeLiangMouMouWujingAllowancesMouZhitianCountsAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterZhugeLiangMouMouWujingAllowancesMouZhitianCountsAccess : IProgramRuntimeOperations
 {
-    ref readonly global::System.Collections.Generic.HashSet<int> _mouWujingAllowances { get; }
+    ref readonly HashSet<int> _mouWujingAllowances { get; }
 
-    ref readonly global::System.Collections.Generic.Dictionary<int, int> _mouZhitianCounts { get; }
+    ref readonly Dictionary<int, int> _mouZhitianCounts { get; }
 }

@@ -1,15 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXunYuMobileGodRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShenXunYuHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => ResolveShenXunYu(frame, op);
+    SkillProgramStepOutcome IShenXunYuHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => ResolveShenXunYu(frame, op);
     internal bool HasDinghanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RecordAndCancelDinghanTarget);
 
     internal HashSet<CardKind> DinghanNames(int seat)
@@ -107,7 +101,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     [ProgramAnswer("dinghan-edit")]
     internal void AnswerDinghanEdit(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenXunYuEditing: true } f || f.SkillId != "mobile:dinghan" || f.TriggerId != "edit-trick-name" || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DinghanEditChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenXunYuEditing: true } f || f.SkillId != "mobile:dinghan" || f.TriggerId != "edit-trick-name" || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DinghanEditChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Dinghan requires its current owner edit choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (selected.Parameters["kind"] != "cancel")

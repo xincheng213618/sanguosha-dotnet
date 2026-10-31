@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_wang_yun_ol_WangYunObservers
 {
     internal static bool WangYunOriginsEqual(WangYunNativeUseOrigin a,WangYunNativeUseOrigin b)=>a.ProgramFrameId==b.ProgramFrameId && a.InstructionIndex==b.InstructionIndex && a.Source==b.Source &&

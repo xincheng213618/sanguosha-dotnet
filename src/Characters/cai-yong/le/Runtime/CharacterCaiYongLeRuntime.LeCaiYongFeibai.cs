@@ -1,10 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiYongLeRuntime
@@ -15,8 +11,8 @@ internal sealed partial class CharacterCaiYongLeRuntime
     internal const string FeibaiDrawReason = "skill-program.le-cai-yong.feibai.draw";
     internal bool HasLeCaiYongFeibaiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveLeCaiYongFeibai);
 
-    internal static CardConversionSource FeibaiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cai_yong_le_LeCaiYongFeibai.FeibaiSource(f);
-    internal static int FeibaiNameLength(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_cai_yong_le_LeCaiYongFeibai.FeibaiNameLength(kind);
+    internal static CardConversionSource FeibaiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cai_yong_le_LeCaiYongFeibai.FeibaiSource(f);
+    internal static int FeibaiNameLength(CardKind kind) => RuntimeSkills.RuntimeRules_cai_yong_le_LeCaiYongFeibai.FeibaiNameLength(kind);
     internal bool FeibaiDisabled(int owner, int turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<FeibaiDisabledEvent>().Any(e => e.OwnerSeat == owner && e.ActualTurn == turn);
     internal long? FeibaiSetupEpoch => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber == 0 && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.NotStarted && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Where(window => window.Window == SkillProgramTriggerWindow.GameStarting && window.Continuation == ProgramLifecycleContinuation.CompleteGameStarting).ToArray()is [var startup] ? startup.Id : null;
     internal bool FeibaiActualUseScopeIsOpen => _coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn || FeibaiSetupEpoch is not null;
@@ -41,7 +37,7 @@ internal sealed partial class CharacterCaiYongLeRuntime
         var original = FeibaiRecordedKind(fact);
         // A defensive response shares the incoming Use's origin frame. Its own
         // name must never inherit that Slash's later Lihuo conversion.
-        if (fact.RoundActionType != CardActionType.Use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(original))
+        if (fact.RoundActionType != CardActionType.Use || !CoreNativeCardClassificationsRuntime.IsSlashCard(original))
             return original;
         var changes = history.Select((payload, index) => (payload, index)).Where(item => item.payload is ProgramCurrentSlashFireChangedEvent change && change.CardUseFrameId == fact.OriginFrameId && (item.index < prefixEnd || fact == current)).ToArray();
         if (changes.Length == 0)
@@ -114,7 +110,7 @@ internal sealed partial class CharacterCaiYongLeRuntime
             return _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.NullificationResponse);
         if (!_coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.Dodge))
             return false;
-        return _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } kind } attack } && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat == action.ActorSeat;
+        return _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } kind } attack } && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat == action.ActorSeat;
     }
 
     internal FeibaiUsePrefixCapturedEvent? FeibaiPrefix(CardActionContext action)
@@ -190,7 +186,7 @@ internal sealed partial class CharacterCaiYongLeRuntime
     internal FeibaiQualification? FeibaiQualificationFor(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => candidate.SkillId != FeibaiSkill || candidate.BindingId != FeibaiBinding || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } use ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<FeibaiQualifiedEvent>().Select(e => e.Qualification).SingleOrDefault(q => q.Prefix.ActionId == use.CardActionId && q.Source == new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId) && q.GameplayHash == candidate.GameplayHash);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29071, SkillProgramEffectOp.ResolveLeCaiYongFeibai)]
     internal bool CanOfferLeCaiYongFeibai(ProgramTriggerLegalityContext gate) => gate.Owner.IsAlive && FeibaiQualificationFor(gate.Candidate, gate.Context)is { } q && q.Prefix.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && !FeibaiDisabled(gate.Owner.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber) && !_coreProgramEventHistoryOperations.ProgramEventHistory<FeibaiStartedEvent>().Any(e => e.Source == q.Source && e.ActionId == q.Prefix.ActionId);
-    internal bool FeibaiWindowMatches(ProgramCardTriggerWindowFrame window, FeibaiQualification q) => global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) == SkillProgramTriggerWindow.CardUseCompleted && window.Action.ActionId == q.Prefix.ActionId && window.Action.ActorSeat == q.Source.OwnerSeat && window.Action.EffectiveKind == q.Prefix.EffectiveKind && IsFeibaiTrueUse(window.Action) && (window.Action.Type != CardActionType.Response || window.CompletedResponseReturn is { IsCommitted: false } && _coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window));
+    internal bool FeibaiWindowMatches(ProgramCardTriggerWindowFrame window, FeibaiQualification q) => CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) == SkillProgramTriggerWindow.CardUseCompleted && window.Action.ActionId == q.Prefix.ActionId && window.Action.ActorSeat == q.Source.OwnerSeat && window.Action.EffectiveKind == q.Prefix.EffectiveKind && IsFeibaiTrueUse(window.Action) && (window.Action.Type != CardActionType.Response || window.CompletedResponseReturn is { IsCommitted: false } && _coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(window));
     internal SkillProgramStepOutcome BeginLeCaiYongFeibai(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -232,7 +228,7 @@ internal sealed partial class CharacterCaiYongLeRuntime
     internal void AnswerFeibaiSample(PromptChoice choice)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
-        if (f.LeCaiYongFeibai is not { Stage: FeibaiStage.Selecting } r || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FeibaiSampleChoices(f).Where(item => item.Id == choice.Id).ToArray()) || choice.Cards is not [var id] || choice.Targets.Count != 0 || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DrawPile)
+        if (f.LeCaiYongFeibai is not { Stage: FeibaiStage.Selecting } r || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], FeibaiSampleChoices(f).Where(item => item.Id == choice.Id).ToArray()) || choice.Cards is not [var id] || choice.Targets.Count != 0 || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DrawPile)
             throw new InvalidOperationException("Feibai must choose one of its real private deck entities.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
@@ -333,7 +329,7 @@ internal sealed partial class CharacterCaiYongLeRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveLeCaiYongFeibai)]
-    internal PromptChoice SelectAiFeibaiSample(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderByDescending(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Cards.Single()).First();
+    internal PromptChoice SelectAiFeibaiSample(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderByDescending(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Cards.Single()).First();
     [ProgramViewContributor(ProgramViewContribution.PrivateCards, 110)]
     internal CardSnapshot[] FeibaiPrivateCards(int viewer) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Where(f => f.OwnerSeat == viewer && f.LeCaiYongFeibai is { Stage: FeibaiStage.Selecting }).SelectMany(f => f.LeCaiYongFeibai!.Sample.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id)))).ToArray();
     internal bool FeibaiRootMatches(ProgramSkillFrame f)
@@ -360,17 +356,17 @@ internal sealed partial class CharacterCaiYongLeRuntime
         if (!FeibaiRootMatches(f))
             return false;
         if (f.LeCaiYongFeibai is { Stage: FeibaiStage.Drawing } && f.NativeDraw is not null)
-            return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
+            return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
             return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
-        return child is CardsMovedTriggerWindowFrame moved && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => FeibaiOperationMovement(f, m));
+        return child is CardsMovedTriggerWindowFrame moved && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => FeibaiOperationMovement(f, m));
     }
 
-    internal bool FeibaiObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame f && (this.FeibaiFirstChild(f, _resolutionStackOperations2._resolutionStack()[child]) || f.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(f, _resolutionStackOperations2._resolutionStack()[child])) || global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
+    internal bool FeibaiObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame f && (this.FeibaiFirstChild(f, _resolutionStackOperations2._resolutionStack()[child]) || f.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(f, _resolutionStackOperations2._resolutionStack()[child])) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? FeibaiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.FeibaiFirstChild(f, child), (index) => this.FeibaiObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 780)]
     internal bool IsFeibaiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && FeibaiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
@@ -387,5 +383,5 @@ internal sealed partial class CharacterCaiYongLeRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 29071)]
     internal bool AdvanceFeibaiChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FeibaiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 
-    SkillProgramStepOutcome global::CardGame.Core.ILeCaiYongFeibaiHost.Resolve(ProgramSkillFrame f) => BeginLeCaiYongFeibai(f);
+    SkillProgramStepOutcome ILeCaiYongFeibaiHost.Resolve(ProgramSkillFrame f) => BeginLeCaiYongFeibai(f);
 }

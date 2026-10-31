@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
 {
-    internal IEnumerable<(CardConversionSource Source, SkillProgramCardPolicy Policy)> RequestedDeckBasicSources(CharacterState actor, CardKind required) => actor.IsAlive && actor.Seat != _coreActualTurnProgressCurrentSeatStartedAccess._currentSeat && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? _coreProgramCardPoliciesOperations.CardPolicies(actor, SkillProgramCardPolicyKind.PrivateTopBasicRequest, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(required) ? CardKind.Slash : required).Select(p => (new CardConversionSource(p.Source.SkillId, p.Policy.Id, actor.Seat, p.Source.SkillInstanceId), p.Policy)) : [];
-    internal bool HasRequestedDeckBasicSource(CharacterState actor, CardKind required) => RequestedDeckBasicSources(actor, required).Any(p => p.Policy.CardKinds.Contains(required) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(required) && p.Policy.CardKinds.Contains(CardKind.Slash));
+    internal IEnumerable<(CardConversionSource Source, SkillProgramCardPolicy Policy)> RequestedDeckBasicSources(CharacterState actor, CardKind required) => actor.IsAlive && actor.Seat != _coreActualTurnProgressCurrentSeatStartedAccess._currentSeat && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? _coreProgramCardPoliciesOperations.CardPolicies(actor, SkillProgramCardPolicyKind.PrivateTopBasicRequest, CoreNativeCardClassificationsRuntime.IsSlashCard(required) ? CardKind.Slash : required).Select(p => (new CardConversionSource(p.Source.SkillId, p.Policy.Id, actor.Seat, p.Source.SkillInstanceId), p.Policy)) : [];
+    internal bool HasRequestedDeckBasicSource(CharacterState actor, CardKind required) => RequestedDeckBasicSources(actor, required).Any(p => p.Policy.CardKinds.Contains(required) || CoreNativeCardClassificationsRuntime.IsSlashCard(required) && p.Policy.CardKinds.Contains(CardKind.Slash));
     internal (RequestedDeckBasicIntent Intent, long OwnerId, long RequestId, int Cursor)? RequestedDeckBasicContext(PendingDecision p, ResolutionFrame? suppliedTop = null)
     {
         var top = suppliedTop ?? _resolutionStackOperations._resolutionStack.LastOrDefault();
@@ -88,7 +85,7 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
         var owner = _resolutionStackOperations._resolutionStack.Single(f => f.Id == context.OwnerId);
         if (owner.RequestedDeckBasicMaterial is { } seen && seen.OriginalPromptId == p.PromptId && seen.RequestFrameId == context.RequestId && seen.ActorSeat == actor.Seat && seen.Cursor == context.Cursor)
             return p;
-        var sources = RequestedDeckBasicSources(actor, required).Where(s => s.Policy.CardKinds.Contains(required) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(required) && s.Policy.CardKinds.Contains(CardKind.Slash)).ToArray();
+        var sources = RequestedDeckBasicSources(actor, required).Where(s => s.Policy.CardKinds.Contains(required) || CoreNativeCardClassificationsRuntime.IsSlashCard(required) && s.Policy.CardKinds.Contains(CardKind.Slash)).ToArray();
         if (sources.Length == 0)
             return p;
         // Older AI producers use PromptId zero. Only this opt-in real need gets
@@ -106,7 +103,7 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
             {
                 ["deck-basic-source"] = "activate"
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
             choices.Add(new(new($"deck-basic.activate.{(source.SkillId)}.{(source.BindingId)}.{(source.SkillInstanceId)}"), $"发动【{(skill.Name)}】，观看牌堆顶可用基本牌", [], [], parameters));
         }
 
@@ -145,7 +142,7 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
 
         var view = _resolutionStackOperations._resolutionStack.LastOrDefault() as RequestedDeckBasicFrame ?? throw new InvalidOperationException("A private top view lost its typed request owner.");
         _coreRequestedDeckBasicOwnershipOperations.AssertRequestedDeckBasicFrame(view);
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], RequestedDeckBasicChoices(view).Where(x => x.Id == c.Id).ToArray()))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], RequestedDeckBasicChoices(view).Where(x => x.Id == c.Id).ToArray()))
             throw new InvalidOperationException("The private top choice changed.");
         var r = view.Receipt;
         if (c.Parameters["deck-basic-source"] == "decline")
@@ -153,7 +150,7 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
             _coreRuntimeOperations.PopResolutionFrame(view.Id, ResolutionFrameKind.RequestedDeckBasic);
             var owner = _resolutionStackOperations._resolutionStack.Single(f => f.Id == r.OwnerFrameId);
             _coreRuntimeOperations.ReplaceRuntimeFrame(owner.Id, owner with { RequestedDeckBasicMaterial = r });
-            _corePendingDecisionPolicyPipelineOperations._pendingDecision = global::CardGame.Core.EngineOwners.CoreGameEngineRequestedDeckBasicOwnershipRuntime.RequestedDeckBasicNativeDecision(view.OriginalDecision);
+            _corePendingDecisionPolicyPipelineOperations._pendingDecision = CoreGameEngineRequestedDeckBasicOwnershipRuntime.RequestedDeckBasicNativeDecision(view.OriginalDecision);
             _coreMatchOutcomeStatusWinnerAccess._status = r.Intent == RequestedDeckBasicIntent.Dying ? EngineStatus.AwaitingHumanDying : _coreMatchParticipantsPlayersAccess._players[r.ActorSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
             return;
         }
@@ -164,20 +161,20 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
         _coreRuntimeOperations.PopResolutionFrame(view.Id, ResolutionFrameKind.RequestedDeckBasic);
         var original = _resolutionStackOperations._resolutionStack.Single(f => f.Id == r.OwnerFrameId);
         _coreRuntimeOperations.ReplaceRuntimeFrame(original.Id, original with { RequestedDeckBasicMaterial = r with { SelectedCardId = card.Id, SelectedKind = card.Kind, Claiming = true } });
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = global::CardGame.Core.EngineOwners.CoreGameEngineRequestedDeckBasicOwnershipRuntime.RequestedDeckBasicNativeDecision(view.OriginalDecision);
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = CoreGameEngineRequestedDeckBasicOwnershipRuntime.RequestedDeckBasicNativeDecision(view.OriginalDecision);
         DispatchRequestedDeckBasicMaterial(r.Intent, card, c.Targets);
     }
 
     internal void BeginRequestedDeckBasicView(PromptChoice choice)
     {
         var original = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("A deck-basic offer requires a current real need.");
-        var source = global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
+        var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
         var context = RequestedDeckBasicContext(original) ?? throw new InvalidOperationException("The basic need no longer has its original producer.");
         var actor = _coreMatchParticipantsPlayersAccess._players[original.PlayerSeat];
         var policy = RequestedDeckBasicSources(actor, RequestedDeckBasicKind(original, context.Intent)).SingleOrDefault(s => s.Source == source).Policy;
-        if (policy is null || !original.Choices.Any(c => c.Id == choice.Id && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (policy is null || !original.Choices.Any(c => c.Id == choice.Id && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("The optional top view source lost current qualification.");
-        var count = global::CardGame.Core.EngineOwners.CharacterZhugeKeMobileRuntime.IsMobileZhugeKeAocai(source.SkillId) ? policy.Value : _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count == 0 ? policy.Value * 2 : policy.Value;
+        var count = CharacterZhugeKeMobileRuntime.IsMobileZhugeKeAocai(source.SkillId) ? policy.Value : _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count == 0 ? policy.Value * 2 : policy.Value;
         // This is the same bounded refresh used by actual draws. Never fill a short nonempty pile by moving looked-at cards.
         _corePhysicalDrawFacadesOperations.EnsureDrawPile();
         var ids = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().Take(count).Select(c => c.Id).ToArray();
@@ -219,7 +216,7 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
             },
             RequestedDeckBasicIntent.ProgramNearestSlash or RequestedDeckBasicIntent.NearestLegalSlash => view.OriginalDecision.ValidTargetSeats.ToArray(),
             _ => Array.Empty<int>()};
-        return targets.Where(t => _coreMatchParticipantsPlayersAccess._players[t].IsAlive && (r.Intent == RequestedDeckBasicIntent.Qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], card.Kind, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)), false, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), _coreFinalTargetSlashOperations.SpecificSlashRank(actor, card, card.Kind)) : _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], card, null, card.Kind, physicalCardIds: [card.Id], ignoreDistance: r.Intent == RequestedDeckBasicIntent.AssistedSlash && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.OwnerFrameId)is ProgramSkillFrame request && _characterLvKuangLvXiangOlOperations.QigongAdapterActor(request, actor.Seat, t, r.Cursor, r.OwnerFrameId, r.RequestFrameId)))).ToArray();
+        return targets.Where(t => _coreMatchParticipantsPlayersAccess._players[t].IsAlive && (r.Intent == RequestedDeckBasicIntent.Qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], card.Kind, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)), false, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), _coreFinalTargetSlashOperations.SpecificSlashRank(actor, card, card.Kind)) : _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], card, null, card.Kind, physicalCardIds: [card.Id], ignoreDistance: r.Intent == RequestedDeckBasicIntent.AssistedSlash && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.OwnerFrameId)is ProgramSkillFrame request && _characterLvKuangLvXiangOlOperations.QigongAdapterActor(request, actor.Seat, t, r.Cursor, r.OwnerFrameId, r.RequestFrameId)))).ToArray();
     }
 
     internal bool RequestedDeckBasicCardMatches(RequestedDeckBasicFrame view, Card card)
@@ -239,7 +236,7 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
         }
 
         var required = RequestedDeckBasicKind(view.OriginalDecision, r.Intent);
-        if (required == CardKind.Slash ? !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) : card.Kind != required)
+        if (required == CardKind.Slash ? !CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) : card.Kind != required)
             return false;
         if (_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, card.Kind, _coreRequestedDeckBasicOwnershipOperations.RequestedDeckBasicActionType(r.Intent)))
             return false;

@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangCanOlRuntime
 {
-    internal static CardConversionSource WangCanSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_can_ol_WangCanPrograms.WangCanSource(f);
-    internal static CardLocation WangCanLease(int owner) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_can_ol_WangCanPrograms.WangCanLease(owner);
-    internal static string WangCanReason(WangCanStage stage) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_can_ol_WangCanPrograms.WangCanReason(stage);
+    internal static CardConversionSource WangCanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_wang_can_ol_WangCanPrograms.WangCanSource(f);
+    internal static CardLocation WangCanLease(int owner) => RuntimeSkills.RuntimeRules_wang_can_ol_WangCanPrograms.WangCanLease(owner);
+    internal static string WangCanReason(WangCanStage stage) => RuntimeSkills.RuntimeRules_wang_can_ol_WangCanPrograms.WangCanReason(stage);
     internal SkillProgramStepOutcome ExecuteWangCan(SkillProgramEffectOp op, ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -38,7 +34,7 @@ internal sealed partial class CharacterWangCanOlRuntime
             var witnesses = r.Sanwen.Witnesses.Where(i => names.Contains(i.Name) && _cardZonesOperations._cardZones.GetLocation(i.CardId) == CardLocation.Hand(f.OwnerSeat)).Select(i => i.CardId).ToArray();
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangCan = r with { Entities = ids } });
             _coreProgramLifecycleOperations.SetProgramCardSet(f.Id, "sanwen-witness", witnesses, SkillProgramCardSetVisibility.Public);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "sanwen-witness", Array.AsReadOnly(witnesses.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray())));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "sanwen-witness", Array.AsReadOnly(witnesses.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray())));
             if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "sanwen-witness-hand"))
                 return SkillProgramStepOutcome.AwaitChild;
             ContinueSanwenAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
@@ -139,7 +135,7 @@ internal sealed partial class CharacterWangCanOlRuntime
         RequireIssuedWangCan(f);
         var r = f.WangCan!;
         var seat = r.Stage == WangCanStage.QiaiChoose ? r.Seats[r.Cursor] : f.OwnerSeat;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !WangCanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != seat || !WangCanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
             throw new InvalidOperationException("Wang Can choice changed the private actual payer, lease entity or legal native use.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == WangCanStage.QiaiChoose)
@@ -153,7 +149,7 @@ internal sealed partial class CharacterWangCanOlRuntime
 
         if (r.Stage == WangCanStage.DenglouView)
         {
-            var nonbasic = r.Remaining.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == r.Lease && global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind) != SkillProgramCardCategory.Basic).ToArray();
+            var nonbasic = r.Remaining.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == r.Lease && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind) != SkillProgramCardCategory.Basic).ToArray();
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangCan = r with { Remaining = r.Remaining.Except(nonbasic).ToArray() } });
             PayWangCanMove(f, nonbasic, CardLocation.Hand(f.OwnerSeat), WangCanStage.DenglouGain);
             return;
@@ -219,5 +215,5 @@ internal sealed partial class CharacterWangCanOlRuntime
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IWangCanProgramHost.ExecuteWangCan(SkillProgramEffectOp op, ProgramSkillFrame f) => ExecuteWangCan(op, f);
+    SkillProgramStepOutcome IWangCanProgramHost.ExecuteWangCan(SkillProgramEffectOp op, ProgramSkillFrame f) => ExecuteWangCan(op, f);
 }

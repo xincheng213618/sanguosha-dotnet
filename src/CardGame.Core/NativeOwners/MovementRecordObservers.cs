@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MovementRecordObservers(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterJuShouMouEntries> getCharacterJuShouMouRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterBianFuRenOlEntries> getCharacterBianFuRenOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterDuFuRenOlEntries> getCharacterDuFuRenOlRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineOriginalHandEntitiesEntries> getCoreGameEngineOriginalHandEntitiesRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineSourceCursesEntries> getCoreGameEngineSourceCursesRuntime) : IMovementRecordObservers
+internal sealed class MovementRecordObservers(Func<RuntimeEntries.CharacterJuShouMouEntries> getCharacterJuShouMouRuntime, Func<RuntimeEntries.CharacterBianFuRenOlEntries> getCharacterBianFuRenOlRuntime, Func<RuntimeEntries.CharacterDuFuRenOlEntries> getCharacterDuFuRenOlRuntime, Func<RuntimeEntries.CoreGameEngineOriginalHandEntitiesEntries> getCoreGameEngineOriginalHandEntitiesRuntime, Func<RuntimeEntries.CoreGameEngineSourceCursesEntries> getCoreGameEngineSourceCursesRuntime) : IMovementRecordObservers
 {
     public void ObserveMouJsMovement(CardMovementRecord movement) => getCharacterJuShouMouRuntime().ObserveMouJsMovement(movement);
     public void CaptureBianFuRenForeignDiscardProducer(CardMovementRecord movement) => getCharacterBianFuRenOlRuntime().CaptureBianFuRenForeignDiscardProducer(movement);

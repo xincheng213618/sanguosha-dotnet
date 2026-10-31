@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBianOlRuntime
@@ -42,7 +38,7 @@ internal sealed partial class CharacterLiuBianOlRuntime
         var actionId = frame.WindowContext?.CardUse?.CardActionId ?? 0;
         var drawn = _corePhysicalDrawFacadesOperations.DrawCards(owner, drawCount, true, new($"skill-program.{(active.SkillId)}.target-draw"));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】，" + $"因成为 {(_coreMatchParticipantsPlayersAccess._players[sourceSeat].Name)} 使用牌的目标（体力值{((drawCount == 3 ? "大于" : drawCount == 2 ? "等于" : "小于"))}你），摸 {(drawn.Count)} 张牌。", owner.Seat, sourceSeat);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramShiYuanTargetDrawEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, sourceSeat, drawCount, actionId));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramShiYuanTargetDrawEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, sourceSeat, drawCount, actionId));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return SkillProgramStepOutcome.AwaitChild;

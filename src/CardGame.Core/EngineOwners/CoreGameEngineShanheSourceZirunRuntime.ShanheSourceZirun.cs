@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceZirunRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheSourceZirunHost.Begin(ProgramSkillFrame frame) => BeginShanheSourceZirun(frame);
+    SkillProgramStepOutcome IShanheSourceZirunHost.Begin(ProgramSkillFrame frame) => BeginShanheSourceZirun(frame);
     internal SkillProgramStepOutcome BeginShanheSourceZirun(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -51,7 +47,7 @@ internal sealed partial class CoreGameEngineShanheSourceZirunRuntime
             var requested = equipment == 0 ? 1 : 2;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheSourceZirun = r with { RequestedCount = requested } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceZirunRequestedEvent(f.Id, r.Index, seat, equipment, requested));
-            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, seat, requested, global::CardGame.Core.EngineOwners.CoreGameEngineShanheSourceZirunDefinitions.ShanheSourceZirunDraw);
+            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, seat, requested, CoreGameEngineShanheSourceZirunDefinitions.ShanheSourceZirunDraw);
             return true;
         }
 

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class QuHuangNativeOperations(global::CardGame.Core.NativeOwners.KernelAdvanceRulesAndPublishStateCall advanceRulesAndPublishState, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeCardUseEntries> getCoreNativeCardUseRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeNullificationEntries> getCoreNativeNullificationRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeTrickEffectsEntries> getCoreNativeTrickEffectsRuntime, global::CardGame.Core.EngineStates.CoreMatchParticipantsState matchParticipantsState) : IQuHuangNativeOperations
+internal sealed class QuHuangNativeOperations(KernelAdvanceRulesAndPublishStateCall advanceRulesAndPublishState, Func<RuntimeEntries.CoreNativeCardUseEntries> getCoreNativeCardUseRuntime, Func<RuntimeEntries.CoreNativeNullificationEntries> getCoreNativeNullificationRuntime, Func<RuntimeEntries.CoreNativeTrickEffectsEntries> getCoreNativeTrickEffectsRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState) : IQuHuangNativeOperations
 {
     public void PublishState() => advanceRulesAndPublishState();
     public long BeginCardUse(Card card, int actor, IReadOnlyList<int> targets, CardKind kind, CardConversionSource source, QuHuangNishouUseOrigin origin) => getCoreNativeCardUseRuntime().BeginCardUse(card, actor, targets, kind, conversionSource: source, quHuangNishou: origin);

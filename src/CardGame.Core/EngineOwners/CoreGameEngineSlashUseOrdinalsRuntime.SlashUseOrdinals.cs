@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSlashUseOrdinalsRuntime
 {
-    internal bool MatchesSlashUseOrdinalModifier(SkillProgramDamageModifier modifier, global::CardGame.Core.GameEngine.IDamageAttempt? attack, int actorSeat, CardKind effectiveKind)
+    internal bool MatchesSlashUseOrdinalModifier(SkillProgramDamageModifier modifier, GameEngine.IDamageAttempt? attack, int actorSeat, CardKind effectiveKind)
     {
         var elemental = modifier.Condition == SkillProgramDamageModifierCondition.OwnerActualTurnElementalSlashUseOrdinalWithinLimit;
         var wholeGame = modifier.Condition == SkillProgramDamageModifierCondition.OwnerGameSlashUseOrdinalMultipleOfThree;
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind) || elemental && effectiveKind == CardKind.Slash || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind) || elemental && effectiveKind == CardKind.Slash || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat))
             return false;
         var dependencies = _contentRegistryOperations._contentRegistry.ProgramDependencies;
         if (wholeGame ? !dependencies.HasGameSlashUseDamageModifiers : elemental ? !dependencies.HasActualTurnElementalSlashUseDamageModifiers : !dependencies.HasRoundSlashUseDamageModifiers)
@@ -21,7 +17,7 @@ internal sealed partial class CoreGameEngineSlashUseOrdinalsRuntime
         CurrentTurnCardUseKindsRecordedEvent? current = null;
         if (attack is not null)
         {
-            if (attack is not global::CardGame.Core.NativeOwners.CardAttackHandle || attack.IsSourceLess || attack.IsChainPropagation || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.CardUserSeat != actorSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == attack.ResolutionId)is not CardUseFrame use)
+            if (attack is not NativeOwners.CardAttackHandle || attack.IsSourceLess || attack.IsChainPropagation || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || attack.CardUserSeat != actorSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == attack.ResolutionId)is not CardUseFrame use)
                 return false;
             var matches = history.Select((fact, index) => (fact, index)).Where(item => item.fact is CurrentTurnCardUseKindsRecordedEvent fact && fact.OriginFrameId == use.Id && !fact.IsNullificationUse && fact.RoundActionType == CardActionType.Use && fact.ProgramInstructionIndex is null).ToArray();
             if (matches is not [var match] || match.fact is not CurrentTurnCardUseKindsRecordedEvent issued || issued.CardActionId != use.Action?.ActionId || issued.RoundProviderSeat != (use.Action?.ProviderSeat ?? issued.ActorSeat) || issued.CardCategoryMask != 1 << (int)SkillProgramCardCategory.Basic)
@@ -87,7 +83,7 @@ internal sealed partial class CoreGameEngineSlashUseOrdinalsRuntime
 
             if (fact == current && actor != expectedActorSeat)
                 return 0;
-            if (actor == expectedActorSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && (!elemental || kind != CardKind.Slash))
+            if (actor == expectedActorSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && (!elemental || kind != CardKind.Slash))
                 count = checked(count + 1);
         }
 
@@ -103,7 +99,7 @@ internal sealed partial class CoreGameEngineSlashUseOrdinalsRuntime
         if (changes.Length == 0)
             return original;
         var declarationIndexes = history.Select((payload, index) => (payload, index)).Where(item => Equals(item.payload, fact)).Select(item => item.index).ToArray();
-        if (changes is not [var entry] || entry.payload is not ProgramCurrentSlashFireChangedEvent change || declarationIndexes is not [var declarationIndex] || entry.index <= declarationIndex || fact.RoundActionType != CardActionType.Use || fact.CardActionId != change.ActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(original) || change.OriginalKind != original || change.FinalKind != CardKind.FireSlash || history.OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == fact.OriginFrameId && e.SourceSeat == fact.ActorSeat && e.CardKind == original) != 1)
+        if (changes is not [var entry] || entry.payload is not ProgramCurrentSlashFireChangedEvent change || declarationIndexes is not [var declarationIndex] || entry.index <= declarationIndex || fact.RoundActionType != CardActionType.Use || fact.CardActionId != change.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(original) || change.OriginalKind != original || change.FinalKind != CardKind.FireSlash || history.OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == fact.OriginFrameId && e.SourceSeat == fact.ActorSeat && e.CardKind == original) != 1)
             throw new InvalidOperationException("An effective Slash kind requires one exact native committed conversion.");
         var starts = history.Select((payload, index) => (payload, index)).Where(item => item.payload is ProgramBindingStartedEvent started && started.FrameId == change.ProgramFrameId).ToArray();
         if (starts is not [var start] || start.index >= entry.index || start.payload is not ProgramBindingStartedEvent binding || binding.SkillId != change.Source.SkillId || binding.BindingId != change.Source.BindingId || binding.SkillInstanceId != change.Source.SkillInstanceId || binding.OwnerSeat != change.Source.OwnerSeat || binding.Window != SkillProgramTriggerWindow.CardUseCommitted || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(binding.SkillId)?.Program is not { } program || ProgramInstructionResolver.Default.FindTrigger(program, binding.BindingId)is not { } trigger || trigger.Window != binding.Window || trigger.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor || trigger.CardKinds.Count != 0 && !ProgramCardKindMatch.Contains(trigger.CardKinds, original) || !ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.OfferCurrentSlashFireAndExtraTarget))

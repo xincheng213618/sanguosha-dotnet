@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.EngineStates.Contracts;
-internal interface ICoreMatchSetupGameStartingProgramsResolvedSetupCompleteAccess : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreMatchSetupGameStartingProgramsResolvedSetupCompleteAccess : IProgramRuntimeOperations
 {
     ref bool _setupComplete { get; }
 

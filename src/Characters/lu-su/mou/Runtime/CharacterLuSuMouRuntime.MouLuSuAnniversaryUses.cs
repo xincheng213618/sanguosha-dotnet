@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuSuMouRuntime
@@ -30,7 +26,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         SelectableCardTargets = a.SelectableCardTargets is null ? null : Array.AsReadOnly(a.SelectableCardTargets.ToArray()),
         SelectableTargetSequences = a.SelectableTargetSequences is null ? null : Array.AsReadOnly(a.SelectableTargetSequences.Select(x => (IReadOnlyList<int>)Array.AsReadOnly(x.ToArray())).ToArray())
     };
-    internal IReadOnlyList<LegalAction> MouLuSuUseActions(ProgramSkillFrame f) => f.MouLuSuAnniversary is { } r && MouLuSuUseQuery(r.Other)?.Id == f.Id && _coreMatchOutcomeWinnerAccess._winner == Winner.None ? Array.AsReadOnly(_coreNativeLegalActionsOperations.BuildLegalActions(_coreMatchParticipantsPlayersAccess._players[r.Other], includeProgramActions: false).Where(a => a.Kind == LegalActionKind.Slash || a.Kind == LegalActionKind.UseEquipmentEffect && a.EquipmentKind == CardKind.ZhangbaSerpentSpear || a.PlayedCardKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && a.Kind != LegalActionKind.UseProgramSkill).Select(FreezeMouLuSuAction).ToArray()) : [];
+    internal IReadOnlyList<LegalAction> MouLuSuUseActions(ProgramSkillFrame f) => f.MouLuSuAnniversary is { } r && MouLuSuUseQuery(r.Other)?.Id == f.Id && _coreMatchOutcomeWinnerAccess._winner == Winner.None ? Array.AsReadOnly(_coreNativeLegalActionsOperations.BuildLegalActions(_coreMatchParticipantsPlayersAccess._players[r.Other], includeProgramActions: false).Where(a => a.Kind == LegalActionKind.Slash || a.Kind == LegalActionKind.UseEquipmentEffect && a.EquipmentKind == CardKind.ZhangbaSerpentSpear || a.PlayedCardKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && a.Kind != LegalActionKind.UseProgramSkill).Select(FreezeMouLuSuAction).ToArray()) : [];
     [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaBeforeLimit, 36100)]
     internal bool MouLuSuRequestedQuota(ProgramSlashQuotaQuery q) => IsMouLuSuUseQuery(q.Actor);
     internal void IssueMouLuSuUse(ProgramSkillFrame f)
@@ -69,7 +65,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         if (i < 1 || _resolutionStackOperations._resolutionStack[i - 1] is not ProgramSkillFrame { MouLuSuAnniversary: { Stage: MouLuSuAnniversaryStage.Issuing, UseId: 0, ActionId: 0, SelectedAction: { } selected } r } f)
             return;
         var expected = selected.Kind == LegalActionKind.UseEquipmentEffect ? r.Cards : selected.CardId is> 0 ? [selected.CardId.Value] : Array.Empty<int>();
-        if (!MouLuSuAnniversary.Valid(f) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || a.ActorSeat != r.Other || a.ProviderSeat != r.Other || a.RequesterSeat is not null || use.SourceSeat != r.Other || !a.PhysicalCards.Select(c => c.CardId).Order().SequenceEqual(expected.Order()) || selected.PlayedCardKind is { } kind && a.EffectiveKind != kind || selected.ConversionSource is { } source && !a.ConversionChain.Contains(source))
+        if (!MouLuSuAnniversary.Valid(f) || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || a.ActorSeat != r.Other || a.ProviderSeat != r.Other || a.RequesterSeat is not null || use.SourceSeat != r.Other || !a.PhysicalCards.Select(c => c.CardId).Order().SequenceEqual(expected.Order()) || selected.PlayedCardKind is { } kind && a.EffectiveKind != kind || selected.ConversionSource is { } source && !a.ConversionChain.Contains(source))
             throw new InvalidOperationException("Mengmou changed its selected actual Slash source or physical materials.");
         var origin = new MouLuSuAnniversaryUseOrigin(f.Id, r.Source, r.GameplayHash, r.Index, r.Other, use.Id, a.ActionId);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MouLuSuAnniversary = r with { Stage = MouLuSuAnniversaryStage.NativeUse, UseId = use.Id, ActionId = a.ActionId } });
@@ -77,7 +73,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuSuAnniversaryUseIssuedEvent(origin));
     }
 
-    internal bool MouLuSuNativeMatches(CardUseFrame use) => use.MouLuSuAnniversary is { } o && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { MouLuSuAnniversary: { Stage: MouLuSuAnniversaryStage.NativeUse } r } f && MouLuSuAnniversary.Valid(f) && o.Source == r.Source && o.GameplayHash == r.GameplayHash && o.Index == r.Index && o.Actor == r.Other && o.UseId == use.Id && o.UseId == r.UseId && o.ActionId == r.ActionId && use.Action?.ActionId == o.ActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuSuAnniversaryUseIssuedEvent>().Count(e => e.Origin == o) == 1;
+    internal bool MouLuSuNativeMatches(CardUseFrame use) => use.MouLuSuAnniversary is { } o && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { MouLuSuAnniversary: { Stage: MouLuSuAnniversaryStage.NativeUse } r } f && MouLuSuAnniversary.Valid(f) && o.Source == r.Source && o.GameplayHash == r.GameplayHash && o.Index == r.Index && o.Actor == r.Other && o.UseId == use.Id && o.UseId == r.UseId && o.ActionId == r.ActionId && use.Action?.ActionId == o.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuSuAnniversaryUseIssuedEvent>().Count(e => e.Origin == o) == 1;
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 36100)]
     internal bool MouLuSuNoSlashDebit(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouLuSuAnniversary: { } o } use && actor == o.Actor && MouLuSuNativeMatches(use);
     [NativeUseValidation(36100)]
@@ -120,7 +116,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         return true;
     }
 
-    internal void AppendMouLuSuIssuedDamageCandidates(global::CardGame.Core.GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> result)
+    internal void AppendMouLuSuIssuedDamageCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> result)
     {
         if (window != SkillProgramTriggerWindow.AfterDamageApplied || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouLuSuAnniversary: { } origin } use || !MouLuSuNativeMatches(use) || attack.SourceSeat != origin.Actor || attack.IsSourceLess)
             return;

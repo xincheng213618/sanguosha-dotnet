@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoChunOlRuntime
@@ -66,7 +62,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
 
     internal bool CaoChunNativeRidesOn(ProgramSkillFrame parent, CardUseFrame use)
     {
-        if (parent.CaoChun is not { Stage: CaoChunStage.NativeSlash, Slash: { } n } r || use.CaoChunSlash != n || n.ParentFrameId != parent.Id || n.Source != r.Source || n.GameplayHash != parent.GameplayHash || n.NativeUseId != use.Id || n.ActionId != use.Action?.ActionId || n.Action is not { } original || use.Action is not { } a || original.ActionId != a.ActionId || original.ParentActionId != a.ParentActionId || original.ProviderSeat != a.ProviderSeat || !a.PhysicalCards.SequenceEqual(n.Materials) || !a.ConversionChain.SequenceEqual(original.ConversionChain) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, parent.OwnerSeat, n.ProviderSeat ?? parent.OwnerSeat) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || n.Ending && n.Materials.Count != 0)
+        if (parent.CaoChun is not { Stage: CaoChunStage.NativeSlash, Slash: { } n } r || use.CaoChunSlash != n || n.ParentFrameId != parent.Id || n.Source != r.Source || n.GameplayHash != parent.GameplayHash || n.NativeUseId != use.Id || n.ActionId != use.Action?.ActionId || n.Action is not { } original || use.Action is not { } a || original.ActionId != a.ActionId || original.ParentActionId != a.ParentActionId || original.ProviderSeat != a.ProviderSeat || !a.PhysicalCards.SequenceEqual(n.Materials) || !a.ConversionChain.SequenceEqual(original.ConversionChain) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, parent.OwnerSeat, n.ProviderSeat ?? parent.OwnerSeat) || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || n.Ending && n.Materials.Count != 0)
             return false;
         if (n.DrawFundedPayment is { } funded && (use.DrawFundedDistinctBasicUse?.Payment != funded || !_coreDrawFundedDistinctBasicPaymentOperations.ValidDrawFundedDistinctBasicPayment(funded)))
             return false;
@@ -96,7 +92,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
 
     // Native AttackCompletionReceipt is captured before its actual CardUseFrame is removed.
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 140)]
-    internal bool CompleteCaoChunSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt receipt)
+    internal bool CompleteCaoChunSlash(GameEngine.AttackCompletionReceipt receipt)
     {
         if (receipt.ProgramFrameId is not { } parentId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoChun: { Stage: CaoChunStage.NativeSlash, Slash: { } n } r } parent || parent.Id != parentId)
             return false;

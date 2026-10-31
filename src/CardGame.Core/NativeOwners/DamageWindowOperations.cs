@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class DamageWindowOperations(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeDamageFramesEntries> getCoreNativeDamageFramesRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CoreNativeDamageHandlesEntries> getCoreNativeDamageHandlesRuntime, global::CardGame.Core.NativeOwners.DamageTriggerCapturedAttackFactory createDamageTriggerCapturedAttack) : IDamageWindowOperations
+internal sealed class DamageWindowOperations(Func<RuntimeEntries.CoreNativeDamageFramesEntries> getCoreNativeDamageFramesRuntime, Func<RuntimeEntries.CoreNativeDamageHandlesEntries> getCoreNativeDamageHandlesRuntime, DamageTriggerCapturedAttackFactory createDamageTriggerCapturedAttack) : IDamageWindowOperations
 {
     public DamageTriggerWindowFrame SetWindowCursor(long windowId, int candidateIndex) => getCoreNativeDamageFramesRuntime().SetDamageTriggerWindowCursor(windowId, candidateIndex);
     public void SetWindowStep(long windowId, ResolutionFrameStep step) => getCoreNativeDamageFramesRuntime().SetDamageTriggerWindowStep(windowId, step);

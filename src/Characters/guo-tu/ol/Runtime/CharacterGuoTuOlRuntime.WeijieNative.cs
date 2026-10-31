@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoTuOlRuntime
@@ -29,13 +25,13 @@ internal sealed partial class CharacterGuoTuOlRuntime
         var a = current;
         if (use.CurrentSlashFirePolicy is { } fire)
         {
-            if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind))
+            if (!CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind))
                 return false;
             _coreCurrentSlashFireOffersOperations.AssertCurrentSlashFirePolicy(use);
             a = fire.OriginalAction;
         }
 
-        return (use.CardKind == p.OutputKind || use.CurrentSlashFirePolicy is not null && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind)) && a.EffectiveKind == p.OutputKind && a.ConversionChain is [var source] && source == p.Source && a.ProviderSeat == p.Need.ProviderSeat && a.RequesterSeat == p.Need.RequesterSeat && a.ResponderSeat is null && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed is null && WeijieIssuedActorMatches(use, p) && _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieAttemptResolvedEvent>().Count(e => e.FrameId == p.AttemptId && e.Matched && e.NativeLegal) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieUseIssuedEvent>().Where(e => e.AttemptId == p.AttemptId).ToArray()is [var issued] && issued.UseId == use.Id && issued.ActionId == a.ActionId && issued.ActorSeat == p.Need.ActorSeat && issued.ProviderSeat == p.Need.ProviderSeat && issued.RequesterSeat == p.Need.RequesterSeat && issued.OutputKind == p.OutputKind;
+        return (use.CardKind == p.OutputKind || use.CurrentSlashFirePolicy is not null && CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind)) && a.EffectiveKind == p.OutputKind && a.ConversionChain is [var source] && source == p.Source && a.ProviderSeat == p.Need.ProviderSeat && a.RequesterSeat == p.Need.RequesterSeat && a.ResponderSeat is null && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed is null && WeijieIssuedActorMatches(use, p) && _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieAttemptResolvedEvent>().Count(e => e.FrameId == p.AttemptId && e.Matched && e.NativeLegal) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieUseIssuedEvent>().Where(e => e.AttemptId == p.AttemptId).ToArray()is [var issued] && issued.UseId == use.Id && issued.ActionId == a.ActionId && issued.ActorSeat == p.Need.ActorSeat && issued.ProviderSeat == p.Need.ProviderSeat && issued.RequesterSeat == p.Need.RequesterSeat && issued.OutputKind == p.OutputKind;
     }
 
     internal bool WeijieIssuedActorMatches(CardUseFrame use, WeijiePaidOrigin p) => _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, p.Need.ActorSeat, p.Need.ProviderSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == p.Need.ActorSeat && use.Action?.ActorSeat == p.Need.ActorSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Any(e => e.CardUseFrameId == use.Id);
@@ -100,13 +96,13 @@ internal sealed partial class CharacterGuoTuOlRuntime
         if (n.Intent == WeijieIntent.GenericBasic)
         {
             var k = parent.KeBiNengPingduan!;
-            var action = new LegalAction(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind) ? LegalActionKind.Slash : p.OutputKind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol, 0, p.OutputKind == CardKind.Alcohol ? null : p.TargetSeat, "诿解：真实零实体基本牌", p.OutputKind, TargetSeats: p.OutputKind == CardKind.Alcohol ? [] : [p.TargetSeat])
+            var action = new LegalAction(CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind) ? LegalActionKind.Slash : p.OutputKind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol, 0, p.OutputKind == CardKind.Alcohol ? null : p.TargetSeat, "诿解：真实零实体基本牌", p.OutputKind, TargetSeats: p.OutputKind == CardKind.Alcohol ? [] : [p.TargetSeat])
             {
                 ConversionSource = p.Source
             };
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WeijieKeActionAcceptedEvent(parent.Id, parent.InstructionIndex, k.Source, parent.GameplayHash, p.AttemptId, p.OutputKind, p.TargetSeat));
             _coreRuntimeOperations.ReplaceRuntimeTop(parent = parent with { WeijieKeAcceptedOrigin = p, KeBiNengPingduan = k with { BasicActions = k.BasicActions.Append(action).ToArray(), SelectedBasicAction = action, Stage = KeBiNengPingduanStage.BasicIssuing } });
-            if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind))
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind))
                 BeginWeijieSlash(p, null, false, parent.Id);
             else if (p.OutputKind == CardKind.Peach)
                 DispatchWeijieRecovery(p, false);
@@ -171,7 +167,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(parent with { NearestLegalSlashRequest = null });
     }
 
-    internal void BeginWeijieSlash(WeijiePaidOrigin p, global::CardGame.Core.NativeOwners.BorrowedSwordHandle? borrowed, bool counts, long? parent, global::CardGame.Core.NativeOwners.FactionCardRequestHandle? faction = null)
+    internal void BeginWeijieSlash(WeijiePaidOrigin p, NativeOwners.BorrowedSwordHandle? borrowed, bool counts, long? parent, NativeOwners.FactionCardRequestHandle? faction = null)
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[p.Need.ActorSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[p.TargetSeat];
@@ -236,10 +232,10 @@ internal sealed partial class CharacterGuoTuOlRuntime
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 50)]
-    internal bool FinishWeijieAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishWeijieAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
-        if (attack.Card is not null || !IsWeijieUse(attack.ResolutionId) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
+        if (attack.Card is not null || !IsWeijieUse(attack.ResolutionId) || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
             return false;
         var u = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
         _coreNativeCardUseFramesOperations.SetCardUseStep(u.Id, ResolutionFrameStep.Completed);

@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFinalTargetGiftsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IFinalTargetGiftHost.GiveOwnedCardToOtherFinalTargetAndDraw(ProgramSkillFrame frame) => BeginFinalTargetGift(frame);
+    SkillProgramStepOutcome IFinalTargetGiftHost.GiveOwnedCardToOtherFinalTargetAndDraw(ProgramSkillFrame frame) => BeginFinalTargetGift(frame);
     internal CardUseFrame FinalTargetGiftUse(ProgramSkillFrame frame)
     {
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } use } || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == use.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } parent || action.ActionId != use.CardActionId || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Trick || parent.Action!.EffectiveDesignatedTargetSeats.Distinct().Count() <= 1 || !parent.Action.EffectiveDesignatedTargetSeats.Contains(frame.OwnerSeat))
+        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } use } || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == use.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } parent || action.ActionId != use.CardActionId || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Trick || parent.Action!.EffectiveDesignatedTargetSeats.Distinct().Count() <= 1 || !parent.Action.EffectiveDesignatedTargetSeats.Contains(frame.OwnerSeat))
             throw new InvalidOperationException("Final-target gift lost its actual multi-target Trick action.");
         return parent;
     }
@@ -20,7 +16,7 @@ internal sealed partial class CoreGameEngineFinalTargetGiftsRuntime
     {
         if (!features.HasOperation(SkillProgramEffectOp.GiveOwnedCardToOtherFinalTargetAndDraw))
             return true;
-        if (context.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || context.CardUse is not { } use || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == use.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } parent || action.ActionId != use.CardActionId || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Trick)
+        if (context.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || context.CardUse is not { } use || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == use.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } parent || action.ActionId != use.CardActionId || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Trick)
             return false;
         var targets = FinalTargetGiftSeats(parent);
         return targets.Count > 1 && targets.Contains(candidate.OwnerSeat) && targets.Any(s => s != candidate.OwnerSeat) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]).Count > 0;

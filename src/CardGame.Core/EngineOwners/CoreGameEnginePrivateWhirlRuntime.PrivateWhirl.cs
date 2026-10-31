@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CoreGameEnginePrivateWhirlRuntime
 {
     internal bool HasPrivateWhirlCapability => _coreGameEnginePrivateWhirlHasIssuedPrivateWhirlAccess._hasIssuedPrivateWhirl;
 
-    internal static CardConversionSource WhirlSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PrivateWhirl.WhirlSource(f);
-    internal static CardLocation WhirlLocation(CardConversionSource source) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PrivateWhirl.WhirlLocation(source);
+    internal static CardConversionSource WhirlSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_Core_PrivateWhirl.WhirlSource(f);
+    internal static CardLocation WhirlLocation(CardConversionSource source) => RuntimeSkills.RuntimeRules_Core_PrivateWhirl.WhirlLocation(source);
     internal PrivateWhirlDeposit[] LiveWhirl(int owner, string? skill = null, string? instance = null)
     {
         if (!HasPrivateWhirlCapability || !_cardZonesOperations._cardZones.HasPrivatePersistentCards(owner))
@@ -28,7 +25,7 @@ internal sealed partial class CoreGameEnginePrivateWhirlRuntime
         if (trigger.Effects is not [var effect])
             return true;
         var deposits = LiveWhirl(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId);
-        if (global::CardGame.Core.EngineOwners.CoreGameEnginePersistentPrivateWhirlRuntime.IsPrivateWhirlDeposit(effect.Op))
+        if (CoreGameEnginePersistentPrivateWhirlRuntime.IsPrivateWhirlDeposit(effect.Op))
             return LiveWhirl(candidate.OwnerSeat).Length < _corePersistentPrivateWhirlOperations.PrivateWhirlMaximum(candidate.SkillId) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]).Count > 0;
         if (effect.Op == SkillProgramEffectOp.ClearPrivateWhirlAtNextPlayEnding)
             return deposits.Any(d => _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId > d.CreatedPlayInstance);
@@ -51,7 +48,7 @@ internal sealed partial class CoreGameEnginePrivateWhirlRuntime
             WindowId = context.ParentFrameId,
             CreatedPlayInstance = _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId
         };
-        if (global::CardGame.Core.EngineOwners.CoreGameEnginePersistentPrivateWhirlRuntime.IsPrivateWhirlDeposit(effect.Op))
+        if (CoreGameEnginePersistentPrivateWhirlRuntime.IsPrivateWhirlDeposit(effect.Op))
             r = r with
             {
                 Stage = PrivateWhirlStage.SelectDeposit
@@ -127,7 +124,7 @@ internal sealed partial class CoreGameEnginePrivateWhirlRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Whirl lost its owning frame.");
         RequirePrivateWhirl(f);
         var r = f.PrivateWhirl!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WhirlChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WhirlChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Whirl selection changed while suspended.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!WhirlSourceCurrent(f))
@@ -270,7 +267,7 @@ internal sealed partial class CoreGameEnginePrivateWhirlRuntime
     {
         if (f.PrivateWhirl is not { } r || r.Source != WhirlSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.WindowId != f.WindowContext?.ParentFrameId || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Count > _corePersistentPrivateWhirlOperations.PrivateWhirlMaximum(f.SkillId) || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.DrawCount < 0 || r.DrawCount > _corePersistentPrivateWhirlOperations.PrivateWhirlMaximum(f.SkillId))
             throw new InvalidOperationException("Whirl lost its immutable owning source, instruction, selection or paid movement.");
-        if (r.OriginalAction is { } original && (original.Type != CardActionType.Use || original.ActorSeat != f.OwnerSeat || original.ActionId != f.WindowContext?.CardUse?.CardActionId || r.UseId != f.WindowContext?.CardUse?.ParentCardUseFrameId || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId!.Value)?.Action is not { } actual || !global::CardGame.Core.EngineOwners.CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(original, actual)))
+        if (r.OriginalAction is { } original && (original.Type != CardActionType.Use || original.ActorSeat != f.OwnerSeat || original.ActionId != f.WindowContext?.CardUse?.CardActionId || r.UseId != f.WindowContext?.CardUse?.ParentCardUseFrameId || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId!.Value)?.Action is not { } actual || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(original, actual)))
             throw new InvalidOperationException("Whirl lost its exact committed actual use.");
         if (r.Stage is PrivateWhirlStage.SelectDeposit or PrivateWhirlStage.SelectRemove)
             return;
@@ -310,5 +307,5 @@ internal sealed partial class CoreGameEnginePrivateWhirlRuntime
         return Array.AsReadOnly(deposits.GroupBy(d => (d.Source.SkillId, d.Source.SkillInstanceId)).Select(g => new PrivateWhirlPileSnapshot { SkillId = g.Key.SkillId, Count = g.Count(), Cards = owner == viewer || revealAll ? g.Select(d => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreCardAttackStateOperations.GetAttackCard(d.CardId))).ToArray() : null }).ToArray());
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IPrivateWhirlHost.BeginPrivateWhirl(ProgramSkillFrame f, SkillProgramEffect effect) => BeginPrivateWhirl(f, effect);
+    SkillProgramStepOutcome IPrivateWhirlHost.BeginPrivateWhirl(ProgramSkillFrame f, SkillProgramEffect effect) => BeginPrivateWhirl(f, effect);
 }

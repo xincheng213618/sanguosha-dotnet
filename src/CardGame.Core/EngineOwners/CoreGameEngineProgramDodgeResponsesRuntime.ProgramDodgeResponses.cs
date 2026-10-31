@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramDodgeResponsesRuntime
@@ -29,7 +25,7 @@ internal sealed partial class CoreGameEngineProgramDodgeResponsesRuntime
         var decision = _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.RespondDodge } pending ? pending : throw new InvalidOperationException("A configured Dodge requires its current response prompt.");
         var attack = _coreActiveNativeAttackQueriesOperations.ActiveCardAttack ?? throw new InvalidOperationException("Configured Dodge lost its attack.");
         var owner = _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat];
-        if ((owner.Seat != attack.TargetSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.CurrentCandidateSeat != owner.Seat) || !owner.IsAlive || !ProgramDodgeResponseChoices(owner).Any(item => item.Id == choice.Id && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([item], [choice])))
+        if ((owner.Seat != attack.TargetSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.CurrentCandidateSeat != owner.Seat) || !owner.IsAlive || !ProgramDodgeResponseChoices(owner).Any(item => item.Id == choice.Id && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([item], [choice])))
             throw new InvalidOperationException("Configured Dodge changed its living responder or published activation.");
         var program = _coreSkillProgramsOperations.GetEnabledSkillProgram(owner, choice.Parameters["skill"]);
         var activation = ProgramInstructionResolver.Default.Resolve(program, ProgramInstructionSourceKind.Activation, choice.Parameters["activation"]).Activation!;

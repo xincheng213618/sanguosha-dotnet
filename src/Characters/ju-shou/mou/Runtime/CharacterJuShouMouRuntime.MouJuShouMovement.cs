@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJuShouMouRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CharacterJuShouMouRuntime
         if (f.SkillId != MouJuShouRuntime.Muwang || f.TriggerId != "first-loss" || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardsMoved } w || w.OwnerSeat != f.OwnerSeat)
             return false;
         var at = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        return at > 0 && _resolutionStackOperations._resolutionStack[at - 1] is CardsMovedTriggerWindowFrame p && p.Id == w.ParentFrameId && p.Batch.Id == w.MovementBatch?.Id && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]) && IsIssuedMouJsMovementCandidate(p.Candidates[p.CandidateIndex], w);
+        return at > 0 && _resolutionStackOperations._resolutionStack[at - 1] is CardsMovedTriggerWindowFrame p && p.Id == w.ParentFrameId && p.Batch.Id == w.MovementBatch?.Id && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]) && IsIssuedMouJsMovementCandidate(p.Candidates[p.CandidateIndex], w);
     }
 
     internal void CaptureMouJsMovementBatch(CardMovementBatchContext batch)

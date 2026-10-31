@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFinalTargetPublicPilesRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IFinalTargetPublicPileHost.ExecuteFinalTargetPublicPile(SkillProgramEffect e, ProgramSkillFrame f) => ExecuteFinalTargetPublicPile(e, f);
+    SkillProgramStepOutcome IFinalTargetPublicPileHost.ExecuteFinalTargetPublicPile(SkillProgramEffect e, ProgramSkillFrame f) => ExecuteFinalTargetPublicPile(e, f);
     internal CardUseFrame FinalTargetPileUse(ProgramSkillFrame frame)
     {
         if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } use } || use.ActorSeat != frame.OwnerSeat || !ProgramCardKindMatch.Contains(CollectFinalTargetCardInPublicPileDescriptor.Kinds, use.EffectiveKind) || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(p => p.Id == use.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } parent || a.ActionId != use.CardActionId || a.ActorSeat != frame.OwnerSeat || a.EffectiveKind != use.EffectiveKind)
@@ -22,7 +18,7 @@ internal sealed partial class CoreGameEngineFinalTargetPublicPilesRuntime
     internal IReadOnlyList<PromptChoice> FinalTargetPileChoices(ProgramSkillFrame frame, SkillProgramEffect e)
     {
         if (e.Op == SkillProgramEffectOp.ObtainPublicPileCard)
-            return _corePublicPileSourcesOperations.ReferencedPublicPileSources(frame.OwnerSeat, e.SkillIds.Single(), frame.SkillInstanceId).SelectMany(source => _corePublicPileSourcesOperations.PublicPileCards(source)).Select(card => new PromptChoice(new($"pile-flow.frame-{(frame.Id)}.card-{(card.Id)}"), "获得【" + global::CardGame.Core.EngineOwners.CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(card) + "】", [card.Id], [], new Dictionary<string, string> { ["program-action"] = "public-pile-flow", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) })).ToArray();
+            return _corePublicPileSourcesOperations.ReferencedPublicPileSources(frame.OwnerSeat, e.SkillIds.Single(), frame.SkillInstanceId).SelectMany(source => _corePublicPileSourcesOperations.PublicPileCards(source)).Select(card => new PromptChoice(new($"pile-flow.frame-{(frame.Id)}.card-{(card.Id)}"), "获得【" + CoreGameEnginePublicPersistentPilesRuntime.PublicPileCardLabel(card) + "】", [card.Id], [], new Dictionary<string, string> { ["program-action"] = "public-pile-flow", ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) })).ToArray();
         var seats = e.Op == SkillProgramEffectOp.CollectFinalTargetCardInPublicPile ? FinalTargetPileUse(frame).TargetSeats.Distinct().Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count >= _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Count) : _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat);
         var zones = e.Op == SkillProgramEffectOp.CollectFinalTargetCardInPublicPile ? new[]
         {

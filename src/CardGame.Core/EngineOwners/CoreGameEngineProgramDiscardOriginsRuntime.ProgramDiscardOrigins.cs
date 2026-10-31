@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramDiscardOriginsRuntime
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineProgramDiscardOriginsRuntime
         return movement.Reason.Value == begin || movement.Reason.Value == begin + "-finished" || movement.Reason.Value == begin + "-discard" ? previous.From : null;
     }
 
-    internal static bool IsOwnedDiscardSource(CardLocation location) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardOrigins.IsOwnedDiscardSource(location);
+    internal static bool IsOwnedDiscardSource(CardLocation location) => RuntimeSkills.RuntimeRules_Core_ProgramDiscardOrigins.IsOwnedDiscardSource(location);
     internal CardMovementSourceCount GetProgramDiscardOriginSourceCount(CardLocation source, IReadOnlyList<CardMovementRecord> completions)
     {
         if (!IsOwnedDiscardSource(source) || completions.Count == 0 || completions.Any(move => GetProgramDiscardSource(move) != source))
@@ -45,5 +41,5 @@ internal sealed partial class CoreGameEngineProgramDiscardOriginsRuntime
         return new(source, before, after);
     }
 
-    internal static bool IsProgramDiscardOriginReason(CardMoveReason reason) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardOrigins.IsProgramDiscardOriginReason(reason);
+    internal static bool IsProgramDiscardOriginReason(CardMoveReason reason) => RuntimeSkills.RuntimeRules_Core_ProgramDiscardOrigins.IsProgramDiscardOriginReason(reason);
 }

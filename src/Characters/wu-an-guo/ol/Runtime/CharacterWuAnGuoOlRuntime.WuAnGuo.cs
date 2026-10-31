@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuAnGuoOlRuntime
@@ -10,12 +6,12 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
     internal const string LiyongGainReason = "skill-program.wu-an-guo.liyong.obtain";
     internal bool HasWuAnGuoCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveLiyongUsedSuitDeckAndDuel);
 
-    internal int WuAnGuoUsedSuitMask(int seat) => !HasWuAnGuoCapability ? 0 : _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WuAnGuoActualSuitUsedEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && e.ActorSeat == seat).Aggregate(0, (bits, e) => bits | global::CardGame.Core.EngineOwners.CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(e.Suit));
+    internal int WuAnGuoUsedSuitMask(int seat) => !HasWuAnGuoCapability ? 0 : _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WuAnGuoActualSuitUsedEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && e.ActorSeat == seat).Aggregate(0, (bits, e) => bits | CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(e.Suit));
     internal bool IsWuAnGuoYangConversionAvailable(CharacterState owner, Card card, CardConversionSource source, bool forResponse)
     {
         if (source.SkillId != "ol:liyong" || source.BindingId != "yang-unused-suit")
             return true;
-        var bit = global::CardGame.Core.EngineOwners.CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card));
+        var bit = CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card));
         return HasWuAnGuoCapability && !forResponse && source.OwnerSeat == owner.Seat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == owner.Seat && owner.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, source.SkillId, source.SkillInstanceId) && !_coreProgramPersistentStateOperations.GetProgramBooleanState2(owner.Seat, source.SkillId, source.SkillInstanceId, "yin") && bit != 0 && (WuAnGuoUsedSuitMask(owner.Seat) & bit) == 0;
     }
 
@@ -48,7 +44,7 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
             else if (response.EffectiveKind == CardKind.Dodge)
             {
                 var parent = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Action?.ActionId == response.ParentActionId);
-                if (parent?.CardAttack is not { EffectiveCardKind: { } kind } attack || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || attack.TargetSeat != response.ActorSeat || response.OpponentSeat != attack.SourceSeat)
+                if (parent?.CardAttack is not { EffectiveCardKind: { } kind } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || attack.TargetSeat != response.ActorSeat || response.OpponentSeat != attack.SourceSeat)
                     return;
             }
             else
@@ -58,20 +54,20 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
 
         if (action is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat))
             return;
-        if (action.EffectiveSuit is { } suit && global::CardGame.Core.EngineOwners.CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(suit) != 0 && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WuAnGuoActualSuitUsedEvent>().Any(e => e.ActionId == action.ActionId))
+        if (action.EffectiveSuit is { } suit && CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(suit) != 0 && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WuAnGuoActualSuitUsedEvent>().Any(e => e.ActionId == action.ActionId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuAnGuoActualSuitUsedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, action.ActorSeat, action.ActionId, suit));
         if (use is null)
             return;
         foreach (var source in action.ConversionChain.Where(s => s.SkillId == "ol:liyong" && s.BindingId == "yang-unused-suit"))
         {
-            if (source.OwnerSeat != action.ActorSeat || action.PhysicalCards is not [var physical] || physical.From.OwnerSeat != source.OwnerSeat || physical.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || action.EffectiveKind != CardKind.Duel || action.EffectiveSuit is not { } usedSuit || global::CardGame.Core.EngineOwners.CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(usedSuit) == 0 || _coreProgramPersistentStateOperations.GetProgramBooleanState2(source.OwnerSeat, source.SkillId, source.SkillInstanceId, "yin") || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WuAnGuoActualSuitUsedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && e.ActorSeat == action.ActorSeat && e.Suit == usedSuit && e.ActionId != action.ActionId))
+            if (source.OwnerSeat != action.ActorSeat || action.PhysicalCards is not [var physical] || physical.From.OwnerSeat != source.OwnerSeat || physical.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || action.EffectiveKind != CardKind.Duel || action.EffectiveSuit is not { } usedSuit || CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(usedSuit) == 0 || _coreProgramPersistentStateOperations.GetProgramBooleanState2(source.OwnerSeat, source.SkillId, source.SkillInstanceId, "yin") || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WuAnGuoActualSuitUsedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && e.ActorSeat == action.ActorSeat && e.Suit == usedSuit && e.ActionId != action.ActionId))
                 throw new InvalidOperationException("Liyong Yang requires its original unused effective suit, one native owned physical payment and current source generation.");
             _coreProgramPersistentStateOperations.SetProgramBooleanState(source.OwnerSeat, source.SkillId, source.SkillInstanceId, "yin", true);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuAnGuoLiyongYangConsumedEvent(use.Id, action.ActionId, source, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, usedSuit));
         }
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IWuAnGuoProgramHost.Resolve(ProgramSkillFrame frame) => BeginWuAnGuoLiyong(frame);
+    SkillProgramStepOutcome IWuAnGuoProgramHost.Resolve(ProgramSkillFrame frame) => BeginWuAnGuoLiyong(frame);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 27010, SkillProgramEffectOp.ResolveLiyongUsedSuitDeckAndDuel)]
     internal bool CanActivateWuAnGuoLiyong(CharacterState owner) => _coreMatchParticipantsPlayersAccess._players.Any(actor => CanIssueWuAnGuoLiyongDuel(actor.Seat, owner.Seat));
     internal SkillProgramStepOutcome BeginWuAnGuoLiyong(ProgramSkillFrame input)
@@ -80,7 +76,7 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
         var mask = WuAnGuoUsedSuitMask(f.OwnerSeat);
         if (f.WuAnGuoLiyong is not null || f.SkillId != "ol:liyong" || f.ActivationId != "yin-obtain-and-incoming-duel" || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var actor] || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreProgramPersistentStateOperations.GetProgramBooleanState(f, "yin") || !CanIssueWuAnGuoLiyongDuel(actor, f.OwnerSeat))
             throw new InvalidOperationException("Liyong Yin requires its current real Play state, earlier actual used suits and native legal incoming Duel actor.");
-        var candidates = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => (global::CardGame.Core.EngineOwners.CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(c.Suit) & mask) != 0).OrderBy(c => c.Id).ToArray();
+        var candidates = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => (CoreGameEngineCurrentTurnUseKindsRuntime.ActualTurnSuitBit(c.Suit) & mask) != 0).OrderBy(c => c.Id).ToArray();
         var card = candidates.Length == 0 ? null : candidates[_randomOperations._random.Next(candidates.Length)];
         var source = new CardConversionSource(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuAnGuoLiyong = new(source, f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, actor, mask, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, card?.Id) });

@@ -1,12 +1,8 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXunYuMobileGodRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     internal void AddQizhengNaturalActions(List<LegalAction> actions, CharacterState actor, IReadOnlyList<Card> playable, int? selectedPhysicalCardId = null)
     {
         foreach (var card in playable.Where(card => card.Kind == CardKind.QizhengXiangsheng && (selectedPhysicalCardId is null || selectedPhysicalCardId == card.Id) && !_coreCardConversionsOperations.HasProgramCardIdentity(actor, card)))
-            foreach (global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, CardKind.QizhengXiangsheng, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), enforceUsePermission: true, physicalCardIds: [card.Id]))
+            foreach (GameEngine.ProgramOrdinaryTrickUseOption option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, CardKind.QizhengXiangsheng, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), enforceUsePermission: true, physicalCardIds: [card.Id]))
                 actions.Add(new(option.ActionKind, card.Id, option.TargetSeats.Single(), option.Description, TargetSeats: option.TargetSeats));
     }
 
@@ -33,7 +29,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
 
     internal void ResolveQizhengXiangshengEffect(NullificationWindowFrame pending)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame { Action: { Type: CardActionType.Use } action, Qizheng: null } use || use.Id != pending.ParentFrameId || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.QizhengXiangsheng || pending.ActionKind != LegalActionKind.QizhengXiangsheng || global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending)is not { } target)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame { Action: { Type: CardActionType.Use } action, Qizheng: null } use || use.Id != pending.ParentFrameId || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.QizhengXiangsheng || pending.ActionKind != LegalActionKind.QizhengXiangsheng || CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending)is not { } target)
             throw new InvalidOperationException("Qizheng requires its original native ordinary-trick return.");
         if (!_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
         {
@@ -90,7 +86,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
                     foreach (var selection in _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(responder, required, true))
                     {
                         var parameters = QizhengParameters("multi", required.ToString());
-                        global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
+                        CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
                         choices.Add(new(new(Id($"multi.{(selection.Source.SkillId)}.{(selection.Source.BindingId)}.{(string.Join('-', selection.Cards.Select(c => c.Id)))}")), $"将{(selection.Cards.Count)}张牌当【{(CardCatalog.Get(required).DisplayName)}】打出", selection.Cards.Select(c => c.Id).ToArray(), [], parameters));
                     }
 
@@ -138,7 +134,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     [ProgramAnswer("qizheng")]
     internal void AnswerQizheng(PromptChoice selected)
     {
-        if (!HasQizhengPrompt() || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame { Qizheng: { } r } use || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], QizhengChoices(use).Where(c => c.Id == selected.Id).ToArray()))
+        if (!HasQizhengPrompt() || _resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame { Qizheng: { } r } use || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], QizhengChoices(use).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Qizheng requires its current participant's exact private choice.");
         AssertQizheng(use);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -151,7 +147,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(use = use with { Qizheng = r with { Stage = QizhengStage.Response, Ambush = ambush, Nonce = nonce, Commitment = commitment } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QizhengSecretCommittedEvent(use.Id, r.NullificationId, commitment));
             var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, requireProcessing: true);
-            global::CardGame.Core.NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle(use.Id, use.SourceSeat, r.Target, card, playedCardKind: CardKind.QizhengXiangsheng, physicalCards: _coreNativeTrickUseOperations.GetCardUsePhysicalCards(use.Id));
+            NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle(use.Id, use.SourceSeat, r.Target, card, playedCardKind: CardKind.QizhengXiangsheng, physicalCards: _coreNativeTrickUseOperations.GetCardUsePhysicalCards(use.Id));
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             PublishQizheng(_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)!);
             return;
@@ -184,7 +180,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QizhengResponsePaidEvent(use.Id, r.NullificationId, kind));
             _coreNativeGroupResponsesOperations.MoveZhangbaResponseCards(responder, pair, use.Id, use.SourceSeat);
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(responder.Seat, CardKind.Slash);
-            global::CardGame.Core.NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(use.Id);
+            NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(use.Id);
             if (_coreCardActionsOperations.TryBeginCardResponsePrograms(attack, responder, responder, null, use.SourceSeat, kind, costs, ProgramCardContinuation.QizhengResponse))
                 return;
             _coreNativeGroupResponsesOperations.FinishZhangbaResponseCards(pair);
@@ -194,7 +190,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
 
         if (branch == "multi")
         {
-            if (!global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var source) || source is null)
+            if (!CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var source) || source is null)
                 throw new InvalidOperationException("Qizheng multi-response lost its exact conversion.");
             var selection = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(responder, selected.Cards, kind, true, source)!;
             _coreRuntimeOperations.ReplaceRuntimeTop(use = use with { Qizheng = r with { Stage = QizhengStage.PaidResponse, ResponseKind = kind } });
@@ -202,14 +198,14 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
             var action = _coreCardConversionsOperations.MoveProgramMultiCardResponse(responder, selection, use.Id, use.SourceSeat);
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(responder.Seat, kind);
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, f => f with { Qizheng = f.Qizheng!with { ResponseActionId = action.ActionId } });
-            global::CardGame.Core.NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(use.Id);
+            NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(use.Id);
             if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.QizhengResponse) || _coreCardActionsOperations.TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardResponseAccepted, [use.SourceSeat], ProgramCardContinuation.QizhengResponse))
                 return;
             _coreNativeDodgeOperations.ContinueAcceptedCardResponse(attack, action, ProgramCardContinuation.QizhengResponse);
             return;
         }
 
-        var physical = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(responder, global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? CardKind.Slash : kind).Single(c => c.Id == selected.Cards.Single());
+        var physical = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(responder, CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? CardKind.Slash : kind).Single(c => c.Id == selected.Cards.Single());
         if (_coreCardDeclarationsOperations.TryBeginCardDeclaration(responder, physical, kind, _coreCardDeclarationsOperations.PeekDeclarationConversion(responder, physical, kind, false), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.QizhengResponse, responder.Seat, finalKind: kind), [use.SourceSeat]))
             return;
         PayQizhengSingleResponse(use.Id, responder, physical, kind);
@@ -228,14 +224,14 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         _coreAlternativeViewAsCostsOperations.PaySingleCardResponse(card, responder, kind, conversion);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(responder.Seat, kind);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(card.Id, responder.Seat, use.SourceSeat, kind));
-        global::CardGame.Core.NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(id);
+        NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(id);
         if (_coreCardActionsOperations.TryBeginCardResponsePrograms(attack, responder, responder, null, use.SourceSeat, kind, [cost], ProgramCardContinuation.QizhengResponse, conversion, suit))
             return;
         _coreAlternativeViewAsCostsOperations.FinishSingleCardResponse(card, conversion);
         ResolveQizhengAfterResponse(id);
     }
 
-    internal bool TryContinueQizhengResponse(global::CardGame.Core.NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
+    internal bool TryContinueQizhengResponse(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
     {
         if (continuation != ProgramCardContinuation.QizhengResponse)
             return false;
@@ -252,7 +248,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         if (_characterSimaYiMobileGodOperations.TryBeginMobileSimaRenjieQizheng(use))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QizhengResolvedEvent(id, r.NullificationId, r.Target, r.Ambush, r.ResponseKind));
-        var answered = r.Ambush ? r.ResponseKind is { } kind && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) : r.ResponseKind == CardKind.Dodge;
+        var answered = r.Ambush ? r.ResponseKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) : r.ResponseKind == CardKind.Dodge;
         if (answered || !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive || !r.Ambush && !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive)
         {
             FinishQizhengWithoutDamage(use);
@@ -268,7 +264,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(use with { Qizheng = r with { Stage = QizhengStage.Damage } });
-        global::CardGame.Core.NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(id);
+        NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(id);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);
@@ -284,7 +280,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, card, CardKind.QizhengXiangsheng);
     }
 
-    internal bool TryCompleteQizhengAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryCompleteQizhengAttack(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Qizheng: { } r } use)
             return false;
@@ -298,7 +294,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     // Slash finishers ask for their physical-card representation. The common
     // attack-completion prelude still runs before this issued-use dispatch.
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 5)]
-    internal bool FinishVirtualQizhengAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, out bool paused)
+    internal bool FinishVirtualQizhengAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {
         paused = false;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { CardId: 0, CardKind: CardKind.QizhengXiangsheng, VirtualOrdinaryTrickOrigin: not null })
@@ -330,11 +326,11 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     {
         if (use.Qizheng is not { } r)
             return;
-        if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.QizhengXiangsheng || use.Action?.ActionId != r.ActionId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) || r.TargetIndex != use.TargetIndex || r.EffectOrdinal != _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id) || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != r.Target || _coreProgramEventHistoryOperations.ProgramEventHistory<QizhengEffectStartedEvent>().Count(e => e == new QizhengEffectStartedEvent(use.Id, r.NullificationId, r.ActionId, r.Target, r.TargetIndex, r.EffectOrdinal)) != 1)
+        if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.QizhengXiangsheng || use.Action?.ActionId != r.ActionId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) || r.TargetIndex != use.TargetIndex || r.EffectOrdinal != _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id) || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != r.Target || _coreProgramEventHistoryOperations.ProgramEventHistory<QizhengEffectStartedEvent>().Count(e => e == new QizhengEffectStartedEvent(use.Id, r.NullificationId, r.ActionId, r.Target, r.TargetIndex, r.EffectOrdinal)) != 1)
             throw new InvalidOperationException("Qizheng lost its original typed native effect receipt.");
         if (r.Stage != QizhengStage.Designation && (r.Nonce.Length != 16 || r.Commitment != QizhengCommitment(use.Id, r.NullificationId, r.Ambush, r.Nonce) || _coreProgramEventHistoryOperations.ProgramEventHistory<QizhengSecretCommittedEvent>().Count(e => e.UseId == use.Id && e.NullificationId == r.NullificationId && e.Commitment == r.Commitment) != 1))
             throw new InvalidOperationException("Qizheng's private designation no longer matches its issued commitment.");
-        if (r.ResponseKind is { } kind && (kind != CardKind.Dodge && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreProgramEventHistoryOperations.ProgramEventHistory<QizhengResponsePaidEvent>().Count(e => e.UseId == use.Id && e.NullificationId == r.NullificationId && e.Kind == kind) != 1))
+        if (r.ResponseKind is { } kind && (kind != CardKind.Dodge && !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreProgramEventHistoryOperations.ProgramEventHistory<QizhengResponsePaidEvent>().Count(e => e.UseId == use.Id && e.NullificationId == r.NullificationId && e.Kind == kind) != 1))
             throw new InvalidOperationException("Qizheng lost its actual chosen response kind.");
     }
 }

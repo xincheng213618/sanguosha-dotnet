@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuMengMouRuntime
@@ -51,5 +47,5 @@ internal sealed partial class CharacterLuMengMouRuntime
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeContributions, 50)]
-    internal void AddGetHengyeGrowthAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => global::CardGame.Core.EngineOwners.CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{(player.Seat)}:hengye:growth", GetHengyeGrowth(player));
+    internal void AddGetHengyeGrowthAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{(player.Seat)}:hengye:growth", GetHengyeGrowth(player));
 }

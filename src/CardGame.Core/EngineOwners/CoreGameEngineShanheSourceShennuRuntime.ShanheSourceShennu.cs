@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
@@ -12,13 +9,13 @@ internal sealed partial class CoreGameEngineShanheSourceShennuRuntime
     internal const string ShanheSourceShennuDrawReason = "skill-program.shanhe-source-shennu-14214.draw";
     internal bool IsShanheSourceShennuMode => _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id == ShanheBattleSetup.BattleModeId && _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is not null;
 
-    void global::CardGame.Core.IShanheSourceShennuHost.ReceiveDamage(ProgramSkillFrame frame) => ReceiveShanheSourceShennuDamage(frame);
+    void IShanheSourceShennuHost.ReceiveDamage(ProgramSkillFrame frame) => ReceiveShanheSourceShennuDamage(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 62048, SkillProgramEffectOp.ResolveShanheSourceShennu)]
     internal bool CanReceiveShanheSourceShennuDamage(ProgramTriggerLegalityContext context) => IsShanheSourceShennuMode && context.WindowContext is { Window: SkillProgramTriggerWindow.DamageAppliedBeforeDying, Amount: > 0 } window && window.TargetSeat == context.OwnerSeat;
     internal void ReceiveShanheSourceShennuDamage(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!IsShanheSourceShennuMode || frame.SkillId != ShanheSourceShennuSkill || frame.ShanheShennuReceived is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.DamageAppliedBeforeDying, Amount: > 0 } context || context.TargetSeat != frame.OwnerSeat || _resolutionStackOperations._resolutionStack.Count < 3 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.ParentFrameId != context.DamageFrameId || window.TriggerWindow != context.Window || _resolutionStackOperations._resolutionStack[^3] is not DamageFrame damage || damage.Id != window.ParentFrameId || damage.TargetSeat != frame.OwnerSeat || damage.Amount != context.Amount || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
+        if (!IsShanheSourceShennuMode || frame.SkillId != ShanheSourceShennuSkill || frame.ShanheShennuReceived is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.DamageAppliedBeforeDying, Amount: > 0 } context || context.TargetSeat != frame.OwnerSeat || _resolutionStackOperations._resolutionStack.Count < 3 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.ParentFrameId != context.DamageFrameId || window.TriggerWindow != context.Window || _resolutionStackOperations._resolutionStack[^3] is not DamageFrame damage || damage.Id != window.ParentFrameId || damage.TargetSeat != frame.OwnerSeat || damage.Amount != context.Amount || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("Source Shennu lost its exact positive applied-damage owner.");
         var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
         if (attack.ResolutionId != damage.ParentFrameId || attack.TargetSeat != damage.TargetSeat || attack.SourceSeat != damage.SourceSeat || context.SourceSeat != (attack.IsSourceLess ? null : attack.SourceSeat))
@@ -27,20 +24,20 @@ internal sealed partial class CoreGameEngineShanheSourceShennuRuntime
         var before = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.ShanheSourceNu);
         var receipt = new ShanheShennuReceivedReceipt(window.Id, damage.Id, frame.InstructionIndex, context.SourceSeat, sourceHp, damage.Amount, before, checked(before + 1));
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheShennuReceived = receipt });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheShennuReceivedEvent(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), receipt));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheShennuReceivedEvent(frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), receipt));
         _coreStrategicProgramsOperations.SetStrategicMarker(frame.OwnerSeat, PlayerMarkerKind.ShanheSourceNu, frame.OwnerSeat, receipt.NuAfter, frame);
         if (sourceHp > 0)
             _coreProgramLifecycleOperations.DrawProgramCards(frame.Id, frame.OwnerSeat, sourceHp, null, null, SkillProgramCardSetVisibility.Private, new(ShanheSourceShennuDrawReason));
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 62048)]
-    internal int ShanheShennuDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack) => IsShanheSourceShennuMode && !attack.IsSourceLess && !attack.IsChainPropagation && !attack.DamageRedirected && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], ShanheSourceShennuSkill) ? Math.Max(0, _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].Markers.GetValueOrDefault(PlayerMarkerKind.ShanheSourceNu)) : 0;
-    internal int ShanheShennuPublicDamageBonus(GameSnapshot view, int sourceSeat, bool sourceLess, bool chain, global::CardGame.Core.GameEngine.IDamageAttempt? attack)
+    internal int ShanheShennuDamageBonus(GameEngine.IDamageAttempt attack) => IsShanheSourceShennuMode && !attack.IsSourceLess && !attack.IsChainPropagation && !attack.DamageRedirected && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], ShanheSourceShennuSkill) ? Math.Max(0, _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].Markers.GetValueOrDefault(PlayerMarkerKind.ShanheSourceNu)) : 0;
+    internal int ShanheShennuPublicDamageBonus(GameSnapshot view, int sourceSeat, bool sourceLess, bool chain, GameEngine.IDamageAttempt? attack)
     {
         if (!IsShanheSourceShennuMode || sourceLess || chain || attack?.DamageRedirected == true)
             return 0;
         var source = view.Players.Single(player => player.Seat == sourceSeat);
-        return source.IsAlive && global::CardGame.Core.EngineOwners.CoreGameEnginePublicDamagePredictionRuntime.VisiblePredictionSkillIds(source).Contains(ShanheSourceShennuSkill) ? Math.Max(0, source.Markers?.SingleOrDefault(marker => marker.Kind == PlayerMarkerKind.ShanheSourceNu)?.Count ?? 0) : 0;
+        return source.IsAlive && CoreGameEnginePublicDamagePredictionRuntime.VisiblePredictionSkillIds(source).Contains(ShanheSourceShennuSkill) ? Math.Max(0, source.Markers?.SingleOrDefault(marker => marker.Kind == PlayerMarkerKind.ShanheSourceNu)?.Count ?? 0) : 0;
     }
 
     // Issued for every real outgoing damage, even at zero Nu: self-damage or
@@ -48,7 +45,7 @@ internal sealed partial class CoreGameEngineShanheSourceShennuRuntime
     // Capture before Wenyi (10) or another paid-health hook can pause and
     // return directly to damage windows without revisiting later hooks.
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 1)]
-    internal bool CaptureShanheShennuOutgoing(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageId)
+    internal bool CaptureShanheShennuOutgoing(GameEngine.IDamageAttempt attack, long damageId)
     {
         if (!IsShanheSourceShennuMode || attack.IsSourceLess || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], ShanheSourceShennuSkill))
             return false;

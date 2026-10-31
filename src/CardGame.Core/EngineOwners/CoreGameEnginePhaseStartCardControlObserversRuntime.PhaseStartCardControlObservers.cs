@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePhaseStartCardControlObserversRuntime
@@ -16,14 +12,14 @@ internal sealed partial class CoreGameEnginePhaseStartCardControlObserversRuntim
         if (receipt.Stage != PhaseStartCardControlStage.MovementChildren || root.PendingMovementContinuation is null)
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return moved.Batch.ParentFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.AwaitingProgramFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.CardId == payment.CardId && m.From == payment.From && m.To == payment.To && m.Sequence > payment.SequenceBefore && m.Sequence <= payment.SequenceAfter && m.Reason.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePhaseStartCardControlRuntime.PhaseStartControlReason(receipt.Kind));
+            return moved.Batch.ParentFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.AwaitingProgramFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.CardId == payment.CardId && m.From == payment.From && m.To == payment.To && m.Sequence > payment.SequenceBefore && m.Sequence <= payment.SequenceAfter && m.Reason.Value == CoreGameEnginePhaseStartCardControlRuntime.PhaseStartControlReason(receipt.Kind));
         if (child is ProgramLifecycleTriggerWindowFrame state && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange)
             return state.ResumeProgramFrameId == root.Id && state.CharacterStateContinuation == CharacterStateContinuation.Program && state.CandidateIndex >= 0 && state.CandidateIndex <= state.Candidates.Count && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == root.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
         if (payment.Kind != CardKind.SilverLion || payment.From.Zone != CardZoneKind.Equipment || payment.From.OwnerSeat is not { } lionOwner)
             return false;
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == root.Id && hp.ResumeFrameId == root.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == lionOwner && hp.Change.TargetSeat == lionOwner && hp.Change.Amount == 1;
-        return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == lionOwner && recovery.Attempt.TargetSeat == lionOwner && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.MoveReason?.Value == global::CardGame.Core.EngineOwners.CoreGameEnginePhaseStartCardControlRuntime.PhaseStartControlReason(receipt.Kind);
+        return child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.SourceSeat == lionOwner && recovery.Attempt.TargetSeat == lionOwner && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.MoveReason?.Value == CoreGameEnginePhaseStartCardControlRuntime.PhaseStartControlReason(receipt.Kind);
     }
 
     internal ProgramSkillFrame? PhaseStartCardControlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.PhaseStartCardControlFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));

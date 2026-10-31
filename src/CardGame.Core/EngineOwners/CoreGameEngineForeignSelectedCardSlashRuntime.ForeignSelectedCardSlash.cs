@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineForeignSelectedCardSlashRuntime
 {
     internal const string ForeignSelectedCardSlashDrawReason = "skill-program.foreign-selected-card-slash.outcome-draw";
-    internal static CardConversionSource SelectedForeignSlashSource(ProgramSkillFrame frame) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ForeignSelectedCardSlash.SelectedForeignSlashSource(frame);
+    internal static CardConversionSource SelectedForeignSlashSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_Core_ForeignSelectedCardSlash.SelectedForeignSlashSource(frame);
     internal bool SelectedForeignSlashEnded => _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreMatchOutcomeStatusWinnerAccess._status == EngineStatus.Completed;
 
     internal bool CanUseSelectedForeignSlashMaterial(int issuer, int actor, Card card, CardLocation from) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(issuer) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && issuer != actor && _coreMatchParticipantsPlayersAccess._players[issuer].IsAlive && _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && from.OwnerSeat == actor && from.Zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment && _cardZonesOperations._cardZones.GetLocation(card.Id) == from && !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor, [card.Id]) && (from.Zone != CardZoneKind.Hand || !_coreCardUseModulesOperations.IsTurnHandCardRestricted(_coreMatchParticipantsPlayersAccess._players[actor], card)) && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(actor, SkillProgramCardTargetRestriction.SelfOnly) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[issuer], card, effectiveKind: CardKind.Slash, ignoreDistance: true, physicalCardIds: [card.Id]) && _coreRuleQueriesOperations.CanSpendSlashUse(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[issuer], false, CardKind.Slash, card, excludedEquipmentId: from.Zone == CardZoneKind.Equipment ? card.Id : null, physicalCardIds: [card.Id]);
@@ -74,7 +71,7 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashRuntime
     [ProgramAnswer("foreign-selected-slash")]
     internal void ResolveSelectedForeignCardSlashChoice(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || !_coreForeignSelectedCardSlashReturnsOperations.ValidSelectedForeignCardSlash(frame) || frame.ForeignSelectedCardSlash is not { Stage: ForeignSelectedCardSlashStage.ChoosingCard } receipt || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], SelectedForeignCardSlashChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || !_coreForeignSelectedCardSlashReturnsOperations.ValidSelectedForeignCardSlash(frame) || frame.ForeignSelectedCardSlash is not { Stage: ForeignSelectedCardSlashStage.ChoosingCard } receipt || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != frame.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], SelectedForeignCardSlashChoices(frame).Where(choice => choice.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The selected foreign-card Slash changed its owning chooser or published opaque entity slot.");
         if (!Enum.TryParse<CardZoneKind>(selected.Parameters.GetValueOrDefault("source-zone"), out var zone) || !int.TryParse(selected.Parameters.GetValueOrDefault("slot-index"), CultureInfo.InvariantCulture, out var slot))
             throw new InvalidOperationException("The selected foreign-card Slash lost its exact source region.");
@@ -121,7 +118,7 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 10)]
-    internal bool ReturnRegisteredCompleteSelectedForeignCardSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool ReturnRegisteredCompleteSelectedForeignCardSlash(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.ForeignSelectedCardSlashReturn is null)
             return false;
@@ -129,7 +126,7 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashRuntime
         return true;
     }
 
-    internal void CompleteSelectedForeignCardSlash(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal void CompleteSelectedForeignCardSlash(GameEngine.AttackCompletionReceipt completion)
     {
         var returned = completion.ForeignSelectedCardSlashReturn ?? throw new InvalidOperationException("The selected foreign-card Slash lost its typed completion.");
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != returned.ProgramFrameId || completion.ProgramFrameId != frame.Id || completion.ResolutionId != returned.CardUseFrameId || frame.ForeignSelectedCardSlash is not { Stage: ForeignSelectedCardSlashStage.UseIssued } receipt || receipt.SlashReturn != returned || !_coreForeignSelectedCardSlashReturnsOperations.ValidSelectedForeignCardSlash(frame) || _coreCardUseLifecycleOperations.LifecycleCardUse(returned.CardUseFrameId)is not null || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == returned.CardUseFrameId) != 1)
@@ -188,5 +185,5 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.UseSelectedForeignCardAsSlash)]
     internal PromptChoice SelectAiSelectedForeignCardSlashChoice(PendingDecision decision, ProgramSkillFrame frame) => decision.Choices.OrderByDescending(choice => choice.Cards.Count == 0 ? 0 : CardCatalog.Get(_coreCardAttackStateOperations.GetAttackCard(choice.Cards.Single()).Kind).HandKeepValue).ThenBy(choice => choice.Id.Value, StringComparer.Ordinal).First(); // Foreign Hand choices remain opaque and equally scored.
-    SkillProgramStepOutcome global::CardGame.Core.ISelectedForeignCardSlashHost.UseSelectedForeignCardAsSlash(ProgramSkillFrame frame, int actorSeat) => BeginSelectedForeignCardSlash(frame, actorSeat);
+    SkillProgramStepOutcome ISelectedForeignCardSlashHost.UseSelectedForeignCardAsSlash(ProgramSkillFrame frame, int actorSeat) => BeginSelectedForeignCardSlash(frame, actorSeat);
 }

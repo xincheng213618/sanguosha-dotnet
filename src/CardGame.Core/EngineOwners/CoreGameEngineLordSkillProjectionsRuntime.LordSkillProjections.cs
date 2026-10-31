@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineLordSkillProjectionsRuntime
@@ -34,11 +30,11 @@ internal sealed partial class CoreGameEngineLordSkillProjectionsRuntime
             return 0;
         var changed = _coreGameEngineLordSkillProjectionsLordProjectionDependenciesLordProjectionDependencyRevisionSynchronizingLordProjectionsAccess._lordProjectionDependencies.Length != _coreMatchParticipantsPlayersAccess._players.Count;
         if (changed)
-            _coreGameEngineLordSkillProjectionsLordProjectionDependenciesLordProjectionDependencyRevisionSynchronizingLordProjectionsAccess._lordProjectionDependencies = new global::CardGame.Core.GameEngine.ProjectionDependency[_coreMatchParticipantsPlayersAccess._players.Count];
+            _coreGameEngineLordSkillProjectionsLordProjectionDependenciesLordProjectionDependencyRevisionSynchronizingLordProjectionsAccess._lordProjectionDependencies = new GameEngine.ProjectionDependency[_coreMatchParticipantsPlayersAccess._players.Count];
         for (var i = 0; i < _coreMatchParticipantsPlayersAccess._players.Count; i++)
         {
             var p = _coreMatchParticipantsPlayersAccess._players[i];
-            var current = new global::CardGame.Core.GameEngine.ProjectionDependency(p.SkillGrants.Revision, p.IsAlive, p.Hp, p.Role, p.GeneralSelected, p.GeneralRevealed, p.SecondaryGeneralSelected, p.SecondaryGeneralRevealed);
+            var current = new GameEngine.ProjectionDependency(p.SkillGrants.Revision, p.IsAlive, p.Hp, p.Role, p.GeneralSelected, p.GeneralRevealed, p.SecondaryGeneralSelected, p.SecondaryGeneralRevealed);
             if (_coreGameEngineLordSkillProjectionsLordProjectionDependenciesLordProjectionDependencyRevisionSynchronizingLordProjectionsAccess._lordProjectionDependencies[i] != current)
             {
                 changed = true;

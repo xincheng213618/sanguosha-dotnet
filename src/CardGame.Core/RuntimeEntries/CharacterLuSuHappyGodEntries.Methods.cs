@@ -2,15 +2,15 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLuSuHappyGodEntries
 {
-    internal global::CardGame.Core.PromptChoice AiHappyDingzhou(global::CardGame.Core.PendingDecision decision, global::CardGame.Core.ProgramSkillFrame frame) => _resolve().AiHappyDingzhou(decision, frame);
-    internal void AnswerHappyDingzhou(global::CardGame.Core.PromptChoice answer) => _resolve().AnswerHappyDingzhou(answer);
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginHappyDingzhou(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginHappyDingzhou(supplied);
+    internal PromptChoice AiHappyDingzhou(PendingDecision decision, ProgramSkillFrame frame) => _resolve().AiHappyDingzhou(decision, frame);
+    internal void AnswerHappyDingzhou(PromptChoice answer) => _resolve().AnswerHappyDingzhou(answer);
+    internal SkillProgramStepOutcome BeginHappyDingzhou(ProgramSkillFrame supplied) => _resolve().BeginHappyDingzhou(supplied);
     internal void ContinueHappyDingzhou(long id) => _resolve().ContinueHappyDingzhou(id);
-    internal void FinishHappyDingzhou(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().FinishHappyDingzhou(frame);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> HappyDingzhouChoices(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().HappyDingzhouChoices(frame);
-    internal bool KeepHappyDingzhouPaid(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().KeepHappyDingzhouPaid(frame);
-    internal void MoveHappyDingzhou(global::CardGame.Core.ProgramSkillFrame frame, global::System.Collections.Generic.IReadOnlyList<int> cards, global::CardGame.Core.HappyDingzhouStage stage, global::CardGame.Core.CardLocation destination) => _resolve().MoveHappyDingzhou(frame, cards, stage, destination);
-    internal void PublishHappyDingzhou(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishHappyDingzhou(frame);
+    internal void FinishHappyDingzhou(ProgramSkillFrame frame) => _resolve().FinishHappyDingzhou(frame);
+    internal IReadOnlyList<PromptChoice> HappyDingzhouChoices(ProgramSkillFrame frame) => _resolve().HappyDingzhouChoices(frame);
+    internal bool KeepHappyDingzhouPaid(ProgramSkillFrame frame) => _resolve().KeepHappyDingzhouPaid(frame);
+    internal void MoveHappyDingzhou(ProgramSkillFrame frame, IReadOnlyList<int> cards, HappyDingzhouStage stage, CardLocation destination) => _resolve().MoveHappyDingzhou(frame, cards, stage, destination);
+    internal void PublishHappyDingzhou(ProgramSkillFrame frame) => _resolve().PublishHappyDingzhou(frame);
     internal bool ResumeHappyDingzhou(long id) => _resolve().ResumeHappyDingzhou(id);
-    internal bool ReturnHappyDingzhouMovement(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().ReturnHappyDingzhouMovement(frame);
+    internal bool ReturnHappyDingzhouMovement(ProgramSkillFrame frame) => _resolve().ReturnHappyDingzhouMovement(frame);
 }

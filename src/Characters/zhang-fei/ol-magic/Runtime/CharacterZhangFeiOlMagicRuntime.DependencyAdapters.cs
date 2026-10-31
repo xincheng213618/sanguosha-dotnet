@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-[global::CardGame.Core.ProgramCapability(typeof(global::CardGame.Core.MoZhangFeiRuntime))]
-internal sealed class CharacterZhangFeiOlMagicMoZhangFeiAdapter(global::System.Func<global::CardGame.Core.MoZhangFeiRuntime> targetFactory) : global::CardGame.Core.EngineOwners.ICharacterZhangFeiOlMagicMoZhangFeiOperations
+[Core.ProgramCapability(typeof(MoZhangFeiRuntime))]
+internal sealed class CharacterZhangFeiOlMagicMoZhangFeiAdapter(Func<MoZhangFeiRuntime> targetFactory) : ICharacterZhangFeiOlMagicMoZhangFeiOperations
 {
-    private readonly global::System.Func<global::CardGame.Core.MoZhangFeiRuntime> _targetFactory = targetFactory;
-    public global::CardGame.Core.MoZhangFeiRuntime Get() => this._targetFactory();
+    private readonly Func<MoZhangFeiRuntime> _targetFactory = targetFactory;
+    public MoZhangFeiRuntime Get() => this._targetFactory();
 }

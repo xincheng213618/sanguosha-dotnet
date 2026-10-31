@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaXiuMaTieOlRuntime
@@ -35,9 +31,9 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Kenshang: { RewrittenTargets: not null } r, Action: { } a } use)
             return;
-        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } card } c || c.TargetSeat != previous || card.ParentCardUseFrameId != id || card.CardActionId != a.ActionId || f.OwnerSeat != previous || f.InstructionIndex < 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)is not { Op: SkillProgramEffectOp.RedirectCurrentAttack } e || next != global::CardGame.Core.EngineOwners.CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(f, e.Target) || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != next || _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangRedirectedEvent>().Any(d => d.UseId == id && d.ProgramFrameId == f.Id && d.InstructionIndex == f.InstructionIndex))
+        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } card } c || c.TargetSeat != previous || card.ParentCardUseFrameId != id || card.CardActionId != a.ActionId || f.OwnerSeat != previous || f.InstructionIndex < 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)is not { Op: SkillProgramEffectOp.RedirectCurrentAttack } e || next != CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(f, e.Target) || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != next || _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangRedirectedEvent>().Any(d => d.UseId == id && d.ProgramFrameId == f.Id && d.InstructionIndex == f.InstructionIndex))
             throw new InvalidOperationException("Kenshang target redirect lost its actual native producer or current target cursor.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KenshangRedirectedEvent(f.Id, id, a.ActionId, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, f.InstructionIndex, use.TargetIndex, previous, next));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KenshangRedirectedEvent(f.Id, id, a.ActionId, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, f.InstructionIndex, use.TargetIndex, previous, next));
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27110)]
@@ -61,7 +57,7 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
             return false;
         if (child is ProgramLifecycleTriggerWindowFrame s && s.ResumeProgramFrameId == f.Id)
             return s.Window == SkillProgramTriggerWindow.SkillsChanged && s.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
-        return f.PendingMovementContinuation is not null && child is CardsMovedTriggerWindowFrame m && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, m) && m.Batch.OriginOwnerSeat == f.OwnerSeat && m.Batch.OriginSkillId == f.SkillId && m.Batch.OriginSkillInstanceId == f.SkillInstanceId && m.Batch.Movements.All(x => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(x) && x.Sequence > r.Before && x.Sequence <= r.After);
+        return f.PendingMovementContinuation is not null && child is CardsMovedTriggerWindowFrame m && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, m) && m.Batch.OriginOwnerSeat == f.OwnerSeat && m.Batch.OriginSkillId == f.SkillId && m.Batch.OriginSkillInstanceId == f.SkillInstanceId && m.Batch.Movements.All(x => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(x) && x.Sequence > r.Before && x.Sequence <= r.After);
     }
 
     internal ProgramSkillFrame? KenshangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.KenshangFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));

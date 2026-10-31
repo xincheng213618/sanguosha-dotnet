@@ -1,15 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGuanduGeneralsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IGuanduGeneralHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginGuanduGeneral(frame, operation);
+    SkillProgramStepOutcome IGuanduGeneralHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginGuanduGeneral(frame, operation);
     internal bool GuanduSkillEnabled(CharacterState owner, string skill) => owner.IsAlive && _contentRegistryOperations._contentRegistry.Skills.ContainsKey(skill) && _coreSkillProgramsOperations.EnabledSkillPrograms(owner).Any(p => p.Id == skill);
     internal bool GuanduGeneralGrantQualified(CharacterState owner, SkillGrant grant)
     {
@@ -56,7 +50,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralsRuntime
     internal bool GuanduTurnDiscarded(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduDiscardFactEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseActor == seat);
     internal Card[] GuanduOwnedCards(int seat, bool judgment = false) => (judgment ? _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat])).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.Judgment(seat))) : _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat]))).ToArray();
     internal Card[] GuanduDiscardable(int chooser, int owner) => GuanduOwnedCards(owner).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard)).ToArray();
-    internal static IReadOnlyList<int> FreezeGuanduSeats(IEnumerable<int> seats) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_GuanduGenerals.FreezeGuanduSeats(seats);
+    internal static IReadOnlyList<int> FreezeGuanduSeats(IEnumerable<int> seats) => RuntimeSkills.RuntimeRules_Core_GuanduGenerals.FreezeGuanduSeats(seats);
     internal bool IsGuanduGeneralContextAllowed(string skillId, SkillProgramEffectOp operation) => _coreGuanduActivitiesOperations.IsGuanduActivity || _coreMatchDefinitionOptionsAccess._options.ShanheBattle is not null && skillId == "guandu:moushi" && operation == SkillProgramEffectOp.ResolveGuanduMoushi || _coreShanheSourceGrainOperations.IsShanheSourceGrainContext(skillId, operation);
     internal SkillProgramStepOutcome BeginGuanduGeneral(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,8 +7,8 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileRuntime
 {
     internal const string BoundaryXiahouDunQingjian = "boundary:qingjian-mobile", BoundaryXiahouDunAction = "boundary-xiahou-dun-qingjian";
     internal const string BoundaryXiahouDunStoreReason = "skill.boundary-xiahou-dun.qingjian.store", BoundaryXiahouDunGiveReason = "skill.boundary-xiahou-dun.qingjian.give";
-    internal static CardConversionSource BoundaryXiahouDunSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IBoundaryXiahouDunHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginBoundaryXiahouDun(f, op);
+    internal static CardConversionSource BoundaryXiahouDunSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IBoundaryXiahouDunHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginBoundaryXiahouDun(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 60010)]
     internal bool OfferBoundaryXiahouDun(ProgramTriggerLegalityContext gate) => gate.SkillId != BoundaryXiahouDunQingjian || (gate.Trigger.Id == "store-after-gain" ? _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[gate.OwnerSeat]).Count > 0 : BoundaryXiahouDunDueDeposits(gate.OwnerSeat, gate.Context.ParentFrameId).Any());
     internal SkillProgramStepOutcome BeginBoundaryXiahouDun(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -68,7 +65,7 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileRuntime
     [ProgramAnswer(BoundaryXiahouDunAction)]
     internal void AnswerBoundaryXiahouDun(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryXiahouDun: { } r } f || !ValidBoundaryXiahouDun(f) || !BoundaryXiahouDunChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || r.Stage == BoundaryXiahouDunStage.Selecting && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { BoundaryXiahouDun: { } r } f || !ValidBoundaryXiahouDun(f) || !BoundaryXiahouDunChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])) || r.Stage == BoundaryXiahouDunStage.Selecting && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("Qingjian's exact private selection or issued distribution changed.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

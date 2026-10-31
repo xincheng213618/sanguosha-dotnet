@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePaidOwnTargetObserversRuntime
 {
     internal bool PaidOwnTargetMatches(ProgramSkillFrame root, ActualUseTargetWindowFrame parent, bool requireCost)
     {
-        if (root.PaidOwnTarget is not { } paid || root.WindowContext is not { ActualUseTarget: { } original } context || context.Window != SkillProgramTriggerWindow.OtherActualUseTargeted || context.ParentFrameId != parent.Id || parent.ParentFrameId != paid.Use.CardUseFrameId || paid.Use != original || root.OwnerSeat != paid.Use.TargetSeat || paid.Source != new CardConversionSource(root.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId) || paid.GameplayHash != root.GameplayHash || paid.ActualLost != 1 || paid.HpBefore < 1 || paid.HpAfter != paid.HpBefore - 1 || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, parent.Candidates[parent.CandidateIndex]) || !_coreActualUseTargetProgramsOperations.MatchesActualUseTarget(paid.Use))
+        if (root.PaidOwnTarget is not { } paid || root.WindowContext is not { ActualUseTarget: { } original } context || context.Window != SkillProgramTriggerWindow.OtherActualUseTargeted || context.ParentFrameId != parent.Id || parent.ParentFrameId != paid.Use.CardUseFrameId || paid.Use != original || root.OwnerSeat != paid.Use.TargetSeat || paid.Source != new CardConversionSource(root.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId) || paid.GameplayHash != root.GameplayHash || paid.ActualLost != 1 || paid.HpBefore < 1 || paid.HpAfter != paid.HpBefore - 1 || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, parent.Candidates[parent.CandidateIndex]) || !_coreActualUseTargetProgramsOperations.MatchesActualUseTarget(paid.Use))
             return false;
         var plan = ProgramInstructionResolver.Default.Resolve(root, _contentRegistryOperations._contentRegistry.GetSkill(root.SkillId).Program!);
         if (paid.InstructionIndex != 0 || plan.Instructions.Count == 0 || plan.Instructions[0].Op != SkillProgramEffectOp.PayHpThenNullifyOwnActualUseTarget)
@@ -29,10 +25,10 @@ internal sealed partial class CoreGameEnginePaidOwnTargetObserversRuntime
         {
             var c = parent.Candidates[parent.CandidateIndex];
             var context = root.WindowContext!;
-            if (!_coreActualUseTargetProgramsOperations.CanRunActualUseTarget(c, context) || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, c) || root.InstructionIndex != 1)
+            if (!_coreActualUseTargetProgramsOperations.CanRunActualUseTarget(c, context) || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, c) || root.InstructionIndex != 1)
                 throw new InvalidOperationException("The target payment lost its exact original use/candidate.");
             var before = _coreMatchParticipantsPlayersAccess._players[root.OwnerSeat].Hp;
-            var receipt = new ProgramPaidOwnTargetReceipt(0, context.ActualUseTarget!, new(root.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId), root.GameplayHash, before, before - 1, 1);
+            var receipt = new ProgramPaidOwnTargetReceipt(0, context.ActualUseTarget!, new(root.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId), root.GameplayHash, before, before - 1, 1);
             _coreRuntimeOperations.ReplaceRuntimeTop(root with { PaidOwnTarget = receipt, ReexecuteParticipantInstruction = true });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PaidOwnTargetHpEvent(root.Id, receipt));
             return _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(root.Id, root.SkillId, root.OwnerSeat, 1);
@@ -60,7 +56,7 @@ internal sealed partial class CoreGameEnginePaidOwnTargetObserversRuntime
         _coreProgramCardTargetEffectsOperations.MarkCardEffectIneffective(paid.Use.CardUseFrameId, paid.Use.TargetSeat);
         _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { PaidOwnTarget = paid with { Applied = true } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PaidOwnTargetAppliedEvent(frame.Id, paid.Use.CardUseFrameId, paid.Use.ActionId, paid.Use.ActorSeat, paid.Use.TargetSeat, paid.Use.EffectiveKind, paid.Source, paid.GameplayHash));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardEffectNullifiedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, paid.Use.ActorSeat, paid.Use.CardUseFrameId, paid.Use.EffectiveKind));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardEffectNullifiedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, paid.Use.ActorSeat, paid.Use.CardUseFrameId, paid.Use.EffectiveKind));
     }
 
     internal void FinishPaidOwnTargetBeforeProgramCompletion(ProgramSkillFrame frame)
@@ -76,7 +72,7 @@ internal sealed partial class CoreGameEnginePaidOwnTargetObserversRuntime
             return null;
         if (wi + 1 >= _resolutionStackOperations._resolutionStack.Count)
             return null;
-        if (_resolutionStackOperations._resolutionStack[wi + 1] is not ProgramSkillFrame root || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, window.Candidates[window.CandidateIndex]) || root.WindowContext?.ParentFrameId != window.Id || root.WindowContext.ActualUseTarget != identity)
+        if (_resolutionStackOperations._resolutionStack[wi + 1] is not ProgramSkillFrame root || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(root, window.Candidates[window.CandidateIndex]) || root.WindowContext?.ParentFrameId != window.Id || root.WindowContext.ActualUseTarget != identity)
             return null;
         if (wi + 2 == _resolutionStackOperations._resolutionStack.Count)
             return root;
@@ -98,7 +94,7 @@ internal sealed partial class CoreGameEnginePaidOwnTargetObserversRuntime
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 480)]
     internal bool IsPaidOwnTargetProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } && _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().Any(w => ActualUseTargetObserverRoot(w.ParentFrameId)is { PaidOwnTarget: not null });
 
-    SkillProgramStepOutcome global::CardGame.Core.IPaidTargetEndingProgramHost.PayHpThenNullifyOwnActualUseTarget(ProgramSkillFrame f) => PayOwnActualUseTarget(f);
-    void global::CardGame.Core.IPaidTargetEndingProgramHost.ScheduleEarnedActualEndingBenefit(ProgramSkillFrame f, string skill, string binding) => _coreEarnedActualEndingBenefitsOperations.IssueEarnedActualEnding(f, skill, binding);
-    SkillProgramStepOutcome global::CardGame.Core.IPaidTargetEndingProgramHost.DrawLostHpThenOfferOwnedCardsUpTo(ProgramSkillFrame f) => _coreLostHpOwnedGiftsOperations.RunLostHpOwnedGift(f);
+    SkillProgramStepOutcome IPaidTargetEndingProgramHost.PayHpThenNullifyOwnActualUseTarget(ProgramSkillFrame f) => PayOwnActualUseTarget(f);
+    void IPaidTargetEndingProgramHost.ScheduleEarnedActualEndingBenefit(ProgramSkillFrame f, string skill, string binding) => _coreEarnedActualEndingBenefitsOperations.IssueEarnedActualEnding(f, skill, binding);
+    SkillProgramStepOutcome IPaidTargetEndingProgramHost.DrawLostHpThenOfferOwnedCardsUpTo(ProgramSkillFrame f) => _coreLostHpOwnedGiftsOperations.RunLostHpOwnedGift(f);
 }

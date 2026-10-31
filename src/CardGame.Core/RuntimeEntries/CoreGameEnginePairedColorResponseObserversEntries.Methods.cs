@@ -2,13 +2,13 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePairedColorResponseObserversEntries
 {
-    internal bool IsPairedColorDispositionChoice(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PendingDecision decision) => _resolve().IsPairedColorDispositionChoice(f, decision);
+    internal bool IsPairedColorDispositionChoice(ProgramSkillFrame f, PendingDecision decision) => _resolve().IsPairedColorDispositionChoice(f, decision);
     internal bool IsPairedColorDispositionDying() => _resolve().IsPairedColorDispositionDying();
-    internal bool PairedColorDispositionFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().PairedColorDispositionFirstChild(f, child);
-    internal global::CardGame.Core.ProgramSkillFrame? PairedColorDispositionObserverRoot() => _resolve().PairedColorDispositionObserverRoot();
-    internal bool PairedColorDispositionStructuralEdge(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.ResolutionFrame child) => _resolve().PairedColorDispositionStructuralEdge(parent, child);
-    internal global::CardGame.Core.CardLocation PairedColorPaidDestination(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ProgramPairedColorDispositionReceipt r) => _resolve().PairedColorPaidDestination(f, r);
-    internal string PairedColorPaidReason(global::CardGame.Core.ProgramPairedColorDispositionReceipt r) => _resolve().PairedColorPaidReason(r);
+    internal bool PairedColorDispositionFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().PairedColorDispositionFirstChild(f, child);
+    internal ProgramSkillFrame? PairedColorDispositionObserverRoot() => _resolve().PairedColorDispositionObserverRoot();
+    internal bool PairedColorDispositionStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => _resolve().PairedColorDispositionStructuralEdge(parent, child);
+    internal CardLocation PairedColorPaidDestination(ProgramSkillFrame f, ProgramPairedColorDispositionReceipt r) => _resolve().PairedColorPaidDestination(f, r);
+    internal string PairedColorPaidReason(ProgramPairedColorDispositionReceipt r) => _resolve().PairedColorPaidReason(r);
     internal bool TryAdvancePairedColorDispositionSubtree() => _resolve().TryAdvancePairedColorDispositionSubtree();
-    internal bool ValidPairedColorDispositionReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidPairedColorDispositionReceipt(f);
+    internal bool ValidPairedColorDispositionReceipt(ProgramSkillFrame f) => _resolve().ValidPairedColorDispositionReceipt(f);
 }

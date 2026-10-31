@@ -2,6 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineHeartSlashDamageEntries
 {
-    internal bool MatchesOwnerUsedHeartSlash(global::CardGame.Core.GameEngine.IDamageAttempt attack) => _resolve().MatchesOwnerUsedHeartSlash(attack);
-    internal global::CardGame.Core.Suit PublicProposedSlashSuit(global::CardGame.Core.GameSnapshot view, int actorSeat, global::CardGame.Core.LegalAction action, global::CardGame.Core.CardKind kind) => _resolve().PublicProposedSlashSuit(view, actorSeat, action, kind);
+    internal bool MatchesOwnerUsedHeartSlash(GameEngine.IDamageAttempt attack) => _resolve().MatchesOwnerUsedHeartSlash(attack);
+    internal Suit PublicProposedSlashSuit(GameSnapshot view, int actorSeat, LegalAction action, CardKind kind) => _resolve().PublicProposedSlashSuit(view, actorSeat, action, kind);
 }

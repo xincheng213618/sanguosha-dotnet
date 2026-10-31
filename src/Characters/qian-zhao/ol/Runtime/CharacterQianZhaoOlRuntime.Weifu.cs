@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQianZhaoOlRuntime
 {
-    internal const string WeifuDiscardReason = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.WeifuDiscardReason, WeifuDrawReason = "skill-program.qian-zhao.weifu.draw";
+    internal const string WeifuDiscardReason = RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.WeifuDiscardReason, WeifuDrawReason = "skill-program.qian-zhao.weifu.draw";
     internal const string WeifuJudgmentReason = "weifu", WeifuJudgmentBind = "weifu-final-result";
-    internal static CardConversionSource QianZhaoSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_qian_zhao_ol_Weifu.QianZhaoSource(f);
+    internal static CardConversionSource QianZhaoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_qian_zhao_ol_Weifu.QianZhaoSource(f);
     internal SkillProgramStepOutcome BeginWeifu(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -19,7 +15,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
         var from = _cardZonesOperations._cardZones.GetLocation(id);
         if (from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || card.IsGeneralWeapon || _coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, card, from, OwnedCardMoveIntent.Discard) || _coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(f.OwnerSeat, card, from, OwnedCardMoveIntent.Discard) || from.Zone == CardZoneKind.Equipment && _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(f.OwnerSeat, f.SkillId, f.SkillInstanceId, card))
             throw new InvalidOperationException("Weifu cannot replace its exact legal HE discard.");
-        var r = new WeifuReceipt(QianZhaoSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, id, from, global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
+        var r = new WeifuReceipt(QianZhaoSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, id, from, CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Weifu = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(f.OwnerSeat, f.OwnerSeat, card, from, new(WeifuDiscardReason));
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
@@ -83,7 +79,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
             return;
         if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment is not { } judgment || !IsWeifuJudgment(judgment, f) || judgment.Id != e.ResolutionId || r.ResultKind is not null)
             throw new InvalidOperationException("Weifu cannot freeze a different or duplicate judgment result.");
-        var category = global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind);
+        var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { Weifu = r with { ResultCardId = card, ResultKind = kind, ResultCategory = category } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WeifuJudgedEvent(f.Id, judgment.Id, card, kind, category));
     }
@@ -112,7 +108,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 26620)]
     internal bool ReturnQianZhaoMovement(ProgramSkillFrame f) => f.Weifu is not null ? ResumeWeifu(f.Id) : f.Kuansai is not null && ResumeKuansai(f.Id);
-    SkillProgramStepOutcome global::CardGame.Core.IQianZhaoHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    SkillProgramStepOutcome IQianZhaoHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.ResolveWeifuJudgment => BeginWeifu(f),
         SkillProgramEffectOp.OfferWeifuCategoryTargets => BeginWeifuTargets(f),

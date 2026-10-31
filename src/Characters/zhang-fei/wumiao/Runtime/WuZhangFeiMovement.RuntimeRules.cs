@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_zhang_fei_wumiao_WuZhangFeiMovement
 {
     internal const string WuZishengMovementBinding = "retaliate-foreign-cards";

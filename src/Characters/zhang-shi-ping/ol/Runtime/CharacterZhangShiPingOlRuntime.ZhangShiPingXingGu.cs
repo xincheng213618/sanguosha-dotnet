@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
 {
     internal const string XingGuStoreReason = "skill-program.zhang-shi-ping.xinggu.initial";
     internal const string XingGuDiamondReason = "skill-program.zhang-shi-ping.xinggu.diamond";
-    internal static bool IsXingGuMount(Card card) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhang_shi_ping_ol_ZhangShiPingXingGu.IsXingGuMount(card);
+    internal static bool IsXingGuMount(Card card) => RuntimeSkills.RuntimeRules_zhang_shi_ping_ol_ZhangShiPingXingGu.IsXingGuMount(card);
     internal IReadOnlyList<PromptChoice> XingGuPlacementChoices(int owner, string instance)
     {
         if (!_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.GetValueOrDefault((owner, "ol:xinggu", instance))is not { } pile)
@@ -78,7 +75,7 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
     [ProgramAnswer("zhang-shi-ping-xinggu")]
     internal void AnswerXingGu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangShiPingXingGu: { Stage: XingGuStage.Choose } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], XingGuPlacementChoices(f.OwnerSeat, f.SkillInstanceId).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangShiPingXingGu: { Stage: XingGuStage.Choose } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], XingGuPlacementChoices(f.OwnerSeat, f.SkillInstanceId).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Xinggu lost its exact physical public mount or legal other recipient.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(choice.Cards.Single());
@@ -147,5 +144,5 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.PlaceXingGuMountAndObtainDiamond)]
-    internal PromptChoice AiXingGu(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderByDescending(c => (global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]) ? 10 : 0) + (_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Any(e => _coreEquipmentContentOperations.EquipmentRules.Get(e.Kind).Slot == _coreEquipmentContentOperations.EquipmentRules.Get(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()).Kind).Slot) ? 0 : 2)).First();
+    internal PromptChoice AiXingGu(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderByDescending(c => (CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]) ? 10 : 0) + (_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Any(e => _coreEquipmentContentOperations.EquipmentRules.Get(e.Kind).Slot == _coreEquipmentContentOperations.EquipmentRules.Get(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()).Kind).Slot) ? 0 : 2)).First();
 }

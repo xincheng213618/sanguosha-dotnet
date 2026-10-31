@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFactionRequestCostRecoveriesRuntime
 {
-    internal bool TryPausePaidFactionRequestCost(global::CardGame.Core.NativeOwners.FactionCardRequestHandle request, Card card, CardLocation from)
+    internal bool TryPausePaidFactionRequestCost(NativeOwners.FactionCardRequestHandle request, Card card, CardLocation from)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not { PendingRecoveryAttempts.Count: > 0 } producer)
             return false;
@@ -49,8 +45,8 @@ internal sealed partial class CoreGameEngineFactionRequestCostRecoveriesRuntime
             _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal static bool PaidFactionRequestMatches(global::CardGame.Core.NativeOwners.FactionCardRequestHandle request, PaidFactionRequestCostRecovery receipt) => request.OwnerFrameId == receipt.RequestOwnerFrameId && request.OwnerSeat == receipt.RequestOwnerSeat && request.Purpose == receipt.Purpose && request.PolicySource == receipt.PolicySource && request.CostPaid && !request.ProviderRewarded && request.AwaitingProviders && request.CandidateIndex == 0 && request.ActiveAttack is null && !request.AwaitingZhuqueFanChoice;
-    internal bool HasPaidFactionRequestCostRecovery(global::CardGame.Core.NativeOwners.FactionCardRequestHandle? request)
+    internal static bool PaidFactionRequestMatches(NativeOwners.FactionCardRequestHandle request, PaidFactionRequestCostRecovery receipt) => request.OwnerFrameId == receipt.RequestOwnerFrameId && request.OwnerSeat == receipt.RequestOwnerSeat && request.Purpose == receipt.Purpose && request.PolicySource == receipt.PolicySource && request.CostPaid && !request.ProviderRewarded && request.AwaitingProviders && request.CandidateIndex == 0 && request.ActiveAttack is null && !request.AwaitingZhuqueFanChoice;
+    internal bool HasPaidFactionRequestCostRecovery(NativeOwners.FactionCardRequestHandle? request)
     {
         if (request is null)
             return false;
@@ -67,7 +63,7 @@ internal sealed partial class CoreGameEngineFactionRequestCostRecoveriesRuntime
                 continue;
             if (child is CardsMovedTriggerWindowFrame movement && movement.Batch.ParentFrameId == parent.Id && (movement.ResumeFactionRequestCostFrameId == parent.Id || movement.ResumeRecoveryReplacementFrameId == parent.Id))
                 continue;
-            if (_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(child, parent) || global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(child, parent) || _corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(child, parent) || _coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(child, parent))
+            if (_coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(child, parent) || CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(child, parent) || _corePublicPileEquipmentSequencesOperations.PileEquipmentFrameRidesOn(child, parent) || _coreDeckEquipmentProgramsOperations.RandomEquipmentFrameRidesOn(child, parent))
                 continue;
             if (child is DyingFrame dying && parent is ProgramSkillFrame program && dying.ParentFrameId == program.Id && dying.ResumesProgramSkill)
                 continue;
@@ -79,7 +75,7 @@ internal sealed partial class CoreGameEngineFactionRequestCostRecoveriesRuntime
         return true;
     }
 
-    internal void CancelPaidFactionRequestAfterRecovery(global::CardGame.Core.NativeOwners.FactionCardRequestHandle request)
+    internal void CancelPaidFactionRequestAfterRecovery(NativeOwners.FactionCardRequestHandle request)
     {
         var purpose = request.Purpose;
         var responseAttack = request.ResponseAttack;

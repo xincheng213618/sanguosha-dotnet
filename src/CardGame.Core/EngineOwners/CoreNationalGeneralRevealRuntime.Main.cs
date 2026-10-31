@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNationalGeneralRevealRuntime
@@ -42,7 +38,7 @@ internal sealed partial class CoreNationalGeneralRevealRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NationalFactionRevealedEvent(actor.Seat, actor.NationalFactionId!));
         }
 
-        _coreMatchLogOperations.AddLog("NationalGeneralRevealed", $"{(actor.Name)} 明置{(global::CardGame.Core.EngineOwners.CoreMatchPresentationRuntime.GetFactionName(actor.NationalFactionId!))}势力的【{(general.Name)}】。", actor.Seat);
+        _coreMatchLogOperations.AddLog("NationalGeneralRevealed", $"{(actor.Name)} 明置{(CoreMatchPresentationRuntime.GetFactionName(actor.NationalFactionId!))}势力的【{(general.Name)}】。", actor.Seat);
     }
 
     internal void RevealNationalInformation(CharacterState player)

@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuCheErAnniversaryRuntime
@@ -10,7 +6,7 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
     internal const string HuCheErAction = "anniversary-hu-che-er", HuCheErClaimReason = "skill-program.anniversary:daoji.obtain";
     internal bool HasAnniversaryHuCheErRules => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryHuCheErDaoji) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RecordAnniversaryHuCheErFuzhongGain);
 
-    internal static CardConversionSource HuCheErSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource HuCheErSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static bool HuCheErWeapon(CardKind kind) => EquipmentCatalog.IsEquipment(kind) && EquipmentCatalog.Get(kind).Slot == EquipmentSlot.Weapon;
     internal CardUseFrame? HuCheErFirstWeapon(int owner, ProgramSkillWindowContext c)
     {
@@ -38,7 +34,7 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
         AnniversaryHuCheErComposition.Fuzhong when t.Id == "foreign-turn-gain" => HuCheErGain(c.OwnerSeat, w),
         _ => true
     };
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryHuCheErHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
+    SkillProgramStepOutcome IAnniversaryHuCheErHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {
         SkillProgramEffectOp.ResolveAnniversaryHuCheErDaoji => BeginHuCheEr(f),
         SkillProgramEffectOp.RecordAnniversaryHuCheErFuzhongGain => RecordHuCheErGain(f),
@@ -96,7 +92,7 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
     [ProgramAnswer(HuCheErAction)]
     internal void AnswerHuCheEr(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHuCheEr: { Stage: AnniversaryHuCheErStage.Choice } r } f || !ValidHuCheEr(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HuCheErChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHuCheEr: { Stage: AnniversaryHuCheErStage.Choice } r } f || !ValidHuCheEr(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HuCheErChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Daoji choice changed its owner, native Use or available original entity.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

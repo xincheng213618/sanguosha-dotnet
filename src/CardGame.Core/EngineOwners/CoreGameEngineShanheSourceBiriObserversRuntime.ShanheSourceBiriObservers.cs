@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceBiriObserversRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CoreGameEngineShanheSourceBiriObserversRuntime
             return receipt.Stage == ShanheSourceBiriStage.DrawChildren && _coreSuitPreventionBenefitObserversOperations.SuitPlacementMovementRoot(root, movement) && movement.Batch.Movements.All(move => move.Sequence > receipt.MovementSequenceBefore && move.Sequence <= receipt.MovementSequenceAfter && (move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(root.OwnerSeat) && move.Reason.Value == "skill-program.shanhe-source-biri-14039.draw" || move.From == CardLocation.DiscardPile && move.To == CardLocation.DrawPile && move.Reason == CardMoveReasons.Reshuffle));
         // Shared native draw replacement and exact skill/state changes retain
         // their own return checks rather than borrowing an unrelated root.
-        return receipt.Stage == ShanheSourceBiriStage.DrawChildren && global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, root) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(root, child);
+        return receipt.Stage == ShanheSourceBiriStage.DrawChildren && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, root) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(root, child);
     }
 
     internal bool ShanheSourceBiriObserverEdge(int index)
@@ -38,7 +34,7 @@ internal sealed partial class CoreGameEngineShanheSourceBiriObserversRuntime
                 return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryRewardReturnMatches(recovery, moved, history);
         }
 
-        return global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(index) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
+        return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(index) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
     }
 
     internal ProgramSkillFrame? ShanheSourceBiriObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => root.ShanheSourceBiri is not null && this.ShanheSourceBiriFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => this.ShanheSourceBiriObserverEdge(child), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying)));

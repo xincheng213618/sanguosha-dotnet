@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuPiOlRuntime
 {
     internal const string LiuPiTableBind = "yicheng-public-table";
-    internal CardConversionSource LiuPiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal static string LiuPiMovementReason(LiuPiExchangeStage stage) => global::CardGame.Core.RuntimeSkills.RuntimeRules_liu_pi_ol_LiuPi.LiuPiMovementReason(stage);
-    SkillProgramStepOutcome global::CardGame.Core.ILiuPiProgramHost.Exchange(ProgramSkillFrame f) => BeginLiuPiExchange(f);
+    internal CardConversionSource LiuPiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static string LiuPiMovementReason(LiuPiExchangeStage stage) => RuntimeSkills.RuntimeRules_liu_pi_ol_LiuPi.LiuPiMovementReason(stage);
+    SkillProgramStepOutcome ILiuPiProgramHost.Exchange(ProgramSkillFrame f) => BeginLiuPiExchange(f);
     internal SkillProgramStepOutcome BeginLiuPiExchange(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.LiuPiExchange is not null || f.TriggerId is not null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "exchange")
+        if (f.LiuPiExchange is not null || f.TriggerId is not null || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "exchange")
             throw new InvalidOperationException("Yicheng needs its one original active program frame.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         if (!owner.IsAlive || !owner.HasHpValue)
@@ -160,7 +156,7 @@ internal sealed partial class CharacterLiuPiOlRuntime
     [ProgramAnswer("liu-pi")]
     internal void AnswerLiuPiExchange(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiuPiExchange: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LiuPiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiuPiExchange: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], LiuPiChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Yicheng lost its private chooser or an exact current physical selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -227,7 +223,7 @@ internal sealed partial class CharacterLiuPiOlRuntime
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(current with { LiuPiExchange = current.LiuPiExchange!with { Table = resulting, SequenceAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
             ReplaceLiuPiPublicTable(f.Id, resulting.Select(e => e.CardId).ToArray());
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, LiuPiTableBind, Array.AsReadOnly(resulting.Select(e => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId))).ToArray())));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, LiuPiTableBind, Array.AsReadOnly(resulting.Select(e => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId))).ToArray())));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LiuPiExchangeCommittedEvent(f.Id, r.Source, full, outgoing.Length, incoming.Length, beforeRank, afterRank, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         }, destinationForCard: (_, source) => source == CardLocation.Hand(f.OwnerSeat) ? CardLocation.Processing : CardLocation.Hand(f.OwnerSeat));
     }

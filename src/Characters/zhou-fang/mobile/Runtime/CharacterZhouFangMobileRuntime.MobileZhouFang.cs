@@ -1,23 +1,20 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouFangMobileRuntime
 {
     internal const string MobileDuanfaId = "mobile:duanfa", MobileDuanfaDiscard = "skill-program.mobile-duanfa.discard", MobileDuanfaDraw = "skill-program.mobile-duanfa.draw";
-    internal static CardConversionSource MobileDuanfaSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource MobileDuanfaSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal SkillGrantPhaseExpiry? MobileDuanfaPhase(int owner) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == owner && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber > 0 && _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId > 0 ? new(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, owner, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) : null;
     internal int MobileDuanfaSpent(int owner, SkillGrantPhaseExpiry phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileDuanfaPaidEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillId == MobileDuanfaId && e.Phase == phase).Sum(e => e.ActualCount);
     internal int MobileDuanfaRemaining(int owner) => MobileDuanfaPhase(owner)is { } phase ? Math.Max(0, _coreMatchParticipantsPlayersAccess._players[owner].MaxHp - MobileDuanfaSpent(owner, phase)) : 0;
     internal bool MobileDuanfaHasBlackCost(CharacterState owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Any(c => _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(owner, c)is Suit.Spade or Suit.Club && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner.Seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner.Seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard));
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 82300, SkillProgramEffectOp.ResolveMobileDuanfa)]
     internal bool CanActivateMobileDuanfa(ProgramActivationLegalityContext g) => g.SkillId == MobileDuanfaId && g.Owner.IsAlive && MobileDuanfaRemaining(g.OwnerSeat) > 0 && MobileDuanfaHasBlackCost(g.Owner);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileZhouFangHost.Begin(ProgramSkillFrame f) => BeginMobileDuanfa(f);
-    void global::CardGame.Core.IMobileZhouFangHost.PublishBait(ProgramSkillFrame f, string bind) => PublishMobileYoudiBait(f, bind);
+    SkillProgramStepOutcome IMobileZhouFangHost.Begin(ProgramSkillFrame f) => BeginMobileDuanfa(f);
+    void IMobileZhouFangHost.PublishBait(ProgramSkillFrame f, string bind) => PublishMobileYoudiBait(f, bind);
     internal IReadOnlyList<PromptChoice> MobileDuanfaCosts(ProgramSkillFrame f) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard).Where(c => c.Cards.Count == 1 && _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()))is Suit.Spade or Suit.Club).ToArray();
     internal SkillProgramStepOutcome BeginMobileDuanfa(ProgramSkillFrame supplied)
     {
@@ -104,7 +101,7 @@ internal sealed partial class CharacterZhouFangMobileRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Duanfa answer lost its original frame.");
         var r = f.MobileDuanfa!;
-        if (r.Stage != MobileDuanfaStage.Cards || selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MobileDuanfaChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (r.Stage != MobileDuanfaStage.Cards || selected.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MobileDuanfaChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Duanfa's actual black HE payment or phase allowance changed.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         switch (selected.Parameters["branch"])

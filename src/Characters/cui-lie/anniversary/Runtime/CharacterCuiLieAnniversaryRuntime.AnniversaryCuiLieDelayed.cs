@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCuiLieAnniversaryRuntime
 {
-    internal bool HasAnniversaryCuiLieDelayedTail(CardUseFrame use) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(use.CardKind) && use.CardId > 0 && use.Action is { Type: CardActionType.Use } a && a.EffectiveKind == use.CardKind && a.TargetSeats.SequenceEqual(use.TargetSeats) && use.TargetSeats.Count > 1 && use.TargetSeats.Distinct().Count() == use.TargetSeats.Count && use.TargetSeats.All(_coreTableSeatQueriesOperations.IsValidPlayerSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuiLieUseChangedEvent>().Any(e => e.UseId == use.Id && !e.Cancelled && e.AfterTargets.Count > 1 && use.TargetSeats.Take(e.AfterTargets.Count).SequenceEqual(e.AfterTargets) && IsAnniversaryCuiLieTargetMutationFact(use, e, e.BeforeTargets));
+    internal bool HasAnniversaryCuiLieDelayedTail(CardUseFrame use) => CoreNativeCardClassificationsRuntime.IsDelayedCard(use.CardKind) && use.CardId > 0 && use.Action is { Type: CardActionType.Use } a && a.EffectiveKind == use.CardKind && a.TargetSeats.SequenceEqual(use.TargetSeats) && use.TargetSeats.Count > 1 && use.TargetSeats.Distinct().Count() == use.TargetSeats.Count && use.TargetSeats.All(_coreTableSeatQueriesOperations.IsValidPlayerSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuiLieUseChangedEvent>().Any(e => e.UseId == use.Id && !e.Cancelled && e.AfterTargets.Count > 1 && use.TargetSeats.Take(e.AfterTargets.Count).SequenceEqual(e.AfterTargets) && IsAnniversaryCuiLieTargetMutationFact(use, e, e.BeforeTargets));
     internal bool IsAnniversaryCuiLieDelayedMaterialPlaced(CardUseFrame use)
     {
         if (!HasAnniversaryCuiLieDelayedTail(use))
@@ -17,7 +13,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
     }
 
     internal bool CuiLieDelayedTargetLegal(CardUseFrame use, int target) => _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreMatchParticipantsPlayersAccess._players[target].JudgmentAreaAbolished && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(_coreMatchParticipantsPlayersAccess._players[target], use.CardKind) && !_coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[target], SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget) && (use.CardKind == CardKind.Lightning || target != use.SourceSeat || _characterLiuYanOlOperations.IsLiuYanLimuUse(use.Id));
-    internal IReadOnlyList<int> AnniversaryCuiLieDelayedPlacementTargets(global::CardGame.Core.NativeOwners.JizhiResolution pending, IReadOnlyList<int> original)
+    internal IReadOnlyList<int> AnniversaryCuiLieDelayedPlacementTargets(NativeOwners.JizhiResolution pending, IReadOnlyList<int> original)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is not { } use || !HasAnniversaryCuiLieDelayedTail(use))
             return original;

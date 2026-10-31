@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -11,7 +8,7 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
     internal const string MouChenGongGiftReason = "skill-program.mou-mobile:mingce.give", MouChenGongDrawReason = "skill-program.mou-mobile:mingce.Draw";
     internal bool HasMouChenGongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouChenGongMingceGift) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouChenGongMingceRelease) || _contentRegistryOperations._contentRegistry.Skills.ContainsKey(MouChenGongComposition.Zhichi);
 
-    internal static CardConversionSource MouChenGongSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_chen_gong_mou_mobile_MouChenGongMingce.MouChenGongSource(f);
+    internal static CardConversionSource MouChenGongSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_chen_gong_mou_mobile_MouChenGongMingce.MouChenGongSource(f);
     internal bool MouChenGongPhaseSpent(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenGongMingceStartedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == MouChenGongComposition.Mingce && e.Phase == phase);
     [ProgramPhaseUsedProjection(30)]
     internal int MouChenGongProjectedPhaseUses(int owner, string skill, int fallback) => skill == MouChenGongComposition.Mingce && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) ? _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenGongMingceStartedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.Phase == phase) : fallback;
@@ -53,7 +50,7 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouChenGongGift!;
-        if (!MouChenGongGiftRoot(f) || r.Stage != MouChenGongGiftStage.GiftChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouChenGongGiftChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!MouChenGongGiftRoot(f) || r.Stage != MouChenGongGiftStage.GiftChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouChenGongGiftChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Mingce requires the owner's exact current HE payment slot.");
         var from = new CardLocation(Enum.Parse<CardZoneKind>(selected.Parameters["source-zone"]), f.OwnerSeat);
         var card = _cardZonesOperations._cardZones.CardsAt(from)[int.Parse(selected.Parameters["slot-index"], CultureInfo.InvariantCulture)];
@@ -79,7 +76,7 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouChenGongGift!;
-        if (!MouChenGongGiftRoot(f) || r.Stage != MouChenGongGiftStage.RecipientChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.RecipientSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouChenGongBranchChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (!MouChenGongGiftRoot(f) || r.Stage != MouChenGongGiftStage.RecipientChoice || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.RecipientSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouChenGongBranchChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Mingce accepts only its actual recipient's current private branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = selected.Parameters["branch"];
@@ -200,13 +197,13 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
     internal PromptChoice AiMouChenGongGift(PendingDecision pending, ProgramSkillFrame f)
     {
         if (f.MouChenGongGift!.Stage == MouChenGongGiftStage.GiftChoice)
-            return pending.Choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+            return pending.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
         var view = _corePlayerViewProjectionOperations.CreateSnapshot(pending.PlayerSeat);
         var friendly = _coreAiBrainsAiBrainsAccess._aiBrains[pending.PlayerSeat].ScoreProgramTarget(view, f.OwnerSeat, new(OwnerDraw: 0, OwnerRecovery: 0, OwnerHpLoss: 0, TargetDraw: 1, TargetRecovery: 0, TargetHpLoss: 0, GivesSelected: false, DiscardsSelected: false)) > 0;
         var branch = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && view.Players[pending.PlayerSeat].Hp >= 4 && friendly ? "lose-hp" : "draw";
         return pending.Choices.Single(c => c.Parameters["branch"] == branch);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IMouChenGongHost.Gift(ProgramSkillFrame frame) => BeginMouChenGongGift(frame);
-    SkillProgramStepOutcome global::CardGame.Core.IMouChenGongHost.Release(ProgramSkillFrame frame) => BeginMouChenGongRelease(frame);
+    SkillProgramStepOutcome IMouChenGongHost.Gift(ProgramSkillFrame frame) => BeginMouChenGongGift(frame);
+    SkillProgramStepOutcome IMouChenGongHost.Release(ProgramSkillFrame frame) => BeginMouChenGongRelease(frame);
 }

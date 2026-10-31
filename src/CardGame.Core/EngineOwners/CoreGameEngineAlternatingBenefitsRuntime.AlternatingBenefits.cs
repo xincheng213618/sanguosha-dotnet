@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineAlternatingBenefitsRuntime
 {
     internal IEnumerable<IGameEvent> CompleteProgramEventHistory() => _coreProgramEventHistoryOperations.ProgramHistory.Complete();
-    void global::CardGame.Core.IAlternatingBenefitsProgramHost.ApplyAlternatingChoiceBenefit(ProgramSkillFrame f, SkillProgramEffect e) => ApplyAlternatingChoiceBenefit(f, e);
-    SkillProgramStepOutcome global::CardGame.Core.IAlternatingBenefitsProgramHost.ObtainDeckCardWithConsecutiveTarget(ProgramSkillFrame f, int seat, SkillProgramEffect e) => ObtainDeckCardWithConsecutiveTarget(f, seat, e);
+    void IAlternatingBenefitsProgramHost.ApplyAlternatingChoiceBenefit(ProgramSkillFrame f, SkillProgramEffect e) => ApplyAlternatingChoiceBenefit(f, e);
+    SkillProgramStepOutcome IAlternatingBenefitsProgramHost.ObtainDeckCardWithConsecutiveTarget(ProgramSkillFrame f, int seat, SkillProgramEffect e) => ObtainDeckCardWithConsecutiveTarget(f, seat, e);
     internal int AlternatingOwnerTurnOrdinal(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == owner);
     internal AlternatingChoiceBenefitResolvedEvent? GetAlternatingChoicePredecessor(int owner, string skill, string instance, SkillProgramEffect effect)
     {
@@ -32,11 +28,11 @@ internal sealed partial class CoreGameEngineAlternatingBenefitsRuntime
         {
             if (effect.AlternatingDrawTiming == SkillProgramAlternatingDrawTiming.NextDrawPhase)
             {
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AlternatingChoiceDrawBenefitIssuedEvent(frame.Id, frame.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), frame.GameplayHash, effect.StateId!, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, ordinal, amount));
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AlternatingChoiceDrawBenefitIssuedEvent(frame.Id, frame.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), frame.GameplayHash, effect.StateId!, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, ordinal, amount));
                 return;
             }
 
-            var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, global::CardGame.Core.EngineOwners.CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), SkillRuleQuery.DrawCount, SkillRuleOperation.Add, amount);
+            var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantRuleModifier(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, frame.InstructionIndex - 1, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), SkillRuleQuery.DrawCount, SkillRuleOperation.Add, amount);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnRuleModifierGrantedEvent(grant));
         }
         else
@@ -92,7 +88,7 @@ internal sealed partial class CoreGameEngineAlternatingBenefitsRuntime
         var ordinal = _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == frame.OwnerSeat);
         var last = _coreProgramEventHistoryOperations.ProgramEventHistory<ConsecutiveTargetDeckGiftEvent>().LastOrDefault(e => e.OwnerSeat == frame.OwnerSeat && e.SkillId == frame.SkillId && e.SkillInstanceId == frame.SkillInstanceId && e.StateId == effect.StateId);
         var repeated = last is not null && last.TargetSeat == targetSeat && last.OwnerTurnOrdinal == ordinal - 1;
-        var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(c => effect.Suits.Contains(c.Suit) && effect.CardCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, category)));
+        var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Reverse().FirstOrDefault(c => effect.Suits.Contains(c.Suit) && effect.CardCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(c.Kind, category)));
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
         _coreRuntimeOperations.ReplaceRuntimeFrame(_resolutionStackOperations._resolutionStack[index].Id, frame with { ChoiceBindings = frame.ChoiceBindings.Append(new ProgramChoiceResultBinding(effect.ResultBind!, repeated ? "repeat" : "new", targetSeat)).ToArray() });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ConsecutiveTargetDeckGiftEvent(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, effect.StateId!, targetSeat, ordinal, card?.Id, repeated));

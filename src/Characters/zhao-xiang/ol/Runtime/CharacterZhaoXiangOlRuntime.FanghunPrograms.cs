@@ -1,11 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoXiangOlRuntime
@@ -51,7 +44,7 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var c = f.WindowContext;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (f.InstructionIndex != 1 || f.TriggerId is null || c is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, DamageFrameId: { } damageId } || index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame parent || parent.Id != c.ParentFrameId || parent.ParentFrameId != damageId || parent.SourceCard is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex].ToProgramCandidate()) || !CanGainMeiYingFromDamage(f.OwnerSeat, _coreProgramLifecycleOperations.GetProgramTrigger(f), parent.SourceSeat, parent.TargetSeat, c.Facts?.DamageSourceIsOwner != true && c.SourceSeat is null) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhaoXiangMeiYingGainedEvent>().Any(e => e.DamageWindowId == parent.Id && e.Source.OwnerSeat == f.OwnerSeat))
+        if (f.InstructionIndex != 1 || f.TriggerId is null || c is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, DamageFrameId: { } damageId } || index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame parent || parent.Id != c.ParentFrameId || parent.ParentFrameId != damageId || parent.SourceCard is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex].ToProgramCandidate()) || !CanGainMeiYingFromDamage(f.OwnerSeat, _coreProgramLifecycleOperations.GetProgramTrigger(f), parent.SourceSeat, parent.TargetSeat, c.Facts?.DamageSourceIsOwner != true && c.SourceSeat is null) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhaoXiangMeiYingGainedEvent>().Any(e => e.DamageWindowId == parent.Id && e.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Proportional MeiYing lost one actual owner-related applied Slash damage.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var total = checked(owner.Markers.GetValueOrDefault(PlayerMarkerKind.MeiYing) + c.Amount);
@@ -63,7 +56,7 @@ internal sealed partial class CharacterZhaoXiangOlRuntime
     internal ZhaoXiangConversionPayment? ZhaoXiangActionPayment(ProgramSkillFrame f)
     {
         var parent = ZhaoXiangConversionParent(f);
-        if (parent is null || parent.Action.ProviderSeat != f.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])))
+        if (parent is null || parent.Action.ProviderSeat != f.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])))
             return null;
         var payments = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ZhaoXiangConversionPayment>().Where(e => e.ActionId == parent.Action.ActionId && e.Source.SkillId == f.SkillId && e.Source.SkillInstanceId == f.SkillInstanceId && e.Source.OwnerSeat == f.OwnerSeat && e.GameplayHash == f.GameplayHash && e.Removed == 1 && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.ActualActorSeat == parent.Action.ActorSeat && e.ProviderSeat == parent.Action.ProviderSeat && e.RequesterSeat == parent.Action.RequesterSeat && parent.Action.ConversionChain.Contains(e.Source) && parent.Action.PhysicalCards is [var card] && card.CardId == e.PhysicalCardId && card.CardKind == e.InputKind && parent.Action.EffectiveKind == e.OutputKind).ToArray();
         return payments is [var paid] ? paid : null;

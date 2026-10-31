@@ -1,20 +1,16 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSlashSuitDiscardRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.ISlashSuitDiscardProgramHost.SuppressCurrentSlashTargetAndJudgeSuitDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginProgramSlashSuitDiscard(frame, effect);
-    internal global::CardGame.Core.NativeOwners.CardAttackHandle SlashSuitDiscardAttack(ProgramSkillFrame frame, bool requireActive = true)
+    SkillProgramStepOutcome ISlashSuitDiscardProgramHost.SuppressCurrentSlashTargetAndJudgeSuitDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginProgramSlashSuitDiscard(frame, effect);
+    internal NativeOwners.CardAttackHandle SlashSuitDiscardAttack(ProgramSkillFrame frame, bool requireActive = true)
     {
         var context = frame.WindowContext;
         var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(item => item.Id == context?.ParentFrameId);
         var attack = window?.AttackOwnerFrameId is { } ownerId ? _kernelCoreMainOperations.CreateCardAttackHandle(ownerId) : throw new InvalidOperationException("Suit discard lost its Slash owner.");
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(item => item.Id == attack.ResolutionId);
-        if (context is not { Window: SkillProgramTriggerWindow.SlashBeforeResponse, CardUse: { } action } || context.TargetSeat != attack.TargetSeat || frame.OwnerSeat != attack.CardUserSeat || use.Action?.ActionId != action.CardActionId || action.ParentCardUseFrameId != use.Id || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || requireActive && !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || frame.SlashSuitDiscard is { } draft && (draft.CardUseFrameId != use.Id || draft.CardActionId != action.CardActionId || draft.TargetSeat != attack.TargetSeat))
+        if (context is not { Window: SkillProgramTriggerWindow.SlashBeforeResponse, CardUse: { } action } || context.TargetSeat != attack.TargetSeat || frame.OwnerSeat != attack.CardUserSeat || use.Action?.ActionId != action.CardActionId || action.ParentCardUseFrameId != use.Id || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || requireActive && !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || frame.SlashSuitDiscard is { } draft && (draft.CardUseFrameId != use.Id || draft.CardActionId != action.CardActionId || draft.TargetSeat != attack.TargetSeat))
             throw new InvalidOperationException("Suit discard lost its exact final target or actual Slash.");
         return attack;
     }
@@ -116,7 +112,7 @@ internal sealed partial class CoreGameEngineSlashSuitDiscardRuntime
             ["program-action"] = "slash-suit-discard",
             ["frame-id"] = frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture)
         };
-        return SlashSuitDiscardCards(draft).Select(card => new PromptChoice(new($"slash-suit-discard.{(frame.Id)}.pay.{(card.Id)}"), $"弃置【{(card.DisplayName)}】{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(draft.FinalSuit))}{(card.RankText)}", [card.Id], [], Parameters())).Append(new(new($"slash-suit-discard.{(frame.Id)}.decline"), frame.SkillId == "boundary:tieqi-mobile" ? "不弃置，不能使用【闪】响应此杀" : "不弃置，不能抵消此杀", [], [], Parameters())).ToArray();
+        return SlashSuitDiscardCards(draft).Select(card => new PromptChoice(new($"slash-suit-discard.{(frame.Id)}.pay.{(card.Id)}"), $"弃置【{(card.DisplayName)}】{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(draft.FinalSuit))}{(card.RankText)}", [card.Id], [], Parameters())).Append(new(new($"slash-suit-discard.{(frame.Id)}.decline"), frame.SkillId == "boundary:tieqi-mobile" ? "不弃置，不能使用【闪】响应此杀" : "不弃置，不能抵消此杀", [], [], Parameters())).ToArray();
     }
 
     internal void PublishProgramSlashSuitDiscard(ProgramSkillFrame frame)
@@ -124,7 +120,7 @@ internal sealed partial class CoreGameEngineSlashSuitDiscardRuntime
         var draft = frame.SlashSuitDiscard!;
         var choices = SlashSuitDiscardChoices(frame);
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId);
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, draft.TargetSeat, $"【{(skill.Name)}】：是否弃置一张{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(draft.FinalSuit))}牌，使你{((frame.SkillId == "boundary:tieqi-mobile" ? "可以使用【闪】响应此杀" : "能抵消此杀"))}？", choices.SelectMany(choice => choice.Cards).ToArray(), [], frame.OwnerSeat)
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, draft.TargetSeat, $"【{(skill.Name)}】：是否弃置一张{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(draft.FinalSuit))}牌，使你{((frame.SkillId == "boundary:tieqi-mobile" ? "可以使用【闪】响应此杀" : "能抵消此杀"))}？", choices.SelectMany(choice => choice.Cards).ToArray(), [], frame.OwnerSeat)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             IsPrivate = true,
@@ -182,7 +178,7 @@ internal sealed partial class CoreGameEngineSlashSuitDiscardRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSlashSuitDiscardResolvedEvent(frame.Id, frame.SkillId, frame.OwnerSeat, draft.CardUseFrameId, draft.TargetSeat, draft.FinalSuit, draft.PaidCardId, paid));
     }
 
-    internal bool IsSlashDodgeCancellationPrevented(global::CardGame.Core.NativeOwners.CardAttackHandle attack) => _coreWushuangCombatTacticsOperations.WushuangDrunkenSlashUnrespondable(attack) || _coreFinalTargetSlashOperations.FinalTargetSlashReceipts(attack.ResolutionId, attack.TargetSeat).Any(item => item.PreventCancellation) || _coreCurrentCardEnhancementsOperations.HasCurrentCardEnhancement(attack.ResolutionId, CurrentCardEnhancement.Uncancelable) || _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).JudgmentSuitDodgeRestriction?.TargetSeat == attack.TargetSeat;
+    internal bool IsSlashDodgeCancellationPrevented(NativeOwners.CardAttackHandle attack) => _coreWushuangCombatTacticsOperations.WushuangDrunkenSlashUnrespondable(attack) || _coreFinalTargetSlashOperations.FinalTargetSlashReceipts(attack.ResolutionId, attack.TargetSeat).Any(item => item.PreventCancellation) || _coreCurrentCardEnhancementsOperations.HasCurrentCardEnhancement(attack.ResolutionId, CurrentCardEnhancement.Uncancelable) || _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).JudgmentSuitDodgeRestriction?.TargetSeat == attack.TargetSeat;
     [ProgramAiChoice(SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeSuitDiscard)]
-    internal PromptChoice SelectAiSlashSuitDiscard(PendingDecision decision, ProgramSkillFrame frame) => decision.Choices.OrderBy(choice => choice.Cards.Count == 0 ? double.MaxValue : global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(SlashSuitDiscardCards(frame.SlashSuitDiscard!).Single(card => card.Id == choice.Cards[0]), _coreMatchParticipantsPlayersAccess._players[frame.SlashSuitDiscard!.TargetSeat])).First();
+    internal PromptChoice SelectAiSlashSuitDiscard(PendingDecision decision, ProgramSkillFrame frame) => decision.Choices.OrderBy(choice => choice.Cards.Count == 0 ? double.MaxValue : CoreNativeAiDecisionsRuntime.GetKeepValue(SlashSuitDiscardCards(frame.SlashSuitDiscard!).Single(card => card.Id == choice.Cards[0]), _coreMatchParticipantsPlayersAccess._players[frame.SlashSuitDiscard!.TargetSeat])).First();
 }

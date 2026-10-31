@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangJiOlRuntime
@@ -118,7 +114,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         if (child is DouyuWindowFrame window)
             return window.ParentFrameId == beneath.Id && beneath.DouyuContest is not null && ValidDouyuContest(beneath);
         if (beneath is DouyuWindowFrame w && child is ProgramSkillFrame f && f.WindowContext is { Douyu: { } dc } c)
-            return c.ParentFrameId == w.Id && dc.ContestId == w.ParentFrameId && dc.Stage == w.Stage && dc.ComparisonIndex == w.ComparisonIndex && w.CandidateIndex >= 0 && w.CandidateIndex < w.Entries.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Entries[w.CandidateIndex].Candidate) && dc.SwapFrameId == w.Entries[w.CandidateIndex].SwapFrameId;
+            return c.ParentFrameId == w.Id && dc.ContestId == w.ParentFrameId && dc.Stage == w.Stage && dc.ComparisonIndex == w.ComparisonIndex && w.CandidateIndex >= 0 && w.CandidateIndex < w.Entries.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Entries[w.CandidateIndex].Candidate) && dc.SwapFrameId == w.Entries[w.CandidateIndex].SwapFrameId;
         return false;
     }
 

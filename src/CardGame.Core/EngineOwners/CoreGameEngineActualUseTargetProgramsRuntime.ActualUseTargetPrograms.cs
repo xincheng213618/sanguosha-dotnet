@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
@@ -11,7 +7,7 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
 
     internal ActualUseTargetIdentity? FreezeActualUseTarget(CardUseFrame use, int target)
     {
-        if (!TracksPaidOwnTargets || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || target == use.SourceSeat && !_coreHalfHandTargetSupportOperations.HasHalfHandSelfTargetSupport(target) && !_coreOwnTrickDrawTargetsOperations.HasOwnMultiTargetTrickSelfTarget(use, target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !use.TargetSeats.Contains(target) && !_coreHalfHandTargetSupportOperations.IsHalfHandImplicitSelfTarget(use, target) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind))
+        if (!TracksPaidOwnTargets || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || target == use.SourceSeat && !_coreHalfHandTargetSupportOperations.HasHalfHandSelfTargetSupport(target) && !_coreOwnTrickDrawTargetsOperations.HasOwnMultiTargetTrickSelfTarget(use, target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !use.TargetSeats.Contains(target) && !_coreHalfHandTargetSupportOperations.IsHalfHandImplicitSelfTarget(use, target) || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind))
             return null;
         if (use.CardKind == CardKind.BorrowedSword && !use.TargetSeats.Where((_, i) => i % 2 == 0).Contains(target))
             return null;
@@ -29,16 +25,16 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
         return identity.LegacyProducerProgramId is { } producer && use.Action is null && (_coreDamageJudgmentSuitPaymentsOperations.LegacyDamageJudgmentVirtualProducer(use, identity.TargetSeat) == producer || _coreUniqueHpTargetAnnouncementsOperations.MatchesAnnouncedUniqueHpLegacyTarget(identity));
     }
 
-    internal bool TryBeginActualUseTargetPrograms(global::CardGame.Core.NativeOwners.CardAttackHandle attack, ActualUseTargetReturnKind kind)
+    internal bool TryBeginActualUseTargetPrograms(NativeOwners.CardAttackHandle attack, ActualUseTargetReturnKind kind)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId);
         return use is not null && StartActualUseTargetWindow(use, [attack.TargetSeat], kind, null);
     }
 
-    internal bool TryBeginActualUseTargetPrograms(global::CardGame.Core.NativeOwners.JizhiResolution pending)
+    internal bool TryBeginActualUseTargetPrograms(NativeOwners.JizhiResolution pending)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId);
-        return use is not null && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) && StartActualUseTargetWindow(use, use.CardKind == CardKind.BorrowedSword ? pending.TargetSeats.Take(1).ToArray() : _coreHalfHandTargetSupportOperations.HalfHandActualTrickTargets(use, pending.TargetSeats), ActualUseTargetReturnKind.OrdinaryTrick, new(pending.Card.Id, pending.ActionKind, pending.TargetCardId, pending.RequiredCardKind));
+        return use is not null && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) && StartActualUseTargetWindow(use, use.CardKind == CardKind.BorrowedSword ? pending.TargetSeats.Take(1).ToArray() : _coreHalfHandTargetSupportOperations.HalfHandActualTrickTargets(use, pending.TargetSeats), ActualUseTargetReturnKind.OrdinaryTrick, new(pending.Card.Id, pending.ActionKind, pending.TargetCardId, pending.RequiredCardKind));
     }
 
     internal bool StartActualUseTargetWindow(CardUseFrame use, IReadOnlyList<int> targets, ActualUseTargetReturnKind kind, ActualUseTargetTrickReturn? trick)
@@ -124,7 +120,7 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
 
     internal void CompleteActualUseTargetBinding(ProgramSkillFrame child, bool completed)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ActualUseTargetWindowFrame parent || parent.Id != child.WindowContext?.ParentFrameId || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(child, parent.Candidates[parent.CandidateIndex]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ActualUseTargetWindowFrame parent || parent.Id != child.WindowContext?.ParentFrameId || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(child, parent.Candidates[parent.CandidateIndex]))
             throw new InvalidOperationException("The paid target binding lost its exact owning candidate.");
         // The binding fact has already been committed by the standard completion path.
         _coreRuntimeOperations.ReplaceRuntimeTop(parent with { CandidateIndex = parent.CandidateIndex + 1, Step = ResolutionFrameStep.ResolvingEffect });
@@ -160,7 +156,7 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
         {
             var ret = parent.TrickReturn ?? throw new InvalidOperationException("Missing ordinary-trick return.");
             var action = use.Action ?? throw new InvalidOperationException("An ordinary-trick target window requires an actual action.");
-            var pending = new global::CardGame.Core.NativeOwners.JizhiResolution(action.ActorSeat, use.Id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, ret.EffectCardId, true), use.CardKind, use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(use.TargetIndex).Take(2).ToArray() : use.TargetSeats, ret.ActionKind, ret.TargetCardId, ret.RequiredCardKind);
+            var pending = new NativeOwners.JizhiResolution(action.ActorSeat, use.Id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, ret.EffectCardId, true), use.CardKind, use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(use.TargetIndex).Take(2).ToArray() : use.TargetSeats, ret.ActionKind, ret.TargetCardId, ret.RequiredCardKind);
             if (!_coreCardActionsOperations.TryBeginProgramCardWindow(null, action, SkillProgramTriggerWindow.CardUseBeforeTargetEffects, use.TargetSeats, ProgramCardContinuation.BeforeTrickTargetEffects, trickContinuation: new(ret.EffectCardId, ret.ActionKind, ret.TargetCardId, ret.RequiredCardKind)))
                 _coreNativeNullificationOperations.ContinueJizhiOrNullificationAfterTargetTriggers(pending);
             return;

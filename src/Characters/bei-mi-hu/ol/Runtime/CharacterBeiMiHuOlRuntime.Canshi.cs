@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -16,12 +13,12 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
     internal bool KuiCancelTargetNormalizeImplicitDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ConsumeKuiCancelSoleIncomingTarget);
     [ProgramTargetWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, 170)]
     internal bool KuiAppendTargetNormalizeImplicitDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ConsumeKuiAppendLegalTargets);
-    internal static int[] BeiMiHuPrimaryTargets(CardUseFrame use) => global::CardGame.Core.RuntimeSkills.RuntimeRules_bei_mi_hu_ol_Canshi.BeiMiHuPrimaryTargets(use);
+    internal static int[] BeiMiHuPrimaryTargets(CardUseFrame use) => RuntimeSkills.RuntimeRules_bei_mi_hu_ol_Canshi.BeiMiHuPrimaryTargets(use);
     internal bool TryGetBeiMiHuCardUse(int owner, ProgramSkillWindowContext context, SkillProgramEffectOp op, out CardUseFrame use, out ProgramCardTriggerWindowFrame window)
     {
         use = null !;
         window = null !;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } p || p.ParentFrameId != identity.ParentCardUseFrameId || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(p) != context.Window || p.CompletedResponseReturn is not null || p.Continuation is not (ProgramCardContinuation.Slash or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.FinalizedSimpleCard) || _coreCardUseLifecycleOperations.LifecycleCardUse(p.ParentFrameId)is not { Action: { Type: CardActionType.Use } action } native || native.Step == ResolutionFrameStep.Completed || action.ActionId != identity.CardActionId || action.ActorSeat != native.SourceSeat || action.EffectiveKind != native.CardKind || p.Action.ActionId != action.ActionId || !action.TargetSeats.SequenceEqual(native.TargetSeats) || !p.Action.TargetSeats.SequenceEqual(native.TargetSeats) || native.DyingResponse is not null || action.ResponderSeat is not null || global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(native.CardKind) != SkillProgramCardCategory.Basic && !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(native.CardKind) || native.CardKind == CardKind.BorrowedSword && native.TargetSeats.Count % 2 != 0 || BeiMiHuPrimaryTargets(native)is not [var sole] || op == SkillProgramEffectOp.ConsumeKuiCancelSoleIncomingTarget && (sole != owner || _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].Markers.GetValueOrDefault(PlayerMarkerKind.Kui) != 1) || op == SkillProgramEffectOp.ConsumeKuiAppendLegalTargets && action.ActorSeat != owner)
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } p || p.ParentFrameId != identity.ParentCardUseFrameId || CoreGameEngineCardActionsRuntime.GetCardActionWindow(p) != context.Window || p.CompletedResponseReturn is not null || p.Continuation is not (ProgramCardContinuation.Slash or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.FinalizedSimpleCard) || _coreCardUseLifecycleOperations.LifecycleCardUse(p.ParentFrameId)is not { Action: { Type: CardActionType.Use } action } native || native.Step == ResolutionFrameStep.Completed || action.ActionId != identity.CardActionId || action.ActorSeat != native.SourceSeat || action.EffectiveKind != native.CardKind || p.Action.ActionId != action.ActionId || !action.TargetSeats.SequenceEqual(native.TargetSeats) || !p.Action.TargetSeats.SequenceEqual(native.TargetSeats) || native.DyingResponse is not null || action.ResponderSeat is not null || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(native.CardKind) != SkillProgramCardCategory.Basic && !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(native.CardKind) || native.CardKind == CardKind.BorrowedSword && native.TargetSeats.Count % 2 != 0 || BeiMiHuPrimaryTargets(native)is not [var sole] || op == SkillProgramEffectOp.ConsumeKuiCancelSoleIncomingTarget && (sole != owner || _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].Markers.GetValueOrDefault(PlayerMarkerKind.Kui) != 1) || op == SkillProgramEffectOp.ConsumeKuiAppendLegalTargets && action.ActorSeat != owner)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == p.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != native.Id)
@@ -62,7 +59,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
         var action = use.Action!;
         var actor = _coreMatchParticipantsPlayersAccess._players[action.ActorSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[group[0]];
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, target, new(-1, use.CardKind, action.EffectiveSuit ?? Suit.None, action.EffectiveRank ?? 0), action.ConversionChain.FirstOrDefault(), use.CardKind, existingUseFrameId: use.Id, specificEffectiveRank: action.EffectiveRank, physicalCardIds: action.PhysicalCards.Select(c => c.CardId).ToArray()))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, target, new(-1, use.CardKind, action.EffectiveSuit ?? Suit.None, action.EffectiveRank ?? 0), action.ConversionChain.FirstOrDefault(), use.CardKind, existingUseFrameId: use.Id, specificEffectiveRank: action.EffectiveRank, physicalCardIds: action.PhysicalCards.Select(c => c.CardId).ToArray()))
             return false;
         if (use.CardKind == CardKind.Snatch && !_coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.IgnoreUseDistance, CardKind.Snatch) && !_coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(actor, target, CardKind.Snatch) && !use.GuanFirstRedDistance && !_coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance2(actor.Seat, action.EffectiveSuit) && !_coreProvenanceCardPoliciesOperations.HasProvenanceUseDistance2(actor, action.PhysicalCards.Select(c => c.CardId).ToArray()) && !_coreGrantedEntityPhasesOperations.HasGrantedPhaseEntityDistance(actor, action.PhysicalCards.Select(c => c.CardId).ToArray()) && !action.ConversionChain.Any(s => _corePlayCardHistoryOperations.ViewAsRule(s)?.DistanceUnlimited == true) && _coreNativeRuleQueriesOperations.GetCombatDistance(actor.Seat, target.Seat) != 1)
             return false;
@@ -160,7 +157,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
         var simple = use.AdjustedSimpleContinuation;
         if (kind == "append" && window.Continuation == ProgramCardContinuation.FinalizedSimpleCard)
             simple ??= window.SimpleContinuation ?? throw new InvalidOperationException("Canshi basic use lost its native continuation.");
-        _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(use with { TargetSeats = receipt.AfterTargets, Action = action, TargetIndex = 0, AdjustedSimpleContinuation = simple, TargetsAdjusted = true, SlashTargetsCancelled = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && targets.Count == 0, Enhancements = kind == "append" ? use.Enhancements | CurrentCardEnhancement.ExtraTarget : use.Enhancements, BeiMiHuTargetMutation = receipt }, action);
+        _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(use with { TargetSeats = receipt.AfterTargets, Action = action, TargetIndex = 0, AdjustedSimpleContinuation = simple, TargetsAdjusted = true, SlashTargetsCancelled = CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && targets.Count == 0, Enhancements = kind == "append" ? use.Enhancements | CurrentCardEnhancement.ExtraTarget : use.Enhancements, BeiMiHuTargetMutation = receipt }, action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BeiMiHuTargetsPaidEvent(receipt));
     }
 
@@ -190,6 +187,6 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
         return r.AfterTargets.Take(original.Count).SequenceEqual(original) && r.AfterTargets.Skip(original.Count).Where((_, i) => use.CardKind != CardKind.BorrowedSword || i % 2 == 0).SequenceEqual(r.PaidMarkerSeats);
     }
 
-    internal static bool BeiMiHuMutationEqual(BeiMiHuTargetMutation x, BeiMiHuTargetMutation y) => global::CardGame.Core.RuntimeSkills.RuntimeRules_bei_mi_hu_ol_Canshi.BeiMiHuMutationEqual(x, y);
-    internal static bool BeiMiHuActionIdentityEqual(CardActionContext x, CardActionContext y) => global::CardGame.Core.RuntimeSkills.RuntimeRules_bei_mi_hu_ol_Canshi.BeiMiHuActionIdentityEqual(x, y);
+    internal static bool BeiMiHuMutationEqual(BeiMiHuTargetMutation x, BeiMiHuTargetMutation y) => RuntimeSkills.RuntimeRules_bei_mi_hu_ol_Canshi.BeiMiHuMutationEqual(x, y);
+    internal static bool BeiMiHuActionIdentityEqual(CardActionContext x, CardActionContext y) => RuntimeSkills.RuntimeRules_bei_mi_hu_ol_Canshi.BeiMiHuActionIdentityEqual(x, y);
 }

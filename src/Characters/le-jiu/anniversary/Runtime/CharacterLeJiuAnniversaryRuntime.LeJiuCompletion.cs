@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLeJiuAnniversaryRuntime
@@ -20,10 +16,10 @@ internal sealed partial class CharacterLeJiuAnniversaryRuntime
             result.Add(new(g.Source.OwnerSeat, action.ActorSeat, g.Source.SkillId, AnniversaryLeJiuComposition.Reward, g.Hash, g.Source.SkillInstanceId!, 0, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, g.Source.OwnerSeat, action.ActorSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat], action)with { CardUseCausedDamage = false })));
     }
 
-    internal bool LeJiuParent(ProgramSkillFrame f) => f.WindowContext is { } w && _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is { } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) && _coreCardActionsOperations.CreateCardActionProgramContext2(parent, parent.Candidates[parent.CandidateIndex]) == w && parent.ParentFrameId == w.CardUse?.ParentCardUseFrameId && parent.Action.ActionId == w.CardUse.CardActionId;
+    internal bool LeJiuParent(ProgramSkillFrame f) => f.WindowContext is { } w && _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is { } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) && _coreCardActionsOperations.CreateCardActionProgramContext2(parent, parent.Candidates[parent.CandidateIndex]) == w && parent.ParentFrameId == w.CardUse?.ParentCardUseFrameId && parent.Action.ActionId == w.CardUse.CardActionId;
     internal bool IsIssuedLeJiuCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext w, bool includeBound)
     {
-        if (c.SkillId != AnniversaryLeJiuComposition.Skill || c.BindingId != AnniversaryLeJiuComposition.Reward || w.Window != SkillProgramTriggerWindow.CardUseCompleted || w.OwnerSeat != c.OwnerSeat || LeJiuContextUse(w)is not { Step: ResolutionFrameStep.Completed, CausedDamage: false } use || LeJiuGrantFor(use, c, includeBound)is null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is not { } parent || parent.ParentFrameId != use.Id || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex]) != c)
+        if (c.SkillId != AnniversaryLeJiuComposition.Skill || c.BindingId != AnniversaryLeJiuComposition.Reward || w.Window != SkillProgramTriggerWindow.CardUseCompleted || w.OwnerSeat != c.OwnerSeat || LeJiuContextUse(w)is not { Step: ResolutionFrameStep.Completed, CausedDamage: false } use || LeJiuGrantFor(use, c, includeBound)is null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is not { } parent || parent.ParentFrameId != use.Id || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex]) != c)
             return false;
         return _coreCardActionsOperations.CreateCardActionProgramContext2(parent, parent.Candidates[parent.CandidateIndex]) == w;
     }

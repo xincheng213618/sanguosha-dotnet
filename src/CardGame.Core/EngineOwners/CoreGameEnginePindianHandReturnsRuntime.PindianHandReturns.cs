@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePindianHandReturnsRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CoreGameEnginePindianHandReturnsRuntime
         var result = native.Result!;
         if (native.ParentFrameId != f.Id || f.InstructionIndex != 1 || f.PindianHandReturn is not null || native.SourceSeat != f.OwnerSeat || f.SelectedTargetSeats is not [var target] || native.OpponentSeat != target || native.ProgramResultBind != "__active-pindian-result" || _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == native.Id && e.SkillId == f.SkillId && e.Result == result) != 1)
             throw new InvalidOperationException("Hand return lost its exact native Pindian result and parent.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { PindianHandReturn = new(f.Id, new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, native.Id, target, result.SourceRank, result.OpponentRank) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { PindianHandReturn = new(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, native.Id, target, result.SourceRank, result.OpponentRank) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramPindianHandContestReturnedEvent(f.Id, native.Id, f.OwnerSeat, target, result.SourceRank, result.OpponentRank, result.SourceWon));
     }
 
@@ -52,7 +48,7 @@ internal sealed partial class CoreGameEnginePindianHandReturnsRuntime
 
     internal ProgramPindianHandReturnReceipt RequirePindianHandReturn(ProgramSkillFrame f)
     {
-        if (!IsPindianHandReturn(f) || f.PindianHandReturn is not { } r || r.FrameId != f.Id || r.Source != new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || f.SelectedTargetSeats is not [var target] || target != r.TargetSeat || f.PindianResultBindings.SingleOrDefault(b => b.Name == "__active-pindian-result")is not { SourceWon: true } result || result.SourceSeat != f.OwnerSeat || result.OpponentSeat != target || result.SourceRank != r.SourceRank || result.OpponentRank != r.OpponentRank || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramPindianHandContestReturnedEvent>().Count(e => e.FrameId == f.Id && e.PindianFrameId == r.PindianFrameId && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == target && e.SourceRank == r.SourceRank && e.OpponentRank == r.OpponentRank && e.Won) != 1)
+        if (!IsPindianHandReturn(f) || f.PindianHandReturn is not { } r || r.FrameId != f.Id || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || f.SelectedTargetSeats is not [var target] || target != r.TargetSeat || f.PindianResultBindings.SingleOrDefault(b => b.Name == "__active-pindian-result")is not { SourceWon: true } result || result.SourceSeat != f.OwnerSeat || result.OpponentSeat != target || result.SourceRank != r.SourceRank || result.OpponentRank != r.OpponentRank || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramPindianHandContestReturnedEvent>().Count(e => e.FrameId == f.Id && e.PindianFrameId == r.PindianFrameId && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == target && e.SourceRank == r.SourceRank && e.OpponentRank == r.OpponentRank && e.Won) != 1)
             throw new InvalidOperationException("Pindian hand return lost its exact native winning contest.");
         if (!r.AcquisitionPaid)
             return r;

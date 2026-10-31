@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDongZhaoMouOlRuntime
@@ -55,9 +51,9 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (f.InstructionIndex != 1 || f.WindowContext is not { MovementBatch: { } batch } context || !IsIssuedMouYishiCandidate(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), context))
+        if (f.InstructionIndex != 1 || f.WindowContext is not { MovementBatch: { } batch } context || !IsIssuedMouYishiCandidate(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), context))
             throw new InvalidOperationException("Yishi requires its original unconsumed matching-suit non-Use loss batch.");
-        var grant = MouYishiCandidateGrant(new(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), batch)!;
+        var grant = MouYishiCandidateGrant(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0, context.OccurrenceIndex), batch)!;
         var receipt = new MouDongZhaoReceipt(MouDongZhaoSource(f), f.GameplayHash, SkillProgramEffectOp.DrawMouDongZhaoYishiLoss, MouDongZhaoStage.Drawing, context.ParentFrameId, _coreActualRoundProgressRoundNumberAccess._roundNumber, f.OwnerSeat, RequestedDraw: 1, GrantFrameId: grant.FrameId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouDongZhao = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhaoYishiLossDrawIssuedEvent(f.Id, grant.FrameId, batch.Id, receipt.Source, receipt.GameplayHash, grant.Suit));

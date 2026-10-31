@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5XuchuAiRuntime
@@ -27,7 +23,7 @@ internal sealed partial class CoreGameEngineShanheS5XuchuAiRuntime
         // next-owner-turn bonus; an existing anonymous hand has a smaller attack opportunity
         // prior. An empty hand with no acquired attack cannot immediately exploit that bonus.
         // Neither estimate reads an unrevealed deck face or another player's hand.
-        var knownAttack = gained.Any(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) || c.Kind == CardKind.Duel);
+        var knownAttack = gained.Any(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.Kind) || c.Kind == CardKind.Duel);
         var bonusOpportunity = knownAttack ? 11d : _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > 0 ? 6d : 0d;
         var skipValue = gained.Length * 8d + frozen.X * bonusOpportunity;
         var normalValue = normalCount * 8d;

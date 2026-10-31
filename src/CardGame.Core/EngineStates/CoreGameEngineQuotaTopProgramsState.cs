@@ -1,9 +1,9 @@
 #nullable enable
 namespace CardGame.Core.EngineStates;
-internal sealed class CoreGameEngineQuotaTopProgramsState : global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineQuotaTopProgramsFirstTurnTargetActionsAccess
+internal sealed class CoreGameEngineQuotaTopProgramsState : Contracts.ICoreGameEngineQuotaTopProgramsFirstTurnTargetActionsAccess
 {
-    private global::System.Collections.Generic.Dictionary<(int Turn, int Target, string Skill), long> _firstTurnTargetActions = [];
-    internal ref readonly global::System.Collections.Generic.Dictionary<(int Turn, int Target, string Skill), long> ReferenceToFirstTurnTargetActions => ref _firstTurnTargetActions;
+    private Dictionary<(int Turn, int Target, string Skill), long> _firstTurnTargetActions = [];
+    internal ref readonly Dictionary<(int Turn, int Target, string Skill), long> ReferenceToFirstTurnTargetActions => ref _firstTurnTargetActions;
 
-    ref readonly global::System.Collections.Generic.Dictionary<(int Turn, int Target, string Skill), long> global::CardGame.Core.EngineStates.Contracts.ICoreGameEngineQuotaTopProgramsFirstTurnTargetActionsAccess._firstTurnTargetActions => ref _firstTurnTargetActions;
+    ref readonly Dictionary<(int Turn, int Target, string Skill), long> Contracts.ICoreGameEngineQuotaTopProgramsFirstTurnTargetActionsAccess._firstTurnTargetActions => ref _firstTurnTargetActions;
 }

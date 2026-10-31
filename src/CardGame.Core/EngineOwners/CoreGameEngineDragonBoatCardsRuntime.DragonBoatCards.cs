@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
 {
-    internal static bool IsDragonBoatCard(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DragonBoatCards.IsDragonBoatCard(kind);
-    internal static bool IsDragonBoatTrick(CardKind kind) => global::CardGame.Core.EngineOwners.CoreGameEngineDragonBoatCardsDefinitions.DragonBoatOrdinaryTrickKinds.Contains(kind);
-    internal static LegalActionKind DragonBoatCardAction(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_DragonBoatCards.DragonBoatCardAction(kind);
+    internal static bool IsDragonBoatCard(CardKind kind) => RuntimeSkills.RuntimeRules_Core_DragonBoatCards.IsDragonBoatCard(kind);
+    internal static bool IsDragonBoatTrick(CardKind kind) => CoreGameEngineDragonBoatCardsDefinitions.DragonBoatOrdinaryTrickKinds.Contains(kind);
+    internal static LegalActionKind DragonBoatCardAction(CardKind kind) => RuntimeSkills.RuntimeRules_Core_DragonBoatCards.DragonBoatCardAction(kind);
     internal bool DragonBoatCardAllies(int first, int second) => _coreMatchParticipantsPlayersAccess._players[first].TeamId is { } team && team == _coreMatchParticipantsPlayersAccess._players[second].TeamId;
     internal bool IsDragonBoatRealgarWineQuotaUse(CardUseFrame use, CardActionContext action) => _coreDragonBoatActivitiesOperations.IsDragonBoatActivity && use.CardKind == CardKind.RealgarWine && action.EffectiveKind == CardKind.RealgarWine && action.Type == CardActionType.Use && action.ActorSeat == use.SourceSeat && action.ProviderSeat == use.SourceSeat && use.TargetSeats is [var target] && target == use.SourceSeat && action.TargetSeats.SequenceEqual(use.TargetSeats);
     internal int DragonBoatCardTeamScore(int seat) => _coreDragonBoatActivitiesOperations.DragonBoatTeamScore(_coreMatchParticipantsPlayersAccess._players[seat].TeamId ?? throw new InvalidOperationException("A Dragon Boat card requires its actual public team."));
@@ -29,7 +25,7 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
         CardKind.Zong => DragonBoatCardAllies(use.SourceSeat, target.Seat) && _coreTreatedWoundedOperations.IsRuleWounded(target),
         _ => false
     });
-    internal IReadOnlyList<int> DragonBoatGlobalTargets(CharacterState actor, Card card) => _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(actor, Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(actor.Seat, offset)]).Where(target => target.IsAlive && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, CardKind.StriveUpstream) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.StriveUpstream, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(actor.Seat, target.Seat, CardKind.StriveUpstream) && !_coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ExcludeGlobalTarget, CardKind.StriveUpstream) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))).Select(target => target.Seat).ToArray());
+    internal IReadOnlyList<int> DragonBoatGlobalTargets(CharacterState actor, Card card) => _coreCardUseModulesOperations.ApplyTurnCardGroupTargetRestrictions(actor, Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreMatchParticipantsPlayersAccess._players[_coreTableOrderOperations.TableStepSeat(actor.Seat, offset)]).Where(target => target.IsAlive && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, CardKind.StriveUpstream) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.StriveUpstream, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(actor.Seat, target.Seat, CardKind.StriveUpstream) && !_coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ExcludeGlobalTarget, CardKind.StriveUpstream) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))).Select(target => target.Seat).ToArray());
     internal IReadOnlyList<int>? DragonBoatExpectedNativeTargets(CharacterState actor, Card card, LegalAction action) => (action.PlayedCardKind ?? card.Kind) switch
     {
         CardKind.StriveUpstream => DragonBoatGlobalTargets(actor, card),
@@ -66,7 +62,7 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
             _ => false
         })))
         {
-            if (_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) || _coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(actor.Seat, target.Seat, kind) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)))
+            if (_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, kind) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) || _coreShenwuEquipmentOperations.IsShenwuRobeTargetProhibited(actor.Seat, target.Seat, kind) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)))
                 continue;
             actions.Add(new(DragonBoatCardAction(kind), card.Id, kind == CardKind.RealgarWine ? null : target.Seat, _coreCardConversionsOperations.DescribeConversion(conversion, $"对 {(target.Name)} 使用【{(CardCatalog.Get(kind).DisplayName)}】"), conversion is null ? null : kind) { ConversionSource = conversion });
         }
@@ -103,29 +99,29 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
 
     internal void ResolveDragonBoatTrickEffect(NullificationWindowFrame pending)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Id != pending.ParentFrameId || !IsDragonBoatTrick(global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use)) || pending.EffectCardKind != global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || pending.ActionKind != DragonBoatCardAction(global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use)) || use.DragonBoatCardEffect is not null || use.Action is not { Type: CardActionType.Use } action || use.SourceSeat != pending.SourceSeat || use.TargetIndex < 0 || use.TargetIndex >= global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending)is not { } target || global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != target)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Id != pending.ParentFrameId || !IsDragonBoatTrick(CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use)) || pending.EffectCardKind != CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || pending.ActionKind != DragonBoatCardAction(CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use)) || use.DragonBoatCardEffect is not null || use.Action is not { Type: CardActionType.Use } action || use.SourceSeat != pending.SourceSeat || use.TargetIndex < 0 || use.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending)is not { } target || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != target)
             throw new InvalidOperationException("A Dragon Boat trick lost its exact native effect and target cursor.");
         if (!_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
         {
-            _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, _coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending), global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
+            _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, _coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending), CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
             return;
         }
 
         var rank = DragonBoatCardRank(use.SourceSeat);
-        var recipients = global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.SameBoat ? _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && DragonBoatCardAllies(target, p.Seat)).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(target, p.Seat)).Select(p => p.Seat).ToArray() : global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.StriveUpstream ? [target] : Array.Empty<int>();
-        var count = global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.SameBoat ? rank.Most ? 2 : 1 : global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.StriveUpstream ? target == use.SourceSeat ? Math.Min(5, DragonBoatCardTeamScore(use.SourceSeat)) : 1 : 0;
-        var receipt = new DragonBoatCardEffectReceipt(action.ActionId, pending.Id, global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), target, use.TargetIndex, global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.AgainstCurrent ? DragonBoatCardEffectStage.AwaitingDamage : DragonBoatCardEffectStage.Drawing)
+        var recipients = CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.SameBoat ? _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && DragonBoatCardAllies(target, p.Seat)).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(target, p.Seat)).Select(p => p.Seat).ToArray() : CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.StriveUpstream ? [target] : Array.Empty<int>();
+        var count = CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.SameBoat ? rank.Most ? 2 : 1 : CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.StriveUpstream ? target == use.SourceSeat ? Math.Min(5, DragonBoatCardTeamScore(use.SourceSeat)) : 1 : 0;
+        var receipt = new DragonBoatCardEffectReceipt(action.ActionId, pending.Id, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), target, use.TargetIndex, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.AgainstCurrent ? DragonBoatCardEffectStage.AwaitingDamage : DragonBoatCardEffectStage.Drawing)
         {
             Recipients = recipients,
             RequestedCount = count,
-            AwaitingProgramFrameId = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()is { } parent && global::CardGame.Core.EngineOwners.CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(parent) ? parent.Id : null
+            AwaitingProgramFrameId = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()is { } parent && CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(parent) ? parent.Id : null
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(use with { Step = ResolutionFrameStep.ResolvingEffect, DragonBoatCardEffect = receipt });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DragonBoatCardEffectStartedEvent(use.Id, action.ActionId, pending.Id, global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), target, use.TargetIndex, recipients.Length, count));
-        if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.AgainstCurrent)
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DragonBoatCardEffectStartedEvent(use.Id, action.ActionId, pending.Id, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), target, use.TargetIndex, recipients.Length, count));
+        if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.AgainstCurrent)
         {
             var effectCard = _coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending);
-            var attack = _kernelCoreMainOperations.CreateCardAttackHandle(use.Id, use.SourceSeat, target, effectCard.Id == 0 ? null : effectCard, playedCardKind: global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), damageNatureOverride: DamageNature.Normal, physicalCards: _coreNativeTrickUseOperations.GetCardUsePhysicalCards(use.Id));
+            var attack = _kernelCoreMainOperations.CreateCardAttackHandle(use.Id, use.SourceSeat, target, effectCard.Id == 0 ? null : effectCard, playedCardKind: CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), damageNatureOverride: DamageNature.Normal, physicalCards: _coreNativeTrickUseOperations.GetCardUsePhysicalCards(use.Id));
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
                 _coreNativeAttackCompletionOperations.CompleteAttack(attack);
@@ -135,7 +131,7 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
         ContinueDragonBoatCardEffect(use.Id);
     }
 
-    internal bool TryCompleteDragonBoatAgainstCurrentAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool TryCompleteDragonBoatAgainstCurrentAttack(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { DragonBoatCardEffect: { Kind: CardKind.AgainstCurrent } r } use)
             return false;
@@ -238,7 +234,7 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
                 throw new InvalidOperationException("A Dragon Boat card lost its native effect stage.");
             if (r.RecipientIndex >= r.Recipients.Count)
             {
-                if (global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.AgainstCurrent)
+                if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.AgainstCurrent)
                 {
                     _coreRuntimeOperations.ReplaceRuntimeTop(use with { DragonBoatCardEffect = r with { Stage = DragonBoatCardEffectStage.FinishingAttack } });
                     var attack = _kernelCoreMainOperations.CreateCardAttackHandle2(id);
@@ -248,7 +244,7 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
                 }
 
                 _coreRuntimeOperations.ReplaceRuntimeTop(use with { DragonBoatCardEffect = null, NativeDraw = null });
-                _coreNativeCardUseCompletionOperations.FinishCardUse(id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, requireProcessing: true), global::CardGame.Core.EngineOwners.CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
+                _coreNativeCardUseCompletionOperations.FinishCardUse(id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, requireProcessing: true), CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
                 return;
             }
 
@@ -272,7 +268,7 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
     }
 
     internal bool IsDragonBoatCardEffectMovement(CardUseFrame use, CardMovementBatchContext batch) => use.DragonBoatCardEffect is { } r && batch.ParentFrameId == use.Id && batch.AwaitingProgramFrameId == r.AwaitingProgramFrameId && batch.Movements.Count > 0 && (r.Stage == DragonBoatCardEffectStage.DrawingChildren && r.DrawOutcome is { } outcome && batch.Movements.All(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && (outcome.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(outcome.RecipientSeat) && m.Reason == CardMoveReasons.Draw || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle)) || r.Stage == DragonBoatCardEffectStage.DiscardChildren && r.DiscardSequence > 0 && batch.Movements is [var move] && move.Sequence == r.DiscardSequence && move.CardId == r.DiscardCardId && move.From == r.DiscardFrom && move.To == CardLocation.DiscardPile && move.Reason == new CardMoveReason("card.effect.dragon-boat.against-current"));
-    internal bool IsDragonBoatCardEffectMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame frame) => frame.ResumeDragonBoatCardEffectFrameId == use.Id && frame.Id == frame.Batch.Id && frame.ResumeProgramFrameId is null && !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(frame with { ResumeDragonBoatCardEffectFrameId = null }) && IsDragonBoatCardEffectMovement(use, frame.Batch);
+    internal bool IsDragonBoatCardEffectMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame frame) => frame.ResumeDragonBoatCardEffectFrameId == use.Id && frame.Id == frame.Batch.Id && frame.ResumeProgramFrameId is null && !CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(frame with { ResumeDragonBoatCardEffectFrameId = null }) && IsDragonBoatCardEffectMovement(use, frame.Batch);
     internal bool IsDragonBoatCardEffectHpReturn(CardUseFrame use, HpChangedTriggerWindowFrame hp) => use.DragonBoatCardEffect is { Stage: DragonBoatCardEffectStage.DrawingChildren or DragonBoatCardEffectStage.DiscardChildren } && hp.Continuation == PostEventContinuation.DragonBoatCardEffect && hp.ResumeFrameId == use.Id && hp.Change.ParentFrameId == use.Id && hp.CardId is null && hp.CardKind is null;
     internal bool IsDragonBoatCardEffectRecoveryReturn(CardUseFrame use, RecoveryReplacementFrame recovery) => recovery.ParentFrameId == use.Id && recovery.Return == new RecoveryReplacementReturn(PostEventContinuation.DragonBoatCardEffect, use.Id) && IsDragonBoatCardRecoveryAttempt(use, recovery.Attempt);
     internal bool IsDragonBoatCardRecoveryAttempt(CardUseFrame use, RecoveryAttempt attempt) => use.DragonBoatCardEffect is { Stage: DragonBoatCardEffectStage.DiscardChildren, DiscardCardId: { } card, DiscardFrom: { Zone: CardZoneKind.Equipment } from, DiscardSequence: > 0 } r && from.OwnerSeat == use.SourceSeat && attempt.SourceSeat == use.SourceSeat && attempt.TargetSeat == use.SourceSeat && attempt.Amount == 1 && attempt.Completion == new RecoveryAttemptCompletion(RecoveryAttemptProducer.SilverLion, MoveReason: new("card.effect.dragon-boat.against-current")) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == r.DiscardSequence && m.CardId == card && m.CardKind == CardKind.SilverLion && m.From == from && m.To == CardLocation.DiscardPile && m.Reason == new CardMoveReason("card.effect.dragon-boat.against-current"));

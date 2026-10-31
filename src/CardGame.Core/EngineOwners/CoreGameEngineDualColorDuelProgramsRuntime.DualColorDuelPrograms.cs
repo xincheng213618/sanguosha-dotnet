@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDualColorDuelProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IDualColorDuelProgramHost.ChoosePrivateColorsDiscardAndDuel(ProgramSkillFrame frame) => BeginDualColorDuel(frame);
+    SkillProgramStepOutcome IDualColorDuelProgramHost.ChoosePrivateColorsDiscardAndDuel(ProgramSkillFrame frame) => BeginDualColorDuel(frame);
     internal bool DualColorSourceCurrent(ProgramSkillFrame frame) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == frame.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId);
     internal bool DualColorDraftMatches(ProgramSkillFrame frame)
     {
@@ -99,7 +96,7 @@ internal sealed partial class CoreGameEngineDualColorDuelProgramsRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal IReadOnlyList<int> DualColorHandIds(int seat, bool red) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Where(card => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], card)) == red).Select(card => card.Id).ToArray());
+    internal IReadOnlyList<int> DualColorHandIds(int seat, bool red) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Where(card => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], card)) == red).Select(card => card.Id).ToArray());
     internal void PayDualColorHands(ProgramSkillFrame frame)
     {
         var draft = frame.DualColorDuel!;
@@ -117,9 +114,9 @@ internal sealed partial class CoreGameEngineDualColorDuelProgramsRuntime
             var ownerCards = _cardZonesOperations._cardZones.MoveMany(draft.OwnerCardIds, ownerFrom, CardLocation.DiscardPile);
             var otherCards = _cardZonesOperations._cardZones.MoveMany(draft.OtherCardIds, otherFrom, CardLocation.DiscardPile);
             foreach (var card in ownerCards)
-                movements.Add(_corePhysicalMovementFacadesOperations.RecordMovement(card, ownerFrom, CardLocation.DiscardPile, global::CardGame.Core.EngineOwners.CoreGameEngineDualColorDuelProgramsDefinitions.DualColorDiscardReason));
+                movements.Add(_corePhysicalMovementFacadesOperations.RecordMovement(card, ownerFrom, CardLocation.DiscardPile, CoreGameEngineDualColorDuelProgramsDefinitions.DualColorDiscardReason));
             foreach (var card in otherCards)
-                movements.Add(_corePhysicalMovementFacadesOperations.RecordMovement(card, otherFrom, CardLocation.DiscardPile, global::CardGame.Core.EngineOwners.CoreGameEngineDualColorDuelProgramsDefinitions.DualColorDiscardReason));
+                movements.Add(_corePhysicalMovementFacadesOperations.RecordMovement(card, otherFrom, CardLocation.DiscardPile, CoreGameEngineDualColorDuelProgramsDefinitions.DualColorDiscardReason));
             committed = true;
         }
         finally
@@ -133,7 +130,7 @@ internal sealed partial class CoreGameEngineDualColorDuelProgramsRuntime
         var draft = frame.DualColorDuel!;
         if (draft.OwnerIsRed is null || draft.OtherIsRed is null || draft.PaymentStartSequence < 0 || draft.PaymentEndSequence < draft.PaymentStartSequence || draft.OwnerCardIds.Distinct().Count() != draft.OwnerCardIds.Count || draft.OtherCardIds.Distinct().Count() != draft.OtherCardIds.Count || draft.OwnerCardIds.Intersect(draft.OtherCardIds).Any())
             return false;
-        bool Exact(int seat, IReadOnlyList<int> ids) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > draft.PaymentStartSequence && move.Sequence <= draft.PaymentEndSequence && move.From == CardLocation.Hand(seat) && move.To == CardLocation.DiscardPile && move.Reason == global::CardGame.Core.EngineOwners.CoreGameEngineDualColorDuelProgramsDefinitions.DualColorDiscardReason).Select(move => move.CardId).Order().SequenceEqual(ids.Order());
+        bool Exact(int seat, IReadOnlyList<int> ids) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > draft.PaymentStartSequence && move.Sequence <= draft.PaymentEndSequence && move.From == CardLocation.Hand(seat) && move.To == CardLocation.DiscardPile && move.Reason == CoreGameEngineDualColorDuelProgramsDefinitions.DualColorDiscardReason).Select(move => move.CardId).Order().SequenceEqual(ids.Order());
         return Exact(frame.OwnerSeat, draft.OwnerCardIds) && Exact(draft.OtherSeat, draft.OtherCardIds);
     }
 
@@ -195,7 +192,7 @@ internal sealed partial class CoreGameEngineDualColorDuelProgramsRuntime
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 110)]
-    internal bool CompleteIssuedDualColorDuelAttack(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal bool CompleteIssuedDualColorDuelAttack(GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.ProgramFrameId is not { } parentId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != parentId || frame.DualColorDuel is not { Stage: ProgramDualColorDuelStage.DuelIssued })
             return false;
@@ -203,7 +200,7 @@ internal sealed partial class CoreGameEngineDualColorDuelProgramsRuntime
         return true;
     }
 
-    internal void CompleteDualColorDuelAttackReturn(ProgramSkillFrame frame, global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal void CompleteDualColorDuelAttackReturn(ProgramSkillFrame frame, GameEngine.AttackCompletionReceipt completion)
     {
         if (completion.DualColorDuelReturn is not { AttackStarted: true } origin || completion.ProgramFrameId != frame.Id || completion.ResolutionId != origin.CardUseFrameId || !MatchesDualColorDuelParent(frame, origin))
             throw new InvalidOperationException("Private color Duel lost its exact completed attack return.");
@@ -237,8 +234,8 @@ internal sealed partial class CoreGameEngineDualColorDuelProgramsRuntime
         return decision.Choices.OrderByDescending(choice =>
         {
             var red = choice.Parameters["color"] == "red";
-            var count = own.Count(card => global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[chooser], card)) == red);
-            var retainedSlash = own.Count(card => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[chooser], card)) != red);
+            var count = own.Count(card => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[chooser], card)) == red);
+            var retainedSlash = own.Count(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[chooser], card)) != red);
             return -count * 1.4d + (hostility > 0 ? count > expectedOtherCount ? 5d : -2d : 0d) + Math.Min(1, retainedSlash) * 2d;
         }).ThenBy(choice => choice.Parameters["color"], StringComparer.Ordinal).First();
     }

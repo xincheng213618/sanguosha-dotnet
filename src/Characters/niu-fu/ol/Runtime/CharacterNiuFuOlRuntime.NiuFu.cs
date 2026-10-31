@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterNiuFuOlRuntime
 {
     internal const string ShisuanGiftReason = "skill-program.niu-fu.shisuan.gift", ZonglueTakeReason = "skill-program.niu-fu.zonglue.obtain";
-    internal static CardConversionSource NiuFuSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_niu_fu_ol_NiuFu.NiuFuSource(f);
-    internal global::CardGame.Core.GameEngine.IDamageAttempt? NiuFuOriginalAttack(long damageId) => _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damageId)is { } d ? _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == d.ParentFrameId) switch
+    internal static CardConversionSource NiuFuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_niu_fu_ol_NiuFu.NiuFuSource(f);
+    internal GameEngine.IDamageAttempt? NiuFuOriginalAttack(long damageId) => _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damageId)is { } d ? _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == d.ParentFrameId) switch
     {
         ProgramSkillFrame { AttackAttempt: not null } => _kernelCoreGameEngineProgramAttackAttemptOperations.CreateProgramAttackHandle(d.ParentFrameId),
         CardUseFrame { CardAttack: not null } or ProgramSkillFrame { CardAttack: not null } or JudgmentFrame { CardAttack: not null } => _kernelCoreMainOperations.CreateCardAttackHandle(d.ParentFrameId),
@@ -26,7 +23,7 @@ internal sealed partial class CharacterNiuFuOlRuntime
         return c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.TargetSeat == candidate.OwnerSeat && c.Amount > 0 && c.DamageFrameId is { } id && NiuFuOriginalAttack(id)is { DamageWasApplied: true } attack && attack.TargetSeat == c.TargetSeat && attack.DamageAmount == c.Amount;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.INiuFuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginNiuFu(f, op);
+    SkillProgramStepOutcome INiuFuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginNiuFu(f, op);
     internal SkillProgramStepOutcome BeginNiuFu(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -65,7 +62,7 @@ internal sealed partial class CharacterNiuFuOlRuntime
         if (r.Stage == NiuFuStage.SourceGiftChoice)
             return Array.AsReadOnly(NiuFuSourceEquipment(f).Select(c => Choice("gift", "交给牛辅【" + _coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()).DisplayName + "】", c.Cards)).ToArray());
         if (r.Stage == NiuFuStage.ZoneChoice && r.NextZone < 3 && _coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive)
-            return Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, r.TargetSeat, [global::CardGame.Core.EngineOwners.CharacterNiuFuOlDefinitions.NiuFuZones[r.NextZone]], OwnedCardMoveIntent.Obtain).Select(c => PromptChoiceProjection.Freeze(c with { Parameters = new Dictionary<string, string>(c.Parameters) { ["program-action"] = "niu-fu", ["branch"] = "obtain" } })).ToArray());
+            return Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, r.TargetSeat, [CharacterNiuFuOlDefinitions.NiuFuZones[r.NextZone]], OwnedCardMoveIntent.Obtain).Select(c => PromptChoiceProjection.Freeze(c with { Parameters = new Dictionary<string, string>(c.Parameters) { ["program-action"] = "niu-fu", ["branch"] = "obtain" } })).ToArray());
         return[];
     }
 
@@ -120,7 +117,7 @@ internal sealed partial class CharacterNiuFuOlRuntime
     [ProgramAnswer("niu-fu")]
     internal void AnswerNiuFu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { NiuFu: { } r } f || !NiuFuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage is NiuFuStage.SourceChoice or NiuFuStage.SourceGiftChoice ? r.DamageSourceSeat : f.OwnerSeat))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { NiuFu: { } r } f || !NiuFuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage is NiuFuStage.SourceChoice or NiuFuStage.SourceGiftChoice ? r.DamageSourceSeat : f.OwnerSeat))
             throw new InvalidOperationException("NiuFu requires its exact chooser's published physical card, opaque slot or source branch.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -149,7 +146,7 @@ internal sealed partial class CharacterNiuFuOlRuntime
             return;
         }
 
-        var from = branch == "obtain" ? new CardLocation(global::CardGame.Core.EngineOwners.CharacterNiuFuOlDefinitions.NiuFuZones[r.NextZone], r.TargetSeat) : _cardZonesOperations._cardZones.GetLocation(choice.Cards.Single());
+        var from = branch == "obtain" ? new CardLocation(CharacterNiuFuOlDefinitions.NiuFuZones[r.NextZone], r.TargetSeat) : _cardZonesOperations._cardZones.GetLocation(choice.Cards.Single());
         var id = branch == "obtain" ? _cardZonesOperations._cardZones.CardsAt(from)[int.Parse(choice.Parameters["slot-index"], CultureInfo.InvariantCulture)].Id : choice.Cards.Single();
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
         if (branch == "obtain" && (from.Zone == CardZoneKind.Hand ? choice.Cards.Count != 0 : !choice.Cards.SequenceEqual([id])))
@@ -255,5 +252,5 @@ internal sealed partial class CharacterNiuFuOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShisuanRecastSourceChoice, SkillProgramEffectOp.ObtainZonglueDamageTargetZones)]
-    internal PromptChoice AiNiuFu(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Parameters.GetValueOrDefault("branch") == "lose-hp" ? 1 : 0).ThenBy(c => c.Cards is [var id] ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
+    internal PromptChoice AiNiuFu(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => c.Parameters.GetValueOrDefault("branch") == "lose-hp" ? 1 : 0).ThenBy(c => c.Cards is [var id] ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat]) : 0).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 }

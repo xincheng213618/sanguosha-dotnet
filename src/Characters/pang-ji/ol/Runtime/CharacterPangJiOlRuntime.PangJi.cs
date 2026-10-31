@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -13,9 +10,9 @@ internal sealed partial class CharacterPangJiOlRuntime
     internal const string BiguoResultBind = "biguo-contest", BiguoGainBind = "biguo-category-gain";
     internal bool HasPangJiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBiguoDrawAndArmTargetPindian) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBiguoTargetedPindianAndCategoryBan) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveDouyuPreRevealSwapAndWinDraw);
 
-    internal static CardConversionSource PangJiSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_pang_ji_ol_PangJi.PangJiSource(f);
+    internal static CardConversionSource PangJiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_pang_ji_ol_PangJi.PangJiSource(f);
     internal bool BiguoTurnOpen(int turn, int owner) => turn > 0 && turn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == turn && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat == owner && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == turn && e.ActorSeat == owner) && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == turn && e.OwnerSeat == owner);
-    SkillProgramStepOutcome global::CardGame.Core.IPangJiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginPangJi(f, op);
+    SkillProgramStepOutcome IPangJiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginPangJi(f, op);
     internal IReadOnlyList<PromptChoice> BiguoCosts(ProgramSkillFrame f) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard);
     internal bool CanBiguoPindian(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _characterLuKangWumiaoOperations.HasWuLuKangPindianInput(_coreMatchParticipantsPlayersAccess._players[owner]) && !_resolutionStackOperations._resolutionStack.Any(f => f is PindianFrame) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != owner && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(owner, p.Seat));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28130)]
@@ -94,7 +91,7 @@ internal sealed partial class CharacterPangJiOlRuntime
     [ProgramAnswer("pang-ji")]
     internal void AnswerPangJi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { PangJi: { Paid: false, Stage: PangJiStage.CostChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !PangJiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { PangJi: { Paid: false, Stage: PangJiStage.CostChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !PangJiChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Biguo requires the exact original private HE cost choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -134,7 +131,7 @@ internal sealed partial class CharacterPangJiOlRuntime
 
         )
         {
-            var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == category).OrderBy(c => c.Id).ToArray();
+            var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.Kind) == category).OrderBy(c => c.Id).ToArray();
             if (cards.Length > 0)
             {
                 var c = cards[_randomOperations._random.Next(cards.Length)];
@@ -250,5 +247,5 @@ internal sealed partial class CharacterPangJiOlRuntime
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBiguoDrawAndArmTargetPindian)]
-    internal PromptChoice ChoosePangJiAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).FirstOrDefault() ?? p.Choices.Single();
+    internal PromptChoice ChoosePangJiAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).FirstOrDefault() ?? p.Choices.Single();
 }

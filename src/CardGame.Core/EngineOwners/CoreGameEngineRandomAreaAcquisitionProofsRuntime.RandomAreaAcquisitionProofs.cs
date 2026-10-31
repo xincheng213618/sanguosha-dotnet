@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRandomAreaAcquisitionProofsRuntime
 {
-    internal static bool SameRandomAreaStep(RandomAreaAcquisitionStepReceipt a, RandomAreaAcquisitionStepReceipt b) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_RandomAreaAcquisitionProofs.SameRandomAreaStep(a, b);
+    internal static bool SameRandomAreaStep(RandomAreaAcquisitionStepReceipt a, RandomAreaAcquisitionStepReceipt b) => RuntimeSkills.RuntimeRules_Core_RandomAreaAcquisitionProofs.SameRandomAreaStep(a, b);
     internal bool ValidRandomAreaStep(ProgramSkillFrame frame, RandomAreaAcquisitionStepReceipt step)
     {
         if (step.SeatIndex < 0 || step.SeatIndex >= frame.RandomAreaAcquisition!.OtherSeats.Count || frame.RandomAreaAcquisition.OtherSeats[step.SeatIndex] != step.TargetSeat || step.EligibleZones.Count == 0 || !step.EligibleZones.SequenceEqual(ObtainRandomAreaFromEachOtherThenTurnOverDescriptor.Areas.Where(step.EligibleZones.Contains)) || step.RandomBefore == 0 || step.MovementBatchId <= 0 || step.SequenceBefore < 0 || step.SequenceAfter <= step.SequenceBefore || step.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || step.Materials.Count == 0 || step.Materials.Select(m => m.CardId).Distinct().Count() != step.Materials.Count || step.Movements.Count != step.Materials.Count || !step.Movements.Select(m => new DamageTargetRegionMaterial(m.CardId, m.CardKind)).SequenceEqual(step.Materials) || !step.Movements.SequenceEqual(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > step.SequenceBefore && m.Sequence <= step.SequenceAfter)))
@@ -19,9 +15,9 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionProofsRuntime
         {
             var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(movement.CardId);
             var from = new CardLocation(step.SelectedZone, step.TargetSeat);
-            var expected = card.IsGeneralWeapon && from.Zone == CardZoneKind.Equipment || global::CardGame.Core.EngineOwners.CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, from, CardLocation.Hand(frame.OwnerSeat)) ? CardLocation.OutsideGame : CardLocation.Hand(frame.OwnerSeat);
+            var expected = card.IsGeneralWeapon && from.Zone == CardZoneKind.Equipment || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, from, CardLocation.Hand(frame.OwnerSeat)) ? CardLocation.OutsideGame : CardLocation.Hand(frame.OwnerSeat);
             expected = _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(card, from, expected);
-            if (movement.From != from || movement.To != expected || movement.Reason != global::CardGame.Core.EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime.RandomAreaReason(frame, step.SeatIndex))
+            if (movement.From != from || movement.To != expected || movement.Reason != CoreGameEngineRandomAreaAcquisitionRuntime.RandomAreaReason(frame, step.SeatIndex))
                 return false;
         }
 
@@ -30,7 +26,7 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionProofsRuntime
 
     internal bool ValidRandomAreaAcquisition(ProgramSkillFrame frame)
     {
-        if (frame.RandomAreaAcquisition is not { } r || !_coreRandomAreaAcquisitionOperations.ExactRandomAreaParent(frame, out var window, out var damage) || r.FrameId != frame.Id || r.InstructionIndex != frame.InstructionIndex || r.Source != global::CardGame.Core.EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime.RandomAreaSource(frame) || r.GameplayHash != frame.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.GameplayHash != r.GameplayHash || r.DamageWindowId != window.Id || r.DamageFrameId != damage.Id || r.OccurrenceIndex != frame.WindowContext!.OccurrenceIndex || r.DamageAmount != damage.Amount || !Enum.IsDefined(r.Stage) || !r.OtherSeats.SequenceEqual(_coreMatchParticipantsPlayersAccess._players.Where(p => p.Seat != frame.OwnerSeat).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(frame.OwnerSeat, p.Seat)).Select(p => p.Seat)) || r.NextSeatIndex < 0 || r.NextSeatIndex > r.OtherSeats.Count || r.Steps.Select(s => s.SeatIndex).Distinct().Count() != r.Steps.Count || !r.Steps.Select(s => s.SeatIndex).SequenceEqual(r.Steps.Select(s => s.SeatIndex).Order()) || r.Steps.Any(s => !ValidRandomAreaStep(frame, s)))
+        if (frame.RandomAreaAcquisition is not { } r || !_coreRandomAreaAcquisitionOperations.ExactRandomAreaParent(frame, out var window, out var damage) || r.FrameId != frame.Id || r.InstructionIndex != frame.InstructionIndex || r.Source != CoreGameEngineRandomAreaAcquisitionRuntime.RandomAreaSource(frame) || r.GameplayHash != frame.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.GameplayHash != r.GameplayHash || r.DamageWindowId != window.Id || r.DamageFrameId != damage.Id || r.OccurrenceIndex != frame.WindowContext!.OccurrenceIndex || r.DamageAmount != damage.Amount || !Enum.IsDefined(r.Stage) || !r.OtherSeats.SequenceEqual(_coreMatchParticipantsPlayersAccess._players.Where(p => p.Seat != frame.OwnerSeat).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(frame.OwnerSeat, p.Seat)).Select(p => p.Seat)) || r.NextSeatIndex < 0 || r.NextSeatIndex > r.OtherSeats.Count || r.Steps.Select(s => s.SeatIndex).Distinct().Count() != r.Steps.Count || !r.Steps.Select(s => s.SeatIndex).SequenceEqual(r.Steps.Select(s => s.SeatIndex).Order()) || r.Steps.Any(s => !ValidRandomAreaStep(frame, s)))
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var starts = history.OfType<RandomAreaAcquisitionStartedEvent>().Where(e => e.Receipt.FrameId == frame.Id).ToArray();

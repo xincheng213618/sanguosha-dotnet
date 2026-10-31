@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using CardGame.Core.Campaigns;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheMobilizationRuntime
 {
     internal const string ShanheMobilizationSkill = "shanhe:current-mobilization-2203";
-    SkillProgramStepOutcome global::CardGame.Core.IShanheMobilizationHost.ReviveRoundAllies(ProgramSkillFrame frame) => BeginShanheMobilization(frame);
+    SkillProgramStepOutcome IShanheMobilizationHost.ReviveRoundAllies(ProgramSkillFrame frame) => BeginShanheMobilization(frame);
     internal bool IsActualShanheMobilizationRound(ProgramSkillFrame frame) => _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id == ShanheBattleSetup.BattleModeId && _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is not null && frame.SkillId == ShanheMobilizationSkill && frame.TriggerId == "next-round-allies" && frame.WindowContext is { Window: SkillProgramTriggerWindow.RoundStarting } context && context.SourceSeat == _coreActualTurnProgressCurrentSeatTurnProgressionAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber > 0 && _coreActualTurnProgressCurrentSeatTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Extra && _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Count == 1 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundStartedEvent>().LastOrDefault()is { } started && started.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber && started.ActorSeat == _coreActualTurnProgressCurrentSeatTurnProgressionAccess._currentSeat;
     internal int[] ShanheMobilizationDeadAllies(int ownerSeat)
     {
@@ -36,7 +33,7 @@ internal sealed partial class CoreGameEngineShanheMobilizationRuntime
         if (targets.Length == 0)
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheMobilization = new(frame.InstructionIndex, _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber, 0, false) { TargetSeats = targets } });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheMobilizationIssuedEvent(frame.Id, frame.InstructionIndex, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber, string.Join(",", targets)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheMobilizationIssuedEvent(frame.Id, frame.InstructionIndex, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber, string.Join(",", targets)));
         ContinueShanheMobilization(frame);
         return SkillProgramStepOutcome.AwaitChild;
     }

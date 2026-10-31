@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramTopReorderRuntime
@@ -49,7 +45,7 @@ internal sealed partial class CoreGameEngineProgramTopReorderRuntime
         {
             var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Single(item => item.Id == id);
             var action = order.ChoosingBottom ? "bottom" : "top";
-            var label = order.RequiredTopCount is null && order.Population is null ? $"将【{(card.DisplayName)}】置于牌堆{((order.ChoosingBottom ? "底" : "顶"))}。" : $"将观看牌 {(Array.IndexOf(order.ViewedCardIds.ToArray(), id) + 1)}【{(card.DisplayName)}】{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))}{(card.RankText)}置于牌堆{((order.ChoosingBottom ? "底" : "顶"))}。";
+            var label = order.RequiredTopCount is null && order.Population is null ? $"将【{(card.DisplayName)}】置于牌堆{((order.ChoosingBottom ? "底" : "顶"))}。" : $"将观看牌 {(Array.IndexOf(order.ViewedCardIds.ToArray(), id) + 1)}【{(card.DisplayName)}】{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(card.Suit))}{(card.RankText)}置于牌堆{((order.ChoosingBottom ? "底" : "顶"))}。";
             return new PromptChoice(new ChoiceId($"program-top-order.{(frame.Id)}.{(action)}.{(id)}"), label, [id], [], new Dictionary<string, string> { ["action"] = action });
         }).ToList();
         if (!order.ChoosingBottom && order.RequiredTopCount is null)
@@ -184,7 +180,7 @@ internal sealed partial class CoreGameEngineProgramTopReorderRuntime
         var state = frame.TopReorder ?? throw new InvalidOperationException("AI top ordering has no cards.");
         var decision = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("AI top ordering has no prompt.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-        var delayed = _corePhysicalOwnedCardQueriesOperations.GetJudgment(owner).Count(card => !_characterDaQiaoLeOperations.IsZixiQinJudgmentCard(card.Id) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(_coreActualTurnsOperations.GetJudgmentEffectiveCardKind(card)));
+        var delayed = _corePhysicalOwnedCardQueriesOperations.GetJudgment(owner).Count(card => !_characterDaQiaoLeOperations.IsZixiQinJudgmentCard(card.Id) && CoreNativeCardClassificationsRuntime.IsDelayedCard(_coreActualTurnsOperations.GetJudgmentEffectiveCardKind(card)));
         var desiredTop = state.RequiredTopCount ?? Math.Min(state.ViewedCardIds.Count, delayed + Math.Max(0, _coreActualTurnsOperations.GetTurnDrawCount(owner)));
         var selected = !state.ChoosingBottom && state.TopCardIds.Count >= desiredTop ? decision.Choices.Single(choice => choice.Parameters.GetValueOrDefault("action") == "finish-top") : decision.Choices.First(choice => choice.Cards.Count == 1);
         ResolveProgramTopReorderChoice(selected);

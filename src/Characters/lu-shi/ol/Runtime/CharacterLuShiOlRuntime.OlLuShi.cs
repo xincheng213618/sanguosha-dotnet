@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuShiOlRuntime
 {
     internal bool HasOlLuShi => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveOlLuShiZhuyan);
 
-    internal static CardConversionSource OlLuShiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource OlLuShiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 42700)]
     internal void CaptureOlLuShiOpening(GameStartedEvent fact)
     {
@@ -38,7 +34,7 @@ internal sealed partial class CharacterLuShiOlRuntime
     internal bool OlLuShiUnused(int owner, int target, string item) => !_coreProgramEventHistoryOperations.ProgramEventHistory<OlLuShiAdjustmentIssuedEvent>().Any(e => e.Source.OwnerSeat == owner && e.TargetSeat == target && e.Item == item);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 42700, SkillProgramEffectOp.ResolveOlLuShiZhuyan)]
     internal bool CanOfferOlLuShi(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => c.SkillId == "ol:zhuyan" && w.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && OlLuShiLastSnapshot(p.Seat)is { } snapshot && (OlLuShiUnused(c.OwnerSeat, p.Seat, "hand") || (snapshot.Hp is not null || snapshot.Dual is not null) && p.HasHpValue && OlLuShiUnused(c.OwnerSeat, p.Seat, "hp")));
-    SkillProgramStepOutcome global::CardGame.Core.IOlLuShiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginOlLuShi(f, op);
+    SkillProgramStepOutcome IOlLuShiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginOlLuShi(f, op);
     internal SkillProgramStepOutcome BeginOlLuShi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -116,7 +112,7 @@ internal sealed partial class CharacterLuShiOlRuntime
     [ProgramAnswer("ol-lushi")]
     internal void AnswerOlLuShi(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OlLuShi: { } r } f || !OlLuShiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { OlLuShi: { } r } f || !OlLuShiChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Lu Shi rejects a stale participant, spent lifetime option, pool or private discard material.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

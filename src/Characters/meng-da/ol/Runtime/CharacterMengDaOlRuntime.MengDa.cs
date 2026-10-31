@@ -1,18 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMengDaOlRuntime
 {
-    internal const string GoudeDrawReason = "skill-program.meng-da.goude.draw", GoudeDiscardReason = global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.GoudeDiscardReason;
-    SkillProgramStepOutcome global::CardGame.Core.IMengDaHost.Resolve(ProgramSkillFrame f) => BeginGoude(f);
+    internal const string GoudeDrawReason = "skill-program.meng-da.goude.draw", GoudeDiscardReason = RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.GoudeDiscardReason;
+    SkillProgramStepOutcome IMengDaHost.Resolve(ProgramSkillFrame f) => BeginGoude(f);
     internal SkillProgramStepOutcome BeginGoude(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority);
+        var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority);
         if (f.Goude is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || !QualifyGoude(c, _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Goude requires a true native completed-turn opportunity with an unexecuted legal option.");
         var cutoff = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Count();
@@ -52,7 +48,7 @@ internal sealed partial class CharacterMengDaOlRuntime
         if (r.Stage == GoudeStage.SlashTarget)
             return Array.AsReadOnly(GoudeSlashTargets(f.OwnerSeat).Select(Seat).ToArray());
         if (r.Stage == GoudeStage.Faction)
-            return Array.AsReadOnly(GoudeFactionChoices(f.OwnerSeat).Select(id => new PromptChoice(new($"goude.{(f.Id)}.faction.{(id)}"), global::CardGame.Core.EngineOwners.CoreMatchPresentationRuntime.GetFactionName(id), [], [], new Dictionary<string, string>(Args("faction")) { ["faction"] = id })).ToArray());
+            return Array.AsReadOnly(GoudeFactionChoices(f.OwnerSeat).Select(id => new PromptChoice(new($"goude.{(f.Id)}.faction.{(id)}"), CoreMatchPresentationRuntime.GetFactionName(id), [], [], new Dictionary<string, string>(Args("faction")) { ["faction"] = id })).ToArray());
         if (r.Stage == GoudeStage.DiscardCard)
             return Array.AsReadOnly(r.Materials.Select(m => new PromptChoice(new($"goude.{(f.Id)}.hand.{(m.Slot)}"), m.HolderSeat == f.OwnerSeat ? $"弃置【{(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).DisplayName)}】" : $"弃置第{(m.Slot + 1)}张手牌", m.HolderSeat == f.OwnerSeat ? [m.CardId] : [], [], new Dictionary<string, string>(Args("card")) { ["slot-index"] = m.Slot.ToString(System.Globalization.CultureInfo.InvariantCulture) })).ToArray());
         return[];
@@ -81,11 +77,11 @@ internal sealed partial class CharacterMengDaOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     }
 
-    internal static bool GoudePrivateChoice(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_meng_da_ol_MengDa.GoudePrivateChoice(f);
+    internal static bool GoudePrivateChoice(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_meng_da_ol_MengDa.GoudePrivateChoice(f);
     [ProgramAnswer("meng-da-goude")]
     internal void AnswerGoude(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Goude: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !GoudeChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Goude: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !GoudeChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Goude requires its exact published option, target, faction or opaque Hand slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -228,6 +224,6 @@ internal sealed partial class CharacterMengDaOlRuntime
             return p.Choices.OrderByDescending(c => _coreMatchParticipantsPlayersAccess._players.Count(v => v.IsAlive && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(v) == c.Parameters["faction"])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
         if (r.Stage is GoudeStage.DiscardTarget or GoudeStage.SlashTarget)
             return p.Choices.OrderByDescending(c => _coreAiBrainsAiBrainsAccess._aiBrains[f.OwnerSeat].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(f.OwnerSeat), c.Targets[0], new SkillProgramAiHint(1, 0, 0, 0, 0, 0, false, false))).First();
-        return p.Choices.OrderBy(c => c.Cards.Count > 0 ? global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 2).First();
+        return p.Choices.OrderBy(c => c.Cards.Count > 0 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]) : 2).First();
     }
 }

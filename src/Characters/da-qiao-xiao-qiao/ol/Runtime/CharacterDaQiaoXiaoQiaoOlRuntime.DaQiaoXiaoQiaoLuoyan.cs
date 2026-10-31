@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
@@ -35,7 +31,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
         return cached.Stamp;
     }
 
-    internal static string DaQiaoXiaoQiaoDerivedId(int seat, DaQiaoXiaoQiaoLuoyanSource r) => global::CardGame.Core.RuntimeSkills.RuntimeRules_da_qiao_xiao_qiao_ol_DaQiaoXiaoQiaoLuoyan.DaQiaoXiaoQiaoDerivedId(seat, r);
+    internal static string DaQiaoXiaoQiaoDerivedId(int seat, DaQiaoXiaoQiaoLuoyanSource r) => RuntimeSkills.RuntimeRules_da_qiao_xiao_qiao_ol_DaQiaoXiaoQiaoLuoyan.DaQiaoXiaoQiaoDerivedId(seat, r);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27340)]
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 27340)]
     internal void SynchronizeDaQiaoXiaoQiaoLuoyan()

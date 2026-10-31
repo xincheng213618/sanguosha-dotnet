@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWangGuanOlRuntime
 {
     internal const string MiuyanGainReason = "skill-program.wang-guan.miuyan.gain", ShiluDrawReason = "skill-program.wang-guan.shilu.draw", ShiluRevealBind = "shilu-public-hand";
-    internal static CardConversionSource WangGuanSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_wang_guan_ol_WangGuan.WangGuanSource(f);
-    SkillProgramStepOutcome global::CardGame.Core.IWangGuanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWangGuan(f, op);
+    internal static CardConversionSource WangGuanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_wang_guan_ol_WangGuan.WangGuanSource(f);
+    SkillProgramStepOutcome IWangGuanHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWangGuan(f, op);
     internal SkillProgramStepOutcome BeginWangGuan(ProgramSkillFrame input, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
@@ -22,7 +18,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
         var hp = 0;
         if (miuyan)
         {
-            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority);
+            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority);
             if (!CanRunIssuedMiuyanCandidate(c, context))
                 throw new InvalidOperationException("Miuyan lost its exact completed native Fire Attack candidate.");
             invoice = MiuyanCandidateUse(c, context)!.MiuyanUse!;
@@ -133,7 +129,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
     [ProgramAnswer("wang-guan")]
     internal void AnswerWangGuan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WangGuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WangGuanChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WangGuan: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !WangGuanChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Shilu requires its exact private opaque hand selection.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

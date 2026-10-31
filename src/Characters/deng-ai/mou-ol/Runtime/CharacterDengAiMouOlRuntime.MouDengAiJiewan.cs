@@ -1,14 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiMouOlRuntime
 {
-    internal PromptChoice MouDengAiChoice(ProgramSkillFrame f, string branch, string label, int? card = null, global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption? option = null) => new(new($"mou-deng-ai.{(f.Id)}.{(f.MouDengAiOl!.Stage)}.{(branch)}.{(card)}.{(option?.Id.Value)}"), label, card is { } id ? [id] : [], option?.TargetSeats ?? [], new Dictionary<string, string> { ["program-action"] = "mou-deng-ai-ol", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = branch, ["option-id"] = option?.Id.Value ?? "" });
+    internal PromptChoice MouDengAiChoice(ProgramSkillFrame f, string branch, string label, int? card = null, GameEngine.ProgramOrdinaryTrickUseOption? option = null) => new(new($"mou-deng-ai.{(f.Id)}.{(f.MouDengAiOl!.Stage)}.{(branch)}.{(card)}.{(option?.Id.Value)}"), label, card is { } id ? [id] : [], option?.TargetSeats ?? [], new Dictionary<string, string> { ["program-action"] = "mou-deng-ai-ol", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = branch, ["option-id"] = option?.Id.Value ?? "" });
     internal IReadOnlyList<PromptChoice> MouDengAiChoices(ProgramSkillFrame f)
     {
         var r = f.MouDengAiOl!;
@@ -68,7 +65,7 @@ internal sealed partial class CharacterDengAiMouOlRuntime
     [ProgramAnswer("mou-deng-ai-ol")]
     internal void AnswerMouDengAiOl(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDengAiOl: { } r } f || !ValidMouDengAiOl(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouDengAiChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDengAiOl: { } r } f || !ValidMouDengAiOl(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !MouDengAiChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Mou Deng Ai requires its current owner and exact live option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -171,17 +168,17 @@ internal sealed partial class CharacterDengAiMouOlRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         if (r.Stage == MouDengAiOlStage.ExchangeHand)
         {
-            var card = choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), owner)).FirstOrDefault();
-            return r.HandCards.Count == 0 && card is not null && MouDengAiGu(f.OwnerSeat).Any(g => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(g, owner) > global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(card.Cards[0]), owner)) ? card : choices.Single(c => c.Parameters["branch"] == "confirm");
+            var card = choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), owner)).FirstOrDefault();
+            return r.HandCards.Count == 0 && card is not null && MouDengAiGu(f.OwnerSeat).Any(g => CoreNativeAiDecisionsRuntime.GetKeepValue(g, owner) > CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(card.Cards[0]), owner)) ? card : choices.Single(c => c.Parameters["branch"] == "confirm");
         }
 
         if (r.Stage == MouDengAiOlStage.Cost)
             return choices.FirstOrDefault(c => c.Parameters["branch"] == "remove") ?? choices.First();
         if (r.Stage == MouDengAiOlStage.ExchangeGu)
-            return choices.OrderByDescending(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), owner)).First();
+            return choices.OrderByDescending(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), owner)).First();
         if (r.Stage is MouDengAiOlStage.RemoveGu or MouDengAiOlStage.Material)
-            return choices.OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), owner)).First();
-        return choices.OrderBy(c => c.Targets.Count > 0 && global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(owner, _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).First();
+            return choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), owner)).First();
+        return choices.OrderBy(c => c.Targets.Count > 0 && CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(owner, _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])).First();
     }
 
     internal bool DrainMouDengAiOl(long id) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(id, PostEventContinuation.AwaitedProgramMovement);

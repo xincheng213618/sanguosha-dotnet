@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime))]
 internal sealed partial class CoreGameEngineRandomAreaAcquisitionEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime> _resolve;
-    private CoreGameEngineRandomAreaAcquisitionEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime> _resolve;
+    private CoreGameEngineRandomAreaAcquisitionEntries(Func<EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineRandomAreaAcquisitionEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineRandomAreaAcquisitionEntries Create(Func<EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime> resolve) => new(resolve);
 }

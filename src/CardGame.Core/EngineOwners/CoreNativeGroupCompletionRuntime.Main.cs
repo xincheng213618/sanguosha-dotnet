@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeGroupCompletionRuntime
 {
-    internal void FinishGroupAttack(global::CardGame.Core.NativeOwners.GroupCardHandle group, bool allowYingboGift = true)
+    internal void FinishGroupAttack(NativeOwners.GroupCardHandle group, bool allowYingboGift = true)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack)
         {
             throw new InvalidOperationException("The group attack is not the current card resolution.");
         }
@@ -35,7 +31,7 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             {
                 _corePhysicalMovementFacadesOperations.MoveCard(physicalCard, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.UseFinished);
             }
-            else if (!global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_CommonRules.IsResolvedGroupPhysicalCardDestinationAllowed(cardLocation, group.DamageClaimedPhysicalCardIds.Contains(physicalCard.Id), group.TargetSeats))
+            else if (!RuntimeSkills.RuntimeRules_Core_CommonRules.IsResolvedGroupPhysicalCardDestinationAllowed(cardLocation, group.DamageClaimedPhysicalCardIds.Contains(physicalCard.Id), group.TargetSeats))
             {
                 throw new InvalidOperationException($"A resolved {(group.Card.Kind)} left Processing through an unsupported destination: {(cardLocation)}.");
             }
@@ -65,9 +61,9 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
         }
     }
 
-    internal void FinishGroupRecovery(global::CardGame.Core.NativeOwners.GroupCardHandle group)
+    internal void FinishGroupRecovery(NativeOwners.GroupCardHandle group)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.Recovery)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.Recovery)
         {
             throw new InvalidOperationException("The group recovery is not the current card resolution.");
         }

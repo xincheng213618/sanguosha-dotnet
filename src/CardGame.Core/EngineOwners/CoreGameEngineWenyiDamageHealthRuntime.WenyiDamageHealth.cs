@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWenyiDamageHealthRuntime
 {
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 10)]
-    internal bool TryBeginWenyiDamageHealth(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageFrameId)
+    internal bool TryBeginWenyiDamageHealth(GameEngine.IDamageAttempt attack, long damageFrameId)
     {
         if (!_characterHuanShuJunOlOperations.HasWenyiHealthSubject(attack.TargetSeat) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.Id != damageFrameId || damage.ParentFrameId != attack.ResolutionId || damage.WenyiHealth is not null)
             return false;

@@ -1,13 +1,13 @@
 #nullable enable
 namespace CardGame.Core.RuntimeEntries;
-[global::CardGame.Core.ProgramRuntimeEntry(typeof(global::CardGame.Core.EngineOwners.CoreGameEngineRevealedFireAttackPaymentRuntime))]
+[Core.ProgramRuntimeEntry(typeof(EngineOwners.CoreGameEngineRevealedFireAttackPaymentRuntime))]
 internal sealed partial class CoreGameEngineRevealedFireAttackPaymentEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRevealedFireAttackPaymentRuntime> _resolve;
-    private CoreGameEngineRevealedFireAttackPaymentEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRevealedFireAttackPaymentRuntime> resolve)
+    private readonly Func<EngineOwners.CoreGameEngineRevealedFireAttackPaymentRuntime> _resolve;
+    private CoreGameEngineRevealedFireAttackPaymentEntries(Func<EngineOwners.CoreGameEngineRevealedFireAttackPaymentRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreGameEngineRevealedFireAttackPaymentEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreGameEngineRevealedFireAttackPaymentRuntime> resolve) => new(resolve);
+    internal static CoreGameEngineRevealedFireAttackPaymentEntries Create(Func<EngineOwners.CoreGameEngineRevealedFireAttackPaymentRuntime> resolve) => new(resolve);
 }

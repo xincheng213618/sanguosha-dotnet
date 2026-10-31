@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramPersistentStateRuntime
@@ -15,7 +11,7 @@ internal sealed partial class CoreGameEngineProgramPersistentStateRuntime
     internal bool GetProgramBooleanState(int ownerSeat, string skillId, string skillInstanceId, string stateId)
     {
         var definition = GetProgramBooleanStateDefinition(skillId, stateId);
-        var key = new global::CardGame.Core.GameEngine.ProgramBooleanStateKey(ownerSeat, skillId, skillInstanceId, stateId);
+        var key = new GameEngine.ProgramBooleanStateKey(ownerSeat, skillId, skillInstanceId, stateId);
         if (!_coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates.TryGetValue(key, out var value))
         {
             value = definition.InitialValue;
@@ -28,7 +24,7 @@ internal sealed partial class CoreGameEngineProgramPersistentStateRuntime
     internal void SetProgramBooleanState(int ownerSeat, string skillId, string instanceId, string stateId, bool value)
     {
         var definition = GetProgramBooleanStateDefinition(skillId, stateId);
-        var key = new global::CardGame.Core.GameEngine.ProgramBooleanStateKey(ownerSeat, skillId, instanceId, stateId);
+        var key = new GameEngine.ProgramBooleanStateKey(ownerSeat, skillId, instanceId, stateId);
         if (GetProgramBooleanState(ownerSeat, skillId, instanceId, stateId) == value)
             return;
         _coreGameEngineProgramPersistentStateProgramBooleanStatesAccess._programBooleanStates[key] = value;

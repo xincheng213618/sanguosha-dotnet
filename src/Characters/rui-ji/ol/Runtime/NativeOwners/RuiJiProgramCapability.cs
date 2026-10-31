@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class RuiJiProgramCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterRuiJiOlEntries> getCharacterRuiJiOlRuntime) : IRuiJiProgramHost
+internal sealed class RuiJiProgramCapability(Func<RuntimeEntries.CharacterRuiJiOlEntries> getCharacterRuiJiOlRuntime) : IRuiJiProgramHost
 {
     public SkillProgramStepOutcome QiaoliWeaponDuel(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterRuiJiOlRuntime().QiaoliProgramDuelLaunch(frame, unrespondable: false);
     public SkillProgramStepOutcome QiaoliArmorDuel(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterRuiJiOlRuntime().QiaoliProgramDuelLaunch(frame, unrespondable: true);

@@ -1,18 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuFuAnniversaryRuntime
 {
-    internal static CardConversionSource WuFuSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    internal static CardConversionSource WuFuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardMoveReason WuFuDrawReason => new("skill-program.anniversary:zhonge.draw");
     internal static CardMoveReason WuFuDiscardReason => new("skill-program.anniversary:zhonge.adjust");
 
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryWuFuHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWuFu(f, op);
+    SkillProgramStepOutcome IAnniversaryWuFuHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWuFu(f, op);
     internal SkillProgramStepOutcome BeginWuFu(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -123,7 +118,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
     [ProgramAnswer("anniversary-wu-fu")]
     internal void AnswerWuFu(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryWuFu: { } r } f || !ValidWuFu(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != WuFuChooser(f) || !WuFuChoices(f).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryWuFu: { } r } f || !ValidWuFu(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != WuFuChooser(f) || !WuFuChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Zhonge rejects a changed private choice or another participant's slot.");
         var chooser = WuFuChooser(f);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

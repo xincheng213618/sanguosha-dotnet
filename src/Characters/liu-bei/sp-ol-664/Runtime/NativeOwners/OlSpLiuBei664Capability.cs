@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class OlSpLiuBei664Capability(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterLiuBeiSpOl664Entries> getCharacterLiuBeiSpOl664Runtime) : IOlSpLiuBei664Host
+internal sealed class OlSpLiuBei664Capability(Func<RuntimeEntries.CharacterLiuBeiSpOl664Entries> getCharacterLiuBeiSpOl664Runtime) : IOlSpLiuBei664Host
 {
     public SkillProgramStepOutcome Execute(ProgramSkillFrame frame, SkillProgramEffect effect) => effect.Op switch
     {

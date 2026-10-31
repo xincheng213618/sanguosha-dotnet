@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class HappyTaishiCiHost(global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterTaishiCiMobileGodEntries> getCharacterTaishiCiMobileGodRuntime, global::System.Func<global::CardGame.Core.RuntimeEntries.CharacterTaishiCiHappyGodEntries> getCharacterTaishiCiHappyGodRuntime) : IHappyTaishiCiHost
+internal sealed class HappyTaishiCiHost(Func<RuntimeEntries.CharacterTaishiCiMobileGodEntries> getCharacterTaishiCiMobileGodRuntime, Func<RuntimeEntries.CharacterTaishiCiHappyGodEntries> getCharacterTaishiCiHappyGodRuntime) : IHappyTaishiCiHost
 {
     public SkillProgramStepOutcome Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => op switch
     {

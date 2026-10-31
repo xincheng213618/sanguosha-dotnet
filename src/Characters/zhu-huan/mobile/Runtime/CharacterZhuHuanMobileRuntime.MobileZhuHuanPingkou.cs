@@ -1,16 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuHuanMobileRuntime
 {
     internal const string MobileZhuHuanPingkouSkill = "mobile:pingkou", MobileZhuHuanPingkouAction = "mobile-zhu-huan-pingkou";
-    internal static CardConversionSource MobileZhuHuanPingkouSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileZhuHuanPingkouHost.Begin(ProgramSkillFrame frame) => BeginMobileZhuHuanPingkou(frame);
+    internal static CardConversionSource MobileZhuHuanPingkouSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMobileZhuHuanPingkouHost.Begin(ProgramSkillFrame frame) => BeginMobileZhuHuanPingkou(frame);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 72500)]
     internal bool CanOfferMobileZhuHuanPingkou(ProgramTriggerLegalityContext gate) => gate.SkillId != MobileZhuHuanPingkouSkill || gate.Owner.Seat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _characterZhuHuanBoundaryMobileOperations.BoundaryPingkouMaximum(gate.Owner.Seat) > 0 && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != gate.Owner.Seat);
     internal SkillProgramStepOutcome BeginMobileZhuHuanPingkou(ProgramSkillFrame supplied)
@@ -56,7 +51,7 @@ internal sealed partial class CharacterZhuHuanMobileRuntime
     [ProgramAnswer(MobileZhuHuanPingkouAction)]
     internal void AnswerMobileZhuHuanPingkou(PromptChoice chosen)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileZhuHuanPingkou: { Sealed: false } r } f || !ValidMobileZhuHuanPingkou(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([chosen], MobileZhuHuanPingkouChoices(f).Where(c => c.Id == chosen.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileZhuHuanPingkou: { Sealed: false } r } f || !ValidMobileZhuHuanPingkou(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([chosen], MobileZhuHuanPingkouChoices(f).Where(c => c.Id == chosen.Id).ToArray()))
             throw new InvalidOperationException("Mobile Pingkou requires its exact original owner and a current distinct living target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -127,5 +122,5 @@ internal sealed partial class CharacterZhuHuanMobileRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 72500)]
     internal bool KeepMobileZhuHuanPingkouIssued(ProgramSkillFrame f) => f.MobileZhuHuanPingkou is { Sealed: true } && ValidMobileZhuHuanPingkou(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMobileZhuHuanPingkou)]
-    internal PromptChoice MobileZhuHuanPingkouAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Targets is [var target] && !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? p.Choices.Single(c => c.Parameters["branch"] == "finish");
+    internal PromptChoice MobileZhuHuanPingkouAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Targets is [var target] && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? p.Choices.Single(c => c.Parameters["branch"] == "finish");
 }

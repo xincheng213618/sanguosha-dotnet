@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTianYuOlRuntime
@@ -41,7 +37,7 @@ internal sealed partial class CharacterTianYuOlRuntime
             throw new InvalidOperationException("The Zhuitao target is no longer legal.");
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDirectedDistanceGrantedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.SkillInstanceId, active.OwnerSeat, targetSeat, -1));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDirectedDistanceGrantedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.SkillInstanceId, active.OwnerSeat, targetSeat, -1));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】，" + $"令自己与 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 的距离-1。", active.OwnerSeat, targetSeat);
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
@@ -55,7 +51,7 @@ internal sealed partial class CharacterTianYuOlRuntime
         var grants = ActiveDirectedDistanceGrants(active.OwnerSeat, damagedSeat);
         if (grants.Count == 0)
             return SkillProgramStepOutcome.Continue;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDirectedDistanceRevokedEvent(active.Id, active.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.SkillInstanceId, active.OwnerSeat, damagedSeat));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDirectedDistanceRevokedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.SkillInstanceId, active.OwnerSeat, damagedSeat));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 对 {(_coreMatchParticipantsPlayersAccess._players[damagedSeat].Name)} 造成伤害，失去以此法对其减少的距离。", active.OwnerSeat, damagedSeat);
         return SkillProgramStepOutcome.Continue;
     }

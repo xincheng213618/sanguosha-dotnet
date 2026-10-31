@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMaTieAnniversaryRuntime
@@ -68,7 +64,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateAnniversaryMaTieFactionParent(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
+    internal bool ValidateAnniversaryMaTieFactionParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
     {
         if (f.AnniversaryMaTie is not { FactionPolicy: { } policy } r || f.SkillId != AnniversaryMaTieComposition.Quxian)
             return false;
@@ -77,14 +73,14 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         return true;
     }
 
-    internal bool AnniversaryMaTieFactionSupplyLegal(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CardKind kind)
+    internal bool AnniversaryMaTieFactionSupplyLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind)
     {
         if (pending.ProgramSkillFrameId is not { } id || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == id)is not { AnniversaryMaTie.FactionPolicy: not null } f)
             return true;
         return ValidateAnniversaryMaTieFactionParent(pending, f) && !_coreCardUseModulesOperations.IsCardUseForbidden(pending.OwnerSeat, kind, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(pending.OwnerSeat, f.AnniversaryMaTie!.Target, kind) && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(pending.OwnerSeat, SkillProgramCardTargetRestriction.SelfOnly);
     }
 
-    internal bool PrepareAnniversaryMaTieFactionNative(ProgramSkillFrame f, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind, CardConversionSource? conversion)
+    internal bool PrepareAnniversaryMaTieFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind, CardConversionSource? conversion)
     {
         if (!ValidateAnniversaryMaTieFactionParent(pending, f))
             return false;
@@ -94,7 +90,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         return PrepareAnniversaryMaTieSuppliedSlash(f, r.Actors[r.Cursor], provider.Seat, r.Target, kind, cards, conversion);
     }
 
-    internal bool FinishAnniversaryMaTieFactionDeclined(long id, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending)
+    internal bool FinishAnniversaryMaTieFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryMaTie.FactionPolicy: not null } f || f.Id != id)
             return false;

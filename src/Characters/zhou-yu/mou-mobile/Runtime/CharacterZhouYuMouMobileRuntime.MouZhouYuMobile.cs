@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -10,7 +7,7 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
 {
     internal bool HasMouZhouYuMobileCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMouZhouYuFanjian) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouZhouYuYingzi);
 
-    internal static CardConversionSource MouZyMobileSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_yu_mou_mobile_MouZhouYuMobile.MouZyMobileSource(f);
+    internal static CardConversionSource MouZyMobileSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhou_yu_mou_mobile_MouZhouYuMobile.MouZyMobileSource(f);
     internal MouZhouYuMobileTurn? MouZyMobileTurn()
     {
         var h = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
@@ -22,7 +19,7 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
     internal Card[] MouZyMobileCards(int owner) => MouZyMobileTurn()is { } turn ? _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Where(c => !MouZyMobileSuitSpent(owner, turn, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], c))).ToArray() : [];
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 31100, SkillProgramEffectOp.ResolveMouZhouYuFanjian)]
     internal bool CanStartMouZyMobile(CharacterState owner) => MouZyMobileTurn()is { } turn && !MouZyMobileDisabled(owner.Seat, turn) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == owner.Seat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == owner.Seat && MouZyMobileCards(owner.Seat).Length > 0;
-    SkillProgramStepOutcome global::CardGame.Core.IMouZhouYuMobileHost.Resolve(ProgramSkillFrame f, bool yingzi) => BeginMouZyMobile(f, yingzi);
+    SkillProgramStepOutcome IMouZhouYuMobileHost.Resolve(ProgramSkillFrame f, bool yingzi) => BeginMouZyMobile(f, yingzi);
     internal SkillProgramStepOutcome BeginMouZyMobile(ProgramSkillFrame supplied, bool yingzi)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -57,7 +54,7 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal static string MouZyMobileSuitName(Suit s) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhou_yu_mou_mobile_MouZhouYuMobile.MouZyMobileSuitName(s);
+    internal static string MouZyMobileSuitName(Suit s) => RuntimeSkills.RuntimeRules_zhou_yu_mou_mobile_MouZhouYuMobile.MouZyMobileSuitName(s);
     internal PromptChoice MouZyMobileChoice(ProgramSkillFrame f, string branch, string text, int? card = null, Suit? declared = null) => new(new($"mou-zhou-yu-mobile.{(f.Id)}.{(branch)}.{(card)}.{(declared)}"), text, card is { } id ? [id] : [], [], new Dictionary<string, string> { ["program-action"] = "mou-zhou-yu-fanjian", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["branch"] = branch, ["declared-suit"] = declared?.ToString() ?? "" });
     internal IReadOnlyList<PromptChoice> MouZyMobileChoices(ProgramSkillFrame f)
     {
@@ -112,7 +109,7 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         var r = f.MouZhouYuMobile;
-        if (r is null || !ValidMouZyMobile(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouZhouYuMobileStage.OwnerChoice ? f.OwnerSeat : r.TargetSeat) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouZyMobileChoices(f).Where(c => c.Id == selected.Id).ToArray()))
+        if (r is null || !ValidMouZyMobile(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouZhouYuMobileStage.OwnerChoice ? f.OwnerSeat : r.TargetSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], MouZyMobileChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("Fanjian accepts only the exact actual private chooser's published option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = selected.Parameters["branch"];
@@ -256,7 +253,7 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
     {
         if (f.MouZhouYuMobile!.Stage == MouZhouYuMobileStage.OwnerChoice)
         {
-            var cards = p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => global::CardGame.Core.EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).ToArray();
+            var cards = p.Choices.Where(c => c.Cards.Count == 1).OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat])).ToArray();
             return cards.Length == 0 ? p.Choices.Single(c => c.Parameters["branch"] == "cancel") : cards[_randomOperations._random.Next(Math.Min(4, cards.Length))];
         }
 

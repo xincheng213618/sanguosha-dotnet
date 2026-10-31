@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal sealed partial class CoreGameEngineRecoveryDamageEdgesRuntime
 {
-    private readonly global::CardGame.Core.RuntimeEntries.CoreGameEngineNativeRecoveryDamageEntries _coreNativeRecoveryDamageOperations;
-    internal CoreGameEngineRecoveryDamageEdgesRuntime(global::CardGame.Core.RuntimeEntries.CoreGameEngineNativeRecoveryDamageEntries coreNativeRecoveryDamageOperations)
+    private readonly RuntimeEntries.CoreGameEngineNativeRecoveryDamageEntries _coreNativeRecoveryDamageOperations;
+    internal CoreGameEngineRecoveryDamageEdgesRuntime(RuntimeEntries.CoreGameEngineNativeRecoveryDamageEntries coreNativeRecoveryDamageOperations)
     {
         this._coreNativeRecoveryDamageOperations = coreNativeRecoveryDamageOperations;
     }

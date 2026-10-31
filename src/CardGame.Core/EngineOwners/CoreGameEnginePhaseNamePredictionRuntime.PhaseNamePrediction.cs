@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -22,16 +19,16 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
 
     internal const string PhasePredictionCostReason = "program.phase-name-prediction.cost";
     internal const string PhasePredictionClaimReason = "program.phase-name-prediction.claim";
-    internal static CardKind PredictionName(CardKind kind) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PhaseNamePrediction.PredictionName(kind);
+    internal static CardKind PredictionName(CardKind kind) => RuntimeSkills.RuntimeRules_Core_PhaseNamePrediction.PredictionName(kind);
     internal bool PredictionConsumed(PhaseNamePredictionPolicy p) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Any(e => e is PhaseNamePredictionSettledEvent s && s.OriginalFrameId == p.Origin.FrameId || e is PhaseNamePredictionExpiredEvent x && x.OriginalFrameId == p.Origin.FrameId);
-    internal static bool IsPhaseNamePredictionResolver(ProgramTriggerCandidate c, SkillProgram p) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_PhaseNamePrediction.IsPhaseNamePredictionResolver(c, p);
+    internal static bool IsPhaseNamePredictionResolver(ProgramTriggerCandidate c, SkillProgram p) => RuntimeSkills.RuntimeRules_Core_PhaseNamePrediction.IsPhaseNamePredictionResolver(c, p);
     internal PhaseNamePredictionMaterial[] PredictionMaterials(long frameId, int seat) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(frameId, seat, seat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard).Where(c => c.Cards.Count == 1).Select(c => c.Cards[0]).Distinct().Select(id => new PhaseNamePredictionMaterial(id, _cardZonesOperations._cardZones.GetLocation(id))).ToArray();
     internal SkillProgramStepOutcome BeginPhaseNamePrediction(ProgramSkillFrame supplied, string stateId)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.InstructionIndex != 1 || f.PhaseNamePrediction is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting, SourceSeat: { } target } c || target != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || target == f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not PlayPhaseStartingBoundaryFrame b || b.Id != c.ParentFrameId || b.ItemIndex < 0 || b.ItemIndex >= b.Items.Count || b.Items[b.ItemIndex].Candidate is not { } candidate || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
+        if (f.InstructionIndex != 1 || f.PhaseNamePrediction is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting, SourceSeat: { } target } c || target != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || target == f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not PlayPhaseStartingBoundaryFrame b || b.Id != c.ParentFrameId || b.ItemIndex < 0 || b.ItemIndex >= b.Items.Count || b.Items[b.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate))
             throw new InvalidOperationException("Phase prediction lost its exact foreign Play-start candidate.");
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var count = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PhaseNamePredictionStartedEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == f.SkillId && e.StateId == stateId && e.ActualRoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
         var origin = new PhaseNamePredictionStartedEvent(f.Id, source, f.GameplayHash, stateId, _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, target, count);
         var materials = PredictionMaterials(f.Id, f.OwnerSeat);
@@ -85,7 +82,7 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
     internal void ResolvePhaseNamePredictionChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Prediction has no owning frame.");
-        if (f.PhaseNamePrediction is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], PredictionChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (f.PhaseNamePrediction is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], PredictionChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Prediction choice changed its exact private draft.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == PhaseNamePredictionStage.ChoosingCost)
@@ -220,7 +217,7 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var c = f.WindowContext!;
-        var candidate = ((ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(b => b.Id == c.ParentFrameId)).Candidates.Single(x => global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, x));
+        var candidate = ((ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(b => b.Id == c.ParentFrameId)).Candidates.Single(x => CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, x));
         if (f.InstructionIndex != 1 || !HasIssuedPhaseNamePrediction(candidate, c) || c.PhaseNamePrediction is not { } p || p.Origin.StateId != stateId)
             throw new InvalidOperationException("Prediction lost its exact issued phase-end item.");
         // Earlier frozen ending candidates may have killed the original target.
@@ -309,6 +306,6 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 650)]
     internal bool CanContinuePhaseNamePrediction(ProgramSkillFrame f) => f.PhaseNamePrediction is not null || f.WindowContext?.PhaseNamePrediction is { } p && _coreGameEnginePhaseNamePredictionPhaseNamePredictionsAccess._phaseNamePredictions.Contains(p);
 
-    SkillProgramStepOutcome global::CardGame.Core.IPhaseNamePredictionHost.BeginPhaseNamePrediction(ProgramSkillFrame f, string state) => BeginPhaseNamePrediction(f, state);
-    SkillProgramStepOutcome global::CardGame.Core.IPhaseNamePredictionHost.SettlePhaseNamePrediction(ProgramSkillFrame f, string state) => SettlePhaseNamePrediction(f, state);
+    SkillProgramStepOutcome IPhaseNamePredictionHost.BeginPhaseNamePrediction(ProgramSkillFrame f, string state) => BeginPhaseNamePrediction(f, state);
+    SkillProgramStepOutcome IPhaseNamePredictionHost.SettlePhaseNamePrediction(ProgramSkillFrame f, string state) => SettlePhaseNamePrediction(f, state);
 }

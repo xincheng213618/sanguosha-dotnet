@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoYunMobileShiRuntime
 {
     internal const string MobileShiWuyiSkill = "mobile:shi-wuyi";
-    internal bool MobileShiWuyiAtLeast(CharacterState owner, int level) => _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Any(instance => instance.SkillId == MobileShiWuyiSkill && _coreProgramPersistentStateOperations.GetProgramBooleanState2(owner.Seat, instance.SkillId, instance.SkillInstanceId, global::CardGame.Core.EngineOwners.CharacterZhaoYunMobileShiDefinitions.MobileShiWuyiLevels[level - 1]));
+    internal bool MobileShiWuyiAtLeast(CharacterState owner, int level) => _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Any(instance => instance.SkillId == MobileShiWuyiSkill && _coreProgramPersistentStateOperations.GetProgramBooleanState2(owner.Seat, instance.SkillId, instance.SkillInstanceId, CharacterZhaoYunMobileShiDefinitions.MobileShiWuyiLevels[level - 1]));
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 67200)]
     internal void RecordMobileShiWuyiHandBasic(CardActionAcceptedEvent accepted)
     {
         var action = accepted.Action;
         if (action.ActorSeat != action.ProviderSeat || action.PhysicalCards.Count == 0 || action.PhysicalCards.Any(card => card.From != new CardLocation(CardZoneKind.Hand, action.ActorSeat)))
             return;
-        var name = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) ? CardKind.Slash : action.EffectiveKind;
+        var name = CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) ? CardKind.Slash : action.EffectiveKind;
         if (name is not (CardKind.Slash or CardKind.Dodge or CardKind.Peach or CardKind.Alcohol))
             return;
         var owner = _coreMatchParticipantsPlayersAccess._players[action.ActorSeat];
@@ -48,5 +44,5 @@ internal sealed partial class CharacterZhaoYunMobileShiRuntime
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPhysicalSlash, 67200)]
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPaidWeaponSlash, 67200)]
     [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 67200)]
-    internal bool MobileShiWuyiSlashDistance(ProgramSlashDistanceQuery query) => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(query.Kind) && MobileShiWuyiAtLeast(query.Actor, 3);
+    internal bool MobileShiWuyiSlashDistance(ProgramSlashDistanceQuery query) => CoreNativeCardClassificationsRuntime.IsSlashCard(query.Kind) && MobileShiWuyiAtLeast(query.Actor, 3);
 }

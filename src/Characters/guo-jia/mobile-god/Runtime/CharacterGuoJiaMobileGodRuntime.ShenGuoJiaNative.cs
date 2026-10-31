@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoJiaMobileGodRuntime
@@ -39,7 +35,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[owner];
         var options = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, physicalSuit: Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: []);
-        return Array.AsReadOnly(_coreNextActualUseTargetAdjustmentsOperations.NextActualUseOrdinaryTrickOptions(actor, options, Suit.None, null, Suit.None, false).Where(option => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(option.EffectiveCardKind)).Select(option => new ShenGuoJiaPlan(option.EffectiveCardKind, option.ActionKind, option.TargetCardId, option.RequiredCardKind, option.NextActualUseAdjusted) { Targets = _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(option.EffectiveCardKind, owner, option.TargetSeats) }).ToArray());
+        return Array.AsReadOnly(_coreNextActualUseTargetAdjustmentsOperations.NextActualUseOrdinaryTrickOptions(actor, options, Suit.None, null, Suit.None, false).Where(option => CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(option.EffectiveCardKind)).Select(option => new ShenGuoJiaPlan(option.EffectiveCardKind, option.ActionKind, option.TargetCardId, option.RequiredCardKind, option.NextActualUseAdjusted) { Targets = _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(option.EffectiveCardKind, owner, option.TargetSeats) }).ToArray());
     }
 
     internal static bool SameShenGuoJiaPlan(ShenGuoJiaPlan left, ShenGuoJiaPlan right) => (left.Kind, left.ActionKind, left.TargetCardId, left.RequiredKind, left.Adjusted) == (right.Kind, right.ActionKind, right.TargetCardId, right.RequiredKind, right.Adjusted) && left.Targets.SequenceEqual(right.Targets);

@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreAwaitedBlindHandTakeProgramsEntries
 {
-    private readonly global::System.Func<global::CardGame.Core.EngineOwners.CoreAwaitedBlindHandTakeProgramsRuntime> _resolve;
-    private CoreAwaitedBlindHandTakeProgramsEntries(global::System.Func<global::CardGame.Core.EngineOwners.CoreAwaitedBlindHandTakeProgramsRuntime> resolve)
+    private readonly Func<EngineOwners.CoreAwaitedBlindHandTakeProgramsRuntime> _resolve;
+    private CoreAwaitedBlindHandTakeProgramsEntries(Func<EngineOwners.CoreAwaitedBlindHandTakeProgramsRuntime> resolve)
     {
         _resolve = resolve;
     }
 
-    internal static CoreAwaitedBlindHandTakeProgramsEntries Create(global::System.Func<global::CardGame.Core.EngineOwners.CoreAwaitedBlindHandTakeProgramsRuntime> resolve) => new(resolve);
+    internal static CoreAwaitedBlindHandTakeProgramsEntries Create(Func<EngineOwners.CoreAwaitedBlindHandTakeProgramsRuntime> resolve) => new(resolve);
 }

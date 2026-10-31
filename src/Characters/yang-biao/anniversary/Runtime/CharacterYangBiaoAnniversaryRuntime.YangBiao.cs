@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYangBiaoAnniversaryRuntime
 {
     internal const string YangBiaoGiftReason = "skill-program.anniversary:zhaohan.give", YangBiaoDiscardReason = "skill-program.anniversary:yang-biao.discard", YangBiaoDrawReason = "skill-program.anniversary:jinjie.draw";
-    internal CardConversionSource YangBiaoSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryYangBiaoHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYangBiao(f, op);
+    internal CardConversionSource YangBiaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryYangBiaoHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYangBiao(f, op);
     internal long YangBiaoDrawPhaseId(ProgramSkillWindowContext? context = null)
     {
         var window = context is null ? null : _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId);
@@ -119,7 +116,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
     [ProgramAnswer("anniversary-yang-biao")]
     internal void AnswerYangBiao(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryYangBiao: { } r } f || !ValidYangBiao(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !YangBiaoChoices(f).Any(choice => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryYangBiao: { } r } f || !ValidYangBiao(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !YangBiaoChoices(f).Any(choice => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
             throw new InvalidOperationException("Yang Biao rejects stale original-entity payment or target choices.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

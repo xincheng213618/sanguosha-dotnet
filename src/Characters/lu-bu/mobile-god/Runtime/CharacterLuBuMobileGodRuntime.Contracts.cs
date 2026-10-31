@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICharacterLuBuMobileGodCoreProgramCardLegalityOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterLuBuMobileGodCoreProgramCardLegalityOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramCardLegality CardLegality { get; }
+    ProgramCardLegality CardLegality { get; }
 }
 
-internal interface ICharacterLuBuMobileGodCoreProgramCardUsePaymentsOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICharacterLuBuMobileGodCoreProgramCardUsePaymentsOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramCardUsePayments CardUsePayments { get; }
+    ProgramCardUsePayments CardUsePayments { get; }
 }

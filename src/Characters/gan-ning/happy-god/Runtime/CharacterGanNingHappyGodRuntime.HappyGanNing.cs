@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGanNingHappyGodRuntime
 {
     internal const string HappyPoxiReason = "skill-program.happy:poxi.discard", HappyPoxiDrawReason = "skill-program.happy:poxi.draw";
-    SkillProgramStepOutcome global::CardGame.Core.IHappyPoxiHost.Resolve(ProgramSkillFrame frame, string bind) => BeginHappyPoxi(frame, bind);
+    SkillProgramStepOutcome IHappyPoxiHost.Resolve(ProgramSkillFrame frame, string bind) => BeginHappyPoxi(frame, bind);
     internal SkillProgramStepOutcome BeginHappyPoxi(ProgramSkillFrame supplied, string bind)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -19,7 +15,7 @@ internal sealed partial class CharacterGanNingHappyGodRuntime
             throw new InvalidOperationException("Happy Poxi lost its three different-suit original hand entities and fixed other participant.");
         if (cards.CardIds.Select((id, index) => (Card: _coreCardAttackStateOperations.GetAttackCard(id), From: cards.SourceLocations[index])).Any(item => _coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(frame.OwnerSeat, item.Card, item.From, OwnedCardMoveIntent.Discard) || _coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(frame.OwnerSeat, item.Card, item.From, OwnedCardMoveIntent.Discard)))
             return SkillProgramStepOutcome.Continue;
-        var receipt = new HappyPoxiReceipt(new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, target, cards.SourceLocations.Count(from => from.OwnerSeat == frame.OwnerSeat), _coreActualTurnProgressTurnNumberAccess._turnNumber, HappyPoxiStage.DiscardChildren)
+        var receipt = new HappyPoxiReceipt(new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, target, cards.SourceLocations.Count(from => from.OwnerSeat == frame.OwnerSeat), _coreActualTurnProgressTurnNumberAccess._turnNumber, HappyPoxiStage.DiscardChildren)
         {
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
             After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence

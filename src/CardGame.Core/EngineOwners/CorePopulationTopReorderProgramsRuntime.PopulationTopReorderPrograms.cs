@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CorePopulationTopReorderProgramsRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IPopulationTopReorderProgramEffectHost.ReorderTopCardsByPopulation(ProgramSkillFrame frame, int maximumCards, ProgramPopulationThresholdCount population, string? allBottomStateId) => _coreProgramTopReorderOperations.BeginProgramTopReorder(frame, maximumCards, null, population: population, allBottomStateId: allBottomStateId);
+    SkillProgramStepOutcome IPopulationTopReorderProgramEffectHost.ReorderTopCardsByPopulation(ProgramSkillFrame frame, int maximumCards, ProgramPopulationThresholdCount population, string? allBottomStateId) => _coreProgramTopReorderOperations.BeginProgramTopReorder(frame, maximumCards, null, population: population, allBottomStateId: allBottomStateId);
     internal CardSnapshot[] GetPopulationTopPrivatelyViewedCards(int viewerSeat) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { TopReorder.Population: not null } frame && frame.OwnerSeat == viewerSeat && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTopReorder, PlayerSeat: var seat } && seat == viewerSeat ? frame.TopReorder!.ViewedCardIds.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Single(card => card.Id == id))).ToArray() : [];
     internal void ValidatePopulationTopReorder(ProgramSkillFrame frame)
     {

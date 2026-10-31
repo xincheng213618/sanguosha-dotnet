@@ -1,9 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineMantianGuohaiRuntime
@@ -39,7 +34,7 @@ internal sealed partial class CoreGameEngineMantianGuohaiRuntime
         {
             if (_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, card.Kind, CardActionType.Use) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(actor.Seat, card.Kind, [card.Id], null, null)))
                 continue;
-            var targets = _coreMatchParticipantsPlayersAccess._players.Where(target => target.IsAlive && target.Seat != actor.Seat && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(target).Count + _corePhysicalOwnedCardQueriesOperations.GetJudgment(target).Count > 0 && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, card.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, card.Kind, card.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))).Select(t => t.Seat).ToArray();
+            var targets = _coreMatchParticipantsPlayersAccess._players.Where(target => target.IsAlive && target.Seat != actor.Seat && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(target).Count + _corePhysicalOwnedCardQueriesOperations.GetJudgment(target).Count > 0 && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, card.Kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, card.Kind, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card))).Select(t => t.Seat).ToArray();
             foreach (var first in targets)
             {
                 actions.Add(new(LegalActionKind.MantianGuohai, card.Id, first, $"对 {(_coreMatchParticipantsPlayersAccess._players[first].Name)} 使用【瞒天过海】"));
@@ -73,7 +68,7 @@ internal sealed partial class CoreGameEngineMantianGuohaiRuntime
     internal void ResolveMantianGuohaiEffect(NullificationWindowFrame pending)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ParentFrameId) ?? throw new InvalidOperationException("Mantian Guohai lost its native use.");
-        var target = global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Mantian Guohai lost its target.");
+        var target = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? throw new InvalidOperationException("Mantian Guohai lost its target.");
         if (!IsMantianGuohaiUse(use.Id) || use.MantianGuohaiGift is not { Complete: false, ProgramFrameId: null } state || state.GiftTargets.Contains(target) || use.Action is null || !use.Action.TargetSeats.Contains(target))
             throw new InvalidOperationException("Mantian Guohai changed its acquisition cursor.");
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { MantianGuohaiGift = state with { GiftTargets = state.GiftTargets.Append(target).ToArray() } });

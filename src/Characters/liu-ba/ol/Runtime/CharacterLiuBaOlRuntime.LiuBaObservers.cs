@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBaOlRuntime
@@ -28,7 +24,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
         if (f.LiuBa is not { Paid: true } r)
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is not null && global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => LiuBaMovementMatches(f, m));
+            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => LiuBaMovementMatches(f, m));
         if (child is RecoveryReplacementFrame recovery)
             return IsLiuBaRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)

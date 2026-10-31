@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuPanOlRuntime
@@ -20,7 +16,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
             return r.Stage is PijingStage.GiftChildren or PijingStage.DrawChildren && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } changed)
             return changed.ResumeProgramFrameId == f.Id && changed.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
-        if (child is not CardsMovedTriggerWindowFrame moved || f.PendingMovementContinuation is null || !global::CardGame.Core.EngineOwners.CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved))
+        if (child is not CardsMovedTriggerWindowFrame moved || f.PendingMovementContinuation is null || !CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved))
             return false;
         if (r.Stage == PijingStage.GiftChildren)
             return r.Gift is { } gift && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (m.CardId == gift.CardId && m.From == gift.From && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == PijingGiftReason || gift.Kind == CardKind.WoodenOx && gift.From.Zone == CardZoneKind.Equipment && m.From == CardLocation.WoodenOxGrain(gift.DonorSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard));

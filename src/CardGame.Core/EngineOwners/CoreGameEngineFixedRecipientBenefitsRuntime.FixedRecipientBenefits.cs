@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineFixedRecipientBenefitsRuntime
@@ -33,12 +29,12 @@ internal sealed partial class CoreGameEngineFixedRecipientBenefitsRuntime
         return candidate.OwnerSeat == owner.Seat && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects.SequenceEqual(effects) && OriginalFixedRecipient(owner.Seat, candidate.SkillId, candidate.GameplayHash, selection.StateId!)is { } issued && issued.Source.SkillInstanceId == candidate.SkillInstanceId && _coreTableSeatQueriesOperations.IsValidPlayerSeat(issued.RecipientSeat) && _coreMatchParticipantsPlayersAccess._players[issued.RecipientSeat].IsAlive ? Array.AsReadOnly(new[] { issued.RecipientSeat }) : [];
     }
 
-    internal bool ExactFixedRecipientEnding(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } context && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().LastOrDefault()is { } ending && context.ParentFrameId == ending.Id && ending.OwnerSeat == f.OwnerSeat && ending.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && ending.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
+    internal bool ExactFixedRecipientEnding(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding } context && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().LastOrDefault()is { } ending && context.ParentFrameId == ending.Id && ending.OwnerSeat == f.OwnerSeat && ending.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && ending.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
     internal bool ExactFixedRecipientDeath(ProgramSkillFrame f, out ProgramDeathTriggerWindowFrame window)
     {
         window = null !;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
-        if (index < 2 || f.WindowContext is not { Window: SkillProgramTriggerWindow.OwnerDied } context || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramDeathTriggerWindowFrame parent || _resolutionStackOperations._resolutionStack[index - 2] is not DeathFrame death || parent.DeathFrameId != death.Id || death.VictimSeat != f.OwnerSeat || parent.OwnerSeat != f.OwnerSeat || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || context.ParentFrameId != parent.Id || context.OwnerSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || context.SourceSeat != parent.KillerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
+        if (index < 2 || f.WindowContext is not { Window: SkillProgramTriggerWindow.OwnerDied } context || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramDeathTriggerWindowFrame parent || _resolutionStackOperations._resolutionStack[index - 2] is not DeathFrame death || parent.DeathFrameId != death.Id || death.VictimSeat != f.OwnerSeat || parent.OwnerSeat != f.OwnerSeat || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || context.ParentFrameId != parent.Id || context.OwnerSeat != f.OwnerSeat || context.TargetSeat != f.OwnerSeat || context.SourceSeat != parent.KillerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
             return false;
         window = parent;
         return true;

@@ -1,15 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
-using System.Text.Json.Serialization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
 {
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 42400)]
-    internal bool TryBeginHappyQiaoDamageHealth(global::CardGame.Core.GameEngine.IDamageAttempt attack, long damageFrameId)
+    internal bool TryBeginHappyQiaoDamageHealth(GameEngine.IDamageAttempt attack, long damageFrameId)
     {
         if ((!HasHappyQiaoHealth(attack.TargetSeat) && !HappyQiaoHealthSubject(attack.TargetSeat)) || !attack.DamageWasApplied || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.Id != damageFrameId || damage.ParentFrameId != attack.ResolutionId || damage.HappyQiaoDamageHealth is not null)
             return false;

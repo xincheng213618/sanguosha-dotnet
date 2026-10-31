@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramChoicesRuntime
@@ -12,7 +8,7 @@ internal sealed partial class CoreGameEngineProgramChoicesRuntime
     internal bool IsClaimableProgramOptionStillAvailable(PromptChoice selected) => _programPaidCardOperations.Get().IsClaimableProgramOptionStillAvailable(selected);
     internal bool IsProgramOptionAvailable(ProgramSkillFrame frame, int chooserSeat, SkillProgramChoiceOption option) => _programPaidCardOperations.Get().IsProgramOptionAvailable(frame, chooserSeat, option);
     internal int CountChooserProgramBoundCards(ProgramSkillFrame frame, string bind, int chooserSeat) => _programPaidCardOperations.Get().CountChooserProgramBoundCards(frame, bind, chooserSeat);
-    internal static int ResolveProgramEffectTarget(ProgramSkillFrame frame, SkillProgramEffectTarget target) => global::CardGame.Core.RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(frame, target);
+    internal static int ResolveProgramEffectTarget(ProgramSkillFrame frame, SkillProgramEffectTarget target) => RuntimeSkills.RuntimeRules_Core_ProgramChoices.ResolveProgramEffectTarget(frame, target);
     [ProgramAiChoice(SkillProgramEffectOp.ChooseOption)]
     internal PromptChoice SelectAiProgramOption(PendingDecision decision, ProgramSkillFrame frame)
     {
@@ -43,7 +39,7 @@ internal sealed partial class CoreGameEngineProgramChoicesRuntime
             PindianWon = bind => frame.PindianResultBindings.SingleOrDefault(item => item.Name == bind)?.SourceWon ?? false,
             PindianOutcome = bind => frame.PindianResultBindings.SingleOrDefault(item => item.Name == bind)?.SourceWon,
             HasClaimableDamageCards = effect.Options.Any(option => option.Condition.ContainsHasClaimableDamageCards()) && _coreProgramLifecycleOperations.GetClaimableProgramDamageCards(frame).Length > 0,
-            HasOwnedCardCategory = (zones, categories, kinds) => (zones.Contains(CardZoneKind.Equipment) && _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat]).Any(card => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardFilter(card.Kind, categories, kinds))) || (zones.Contains(CardZoneKind.Hand) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat]).Any(card => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardFilter(card.Kind, categories, kinds)))
+            HasOwnedCardCategory = (zones, categories, kinds) => (zones.Contains(CardZoneKind.Equipment) && _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat]).Any(card => CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardFilter(card.Kind, categories, kinds))) || (zones.Contains(CardZoneKind.Hand) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat]).Any(card => CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardFilter(card.Kind, categories, kinds)))
         };
         return decision.Choices.Select(choice =>
         {

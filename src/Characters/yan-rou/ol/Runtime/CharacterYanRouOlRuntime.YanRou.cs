@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYanRouOlRuntime
 {
     internal const string YanRouDiscardReason = "skill-program.yan-rou.choutao.discard", YanRouDrawReason = "skill-program.yan-rou.xiangshu.draw";
-    internal CardConversionSource YanRouSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IYanRouHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYanRou(f, op);
+    internal CardConversionSource YanRouSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IYanRouHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYanRou(f, op);
     internal bool YanRouSpent(int owner, string skill, string hash) => _coreProgramEventHistoryOperations.ProgramEventHistory<YanRouXiangshuSpentEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.GameplayHash == hash);
     internal int YanRouTurnDamage(int owner) => Math.Min(5, _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent).OfType<DamageAppliedEvent>().Where(e => !e.SourceLess && e.SourceSeat == owner && e.Amount > 0).Sum(e => e.Amount));
     internal bool YanRouParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
@@ -19,7 +16,7 @@ internal sealed partial class CharacterYanRouOlRuntime
             return false;
         var parent = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == c.ParentFrameId);
         if (parent is ProgramCardTriggerWindowFrame w)
-            return c.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) == c.Window && w.Action.Type == CardActionType.Use && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(w.Action.EffectiveKind) && c.CardUse is { } card && card.CardActionId == w.Action.ActionId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) == candidate && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(use => use.Id == card.ParentCardUseFrameId && use.Action?.ActionId == card.CardActionId && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind));
+            return c.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) == c.Window && w.Action.Type == CardActionType.Use && CoreNativeCardClassificationsRuntime.IsSlashCard(w.Action.EffectiveKind) && c.CardUse is { } card && card.CardActionId == w.Action.ActionId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) == candidate && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(use => use.Id == card.ParentCardUseFrameId && use.Action?.ActionId == card.CardActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind));
         return parent is TurnEndingBoundaryFrame end && c.Window == SkillProgramTriggerWindow.TurnEnding && end.OwnerSeat == candidate.OwnerSeat && end.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && end.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && c.SourceSeat == end.OwnerSeat && c.TargetSeat == end.OwnerSeat && end.ItemIndex >= 0 && end.ItemIndex < end.Items.Count && end.Items[end.ItemIndex].Candidate == candidate && c.OccurrenceIndex == candidate.OccurrenceIndex;
     }
 
@@ -89,7 +86,7 @@ internal sealed partial class CharacterYanRouOlRuntime
     [ProgramAnswer("yan-rou")]
     internal void AnswerYanRou(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YanRou: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], YanRouChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { YanRou: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], YanRouChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Yan Rou lost its actual private chooser or published opaque slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (r.Stage == YanRouStage.TargetChoice)

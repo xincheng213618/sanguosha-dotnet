@@ -2,5 +2,5 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineOwnTrickDrawAlcoholObserversEntries
 {
-    internal bool OwnTrickDrawLegacyAlcoholRide(global::CardGame.Core.ProgramSkillFrame root, global::CardGame.Core.ActualUseTargetWindowFrame parent, int dyingIndex, global::CardGame.Core.DyingFrame dying) => _resolve().OwnTrickDrawLegacyAlcoholRide(root, parent, dyingIndex, dying);
+    internal bool OwnTrickDrawLegacyAlcoholRide(ProgramSkillFrame root, ActualUseTargetWindowFrame parent, int dyingIndex, DyingFrame dying) => _resolve().OwnTrickDrawLegacyAlcoholRide(root, parent, dyingIndex, dying);
 }

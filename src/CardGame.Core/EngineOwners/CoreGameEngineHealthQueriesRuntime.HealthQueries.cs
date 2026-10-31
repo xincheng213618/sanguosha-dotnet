@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineHealthQueriesRuntime
 {
     internal int? UnambiguousHp(CharacterState player) => !player.HasHpValue || player.HappyQiaoHealth is { } health && health.DaQiaoHp != health.XiaoQiaoHp && player.HappyQiaoPoolQuery?.Invoke(player)is null ? null : player.Hp;
-    internal bool TryBeginHappyQiaoAttackHpLossChoice(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal bool TryBeginHappyQiaoAttackHpLossChoice(GameEngine.IDamageAttempt attack)
     {
         if (!_characterDaQiaoXiaoQiaoHappyGodOperations.HasHappyQiaoHealth(attack.TargetSeat))
             return false;
@@ -75,7 +71,7 @@ internal sealed partial class CoreGameEngineHealthQueriesRuntime
             if (index == unresolved.Length)
             {
                 var previous = _coreGameEngineActionQueriesActionQueryAccess._actionQuery;
-                _coreGameEngineActionQueriesActionQueryAccess._actionQuery = new global::CardGame.Core.NativeOwners.ActionQuery(_coreMatchParticipantsPlayersAccess._players.Count);
+                _coreGameEngineActionQueriesActionQueryAccess._actionQuery = new NativeOwners.ActionQuery(_coreMatchParticipantsPlayersAccess._players.Count);
                 using var scope = _kernelCoreGameEngineActionQueriesOperations.CreateActionQueryScope(previous);
                 actions.AddRange(query());
                 return;

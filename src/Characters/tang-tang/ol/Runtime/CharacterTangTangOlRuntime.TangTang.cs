@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTangTangOlRuntime
 {
     internal const string ZexingTakeReason = "skill-program.tang-tang.zexing.take", ZexingGiftReason = "skill-program.tang-tang.zexing.gift", ZhiyiDrawReason = "skill-program.tang-tang.zhiyi.draw";
-    internal static CardConversionSource TangTangSource(ProgramSkillFrame f) => global::CardGame.Core.RuntimeSkills.RuntimeRules_tang_tang_ol_TangTang.TangTangSource(f);
+    internal static CardConversionSource TangTangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_tang_tang_ol_TangTang.TangTangSource(f);
     internal IReadOnlyList<Card> TangTangTransferCards(int chooser, int holder) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(holder)).Where(c => !c.IsGeneralWeapon && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Transfer)).ToArray();
     internal TangTangEntity TangTangEntityAt(int holder, int id)
     {
@@ -17,7 +14,7 @@ internal sealed partial class CharacterTangTangOlRuntime
         return new(id, c.Kind, _cardZonesOperations._cardZones.GetLocation(id), _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[holder], c));
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ITangTangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginTangTang(f, op);
+    SkillProgramStepOutcome ITangTangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginTangTang(f, op);
     internal SkillProgramStepOutcome BeginTangTang(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -122,7 +119,7 @@ internal sealed partial class CharacterTangTangOlRuntime
     [ProgramAnswer("tang-tang")]
     internal void AnswerTangTang(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TangTang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != TangTangChooser(f) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], TangTangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { TangTang: { } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != TangTangChooser(f) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], TangTangChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Tang Tang lost her exact private chooser, original card or live option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var branch = choice.Parameters["branch"];
@@ -153,7 +150,7 @@ internal sealed partial class CharacterTangTangOlRuntime
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { TangTang = r with { Shown = TangTangEntityAt(f.OwnerSeat, shown.CardId), Paid = true, Peer = peer, Stage = TangTangStage.ShowChildren } });
                 var frozen = f.TangTang!.Shown!;
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZexingShownEvent(f.Id, f.OwnerSeat, frozen.CardId, frozen.Kind, frozen.From, frozen.Suit));
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "zexing-shown", [_coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(frozen.CardId))]));
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "zexing-shown", [_coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(frozen.CardId))]));
             }
             else
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { TangTang = r with { Peer = peer, Stage = TangTangStage.ShowChildren, Selected = [], Candidates = [], Viewed = [] } });

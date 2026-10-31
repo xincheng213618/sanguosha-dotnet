@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOwnedExactCountAndNamedTargetsRuntime
@@ -42,7 +38,7 @@ internal sealed partial class CoreGameEngineOwnedExactCountAndNamedTargetsRuntim
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        var draft = new ProgramNamedBoundTargetSelection(frame.InstructionIndex, frame.OwnerSeat, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.GameplayHash, effect.SourceBind, count, effect.MinimumTargets, maximum, kind, aiOrder, Array.AsReadOnly(candidates.ToArray()));
+        var draft = new ProgramNamedBoundTargetSelection(frame.InstructionIndex, frame.OwnerSeat, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.GameplayHash, effect.SourceBind, count, effect.MinimumTargets, maximum, kind, aiOrder, Array.AsReadOnly(candidates.ToArray()));
         frame = frame with
         {
             NamedBoundTargetSelection = draft
@@ -107,7 +103,7 @@ internal sealed partial class CoreGameEngineOwnedExactCountAndNamedTargetsRuntim
             return;
         }
 
-        if (paused.Op != SkillProgramEffectOp.SelectTargets || paused.SourceBind != draft.SourceBind || paused.NumberExpression != SkillProgramNumberExpression.BoundCardCount || paused.TargetKind != draft.TargetKind || paused.TargetAiOrder != draft.TargetAiOrder || draft.InstructionIndex != frame.InstructionIndex || draft.OwnerSeat != frame.OwnerSeat || draft.SkillId != frame.SkillId || draft.BindingId != global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || draft.SkillInstanceId != frame.SkillInstanceId || draft.GameplayHash != frame.GameplayHash || draft.FrozenBoundCardCount != _coreProgramLifecycleOperations.GetProgramCardSet(frame, draft.SourceBind).CardIds.Count || draft.MinimumTargets != paused.MinimumTargets || draft.MaximumTargets != Math.Min(Math.Min(paused.MaximumTargets, draft.FrozenBoundCardCount), draft.CandidateSeats.Count) || draft.MinimumTargets < 0 || draft.MaximumTargets < draft.MinimumTargets || draft.MaximumTargets > 8 || draft.CandidateSeats.Distinct().Count() != draft.CandidateSeats.Count || !draft.CandidateSeats.SequenceEqual(_coreProgramLifecycleOperations.GetProgramTargetSeats(frame.OwnerSeat, draft.TargetKind, frame.WindowContext)) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != frame.OwnerSeat || !decision.ValidTargetSeats.SequenceEqual(draft.CandidateSeats))
+        if (paused.Op != SkillProgramEffectOp.SelectTargets || paused.SourceBind != draft.SourceBind || paused.NumberExpression != SkillProgramNumberExpression.BoundCardCount || paused.TargetKind != draft.TargetKind || paused.TargetAiOrder != draft.TargetAiOrder || draft.InstructionIndex != frame.InstructionIndex || draft.OwnerSeat != frame.OwnerSeat || draft.SkillId != frame.SkillId || draft.BindingId != CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) || draft.SkillInstanceId != frame.SkillInstanceId || draft.GameplayHash != frame.GameplayHash || draft.FrozenBoundCardCount != _coreProgramLifecycleOperations.GetProgramCardSet(frame, draft.SourceBind).CardIds.Count || draft.MinimumTargets != paused.MinimumTargets || draft.MaximumTargets != Math.Min(Math.Min(paused.MaximumTargets, draft.FrozenBoundCardCount), draft.CandidateSeats.Count) || draft.MinimumTargets < 0 || draft.MaximumTargets < draft.MinimumTargets || draft.MaximumTargets > 8 || draft.CandidateSeats.Distinct().Count() != draft.CandidateSeats.Count || !draft.CandidateSeats.SequenceEqual(_coreProgramLifecycleOperations.GetProgramTargetSeats(frame.OwnerSeat, draft.TargetKind, frame.WindowContext)) || !ReferenceEquals(frame, _resolutionStackOperations._resolutionStack.LastOrDefault()) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } decision || decision.PlayerSeat != frame.OwnerSeat || !decision.ValidTargetSeats.SequenceEqual(draft.CandidateSeats))
             throw new InvalidOperationException("The named target draft lost its exact instruction, frozen count or public candidates.");
         var expected = NamedBoundTargetChoices(frame, draft);
         if (decision.Choices.Count != expected.Count || decision.Choices.Where((c, i) => c.Id != expected[i].Id || c.Cards.Count != 0 || !c.Targets.SequenceEqual(expected[i].Targets) || c.Parameters.Count != expected[i].Parameters.Count || c.Parameters.Any(p => expected[i].Parameters.GetValueOrDefault(p.Key) != p.Value)).Any())

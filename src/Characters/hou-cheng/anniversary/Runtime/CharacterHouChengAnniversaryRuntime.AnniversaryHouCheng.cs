@@ -1,16 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHouChengAnniversaryRuntime
 {
     internal const string HouChengAction = "anniversary-hou-cheng", HouChengObtainReason = "skill-program.anniversary:xianniang.obtain", HouChengGiveReason = "skill-program.anniversary:xianniang.give";
-    SkillProgramStepOutcome global::CardGame.Core.IAnniversaryHouChengHost.Begin(ProgramSkillFrame f) => BeginHouCheng(f);
-    internal static CardConversionSource HouChengSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IAnniversaryHouChengHost.Begin(ProgramSkillFrame f) => BeginHouCheng(f);
+    internal static CardConversionSource HouChengSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasHouChengContent => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryHouChengXianniang);
 
     internal bool HouChengForeignDiscard(int owner, ProgramSkillWindowContext c)
@@ -27,8 +24,8 @@ internal sealed partial class CharacterHouChengAnniversaryRuntime
         if (f.WindowContext is not { } c || f.SkillId != AnniversaryHouChengComposition.Skill || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
             return false;
         if (f.TriggerId == "foreign-discard")
-            return HouChengForeignDiscard(f.OwnerSeat, c) && _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } w && c.MovementBatch is { } batch && w.Batch.Id == batch.Id && w.Batch.TurnNumber == batch.TurnNumber && w.Batch.Movements.SequenceEqual(batch.Movements) && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]);
-        return f.TriggerId == "after-damage" && c is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, TargetSeat: { } target, DamageFrameId: { } id } && target == f.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } d && d.ParentFrameId == id && d.TargetSeat == target && d.TriggerWindow == c.Window && d.CandidateIndex >= 0 && d.CandidateIndex < d.Candidates.Count && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, d.Candidates[d.CandidateIndex].ToProgramCandidate()) && _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().Any(a => a.Id == id && a.TargetSeat == target && a.Amount == c.Amount);
+            return HouChengForeignDiscard(f.OwnerSeat, c) && _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } w && c.MovementBatch is { } batch && w.Batch.Id == batch.Id && w.Batch.TurnNumber == batch.TurnNumber && w.Batch.Movements.SequenceEqual(batch.Movements) && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]);
+        return f.TriggerId == "after-damage" && c is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, TargetSeat: { } target, DamageFrameId: { } id } && target == f.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } d && d.ParentFrameId == id && d.TargetSeat == target && d.TriggerWindow == c.Window && d.CandidateIndex >= 0 && d.CandidateIndex < d.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, d.Candidates[d.CandidateIndex].ToProgramCandidate()) && _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().Any(a => a.Id == id && a.TargetSeat == target && a.Amount == c.Amount);
     }
 
     internal SkillProgramStepOutcome BeginHouCheng(ProgramSkillFrame supplied)
@@ -108,7 +105,7 @@ internal sealed partial class CharacterHouChengAnniversaryRuntime
     [ProgramAnswer(HouChengAction)]
     internal void AnswerHouCheng(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHouCheng: { } r } f || !ValidHouCheng(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HouChengChoices(f).Any(a => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([a], [c])))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryHouCheng: { } r } f || !ValidHouCheng(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !HouChengChoices(f).Any(a => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([a], [c])))
             throw new InvalidOperationException("Xianniang requires its exact current private selection and original frame.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });

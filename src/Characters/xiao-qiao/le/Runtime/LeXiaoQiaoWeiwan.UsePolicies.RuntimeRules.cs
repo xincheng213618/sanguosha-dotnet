@@ -1,6 +1,6 @@
 namespace CardGame.Core.RuntimeSkills;
 
-[global::CardGame.Core.ProgramRuntimeModule]
+[Core.ProgramRuntimeModule]
 internal static class RuntimeRules_xiao_qiao_le_LeXiaoQiaoWeiwan_UsePolicies
 {
     internal static bool WeiwanDeclarationIsTrueUse(CardDeclarationParentReturn parent) => parent.Purpose is

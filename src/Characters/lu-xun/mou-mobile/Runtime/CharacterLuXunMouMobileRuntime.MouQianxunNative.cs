@@ -1,22 +1,18 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuXunMouMobileRuntime
 {
-    internal IReadOnlyList<global::CardGame.Core.GameEngine.ProgramOrdinaryTrickUseOption> MouLuXunUseOptions(ProgramSkillFrame f)
+    internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> MouLuXunUseOptions(ProgramSkillFrame f)
     {
-        if (f.MouLuXun is not { Kind: { } kind, Paid: true } || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
+        if (f.MouLuXun is not { Kind: { } kind, Paid: true } || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
             return[];
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var options = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: []);
         return _coreNextActualUseTargetAdjustmentsOperations.NextActualUseOrdinaryTrickOptions(actor, options, Suit.None, null, Suit.None, false);
     }
 
-    internal bool IsMouLuXunVirtualParent(ProgramSkillFrame f) => f.MouLuXun is { Operation: SkillProgramEffectOp.UseMouLuXunRecordedTrick, Paid: true, Kind: { } kind, Plan: not null } r && r.Stage is MouLuXunStage.IssuingUse or MouLuXunStage.NativeUse or MouLuXunStage.NativeReturned && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && ValidMouLuXun(f) && f.WindowContext?.Window == SkillProgramTriggerWindow.PlayPhaseStarting && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuXunNameRemovedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Kind == kind) == 1;
+    internal bool IsMouLuXunVirtualParent(ProgramSkillFrame f) => f.MouLuXun is { Operation: SkillProgramEffectOp.UseMouLuXunRecordedTrick, Paid: true, Kind: { } kind, Plan: not null } r && r.Stage is MouLuXunStage.IssuingUse or MouLuXunStage.NativeUse or MouLuXunStage.NativeReturned && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && ValidMouLuXun(f) && f.WindowContext?.Window == SkillProgramTriggerWindow.PlayPhaseStarting && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuXunNameRemovedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Kind == kind) == 1;
     internal SkillProgramEffect MouLuXunVirtualInstruction(ProgramSkillFrame f)
     {
         if (!IsMouLuXunVirtualParent(f))

@@ -1,8 +1,5 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
@@ -33,15 +30,15 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
         return parent.InstructionIndex >= 1 && parent.InstructionIndex <= instructions.Count && instructions[parent.InstructionIndex - 1] is { Op: SkillProgramEffectOp.UseVirtualCard, OutputKind: CardKind.Slash, UseCardActionWindows: false, TargetRestriction: SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget } ? parent.Id : null;
     }
 
-    internal bool DamageJudgmentUseMatches(ProgramDamageJudgmentSuitPayment draft, CardKind? kind) => _coreCardUseLifecycleOperations.LifecycleCardUse(draft.CardUseFrameId)is { } use && use.SourceSeat == draft.SourceSeat && (use.Action is { Type: CardActionType.Use } action ? draft.LegacyVirtualProducerFrameId is null && action.ActionId == draft.CardActionId && action.ActorSeat == draft.SourceSeat && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && action.EffectiveKind == kind : kind == CardKind.Slash && draft.CardActionId is null && draft.LegacyVirtualProducerFrameId is { } legacy && LegacyDamageJudgmentVirtualProducer(use, draft.TargetSeat) == legacy);
+    internal bool DamageJudgmentUseMatches(ProgramDamageJudgmentSuitPayment draft, CardKind? kind) => _coreCardUseLifecycleOperations.LifecycleCardUse(draft.CardUseFrameId)is { } use && use.SourceSeat == draft.SourceSeat && (use.Action is { Type: CardActionType.Use } action ? draft.LegacyVirtualProducerFrameId is null && action.ActionId == draft.CardActionId && action.ActorSeat == draft.SourceSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) && action.EffectiveKind == kind : kind == CardKind.Slash && draft.CardActionId is null && draft.LegacyVirtualProducerFrameId is { } legacy && LegacyDamageJudgmentVirtualProducer(use, draft.TargetSeat) == legacy);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 1110)]
-    internal bool CanRunDamageJudgmentSuitPayment(SkillProgramTrigger trigger, ProgramSkillWindowContext context, int owner) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.JudgeDamageTargetThenOfferSuitDiscard) || _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && context.TargetSeat is { } target && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && ActualDamageJudgmentUse(context)is not null && global::CardGame.Core.EngineOwners.CoreGameEngineDamageJudgmentSuitPaymentsDefinitions.DamageJudgmentPaymentZones.Any(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, owner)).Count > 0);
+    internal bool CanRunDamageJudgmentSuitPayment(SkillProgramTrigger trigger, ProgramSkillWindowContext context, int owner) => !trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.JudgeDamageTargetThenOfferSuitDiscard) || _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && context.TargetSeat is { } target && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && ActualDamageJudgmentUse(context)is not null && CoreGameEngineDamageJudgmentSuitPaymentsDefinitions.DamageJudgmentPaymentZones.Any(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, owner)).Count > 0);
     internal SkillProgramStepOutcome BeginDamageJudgmentSuitPayment(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var context = active.WindowContext ?? throw new InvalidOperationException("Damage judgment lost its original window.");
         var use = ActualDamageJudgmentUse(context);
-        if (active.DamageJudgmentSuitPayment is not null || use is null || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame damage || damage.Id != context.ParentFrameId || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId) || context.TargetSeat is not { } target || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
+        if (active.DamageJudgmentSuitPayment is not null || use is null || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame damage || damage.Id != context.ParentFrameId || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId) || context.TargetSeat is not { } target || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
             throw new InvalidOperationException("Damage judgment requires its exact actual Slash candidate and living source.");
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { DamageJudgmentSuitPayment = new(active.InstructionIndex, damage.Id, damage.ParentFrameId, use.Id, use.Action?.ActionId, active.OwnerSeat, use.SourceSeat, target, context.OccurrenceIndex, _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1, effect.JudgmentReason!, effect.ResultBind!, LegacyVirtualProducerFrameId: use.Action is null ? LegacyDamageJudgmentVirtualProducer(use, target) : null) });
         return _coreProgramLifecycleOperations.StartProgramJudgment(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id), target, effect.JudgmentReason!, effect.ResultBind!, SkillProgramCardSetVisibility.Public, use.SourceSeat);
@@ -83,7 +80,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
     {
         var draft = frame.DamageJudgmentSuitPayment!;
         var actor = sourceDiscard ? draft.SourceSeat : draft.OwnerSeat;
-        var result = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(frame.Id, actor, actor, global::CardGame.Core.EngineOwners.CoreGameEngineDamageJudgmentSuitPaymentsDefinitions.DamageJudgmentPaymentZones, OwnedCardMoveIntent.Discard).Select(choice => choice with { Parameters = new Dictionary<string, string>(choice.Parameters) { ["program-action"] = "damage-judgment-suit-payment", ["payment-kind"] = sourceDiscard ? "source-discard" : "owner-payment" } }).ToList();
+        var result = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(frame.Id, actor, actor, CoreGameEngineDamageJudgmentSuitPaymentsDefinitions.DamageJudgmentPaymentZones, OwnedCardMoveIntent.Discard).Select(choice => choice with { Parameters = new Dictionary<string, string>(choice.Parameters) { ["program-action"] = "damage-judgment-suit-payment", ["payment-kind"] = sourceDiscard ? "source-discard" : "owner-payment" } }).ToList();
         if (!sourceDiscard)
             result.Add(new(new ChoiceId($"damage-judgment.{(frame.Id)}.decline"), "不弃置牌。", [], [], new Dictionary<string, string> { ["program-action"] = "damage-judgment-suit-payment", ["payment-kind"] = "decline", ["frame-id"] = frame.Id.ToString(CultureInfo.InvariantCulture) }));
         return Array.AsReadOnly(result.ToArray());
@@ -95,7 +92,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
         var actor = sourceDiscard ? draft.SourceSeat : frame.OwnerSeat;
         var choices = DamageJudgmentPaymentChoices(frame, sourceDiscard);
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId);
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, actor, sourceDiscard ? "请弃置一张牌。" : $"判定为{(global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.GetSuitDisplayName(draft.JudgmentSuit))}{(draft.JudgmentRank)}，你可以弃置一张牌执行效果。", choices.SelectMany(c => c.Cards).ToArray(), [], frame.OwnerSeat)
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, actor, sourceDiscard ? "请弃置一张牌。" : $"判定为{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(draft.JudgmentSuit))}{(draft.JudgmentRank)}，你可以弃置一张牌执行效果。", choices.SelectMany(c => c.Cards).ToArray(), [], frame.OwnerSeat)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             IsPrivate = true,
@@ -111,7 +108,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Damage judgment payment lost its owner.");
         var draft = frame.DamageJudgmentSuitPayment ?? throw new InvalidOperationException("Damage judgment payment lost its frozen facts.");
         var sourceDiscard = draft.Stage == ProgramDamageJudgmentPaymentStage.ChoosingSourceDiscard;
-        if (!_coreDamageJudgmentSuitPaymentObserversOperations.IsValidDamageJudgmentSuitPayment(frame) || !sourceDiscard && draft.Stage != ProgramDamageJudgmentPaymentStage.ChoosingPayment || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (sourceDiscard ? draft.SourceSeat : frame.OwnerSeat) || !DamageJudgmentPaymentChoices(frame, sourceDiscard).Any(c => global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (!_coreDamageJudgmentSuitPaymentObserversOperations.IsValidDamageJudgmentSuitPayment(frame) || !sourceDiscard && draft.Stage != ProgramDamageJudgmentPaymentStage.ChoosingPayment || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (sourceDiscard ? draft.SourceSeat : frame.OwnerSeat) || !DamageJudgmentPaymentChoices(frame, sourceDiscard).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Damage judgment payment changed its published actor, slot or original result.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!sourceDiscard && (selected.Parameters["payment-kind"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId)))
@@ -142,7 +139,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
             }
 
             _coreRuntimeOperations.ReplaceRuntimeTop(current with { DamageJudgmentSuitPayment = current.DamageJudgmentSuitPayment!with { PaidMovementSequence = movement.Sequence, PaidTo = movement.To } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJudgmentSuitPaymentCommittedEvent(frame.Id, frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.OwnerSeat, draft.JudgmentFrameId, draft.JudgmentCardId!.Value, card.Id, movement.Sequence, draft.JudgmentSuit == paidSuit, draft.JudgmentRank == card.Rank, draft.JudgmentSuit!.Value, draft.JudgmentRank!.Value, paidSuit, card.Rank));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJudgmentSuitPaymentCommittedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.OwnerSeat, draft.JudgmentFrameId, draft.JudgmentCardId!.Value, card.Id, movement.Sequence, draft.JudgmentSuit == paidSuit, draft.JudgmentRank == card.Rank, draft.JudgmentSuit!.Value, draft.JudgmentRank!.Value, paidSuit, card.Rank));
         });
         _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(logicalDiscard);
         if (sourceDiscard && _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id).DamageJudgmentSuitPayment!.SourceDiscardsRemaining == 0)
@@ -294,5 +291,5 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDamageJudgmentSuitPaymentHost.JudgeDamageTargetThenOfferSuitDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginDamageJudgmentSuitPayment(frame, effect);
+    SkillProgramStepOutcome IDamageJudgmentSuitPaymentHost.JudgeDamageTargetThenOfferSuitDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => BeginDamageJudgmentSuitPayment(frame, effect);
 }

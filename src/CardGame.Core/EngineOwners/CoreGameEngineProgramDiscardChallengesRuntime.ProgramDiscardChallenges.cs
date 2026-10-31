@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramDiscardChallengesRuntime
@@ -21,7 +17,7 @@ internal sealed partial class CoreGameEngineProgramDiscardChallengesRuntime
         if (draft.Mode == "category" && !draft.ComplementOnly)
         {
             var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-            var primary = cards.FirstOrDefault(c => effect.CardCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(card => card.Id == c.Cards[0]).Kind, category)));
+            var primary = cards.FirstOrDefault(c => effect.CardCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Cards[0])).Single(card => card.Id == c.Cards[0]).Kind, category)));
             if (primary is not null)
                 return primary;
         }
@@ -29,7 +25,7 @@ internal sealed partial class CoreGameEngineProgramDiscardChallengesRuntime
         return cards.FirstOrDefault() ?? decision.Choices.First();
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.IDiscardChallengeProgramHost.ExecuteDiscardChallenge(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat) => ExecuteDiscardChallenge(effect, frame, targetSeat);
+    SkillProgramStepOutcome IDiscardChallengeProgramHost.ExecuteDiscardChallenge(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat) => ExecuteDiscardChallenge(effect, frame, targetSeat);
     internal SkillProgramStepOutcome ExecuteDiscardChallenge(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat)
     {
         var escalating = effect.Op == SkillProgramEffectOp.EscalatingDiscardOrDamage;
@@ -70,7 +66,7 @@ internal sealed partial class CoreGameEngineProgramDiscardChallengesRuntime
         foreach (var zone in effect.Zones)
             foreach (var card in _cardZonesOperations._cardZones.CardsAt(new CardLocation(zone, draft.ChooserSeat)))
             {
-                if (_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(draft.ChooserSeat, card, new(zone, draft.ChooserSeat), OwnedCardMoveIntent.Discard) || draft.SelectedIds.Contains(card.Id) || draft.Mode == "category" && draft.ComplementOnly && effect.CardCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, category)))
+                if (_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(draft.ChooserSeat, card, new(zone, draft.ChooserSeat), OwnedCardMoveIntent.Discard) || draft.SelectedIds.Contains(card.Id) || draft.Mode == "category" && draft.ComplementOnly && effect.CardCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, category)))
                     continue;
                 choices.Add(new(new ChoiceId($"discard-challenge.card-{(card.Id)}"), $"{((draft.Mode == "escalating" ? "选择" : "弃置"))}【{(card.DisplayName)}】", [card.Id], [draft.ChooserSeat], new Dictionary<string, string> { ["program-action"] = "discard-challenge", ["branch"] = "card" }));
             }
@@ -124,7 +120,7 @@ internal sealed partial class CoreGameEngineProgramDiscardChallengesRuntime
             if (location.OwnerSeat != draft.ChooserSeat || !effect.Zones.Contains(location.Zone))
                 throw new InvalidOperationException("Discard card left its owner.");
             var card = _cardZonesOperations._cardZones.CardsAt(location).Single(c => c.Id == choice.Cards[0]);
-            var primary = effect.CardCategories.Any(category => global::CardGame.Core.EngineOwners.CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, category));
+            var primary = effect.CardCategories.Any(category => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(card.Kind, category));
             if (draft.Mode == "category" && draft.ComplementOnly && primary)
                 throw new InvalidOperationException("Wrong discard category.");
             _coreNativePromptBoundaryOperations.ClearPendingDecision();

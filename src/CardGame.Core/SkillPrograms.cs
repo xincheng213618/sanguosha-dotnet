@@ -2333,34 +2333,34 @@ public sealed record SkillProgramTriggerFacts(
     string? DamageSourceFactionId = null,
     int TurnOwnerDiscardPhaseHandDiscardCount = 0,
     bool OwnerIsFaceDown = false,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     bool? CardActionMatchesPreviousPlayCard = null,
     bool? PreviousPlayCardIsBasic = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     int? DamageInstancesTakenThisTurn = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     int LivingWoundedCount = 0,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     IReadOnlyDictionary<PlayerMarkerKind, int>? GlobalMarkerCounts = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     bool? OwnerKilledThisTurn = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     int? CardActionPhysicalCardCount = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] int? CardActionHandCardCount = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] bool? CardActionCardIsBlack = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] GeneralGender? DamageSourceGender = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<string>? UnfulfilledPhaseColorRestrictionInstances = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)] int PlayPhaseDamageTakenByAny = 0,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] Suit? CardActionSuit = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] bool? DeathExtinguishedFaction = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] bool? DiscardPhaseSuitsAllDistinct = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] bool? OtherDamageSourceAlive = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<string>? BlockedDamageSourceSkills = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<int>? LowHandPopulationSeats = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] IReadOnlyDictionary<PlayerMarkerKind,int>? EventTargetMarkerCounts = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] IReadOnlyDictionary<PlayerMarkerKind,int>? EventSourceMarkerCounts = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] int? CurrentAvailableEquipmentSlotCount = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] IReadOnlyDictionary<string, int>? PublicPersistentPileCounts = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? CardActionHandCardCount = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? CardActionCardIsBlack = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] GeneralGender? DamageSourceGender = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<string>? UnfulfilledPhaseColorRestrictionInstances = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] int PlayPhaseDamageTakenByAny = 0,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] Suit? CardActionSuit = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? DeathExtinguishedFaction = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? DiscardPhaseSuitsAllDistinct = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? OtherDamageSourceAlive = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<string>? BlockedDamageSourceSkills = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<int>? LowHandPopulationSeats = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyDictionary<PlayerMarkerKind,int>? EventTargetMarkerCounts = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyDictionary<PlayerMarkerKind,int>? EventSourceMarkerCounts = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? CurrentAvailableEquipmentSlotCount = null,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyDictionary<string, int>? PublicPersistentPileCounts = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? TurnDiscardSuitMask = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? TurnOwnerDamageDealtThisTurn = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? TurnOwnerSlashUseCount = null,
@@ -2373,7 +2373,7 @@ public sealed record SkillProgramTriggerFacts(
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? FengjiRoundChoicePending = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? FengjiSwapAvailable = null)
 {
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public CardMovementTiming? MovementTiming { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? EventTargetDamageInstancesTakenThisTurn { get; init; }
@@ -2493,7 +2493,7 @@ public sealed record SkillProgramTriggerFacts(
 
 public readonly record struct SkillProgramOwnedZoneCounts(
     int WoodenOxGrain, int BuquWound, int Authority, int Chunlao,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)] int PublicPersistentPile = 0)
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] int PublicPersistentPile = 0)
 {
     public int Get(CardZoneKind zone) => zone switch
     {
@@ -2890,9 +2890,9 @@ public sealed class SkillProgramViewAs
     public bool EqualNameLengthUse { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool RankTwoDamageUse { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool NonBasicUnrespondableSlash { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? UseEffectiveInputSuit { get; internal init; }
     public bool ExtendedUse { get; internal init; }
     public int DamageBonus { get; internal init; }
@@ -2909,26 +2909,26 @@ public sealed class SkillProgramViewAs
     public string? ConversionStateId { get; internal init; }
     public int MinimumTier { get; internal init; }
     public int MaximumTier { get; internal init; } = 2;
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramDeclarationValidation? DeclarationValidation { get; internal init; }
     public bool DeclaredEntity { get; internal init; }
     public string? ActivationUsageGroup { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramTieredRoundConversionPolicy? TieredRoundConversion { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramRoundOnceCardlessBasicPolicy? RoundOnceCardlessBasic { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramLeiluanBasicUsePolicy? LeiluanBasicUse { get; internal init; }
     public ProgramXieweiBaitBasicUsePolicy? XieweiBaitBasicUse { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? ChainedStateCost { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramRoundDistinctBasicUsePolicy? RoundDistinctBasicUse { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DrawFundedDistinctBasicPolicy? DrawFundedDistinctBasic { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? DisableSkillUntilTurnEndIfNoDamage { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? LastInSourceZone { get; internal init; }
     public string? SourcePileSkillId { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -2941,7 +2941,7 @@ public sealed partial class SkillProgramEffect
     public bool CapAtTargetMaxHp { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? ReplaceSelection { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? RequireDifferentColor { get; internal init; }
 
     internal SkillProgramEffect(
@@ -3053,7 +3053,7 @@ public sealed partial class SkillProgramEffect
             skippedPhases ?? Array.Empty<SkillProgramTurnPhase>(), revealMode, sourceRef,
             prohibitReplacingEquipment, onePerSuit, allowDecline, useCardActionWindows, freezeMovedCardSuit, useFrozenSuit,
             suitFrom, amountFromMarker, clearMarker, turnSkillExpiry);
-    [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]
     public PrivateGeneralLibraryPolicy? GeneralLibraryPolicy {get;internal init;}
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public PublicDeathDamageCostPolicy? PublicDeathDamageCost { get; internal init; }
@@ -3086,17 +3086,17 @@ public sealed partial class SkillProgramEffect
     // The public definition and its serialized content fingerprint stay unchanged.
     [System.Text.Json.Serialization.JsonIgnore]
     internal ProgramSkillInstruction? CompiledInstruction { get; set; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool UseCardActionWindows { get; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool FreezeMovedCardSuit { get; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool UseFrozenSuit { get; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramSuitSource? SuitFrom { get; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public PlayerMarkerKind? AmountFromMarker { get; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool ClearMarker { get; }
     public SkillProgramEffectTarget Target { get; }
     public int Amount { get; }
@@ -3104,11 +3104,11 @@ public sealed partial class SkillProgramEffect
     public TurnPhase? Phase { get; }
     public SkillProgramPhaseContinuation? PhaseContinuation { get; }
     public SkillProgramNumberExpression? NumberExpression { get; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramExpression? AmountExpression { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public SkillProgramUnknownAmountBehavior OnUnknownAmount { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramExpression? ValueExpression { get; internal init; }
     public int MinimumValue { get; }
     public bool ClampToMaxHp { get; }
@@ -3192,7 +3192,7 @@ public sealed record SkillProgramMarkerCost(PlayerMarkerKind Marker, int Amount)
 
 public sealed partial class SkillProgramActivation
 {
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? PindianHandReturn { get; internal init; }
     public bool OtherCharactersOnly { get; internal init; }
     internal SkillProgramActivation(string id, int minCards, int maxCards, int minTargets, int maxTargets,
@@ -3226,7 +3226,7 @@ public sealed partial class SkillProgramActivation
     public bool SelectedCardsSameSuit { get; }
     public IReadOnlyList<EquipmentSlot> EquipmentSlots { get; }
     public string UsageGroup { get; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramMarkerCost? MarkerCost { get; internal init; }
 
     /// <summary>
@@ -3236,7 +3236,7 @@ public sealed partial class SkillProgramActivation
     public bool TargetRequiresEmptyEquipmentSlot { get; }
     public bool ContinueAfterOwnerDeath { get; internal init; }
     public bool SelectedCardsDistinctSuits { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramCardCountExpression? CardCountExpression { get; internal init; }
     public IReadOnlyList<CardKind> CardKinds { get; internal init; } = [];
     public IReadOnlyList<Suit> CardSuits { get; internal init; } = [];
@@ -3313,9 +3313,9 @@ public sealed class SkillProgramTrigger
     public IReadOnlyList<string> MovementReasons { get; internal init; } = [];
     public IReadOnlyList<string> ExcludedMovementReasons { get; internal init; } = [];
     public bool IgnoreOwnSkillMovements { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool MovementDiscardOnly { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public SkillProgramDiscardOwnerScope DiscardOwnerScope { get; internal init; }
     public SkillProgramHpChangeOccurrence HpChangeOccurrence { get; internal init; }
     public SkillProgramMovementOccurrence? MovementOccurrence { get; }
@@ -3344,22 +3344,22 @@ public sealed class SkillProgramTrigger
     public string? OrderGroup { get; internal init; }
     public SkillProgramCardActionOwnerRelation? OwnerRelation { get; }
     public bool AllowNoEventTarget { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IncludeResponseUses { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool SingleActionInstance { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool NoDyingAtActivation { get; internal init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] public bool DeferredTurnEndOnly { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool OnlyDesignatedCardTargets { get; internal init; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool AllowOwnDiscardPhaseEnded { get; internal init; }
     public SkillProgramTurnOwnerScope TurnOwnerScope { get; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool EvaluateConditionAtResolution { get; internal init; }
     public string? ChoiceLabel { get; internal set; }
-    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SkillProgramMarkerCost? MarkerCost { get; internal init; }
 
 }
@@ -4212,7 +4212,7 @@ public sealed class SkillProgramCatalog
         { DiscardCost = discardCost, ProviderDrawCount = providerDrawCount,
           UseIncomingResponseDistance = useIncomingResponseDistance, IncludeNonTargetResponders = includeNonTargetResponders,
           PeachRecoveryScope = peachRecoveryScope, BeforePhaseEntry = beforePhaseEntry };
-global::CardGame.Core.EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBlackSlashPolicy(path,policy);
+EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBlackSlashPolicy(path,policy);
         return policy;
     }
 

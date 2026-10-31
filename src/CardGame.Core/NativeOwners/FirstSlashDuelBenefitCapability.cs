@@ -1,8 +1,7 @@
 #nullable enable
-using System.Globalization;
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class FirstSlashDuelBenefitCapability(global::System.Func<global::CardGame.Core.RuntimeEntries.CoreGameEngineFirstSlashDuelBenefitsEntries> getCoreGameEngineFirstSlashDuelBenefitsRuntime) : IFirstSlashDuelBenefitHost
+internal sealed class FirstSlashDuelBenefitCapability(Func<RuntimeEntries.CoreGameEngineFirstSlashDuelBenefitsEntries> getCoreGameEngineFirstSlashDuelBenefitsRuntime) : IFirstSlashDuelBenefitHost
 {
     public SkillProgramStepOutcome ChooseFirstSlashDuelDiamondBenefit(ProgramSkillFrame frame) => getCoreGameEngineFirstSlashDuelBenefitsRuntime().BeginFirstSlashDuelBenefit(frame);
 }

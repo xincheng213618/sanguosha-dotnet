@@ -1,16 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheMuluRuntime
 {
     internal const string MuluSummonSkill = "shanhe:mulu-summon", ElephantYangshengSkill = "shanhe:elephant-yangsheng";
     internal static bool IsShanheMuluFollower(CharacterState player) => player.General.Id is "shanhe:mulu-rage-elephant-2026" or "shanhe:mulu-angry-elephant-2026";
-    SkillProgramStepOutcome global::CardGame.Core.IShanheMuluProgramHost.ReviveFollowers(ProgramSkillFrame frame) => BeginShanheMuluRevival(frame);
-    void global::CardGame.Core.IShanheMuluProgramHost.FreezeRoundDamage(ProgramSkillFrame frame) => FreezeShanheElephantRoundDamage(frame);
+    SkillProgramStepOutcome IShanheMuluProgramHost.ReviveFollowers(ProgramSkillFrame frame) => BeginShanheMuluRevival(frame);
+    void IShanheMuluProgramHost.FreezeRoundDamage(ProgramSkillFrame frame) => FreezeShanheElephantRoundDamage(frame);
     internal SkillProgramStepOutcome BeginShanheMuluRevival(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -20,7 +16,7 @@ internal sealed partial class CoreGameEngineShanheMuluRuntime
         if (targets.Length > 4)
             throw new InvalidOperationException("Mulu may own at most its four authored elephant followers.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheMuluRevival = new(frame.InstructionIndex, 0, ShanheMuluRevivalStage.Cleanup) { TargetSeats = targets } });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheMuluRevivalIssuedEvent(frame.Id, frame.InstructionIndex, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), string.Join(",", targets)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheMuluRevivalIssuedEvent(frame.Id, frame.InstructionIndex, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), string.Join(",", targets)));
         ContinueShanheMuluRevival(frame);
         return SkillProgramStepOutcome.AwaitChild;
     }
@@ -105,11 +101,11 @@ internal sealed partial class CoreGameEngineShanheMuluRuntime
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var boundary = Array.FindLastIndex(history, item => item is RoundStartedEvent);
         var amount = Math.Min(3, history.Skip(boundary + 1).OfType<DamageAppliedEvent>().Count(item => item.TargetSeat == frame.OwnerSeat && item.Amount > 0));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheElephantDamageFrozenEvent(frame.Id, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, amount));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheElephantDamageFrozenEvent(frame.Id, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, amount));
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 5421)]
-    internal int ShanheElephantFrozenDamageBonus(global::CardGame.Core.GameEngine.IDamageAttempt attack)
+    internal int ShanheElephantFrozenDamageBonus(GameEngine.IDamageAttempt attack)
     {
         if (attack.IsSourceLess || attack.IsChainPropagation || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat].IsAlive || !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.FreezeShanheElephantRoundDamage))
             return 0;

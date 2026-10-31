@@ -2,7 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaoXiuBoundaryMobileEntries
 {
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginBoundaryCaoXiuQingxi(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginBoundaryCaoXiuQingxi(supplied);
-    internal void PublishBoundaryCaoXiuQingxi(global::CardGame.Core.ProgramSkillFrame frame) => _resolve().PublishBoundaryCaoXiuQingxi(frame);
-    internal void ResolveBoundaryCaoXiuQingxi(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveBoundaryCaoXiuQingxi(choice);
+    internal SkillProgramStepOutcome BeginBoundaryCaoXiuQingxi(ProgramSkillFrame supplied) => _resolve().BeginBoundaryCaoXiuQingxi(supplied);
+    internal void PublishBoundaryCaoXiuQingxi(ProgramSkillFrame frame) => _resolve().PublishBoundaryCaoXiuQingxi(frame);
+    internal void ResolveBoundaryCaoXiuQingxi(PromptChoice choice) => _resolve().ResolveBoundaryCaoXiuQingxi(choice);
 }

@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHeQiMobileRuntime
 {
     internal const string MobileHeQiAction = "mobile-he-qi-view";
-    internal static CardConversionSource MobileHeQiSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IMobileHeQiHost.View(ProgramSkillFrame f) => BeginMobileHeQiView(f);
+    internal static CardConversionSource MobileHeQiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IMobileHeQiHost.View(ProgramSkillFrame f) => BeginMobileHeQiView(f);
     internal bool MobileHeQiOriginal(ProgramSkillFrame f) => f.SkillId == MobileHeQiComposition.Skill && f.TriggerId is null && f.ActivationId == MobileHeQiComposition.Activation && f.InstructionIndex == 3 && f.SelectedCardIds.Count == 1 && f.SelectedTargetSeats is [var target] && target != f.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == SkillProgramEffectOp.ResolveMobileHeQiShanxiView && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.ActivationId == f.ActivationId) == 1;
     internal NativeLogicalDiscardMaterialCompletedEvent? MobileHeQiDiscard(ProgramSkillFrame f, out NativeLogicalDiscardInvocationRecordedEvent? invoice)
     {
@@ -77,11 +73,11 @@ internal sealed partial class CharacterHeQiMobileRuntime
         return _coreProgramEventHistoryOperations.ProgramEventHistory<MobileHeQiHandViewedEvent>().Count(e => e == new MobileHeQiHandViewedEvent(f.Id, r.Source, r.InvocationId, r.CardId, r.DiscardedKind, r.Viewer, r.Holder, r.Hand.Count)) == 1;
     }
 
-    internal bool HasMobileHeQiPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MobileHeQiView: { } r, Step: ResolutionFrameStep.AwaitingResponse } f && ValidMobileHeQiView(f) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && p.PlayerSeat == r.Viewer && p.SourceSeat == f.OwnerSeat && p.TargetSeat == r.Holder && global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, [MobileHeQiConfirm(f)]);
+    internal bool HasMobileHeQiPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MobileHeQiView: { } r, Step: ResolutionFrameStep.AwaitingResponse } f && ValidMobileHeQiView(f) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && p.PlayerSeat == r.Viewer && p.SourceSeat == f.OwnerSeat && p.TargetSeat == r.Holder && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, [MobileHeQiConfirm(f)]);
     [ProgramAnswer(MobileHeQiAction)]
     internal void AnswerMobileHeQiView(PromptChoice c)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileHeQiView: { } r } f || !HasMobileHeQiPrompt() || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [MobileHeQiConfirm(f)]))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileHeQiView: { } r } f || !HasMobileHeQiPrompt() || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [MobileHeQiConfirm(f)]))
             throw new InvalidOperationException("Mobile Shanxi lost its exact private viewer or hand confirmation.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MobileHeQiView = null, Step = ResolutionFrameStep.ResolvingEffect });

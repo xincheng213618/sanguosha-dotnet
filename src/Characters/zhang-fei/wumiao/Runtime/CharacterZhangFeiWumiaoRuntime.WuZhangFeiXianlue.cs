@@ -1,10 +1,6 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
-using System.Numerics;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangFeiWumiaoRuntime
@@ -13,7 +9,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal const string WuZhangFeiXianlueDrawReason = "skill-program.wu-zhang-fei.xianlue.draw";
     internal bool HasWuZhangFeiXianlueCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveWuZhangFeiXianlue);
 
-    internal static int WuZhangFeiRankCount(int mask) => global::CardGame.Core.RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiXianlue.WuZhangFeiRankCount(mask);
+    internal static int WuZhangFeiRankCount(int mask) => RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiXianlue.WuZhangFeiRankCount(mask);
     internal WuZhangFeiRankCycleChangedEvent WuZhangFeiCycle(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<WuZhangFeiRankCycleChangedEvent>().LastOrDefault(e => e.OwnerSeat == owner) ?? new(owner, 1, 0, 13, 0, "initial", 0);
     internal bool CanObserveWuZhangFeiHand(int owner, int target) => HasWuZhangFeiXianlueCapability && _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && target != owner && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == owner && _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<WuZhangFeiXianlueStartedEvent>().Any(e => e.Source.OwnerSeat == owner && e.TargetSeat == target && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) && _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent).Any(e => e is DamageAppliedEvent { Amount: > 0 } damage && damage.TargetSeat == target || e is CardMovedEvent move && move.From.OwnerSeat == target && move.From != move.To);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 29061, SkillProgramEffectOp.ResolveWuZhangFeiXianlue)]
@@ -61,7 +57,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal void AnswerWuZhangFeiObserved(PromptChoice choice)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
-        if (f.WuZhangFeiXianlue is not { Stage: WuZhangFeiXianlueStage.Observing } r || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuZhangFeiObservedChoices(f)))
+        if (f.WuZhangFeiXianlue is not { Stage: WuZhangFeiXianlueStage.Observing } r || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuZhangFeiObservedChoices(f)))
             throw new InvalidOperationException("Xianlue observation must return through its original private acknowledgement.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { WuZhangFeiXianlue = r with { Stage = WuZhangFeiXianlueStage.Drawing } });
@@ -156,6 +152,6 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveWuZhangFeiXianlue)]
     internal PromptChoice SelectAiWuZhangFeiObserved(PendingDecision decision, ProgramSkillFrame frame) => decision.Choices.Single();
-    SkillProgramStepOutcome global::CardGame.Core.IWuZhangFeiXianlueHost.Observe(ProgramSkillFrame frame) => BeginWuZhangFeiXianlue(frame);
-    bool global::CardGame.Core.IWuZhangFeiXianlueSelection.CanObserve(int ownerSeat, int targetSeat) => CanObserveWuZhangFeiHand(ownerSeat, targetSeat);
+    SkillProgramStepOutcome IWuZhangFeiXianlueHost.Observe(ProgramSkillFrame frame) => BeginWuZhangFeiXianlue(frame);
+    bool IWuZhangFeiXianlueSelection.CanObserve(int ownerSeat, int targetSeat) => CanObserveWuZhangFeiHand(ownerSeat, targetSeat);
 }

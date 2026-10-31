@@ -2,19 +2,19 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineEndRefillNextTurnEntries
 {
-    internal global::CardGame.Core.SkillProgramStepOutcome BeginEndRefillNextTurn(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().BeginEndRefillNextTurn(supplied);
-    internal bool CanContinueEndRefillNextTurn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CanContinueEndRefillNextTurn(f);
-    internal void CompleteEndRefillNextTurn(global::CardGame.Core.ProgramSkillFrame f) => _resolve().CompleteEndRefillNextTurn(f);
-    internal void ConsumeEndRefillNextTurn(global::CardGame.Core.CharacterState current) => _resolve().ConsumeEndRefillNextTurn(current);
-    internal bool DrainEndRefillNextTurnChildren(global::CardGame.Core.ProgramSkillFrame f) => _resolve().DrainEndRefillNextTurnChildren(f);
-    internal global::System.Collections.Generic.IReadOnlyList<global::CardGame.Core.PromptChoice> EndRefillNextTurnChoices(global::CardGame.Core.ProgramSkillFrame f) => _resolve().EndRefillNextTurnChoices(f);
+    internal SkillProgramStepOutcome BeginEndRefillNextTurn(ProgramSkillFrame supplied) => _resolve().BeginEndRefillNextTurn(supplied);
+    internal bool CanContinueEndRefillNextTurn(ProgramSkillFrame f) => _resolve().CanContinueEndRefillNextTurn(f);
+    internal void CompleteEndRefillNextTurn(ProgramSkillFrame f) => _resolve().CompleteEndRefillNextTurn(f);
+    internal void ConsumeEndRefillNextTurn(CharacterState current) => _resolve().ConsumeEndRefillNextTurn(current);
+    internal bool DrainEndRefillNextTurnChildren(ProgramSkillFrame f) => _resolve().DrainEndRefillNextTurnChildren(f);
+    internal IReadOnlyList<PromptChoice> EndRefillNextTurnChoices(ProgramSkillFrame f) => _resolve().EndRefillNextTurnChoices(f);
     internal double EndRefillNextTurnPublicScore(int owner) => _resolve().EndRefillNextTurnPublicScore(owner);
     internal double EndRefillPublicChoiceScore(int owner, int target) => _resolve().EndRefillPublicChoiceScore(owner, target);
-    internal bool IsExactOwnAfterTurnEndedProgram(global::CardGame.Core.ProgramSkillFrame f) => _resolve().IsExactOwnAfterTurnEndedProgram(f);
-    internal void PublishEndRefillNextTurnChoice(global::CardGame.Core.ProgramSkillFrame supplied) => _resolve().PublishEndRefillNextTurnChoice(supplied);
-    internal void RequireEndRefillNextTurnReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().RequireEndRefillNextTurnReceipt(f);
-    internal void ResolveEndRefillNextTurnChoice(global::CardGame.Core.PromptChoice choice) => _resolve().ResolveEndRefillNextTurnChoice(choice);
+    internal bool IsExactOwnAfterTurnEndedProgram(ProgramSkillFrame f) => _resolve().IsExactOwnAfterTurnEndedProgram(f);
+    internal void PublishEndRefillNextTurnChoice(ProgramSkillFrame supplied) => _resolve().PublishEndRefillNextTurnChoice(supplied);
+    internal void RequireEndRefillNextTurnReceipt(ProgramSkillFrame f) => _resolve().RequireEndRefillNextTurnReceipt(f);
+    internal void ResolveEndRefillNextTurnChoice(PromptChoice choice) => _resolve().ResolveEndRefillNextTurnChoice(choice);
     internal bool ResumeEndRefillNextTurn(long id) => _resolve().ResumeEndRefillNextTurn(id);
-    internal bool ReturnEndRefillNextTurnMovement(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ReturnEndRefillNextTurnMovement(f);
-    internal global::CardGame.Core.PromptChoice SelectAiEndRefillNextTurn(global::CardGame.Core.PendingDecision prompt, global::CardGame.Core.ProgramSkillFrame f) => _resolve().SelectAiEndRefillNextTurn(prompt, f);
+    internal bool ReturnEndRefillNextTurnMovement(ProgramSkillFrame f) => _resolve().ReturnEndRefillNextTurnMovement(f);
+    internal PromptChoice SelectAiEndRefillNextTurn(PendingDecision prompt, ProgramSkillFrame f) => _resolve().SelectAiEndRefillNextTurn(prompt, f);
 }

@@ -1,14 +1,10 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterBaoXinOlRuntime
 {
     internal const string BaoXinStore = "skill-program.bao-xin.mutao.store", BaoXinGift = "skill-program.bao-xin.mutao.gift", BaoXinCleanup = "skill-program.bao-xin.mutao.cleanup", BaoXinObtain = "skill-program.bao-xin.yimou.obtain", BaoXinYimouGift = "skill-program.bao-xin.yimou.gift", BaoXinDraw = "skill-program.bao-xin.yimou.draw";
-    SkillProgramStepOutcome global::CardGame.Core.IBaoXinHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginBaoXin(f, op);
+    SkillProgramStepOutcome IBaoXinHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginBaoXin(f, op);
     internal SkillProgramStepOutcome BeginBaoXin(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -22,9 +18,9 @@ internal sealed partial class CharacterBaoXinOlRuntime
         };
         if (op == SkillProgramEffectOp.ResolveBaoXinMutao)
         {
-            if (f.TriggerId is not null || f.SkillId != "ol:mutao" || global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "public-slash-ring" || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[holder].IsAlive)
+            if (f.TriggerId is not null || f.SkillId != "ol:mutao" || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "public-slash-ring" || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[holder].IsAlive)
                 throw new InvalidOperationException("Mutao requires the actual one-role Play activation.");
-            var materials = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]).Where(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[holder], c))).Select(c => new BaoXinEntity(c.Id, c.Kind, _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[holder], c), CardLocation.Hand(holder))).ToArray();
+            var materials = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]).Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[holder], c))).Select(c => new BaoXinEntity(c.Id, c.Kind, _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[holder], c), CardLocation.Hand(holder))).ToArray();
             r = r with
             {
                 Paid = true,
@@ -35,7 +31,7 @@ internal sealed partial class CharacterBaoXinOlRuntime
         else
         {
             var context = f.WindowContext ?? throw new InvalidOperationException("Yimou requires its native damage context.");
-            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
+            var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
             r = r with
             {
                 Qualification = BaoXinQualification(c, context) ?? throw new InvalidOperationException("Yimou lost its exact damage occurrence or frozen directional distance.")
@@ -199,7 +195,7 @@ internal sealed partial class CharacterBaoXinOlRuntime
 
         if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && r.LastRecipient is { } last && _coreMatchParticipantsPlayersAccess._players[last].IsAlive)
         {
-            var count = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[last]).Count(c => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[last], c)));
+            var count = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[last]).Count(c => CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[last], c)));
             var damage = Math.Min(2, count);
             if (damage > 0)
             {

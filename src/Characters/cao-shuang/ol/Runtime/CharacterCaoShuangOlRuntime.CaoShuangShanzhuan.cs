@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoShuangOlRuntime
 {
     internal const string CaoShuangPlacementReason = "skill-program.caoshuang.shanzhuan.place";
-    internal bool CaoShuangPlaceCardEligible(int chooser, int target, Card card, CardZoneKind zone) => !card.IsGeneralWeapon && (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(card.Kind) || _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[target], card)is Suit.Heart or Suit.Diamond or Suit.Club or Suit.Spade) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, card, new(zone, target), OwnedCardMoveIntent.Transfer);
+    internal bool CaoShuangPlaceCardEligible(int chooser, int target, Card card, CardZoneKind zone) => !card.IsGeneralWeapon && (CoreNativeCardClassificationsRuntime.IsDelayedCard(card.Kind) || _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[target], card)is Suit.Heart or Suit.Diamond or Suit.Club or Suit.Spade) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, card, new(zone, target), OwnedCardMoveIntent.Transfer);
     internal bool CaoShuangCanPlace(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && owner != target && _coreMatchParticipantsPlayersAccess._players[target] is { IsAlive: true, JudgmentAreaAbolished: false } && _corePhysicalOwnedCardQueriesOperations.GetJudgment(_coreMatchParticipantsPlayersAccess._players[target]).Count == 0 && (_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Any(c => CaoShuangPlaceCardEligible(owner, target, c, CardZoneKind.Hand)) || _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[target]).Any(c => CaoShuangPlaceCardEligible(owner, target, c, CardZoneKind.Equipment)));
     internal SkillProgramStepOutcome BeginCaoShuangShanzhuan(ProgramSkillFrame supplied)
     {
@@ -54,7 +51,7 @@ internal sealed partial class CharacterCaoShuangOlRuntime
     [ProgramAnswer("caoshuang-shanzhuan")]
     internal void AnswerCaoShuangShanzhuan(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoShuangShanzhuan: { Placed: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoShuangShanzhuanChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoShuangShanzhuan: { Placed: false } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], CaoShuangShanzhuanChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Shanzhuan lost the actual empty-judgment target or anonymous owned-card slot.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
@@ -68,7 +65,7 @@ internal sealed partial class CharacterCaoShuangOlRuntime
         var card = (zone == CardZoneKind.Hand ? _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat]) : _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat]))[slot];
         var from = new CardLocation(zone, r.TargetSeat);
         var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat], card);
-        var effective = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(card.Kind) ? card.Kind : global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsRedSuit(suit) ? CardKind.Indulgence : CardKind.SupplyShortage;
+        var effective = CoreNativeCardClassificationsRuntime.IsDelayedCard(card.Kind) ? card.Kind : CoreNativeCardClassificationsRuntime.IsRedSuit(suit) ? CardKind.Indulgence : CardKind.SupplyShortage;
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CaoShuangShanzhuan = r with { Placed = true, CardId = card.Id, From = from, EffectiveKind = effective, SequenceBefore = before, SequenceAfter = before }, Step = ResolutionFrameStep.ResolvingEffect });
         _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Judgment(r.TargetSeat), new(CaoShuangPlacementReason));

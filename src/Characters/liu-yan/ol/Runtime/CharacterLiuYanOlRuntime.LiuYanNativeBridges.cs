@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYanOlRuntime
@@ -43,7 +39,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
         return i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && MatchesLiuYanLimu(f, o);
     }
 
-    internal bool IsLiuYanLimuSelfDelayedUse(NullificationWindowFrame p) => p.EffectCardKind == CardKind.Indulgence && p.ActionKind == LegalActionKind.Indulgence && IsLiuYanLimuUse(p.ParentFrameId) && _coreCardUseLifecycleOperations.LifecycleCardUse(p.ParentFrameId)is { LiuYanLimu: { } o } && p.EffectCardId == o.CardId && global::CardGame.Core.EngineOwners.CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(p) == o.ActorSeat;
+    internal bool IsLiuYanLimuSelfDelayedUse(NullificationWindowFrame p) => p.EffectCardKind == CardKind.Indulgence && p.ActionKind == LegalActionKind.Indulgence && IsLiuYanLimuUse(p.ParentFrameId) && _coreCardUseLifecycleOperations.LifecycleCardUse(p.ParentFrameId)is { LiuYanLimu: { } o } && p.EffectCardId == o.CardId && CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(p) == o.ActorSeat;
     internal bool TrySkipUnavailableLiuYanLimuEffect(NullificationWindowFrame p)
     {
         if (!IsLiuYanLimuSelfDelayedUse(p))

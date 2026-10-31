@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeFactionSlashRuntime
@@ -19,7 +15,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         AdvanceFactionSlashCandidate();
     }
 
-    internal void BeginFactionSlashResponseRequest(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void BeginFactionSlashResponseRequest(NativeOwners.CardAttackHandle attack)
     {
         if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not null)
         {
@@ -28,7 +24,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
 
         FactionCardRequestPurpose purpose;
         CharacterState owner;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveDuel is { } duel && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(duel.Attack, attack))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveDuel is { } duel && CoreNativeDamageHandlesRuntime.SameAttackOwner(duel.Attack, attack))
         {
             purpose = FactionCardRequestPurpose.DuelResponse;
             owner = _coreMatchParticipantsPlayersAccess._players[duel.ResponderSeat];
@@ -39,7 +35,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
 
             duel.FactionSlashAttempted = true;
         }
-        else if (_coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack, RequiredCardKind: CardKind.Slash } group && global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(group.CurrentAttack, attack))
+        else if (_coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.ResponseAttack, RequiredCardKind: CardKind.Slash } group && CoreNativeDamageHandlesRuntime.SameAttackOwner(group.CurrentAttack, attack))
         {
             purpose = FactionCardRequestPurpose.GroupResponse;
             owner = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
@@ -65,9 +61,9 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         AdvanceFactionSlashCandidate();
     }
 
-    internal void BeginBorrowedSwordFactionSlashRequest(global::CardGame.Core.NativeOwners.BorrowedSwordHandle borrowedSword)
+    internal void BeginBorrowedSwordFactionSlashRequest(NativeOwners.BorrowedSwordHandle borrowedSword)
     {
-        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not null || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, borrowedSword) || !borrowedSword.AwaitingSlashChoice || !_coreNativeBorrowedSwordOperations.CanRequestBorrowedSwordFactionSlash(borrowedSword))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not null || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, borrowedSword) || !borrowedSword.AwaitingSlashChoice || !_coreNativeBorrowedSwordOperations.CanRequestBorrowedSwordFactionSlash(borrowedSword))
         {
             throw new InvalidOperationException("FactionSlash is not available for this Borrowed Sword use.");
         }
@@ -85,9 +81,9 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         AdvanceFactionSlashCandidate();
     }
 
-    internal void BeginQinglongCrescentBladeFactionSlashRequest(global::CardGame.Core.NativeOwners.QinglongCrescentBladeHandle qinglong)
+    internal void BeginQinglongCrescentBladeFactionSlashRequest(NativeOwners.QinglongCrescentBladeHandle qinglong)
     {
-        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not null || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, qinglong) || !_coreNativeQinglongOperations.CanRequestQinglongCrescentBladeFactionSlash(qinglong))
+        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not null || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, qinglong) || !_coreNativeQinglongOperations.CanRequestQinglongCrescentBladeFactionSlash(qinglong))
         {
             throw new InvalidOperationException("FactionSlash is not available for this Qinglong Crescent Blade use.");
         }
@@ -146,9 +142,9 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         CompleteFactionSlashFailure(pending);
     }
 
-    internal string GetFactionRequestSkillId(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending) => pending.IsProgramSkillUse && !pending.IsAssistedProgramUse && pending.ProgramSkillFrameId is { } frameId ? _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == frameId).SkillId : pending.PolicySource!.SkillId;
-    internal string GetFactionRequestDisplayName(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending) => _contentRegistryOperations._contentRegistry!.GetSkill(GetFactionRequestSkillId(pending)).Name;
-    internal IReadOnlyList<PromptChoice> CreateFactionSlashResponseChoices(CharacterState provider, global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, IReadOnlyList<Card> slashes)
+    internal string GetFactionRequestSkillId(NativeOwners.FactionCardRequestHandle pending) => pending.IsProgramSkillUse && !pending.IsAssistedProgramUse && pending.ProgramSkillFrameId is { } frameId ? _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == frameId).SkillId : pending.PolicySource!.SkillId;
+    internal string GetFactionRequestDisplayName(NativeOwners.FactionCardRequestHandle pending) => _contentRegistryOperations._contentRegistry!.GetSkill(GetFactionRequestSkillId(pending)).Name;
+    internal IReadOnlyList<PromptChoice> CreateFactionSlashResponseChoices(CharacterState provider, NativeOwners.FactionCardRequestHandle pending, IReadOnlyList<Card> slashes)
     {
         if (pending.IsAssistedProgramUse)
             return _coreAssistedFactionSlashOperations.CreateAssistedFactionSlashChoices(provider, pending);
@@ -165,7 +161,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         var choices = slashes.SelectMany(card =>
         {
             var effectiveKind = _coreCardConversionsOperations.GetFactionSlashEffectiveSlashKind(pending, provider, card);
-            var description = global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Slash) ? $"打出【{(CardCatalog.Get(effectiveKind).DisplayName)}】" : $"将【{(card.DisplayName)}】当作【杀】";
+            var description = CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Slash) ? $"打出【{(CardCatalog.Get(effectiveKind).DisplayName)}】" : $"将【{(card.DisplayName)}】当作【杀】";
             return _coreCardConversionsOperations.CreateConversionChoiceVariants(provider, card, effectiveKind, isResponse, $"faction-slash.slash.card-{(card.Id)}", $"{(description)}，替 {(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat].Name)} 响应【{(GetFactionRequestDisplayName(pending))}】。", [card.Id], responseTargets, new Dictionary<string, string> { ["response"] = "faction-slash-slash", ["response-card-kind"] = effectiveKind.ToString(), ["skill"] = GetFactionRequestSkillId(pending) });
         }).Where(choice => !_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashChoiceForbidden(pending, choice)).ToList();
         foreach (var pair in _coreAssistedFactionSlashOperations.GetFactionRequestZhangbaPairs(pending, provider))
@@ -182,7 +178,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
                 ["response-card-kind"] = CardKind.Slash.ToString(),
                 ["skill"] = GetFactionRequestSkillId(pending)
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, selection.Source);
             choices.Add(new PromptChoice(new ChoiceId($"faction-slash.program-view-as-slash.{(selection.Source.SkillId.Length)}:" + $"{(selection.Source.SkillId)}.{(selection.Source.BindingId)}.cards-{(string.Join('-', cardIds))}"), $"发动【{(_coreCardConversionsOperations.ProgramConversionName(selection.Source))}】，将 {(cardIds.Length)} 张手牌当【杀】替 {(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat].Name)} 响应【{(GetFactionRequestDisplayName(pending))}】。", cardIds, responseTargets, parameters));
         }
 
@@ -190,9 +186,9 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         return choices;
     }
 
-    internal void ResolveFactionSlashCandidateResponse(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, bool useSlash, int? requestedCardId, CardKind? requestedEffectiveKind = null)
+    internal void ResolveFactionSlashCandidateResponse(NativeOwners.FactionCardRequestHandle pending, bool useSlash, int? requestedCardId, CardKind? requestedEffectiveKind = null)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.AwaitingProviders || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondSlash } decision || decision.PlayerSeat != pending.CurrentCandidateSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.AwaitingProviders || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondSlash } decision || decision.PlayerSeat != pending.CurrentCandidateSeat)
         {
             throw new InvalidOperationException("The FactionSlash response is not the current continuation.");
         }
@@ -245,10 +241,10 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         AdvanceFactionSlashCandidate();
     }
 
-    internal void ResolveFactionSlashZhangbaCandidateResponse(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> pair)
+    internal void ResolveFactionSlashZhangbaCandidateResponse(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> pair)
     {
         var providerReward = _coreFactionRequestPaymentsOperations.CaptureFactionProviderReward(pending);
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.AwaitingProviders || provider.Seat != pending.CurrentCandidateSeat || _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(provider, pair.Select(card => card.Id).ToArray())is null)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.AwaitingProviders || provider.Seat != pending.CurrentCandidateSeat || _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(provider, pair.Select(card => card.Id).ToArray())is null)
         {
             throw new InvalidOperationException("The Zhangba FactionSlash response is not current.");
         }
@@ -325,10 +321,10 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
 
-    internal void ResolveFactionSlashProgramMultiCardCandidateResponse(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, ProgramMultiCardViewAsSelection selection)
+    internal void ResolveFactionSlashProgramMultiCardCandidateResponse(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, ProgramMultiCardViewAsSelection selection)
     {
         var providerReward = _coreFactionRequestPaymentsOperations.CaptureFactionProviderReward(pending);
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.AwaitingProviders || provider.Seat != pending.CurrentCandidateSeat || _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.RoundDistinctBasicUse is not null || _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(provider, selection.Cards.Select(card => card.Id).ToArray(), CardKind.Slash, forResponse: !pending.IsProgramSkillUse && !pending.IsBorrowedSwordUse && !pending.IsQinglongCrescentBladeUse, selection.Source)is null)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.AwaitingProviders || provider.Seat != pending.CurrentCandidateSeat || _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.RoundDistinctBasicUse is not null || _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(provider, selection.Cards.Select(card => card.Id).ToArray(), CardKind.Slash, forResponse: !pending.IsProgramSkillUse && !pending.IsBorrowedSwordUse && !pending.IsQinglongCrescentBladeUse, selection.Source)is null)
         {
             throw new InvalidOperationException("The configured FactionSlash conversion is not current.");
         }
@@ -398,9 +394,9 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
 
-    internal void CompleteFactionSlashFailure(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending)
+    internal void CompleteFactionSlashFailure(NativeOwners.FactionCardRequestHandle pending)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending))
         {
             throw new InvalidOperationException("The failed FactionSlash request is not current.");
         }
@@ -408,7 +404,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = null;
         if (!pending.IsProgramSkillUse || pending.IsAssistedProgramUse)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashResolvedEvent(pending.ResolutionId, pending.OwnerSeat, Succeeded: false, ProviderSeat: null, SlashCardId: null, EffectiveSlashKind: null, pending.IsBorrowedSwordUse || pending.IsQinglongCrescentBladeUse || pending.IsAssistedProgramUse, pending.TargetSeat));
-        _coreMatchLogOperations.AddLog("SkillResolved", $"没有{(global::CardGame.Core.EngineOwners.CoreMatchPresentationRuntime.GetFactionName(pending.ProviderFactionId))}势力角色响应 {(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat].Name)} 的【{(GetFactionRequestDisplayName(pending))}】。", pending.OwnerSeat, pending.TargetSeat);
+        _coreMatchLogOperations.AddLog("SkillResolved", $"没有{(CoreMatchPresentationRuntime.GetFactionName(pending.ProviderFactionId))}势力角色响应 {(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat].Name)} 的【{(GetFactionRequestDisplayName(pending))}】。", pending.OwnerSeat, pending.TargetSeat);
         if (pending.IsBorrowedSwordUse)
         {
             var borrowedSword = pending.BorrowedSword ?? throw new InvalidOperationException("A Borrowed Sword FactionSlash failure has no parent resolution.");
@@ -454,7 +450,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreMatchOutcomeStatusAccess._status = EngineStatus.Running;
     }
 
-    internal void PublishOwnerSlashDecision(global::CardGame.Core.NativeOwners.FactionCardRequestHandle failedRequest)
+    internal void PublishOwnerSlashDecision(NativeOwners.FactionCardRequestHandle failedRequest)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[failedRequest.OwnerSeat];
         var slashes = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(owner, CardKind.Slash);
@@ -473,13 +469,13 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreMatchOutcomeStatusAccess._status = owner.IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running;
     }
 
-    internal void CompleteFactionSlashResponse(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, Card selectedSlash)
+    internal void CompleteFactionSlashResponse(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, Card selectedSlash)
     {
         if (_coreCardDeclarationsOperations.TryBeginCardDeclaration(provider, selectedSlash, CardKind.Slash, _coreCardDeclarationsOperations.PeekDeclarationConversion(provider, selectedSlash, CardKind.Slash, false), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.FactionSlash, pending.OwnerSeat), [pending.ResponseAttack!.SourceSeat]))
             return;
         var providerReward = _coreFactionRequestPaymentsOperations.CaptureFactionProviderReward(pending);
         var attack = pending.ResponseAttack ?? throw new InvalidOperationException("A response FactionSlash has no attack continuation.");
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || provider.Seat != pending.CurrentCandidateSeat)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || provider.Seat != pending.CurrentCandidateSeat)
         {
             throw new InvalidOperationException("The completed FactionSlash response is not current.");
         }
@@ -530,7 +526,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
 
-    internal void BeginProvidedFactionSlashSlash(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind effectiveKind, bool usesZhuqueFan, CardConversionSource? conversionSource = null)
+    internal void BeginProvidedFactionSlashSlash(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind effectiveKind, bool usesZhuqueFan, CardConversionSource? conversionSource = null)
     {
         var actualConversion = conversionSource ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion;
         if (_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, effectiveKind, physicalCards, actualConversion))
@@ -541,7 +537,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         var selectedSlash = physicalCards.FirstOrDefault() ?? throw new InvalidOperationException("An active FactionSlash Slash must retain a physical card.");
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[pending.TargetSeat ?? throw new InvalidOperationException("An active FactionSlash use has no target.")];
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.IsProgramSkillUse || (pending.IsAssistedProgramUse ? !_coreAssistedFactionSlashOperations.IsAssistedProvidedSlashTarget(owner.Seat, target.Seat, effectiveKind, _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), allowPotentialRank: false, physicalCardIds: physicalCards.Select(c => c.Id).ToArray()) : !_coreNativeEquipmentAndFactionQueriesOperations.CanUseProvidedSlashTarget(owner, target, effectiveKind, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, physicalCards), allowAnyPhysicalSuit: false, effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), physicalCardIds: physicalCards.Select(c => c.Id).ToArray())))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.IsProgramSkillUse || (pending.IsAssistedProgramUse ? !_coreAssistedFactionSlashOperations.IsAssistedProvidedSlashTarget(owner.Seat, target.Seat, effectiveKind, _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), allowPotentialRank: false, physicalCardIds: physicalCards.Select(c => c.Id).ToArray()) : !_coreNativeEquipmentAndFactionQueriesOperations.CanUseProvidedSlashTarget(owner, target, effectiveKind, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, physicalCards), allowAnyPhysicalSuit: false, effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), physicalCardIds: physicalCards.Select(c => c.Id).ToArray())))
         {
             throw new InvalidOperationException("The active FactionSlash target is no longer legal.");
         }
@@ -573,7 +569,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(providerReward, provider.Seat);
     }
 
-    internal void BeginBorrowedSwordFactionSlashSlash(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind effectiveKind, bool usesZhuqueFan, CardConversionSource? conversionSource = null)
+    internal void BeginBorrowedSwordFactionSlashSlash(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind effectiveKind, bool usesZhuqueFan, CardConversionSource? conversionSource = null)
     {
         var providerReward = _coreFactionRequestPaymentsOperations.CaptureFactionProviderReward(pending);
         var selectedSlash = physicalCards.FirstOrDefault() ?? throw new InvalidOperationException("A Borrowed Sword FactionSlash Slash must retain a physical card.");
@@ -581,7 +577,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         var borrowedSword = pending.BorrowedSword ?? throw new InvalidOperationException("A Borrowed Sword FactionSlash use has no parent resolution.");
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[pending.TargetSeat ?? throw new InvalidOperationException("A Borrowed Sword FactionSlash use has no target.")];
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, borrowedSword) || !pending.IsBorrowedSwordUse || !_coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(owner, target, effectiveKind, physicalSuit: _coreCurrentTurnShownCardBenefitsOperations.HasSlashUseDistanceBySuit(owner, effectiveKind, Suit.Diamond) ? _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, physicalCards) : null, allowAnyPhysicalSuit: false, effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), physicalCardIds: _coreProgramCardPoliciesOperations.HasCardPolicy(owner, SkillProgramCardPolicyKind.RoundGainedOtherSourceUse) ? physicalCards.Select(c => c.Id).ToArray() : null))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, borrowedSword) || !pending.IsBorrowedSwordUse || !_coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(owner, target, effectiveKind, physicalSuit: _coreCurrentTurnShownCardBenefitsOperations.HasSlashUseDistanceBySuit(owner, effectiveKind, Suit.Diamond) ? _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, physicalCards) : null, allowAnyPhysicalSuit: false, effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), physicalCardIds: _coreProgramCardPoliciesOperations.HasCardPolicy(owner, SkillProgramCardPolicyKind.RoundGainedOtherSourceUse) ? physicalCards.Select(c => c.Id).ToArray() : null))
         {
             throw new InvalidOperationException("The Borrowed Sword FactionSlash target is no longer legal.");
         }
@@ -603,7 +599,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(providerReward, provider.Seat);
     }
 
-    internal void BeginQinglongCrescentBladeFactionSlashSlash(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind effectiveKind, bool usesZhuqueFan, CardConversionSource? conversionSource = null)
+    internal void BeginQinglongCrescentBladeFactionSlashSlash(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind effectiveKind, bool usesZhuqueFan, CardConversionSource? conversionSource = null)
     {
         var providerReward = _coreFactionRequestPaymentsOperations.CaptureFactionProviderReward(pending);
         var selectedSlash = physicalCards.FirstOrDefault() ?? throw new InvalidOperationException("A Qinglong Crescent Blade FactionSlash Slash must retain a physical card.");
@@ -611,7 +607,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         var qinglong = pending.QinglongCrescentBlade ?? throw new InvalidOperationException("A Qinglong Crescent Blade FactionSlash use has no parent resolution.");
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[pending.TargetSeat ?? throw new InvalidOperationException("A Qinglong Crescent Blade FactionSlash use has no target.")];
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, qinglong) || !pending.IsQinglongCrescentBladeUse || !_coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(owner, target, effectiveKind, _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, physicalCards), allowAnyColor: false, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), physicalCardIds: physicalCards.Select(c => c.Id).ToArray()))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, qinglong) || !pending.IsQinglongCrescentBladeUse || !_coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(owner, target, effectiveKind, _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, physicalCards), allowAnyColor: false, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), physicalCardIds: physicalCards.Select(c => c.Id).ToArray()))
         {
             throw new InvalidOperationException("The Qinglong Crescent Blade FactionSlash target is no longer legal.");
         }
@@ -636,7 +632,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(providerReward, provider.Seat);
     }
 
-    internal bool TryBeginFactionSlashZhuqueFanChoice(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind baseEffectiveKind)
+    internal bool TryBeginFactionSlashZhuqueFanChoice(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind baseEffectiveKind)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
         if ((!pending.IsProgramSkillUse && !pending.IsBorrowedSwordUse) || baseEffectiveKind != CardKind.Slash || (physicalCards.Count == 1 && physicalCards[0].Kind != CardKind.Slash && !_characterGuanYuWumiaoOperations.IsWuyouIdentityKind(provider, physicalCards[0], CardKind.Slash) && !_coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(provider, physicalCards[0])) || !_coreNativeTargetLegalityOperations.HasZhuqueFan(owner))
@@ -701,9 +697,9 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         return true;
     }
 
-    internal void ResolveFactionSlashZhuqueFanChoice(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending, bool convertToFireSlash)
+    internal void ResolveFactionSlashZhuqueFanChoice(NativeOwners.FactionCardRequestHandle pending, bool convertToFireSlash)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.AwaitingZhuqueFanChoice || pending.AwaitingProviders || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ZhuqueFan } decision || decision.PlayerSeat != pending.OwnerSeat || pending.ZhuqueFanProviderSeat is not { } providerSeat || pending.ZhuqueFanPhysicalCards.Count == 0)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.AwaitingZhuqueFanChoice || pending.AwaitingProviders || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ZhuqueFan } decision || decision.PlayerSeat != pending.OwnerSeat || pending.ZhuqueFanProviderSeat is not { } providerSeat || pending.ZhuqueFanPhysicalCards.Count == 0)
         {
             throw new InvalidOperationException("The FactionSlash Zhuque Fan choice is not current.");
         }
@@ -736,9 +732,9 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         BeginProvidedFactionSlashSlash(pending, provider, physicalCards, effectiveKind, convertToFireSlash);
     }
 
-    internal void CompleteQinglongCrescentBladeFactionSlash(global::CardGame.Core.NativeOwners.FactionCardRequestHandle pending)
+    internal void CompleteQinglongCrescentBladeFactionSlash(NativeOwners.FactionCardRequestHandle pending)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.IsQinglongCrescentBladeUse || pending.AwaitingProviders)
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.IsQinglongCrescentBladeUse || pending.AwaitingProviders)
         {
             throw new InvalidOperationException("The completed Qinglong Crescent Blade FactionSlash continuation is invalid.");
         }

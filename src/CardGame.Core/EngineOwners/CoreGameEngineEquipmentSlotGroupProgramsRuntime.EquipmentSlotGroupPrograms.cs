@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEquipmentSlotGroupProgramsRuntime
@@ -13,9 +9,9 @@ internal sealed partial class CoreGameEngineEquipmentSlotGroupProgramsRuntime
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 140)]
     internal bool CanPayEquipmentSlotGroup(CharacterState owner, SkillProgramActivation activation) => ProgramInstructionResolver.Default.Features(activation).ForOperation(SkillProgramEffectOp.AbolishEquipmentSlotGroup).All(e => e.EquipmentSlots.Any(slot => owner.EquipmentSlotCapacity(slot) > 0));
     internal bool CanSelectProgramPindianOpponent(ProgramSkillFrame frame, int targetSeat) => _programTargetSelectionOperations.Get().CanSelectPindianOpponent(frame, targetSeat);
-    void global::CardGame.Core.IEquipmentSlotGroupProgramHost.AbolishEquipmentSlotGroup(ProgramSkillFrame frame, IReadOnlyList<EquipmentSlot> slots) => AbolishProgramEquipmentSlotGroup(frame, slots);
-    void global::CardGame.Core.IEquipmentSlotGroupProgramHost.RecastSelectedEquipment(ProgramSkillFrame frame) => RecastProgramSelectedEquipment(frame);
-    void global::CardGame.Core.IEquipmentSlotGroupProgramHost.ReplaceSkillsOnPreparation(ProgramSkillFrame frame, IReadOnlyList<string> lost, string acquired) => ReplaceProgramPreparationSkills(frame, lost, acquired);
+    void IEquipmentSlotGroupProgramHost.AbolishEquipmentSlotGroup(ProgramSkillFrame frame, IReadOnlyList<EquipmentSlot> slots) => AbolishProgramEquipmentSlotGroup(frame, slots);
+    void IEquipmentSlotGroupProgramHost.RecastSelectedEquipment(ProgramSkillFrame frame) => RecastProgramSelectedEquipment(frame);
+    void IEquipmentSlotGroupProgramHost.ReplaceSkillsOnPreparation(ProgramSkillFrame frame, IReadOnlyList<string> lost, string acquired) => ReplaceProgramPreparationSkills(frame, lost, acquired);
     internal void AbolishProgramEquipmentSlotGroup(ProgramSkillFrame frame, IReadOnlyList<EquipmentSlot> slots)
     {
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);

@@ -1,13 +1,9 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeSlashCompletionRuntime
 {
-    internal bool FinishAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack, bool allowYingboGift = true)
+    internal bool FinishAttack(NativeOwners.CardAttackHandle attack, bool allowYingboGift = true)
     {
         if (_coreProgramDamageHooksOperations.DamageHooks.TryComplete(ProgramDamagePhase.AttackCompletionPrelude, attack, out var preludePaused))
             return preludePaused;
@@ -42,7 +38,7 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
             return false;
         }
 
-        if (attack.Card is null && (attack.EffectiveCardKind == CardKind.Slash || _coreNativeSlashTargetDuelOperations.IsNativeSlashTargetDuelAttack(attack) || _coreShanheS5XuncanOperations.IsShanheS5YunshenUse(attack.ResolutionId) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } fireUse && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(fireUse) || global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.VirtualBasicReturn is not null) && (attack.ProgramSkillCardUseFrameId is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.VirtualBasicReturn is not null || _coreForeignPublicPileSlashesOperations.IsForeignPublicPileSlashUse(attack.ResolutionId)))
+        if (attack.Card is null && (attack.EffectiveCardKind == CardKind.Slash || _coreNativeSlashTargetDuelOperations.IsNativeSlashTargetDuelAttack(attack) || _coreShanheS5XuncanOperations.IsShanheS5YunshenUse(attack.ResolutionId) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } fireUse && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(fireUse) || CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.VirtualBasicReturn is not null) && (attack.ProgramSkillCardUseFrameId is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.VirtualBasicReturn is not null || _coreForeignPublicPileSlashesOperations.IsForeignPublicPileSlashUse(attack.ResolutionId)))
         {
             var virtualUse = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == attack.ResolutionId);
             virtualUse = _coreActualHandGainProgramsOperations.NormalizeCompletedCategoryVirtualUse(virtualUse, attack.ProgramSkillCardUseFrameId);
@@ -85,7 +81,7 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
 
         if (_coreOriginalUseLightningOperations.FinishOriginalUseLightningAttack(attack))
             return false;
-        var attackCard = global::CardGame.Core.EngineOwners.CoreNativeDamagePoliciesRuntime.RequireAttackCard(attack);
+        var attackCard = CoreNativeDamagePoliciesRuntime.RequireAttackCard(attack);
         var cardLocation = _cardZonesOperations._cardZones.GetLocation(attackCard.Id);
         if (attack.IsDelayedJudgmentDamage)
         {
@@ -106,7 +102,7 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
             return false;
         }
 
-        if (allowYingboGift && _characterLuMengMouOperations.TryBeginYingboGift(attack.ResolutionId, attack.CardUserSeat, attackCard, global::CardGame.Core.EngineOwners.CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack), attack.PhysicalCards, YingboGiftContinuation.Attack, attack: attack))
+        if (allowYingboGift && _characterLuMengMouOperations.TryBeginYingboGift(attack.ResolutionId, attack.CardUserSeat, attackCard, CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack), attack.PhysicalCards, YingboGiftContinuation.Attack, attack: attack))
         {
             return true;
         }
@@ -131,7 +127,7 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
         }
 
         var completedAction = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == attack.ResolutionId).Action;
-        _coreNativeCardUseCompletionOperations.QueueCardUseFinishedWithoutPop(attack.ResolutionId, attackCard, global::CardGame.Core.EngineOwners.CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack));
+        _coreNativeCardUseCompletionOperations.QueueCardUseFinishedWithoutPop(attack.ResolutionId, attackCard, CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack));
         if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && completedAction is not null && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, completedAction, SkillProgramTriggerWindow.CardUseCompleted, completedAction.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
             return true;
         _coreNativeCardUseCompletionOperations.PopFinishedCardUse(attack.ResolutionId);

@@ -1,21 +1,17 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineSoleIncomingEffectRepeatRuntime
 {
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedBeforeActivity, 50)]
-    internal bool SoleIncomingEffectFinalizedBeforeActivityTargetWindow(ProgramTargetCardWindowQuery query) => HasSoleIncomingEffectCapability && global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(query.Kind);
+    internal bool SoleIncomingEffectFinalizedBeforeActivityTargetWindow(ProgramTargetCardWindowQuery query) => HasSoleIncomingEffectCapability && CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(query.Kind);
     internal bool HasSoleIncomingEffectCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RepeatIncomingSoleCardEffectAndDrawByRange);
 
     internal bool TryGetSoleIncomingEffect(int owner, ProgramSkillWindowContext? context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window)
     {
         use = null !;
         window = null !;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } id } || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != id.ParentCardUseFrameId || w.CompletedResponseReturn is not null || w.Continuation is not (ProgramCardContinuation.Slash or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.FinalizedSimpleCard) || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } current || a.ActorSeat == owner || a.ActionId != id.CardActionId || a.ActorSeat != current.SourceSeat || a.EffectiveKind != current.CardKind || w.Action.ActionId != a.ActionId || !w.Action.TargetSeats.SequenceEqual(current.TargetSeats) || !global::CardGame.Core.EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(current.CardKind) || current.CardKind is CardKind.Dodge or CardKind.Nullification || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive)
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } id } || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != id.ParentCardUseFrameId || w.CompletedResponseReturn is not null || w.Continuation is not (ProgramCardContinuation.Slash or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.FinalizedSimpleCard) || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { Type: CardActionType.Use } a } current || a.ActorSeat == owner || a.ActionId != id.CardActionId || a.ActorSeat != current.SourceSeat || a.EffectiveKind != current.CardKind || w.Action.ActionId != a.ActionId || !w.Action.TargetSeats.SequenceEqual(current.TargetSeats) || !CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(current.CardKind) || current.CardKind is CardKind.Dodge or CardKind.Nullification || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive)
             return false;
         var actual = a.EffectiveDesignatedTargetSeats.Distinct().ToArray();
         if (actual is not [var target] || target != owner || !current.TargetSeats.Contains(owner) || current.SoleIncomingEffects is { Started: > 0 })
@@ -35,7 +31,7 @@ internal sealed partial class CoreGameEngineSoleIncomingEffectRepeatRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || !TryGetSoleIncomingEffect(f.OwnerSeat, context, out var use, out var window) || !CanOfferSoleIncomingEffect(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("An incoming repeat needs its exact sole target and original finalized native use.");
-        var source = new CardConversionSource(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+        var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var grant = new SoleIncomingEffectGrant(f.Id, source, f.GameplayHash, window.Id, use.Id, use.Action!.ActionId, use.Action.ActorSeat, f.OwnerSeat, use.CardKind, cap);
         var previous = use.SoleIncomingEffects;
         var simple = window.SimpleContinuation is { } s ? s with
@@ -58,9 +54,9 @@ internal sealed partial class CoreGameEngineSoleIncomingEffectRepeatRuntime
 
     internal bool HasUnstartedSoleIncomingEffect(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { SoleIncomingEffects: { } r, Action: { } a } use && a.ActionId == r.ActionId && r.Started < r.Grants.Count && !_coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(use) && _coreMatchOutcomeWinnerAccess._winner == Winner.None;
     internal bool IsSoleIncomingExtraRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.SoleIncomingEffects is { Active: true };
-    internal void CaptureSoleIncomingAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal void CaptureSoleIncomingAttack(NativeOwners.CardAttackHandle attack)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { SoleIncomingEffects: { Started: 0 } rounds, CardAttack: { } original } use || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id) != 0 || rounds.Native.OriginalAttacks.Any(s => s.TargetIndex == use.TargetIndex))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { SoleIncomingEffects: { Started: 0 } rounds, CardAttack: { } original } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id) != 0 || rounds.Native.OriginalAttacks.Any(s => s.TargetIndex == use.TargetIndex))
             return;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { SoleIncomingEffects = rounds with { Native = rounds.Native with { OriginalAttacks = rounds.Native.OriginalAttacks.Append(new(use.TargetIndex, original)).ToArray(), Fangtian = current.Continuations.FangtianHalberd ?? rounds.Native.Fangtian } } });
     }
@@ -97,7 +93,7 @@ internal sealed partial class CoreGameEngineSoleIncomingEffectRepeatRuntime
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
         }
 
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
         {
             var first = native.OriginalAttacks.OrderBy(s => s.TargetIndex).FirstOrDefault(s => _coreMatchParticipantsPlayersAccess._players[s.Attack.TargetSeat].IsAlive && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(id, s.Attack.TargetSeat));
             if (first is null)
@@ -114,7 +110,7 @@ internal sealed partial class CoreGameEngineSoleIncomingEffectRepeatRuntime
                 _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd = _kernelCoreMainOperations.CreateFangtianHalberdHandle(id);
             }
 
-            _coreCardAttackStateOperations.UpdateCardAttackState(id, _ => global::CardGame.Core.EngineOwners.CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(first.Attack));
+            _coreCardAttackStateOperations.UpdateCardAttackState(id, _ => CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(first.Attack));
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id);
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             _coreNativeSlashUseOperations.ContinueSlashDefense(attack);
@@ -141,7 +137,7 @@ internal sealed partial class CoreGameEngineSoleIncomingEffectRepeatRuntime
         throw new InvalidOperationException("An incoming repeat lost its accepted original effect continuation.");
     }
 
-    internal bool ContinueSoleIncomingFangtian(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool ContinueSoleIncomingFangtian(NativeOwners.CardAttackHandle attack)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { SoleIncomingEffects: { Active: true } r } use)
             return false;
@@ -152,10 +148,10 @@ internal sealed partial class CoreGameEngineSoleIncomingEffectRepeatRuntime
             return true;
         }
 
-        _coreCardAttackStateOperations.UpdateCardAttackState(use.Id, _ => global::CardGame.Core.EngineOwners.CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(seed.Attack));
+        _coreCardAttackStateOperations.UpdateCardAttackState(use.Id, _ => CoreGameEngineExtraCardEffectRoundsRuntime.ResetExtraCardEffectAttack(seed.Attack));
         _coreNativeSlashUseOperations.ContinueSlashDefense(attack);
         return true;
     }
 
-    void global::CardGame.Core.ISoleIncomingEffectRepeatHost.IssueSoleIncomingEffect(ProgramSkillFrame frame, int maximumDrawCount) => IssueSoleIncomingEffect(frame, maximumDrawCount);
+    void ISoleIncomingEffectRepeatHost.IssueSoleIncomingEffect(ProgramSkillFrame frame, int maximumDrawCount) => IssueSoleIncomingEffect(frame, maximumDrawCount);
 }

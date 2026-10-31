@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineOriginalUseLightningRuntime
@@ -50,7 +46,7 @@ internal sealed partial class CoreGameEngineOriginalUseLightningRuntime
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(use.Id, new(0, CardKind.Lightning, Suit.None, 0), use.SourceSeat, use.TargetSeats, LegalActionKind.Lightning, playedCardKind: CardKind.Lightning);
     }
 
-    internal IReadOnlyList<int> OriginalUseLightningPlacementTargets(global::CardGame.Core.NativeOwners.JizhiResolution pending) => IsOriginalUseLightning(pending.ResolutionId) ? _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)!.TargetSeats.Skip(_coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)!.TargetIndex).Take(1).ToArray() : pending.TargetSeats;
+    internal IReadOnlyList<int> OriginalUseLightningPlacementTargets(NativeOwners.JizhiResolution pending) => IsOriginalUseLightning(pending.ResolutionId) ? _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)!.TargetSeats.Skip(_coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)!.TargetIndex).Take(1).ToArray() : pending.TargetSeats;
     internal bool PlaceOriginalUseLightning(NullificationWindowFrame pending)
     {
         if (!IsOriginalUseLightning(pending.ParentFrameId))
@@ -109,7 +105,7 @@ internal sealed partial class CoreGameEngineOriginalUseLightningRuntime
         var attachment = current.HeldOriginalUseLightning.Where(a => a.LastJudgmentTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && ValidOriginalUseLightning(a)).OrderBy(a => a.AfterMovement).ThenBy(a => a.Order).FirstOrDefault();
         if (attachment is null)
             return false;
-        var physical = _corePhysicalOwnedCardQueriesOperations.GetJudgment(current).FirstOrDefault(c => !_characterDaQiaoLeOperations.IsZixiQinJudgmentCard(c.Id) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsDelayedCard(_coreActualTurnsOperations.GetJudgmentEffectiveCardKind(c)) && c.Id != excludedCard);
+        var physical = _corePhysicalOwnedCardQueriesOperations.GetJudgment(current).FirstOrDefault(c => !_characterDaQiaoLeOperations.IsZixiQinJudgmentCard(c.Id) && CoreNativeCardClassificationsRuntime.IsDelayedCard(_coreActualTurnsOperations.GetJudgmentEffectiveCardKind(c)) && c.Id != excludedCard);
         if (physical is not null && (_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == physical.Id)?.Sequence ?? 0) <= attachment.AfterMovement)
             return false;
         if (!current.IsAlive || current.JudgmentAreaAbolished || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1 || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Draw || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != current.Seat)
@@ -191,7 +187,7 @@ internal sealed partial class CoreGameEngineOriginalUseLightningRuntime
         if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);
     }
-    internal bool FinishOriginalUseLightningAttack(global::CardGame.Core.NativeOwners.CardAttackHandle attack)
+    internal bool FinishOriginalUseLightningAttack(NativeOwners.CardAttackHandle attack)
     {
         if (_resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(j => j.Id == attack.ResolutionId)is not { OriginalUseLightning: { } a } judgment)
             return false;
@@ -255,7 +251,7 @@ internal sealed partial class CoreGameEngineOriginalUseLightningRuntime
             }
     }
 
-    internal void PreserveNativeDelayedAttackCompletion(global::CardGame.Core.GameEngine.AttackCompletionReceipt completion)
+    internal void PreserveNativeDelayedAttackCompletion(GameEngine.AttackCompletionReceipt completion)
     {
         if (!completion.DelayedTurn)
             return;

@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRecipientCategorySlashTargetsRuntime
 {
     internal bool TryGetRecipientCategorySlashUse(int owner, ProgramSkillWindowContext c, out CardUseFrame use, out ProgramCardTriggerWindowFrame window)
     {
-        if (!_coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(owner, c, out use, out window) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || window.Continuation != ProgramCardContinuation.Slash)
+        if (!_coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(owner, c, out use, out window) || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || window.Continuation != ProgramCardContinuation.Slash)
             return false;
         var id = use.Id;
         // Native TargetsConfirmed is the immutable original designation. An earlier
@@ -19,7 +15,7 @@ internal sealed partial class CoreGameEngineRecipientCategorySlashTargetsRuntime
 
     internal bool CanBeRecipientCategorySlashTarget(CardUseFrame use, CharacterState target)
     {
-        if (!global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.Action is not { Type: CardActionType.Use } action || !target.IsAlive || use.TargetSeats.Contains(target.Seat) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(action.ActorSeat, target.Seat, use.CardKind, use.Id) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, action.EffectiveSuit ?? Suit.None, global::CardGame.Core.EngineOwners.CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(action.ActorSeat, target.Seat, action.EffectiveSuit) || _coreHandComparisonOperations.IsSelfTargetForbiddenAction(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], use.CardKind, [target.Seat]))
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.Action is not { Type: CardActionType.Use } action || !target.IsAlive || use.TargetSeats.Contains(target.Seat) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(action.ActorSeat, target.Seat, use.CardKind, use.Id) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, use.CardKind, action.EffectiveSuit ?? Suit.None, CoreGameEngineDyingWindowSkillPoliciesRuntime.ActualTargetPolicyColor(action)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(action.ActorSeat, target.Seat, action.EffectiveSuit) || _coreHandComparisonOperations.IsSelfTargetForbiddenAction(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], use.CardKind, [target.Seat]))
             return false;
         // No current primary FAQ establishes distance-free designation. This
         // generic contract therefore applies the native Slash target range.
@@ -46,7 +42,7 @@ internal sealed partial class CoreGameEngineRecipientCategorySlashTargetsRuntime
 
     internal bool IsRecipientCategorySlashTargetFact(CardUseFrame use, RecipientCategorySlashTargetsResolvedEvent fact, IReadOnlyList<int> before)
     {
-        if (use.Action is not { Type: CardActionType.Use } action || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || fact.CardUseFrameId != use.Id || fact.ActionId != action.ActionId || fact.Source.OwnerSeat != action.ActorSeat || !fact.BeforeTargets.SequenceEqual(before) || fact.AddedTargets.Count > 2 || fact.AddedTargets.Distinct().Count() != fact.AddedTargets.Count || fact.AddedTargets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || before.Contains(s)) || !fact.ResultTargets.SequenceEqual(before.Concat(fact.AddedTargets)) || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program is not { } p || p.GameplayHash != fact.GameplayHash || p.Triggers.SingleOrDefault(t => t.Id == fact.Source.BindingId)is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized } trigger || trigger.Effects is not [{ Op: SkillProgramEffectOp.SpendCategoryMarkForSlashTargets } effect])
+        if (use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || fact.CardUseFrameId != use.Id || fact.ActionId != action.ActionId || fact.Source.OwnerSeat != action.ActorSeat || !fact.BeforeTargets.SequenceEqual(before) || fact.AddedTargets.Count > 2 || fact.AddedTargets.Distinct().Count() != fact.AddedTargets.Count || fact.AddedTargets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || before.Contains(s)) || !fact.ResultTargets.SequenceEqual(before.Concat(fact.AddedTargets)) || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program is not { } p || p.GameplayHash != fact.GameplayHash || p.Triggers.SingleOrDefault(t => t.Id == fact.Source.BindingId)is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized } trigger || trigger.Effects is not [{ Op: SkillProgramEffectOp.SpendCategoryMarkForSlashTargets } effect])
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         return history.OfType<TargetsConfirmedEvent>().Where(e => e.ResolutionId == use.Id).ToArray()is [{ TargetSeats.Count: 1 }] && history.OfType<RecipientCategorySlashTargetsResolvedEvent>().Count(e => e.FrameId == fact.FrameId) == 1 && history.OfType<RecipientCategoryMarkStartedEvent>().Count(e => e.FrameId == fact.FrameId && e.Source == fact.Source && e.GameplayHash == fact.GameplayHash && e.SourceSkillId == effect.SourceBind && e.StateId == effect.StateId && e.Operation == effect.Op && e.TokenId == fact.TokenId && e.HolderSeat == action.ActorSeat) == 1 && history.OfType<RecipientCategoryMarkConsumedEvent>().Count(e => e.FrameId == fact.FrameId && e.TokenId == fact.TokenId && e.HolderSeat == action.ActorSeat && e.SourceSkillId == effect.SourceBind && e.StateId == effect.StateId && e.Kind == RecipientCategoryMarkKind.ExtraTargets) == 1 && history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == fact.FrameId && e.OwnerSeat == action.ActorSeat && e.SkillId == fact.Source.SkillId && e.BindingId == fact.Source.BindingId && e.SkillInstanceId == fact.Source.SkillInstanceId && e.Window == trigger.Window) == 1 && history.OfType<ProgramCardUseTargetAddedEvent>().Where(e => e.FrameId == fact.FrameId && e.CardUseFrameId == use.Id).Select(e => e.TargetSeat).SequenceEqual(fact.AddedTargets);

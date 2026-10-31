@@ -1,15 +1,11 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuJingOlRuntime
 {
     internal const string WuJingRewardReason = "skill-program.wu-jing.heji.red", WuJingClaimReason = "skill-program.wu-jing.liubing.claim";
-    internal CardConversionSource WuJingSource(ProgramSkillFrame f) => new(f.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    SkillProgramStepOutcome global::CardGame.Core.IWuJingHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWuJing(f, op);
+    internal CardConversionSource WuJingSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
+    SkillProgramStepOutcome IWuJingHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWuJing(f, op);
     internal CardUseFrame? WuJingCompletedUse(ProgramSkillWindowContext context)
     {
         if (context is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } card })
@@ -82,12 +78,12 @@ internal sealed partial class CharacterWuJingOlRuntime
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[owner];
         var victim = _coreMatchParticipantsPlayersAccess._players[target];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !actor.IsAlive || !victim.IsAlive || owner == target || _coreCardUseModulesOperations.IsCardUseForbidden(owner, kind, CardActionType.Use) || (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? _coreTurnHandCategoryRestrictionsOperations.IsHandCategoryMaterialRestricted(ids) || WuJingLiubingUsedSuit(owner, card, kind, ids, conversion is null ? [] : [conversion], _corePlayCardHistoryOperations.CaptureUsedCardSuit(owner, ids, card))is { } usedSuit && _coreProgramParticipantPhaseOperationsOperations.IsTurnSuitUseForbidden(owner, usedSuit) : _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner, ids)) || _coreCardUseModulesOperations.HasTurnCardTargetRestriction(owner, SkillProgramCardTargetRestriction.SelfOnly) || ids.Any(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(owner) && _coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, _coreAdvancedLifecycleOperations.GetAdvancedCard(id))))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !actor.IsAlive || !victim.IsAlive || owner == target || _coreCardUseModulesOperations.IsCardUseForbidden(owner, kind, CardActionType.Use) || (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? _coreTurnHandCategoryRestrictionsOperations.IsHandCategoryMaterialRestricted(ids) || WuJingLiubingUsedSuit(owner, card, kind, ids, conversion is null ? [] : [conversion], _corePlayCardHistoryOperations.CaptureUsedCardSuit(owner, ids, card))is { } usedSuit && _coreProgramParticipantPhaseOperationsOperations.IsTurnSuitUseForbidden(owner, usedSuit) : _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner, ids)) || _coreCardUseModulesOperations.HasTurnCardTargetRestriction(owner, SkillProgramCardTargetRestriction.SelfOnly) || ids.Any(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(owner) && _coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, _coreAdvancedLifecycleOperations.GetAdvancedCard(id))))
             return false;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, victim, card, conversion, kind, ignoreDistance: true, physicalCardIds: ids);
         var appearance = _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, card, conversion);
-        return kind == CardKind.Duel && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, target, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(victim, kind, appearance.Suit, global::CardGame.Core.EngineOwners.CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, appearance)));
+        return kind == CardKind.Duel && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, target, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(victim, kind, appearance.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, appearance)));
     }
 
     internal IReadOnlyList<PromptChoice> WuJingChoices(ProgramSkillFrame f)
@@ -107,7 +103,7 @@ internal sealed partial class CharacterWuJingOlRuntime
                 return;
             var parameters = P(kind);
             if (source is not null)
-                global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
+                CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
             if (zhangba)
                 parameters["equipment"] = CardKind.ZhangbaSerpentSpear.ToString();
             result.Add(new(new($"wu-jing.{(f.Id)}.{(kind)}.{(source?.SkillInstanceId)}.{(source?.BindingId)}.{(string.Join('-', ids))}.{(zhangba)}"), $"对{(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].Name)}使用【{(CardCatalog.Get(kind).DisplayName)}】", ids, [r.TargetSeat], parameters));
@@ -115,7 +111,7 @@ internal sealed partial class CharacterWuJingOlRuntime
 
         foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileOriginalUseCards(actor)).DistinctBy(c => c.Id))
         {
-            foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Append(CardKind.Duel))
+            foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Append(CardKind.Duel))
                 foreach (var conversion in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, false))
                     Add(card, kind, conversion, [card.Id]);
             if (card.Kind == CardKind.Duel && !_coreCardConversionsOperations.HasProgramCardIdentity(actor, card))
@@ -126,12 +122,12 @@ internal sealed partial class CharacterWuJingOlRuntime
 
         foreach (var card in _coreActionQueriesOperations.GetSlashUseCards(actor))
         {
-            var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(actor, card).FirstOrDefault(i => global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(i.Identity.OutputKind));
-            var baseKind = identity?.Identity.OutputKind ?? (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) ? card.Kind : CardKind.Slash);
+            var identity = _coreActionQueriesOperations.GetProgramCardIdentityMatches(actor, card).FirstOrDefault(i => CoreNativeCardClassificationsRuntime.IsSlashCard(i.Identity.OutputKind));
+            var baseKind = identity?.Identity.OutputKind ?? (CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) ? card.Kind : CardKind.Slash);
             foreach (var kind in _coreNativeTargetLegalityOperations.GetSlashUseKinds(actor, baseKind))
                 foreach (var variant in _coreCardConversionsOperations.CreateConversionChoiceVariants(actor, card, kind, false, $"wu-jing.{(f.Id)}.base.{(kind)}.{(card.Id)}", $"使用【{(CardCatalog.Get(kind).DisplayName)}】", [card.Id], [r.TargetSeat], P(kind)))
                 {
-                    global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(variant.Parameters, out var conversion);
+                    CoreGameEngineCardConversionsRuntime.TryReadConversionSource(variant.Parameters, out var conversion);
                     if (WuJingCanUse(f.OwnerSeat, r.TargetSeat, card, kind, conversion, [card.Id]))
                         result.Add(variant);
                 }
@@ -139,7 +135,7 @@ internal sealed partial class CharacterWuJingOlRuntime
 
         foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor))
             Add(pair[0], CardKind.Slash, null, pair.Select(c => c.Id).ToArray(), true);
-        foreach (var kind in global::CardGame.Core.EngineOwners.CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Append(CardKind.Duel))
+        foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Append(CardKind.Duel))
             foreach (var selection in _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(actor, kind, false).Where(s => _corePlayCardHistoryOperations.ViewAsRule(s.Source)is { RoundDistinctBasicUse: null, LeiluanBasicUse: null } || s.OutputKind == kind))
                 Add(selection.Cards[0], kind, selection.Source, selection.Cards.Select(c => c.Id).ToArray());
         result.AddRange(_characterMaXiuMaTieOlOperations.KenshangProgramSlashChoices(f, f.OwnerSeat, [r.TargetSeat]));
@@ -150,7 +146,7 @@ internal sealed partial class CharacterWuJingOlRuntime
                 ["program-action"] = "wu-jing",
                 ["kind"] = "round-once"
             };
-            global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, source);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(p, source);
             result.Add(new(new($"wu-jing.{(f.Id)}.round-once.{(source.SkillInstanceId)}.{(source.BindingId)}"), "支付独立回合额度，视为对原目标使用杀", [], [r.TargetSeat], p));
         }
 
@@ -186,7 +182,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     [ProgramAnswer("wu-jing")]
     internal void AnswerWuJing(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuJing: { Stage: WuJingStage.UseChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuJingChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuJing: { Stage: WuJingStage.UseChoice } r } f || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], WuJingChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Heji lost its exact private original-actor card choices.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
@@ -198,7 +194,7 @@ internal sealed partial class CharacterWuJingOlRuntime
 
         if (choice.Parameters["kind"] == "round-once")
         {
-            BeginWuJingRoundOnce(f, global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice));
+            BeginWuJingRoundOnce(f, CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice));
             return;
         }
 
@@ -209,7 +205,7 @@ internal sealed partial class CharacterWuJingOlRuntime
         }
 
         var kind = Enum.Parse<CardKind>(choice.Parameters["kind"]);
-        global::CardGame.Core.EngineOwners.CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source);
+        CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source);
         var zhangba = choice.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString();
         var cards = choice.Cards.Count == 1 ? new[]
         {
@@ -225,7 +221,7 @@ internal sealed partial class CharacterWuJingOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuJing = r with { Stage = WuJingStage.IssuingUse, Selection = selection, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._selectedUseConversion = source;
         _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._hasSelectedUseConversionChoice = true;
-        if (global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[r.TargetSeat], cards[0], kind, f.OwnerSeat, physicalCards: cards, countsTowardSlashLimit: false, usesZhuqueFan: selection.UsesFan, conversionSource: source, programSkillCardUseFrameId: f.Id);
         else
         {
@@ -287,5 +283,5 @@ internal sealed partial class CharacterWuJingOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27130)]
     internal bool ContinuePaidWuJing(ProgramSkillFrame f) => f.WuJing is { } r && (r.Stage != WuJingStage.UseChoice || WuJingHasPaidAdapter(f)) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.UseHejiAtCompletedSingleTarget, SkillProgramEffectOp.ClaimLiubingUndamagingSlash, SkillProgramEffectOp.RewardHejiUnconvertedUse)]
-    internal PromptChoice AiWuJing(PendingDecision p, ProgramSkillFrame f) => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.WuJing!.TargetSeat]) ? p.Choices.Single(c => c.Parameters.GetValueOrDefault("kind") == "decline") : p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("kind") != "decline") ?? p.Choices.First();
+    internal PromptChoice AiWuJing(PendingDecision p, ProgramSkillFrame f) => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.WuJing!.TargetSeat]) ? p.Choices.Single(c => c.Parameters.GetValueOrDefault("kind") == "decline") : p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("kind") != "decline") ?? p.Choices.First();
 }

@@ -1,17 +1,14 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheGuangaoRuntime
 {
-    SkillProgramStepOutcome global::CardGame.Core.IShanheGuangaoHost.Resolve(ProgramSkillFrame frame) => BeginShanheGuangao(frame);
+    SkillProgramStepOutcome IShanheGuangaoHost.Resolve(ProgramSkillFrame frame) => BeginShanheGuangao(frame);
     internal CardUseFrame RequireShanheGuangaoUse(ProgramSkillFrame frame)
     {
-        if (frame.SkillId != "shanhe:companion-guangao" || frame.InstructionIndex != 1 || frame.WindowContext is not { } context || !_coreAdjacentRedTargetsOperations.TryGetAdjacentRedTargetUse(frame.OwnerSeat, context, out var use, out var window) || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || _coreProgramLifecycleOperations.GetProgramTrigger(frame).Effects is not [{ Op: SkillProgramEffectOp.ResolveShanheGuangao }] || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, global::CardGame.Core.EngineOwners.CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])))
+        if (frame.SkillId != "shanhe:companion-guangao" || frame.InstructionIndex != 1 || frame.WindowContext is not { } context || !_coreAdjacentRedTargetsOperations.TryGetAdjacentRedTargetUse(frame.OwnerSeat, context, out var use, out var window) || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || _coreProgramLifecycleOperations.GetProgramTrigger(frame).Effects is not [{ Op: SkillProgramEffectOp.ResolveShanheGuangao }] || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])))
             throw new InvalidOperationException("Guangao lost its exact native Slash, owner or current observer.");
         return use;
     }
@@ -24,7 +21,7 @@ internal sealed partial class CoreGameEngineShanheGuangaoRuntime
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 5405)]
-    internal bool CanOfferShanheGuangao(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => !trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ResolveShanheGuangao) || candidate.SkillId == "shanhe:companion-guangao" && _coreAdjacentRedTargetsOperations.TryGetAdjacentRedTargetUse(candidate.OwnerSeat, context, out var use, out _) && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && ShanheGuangaoCandidates(candidate.OwnerSeat, use).Length > 0;
+    internal bool CanOfferShanheGuangao(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => !trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ResolveShanheGuangao) || candidate.SkillId == "shanhe:companion-guangao" && _coreAdjacentRedTargetsOperations.TryGetAdjacentRedTargetUse(candidate.OwnerSeat, context, out var use, out _) && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && ShanheGuangaoCandidates(candidate.OwnerSeat, use).Length > 0;
     internal SkillProgramStepOutcome BeginShanheGuangao(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -87,7 +84,7 @@ internal sealed partial class CoreGameEngineShanheGuangaoRuntime
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Guangao lost its owning frame.");
         var draft = frame.ShanheGuangao!;
         var choice = draft.Choices.SingleOrDefault(candidate => candidate.Id == selected.Id);
-        if (choice is null || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]))
+        if (choice is null || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [selected]))
             throw new InvalidOperationException("Guangao changed its issued choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var use = RequireShanheGuangaoUse(frame);
@@ -124,7 +121,7 @@ internal sealed partial class CoreGameEngineShanheGuangaoRuntime
 
             frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheGuangao = draft with { Stage = "draw", AddedTarget = target, HandCountBeforeDraw = count, Choices = [] } });
-            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(frame, frame.OwnerSeat, 1, global::CardGame.Core.EngineOwners.CoreGameEngineShanheGuangaoDefinitions.ShanheGuangaoDrawReason);
+            _coreProgramNativeDrawOperations.BeginOperationProgramDraw(frame, frame.OwnerSeat, 1, CoreGameEngineShanheGuangaoDefinitions.ShanheGuangaoDrawReason);
             return;
         }
 
@@ -173,7 +170,7 @@ internal sealed partial class CoreGameEngineShanheGuangaoRuntime
     {
         var use = RequireShanheGuangaoUse(frame);
         if (frame.ShanheGuangao?.Stage == "target")
-            return decision.Choices.Where(choice => choice.Targets.Count > 0).FirstOrDefault(choice => use.SourceSeat == frame.OwnerSeat ? !global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[choice.Targets[0]]) : (_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Count % 2 == 0) == global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat], _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat])) ?? decision.Choices.Single(choice => choice.Targets.Count == 0);
-        return decision.Choices.OrderByDescending(choice => choice.Targets.Sum(target => global::CardGame.Core.EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target]) ? 2 : -3)).ThenBy(choice => choice.Targets.Count).First();
+            return decision.Choices.Where(choice => choice.Targets.Count > 0).FirstOrDefault(choice => use.SourceSeat == frame.OwnerSeat ? !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[choice.Targets[0]]) : (_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).Count % 2 == 0) == CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat], _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat])) ?? decision.Choices.Single(choice => choice.Targets.Count == 0);
+        return decision.Choices.OrderByDescending(choice => choice.Targets.Sum(target => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target]) ? 2 : -3)).ThenBy(choice => choice.Targets.Count).First();
     }
 }

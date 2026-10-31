@@ -2,14 +2,14 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineSameNameHandDiscardOrDamageObserversEntries
 {
-    internal bool IsSameNameHandDiscardOrDamageChoice(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.PendingDecision decision) => _resolve().IsSameNameHandDiscardOrDamageChoice(f, decision);
+    internal bool IsSameNameHandDiscardOrDamageChoice(ProgramSkillFrame f, PendingDecision decision) => _resolve().IsSameNameHandDiscardOrDamageChoice(f, decision);
     internal bool IsSameNameHandDying() => _resolve().IsSameNameHandDying();
     internal bool IsSameNameHandObserverEdge(int child) => _resolve().IsSameNameHandObserverEdge(child);
-    internal global::CardGame.Core.ProgramCardTriggerWindowFrame? ResponseCompletionObserverRoot() => _resolve().ResponseCompletionObserverRoot();
-    internal bool SameNameHandFirstChild(global::CardGame.Core.ProgramSkillFrame f, global::CardGame.Core.ResolutionFrame child) => _resolve().SameNameHandFirstChild(f, child);
-    internal global::CardGame.Core.ProgramSkillFrame? SameNameHandObserverRoot() => _resolve().SameNameHandObserverRoot();
+    internal ProgramCardTriggerWindowFrame? ResponseCompletionObserverRoot() => _resolve().ResponseCompletionObserverRoot();
+    internal bool SameNameHandFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().SameNameHandFirstChild(f, child);
+    internal ProgramSkillFrame? SameNameHandObserverRoot() => _resolve().SameNameHandObserverRoot();
     internal bool SameNameHandObserverSuffix(int index) => _resolve().SameNameHandObserverSuffix(index);
-    internal bool SameNameHandStructuralEdge(global::CardGame.Core.ResolutionFrame parent, global::CardGame.Core.ResolutionFrame child) => _resolve().SameNameHandStructuralEdge(parent, child);
+    internal bool SameNameHandStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => _resolve().SameNameHandStructuralEdge(parent, child);
     internal bool TryAdvanceSameNameHandSubtree() => _resolve().TryAdvanceSameNameHandSubtree();
-    internal bool ValidSameNameHandReceipt(global::CardGame.Core.ProgramSkillFrame f) => _resolve().ValidSameNameHandReceipt(f);
+    internal bool ValidSameNameHandReceipt(ProgramSkillFrame f) => _resolve().ValidSameNameHandReceipt(f);
 }

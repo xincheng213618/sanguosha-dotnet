@@ -1,17 +1,13 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 
-internal interface ICoreNativeTargetLegalityCoreProgramTargetRulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeTargetLegalityCoreProgramTargetRulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramTargetRules TargetRules { get; }
+    ProgramTargetRules TargetRules { get; }
 }
 
-internal interface ICoreNativeTargetLegalityCoreProgramDistanceRulesOperations : global::CardGame.Core.IProgramRuntimeOperations
+internal interface ICoreNativeTargetLegalityCoreProgramDistanceRulesOperations : IProgramRuntimeOperations
 {
-    global::CardGame.Core.ProgramDistanceRules DistanceRules { get; }
+    ProgramDistanceRules DistanceRules { get; }
 }

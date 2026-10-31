@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineTriggeredCardConversionsRuntime
@@ -14,7 +10,7 @@ internal sealed partial class CoreGameEngineTriggeredCardConversionsRuntime
         if (!plan.Instructions.Any(effect => effect.Op == SkillProgramEffectOp.UseBoundCardsAsSlash && effect.SourceBind == bind))
             return true;
         var selection = plan.Instructions[0];
-        return ownerSeat == frame.OwnerSeat && frame.TriggerId is not null && frame.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding, TargetSeat: { } target } && TriggeredSlashSelectionAccepts(_coreMatchParticipantsPlayersAccess._players[ownerSeat], selection, card, location) && CanUseTriggeredSlashMaterial(ownerSeat, target, card, location, new(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), ownerSeat, frame.SkillInstanceId));
+        return ownerSeat == frame.OwnerSeat && frame.TriggerId is not null && frame.WindowContext is { Window: SkillProgramTriggerWindow.TurnEnding, TargetSeat: { } target } && TriggeredSlashSelectionAccepts(_coreMatchParticipantsPlayersAccess._players[ownerSeat], selection, card, location) && CanUseTriggeredSlashMaterial(ownerSeat, target, card, location, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), ownerSeat, frame.SkillInstanceId));
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.AfterInitialPayments, 50, SkillProgramEffectOp.UseBoundCardsAsSlash)]
@@ -47,10 +43,10 @@ internal sealed partial class CoreGameEngineTriggeredCardConversionsRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        var source = new CardConversionSource(frame.SkillId, global::CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
+        var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
         _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target], card, CardKind.Slash, frame.OwnerSeat, physicalCards: [card], countsTowardSlashLimit: false, conversionSource: source, programSkillCardUseFrameId: frame.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    SkillProgramStepOutcome global::CardGame.Core.ITriggeredCardConversionHost.UseBoundCardsAsSlash(ProgramSkillFrame frame, SkillProgramEffect effect) => UseTriggeredBoundCardsAsSlash(frame, effect);
+    SkillProgramStepOutcome ITriggeredCardConversionHost.UseBoundCardsAsSlash(ProgramSkillFrame frame, SkillProgramEffect effect) => UseTriggeredBoundCardsAsSlash(frame, effect);
 }

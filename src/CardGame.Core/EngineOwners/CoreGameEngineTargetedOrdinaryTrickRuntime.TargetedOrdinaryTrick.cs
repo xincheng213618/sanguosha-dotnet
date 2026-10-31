@@ -1,15 +1,12 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
+
 using System.Globalization;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineTargetedOrdinaryTrickRuntime
 {
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedAfterCategory, 140)]
-    internal bool TargetedOrdinaryTrickFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => HasTargetedOrdinaryTrickAdjustment && global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind);
+    internal bool TargetedOrdinaryTrickFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => HasTargetedOrdinaryTrickAdjustment && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(query.Kind);
     [ProgramTargetWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, 140)]
     internal bool TargetedOrdinaryTrickNormalizeImplicitDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => HasTargetedOrdinaryTrickAdjustment;
     internal bool HasTargetedOrdinaryTrickAdjustment => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AdjustTargetedOrdinaryTrick);
@@ -18,7 +15,7 @@ internal sealed partial class CoreGameEngineTargetedOrdinaryTrickRuntime
     {
         use = null !;
         window = null !;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { Action: { } action } current || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(current.CardKind))
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { Action: { } action } current || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(current.CardKind))
             return false;
         // Earlier role changes preserve the same actual action but can change its
         // user. Legality follows that current user while the issued source stays frozen.
@@ -132,7 +129,7 @@ internal sealed partial class CoreGameEngineTargetedOrdinaryTrickRuntime
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("No owning targeted trick frame.");
         var use = RequireTargetedOrdinaryTrickParent(f, out _);
         var r = f.TargetedOrdinaryTrick ?? throw new InvalidOperationException("No issued target receipt.");
-        if (!global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], r.Choices.Where(c => c.Id == selected.Id).ToArray()) || !global::CardGame.Core.EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], TargetedTrickChoices(f.Id, use, TargetedTrickRemovesTargets(f)).Where(c => c.Id == selected.Id).ToArray()))
+        if (!CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], r.Choices.Where(c => c.Id == selected.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], TargetedTrickChoices(f.Id, use, TargetedTrickRemovesTargets(f)).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("A targeted trick answer lost its current legal participant or last-effective-target protection.");
         var branch = selected.Parameters["branch"];
         var before = use.TargetSeats;
@@ -177,7 +174,7 @@ internal sealed partial class CoreGameEngineTargetedOrdinaryTrickRuntime
         if (removesTargets && fact.IneffectiveTarget is not null)
             return false;
         IEnumerable<int> result = fact.RemovedTarget is { } removedPrimary ? RemoveTargetedTrickTarget(use.CardKind, before, removedPrimary) : before.Concat(fact.AddedTargets);
-        if (fact.CardUseFrameId != use.Id || fact.ActionId != use.Action?.ActionId || !global::CardGame.Core.EngineOwners.CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || !fact.BeforeTargets.SequenceEqual(before) || fact.AddedTargets.Count is not 0 && fact.AddedTargets.Count != pair || fact.AddedTargets.Count > 0 && fact.IneffectiveTarget is not null || !fact.ResultTargets.SequenceEqual(result) || !_coreCompletedCategoryUseProofOperations.ActualHandGainMutationBinding(fact.ProgramFrameId, fact.Source.SkillId, fact.Source.OwnerSeat, SkillProgramTriggerWindow.CardUseTargetsFinalized, SkillProgramEffectOp.AdjustTargetedOrdinaryTrick) || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program?.GameplayHash != fact.GameplayHash)
+        if (fact.CardUseFrameId != use.Id || fact.ActionId != use.Action?.ActionId || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(use.CardKind) || !fact.BeforeTargets.SequenceEqual(before) || fact.AddedTargets.Count is not 0 && fact.AddedTargets.Count != pair || fact.AddedTargets.Count > 0 && fact.IneffectiveTarget is not null || !fact.ResultTargets.SequenceEqual(result) || !_coreCompletedCategoryUseProofOperations.ActualHandGainMutationBinding(fact.ProgramFrameId, fact.Source.SkillId, fact.Source.OwnerSeat, SkillProgramTriggerWindow.CardUseTargetsFinalized, SkillProgramEffectOp.AdjustTargetedOrdinaryTrick) || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program?.GameplayHash != fact.GameplayHash)
             return false;
         var original = before.Where((_, index) => index % pair == 0).ToArray();
         if (!original.Contains(fact.Source.OwnerSeat) || fact.AddedTargets.Count > 0 && original.Contains(fact.AddedTargets[0]) || fact.IneffectiveTarget is { } target && (!original.Contains(target) || use.IneffectiveTargetSeats?.Contains(target) != true))

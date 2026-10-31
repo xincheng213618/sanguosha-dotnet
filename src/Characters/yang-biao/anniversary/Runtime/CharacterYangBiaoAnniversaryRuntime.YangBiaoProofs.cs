@@ -1,8 +1,4 @@
 #nullable enable
-using global::System;
-using global::System.Collections.Generic;
-using global::System.Linq;
-using global::CardGame.Core;
 
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYangBiaoAnniversaryRuntime
@@ -12,8 +8,8 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
         if (f.ActivationId != f.TriggerId || f.WindowContext is not { } c || c.OwnerSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.OwnerSeat == f.OwnerSeat && e.SkillInstanceId == f.SkillInstanceId && e.Window == c.Window) != 1)
             return false;
         if (f.SkillId == AnniversaryYangBiaoComposition.Juee)
-            return f.TriggerId == "ending-random-uses" && c.Window == SkillProgramTriggerWindow.TurnEnding && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is TurnEndingBoundaryFrame w && w.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && w.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && c.SourceSeat == w.OwnerSeat && c.TargetSeat == w.OwnerSeat && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex] is { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } && global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && candidate.OccurrenceIndex == c.OccurrenceIndex;
-        if (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame parent || parent.Window != c.Window || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !global::CardGame.Core.EngineOwners.CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || parent.Candidates[parent.CandidateIndex].OccurrenceIndex != c.OccurrenceIndex)
+            return f.TriggerId == "ending-random-uses" && c.Window == SkillProgramTriggerWindow.TurnEnding && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is TurnEndingBoundaryFrame w && w.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && w.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && c.SourceSeat == w.OwnerSeat && c.TargetSeat == w.OwnerSeat && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex] is { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && candidate.OccurrenceIndex == c.OccurrenceIndex;
+        if (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame parent || parent.Window != c.Window || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || parent.Candidates[parent.CandidateIndex].OccurrenceIndex != c.OccurrenceIndex)
             return false;
         if (f.SkillId == AnniversaryYangBiaoComposition.Zhaohan)
             return (f.TriggerId, c.Window)is ("extra-normal-draw", SkillProgramTriggerWindow.DrawPhaseStarting) or ("settle-extra-draw", SkillProgramTriggerWindow.AfterNormalDraw) or ("settle-phase-draw", SkillProgramTriggerWindow.DrawPhaseEnded) && parent.OwnerSeat == f.OwnerSeat && c.SourceSeat == f.OwnerSeat && c.TargetSeat == f.OwnerSeat && _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat == f.OwnerSeat;
@@ -162,7 +158,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
             if (!YangBiaoFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]))
                 return false;
             for (var i = index + 2; i < _resolutionStackOperations._resolutionStack.Count; i++)
-                if (!global::CardGame.Core.EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) && !_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]))
+                if (!CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) && !_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]))
                     return false;
             return true;
         }
