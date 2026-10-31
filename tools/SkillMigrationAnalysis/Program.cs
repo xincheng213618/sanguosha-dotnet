@@ -10,7 +10,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 var root = Path.GetFullPath(Option("--root") ?? FindRoot());
-var output = Path.GetFullPath(Option("--out") ?? Path.Combine(root, ".artifacts", "benchmarks", "skill-patterns"));
+var historyMode = args.Contains("--history");
+var output = Path.GetFullPath(Option("--out") ?? Path.Combine(root, ".artifacts", "benchmarks", historyMode ? "step-receipts" : "skill-patterns"));
 Directory.CreateDirectory(output);
 var timer = Stopwatch.StartNew();
 var json = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
@@ -23,6 +24,11 @@ var paths = Directory.EnumerateFiles(Path.Combine(root, "src", "CardGame.Core"),
     .Where(p => !IsBuildPath(p)).Concat(characterPaths).Order().ToArray();
 Console.WriteLine($"Parsing {paths.Length} source-context files...");
 var trees = paths.AsParallel().AsOrdered().Select(p => CSharpSyntaxTree.ParseText(File.ReadAllText(p), parseOptions, p, Encoding.UTF8)).ToArray();
+if (historyMode)
+{
+    HistoryQueryAnalysis.Run(root, output, trees, CreateCompilation(trees, parseOptions), json);
+    return;
+}
 var methods = trees.Where(t => t.FilePath.StartsWith(characterRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) &&
         !new[] { "Contracts", "DependencyAdapters", "StateContracts", "NativeOwners" }.Any(s => t.FilePath.Contains(s, StringComparison.OrdinalIgnoreCase)))
     .SelectMany(tree => tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>()
@@ -36,12 +42,7 @@ Write("methods-syntax.json", methods.Select(m => new
 Console.WriteLine($"Syntax report ready: {methods.Length} methods in {timer.Elapsed.TotalSeconds:F1}s.");
 if (args.Contains("--syntax-only")) return;
 
-var refRoot = Directory.GetDirectories(@"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref", "8.*")
-    .OrderByDescending(p => Version.Parse(Path.GetFileName(p))).First();
-var compilation = CSharpCompilation.Create("CardGame.Core", trees.Append(CSharpSyntaxTree.ParseText(
-    "global using System;global using System.Collections.Generic;global using System.IO;global using System.Linq;global using System.Net.Http;global using System.Threading;global using System.Threading.Tasks;", parseOptions)),
-    Directory.GetFiles(Path.Combine(refRoot, "ref", "net8.0"), "*.dll").Select(p => MetadataReference.CreateFromFile(p)),
-    new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
+var compilation = CreateCompilation(trees, parseOptions);
 var models = new ConcurrentDictionary<SyntaxTree, SemanticModel>();
 SemanticModel Model(SyntaxTree t) => models.GetOrAdd(t, t => compilation.GetSemanticModel(t));
 var bySymbol = new Dictionary<ISymbol, MethodInfo>(SymbolEqualityComparer.Default);
@@ -176,6 +177,15 @@ static string FindRoot()
     throw new InvalidOperationException("Run inside the Card checkout or pass --root <checkout>.");
 }
 static bool IsBuildPath(string p) => p.Split(Path.DirectorySeparatorChar).Any(x => x is "bin" or "obj" or ".artifacts");
+static CSharpCompilation CreateCompilation(SyntaxTree[] trees, CSharpParseOptions options)
+{
+    var refs = Directory.GetDirectories(@"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref", "8.*")
+        .OrderByDescending(p => Version.Parse(Path.GetFileName(p))).First();
+    return CSharpCompilation.Create("CardGame.Core", trees.Append(CSharpSyntaxTree.ParseText(
+        "global using System;global using System.Collections.Generic;global using System.IO;global using System.Linq;global using System.Net.Http;global using System.Threading;global using System.Threading.Tasks;", options)),
+        Directory.GetFiles(Path.Combine(refs, "ref", "net8.0"), "*.dll").Select(p => MetadataReference.CreateFromFile(p)),
+        new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
+}
 static string Hash(string text) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text)))[..20].ToLowerInvariant();
 static string TypeShape(ITypeSymbol type) => type.SpecialType != SpecialType.None ? type.SpecialType.ToString() : type.TypeKind switch
 { TypeKind.Enum => "enum", TypeKind.Array => "array", TypeKind.Delegate => "delegate", TypeKind.Interface => "interface:" + type.Name, _ => type.IsValueType ? "value:" + type.Name : "reference:" + type.Name };

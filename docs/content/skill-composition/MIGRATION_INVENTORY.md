@@ -1,84 +1,38 @@
-# 人物 Runtime 向 JSON 迁移
+# 人物 Runtime 向共享动作与 JSON 迁移
 
-衡量真实退役的人物专用业务 C#：删除文件、删除行数、新增共享 C# 和 `src` C# 净变化。已有 JSON 技能的定义校验清理、未使用类清理、将人物分支搬到 Core，均不增加迁移技能数。共享文件只计一次；同一目录中其他技能已经是 JSON 时，不重复计算。
+每批按真实退役方法和 `src` C# 净变化计量，20 处作为收益参考。资格留在原阶段；规则差异登记，不合并成伪共享动作；不剪测试。
 
-## 基线与统计边界
+## 历史查询分类（本批）
 
-基线为 `236f9eabc`，即主构造与安全转发清理完成之后。按 Git 中的源文件统计，不含 `bin/obj`。
+基线 `7eb746654`；现有 Roslyn 工具 `--history` 模式解析人物 Runtime，排除 Contracts、DependencyAdapters、StateContracts、NativeOwners。共 4,856 个实际 accessor 调用（typed 4,294 / 聚合 562）、3,014 方法 / 34,743 行；原 3,604 是全 Runtime 的匹配物理行数。以下为保守自动分类，不把 Paid/Proof 方法名当证据。
 
-| 指标 | 数量 |
-| --- | ---: |
-| `src` C# | 563,971 行 |
-| 人物 Runtime | 515 个版本目录 / 4,309 文件 / 243,503 行 |
-| 规则中的唯一技能 ID | 1,876 |
-| 所在版本含 Runtime 的技能 ID | 1,205 |
-| 所在版本均无 Runtime 的技能 ID | 671 |
-
-最后两项只描述目录占用，不能当成真实业务迁移率。例如伏枥已是 JSON，廖化目录仍因当先保留 Runtime；移动龙魂剩下的 C# 是定义约束。暂未逐一审查的技能保持未分类，不凭文件名归入“难题”。
-
-## 执行办法
-
-- 先复用现有操作、条件和数量表达式，优先能删除完整执行链的候选。
-- 本轮按方法级实际退役计量；20 处只作收益参考。按完整能力簇交付，不为凑数合并语义不同的规则，也不因未满数量长期停在扫描。
-- 每批 `src` C# 净变化必须为负；单独检查每个能力簇，不能用其他批的删除掩盖新增膨胀。
-- 资格条件在原资格阶段运行，不能挪到效果阶段，避免多出询问、使用次数或支付。
-- 难题登记一行缺口并继续。复用既有检查，只为新增共享行为补检查，不剪测试，不新增每人物定义快照。
-
-## 已核实的候选
-
-这是经过执行路径核对的短清单，不是对 1,876 个技能的完整人工分类。行数是基线中的专用文件；目录总量不充当可删除量。
-
-| 优先级 | 技能 | 最小缺口 / 复用方式 | 可退役专用 C# | 状态 |
-| --- | --- | --- | ---: | --- |
-| 1 | `mobile:tuntian`、`boundary:tuntian-mobile`、`anniversary:qinguo` | 共用“本移动批有牌离开拥有者指定区域集合”资格；屯田为手牌+装备，勤国对装备取否 | 6 文件 / 64 行 | 已迁移；3 技能 ID、2 种规则 |
-| 2 | `mobile:bingyi` | 现有同色绑定条件同时控制选目标与摸牌；解析及空目标摸牌协议接受相同条件配对 | 3 文件 / 66 行；另删死副本 1 文件 / 15 行 | 已迁移，专属枚举和工厂已删 |
-| D | `happy:wushen` | 旧 hook 允许死亡用牌者尚未结算的杀加伤，共享修正要求来源存活 | 同文件中的加伤 hook；完整文件删除为 0 | 存在行为差异，跳过 |
-| B | `boundary:dangxian-mobile` | 公共弃牌堆按牌类选择、绑定后获得，等待移牌子结算 | 4 文件 / 165 行 | 仅确认 1 个完整消费者，暂缓 |
-| B | `ol:fenglve`、`boundary:lieren-mobile` | 拼点实体输出之外，还缺条件移牌、等待边界及已被领取牌的跳过 | 6 文件 / 168 行 | 单补绑定不能完整迁移，暂缓 |
-| B | `mobile:jingce` | 读取当前真实出牌阶段的使用牌数 | 4 文件 / 56 行 | 仅确认 1 个消费者，暂缓 |
-
-## 缺失能力按实际解锁量排序
-
-| 能力 | 已确认可完整迁移的技能数 | 已确认专用 C# | 决策 |
+| 分类 | 查询数 | 类内去重的方法行数 | 3 个例子（基线 src/Characters） |
 | --- | ---: | ---: | --- |
-| 移动批区域集合损失资格 | 3 | 64 行 | 先做；新增生产代码预算低于删除量 |
-| 拼点实体输出绑定 | 0（2 个相邻技能尚有其他缺口） | 168 行潜在范围 | 不把输出绑定成本当成完整迁移报价 |
-| 公共弃牌堆筛选并选择 | 1 | 165 行 | 其他相邻技能还有不同机制，不能算作一并解锁 |
-| 有条件的目标集合选择 | 1 | 66 行业务链，另 15 行死副本 | 复用执行器条件；让空目标摸牌识别相同条件配对 |
-| 真实出牌阶段使用数读取 | 1 | 56 行 | 等更多独立消费者 |
+| a 本帧自身步骤/支付证明 | 1,344（typed 1,249 / 聚合 95） | 12,110 | `_shared/Runtime/CharacterSharedGameEngineOlMoRumoObserversRuntime.OlMoRumoObservers.cs:18`；`a-hui-nan/ol/Runtime/CharacterAHuiNanOlRuntime.AHuiNan.cs:74`；`a-hui-nan/ol/Runtime/CharacterAHuiNanOlRuntime.AHuiNanInvariants.cs:11` |
+| b 规则需要的时域/跨帧历史 | 702（typed 627 / 聚合 75） | 5,405 | `_shared/Runtime/CharacterSharedGameEngineOlMoRumoRuntime.OlMoRumo.cs:45`；`bei-mi-hu/ol/Runtime/CharacterBeiMiHuOlRuntime.BeiMiHuPrograms.cs:12`；`bei-mi-hu/ol/Runtime/CharacterBeiMiHuOlRuntime.BeiMiHuPrograms.cs:24` |
+| c 其他及待判 | 2,810（typed 2,418 / 聚合 392） | 23,203 | `_shared/Runtime/CharacterSharedGameEngineOlMoRumoObserversRuntime.OlMoRumoObservers.cs:11`；`_shared/Runtime/CharacterSharedGameEngineOlMoRumoProofsRuntime.OlMoRumoProofs.cs:11`；`a-hui-nan/ol/Runtime/CharacterAHuiNanOlRuntime.AHuiNan.cs:18` |
 
-## 暂缓项目
+各类方法行数会交叠，不能相加作删行预算；(a) 仅明确识别 27.68%，涉及 826 方法，只有 (a) 查询的方法为 636 个 / 8,165 行；并未证实其占多数。(c) 为明确其他 9、待判 2,801，含未追清的别名、原生父子身份和混合消费，不将待判项伪装成规则历史。用户据此明确继续两个已核实消费者；本帧回执查询也不一定重复。
 
-| 项目 | 一行原因 |
-| --- | --- |
-| 鲍信穆讨 / 义谋 | 随机取牌、分支选择、逐人结算未被现有顺序动作完整覆盖。 |
-| `ol:leiluan` | 需要当前实际回合移牌历史过滤，单补弃牌选择不能退役。 |
-| 势邓艾凿险奖励段 | 仍有奖励循环与消耗状态，单补公共选择不能退役。 |
-| `mou-mobile:qicai` | 包含装备区装入、替换及原生装备结算。 |
-| `mou-mobile:huoshou` | 随机获得南蛮之外，仍有蓄力和伤害归属。 |
-| 陆绩 mobile / 吕蒙 boundary-mobile | 分别缺其他技能拥有关系、固定初始人数的资格读取。 |
-| 何太后 mobile / 周泰 boundary-mobile | 分别依赖冻结的实际回合击杀数、回合结束目标手牌的实时读取，现有相似读取时点不同。 |
-| 界顾雍 / 移动诸葛瑾空目标摸牌 | 分别使用具名牌数选择、限定他人选择及原生摸牌游标，当前通用选择未覆盖。 |
+## 步骤回执与原契约
 
-补查排除纯定义校验后的 20 个最小 Runtime 版本，未再确认可直接退役的 A 类；不能把相似字段或效果数量当成资格语义相同。
+签发：InstructionIndex 在执行前推进，不能充当付款。实际应用：复用原帧 `ProgramSelectedCardPayment.MovementCommitted`，在原生物理移动回调写实际牌、来源、终点、批次和序号；到 Processing、OutsideGame 或保留在原处不等于送达。子结算返回：复用 ActiveChildFrameId / LastCompletedChildFrameId 和 `ProgramSelectedCardPaymentResult`，不得重付；不与 PendingMovementContinuation 并存。
+许可与事实分开：activation 的 `continueAfterSkillLossAfter` 显式引用送达步骤的 resultBind，只有本次实际送达后才能履约本 activation 的剩余步骤；默认不授权失技续行，也不授权 owner 死亡续行。子窗口再次移走牌，不撤销已提交的送达。安恤在全部赠牌子窗口结束后比较双方当前手牌并发布选择；回答时不重新比较。
+必须保留原帧/owner/技能实例、玩法哈希、动态选牌与支付合法性、原生 Give 或装备置入语义、typed child 返回、私密集合冻结与冷恢复。可删除的是人物再发专属付款事件、扫历史并逐项对照同一移牌记录、游标和身份的重复证明；有外部规则消费者的事件不能删。
+其他内建步骤复用已有承载：选择用 ChoiceBindings / CardSetBindings；摸牌用 NativeDraw、RecipientApplied 与 DrawCompleted；伤害用 AttackAttempt / AttackReturn；给予保留 native give / gain settlement。本批只接通安恤所需的选牌→移牌→原帧返回，不另铺通用账本。
 
-另批清理了 967 个仅被各自未用工厂引用的旧 NativeOwners 类（秉壹副本已在前批删除）：类文件 10,029 行、完整工厂方法 999 行，净减 11,028 行。其中人物文件 526 个 / 5,887 行。这是死代码删除，不计新技能 JSON 覆盖，也不混入业务迁移收益。
+## 本批范围与保留项
 
-## 批次结果
+- `mobile:anxu` 与 `boundary:zhijian-mobile`：实际送达后失技履约，owner 死亡无额外许可；各自 Give / 装备置入身份不变。人物 Delivered / Paid / Compared 事件没有外部消费者，随重复证明和续接一起退役。
+- `boundary:anxu-mobile`：原来源移出即可保留，Delivered 另决定奖励；其默认 movement return 还要求 donor 存活并检查 source。与本批不同，保持原行为。
+- `mobile:youdi`、`boundary:jianchu-mobile`、`mou-mobile:liuli`：分别还依赖逻辑弃牌、当前 Slash Use/Action 身份、死亡后重定向许可，不用送达回执替换。
+- (b) 规则历史读取留待下一批，本批不增加表达式历史读取。
 
-| 批次 / 提交 | 技能专用 C# 删除 | 共享 C# 新增 | `src` C# 净变化 |
-| --- | ---: | ---: | ---: |
-| 首轮：屯田两版、勤国 | 64 行 / 6 文件 | 净 +27 行 | −37 行 |
-| 首轮：移动秉壹 | 66 行 / 3 文件 | 净 +6 行 | −77 行 |
-| 独立旧 NativeOwners 清理 | 不计技能退役 | 0 行 | −11,028 行 |
+## 既有批次记录
 
-秉壹另删除旧死副本 15 行和枚举/工厂 2 行，不计业务迁移量。合计真实迁移 4 技能、业务执行链 9 文件 / 130 行，实际人物 C# 删除 10 文件 / 145 行，`src` C# 净减 114 行至 563,857 行。16 项相关 Core、3 项 WPF 和常规 4 项检查通过；无全量验证。
+首批迁屯田两版、勤国、秉壹共 4 技能，`src` C# 净减 114 行；另删 967 个未用 NativeOwners / 工厂净减 11,028 行，后者不计业务 JSON 迁移。此前“选择→摸牌”批完成 19 个执行方法，人物 C# 净减 369、共享净增 59，`src` C# 净减 310 至 552,519 行；详见下列基线排名与批次结果。
 
-每批附报 `bao-xin`、`liao-hua`、`xun-yu` 的文件数、行数与字节数。基线分别为：14 / 662 / 56,188；4 / 165 / 14,226；21 / 1,196 / 135,576。
-
-旧副本清理后分别为：13 / 656 / 55,859；3 / 159 / 13,767；19 / 1,133 / 127,949。`src` C# 为 552,829 行，比拆分前的 491,309 行仍多 61,520 行；不把架构样板缩减当成人物已完成迁移。
-
-## 模式排名（本轮）
+## 模式排名（上一批）
 
 Roslyn 基线 `e27ab1a64`：20,564 方法、159,052 方法体行、2,626 个含方法文件。共享调用按实际 callee 绑定，变量/人物前缀归一；先保留控制骨架与精确变体，再按动作/查询族及注册边界合并。定义校验、来源元数据、桥接与 AI 策略另列，不当业务动作。
 下列是按方法数排序的非等价候选范围，行数为方法体 span 合计，不能视作可删除量。A 表示已有基础操作，不承诺整个族自动迁移；例子为基线文件行号。工具：`tools/SkillMigrationAnalysis/`。
