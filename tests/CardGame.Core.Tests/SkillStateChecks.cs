@@ -95,21 +95,33 @@ internal static class SkillStateChecks
 
     private static void AfterCurrentTurnWaitsForTheNextOwnerTurnEnd()
     {
-        var s = Scene.Start();
-        s.Use(0, Driver, "through-next-owner-end", 1); s.Play(0);
-        s.Play(1);
-        Require(s.E<TurnEndedEvent>().Count(e => e.ActorSeat == 0) == 1 &&
-            s.Owns(1, Counter) && !s.CanUse(1, Counter, "pulse") && s.CanUse(1, Locked, "pulse"),
-            "AfterCurrentTurn keeps the non-locked restriction through the issuing owner's current turn end.");
-        s.Cold();
-        Require(s.Owns(1, Counter) && !s.Effective(1, Counter) && s.StateLeases(1) == 1,
-            "Cold replay retains the restriction that deliberately skipped the first matching end.");
-        s.Play(0);
-        Require(!s.Effective(1, Counter), "The target's intervening turn end cannot expire the owner's next-turn restriction.");
-        s.Play(1);
-        Require(s.E<TurnEndedEvent>().Count(e => e.ActorSeat == 0) == 2 && s.StateLeases(1) == 0 &&
-            s.Owns(1, Counter) && s.CanUse(1, Counter, "pulse") && s.CanUse(1, Locked, "pulse"),
-            "The owner's next actual turn end removes the restriction and restores the original target abilities.");
+        foreach (var before in new[] { false, true })
+        {
+            var s = Scene.Start();
+            s.Use(0, Driver, before ? "through-next-owner-before-end" : "through-next-owner-end", 1); s.Play(0);
+            var source = s.E<SkillStateChangedEvent>().Single(e => e.Seat == 1 && e.SkillId == Counter).SourceId;
+            s.Play(1);
+            Require(s.E<TurnEndedEvent>().Count(e => e.ActorSeat == 0) == 1 &&
+                s.Owns(1, Counter) && !s.CanUse(1, Counter, "pulse") && s.CanUse(1, Locked, "pulse"),
+                "AfterCurrentTurn keeps the non-locked restriction through the issuing owner's current turn end.");
+            s.Cold();
+            Require(s.Owns(1, Counter) && !s.Effective(1, Counter) && s.StateLeases(1) == 1,
+                "Cold replay retains the restriction that deliberately skipped the first matching end.");
+            s.Play(0);
+            Require(!s.Effective(1, Counter), "The target's intervening turn end cannot expire the owner's next-turn restriction.");
+            s.Play(1);
+            Require(s.E<TurnEndedEvent>().Count(e => e.ActorSeat == 0) == 2 && s.StateLeases(1) == 0 &&
+                s.Owns(1, Counter) && s.CanUse(1, Counter, "pulse") && s.CanUse(1, Locked, "pulse"),
+                "The owner's next actual turn end removes the restriction and restores the original target abilities.");
+            var ended = s.G.Events.Last(e => e.Payload is TurnEndedEvent { ActorSeat: 0 }).Sequence;
+            var expired = s.G.Events.Single(e => e.Payload is SkillStateExpiredEvent expiry && expiry.SourceId == source).Sequence;
+            Require(before ? expired < ended : expired > ended,
+                "Explicit beforeTurnEnded expires before the actual end fact; the default expires after that fact.");
+            s.Cold();
+            Require(s.G.Events.Last(e => e.Payload is TurnEndedEvent { ActorSeat: 0 }).Sequence == ended &&
+                s.G.Events.Single(e => e.Payload is SkillStateExpiredEvent expiry && expiry.SourceId == source).Sequence == expired,
+                "Cold replay preserves the selected lifecycle boundary and exact expiry/end publication order.");
+        }
     }
 
     private static void TransferReusesAnAlreadyOwnedInstance()
@@ -331,6 +343,8 @@ internal static class SkillStateChecks
                       {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"named","skillIds":["{{{Counter}}}"],"duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"selectedTarget"}}]},
                     {"id":"through-next-owner-end","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"nonLocked","duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"owner"},"afterCurrentTurn":true}]},
+                    {"id":"through-next-owner-before-end","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
+                      {"op":"skillState","target":"selectedTarget","action":"suppress","scope":"nonLocked","duration":"untilTurnEndOf","untilTurnEndOf":{"kind":"owner"},"afterCurrentTurn":true,"endTiming":"beforeTurnEnded"}]},
                     {"id":"transfer","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"skillState","target":"selectedTarget","action":"transfer","scope":"named","skillIds":["{{{Counter}}}"],"duration":"currentTurn"}]},
                     {"id":"lose-own-counter","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[

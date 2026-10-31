@@ -5,8 +5,12 @@ internal sealed partial class CharacterCaoPiMouRuntime
 {
     internal IReadOnlyList<MouCaoPiControl>? MouCaoPiControlsSnapshot(int seat)
     {
-        var controls = ActiveMouCaoPiControls(seat).ToArray();
-        return controls.Length == 0 ? null : Array.AsReadOnly(controls);
+        var controls = ActiveMouCaoPiControls(seat).ToList();
+        foreach (var grant in _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants)
+            if (grant.SkillState is { Acquisition: false, Action: SkillStateAction.Suppress, Scope: SkillStateScope.All,
+                Duration: SkillStateDuration.UntilTurnEndOf, Origin: { } origin } state && origin.Source.SkillId == "mou:fangzhu")
+                controls.Add(new(origin.FrameId, origin.Source.OwnerSeat, seat, state.IssuedTurn, MouCaoPiControlKind.SkillsInvalid));
+        return controls.Count == 0 ? null : Array.AsReadOnly(controls.OrderBy(c => c.FrameId).ToArray());
     }
 
     internal IEnumerable<MouCaoPiControl> ActiveMouCaoPiControls(int seat)
@@ -14,7 +18,6 @@ internal sealed partial class CharacterCaoPiMouRuntime
         return _characterCaoPiMouMouCaoPiControlsAccess._mouCaoPiControls.Where(c => c.TargetSeat == seat);
     }
 
-    internal bool MouCaoPiSkillsQualified(CharacterState owner, SkillGrant grant) => grant.SourceId.StartsWith("equipment:", StringComparison.Ordinal) || !ActiveMouCaoPiControls(owner.Seat).Any(c => c.Kind == MouCaoPiControlKind.SkillsInvalid);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 28000)]
     internal void ExpireMouCaoPiControls(TurnEndedEvent e)
     {

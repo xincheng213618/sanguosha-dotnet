@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterCaoPiMouEntries
 {
-    internal IEnumerable<MouCaoPiControl> ActiveMouCaoPiControls(int seat) => _resolve().ActiveMouCaoPiControls(seat);
     internal bool AdvanceMouCaoPiChildren() => _resolve().AdvanceMouCaoPiChildren();
     internal void AnswerMouCaoPi(PromptChoice choice) => _resolve().AnswerMouCaoPi(choice);
     internal SkillProgramStepOutcome BeginMouCaoPi(ProgramSkillFrame supplied, SkillProgramEffectOp op) => _resolve().BeginMouCaoPi(supplied, op);
@@ -30,7 +29,6 @@ internal sealed partial class CharacterCaoPiMouEntries
     internal string[] MouCaoPiPrintedSkills(CharacterState dead) => _resolve().MouCaoPiPrintedSkills(dead);
     internal bool MouCaoPiResponseForbidden(int actor, CardKind kind, CardActionType type) => _resolve().MouCaoPiResponseForbidden(actor, kind, type);
     internal int? MouCaoPiResponseSource() => _resolve().MouCaoPiResponseSource();
-    internal bool MouCaoPiSkillsQualified(CharacterState owner, SkillGrant grant) => _resolve().MouCaoPiSkillsQualified(owner, grant);
     internal void PublishMouCaoPi(ProgramSkillFrame f) => _resolve().PublishMouCaoPi(f);
     internal bool ResumeMouCaoPi(long id) => _resolve().ResumeMouCaoPi(id);
     internal bool ReturnMouCaoPi(ProgramSkillFrame f) => _resolve().ReturnMouCaoPi(f);

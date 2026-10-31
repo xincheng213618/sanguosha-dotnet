@@ -5,6 +5,7 @@ namespace CardGame.Core;
 public enum SkillStateAction { Suppress, Lose, Transfer }
 public enum SkillStateScope { All, NonLocked, Named, ChosenFromTarget, Expression }
 public enum SkillStateDuration { CurrentTurn, UntilTurnEndOf, Permanent }
+public enum SkillStateEndTiming { AfterTurnEnded, BeforeTurnEnded }
 
 public sealed record SkillStateSpec(SkillStateAction Action, SkillStateScope Scope, SkillStateDuration Duration)
 {
@@ -15,6 +16,8 @@ public sealed record SkillStateSpec(SkillStateAction Action, SkillStateScope Sco
     public bool ExcludeLocked { get; init; }
     public bool ExpireOnDeath { get; init; }
     public bool AfterCurrentTurn { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public SkillStateEndTiming EndTiming { get; init; }
 }
 
 // These entries live in CharacterSkillSet, alongside grants. An entry with
@@ -27,6 +30,8 @@ public sealed record SkillStateLease(SkillStateAction Action, SkillStateScope Sc
     public SkillStateOrigin? Origin { get; init; }
     public int? DeathSeat { get; init; }
     public string? TargetGrantId { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public SkillStateEndTiming EndTiming { get; init; }
 }
 public sealed record SkillStateOrigin(long FrameId, int EffectIndex, CardUseEffectSource Source,
     long? CardUseFrameId = null, long? CardActionId = null);
@@ -72,7 +77,7 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
         r.AllowOnly("op", "target", "targetRef", "action", "scope", "duration", "untilTurnEndOf", "skillIds",
-            "filter", "printedOnly", "characterOnly", "excludeLocked", "expireOnDeath", "afterCurrentTurn", "resultBind", "condition");
+            "filter", "printedOnly", "characterOnly", "excludeLocked", "expireOnDeath", "afterCurrentTurn", "endTiming", "resultBind", "condition");
         var action = r.RequiredEnum<SkillStateAction>("action");
         var scope = r.RequiredEnum<SkillStateScope>("scope");
         var duration = r.RequiredEnum<SkillStateDuration>("duration");
@@ -85,6 +90,8 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.skillIds: must not be empty.");
         if (r.Has("afterCurrentTurn") && duration != SkillStateDuration.UntilTurnEndOf)
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.afterCurrentTurn: requires untilTurnEndOf.");
+        if (r.Has("endTiming") && duration != SkillStateDuration.UntilTurnEndOf)
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}.endTiming: requires untilTurnEndOf.");
         return new(Op, r.RequiredEnum<SkillProgramEffectTarget>("target"), 0, r.Condition(),
             targetReference: r.Has("targetRef") ? r.RequiredParticipantReference("targetRef") : null,
             skillIds: ids, resultBind: r.OptionalIdentifier("resultBind"))
@@ -97,7 +104,8 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
                 CharacterOnly = !r.Has("characterOnly") || r.RequiredBool("characterOnly"),
                 ExcludeLocked = r.Has("excludeLocked") && r.RequiredBool("excludeLocked"),
                 ExpireOnDeath = r.Has("expireOnDeath") && r.RequiredBool("expireOnDeath"),
-                AfterCurrentTurn = r.Has("afterCurrentTurn") && r.RequiredBool("afterCurrentTurn")
+                AfterCurrentTurn = r.Has("afterCurrentTurn") && r.RequiredBool("afterCurrentTurn"),
+                EndTiming = r.Has("endTiming") ? r.RequiredEnum<SkillStateEndTiming>("endTiming") : SkillStateEndTiming.AfterTurnEnded
             }
         };
     }

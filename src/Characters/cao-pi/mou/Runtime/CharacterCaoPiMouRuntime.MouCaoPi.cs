@@ -116,13 +116,17 @@ internal sealed partial class CharacterCaoPiMouRuntime
             LoseMouCaoPiSkills(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.OwnerSeat, ["mou:xingshang", "mou:fangzhu", "mou:songwei"]);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouCaoPiInheritedEvent(f.Id, f.OwnerSeat, target, recipient.General.Id));
         }
+        else if (option == "skills")
+            _coreProgramSkillChangesOperations.IssueSkillState(new(f.Id, f.InstructionIndex - 1,
+                new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId)), target,
+                new(SkillStateAction.Suppress, SkillStateScope.All, SkillStateDuration.UntilTurnEndOf)
+                { CharacterOnly = true, AfterCurrentTurn = true, EndTiming = SkillStateEndTiming.BeforeTurnEnded }, [], target);
         else
         {
             var kind = option switch
             {
                 "basic" => MouCaoPiControlKind.BasicHandOnly,
                 "response" => MouCaoPiControlKind.CannotRespond,
-                "skills" => MouCaoPiControlKind.SkillsInvalid,
                 "trick" => MouCaoPiControlKind.TrickHandOnly,
                 "equipment" => MouCaoPiControlKind.EquipmentHandOnly,
                 _ => throw new InvalidOperationException("Unknown Fangzhu option.")};
