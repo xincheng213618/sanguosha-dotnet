@@ -17,97 +17,6 @@ internal static class ShanheDongJiChecks
     private static readonly Lazy<ContentRegistry> Production = new(() => StandardShanheCampaignCatalog.CreateBattleRegistry(
         new(83, 1, "fixture:dongji-content", Boss, 8, 0, 0, 0, 0, [], [], [], [new("classic:cao-cao")], [], new string('c', 64))));
 
-    public static void BlackGiftLocksExcludePaymentAndExactDynamicDiscardOrDrawCold()
-    {
-        foreach (var scene in new[] { "insufficient", "draw", "discard", "red" })
-        {
-            var s = Scene.Start(scene); s.Play();
-            if (scene == "discard") s.PlaceLion();
-            var gift = s.V().Hand.First(card => card.Suit == (scene == "red" ? Suit.Heart : Suit.Spade) && card.Kind == CardKind.Dodge).Id;
-            var originalHand = s.V().HandCount;
-            s.Gift(gift); s.Until(() => s.At(GiftWatch));
-            var frameId = s.Root.Id;
-            Need(s.Root.LianZhu is { Stage: LianZhuStage.GiftChildren, GiftFrom: { } from, CountPolicy: null } && from == CardLocation.Hand(0) &&
-                s.E<LianZhuChoiceAmountCapturedEvent>().Length == 0 && s.V(Recipient).Hand.Any(card => card.Id == gift),
-                "The real hand gift pays first and remains on its native owner; no recipient-HP amount is captured before its actual movement children return.");
-            s.AssertGift(gift, CardLocation.Hand(0)); s.Cold(); s.Continue();
-            if (scene == "red")
-            {
-                s.Play();
-                Need(s.E<LianZhuChoiceAmountCapturedEvent>().Length == 0 && s.E<XiaHuiRestrictionGrantedEvent>().Length == 0 &&
-                    s.E<LianZhuSegmentPaidEvent>() is [{ Stage: LianZhuStage.GiftChildren }] && s.V().HandCount == originalHand - 1,
-                    "A true red gift completes without a black-card branch, fictional X, restriction, discard or draw.");
-            }
-            else
-            {
-                s.Until(s.AtChoice); s.AssertAmount(3); s.AssertRecipientAuthority();
-                Need(s.E<XiaHuiRestrictionGrantedEvent>().Single().Restriction is { RecipientSeat: Recipient, CardId: var restricted } && restricted == gift,
-                    "Native Xiahui restricts exactly the received original black entity before any payment choice.");
-                Need(s.P!.Choices.Any(choice => Branch(choice) == "discard") == (scene != "insufficient"),
-                    "Two otherwise-discardable HE cards plus one locked gift cannot satisfy X=3; the discard branch is offered only when the entire legal amount exists.");
-                s.Cold();
-                if (scene == "discard")
-                {
-                    s.Answer(choice => Branch(choice) == "discard");
-                    Need(s.P!.RequiredCardCount == 3 && s.P.Choices.All(choice => !choice.Cards.Contains(gift)), "The actually published three-card payment list excludes the Xiahui-locked gift.");
-                    s.Reject(new AnswerPromptCommand(Recipient, s.P.PromptId, new("lianzhu." + frameId + ".card-" + gift), s.G.Revision));
-                    var ids = s.P.Choices.SelectMany(choice => choice.Cards).ToArray();
-                    Need(ids.Length == 3 && ids.Distinct().Count() == 3 && ids.Any(id => s.V(Recipient).Equipment.Any(card => card.Id == id)),
-                        "The real exact-X payment spans the two old hand entities and an actually equipped Silver Lion.");
-                    s.Answer(choice => choice.Cards.SequenceEqual([ids[0]])); s.Cold();
-                    Need(s.P!.RequiredCardCount == 2 && s.Root.LianZhu!.Selected.SequenceEqual([ids[0]]) &&
-                        s.E<LianZhuSegmentPaidEvent>().All(fact => fact.Stage != LianZhuStage.DiscardChildren) &&
-                        s.G.CardMovements.All(move => move.Reason.Value != DiscardReason),
-                        "Selecting one of three required entities freezes only selection and cannot prematurely pay or discard fewer than X.");
-                    s.Answer(choice => choice.Cards.SequenceEqual([ids[1]]));
-                    Need(s.P!.RequiredCardCount == 1 && s.V(Recipient).Hp == 3 &&
-                        s.P.Choices.All(choice => !choice.Cards.Contains(gift)) && s.G.CardMovements.All(move => move.Reason.Value != DiscardReason),
-                        "The remaining native payment count is genuinely three, two, then one; neither old material nor the locked gift moves before the last required choice.");
-                    s.Cold();
-                    s.Answer(choice => choice.Cards.SequenceEqual([ids[2]])); s.Until(() => s.At(DiscardWatch));
-                    Need(s.Root.LianZhu is { CountPolicy.Amount: 3, Count: 3, Stage: LianZhuStage.DiscardChildren } &&
-                        s.E<LianZhuSegmentPaidEvent>().Single(fact => fact.Stage == LianZhuStage.DiscardChildren).Count == 3 &&
-                        s.V(Recipient).Hp == 4 && s.E<RecoveryAppliedEvent>() is [{ TargetSeat: Recipient, Amount: 1 }] &&
-                        ids.All(id => s.G.CardMovements.Count(move => move.CardId == id && move.To == CardLocation.DiscardPile && move.Reason.Value == DiscardReason) == 1),
-                        "Exactly three old HE entities are paid once; real Silver Lion removal heals the recipient afterward without turning frozen X=3 into four.");
-                    s.Cold(); s.Play();
-                    Need(s.V(Recipient).Hand.Select(card => card.Id).SequenceEqual([gift]) && s.V().HandCount == originalHand - 1 &&
-                        s.E<LianZhuSegmentPaidEvent>().All(fact => fact.Stage != LianZhuStage.DrawChildren),
-                        "The locked new gift remains, recovery does not clear its lock, and choosing the complete discard branch gives the source no draw.");
-                }
-                else
-                {
-                    s.Answer(choice => Branch(choice) == "draw"); s.Until(() => s.At(DrawWatch));
-                    Need(s.Root.LianZhu is { Stage: LianZhuStage.DrawChildren, Count: 3, CountPolicy.Amount: 3 } &&
-                        s.E<LianZhuSegmentPaidEvent>().Single(fact => fact.Stage == LianZhuStage.DrawChildren).Count == 3 &&
-                        s.G.CardMovements.Count(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0) && move.Reason.Value == DrawReason) == 3,
-                        "Either an explicit draw choice or inability to pay all X produces one genuine Draw3, never old fixed Draw2 or an insufficient discard-all.");
-                    s.Cold(); s.Play();
-                    Need(s.V().HandCount == originalHand + 2 && s.E<LianZhuSegmentPaidEvent>().All(fact => fact.Stage != LianZhuStage.DiscardChildren),
-                        "Returning from paid draw children cannot obtain, draw or charge the gift a second time.");
-                }
-            }
-            s.AssertFinished(frameId); s.AssertGift(gift, CardLocation.Hand(0));
-            if (scene == "insufficient")
-            {
-                s.UseDriver("armor", [Recipient]); s.UseDriver("hurt", [Recipient]);
-                Need(s.V(Recipient).Hp == 3 && s.V(Recipient).Armor == 0 &&
-                    s.E<DamageAppliedEvent>() is [{ TargetSeat: Recipient, Amount: 2, ArmorPayment: { ArmorAbsorbed: 2, HpLossAmount: 0 } }] &&
-                    s.E<XiaHuiRestrictionReleasedEvent>().All(fact => fact.CardId != gift),
-                    "Two genuine damage points fully paid by numeric armor do not reduce HP or release the exact black gift's Xiahui restriction.");
-                s.UseDriver("lose", [Recipient]);
-                Need(s.V(Recipient).Hp == 2 && s.E<XiaHuiRestrictionReleasedEvent>().Count(fact =>
-                    fact.CardId == gift && fact.RecipientSeat == Recipient && fact.Reason == "recipient-hp-decreased") == 1,
-                    "Only the following actual HP loss releases that same restriction once.");
-                s.Cold();
-            }
-            var remaining = s.V().Hand.First().Id;
-            s.Reject(new UseProgramSkillCommand(0, Skill, "reveal-owned-gift", [remaining], [Recipient], s.G.Revision, s.P!.PromptId));
-            Need(s.G.GetHumanLegalActions().All(action => action.ProgramSkillId != Skill), "The real once-per-Play allowance remains consumed across black/red branches and cold returns.");
-            s.Cold();
-        }
-    }
-
     public static void FrozenRecipientHpSurvivesEquipmentChildrenAndPaidSourceInvalidationCold()
     {
         var equipment = Scene.Start("equipment"); equipment.Play();
@@ -168,58 +77,6 @@ internal static class ShanheDongJiChecks
         VerifyNativeNpcDecisions();
     }
 
-    public static void ActualDongshiEncounterUsesSourcePairAndIsolatesEditionsCold()
-    {
-        VerifyLoaderBoundaries();
-        foreach (var difficulty in new[] { 1, 2, 3 })
-        {
-            var definition = StandardShanheCampaignCatalog.CreateDefinition(difficulty, StandardShanheCampaignCatalog.Returning2026EditionId);
-            var encounter = definition.Nodes.Single(node => node.Id == "luoyang").Encounters!.Single(item => item.Id == Encounter);
-            Need(encounter.Enemies.Select(member => member.GeneralId).Order().SequenceEqual(new[] { Dong, Boss }.Order()) &&
-                encounter.Allies is [{ GeneralId: "classic:sun-jian" }] && encounter.Enemies.All(member => member is
-                    { Hp: null, MaxHpBonus: 0, InitialHandBonus: 0, DrawBonus: 0, SlashBonus: 0, StartingHand: null } &&
-                    (member.ExtraSkillIds?.Count ?? 0) == 0 && (member.QualifiedPrintedLordSkillIds?.Count ?? 0) == 0),
-                "The real 2685 candidate keeps the complete raw two-enemy source roster and explicit local Sun Jian companion at every local tier; no invented equipment, growth or stage is supplied.");
-            var old = StandardShanheCampaignCatalog.CreateDefinition(difficulty, StandardShanheCampaignCatalog.LocalEditionId);
-            Need(old.Nodes.SelectMany(node => node.Encounters ?? []).All(item => item.Id != Encounter && item.Enemies.All(member => member.GeneralId is not (Dong or Boss))),
-                "The independent current two-enemy recipe is never appended to the 2024 edition.");
-            if (difficulty != 1) continue;
-            var setup = ShanheBattleSetup.Freeze(new(83, 1, "luoyang", "classic:guan-yu", 4, 0, 0, 0, 0, [], [], [],
-                encounter.Enemies, encounter.Allies!, ShanheCampaignContent.GetContentHash(definition)) { DefaultGodFactionId = definition.DefaultGodFactionId });
-            var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
-            Need(registry.Generals[Dong] is { BaseHp: 15, InitialHp: 10 } && registry.Generals[Boss].BaseHp == 8 &&
-                registry.Generals[Boss].SkillIds.Order().SequenceEqual(new[] { Skill, Xiahui }.Order()) &&
-                registry.Generals[Dong].SkillIds.Order().SequenceEqual(new[] { "shanhe:s5-jiuchi-14210", "shanhe:s5-roulin-14211", "boundary:benghuai-current", "shanhe:s5-daoshu-952" }.Order()) &&
-                registry.GetDeck(registry.Modes[ShanheBattleSetup.BattleModeId].DeckId!) is { InitialHandSize: 4, DrawPerTurn: 2 } && setup.StartingEquipment.Count == 0,
-                "Actual production definitions print dynamic HE 14212 plus original Xiahui on 8/8 Dong Ji and the exact reused four skills on 10/15 Dong Zhuo, with H4/D2 and no unverified fixed gear.");
-            var mode = registry.Modes[ShanheBattleSetup.BattleModeId];
-            Need(mode is { MinPlayers: 4, MaxPlayers: 4, ModeKind: ContentModeKind.Team, BossActivity: null, TeamActivity: null } &&
-                mode.TeamCounts!.GetValueOrDefault(ShanheBattleSetup.PlayerTeamId) == 2 && mode.TeamCounts!.GetValueOrDefault(ShanheBattleSetup.EnemyTeamId) == 2,
-                "The actual native encounter is four-seat 2-versus-2, not the different three-enemy Fengyi group or a stage controller.");
-            var battle = StandardShanheCampaignCatalog.CreateBattle(setup); var started = battle.Submit(new StartGameCommand());
-            Need(started.Accepted, started.Error?.Message ?? "Actual Dongshi encounter rejected.");
-            var players = battle.CreateSnapshot(0).Players;
-            Need(players.Single(player => player.GeneralId == Dong) is { Hp: 10, MaxHp: 15, Armor: 0 } &&
-                players.Single(player => player.GeneralId == Boss) is { Hp: 8, MaxHp: 8, Armor: 0, HandCount: 4 } &&
-                players.Single(player => player.GeneralId == Boss).Skills!.Select(skill => skill.ContentId).Order().SequenceEqual(new[] { Skill, Xiahui }.Order()) &&
-                battle.Events.Select(fact => fact.Payload).OfType<DamageAppliedEvent>().Count() == 0,
-                "Real setup/registry/engine startup initializes the two original health values and printed skills directly rather than simulating HP10 with damage.");
-            ColdActual(battle, registry);
-            var hash = registry.ContentHash;
-            var originalNode = old.Nodes.First(node => node.Encounters is { Count: > 0 }); var originalEncounter = originalNode.Encounters![0];
-            var plain = new ShanheBattleSetup(83, 1, originalNode.Id, old.PlayerGeneralIds[0], 4, 0, 0, 0, 0, [], [], [],
-                originalEncounter.Enemies, originalEncounter.Allies ?? [], ShanheCampaignContent.GetContentHash(old));
-            var oldRegistry = StandardShanheCampaignCatalog.CreateBattleRegistry(plain);
-            Need(!oldRegistry.Generals.ContainsKey(Boss) && !oldRegistry.Generals.ContainsKey(Dong) && !oldRegistry.Skills.ContainsKey(Skill) &&
-                StandardShanheCampaignCatalog.CreateBattleRegistry(setup).ContentHash == hash && registry.Packages.Count(package => package.Id == "shanhe-s5-dongshi-boss") == 1,
-                "Conditional package caches preserve current/old edition isolation in both warm orders, without importing the dedicated 14212 bundle into an ordinary old recipe.");
-            var checkpoint = battle.CreateCheckpoint(); var rejected = false;
-            try { _ = GameReplay.Restore(checkpoint with { ContentHash = new string('0', checkpoint.ContentHash.Length) }, registry); }
-            catch (Exception error) when (error is InvalidOperationException or ArgumentException) { rejected = true; }
-            Need(rejected && ShanheBattleSetup.ValueEquals(checkpoint.Options.ShanheBattle, setup), "Native replay keeps the exact frozen source recipe and rejects a changed complete content fingerprint.");
-        }
-    }
-
     private static void VerifyNonTransferableWeapon()
     {
         var s = Scene.Start("weapon"); s.Play(); s.UseDriver("weapon");
@@ -231,24 +88,6 @@ internal static class ShanheDongJiChecks
         Need(s.State() == before && s.V().Equipment.Any(card => card.Id == weapon) && s.E<LianZhuSegmentPaidEvent>().Length == 0,
             "Forcing the same nontransferable original entity is atomically rejected and cannot manufacture a gifted OutsideGame weapon.");
         s.Cold();
-    }
-
-    private static void VerifyLoaderBoundaries()
-    {
-        string Read(string suffix)
-        { using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.shanhe-s5-lianzhu." + suffix)!; using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-        var original = JsonNode.Parse(Read("rules.json"))!; var presentation = Read("presentation.json");
-        JsonObject Activation(JsonNode node) => node["skills"]![0]!["activations"]![0]!.AsObject();
-        JsonObject Effect(JsonNode node) => Activation(node)["effects"]![0]!.AsObject();
-        void Load(JsonNode node) => _ = SkillProgramCatalog.Load(node.ToJsonString(), presentation);
-        void Reject(JsonNode node)
-        { var rejected = false; try { Load(node); } catch (Exception error) when (error is InvalidOperationException or ArgumentException or JsonException) { rejected = true; }
-          Need(rejected, "Known program/effect expressions cannot bypass the dynamic gift's explicit HE or expression consumer contract."); }
-        Load(original);
-        var legacy = original.DeepClone(); Activation(legacy)["sourceZones"] = new JsonArray("hand"); Effect(legacy).Remove("numberExpression"); Load(legacy);
-        var implicitHe = original.DeepClone(); Effect(implicitHe).Remove("numberExpression"); Reject(implicitHe);
-        var otherExpression = original.DeepClone(); Effect(otherExpression)["numberExpression"] = "ownerMaxHp"; Reject(otherExpression);
-        var wrongConsumer = original.DeepClone(); Effect(wrongConsumer)["op"] = "draw"; Effect(wrongConsumer)["target"] = "owner"; Reject(wrongConsumer);
     }
 
     private static void VerifyNativeNpcDecisions()

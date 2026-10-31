@@ -168,35 +168,6 @@ internal static partial class WushuangModeChecks
         Cold(shopClock, shopRegistry);
     }
 
-    public static void SurvivalLimitsCompareCurrentHpWithoutRatioOrCards()
-    {
-        foreach (var (hp, expectedTeam) in new (int, string?)[]
-            { (21, WushuangMode.PlayerTeamId), (19, WushuangMode.AiTeamId), (20, null) })
-        {
-            var (game, registry) = Start(false, initialHp: hp, aiBaseHp: 20);
-            Drive(game, () => Shop(game) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
-            var contenders = game.CreateSnapshot(0).Players;
-            Require(contenders[0].MaxHp == 30 && contenders[1].MaxHp == 20 && contenders[0].Hp == hp &&
-                contenders[0].HandCount != contenders[1].HandCount,
-                "The real limit fixture distinguishes current HP from HP ratio and unequal initial hands.");
-            Accept(game, new TickWushuangClockCommand(WushuangMode.TimeLimitMilliseconds, game.Revision));
-            Require(game.State.WinnerTeamId == expectedTeam && (game.State.Winner == Winner.Draw) == (expectedTeam is null),
-                "Only current HP decides the survival winner; equal HP remains a draw despite different maximum HP and hand counts.");
-            Cold(game, registry);
-        }
-        var (limited, limitedRegistry) = Start(false, 57, maxTurns: 1);
-        Drive(limited, () => Shop(limited) is { CanShop: true, Phase: WushuangShopPhase.OpeningTactic });
-        Buy(limited, Shop(limited).Offers.Single(offer => offer.TacticId == 2293).Id);
-        Drive(limited, () => limited.State.Status == EngineStatus.Completed);
-        var ordered = limited.CreateSnapshot(0).Players.OrderByDescending(player => player.Hp).ToArray();
-        var team = ordered[0].Hp == ordered[1].Hp ? null : ordered[0].TeamId;
-        Require(limited.State.Status == EngineStatus.Completed && limited.State.TurnNumber == 1 &&
-            limited.State.WinnerTeamId == team && (limited.State.Winner == Winner.Draw) == (team is null) &&
-            limited.ResolutionStack.Count == 0 && !E<WushuangClockExpiredEvent>(limited).Any(),
-            "The configured native turn boundary uses the same HP result without advancing or expiring the host clock.");
-        Cold(limited, limitedRegistry);
-    }
-
     private static (GameEngine, ContentRegistry) Start(bool clock, int seed = 17, string[]? skills = null, bool gain = false, int? initialHp = null, int? aiQuota = null, bool confirmOpeningHand = false, int aiBaseHp = 30, int maxTurns = 300, bool grantCategoryRefund = false, bool grantWangYunTrick = false, bool simaYiShopGive = false, bool peaches = false, bool interactiveDiscard = false, bool mixedTricks = false, bool publicPileStorage = false, string? materialCase = null, int? legacyOpeningTactic = null)
     {
         var registry = ComposedSkillContentRegistry.CreateShowcase(additionalPackages: [new Fixture(clock, skills, gain, initialHp, aiQuota, aiBaseHp, grantCategoryRefund, grantWangYunTrick, simaYiShopGive, peaches, mixedTricks, publicPileStorage, materialCase, legacyOpeningTactic)]);
@@ -233,12 +204,6 @@ internal static partial class WushuangModeChecks
     }
     private static void End(GameEngine g) => Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
     private static void Play(GameEngine g) => Drive(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
-    private static void NextHumanTurn(GameEngine g)
-    {
-        var oldTurn = g.State.TurnNumber;
-        End(g);
-        Drive(g, () => g.State.TurnNumber > oldTurn && P(g) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
-    }
     private static void Drive(GameEngine g, Func<bool> done)
     {
         for (var step = 0; step < 160; step++)

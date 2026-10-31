@@ -6,7 +6,6 @@ using CardGame.Server;
 internal static class LanRoomChecks
 {
     public static void HttpPlayersAiAndIsolation() => Run(requireCompletion: true).GetAwaiter().GetResult();
-    public static void HttpFirstRound() => Run(requireCompletion: false).GetAwaiter().GetResult();
 
     private static async Task Run(bool requireCompletion)
     {

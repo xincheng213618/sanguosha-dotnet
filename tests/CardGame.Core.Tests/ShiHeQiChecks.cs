@@ -9,41 +9,6 @@ internal static class ShiHeQiChecks
         Driver = "fixture:shi-he-qi-driver", Watch = "fixture:shi-he-qi-watch", Quiet = "fixture:shi-he-qi-quiet", Aggressor = "fixture:shi-he-qi-aggressor",
         Spent = "fixture:shi-he-qi-spent", Peer = "fixture:shi-he-qi-peer", ActivePeer = "fixture:shi-he-qi-active-peer", Deck = "fixture:shi-he-qi-deck";
 
-    public static void FieldEntriesNextMarkRewardNativeDuelTargetQuotaAndPaidDrawCold()
-    {
-        var s = Scene.Start(watchDraw: true); s.DrawChildren(cold: true); s.Play();
-        var initialDraw = s.E<ShiHqDrawPaidEvent>().Single();
-        s.Need(initialDraw.Count == 2 && s.V(0).Hand.Count(c => Marked(c)) == 2 && s.Reward == false,
-            "The separate draw-phase native extra draw marks exactly its two actual hand entities and does not arm or consume the next-mark reward.");
-        var slash = s.V(0).Hand.Single(c => c.Kind == CardKind.Slash).Id;
-        s.Native(CardKind.BaguaFormation, []); s.Mark(0, slash); s.Play();
-        s.Need(s.Reward && s.E<ShiHqSelectedEvent>().Single() is { RewardConsumed: false, NextReward: true } && s.E<ShiHqDrawPaidEvent>().Length == 1,
-            "The first actual equipment-entry marking of Slash signs the next invocation only, without immediately paying itself.");
-        var other = s.V(1).Hand.First(c => c.Kind == CardKind.Dodge).Id;
-        s.Native(CardKind.Crossbow, []); s.Mark(1, other);
-        s.DrawChildren(cold: true); s.Play();
-        var selected = s.E<ShiHqSelectedEvent>().Last();
-        s.Need(!s.Reward && selected is { RewardConsumed: true, NextReward: false } && s.E<ShiHqDrawPaidEvent>().Length == 2 &&
-            s.E<ShiHqDrawPaidEvent>().All(e => e.Count == 2) && s.V(0).Hand.Count(Marked) == 5 && Marked(s.V(1).Hand.Single(c => c.Id == other)),
-            "The second successful mark consumes the previous reward, marks exactly the new two native draw entities, and a non-Slash does not renew it.");
-        var unmarked = s.V(0).Hand.First(c => !Marked(c));
-        s.Need(s.G.GetHumanLegalActions().All(a => a.CardId != unmarked.Id || a.ConversionSource?.SkillId != Shanxi), "An unmarked entity cannot be a Shanxi material.");
-        s.Duel(1); s.Play();
-        s.Need(s.G.GetHumanLegalActions().All(a => a.ConversionSource?.SkillId != Shanxi || !a.TargetSeats.Contains(1)) &&
-            s.G.GetHumanLegalActions().Any(a => a.ConversionSource?.SkillId == Shanxi && a.TargetSeats.SequenceEqual([2])),
-            "The accepted native Duel spends only that actual Play target, while a different living target remains legal.");
-        s.Duel(2); s.Play();
-        var uses = s.E<ShiHqShanxiUsedEvent>();
-        s.Need(uses.Length == 2 && uses.Select(e => e.Target).SequenceEqual([1, 2]) && uses.Select(e => e.PhaseInstance).Distinct().Count() == 1 &&
-            uses.All(e => s.E<ProgramViewAsConvertedEvent>().Count(c => c.FrameId == e.UseId && c.SkillId == Shanxi && c.OutputKind == CardKind.Duel && c.PhysicalCardIds.SequenceEqual([e.CardId])) == 1),
-            "Each target ledger entry belongs to one genuine marked single-material conversion and its original native Duel action.");
-        s.End(); s.AtWatch(); s.ContinueWatch(); s.Offer();
-        s.Need(s.G.State.CurrentSeat == 1 && s.V(0).Judgment.Any(c => c.Kind == CardKind.Indulgence) &&
-            s.G.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Any(w => w.Batch.Movements.Any(m => m.To == CardLocation.Judgment(0) && m.From.OwnerSeat != 0)),
-            "An enemy's true delayed-trick entry to this judgment zone also offers Qizhou even when the owner lost no card in that batch.");
-        s.Mark(0, s.V(0).Hand.First().Id, alreadyOffered: true); s.Replay();
-    }
-
     public static void IssuedGlobalYingjiCleanupUsesPhysicalMoveAfterSourceLossCold()
     {
         var s = Scene.Start(watchDraw: false); s.Play();

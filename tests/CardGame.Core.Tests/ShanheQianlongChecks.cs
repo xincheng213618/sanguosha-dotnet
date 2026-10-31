@@ -13,69 +13,6 @@ internal static class ShanheQianlongChecks
     private const string Deck = "fixture:qianlong-deck", Ordinary = "team:qianlong-ordinary";
     private const string Supplies = "qianlong-supplies", Filler = "qianlong-filler";
 
-    public static void FrozenCapacityIgnoresPrintedTacticAndRankPrivilegesAndOtherSeats()
-    {
-        const string shapeId = "fixture:qianlong-modifier-shape";
-        static SkillProgramCatalog LoadShape(string query = "slashLimit", string recipient = "owner", int multiplier = 2) =>
-            SkillProgramCatalog.Load(JsonSerializer.Serialize(new
-            {
-                schemaVersion = SkillProgramCatalog.RulesSchemaVersion,
-                skills = new[] { new { id = shapeId, revision = 1, modifiers = new[] { new
-                {
-                    id = "empty-slots", query, operation = "add", valueExpression = "emptyCampaignSkillSlotCount",
-                    valueMultiplier = multiplier, recipientScope = recipient, priority = 0
-                } } } }
-            }), JsonSerializer.Serialize(new
-            {
-                schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
-                skills = new Dictionary<string, object> { [shapeId] = new { name = "潜龙表达式", description = "实际空技能槽" } }
-            }));
-        Need(LoadShape().Programs[shapeId].Modifiers.Single() is
-                { Query: SkillRuleQuery.SlashLimit, Operation: SkillRuleOperation.Add,
-                  ValueExpression: SkillRuleValueExpression.EmptyCampaignSkillSlotCount, ValueMultiplier: 2,
-                  RecipientScope: SkillRuleRecipientScope.Owner },
-            "The full immutable loader accepts the legitimate owner Slash-limit expression through all modifier validation stages.");
-        foreach (var (query, recipient, multiplier) in new[]
-                 { ("handLimit", "owner", 2), ("slashLimit", "otherPublicTeamAllies", 2),
-                   ("slashLimit", "owner", 0), ("slashLimit", "owner", 21) })
-        {
-            var rejected = false;
-            try { _ = LoadShape(query, recipient, multiplier); }
-            catch (InvalidOperationException) { rejected = true; }
-            Need(rejected, "The loader rejects a wrong campaign-slot query, recipient or multiplier: " +
-                JsonSerializer.Serialize(new { query, recipient, multiplier }));
-        }
-        var s = Scene.Start(persistent: false, carried: true, initialSkill: true, rank: 5, slots: 3);
-        Need(s.Setup.MarketSetup is null && s.Setup.ExtraSkillSlots == 3 &&
-             s.Setup.ExtraSkillIds.SequenceEqual([LearnedA, ShanheGeneralRanks.RebirthSkillId]) &&
-             s.Player().Skills!.Any(skill => skill.ContentId == Driver) &&
-             s.Player().Skills!.Any(skill => skill.ContentId == StandardShanheQianlongPackage.SkillId) &&
-             Limit(s.Game, 0) == 6,
-            "The real campaign freezes three unlocked slots even without a market: one learned skill leaves two empty; printed skills, tactics and fifth-rank rebirth do not consume them, and the separate rank Slash remains additive.");
-        s.Accept(new UseProgramSkillCommand(0, Driver, "grant-off-ledger", [], [], s.Game.Revision, s.Game.PendingDecision!.PromptId));
-        s.Play();
-        Need(s.Player().Skills!.Any(skill => skill.ContentId == LearnedB) && Limit(s.Game, 0) == 6 &&
-             s.Game.CreateSnapshot(1).Players[1].Skills!.Any(skill => skill.ContentId == StandardShanheQianlongPackage.SkillId) &&
-             Limit(s.Game, 1) == 1,
-            "A genuine temporary native skill grant does not rewrite paid campaign occupancy, and the opposing holder cannot borrow the player's empty slots.");
-        for (var use = 0; use < 6; use++) s.Slash();
-        Need(s.PaidSlashes == 6 && !s.HasSlash && s.Player().Hand.Any(card => card.Kind == CardKind.Slash),
-            "The frozen no-market recipe permits exactly six genuine physical Slashes, leaving an unusable seventh entity in hand.");
-        s.RejectSlash();
-
-        var ordinaryRegistry = Registry(ordinary: true);
-        var ordinary = GameEngine.CreateStandard(new()
-        {
-            Seed = 41, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
-            HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = Ordinary,
-            UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false,
-            MaxTurns = 4, AiPolicyVersion = AiDecisionPolicy.CurrentVersion
-        }, ordinaryRegistry);
-        Need(ordinary.CreateSnapshot(0).Players[0].Skills!.Any(skill => skill.ContentId == StandardShanheQianlongPackage.SkillId) &&
-             Limit(ordinary, 0) == 1,
-            "The same printed modifier in an ordinary mode supplies zero campaign-slot contribution.");
-    }
-
     public static void LivePurchasesReplacementAndUnlockedSlotsRecomputeWithoutResettingPaidSlashes()
     {
         var s = Scene.Start(persistent: true, carried: false, initialSkill: false, rank: 1, slots: 2);

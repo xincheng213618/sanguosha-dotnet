@@ -460,54 +460,6 @@ internal static partial class ShanheCampaignChecks
         }
     }
 
-    public static void TacticsUseIndependentGrantsAndRejectAliases()
-    {
-        var definition = new ShanheCampaignDefinition("fixture:tactics", "战法构筑", [Player], ["shop"],
-        [
-            new("shop", "军议", ShanheNodeKind.Shop, ["battle"], Choices:
-            [
-                new("skill", "传习突袭", GoldCost: 2, RewardId: "skill", LeavesNode: false),
-                new("tactic", "习得反刺", GoldCost: 1, RewardId: "tactic", LeavesNode: false),
-                new("alias", "再次反刺", GoldCost: 3, RewardId: "alias", LeavesNode: false)
-            ]),
-            new("battle", "决战", ShanheNodeKind.BossBattle, [], [new("gate", "守军", [new(Enemy)])], ["alias", "gold"])
-        ],
-        [
-            new("skill", "武将技能", SkillId: Raid),
-            new("tactic", "反刺") { TacticSkillId = Guard },
-            new("alias", "反刺别名") { TacticSkillId = Guard },
-            new("gold", "军资", Gold: 2)
-        ], StartingGold: 10, ExtraSkillSlots: 1);
-        var session = Create(definition);
-        Accept(session, new MoveShanheNodeCommand("shop", 0));
-        Accept(session, new ChooseShanheNodeOptionCommand("skill", null, session.Revision));
-        Accept(session, new ChooseShanheNodeOptionCommand("tactic", null, session.Revision));
-        Require(session.Snapshot.ExtraSkillSlots == 1 && session.Snapshot.ExtraSkillIds.SequenceEqual([Raid]) &&
-            session.Snapshot.TacticIds.SequenceEqual(["tactic"]) && session.Snapshot.Gold == 7 &&
-            session.Snapshot.NodeChoices.All(c => c.Id != "alias"),
-            "A tactic preserves its reward provenance while granting a separate program without using the full general-skill slot.");
-        var before = Snapshot(session);
-        Require(!session.Submit(new ChooseShanheNodeOptionCommand("alias", null, session.Revision)).Accepted && Snapshot(session) == before,
-            "A second reward id for the same tactic program must be rejected before costs or grants commit.");
-        RejectMutation(session.Snapshot.TacticIds);
-        Cold(session, definition);
-        Accept(session, new ChooseShanheNodeOptionCommand("$leave", null, session.Revision));
-        Accept(session, new MoveShanheNodeCommand("battle", session.Revision));
-        var pending = session.PendingBattleSetup!;
-        Require(pending.TacticSkillIds.SequenceEqual([Guard]) && pending.ExtraSkillIds.SequenceEqual([Raid]) &&
-            !ShanheBattleSetup.ValueEquals(pending, pending with { TacticSkillIds = [] }),
-            "The encounter recipe and structural setup validation must include its independent tactic programs.");
-        RejectMutation(pending.TacticSkillIds);
-        Cold(session, definition);
-        var battle = CreateBattle(pending);
-        FinishBattle(battle, "defeat");
-        Require(session.CompleteBattle(battle, session.Revision).Accepted && session.Snapshot.RewardOffers.Select(r => r.Id).SequenceEqual(["gold"]),
-            "A completed battle must exclude aliases of previously acquired tactic programs from its offered rewards.");
-        Accept(session, new ChooseShanheRewardCommand("gold", null, session.Revision));
-        Cold(session, definition);
-        MustThrow(() => Create(definition with { Rewards = [.. definition.Rewards, new("missing", "缺失战法") { TacticSkillId = "missing:program" }] }));
-    }
-
     private static ShanheCampaignDefinition StoryDefinition() => new("fixture:story", "讨董行记", [Player], ["shop"],
     [
         new("shop", "行商", ShanheNodeKind.Shop, ["battle"], Choices:

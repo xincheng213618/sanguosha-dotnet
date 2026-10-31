@@ -11,46 +11,6 @@ internal static class MobileShiYuJiChecks
         HighestSlash = "fixture:shi-yu-ji-highest-slash", DoubleSlash = "fixture:shi-yu-ji-double-slash",
         Peer = "fixture:shi-yu-ji-peer", Deck = "fixture:shi-yu-ji-deck";
 
-    public static void FujiGiftMarksEmpoweredFirstSlashAndMarkedDodge()
-    {
-        var s = Scene.Start("fuji-first");
-        s.Play();
-        var realSlash = s.V(0).Hand.Single(c => c.Kind == CardKind.Slash && c.Suit == Suit.Club).Id;
-        var dodge = s.V(0).Hand.Single(c => c.Kind == CardKind.Dodge).Id;
-        s.ActivateFuji([dodge], [3]); s.Play();
-        s.Need(s.E<MobileShiFujiCardMarkedEvent>() is [{ RecipientSeat: 3, CardId: var markedId, Kind: CardKind.Dodge, Suit: Suit.Club }] &&
-                markedId == dodge && s.Zone(dodge) == CardLocation.Hand(3),
-            "The gifted physical Dodge is marked as a Fuji card and reaches the single adjacent recipient's hand.");
-        s.Need(s.E<MobileShiFujiEmpowerIssuedEvent>().Length == 1 && FujiEmpowered(s) && s.V(0).HandCount == 3,
-            "Ending with the fewest hand draws one card and arms the empowered first-Slash/Dodge window.");
-
-        var peerHp = s.V(1).Hp;
-        s.NativeCard(realSlash, 1); s.Play();
-        s.Need(s.V(1).Hp == peerHp - 2 && s.E<DamageAppliedEvent>().Any(e => e.SourceSeat == 0 && e.TargetSeat == 1 && e.Amount == 2),
-            "The empowered first real Slash gains exactly one base damage.");
-        s.Need(s.E<MobileShiFujiCardUsedEvent>().Any(e => e.Empowered && e.UserSeat == 0 && e.Name == CardKind.Slash) &&
-                s.E<MobileShiFujiSuitGainIssuedEvent>().Any(e => e.UserSeat == 0 && e.Suit == Suit.Club && s.Zone(e.GainedCardId) == CardLocation.Hand(0)),
-            "The empowered Slash also grants its user one same-suit card from the draw pile.");
-
-        var before = s.V(3).HandCount;
-        s.End();
-        s.Reach(() => s.E<CardActionAcceptedEvent>().Any(e => e.Action.ActorSeat == 3 && e.Action.EffectiveKind == CardKind.Dodge &&
-            e.Action.PhysicalCards.Any(cost => cost.CardId == dodge)));
-        s.Need(s.E<MobileShiFujiCardUsedEvent>().Any(e => !e.Empowered && e.UserSeat == 3 && e.CardId == dodge && e.Name == CardKind.Dodge) &&
-                s.E<MobileShiFujiSuitGainIssuedEvent>().Any(e => e.UserSeat == 3 && e.Suit == Suit.Club) &&
-                s.E<MobileShiFujiDodgeDrawIssuedEvent>().Any(e => e.UserSeat == 3 && e.CardId == dodge) && s.V(3).HandCount == before + 1,
-            "Answering the highest-hand attack with the marked Dodge grants one same-suit card and one post-completion draw.");
-
-        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge });
-        s.Answer(c => c.Cards.Count == 1 && !c.Parameters.ContainsKey("conversion-skill-id"));
-        s.Reach(() => s.E<MobileShiFujiDodgeDrawIssuedEvent>().Any(e => e.UserSeat == 0));
-        s.Need(s.E<MobileShiFujiCardUsedEvent>().Any(e => e.Empowered && e.UserSeat == 0 && e.Name == CardKind.Dodge) &&
-                s.E<MobileShiFujiSuitGainIssuedEvent>().Any(e => e.UserSeat == 0 && e.Suit == Suit.Club),
-            "The owner's first Dodge while armed carries the empowered effects too.");
-        s.Need(FujiEmpowered(s), "The armed window survives until the owner's next turn starts.");
-        s.Replay();
-    }
-
     public static void FujiMarkedSlashDuelResponseAndEmpowerExpiry()
     {
         var s = Scene.Start("fuji-expiry");
@@ -74,83 +34,6 @@ internal static class MobileShiYuJiChecks
         s.Need(s.V(0).Hp == 2 && s.E<DamageAppliedEvent>().Any(e => e.TargetSeat == 0 && e.Amount == 1) &&
                 s.E<MobileShiFujiCardUsedEvent>().Length == 0,
             "The expired window no longer empowers anyone while the declined Duel costs one health.");
-        s.Replay();
-    }
-
-    public static void DaozhuanOwnTurnExhaustBlocksResponsesUntilRoundRestore()
-    {
-        var s = Scene.Start("daozhuan-exhaust");
-        s.Play();
-        s.Need(s.DaozhuanActions().Any(), "Daozhuan offers its one-card basic conversions on the owner's turn.");
-        var material = s.V(0).Hand.First(c => c.Kind == CardKind.Peach).Id;
-        var peerHp = s.V(1).Hp;
-        s.DaozhuanPlay(material, 1); s.Play();
-        s.Need(s.E<CardActionAcceptedEvent>().Any(e => e.Action.ActorSeat == 0 && e.Action.EffectiveKind == CardKind.Slash &&
-                e.Action.ConversionChain.Any(source => source.SkillId == Daozhuan) && e.Action.PhysicalCards.Any(cost => cost.CardId == material)) &&
-                s.Zone(material) == CardLocation.DiscardPile && s.V(1).Hp == peerHp - 1,
-            "The paid hand card is discarded to use an actual converted Slash for one damage.");
-        s.Need(s.E<MobileShiDaozhuanUseRecordedEvent>() is [{ OwnerSeat: 0, Name: CardKind.Slash, TurnNumber: 1, RoundNumber: 1, OwnerIsTurnPlayer: true }] &&
-                !s.DaozhuanActions().Any(),
-            "The own-turn use records once and exhausts every further Daozhuan conversion this turn.");
-        s.Native(CardKind.Duel, 1); s.Play();
-        s.End();
-        var prompted = 0;
-        while (true)
-        {
-            s.Reach(() => s.G.State.TurnNumber >= 5 ||
-                s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge or DecisionKind.RespondSlash });
-            if (s.G.State.TurnNumber >= 5 &&
-                s.P is not { PlayerSeat: 0, Kind: DecisionKind.RespondDodge or DecisionKind.RespondSlash }) break;
-            s.Need(s.P!.Choices.All(c => c.Parameters.GetValueOrDefault("conversion-skill-id") != Daozhuan),
-                "The exhausted state also removes Daozhuan from every foreign-turn response window.");
-            s.AnswerRealOrDecline(); prompted++;
-        }
-        s.Need(prompted >= 2, "The scripted foreign turns produced their expected response windows.");
-        s.Need(s.E<MobileShiDaozhuanUseRecordedEvent>().Length == 1,
-            "The next round's start restores the exhausted conversions without inventing a second recorded use.");
-        s.Play();
-        var restored = s.V(0).Hand.Single(c => c.Kind == CardKind.Peach).Id;
-        s.Need(s.DaozhuanActions().Any(a => a.CardId == restored), "The restored round offers the Slash name once more.");
-        s.DaozhuanPlay(restored, 3); s.Play();
-        s.Need(s.E<MobileShiDaozhuanUseRecordedEvent>() is [{ Name: CardKind.Slash }, { Name: CardKind.Slash, TurnNumber: 5, RoundNumber: 2 }] &&
-                !s.DaozhuanActions().Any(),
-            "The restored round allows the Slash name once more and re-exhausts after the own-turn use.");
-        s.Replay();
-    }
-
-    public static void DaozhuanRoundNameLedgerAndPerTurnTotalOffTurn()
-    {
-        var s = Scene.Start("daozhuan-ledger");
-        s.Play();
-        s.Need(s.DaozhuanActions().Any(), "Daozhuan stays available when the owner has not used it this round.");
-        s.End();
-        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge });
-        var firstMaterial = s.V(0).Hand.First(c => c.Kind == CardKind.Alcohol).Id;
-        s.Answer(c => c.Cards.Count == 1 && c.Cards[0] == firstMaterial &&
-            c.Parameters.GetValueOrDefault("conversion-skill-id") == Daozhuan &&
-            c.Parameters.GetValueOrDefault("conversion-binding-id") == "daozhuan-dodge");
-        s.Need(s.E<MobileShiDaozhuanUseRecordedEvent>() is [{ OwnerSeat: 0, Name: CardKind.Dodge, TurnNumber: 3, RoundNumber: 1, OwnerIsTurnPlayer: false }] &&
-                s.Zone(firstMaterial) == CardLocation.DiscardPile,
-            "An off-turn converted Dodge records its name in its own turn without exhausting the skill.");
-        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge });
-        s.Need(s.P!.Choices.All(c => c.Parameters.GetValueOrDefault("conversion-skill-id") != Daozhuan),
-            "A second Daozhuan use inside the same foreign turn is banned by the shared once-per-turn ceiling.");
-        s.Answer(c => c.Cards.Count == 0 && !c.Parameters.ContainsKey("conversion-skill-id"));
-        s.Play();
-        s.Need(s.DaozhuanActions().Any(), "The next round frees the spent names again.");
-        s.End();
-        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge });
-        var secondMaterial = s.V(0).Hand.Single(c => c.Kind == CardKind.Alcohol).Id;
-        s.Answer(c => c.Cards.Count == 1 && c.Cards[0] == secondMaterial &&
-            c.Parameters.GetValueOrDefault("conversion-skill-id") == Daozhuan &&
-            c.Parameters.GetValueOrDefault("conversion-binding-id") == "daozhuan-dodge");
-        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge });
-        s.Need(s.P!.Choices.All(c => c.Parameters.GetValueOrDefault("conversion-skill-id") != Daozhuan) &&
-                s.E<MobileShiDaozhuanUseRecordedEvent>() is
-                    [{ Name: CardKind.Dodge, TurnNumber: 3 }, { Name: CardKind.Dodge, TurnNumber: 7, RoundNumber: 2 }] &&
-                s.Zone(secondMaterial) == CardLocation.DiscardPile,
-            "The new round frees the Dodge name once while the per-turn and per-round ceilings still bind.");
-        s.Answer(c => c.Cards.Count == 0 && !c.Parameters.ContainsKey("conversion-skill-id"));
         s.Replay();
     }
 

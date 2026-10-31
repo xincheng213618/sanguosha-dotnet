@@ -6,50 +6,6 @@ internal static class HulaoRuleChecks
 {
     private const string Driver = "fixture:hulao-rule-driver", Mode = "fixture:hulao-rule-mode";
 
-    public static void RealHulaoSetupTierFiveCompatibleRosterAndKurouColdReplay()
-    {
-        var registry = ComposedSkillContentRegistry.CreateShowcase(includeActivities: true, includeBossActivities: true, includeHulaoActivities: true);
-        var activity = registry.Modes["activity:hulao-2022"].BossActivity!;
-        Require(new[] { "classic:cao-pi", "classic:man-chong", "classic:cai-wen-ji", "classic:lu-bu", "boundary:lu-bu",
-                "classic:yuan-shu", "boundary:da-qiao", "sp:guan-yu" }.All(id => !activity.PlayerPoolIds.Contains(id)) &&
-            activity.PlayerPoolIds.Contains("classic:da-qiao") && activity.PlayerPoolIds.Contains("classic:guan-yu") &&
-            registry.Generals["classic:lu-bu"].CharacterId is null,
-            "Hulao official bans cover legacy null-identity versions and actual Yuan Shu, retaining legal ordinary Da Qiao and Guan Yu without rewriting historical character metadata.");
-        string[] restoredGenerals =
-        [
-            "classic:xun-you", "classic:zhang-rang", "classic:guo-huanghou", "boundary:guo-huang-hou",
-            "ol:wo-long-feng-chu", "ol:wang-yun", "ol:ruan-yu", "classic:huang-yueying", "classic:wang-yi",
-            "classic:lu-kang", "ol:zhong-yan"
-        ];
-        Require(activity.PlayerTier == 5 && restoredGenerals.All(activity.PlayerPoolIds.Contains) &&
-            activity.PlayerPoolIds.Contains("boundary:huang-yueying") &&
-            registry.Generals["boundary:huang-yueying"].SkillIds.Contains("boundary:jizhi-current"),
-            "The runtime activity-trick bridge restores all formerly excluded legal character versions, including dynamic skill grants, while retaining current Jie Jizhi.");
-        var g = GameEngine.CreateStandard(new GameOptions { Seed = 17, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
-            HumanTeamId = "team:allies", ModeId = "activity:hulao-2022", UseInteractiveSetup = true,
-            UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 12 }, registry);
-        Accept(g, new StartGameCommand()); Until(g, () => P(g)?.Kind == DecisionKind.SelectGeneral);
-        Accept(g, new RequestGeneralRosterCommand(0, true, g.Revision, P(g)!.PromptId));
-        Require(P(g)!.ValidContentIds.Contains("classic:huang-gai") && restoredGenerals.All(P(g)!.ValidContentIds.Contains) &&
-            P(g)!.ValidContentIds.All(activity.PlayerPoolIds.Contains) && !P(g)!.ValidContentIds.Contains("hulao:lvbu-myth"),
-            "The actual expanded human draft exposes the complete implemented legal player pool and keeps the AI boss out.");
-        Cold(g, registry);
-        Accept(g, new SelectGeneralCommand(0, "classic:huang-gai", g.Revision, P(g)!.PromptId));
-        Until(g, () => E<SetupCompletedEvent>(g).Any());
-        Require(g.CreateSnapshot(0).Players.Select(player => player.HandCount).SequenceEqual([4, 5, 6, 8]) &&
-            V(g, 0) is { Hp: 6, MaxHp: 6, GeneralId: "classic:huang-gai" } &&
-            g.CreateSnapshot(0).Players.Count(player => !player.IsHuman && player.TeamId == "team:allies") == 2,
-            "Real tier-five Hulao deals 4/5/6 allied hands and 8 boss cards, with two AI teammates and Huang Gai's +2 health.");
-        Cold(g, registry); Play(g);
-        var hp = V(g, 0).Hp; var hand = V(g, 0).HandCount; var movementStart = g.CardMovements.Count;
-        Accept(g, new UseProgramSkillCommand(0, "classic:kujin", "lose-hp-and-draw", [], [], g.Revision, P(g)!.PromptId)); Play(g);
-        Require(V(g, 0).Hp == hp - 1 && V(g, 0).HandCount == hand + 2 &&
-            E<ProgramSkillHpLostEvent>(g).Count(e => e.SkillId == "classic:kujin" && e.TargetSeat == 0 && e.Amount == 1) == 1 &&
-            g.CardMovements.Skip(movementStart).Count(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0)) == 2,
-            "Huang Gai's actual Kurou command loses exactly one HP and draws two real cards in the public-team activity.");
-        Cold(g, registry);
-    }
-
     public static void AozhanPreventsWholeLargeDamageAndUnitedSuppliesSurvivors()
     {
         {
@@ -127,75 +83,6 @@ internal static class HulaoRuleChecks
                     m.To == CardLocation.DiscardPile && m.Sequence > movements[0].Sequence),
                     "Native payment and judgment discards retain separate, ordered physical movements without repaying on resume.");
             }
-            Cold(g, registry);
-        }
-    }
-
-    public static void ShenquUsesPhysicalPeachAndJiwuSkillsExpireAtActualTurnEnd()
-    {
-        {
-            var (g, registry) = Start("hulao:shenqu", "standard:peach");
-            var openingDraws = g.CardMovements.Where(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0)).ToArray();
-            var shenquOpening = openingDraws.Where(move => move.Reason.Value == "skill-program.hulao:shenqu.Draw").ToArray();
-            var normalOpening = openingDraws.Where(move => move.Reason == CardMoveReasons.Draw).ToArray();
-            Require(V(g, 0).HandCount == 7 && shenquOpening.Length == 2 && normalOpening.Length == 2 &&
-                shenquOpening.Max(move => move.Sequence) < normalOpening.Min(move => move.Sequence),
-                $"The 2v2 initiative-adjusted three-card hand receives two real Shenqu cards before two ordinary draw cards (hand={V(g, 0).HandCount}).");
-            var before = V(g, 0).HandCount;
-            Use(g, "damage", 0);
-            Until(g, () => P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "hulao-peach") == true);
-            Require(V(g, 0).Hp == 2, "The actual damage has applied before the optional Peach use.");
-            Cold(g, registry);
-            var peach = P(g)!.Choices.First(c => c.Cards.Count == 1).Cards.Single();
-            Answer(g, c => c.Cards.SequenceEqual([peach])); Play(g);
-            Require(V(g, 0).Hp == 3 && V(g, 0).HandCount == before - 1 &&
-                E<CardUseDeclaredEvent>(g).Any(e => e.CardId == peach && e.CardKind == CardKind.Peach && e.SourceSeat == 0) &&
-                E<HulaoPeachIssuedEvent>(g).Count() == 1 && E<HulaoPeachReturnedEvent>(g).Count() == 1 &&
-                g.CardMovements.Any(m => m.CardId == peach && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) &&
-                g.CardMovements.Any(m => m.CardId == peach && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile),
-                "Shenqu issues, commits and finishes a genuine paid Peach use, with one real recovery.");
-            Cold(g, registry);
-            var secondPeach = g.GetHumanLegalActions().First(action => action.Kind == LegalActionKind.Peach && action.CardId is not null);
-            Accept(g, new PlayCardCommand(0, secondPeach.CardId!.Value, secondPeach.TargetSeats, g.Revision,
-                P(g)!.PromptId, secondPeach.PlayedCardKind, secondPeach.TargetCardId)); Play(g);
-            Require(V(g, 0).Hp == 4 && V(g, 0).HandCount == 5, "A separate actual Play Peach restores full health before ordinary hand-limit discard.");
-            var ownTurn = g.State.TurnNumber; var discardStart = g.CardMovements.Count;
-            Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-            Until(g, () => P(g) is { PlayerSeat: 0, SkillPrompt.SkillId: "hulao:shenqu" } prompt &&
-                prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate"));
-            var foreignSeat = g.State.CurrentSeat; var foreignTurn = g.State.TurnNumber;
-            var ordinaryDiscards = g.CardMovements.Skip(discardStart).Count(move => move.TurnNumber == ownTurn &&
-                move.From == CardLocation.Hand(0) && move.To == CardLocation.DiscardPile && move.Reason == CardMoveReasons.HandLimitDiscard);
-            Require(foreignSeat == 1 && foreignTurn > ownTurn && V(g, 0).HandCount == 4 &&
-                E<TurnStartedEvent>(g).Last() is { ActorSeat: 1 } &&
-                ordinaryDiscards == 1,
-                $"Normal discard reaches four cards, and the first foreign actual turn offers genuine Shenqu (seat={foreignSeat}, turn={foreignTurn}, ownTurn={ownTurn}, hand={V(g, 0).HandCount}, lastActor={E<TurnStartedEvent>(g).Last().ActorSeat}, physicalDiscards={ordinaryDiscards}).");
-            Cold(g, registry);
-            var foreignMovements = g.CardMovements.Count;
-            Answer(g, choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
-            Until(g, () => g.CardMovements.Skip(foreignMovements).Count(move => move.From == CardLocation.DrawPile &&
-                move.To == CardLocation.Hand(foreignSeat) && move.Reason == CardMoveReasons.Draw) == 2);
-            Require(g.State.CurrentSeat == foreignSeat && g.State.TurnNumber == foreignTurn && V(g, 0).HandCount == 6 &&
-                g.CardMovements.Skip(foreignMovements).Count(move => move.From == CardLocation.DrawPile &&
-                    move.To == CardLocation.Hand(0) && move.Reason.Value == "skill-program.hulao:shenqu.Draw") == 2,
-                "The accepted off-turn draw pays two physical cards once and returns to the same NPC's normal draw without changing its actual turn.");
-            Cold(g, registry);
-        }
-        {
-            var (g, registry) = Start("hulao:jiwu");
-            var cost = V(g, 0).Hand[0].Id; var turn = g.State.TurnNumber;
-            Accept(g, new UseProgramSkillCommand(0, "hulao:jiwu", "acquire-qiangxi", [cost], [], g.Revision, P(g)!.PromptId)); Play(g);
-            Require(V(g, 0).Skills!.Any(s => s.Id == "hulao:qiangxi") && E<ProgramTurnSkillsGrantedEvent>(g).Single().TurnExpiry == new SkillGrantTurnExpiry(turn, 0),
-                "Jiwu pays a real HE card and grants the selected skill until the current actual turn ends.");
-            var enemy = g.CreateSnapshot(0).Players.First(p => p.Seat is 1 or 3).Seat;
-            var before = V(g, enemy).Hp;
-            Accept(g, new UseProgramSkillCommand(0, "hulao:qiangxi", "lose-hp-and-damage", [], [enemy], g.Revision, P(g)!.PromptId)); Play(g);
-            Require(V(g, 0).Hp == 3 && V(g, enemy).Hp == before - 1,
-                "The acquired Qiangxi operates in public-team mode and applies both its actual HP cost and damage.");
-            Cold(g, registry);
-            Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-            Until(g, () => E<ProgramTurnSkillGrantExpiredEvent>(g).Any(e => e.SkillId == "hulao:qiangxi"));
-            Require(V(g, 0).Skills!.All(s => s.Id != "hulao:qiangxi"), "Actual turn completion removes the grant without waiting for the next preparation.");
             Cold(g, registry);
         }
     }

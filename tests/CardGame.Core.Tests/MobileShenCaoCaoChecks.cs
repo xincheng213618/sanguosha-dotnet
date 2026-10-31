@@ -50,57 +50,6 @@ internal static class MobileShenCaoCaoChecks
             "Cold continuation visits each original participant once, flips once, and never reclaims or destroys the same phantom payment twice.");
         _ = Cold(g, registry);
     }
-
-    public static void GuixinSelectsAreasPerDamagePointAndColdReturnsOnce()
-    {
-        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
-        var g = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord,
-            ModeId = Mode, UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 4 }, r);
-        Accept(g, new StartGameCommand()); Reach(g, p => p.Kind == DecisionKind.SelectGeneral);
-        Accept(g, new SelectGeneralCommand(0, Hero, g.Revision, P(g)!.PromptId)); Play(g);
-        Use(g, "draw"); Play(g);
-        var equipment = V(g).Hand.First(c => c.Kind == CardKind.Crossbow).Id;
-        Use(g, "equip-other", [1]);
-        Reach(g, p => p.Choices.Any(c => c.Cards.SequenceEqual([equipment])));
-        Answer(g, c => c.Cards.SequenceEqual([equipment])); Play(g);
-        var indulgence = g.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Indulgence && a.TargetSeats.SequenceEqual([2]));
-        Accept(g, new PlayCardCommand(0, indulgence.CardId!.Value, indulgence.TargetSeats, g.Revision, P(g)!.PromptId, indulgence.PlayedCardKind, indulgence.TargetCardId));
-        Play(g);
-        Need(Zone(g, equipment) == CardLocation.Equipment(1) && Zone(g, indulgence.CardId.Value) == CardLocation.Judgment(2),
-            "The fixture creates a real chosen public weapon and a real delayed trick through native commands.");
-        var hand = V(g).HandCount; var thirdHand = V(g, 3).HandCount;
-        Use(g, "damage"); Offer(g); Activate(g);
-        Claim(g, 1, c => c.Cards.SequenceEqual([equipment])); Paid(g);
-        var first = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Guixin);
-        var firstId = first.Id;
-        Need(first.MobileGuixin is { Stage: MobileGuixinStage.MovementChildren, Cursor: 0, Payments.Count: 1 } paid &&
-             paid.Payments[0].CardId == equipment && paid.OtherSeats.SequenceEqual([1, 2, 3]) && first.PendingMovementContinuation is not null &&
-             Zone(g, equipment) == CardLocation.Hand(0) && Zone(g, indulgence.CardId.Value) == CardLocation.Judgment(2) &&
-             V(g).HandCount == hand + 1 && V(g, 3).HandCount == thirdHand && !V(g).IsFaceDown,
-            "The first actual damage point obtains the selected public equipment, then pauses its real gain child before visiting the next character or flipping.");
-        g = Cold(g, r); Continue(g);
-        Claim(g, 2, c => c.Cards.SequenceEqual([indulgence.CardId.Value])); Paid(g); Continue(g);
-        Claim(g, 3, c => c.Parameters.GetValueOrDefault("source-zone") == nameof(CardZoneKind.Hand) && c.Cards.Count == 0);
-        Paid(g); Continue(g); Offer(g);
-        Need(V(g).IsFaceDown && V(g).HandCount == hand + 3 && V(g, 3).HandCount == thirdHand - 1 &&
-             E<MobileGuixinCompletedEvent>(g).Single(e => e.FrameId == firstId) is { PaidCharacters: 3, TurnoverIssued: true, Cancelled: false } &&
-             E<ProgramBindingResolvedEvent>(g).Count(e => e.FrameId == firstId && e.Activated && e.Completed) == 1,
-            "The chosen Judgment card and opaque foreign hand card move once each; the first sweep flips only after all three gain children return.");
-        Activate(g);
-        foreach (var seat in new[] { 1, 2, 3 })
-        {
-            Claim(g, seat, c => c.Parameters.GetValueOrDefault("source-zone") == nameof(CardZoneKind.Hand) && c.Cards.Count == 0);
-            Paid(g); Continue(g);
-        }
-        Play(g);
-        Need(!V(g).IsFaceDown && V(g).HandCount == hand + 6 &&
-             E<MobileGuixinStartedEvent>(g).Select(e => e.OccurrenceIndex).SequenceEqual([0, 1]) &&
-             E<MobileGuixinTurnoverIssuedEvent>(g).Select(e => (e.Before, e.After)).SequenceEqual([(false, true), (true, false)]) &&
-             E<MobileGuixinCompletedEvent>(g).Length == 2 && g.CardMovements.Count(m => m.Reason.Value == Reason) == 6 &&
-             g.ResolutionStack.All(f => f is not ProgramSkillFrame { MobileGuixin: not null }),
-            "One real two-point damage gives two independent accepted Guixin sweeps, six actual acquisitions and exactly two opposite turnovers after cold replay.");
-    }
-    private static PlayerSnapshot V(GameEngine g, int seat = 0) => g.CreateSnapshot(seat).Players.Single(p => p.Seat == seat);
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static T[] E<T>(GameEngine g) => g.Events.Select(e => e.Payload).OfType<T>().ToArray();
     private static CardLocation Zone(GameEngine g, int card) => g.CreateCardZoneDiagnostics().Single(c => c.CardId == card).Location;

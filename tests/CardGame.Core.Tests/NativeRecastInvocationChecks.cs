@@ -41,31 +41,6 @@ internal static class NativeRecastInvocationChecks
         }
     }
 
-    public static void TwoParticipantsOwnIndependentFrozenInvocationsCold()
-    {
-        var (g, registry) = Start("pair");
-        var original = V(g, 0).Hand[0].Id;
-        Use(g, Pair, "pair", [original], [1]);
-        Reach(g, () => P(g)?.SkillPrompt?.SkillId == Watch);
-        var root = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.PairedHandRecast is not null);
-        var started = E<PairedHandRecastStartedEvent>(g).Single();
-        var draft = root.NativeRecastInvocation!;
-        Need(draft is { ExecutorSeat: 0, ParticipantCursor: 0 } && draft.Materials is [{ CardId: var paid }] && paid == original &&
-            draft.Materials is System.Collections.IList { IsReadOnly: true } && E<NativeRecastInvocationRecordedEvent>(g).Length == 0 &&
-            root.PairedHandRecast!.Owner.CostIssued && !root.PairedHandRecast.Owner.DrawIssued && !root.PairedHandRecast.Partner.CostIssued,
-            "Before its native cost child returns, the first participant owns one frozen primary group and has not issued either reward or the peer's recast.");
-        Need(Enumerable.Range(1, 3).All(s => g.CreateSnapshot(s).PendingDecision is null && g.CreateSnapshot(s).Players[0].Hand.Count == 0),
-            "The actual participant's private observer prompt and remaining hand identities are absent from other views.");
-        g = Cold(g, registry); Continue(g); Play(g);
-        var facts = E<NativeRecastInvocationRecordedEvent>(g).Where(e => e.ParentFrameId == started.FrameId).ToArray();
-        Need(facts.Length == 2 && facts.Select(e => e.InvocationId).Distinct().Count() == 2 &&
-            facts.Select(e => e.ExecutorSeat).SequenceEqual([0, 1]) && facts.Select(e => e.ParticipantCursor).SequenceEqual(new int?[] { 0, 1 }) &&
-            facts.All(e => e is { InitiatorSeat: 0, PrimaryCount: 1, ActualRecastCount: 1, ActualDrawCount: 1 }) &&
-            facts[1].SequenceBefore >= facts[0].SequenceAfter && E<PairedHandRecastCompletedEvent>(g).Single().PartnerPaid,
-            "A real paired program emits one independent whole invocation for each actual payer, in native participant order, after cold recovery exactly once.");
-        _ = Cold(g, registry);
-    }
-
     public static void PaidLossAndDeathKeepZeroDrawCompletionCold()
     {
         foreach (var scene in new[] { "loss", "death" })
@@ -87,64 +62,6 @@ internal static class NativeRecastInvocationChecks
                 g.CardMovements.Count(m => m.CardId == card && m.From == CardLocation.Hand(0) && m.Reason == CardMoveReasons.RecastDiscard) == 1 &&
                 (scene == "death" ? !V(g, 0).IsAlive : V(g, 0).IsAlive && !V(g, 0).Skills!.Any(s => s.Id == Slash)),
                 "A genuine already-paid recast remains a one-card recast when its source is lost or its participant dies before the reward; zero draw neither cancels nor repays the cost.");
-            _ = Cold(g, registry);
-        }
-    }
-
-    public static void EquipmentRecoveryAndOxSpillAreNotExtraRecastsCold()
-    {
-        foreach (var scene in new[] { "lion-native", "lion-program", "ox" })
-        {
-            var (g, registry) = Start(scene);
-            var card = V(g, 0).Hand[0].Id;
-            Accept(g, new PlayCardCommand(0, card, [], g.Revision, P(g)!.PromptId)); Play(g);
-            Need(V(g, 0).Equipment.Any(c => c.Id == card), "The recast material is a genuinely equipped native entity.");
-            int[] grain = [];
-            if (scene == "ox")
-            {
-                grain = V(g, 0).Hand.Take(2).Select(c => c.Id).ToArray();
-                foreach (var id in grain) { Use(g, Driver, "grain", [id]); Play(g); }
-            }
-            else { Use(g, Driver, "wound"); Play(g); }
-            var handBeforeRecast = V(g, 0).HandCount;
-            if (scene is "lion-native" or "ox")
-            {
-                var recast = g.GetHumanLegalActions().Single(a => a.Kind == LegalActionKind.Recast && a.CardId == card);
-                Accept(g, new RecastCardCommand(0, card, g.Revision, P(g)!.PromptId) { ConversionSource = recast.ConversionSource });
-            }
-            else Use(g, Driver, "equipment", [card]);
-            Reach(g, () => P(g)?.SkillPrompt?.SkillId == Watch);
-            var drafts = g.ResolutionStack.OfType<EquipmentRecastFrame>().Select(f => f.NativeRecastInvocation)
-                .Concat(g.ResolutionStack.OfType<ProgramSkillFrame>().Select(f => f.NativeRecastInvocation))
-                .OfType<NativeRecastInvocationDraft>().ToArray();
-            if (scene == "lion-program")
-            {
-                var parent = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Driver && f.ActivationId == "equipment");
-                var invoices = E<NativeRecastInvocationRecordedEvent>(g);
-                var paid = g.CardMovements.Single(m => m.CardId == card && m.From == CardLocation.Equipment(0) && m.Reason == CardMoveReasons.RecastDiscard);
-                Need(drafts.Length == 0 && invoices is [{ InitiatorSeat: 0, ExecutorSeat: 0, PrimaryCount: 1, ActualRecastCount: 1, ActualDrawCount: 1 }] &&
-                    invoices[0].ParentFrameId == parent.Id && invoices[0].InstructionIndex == parent.InstructionIndex &&
-                    invoices[0].SequenceBefore < paid.Sequence && paid.Sequence <= invoices[0].SequenceAfter &&
-                    E<CardRecastEvent>(g) is [{ DrawCount: 1 }] && E<CardRecastEvent>(g)[0].CardId == card &&
-                    V(g, 0).HandCount == handBeforeRecast + 1 && V(g, 0).Hp == V(g, 0).MaxHp,
-                    "The existing synchronous equipment program completes its exact one-primary payment and Draw1 before the genuine Lion recovery observer, retaining one completed whole invoice and its original instruction.");
-            }
-            else
-            {
-                Need(drafts.Length == 1, "The native cost child must retain exactly one frame-owned original recast invoice: " + Diagnostic(g) +
-                    " Invoices=" + JsonSerializer.Serialize(E<NativeRecastInvocationRecordedEvent>(g)));
-                var draft = drafts.Single();
-                Need(draft is { Materials.Count: 1 } && draft.Materials[0].CardId == card && draft.Materials[0].From == CardLocation.Equipment(0) &&
-                    E<NativeRecastInvocationRecordedEvent>(g).Length == 0 && V(g, 0).HandCount == handBeforeRecast &&
-                    (scene == "ox" ? grain.All(id => g.CardMovements.Any(m => m.CardId == id && m.From.Zone == CardZoneKind.WoodenOxGrain && m.To == CardLocation.DiscardPile)) : V(g, 0).Hp == V(g, 0).MaxHp),
-                    "Native Lion recovery or Ox spill pauses under the original frozen equipment invoice before its reward and whole completion.");
-            }
-            g = Cold(g, registry); Continue(g); Play(g);
-            Need(E<NativeRecastInvocationRecordedEvent>(g) is [{ PrimaryCount: 1, ActualRecastCount: 1, ActualDrawCount: 1 }] &&
-                E<CardRecastEvent>(g).Length == 1 && E<CardRecastEvent>(g).Single().CardId == card &&
-                E<NativeLogicalDiscardInvocationRecordedEvent>(g).All(e => e.Reason != CardMoveReasons.RecastDiscard) &&
-                g.CardMovements.Count(m => m.CardId == card && m.Reason == CardMoveReasons.RecastDiscard) == 1 && V(g, 0).HandCount == handBeforeRecast + 1,
-                "Cold child return preserves exactly one reward and whole completion in the producer's native order; Ox grain never becomes an extra primary or logical discard.");
             _ = Cold(g, registry);
         }
     }

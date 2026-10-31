@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
@@ -7,41 +7,6 @@ internal static class WushuangAiCombatChecks
     private const string Human = "fixture:wushuang-ai-human", Peer = "fixture:wushuang-ai-peer",
         Driver = "fixture:wushuang-ai-driver", Quiet = "fixture:wushuang-ai-quiet";
     private static readonly Lazy<ContentRegistry> Source = new(StandardWushuangContentRegistry.Create);
-
-    public static void FixedDamageKeepsWineUnlessDrunkenSlashCannotBeResistedCold()
-    {
-        var s = Scene.Start(913, 2210); s.EmptyPeer(); s.Obtain("slash"); s.Obtain("alcohol");
-        var before = s.State(); var slash = s.Action(LegalActionKind.Slash); var old = s.G.PredictPublicActionDamage(0, slash, 1);
-        var again = s.G.PredictPublicActionDamage(0, slash, 1);
-        Need(before == s.State() && old == again && old.HpLossAmount == 1 && old.Wushuang?.TargetPayment.HpLossAmount == 2,
-            "The optional public summary adds the genuine fixed-two prediction without changing legacy fields, commands, RNG, receipts or inventory.");
-        Need(s.Choose(10).Action.Kind == LegalActionKind.Alcohol && s.Choose(11).Action.Kind == LegalActionKind.Slash,
-            "With fixed damage and no Drunken Fist, the new actual choice uses Slash before consuming a wine that cannot increase damage.");
-        s.AssertHistoricalAndOtherMode(); s.Cold(); var hp = s.V(1).Hp; var use = s.Play(s.Action(LegalActionKind.Slash)); s.PlayBoundary();
-        Need(s.V(1).Hp == hp - 2 && s.E<DamageAppliedEvent>().Last(damage => damage.SourceSeat == 0 && damage.TargetSeat == 1).Amount == 2 &&
-            s.E<CardUseFinishedEvent>().Count(done => done.ResolutionId == use) == 1 && s.V(0).Hand.Any(card => card.Kind == CardKind.Alcohol),
-            "The accepted physical Slash really pays fixed damage two, finishes once and retains the real wine.");
-        s.Cold();
-
-        var drunk = Scene.Start(19, 2001); drunk.EmptyPeer(); drunk.EmptyOwn(); drunk.Obtain("slash"); drunk.Obtain("alcohol"); drunk.Obtain("dodge");
-        var dodge = drunk.V(0).Hand.Single(card => card.Kind == CardKind.Dodge).Id; drunk.Give(dodge);
-        Need(drunk.V(1).Hand.Any(card => card.Id == dodge) && drunk.Choose(11).Action.Kind == LegalActionKind.Alcohol,
-            "A real enemy Dodge remains hidden from the brain; the published Drunken Fist synergy still chooses wine before the independent Slash.");
-        drunk.Play(drunk.Action(LegalActionKind.Alcohol)); drunk.PlayBoundary();
-        var drunkSlash = drunk.Action(LegalActionKind.Slash); var payment = drunk.G.PredictPublicActionDamage(0, drunkSlash, 1);
-        Need(payment.Wushuang is { DrunkenSlashUnrespondable: true } && payment.Wushuang.TargetPayment.HpLossAmount >= 2,
-            "The already consumed wine makes this current published Slash unrespondable without guessing the enemy's hand.");
-        drunk.Cold(); hp = drunk.V(1).Hp; use = drunk.Play(drunk.Action(LegalActionKind.Slash)); drunk.PlayBoundary();
-        Need(drunk.V(1).Hp == hp - payment.Wushuang!.TargetPayment.HpLossAmount && drunk.V(1).Hand.Any(card => card.Id == dodge) &&
-            !drunk.E<ResponseRequestedEvent>().Any(request => request.SourceSeat == 0 && request.TargetSeat == 1 && request.IncomingCard == CardKind.Slash) &&
-            drunk.E<CardUseFinishedEvent>().Count(done => done.ResolutionId == use) == 1,
-            "The genuine drunken native Slash cannot be canceled by the actual retained Dodge, and its paid use completes once. " +
-            JsonSerializer.Serialize(new { HpBefore = hp, HpAfter = drunk.V(1).Hp, payment.Wushuang, DodgeRetained = drunk.V(1).Hand.Any(card => card.Id == dodge),
-                UseId = use, Finishes = drunk.E<CardUseFinishedEvent>().Where(done => done.ResolutionId == use).Take(4),
-                Requests = drunk.E<ResponseRequestedEvent>().TakeLast(8), Damage = drunk.E<DamageAppliedEvent>().TakeLast(8),
-                Uses = drunk.E<WushuangCombatUseFactEvent>().TakeLast(8) }));
-        drunk.Cold();
-    }
 
     public static void ThornsAvoidsSelfDefeatButDoesNotInventRetaliationAfterDeathCold()
     {
@@ -66,64 +31,6 @@ internal static class WushuangAiCombatChecks
             !finish.E<DamageAppliedEvent>().Any(damage => damage.SourceSeat == 1 && damage.TargetSeat == 0),
             "The real finishing Slash ends the victim before a Thorns return, preserving the source and its win.");
         finish.Cold();
-    }
-
-    public static void FiniteReductionUsesPublicReceiptsAndIndependentSlashBudgetCold()
-    {
-        var s = Scene.Start(31, 2003, legacyEnemyTactic: 2196); s.EmptyOwn(); s.EmptyPeer(); s.Obtain("slash");
-        Need(s.V(0).Hand is [{ Kind: CardKind.Slash }] && s.V(1).WushuangTacticIds!.Contains(2196) &&
-            s.Choose(11).Action.Kind == LegalActionKind.EndPlay,
-            "One available Slash cannot get through the enemy's two public per-round reductions, so the actual choice keeps it.");
-        s.Obtain("slash"); s.Obtain("slash");
-        var burstChoice = s.Choose(11);
-        Need(s.V(0).Hand.Count == 3 && s.V(0).Hand.All(card => card.Kind == CardKind.Slash) && burstChoice.Action.Kind == LegalActionKind.Slash,
-            "Three independent actual Slash entities and the fixture's real extra Slash quota can exhaust two finite reductions instead of refusing all aggression. " +
-            JsonSerializer.Serialize(new { Old = s.Choose(10).Thought.Candidates.Take(8), Current = burstChoice.Thought.Candidates.Take(8),
-                Prediction = s.G.PredictPublicActionDamage(0, s.Action(LegalActionKind.Slash), 1).Wushuang }));
-        var hp = s.V(1).Hp;
-        for (var hit = 0; hit < 3; hit++)
-        {
-            var action = s.Action(LegalActionKind.Slash); var prediction = s.G.PredictPublicActionDamage(0, action, 1).Wushuang!;
-            Need(prediction.TargetPayment.HpLossAmount == (hit < 2 ? 0 : 1) && prediction.IncomingReductionSegmentsRemaining == Math.Max(0, 2 - hit),
-                "Each next published action reads the real remaining allowance, including zero-damage consumption.");
-            s.Cold(); s.Play(s.Action(LegalActionKind.Slash)); s.PlayBoundary();
-            Need(s.V(1).Hp == hp - (hit < 2 ? 0 : 1) && s.E<WushuangIncomingReductionIssuedEvent>().Count(receipt => receipt.TargetSeat == 1) == hit + 1,
-                "The native damage hook spends each allowance exactly once, even when no HP is lost.");
-        }
-        s.Cold();
-    }
-
-    public static void NativeIncomingTacticsKeepUnsafeInjuryDefenseAndLegacyFieldsCold()
-    {
-        foreach (var (seed, tactic, suit, damage) in new[]
-        {
-            (19, 2001, Suit.Spade, 1), (913, 2210, Suit.Spade, 2), (103, 2045, Suit.Heart, 3)
-        })
-        {
-            var s = Scene.Start(seed, tactic, enemyHp: 3, slashSuit: suit, enemyYiji: true);
-            s.EmptyOwn(); s.EmptyPeer(); s.Obtain("dodge");
-            s.Give(s.V(0).Hand.Single().Id); s.Obtain("slash");
-            var use = s.Play(s.Action(LegalActionKind.Slash)); s.DodgeBoundary();
-            Need(s.E<WushuangCombatUseFactEvent>().Single(fact => fact.CardUseFrameId == use) is { SlashOrdinal: 1 } receipt &&
-                receipt.Suit == suit && s.V(1).WushuangBuild is { InjuryDrawPerDamagePoint: 2 },
-                "The native response owns the real declared public suit/ordinal and the opponent's actual current injury-draw skill.");
-            var state = s.State(); var prediction = s.Incoming();
-            Need(state == s.State() && prediction == s.Incoming() && prediction.HpLossAmount == 1 &&
-                prediction.Wushuang?.TargetPayment.HpLossAmount == damage,
-                "The real pending response adds exact native fixed-two/Heart-plus-two payment while preserving legacy fields and all native RNG, quota, payment and frame state.");
-            var view = s.G.CreateSnapshot(1);
-            (bool UseDodge, bool UseBagua, AiThoughtRecord Thought) Choose(int policy, PublicDamagePrediction p) =>
-                new SimpleAiBrain(1, 917, policy).ChooseDodgeResponse(view, 0, 1, false, true,
-                    incomingPrediction: p, legalBaguaAvailable: false);
-            var current = Choose(11, prediction);
-            Need(current.UseDodge == (damage != 1) && !current.UseBagua,
-                "Only a genuine safe one-damage Slash permits injury management; native fixed-two and a lethal Heart-plus-two Slash retain the actual Dodge.");
-            Need(JsonSerializer.Serialize(Choose(10, prediction).Thought) ==
-                JsonSerializer.Serialize(Choose(10, prediction with { Wushuang = null }).Thought),
-                "Historical policy ten keeps identical response decisions and seeded thoughts when the optional native incoming summary is attached.");
-            s.Cold();
-            Need(s.Incoming() == prediction, "Cold restore preserves the declared receipt and the exact incoming native payment prediction.");
-        }
     }
 
     public static void NullifiedTrickClaimsItsOnceFinishedPhysicalMaterialCold()

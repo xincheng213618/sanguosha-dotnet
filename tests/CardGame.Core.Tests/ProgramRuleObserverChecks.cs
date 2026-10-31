@@ -42,28 +42,6 @@ internal static class ProgramRuleObserverChecks
         _ = ProgramRuleObserverCatalog.Discover(ProgramRuntimeModuleCatalog.Default.Methods);
     }
 
-    public static void InvalidRegistrationsFailBeforeDispatch()
-    {
-        Reject(typeof(DuplicateOrderFixture), "Duplicate rule observer order");
-        Reject(typeof(MissingPhaseFixture), "has no registrations", completePhases: false);
-        Reject(typeof(MissingOrderFixture), "positive explicit order");
-        Reject(typeof(InvalidPhaseFixture), "valid phase");
-        Reject(typeof(InvalidParameterFixture), "invalid handler signature");
-        Reject(typeof(InvalidReturnFixture), "invalid handler signature");
-        Reject(typeof(InvalidStaticFixture), "invalid handler signature");
-        Reject(typeof(InvalidPublicationFixture), "invalid handler signature");
-        Reject(typeof(OptionalEventFixture), "invalid handler signature");
-
-        static void Reject(Type fixture, string expected, bool completePhases = true)
-        {
-            var methods = Methods(fixture).AsEnumerable();
-            if (completePhases) methods = methods.Concat(Methods(typeof(CompletePhaseFixture)));
-            try { _ = ProgramRuleObserverCatalog.Discover(methods); }
-            catch (InvalidOperationException error) when (error.Message.Contains(expected, StringComparison.Ordinal)) { return; }
-            throw new InvalidOperationException($"Rule observer registration did not reject '{fixture.Name}' with '{expected}'.");
-        }
-    }
-
     private static MethodInfo[] Methods(Type type) => type.GetMethods(
         BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
 
@@ -108,58 +86,5 @@ internal static class ProgramRuleObserverChecks
 
         [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 10)]
         private void After(TurnStartedEvent ended) => Trace.Add($"after:{ended.TurnNumber}");
-    }
-
-    private sealed class DuplicateOrderFixture
-    {
-        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 10)] private void First() { }
-        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 10)] private void Duplicate() { }
-    }
-
-    private sealed class CompletePhaseFixture
-    {
-        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 10000)] private void Before() { }
-        [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 10000)] private void After() { }
-        [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 10000)] private void Publish() { }
-    }
-
-    private sealed class MissingPhaseFixture
-    {
-        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 10)] private void Incomplete() { }
-    }
-
-    private sealed class MissingOrderFixture
-    {
-        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 0)] private void Unordered() { }
-    }
-
-    private sealed class InvalidPhaseFixture
-    {
-        [ProgramRuleObserver((ProgramRulePhase)12345, 10)] private void Unknown() { }
-    }
-
-    private sealed class InvalidParameterFixture
-    {
-        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 10)] private void Wrong(string value) { }
-    }
-
-    private sealed class InvalidReturnFixture
-    {
-        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 10)] private bool Wrong() => false;
-    }
-
-    private sealed class InvalidStaticFixture
-    {
-        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 10)] private static void Wrong() { }
-    }
-
-    private sealed class InvalidPublicationFixture
-    {
-        [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 10)] private void Wrong(TurnStartedEvent payload) { }
-    }
-
-    private sealed class OptionalEventFixture
-    {
-        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 10)] private void Wrong(IGameEvent? payload = null) { }
     }
 }

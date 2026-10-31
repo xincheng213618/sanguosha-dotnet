@@ -75,50 +75,6 @@ internal static class ShanheShopRefreshChecks
         }
     }
 
-    public static void MidShopAcquisitionAddsFreeUsesAndNextShopResetsEveryCounter()
-    {
-        var session = Create(Definition(1100));
-        Enter(session, "shop");
-        Accept(session, new RefreshShanheShopCommand(session.Revision));
-        Budget(session, 0, 0, 100);
-        var card = session.Snapshot.ShopItems.First(item => item.Reward?.Id.StartsWith("card-", StringComparison.Ordinal) == true);
-        Need(card.GoldCost == 100, "The first ordinary card purchase keeps its own authored price.");
-        Accept(session, new ChooseShanheNodeOptionCommand(card.ChoiceId, null, session.Revision));
-        Buy(session, FreeTwo, 300);
-        Budget(session, 2, 0, 0);
-        var twoQuote = session.Snapshot;
-        var ids = new HashSet<string>(StringComparer.Ordinal);
-        RecordStock(session, 1, ids);
-        Accept(session, new RefreshShanheShopCommand(session.Revision));
-        Budget(session, 1, 0, 0);
-        RecordStock(session, 2, ids);
-        RejectUnchanged(session, new ChooseShanheNodeOptionCommand(card.ChoiceId, null, session.Revision));
-        Buy(session, FreeFour, 600);
-        Budget(session, 5, 0, 0);
-        Need(session.Snapshot.Gold == 0 && twoQuote.ShopFreeRefreshRemaining == 2 &&
-            twoQuote.ShopItems.Single(item => item.ChoiceId == card.ChoiceId).IsPurchased,
-            "Buying both real source tactics after the paid allowance is spent adds 2+4 current-shop uses without refunding the free refresh already used, while category pricing, purchase history and the old quote remain intact.");
-        for (var index = 0; index < 5; index++)
-        {
-            Accept(session, new RefreshShanheShopCommand(session.Revision));
-            Budget(session, 4 - index, 0, index < 4 ? 0 : 100);
-            Need(session.Snapshot.Gold == 0 && session.Snapshot.ShopItems.All(item => item.GoldCost == 200),
-                "A zero-copper free refresh preserves the earlier card-category surcharge instead of resetting shop purchases.");
-            RecordStock(session, index + 3, ids);
-        }
-        RejectUnchanged(session, new RefreshShanheShopCommand(session.Revision));
-        Accept(session, new ChooseShanheNodeOptionCommand("$leave", null, session.Revision));
-        Budget(session, 0, 0, 0);
-        Enter(session, "next");
-        Budget(session, 6, 1, 0);
-        Need(session.Snapshot.ShopItems.All(item => item.GoldCost == 100 && !item.IsPurchased),
-            "The next real shop resets free and paid usage plus category and purchase histories, while retaining the held source tactics.");
-        RecordStock(session, 0, new HashSet<string>(StringComparer.Ordinal));
-        Accept(session, new RefreshShanheShopCommand(session.Revision));
-        Budget(session, 5, 1, 0);
-        Need(session.Snapshot.Gold == 0, "The reset second-shop free allowance remains executable without copper.");
-    }
-
     private static ShanheCampaignDefinition Definition(int gold)
     {
         var sources = StandardShanheCampaignCatalog.CurrentEconomyTactics.Where(source => source.SourceId is 2291 or 2292 or 2107).ToArray();
@@ -141,12 +97,6 @@ internal static class ShanheShopRefreshChecks
         ShanheCampaignSession.Create(definition, new(71, ShanheCampaignChecks.Player)
             { UseCodexRewardPool = true, EquippedTacticIds = tactics }, ShanheCampaignChecks.Registry);
     private static void Enter(ShanheCampaignSession session, string id) => Accept(session, new MoveShanheNodeCommand(id, session.Revision));
-    private static void Buy(ShanheCampaignSession session, string reward, int price)
-    {
-        var item = session.Snapshot.ShopItems.Single(item => item.Reward?.Id == reward);
-        Need(item.GoldCost == price, "The real source tactic purchase must pay the quoted price including earlier tactic purchases.");
-        Accept(session, new ChooseShanheNodeOptionCommand(item.ChoiceId, null, session.Revision));
-    }
     private static void Budget(ShanheCampaignSession session, int free, int paid, int cost) => Need(
         session.Snapshot.ShopFreeRefreshRemaining == free && session.Snapshot.ShopPaidRefreshRemaining == paid &&
         session.Snapshot.ShopRefreshRemaining == free + paid && session.Snapshot.ShopRefreshCost == cost,

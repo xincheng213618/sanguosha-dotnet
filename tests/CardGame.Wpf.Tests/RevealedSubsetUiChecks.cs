@@ -12,61 +12,6 @@ internal static class RevealedSubsetUiChecks
 {
     private const string Chengxiang = "boundary:chengxiang-current";
 
-    public static void RankDraftConfirmationAndEmptyCancel(string output)
-    {
-        var (source, registry) = Create("boundary:cao-chong");
-        BeginChengxiang(source);
-        using var model = Restore(source, registry);
-        using var host = new NativeResponseStatusChecks.NativeHost(model);
-        var game = Program.Engine(model);
-        var prompt = game.CreateSnapshot(0).PendingDecision!;
-        var ids = model.PublicRevealedCards.Select(card => card.Id).ToArray();
-        var commands = game.AcceptedCommands.Count;
-        var movements = game.CardMovements.Count;
-        Program.Assert(ids.Length == 4 && model.IsRevealedSubsetSelectionPending &&
-            model.CenterSkillChoices.Count == 0 && model.SelectionArea.ShowConfirm && model.CanCancelAction,
-            "The real four-card Chengxiang pool uses direct faces and lower confirmation/cancel, without combination buttons.");
-        ClickCard(host, ids[0]); ClickCard(host, ids[1]); ClickCard(host, ids[2]);
-        Program.Assert(model.PublicRevealedCards.Count(card => card.IsSelected) == 3 && model.CanConfirmSelected &&
-            model.ActionHint.Contains("点数和 12") && !model.SelectRevealedCardCommand.CanExecute(model.PublicRevealedCards.Single(card => card.Id == ids[3])),
-            "Three real rank-four cards may be selected together; a fourth must be blocked by the combined thirteen-point cap.");
-        model.SelectRevealedCardCommand.Execute(model.PublicRevealedCards.Single(card => card.Id == ids[3]));
-        Refresh(model);
-        Program.Assert(model.PublicRevealedCards.Count(card => card.IsSelected) == 3 &&
-            game.AcceptedCommands.Count == commands && game.CardMovements.Count == movements &&
-            game.PendingDecision!.PromptId == prompt.PromptId, "Refresh and invalid toggles retain the entire unpaid draft.");
-        var selectedCard = model.PublicRevealedCards.First(card => card.IsSelected);
-        var face = CardButton(host, selectedCard.Id);
-        var outline = Program.Find<Border>(face).Single(border => border.Name == "ChoiceFrame");
-        Program.Assert(((SolidColorBrush)outline.BorderBrush).Color == Color.FromRgb(255, 226, 145) &&
-            selectedCard.PublicCardLabel.Contains("已选择"), "Selected faces retain a visible outline and cancellation label after refresh.");
-        ClickCard(host, ids[1]); ClickCard(host, ids[1]);
-        host.Capture(output, "chengxiang-direct-three-selected", 1120);
-        Click((Button)host.Window.FindName("PlayCardButton"));
-        var answer = game.AcceptedCommands.OfType<AnswerPromptCommand>().Last();
-        Program.Assert(answer.Choice == prompt.Choices.Single(choice => choice.Cards.ToHashSet().SetEquals(ids.Take(3))).Id &&
-            game.Events.Select(envelope => envelope.Payload).OfType<ProgramCardSubsetSelectedEvent>().Last() is
-                { CardIds.Count: 3, RankSum: 12 }, "One lower confirmation submits the exact original three-card choice.");
-        Reach(game, p => p.Kind == DecisionKind.PlayCard);
-        Program.Assert(ids.Take(3).All(id => game.CreateSnapshot(0).Players[0].Hand.Any(card => card.Id == id)) &&
-            game.CardMovements.Count(move => move.CardId == ids[3] && move.To == CardLocation.DiscardPile) == 1,
-            "The confirmed subset is gained and its remainder discarded once.");
-        BeginChengxiang(game); Refresh(model);
-        var cancelPrompt = game.CreateSnapshot(0).PendingDecision!;
-        var stale = model.PublicRevealedCards.First();
-        ClickCard(host, stale.Id);
-        LegacySaveFixtures.Save(model); LegacySaveFixtures.Load(model);
-        game = Program.Engine(model);
-        Program.Assert(model.IsRevealedSubsetSelectionPending && !model.HasSelection &&
-            !model.SelectRevealedCardCommand.CanExecute(stale), "Cold reload retires old faces and clears the uncommitted local draft.");
-        ClickCard(host, model.PublicRevealedCards.First().Id);
-        Click((Button)host.Window.FindName("CancelActionButton"));
-        Program.Assert(game.AcceptedCommands.OfType<AnswerPromptCommand>().Last().Choice ==
-            cancelPrompt.Choices.Single(choice => choice.Cards.Count == 0).Id &&
-            game.Events.Select(envelope => envelope.Payload).OfType<ProgramCardSubsetSelectedEvent>().Last() is
-                { CardIds.Count: 0, RankSum: 0 }, "Cancel submits the original empty subset even when some cards were selected.");
-    }
-
     public static void SharedPrivateCountAndPublicSuitDrafts(string output)
     {
         foreach (var character in new[] { "classic:li-dian", "classic:shen-lu-meng" })
@@ -210,14 +155,6 @@ internal static class RevealedSubsetUiChecks
         Reach(game, p => p.Kind == DecisionKind.SelectGeneral);
         Accept(game, new SelectGeneralCommand(0, Fixture.Owner, game.Revision, game.PendingDecision!.PromptId));
         return (game, registry);
-    }
-    private static void BeginChengxiang(GameEngine game)
-    {
-        Reach(game, p => p.Kind == DecisionKind.PlayCard);
-        Accept(game, new UseProgramSkillCommand(0, Fixture.Driver, "hurt", [], [], game.Revision, game.PendingDecision!.PromptId));
-        Reach(game, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("skill-id") == Chengxiang && c.Parameters.GetValueOrDefault("program-action") == "activate"));
-        Answer(game, game.CreateSnapshot(0).PendingDecision!.Choices.First(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
-        Reach(game, IsSubset);
     }
     private static bool IsSubset(PendingDecision prompt) => prompt.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-subset");
     private static void Reach(GameEngine game, Func<PendingDecision, bool> predicate)

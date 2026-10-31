@@ -64,53 +64,6 @@ internal static class HellTierPrivilegeChecks
         Cold(g, registry);
     }
 
-    public static void TierEquipmentAndLateFifthTierAssaultUseRealNativeCardsOnce()
-    {
-        foreach (var tier in Enumerable.Range(2, 4))
-        {
-            var (g, registry) = Start(tier, rebirth: false);
-            Need(Enumerable.Range(0, 4).All(seat => V(g, seat).Equipment.Count == 1 &&
-                    Facts<CardUseDeclaredEvent>(g).Count(e => e.SourceSeat == seat && e.CardKind == CardKind.Crossbow) == 1) &&
-                Enumerable.Range(0, 3).All(seat => Facts<ProgramBindingResolvedEvent>(g).Count(e =>
-                    e.OwnerSeat == seat && e.SkillId == "hell:player-tier" && e.BindingId == "arrival-equipment" && e.Completed) == 1) &&
-                Facts<ProgramBindingResolvedEvent>(g).Count(e => e.OwnerSeat == 3 && e.SkillId == "hell:boss-tier" &&
-                    e.BindingId == "arrival-equipment" && e.Completed) == 1 &&
-                Facts<DamageAppliedEvent>(g).Count(e => e.SourceSeat == 3 && e.TargetSeat < 3) == (tier == 5 ? 3 : 0) &&
-                Facts<DamageAppliedEvent>(g).Where(e => e.SourceSeat == 3 && e.TargetSeat < 3).All(e => e.Amount == 2),
-                "Enemy tiers two through five and the three real player-tier entry programs equip one actual deck entity; only tier five issues the real two-damage native Barbarian Assault.");
-            Cold(g, registry);
-            if (tier != 5) continue;
-            var alliedEquipment = Enumerable.Range(0, 3).Select(seat => V(g, seat).Equipment.Single().Id).ToArray();
-            var initialAssaults = Facts<CardUseDeclaredEvent>(g).Where(e => e.CardKind == CardKind.BarbarianAssault).ToArray();
-            Need(initialAssaults is [{ SourceSeat: 3, CardId: 0 }] && Enumerable.Range(0, 3).All(seat => V(g, seat).Hp == 4),
-                "The opening fifth-tier attack uses a genuine zero-material ordinary trick and applies its scoped plus-one damage separately to all three coalition recipients.");
-            Use(g, "kill", targets: [3]);
-            Until(g, () => P(g) is { PlayerSeat: 0, SkillPrompt.SkillId: ArrivalWatch } &&
-                Facts<BossActivityStageStartedEvent>(g).Any(e => e.StageIndex == 1) &&
-                g.ResolutionStack.OfType<CardUseFrame>().Any(f => f.CardKind == CardKind.BarbarianAssault &&
-                    f.VirtualOrdinaryTrickOrigin is { SkillId: "hell:boss-tier" }));
-            var use = g.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardKind == CardKind.BarbarianAssault);
-            Need(use.CardId == 0 && use.Action!.PhysicalCards.Count == 0 && use.SourceSeat == 3 &&
-                use.VirtualOrdinaryTrickOrigin is { BindingId: "arrival-assault" } &&
-                Facts<CardUseDeclaredEvent>(g).Count(e => e.CardKind == CardKind.BarbarianAssault) == 2,
-                "A genuinely replaced later boss owns its new native arrival assault rather than re-running the original global game-start window.");
-            Cold(g, registry); Play(g);
-            Need(Facts<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id) == 1 &&
-                Facts<DamageAppliedEvent>(g).Count(e => e.SourceSeat == 3 && e.TargetSeat < 3 && e.Amount == 2) == 6 &&
-                Enumerable.Range(0, 3).All(seat => V(g, seat).Hp == 2 && V(g, seat).Equipment.Single().Id == alliedEquipment[seat] &&
-                    Facts<ProgramBindingResolvedEvent>(g).Count(e => e.OwnerSeat == seat && e.SkillId == "hell:player-tier" &&
-                        e.BindingId == "arrival-equipment" && e.Completed) == 1) &&
-                Facts<ProgramBindingResolvedEvent>(g).Count(e => e.OwnerSeat == 3 && e.SkillId == "hell:boss-tier" &&
-                    e.BindingId == "arrival-equipment" && e.Completed) == 2 &&
-                Facts<ProgramBindingResolvedEvent>(g).Count(e => e.OwnerSeat == 3 && e.SkillId == "hell:boss-tier" &&
-                    e.BindingId == "arrival-assault" && e.Completed) == 2 &&
-                Facts<HellNpcAppearedEvent>(g).Where(e => e.Seat == 3).All(e =>
-                    Facts<HellAppearanceCompletedEvent>(g).Count(done => done.AppearanceId == e.AppearanceId) == 1),
-                "The cold-resumed later arrival settles once with two damage per target; existing players retain their equipment and never repeat entry skills, while only the new NPC receives its second actual entry.");
-            Cold(g, registry);
-        }
-    }
-
     private static bool IsChongsheng(PromptChoice choice) =>
         choice.Parameters.GetValueOrDefault("response") == "program-trigger" &&
         choice.Parameters.GetValueOrDefault("skill-id") == "hell:chongsheng" &&

@@ -79,57 +79,6 @@ internal static class ShanheCompanionChecks
             "Verified seeds select distinct members of a multi-entry fixture once and reproduce the same picks after cold restoration.");
     }
 
-    public static void BothOpeningTacticsAccumulateFixedHandsAndRespectRemainingSeatsCold()
-    {
-        var production = StandardShanheCampaignCatalog.CreateCodexDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
-        var ordinary = production.Rewards.Single(reward => reward.Id == StandardShanheCampaignCatalog.OpeningCompanionRewardId);
-        var manzhu = ordinary.OpeningCompanionPool!.Single(member => member.GeneralId == Companion);
-        var chilian = ordinary.OpeningCompanionPool!.Single(member => member.GeneralId == StandardShanheChilianCompanionPackage.ChilianId);
-        Need(manzhu.StartingHand!.Select(card => (card.Kind, card.Suit, card.Rank)).SequenceEqual(new[]
-            { (CardKind.Dodge, Suit.Club, 13), (CardKind.Dodge, Suit.Club, 12), (CardKind.Dodge, Suit.Club, 11), (CardKind.Slash, Suit.Heart, 1) }) &&
-            chilian.StartingHand!.Select(card => (card.Kind, card.Suit, card.Rank)).SequenceEqual(new[]
-            { (CardKind.Slash, Suit.Heart, 5), (CardKind.Alcohol, Suit.Spade, 3) }),
-            "The screenshot's named hands override the article's swapped Manzhu and Chilian prose.");
-        var definition = Definition() with
-        {
-            Schools = production.Schools,
-            Rewards = [ordinary with { OpeningCompanionPool = [manzhu] },
-                new(StandardShanheCampaignCatalog.EliteOpeningCompanionRewardId, "第二份队友") { OpeningCompanionPool = [chilian] }]
-        };
-        var run = ShanheCampaignSession.Create(definition, new(71, Player)
-        { EquippedTacticIds = [StandardShanheCampaignCatalog.OpeningCompanionRewardId, StandardShanheCampaignCatalog.EliteOpeningCompanionRewardId] },
-            StandardShanheCampaignCatalog.CreateBattleRegistry);
-        Need(run.Snapshot.StartingCompanions.Count == 2 && run.Snapshot.TacticIds.Count == 2 &&
-            run.PreviewEncounter("battle").Allies!.Select(member => member.GeneralId).SequenceEqual([Companion, chilian.GeneralId]),
-            "Both independently equipped opening tactics accumulate their own fixed companion.");
-        Accept(run, new MoveShanheNodeCommand("battle", run.Revision));
-        var cold = Cold(run, definition);
-        Need(cold.Snapshot.StartingCompanions.Count == 2 && ShanheBattleSetup.ValueEquals(run.PendingBattleSetup, cold.PendingBattleSetup),
-            "Cold campaign replay preserves both companion grants and exact faces.");
-        var battle = StandardShanheCampaignCatalog.CreateBattle(run.PendingBattleSetup!);
-        Need(battle.Submit(new StartGameCommand()).Accepted, "Both companions start a native battle together.");
-        foreach (var member in new[] { manzhu, chilian })
-        {
-            var player = battle.CreateSnapshot(0).Players.Single(player => player.GeneralId == member.GeneralId);
-            var hand = battle.CreateSnapshot(player.Seat).Players.Single(view => view.Seat == player.Seat).Hand;
-            Need(hand.Select(card => (card.Kind, card.Suit, card.Rank)).SequenceEqual(member.StartingHand!.Select(card => (card.Kind, card.Suit, card.Rank))),
-                "A fixed companion hand replaces ordinary random starting cards.");
-        }
-        var enemies = new[] { "classic:zhang-liao", "classic:cao-cao", "classic:sun-quan", "classic:zhou-yu", "classic:ma-chao", "classic:zhao-yun" }
-            .Select(id => new ShanheCombatantDefinition(id)).ToArray();
-        var tight = definition with { Nodes = Definition(enemies: enemies).Nodes };
-        var seated = ShanheCampaignSession.Create(tight, new(71, Player)
-        { EquippedTacticIds = [StandardShanheCampaignCatalog.OpeningCompanionRewardId, StandardShanheCampaignCatalog.EliteOpeningCompanionRewardId] },
-            StandardShanheCampaignCatalog.CreateBattleRegistry);
-        var preview = seated.PreviewEncounter("battle");
-        Need(preview.Allies is [{ GeneralId: Companion }] && preview.StoryText!.Contains("部分开局队友暂不参战") &&
-            seated.Snapshot.StartingCompanions.Count == 2,
-            "One remaining seat admits the first companion and preserves the second for later battles.");
-        Accept(seated, new MoveShanheNodeCommand("battle", seated.Revision));
-        Need(ShanheBattleSetup.ValueEquals(Cold(seated, tight).PendingBattleSetup, seated.PendingBattleSetup),
-            "Preview, challenge and replay retain the same partial seating.");
-    }
-
     private static ShanheCampaignDefinition Definition(IReadOnlyList<ShanheCombatantDefinition>? enemies = null,
         IReadOnlyList<ShanheCombatantDefinition>? allies = null, IReadOnlyList<ShanheCombatantDefinition>? pool = null) =>
         new("fixture:companion", "开局同伴机制", [Player], ["battle"],

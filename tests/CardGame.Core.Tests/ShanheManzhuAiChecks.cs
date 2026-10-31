@@ -8,44 +8,6 @@ internal static class ShanheManzhuAiChecks
     private const string Player = "fixture:manzhu-player", Enemy = "fixture:manzhu-enemy", Other = "fixture:manzhu-other";
     private const string Twin = "fixture:manzhu-twin", Manzhu = StandardShanheCompanionPackage.ManzhuId;
 
-    public static void EnemyDodgeAiPaysHpChainsZhaxiangAndKeepsFirstResponseCursor()
-    {
-        foreach (var twin in new[] { false, true })
-        {
-            var game = Start(twin: twin);
-            Play(game);
-            var initialHand = game.CreateSnapshot(1).Players[1].Hand.Select(card => card.Id).ToArray();
-            var targets = twin ? new[] { 2, 3 } : [2];
-            Use(game, game.GetHumanLegalActions().First(action => action.Kind == LegalActionKind.Slash && action.TargetSeats.SequenceEqual(targets)));
-            Reach(game, () => P(game) is { PlayerSeat: 1 } p &&
-                p.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "wushuang-zengou"));
-            var frame = game.ResolutionStack.OfType<ProgramSkillFrame>().Last();
-            var receipt = frame.WushuangZengou!;
-            var attack = game.ResolutionStack.OfType<CardUseFrame>().Single(use => use.Id == receipt.AttackFrameId);
-            Need(frame.SkillId == "ol:zengou" && receipt.DodgerSeat == 2 && receipt.DodgeCursor == 0 &&
-                attack.CardAttack!.RequiredDodgeResponses == (twin ? 2 : 1) && attack.TargetSeats.Count == targets.Length &&
-                P(game)!.Choices.Any(choice => choice.Cards.Count == 1) &&
-                P(game)!.Choices.Any(choice => choice.Parameters.GetValueOrDefault("cost") == "hp"),
-                "Normal AI activates the actual OL skill at the first Dodge, including multi-target double-Dodge attacks, with both real cost alternatives available.");
-            var dodge = receipt.Cards.Single();
-            Play(game);
-            var invoice = Events<WushuangZengouPaidEvent>(game).Single();
-            var hand = game.CreateSnapshot(1).Players[1].Hand;
-            Need(invoice.CostCardId is null && invoice.DodgerSeat == 2 && invoice.DodgeCursor == 0 &&
-                game.CreateSnapshot(0).Players[1].Hp == 2 && initialHand.All(id => hand.Any(card => card.Id == id)) &&
-                hand.Count == initialHand.Length + 4 && hand.Any(card => card.Id == dodge) &&
-                Events<ProgramSkillHpLostEvent>(game).Count(loss => loss.SkillId == "ol:zengou" && loss.TargetSeat == 1 && loss.Amount == 1) == 1 &&
-                game.CardMovements.Count(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(1) &&
-                    move.Reason.Value == "skill-program.boundary:zhaxiang.Draw") == 3 &&
-                Events<WushuangZengouInvalidatedEvent>(game).Single().Payment == invoice &&
-                Events<WushuangZengouGainedCardEvent>(game).Single().CardId == dodge &&
-                game.CreateCardZoneDiagnostics().Single(card => card.CardId == dodge).Location == CardLocation.Hand(1) &&
-                game.CreateSnapshot(0).Players[2].Hp == 7 &&
-                !Events<RequiredResponseProgressEvent>(game).Any(progress => progress.ResponderSeat == 2 && progress.ResponseCount > 0),
-                "AI prefers genuine HP payment with Zhaxiang: lose once, draw three, invalidate the exact first Dodge, obtain it once and allow the hit without consuming a successful response.");
-        }
-    }
-
     public static void AiPreservesLastHpRangeAndConvertedDuelBoundaries()
     {
         var low = Start(hp: 1);

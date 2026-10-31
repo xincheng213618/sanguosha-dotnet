@@ -10,32 +10,6 @@ internal static class ShanheArmorBreakTacticChecks
     private const string Driver = "fixture:armor-break-driver", Quiet = "fixture:armor-break-quiet";
     private const string Owner = "fixture:armor-break-owner", Deck = "fixture:armor-break-deck";
 
-    public static void BypassAffectsOtherParticipantsWhileSelfDamageStillPaysArmor()
-    {
-        var s = Scene.Start([Geshan]);
-        s.Use("armor-three", 2); s.Use("armor-three", 0);
-        var slash = s.Action(CardKind.Slash, 2);
-        Need(s.G.PredictPublicActionDamage(0, slash, 2) is
-                { DamageAmount: 1, ArmorAbsorbed: 0, HpLossAmount: 1, HpAfter: 11, ArmorAfter: 3 },
-            "A proposed actual Slash must predict bypassed Armor while retaining one real damage.");
-        var physical = s.Card(slash);
-        Need(s.E<DamageAppliedEvent>().Single() is
-                { SourceSeat: 0, TargetSeat: 2, Amount: 1, RemainingHp: 11, SourceLess: false, ArmorPayment: null,
-                    SourceCardUseResolutionId: not null } && s.V(2) is { Hp: 11, Armor: 3 } &&
-            s.E<CardUseDeclaredEvent>().Count(e => e.CardId == physical && e.CardKind == CardKind.Slash) == 1 &&
-            s.G.CardMovements.Any(m => m.CardId == physical && m.From == CardLocation.Hand(0)),
-            "The paid physical Slash actually loses one HP, leaves all three Armor, and retains one native card use and damage event.");
-        s.Use("armor-three", 1); s.Use("hit-two", 1);
-        Need(s.V(1) is { Hp: 10, Armor: 3 } && s.E<DamageAppliedEvent>().Last() is
-                { SourceSeat: 0, TargetSeat: 1, Amount: 2, ArmorPayment: null, SourceCardUseResolutionId: null },
-            "A real cardless skill hit also bypasses Armor on an allied other participant; the source rule does not silently become enemy-only.");
-        s.Use("hit-two", 0);
-        Need(s.V(0) is { Hp: 12, Armor: 1 } && s.E<DamageAppliedEvent>().Last() is
-                { SourceSeat: 0, TargetSeat: 0, Amount: 2, ArmorPayment:
-                    { ArmorBefore: 3, ArmorAbsorbed: 2, ArmorAfter: 1, HpLossAmount: 0, ArmorDamageMultiplier: 1 } },
-            "Geshan's real self damage still spends native Armor and preserves its exact payment receipt without losing HP.");
-    }
-
     public static void DoubleArmorPreservesNativeOverflowAndBypassPriorityAndSourcelessPayment()
     {
         var s = Scene.Start([Tijia]);

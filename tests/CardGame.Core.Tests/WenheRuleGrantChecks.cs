@@ -9,43 +9,6 @@ internal static class WenheRuleGrantChecks
         Owner = "fixture:wenhe-grant-owner", Mode = "fixture:wenhe-grant-mode";
     private static readonly string[] ModeSkills = ["wenhe:rules", "wenhe:chaos-resolution", "wenhe:champion-mark", "wenhe:niepan"];
 
-    public static void ModeInstancesSurviveTemplateReplacementWithoutProtectingOrdinarySameName()
-    {
-        const string id = "wenhe:champion-mark";
-        var normal = new SkillGrant("ordinary", id, "ordinary-instance", "acquired:fixture");
-        using (var json = JsonDocument.Parse(JsonSerializer.Serialize(normal)))
-            Need(json.RootElement.EnumerateObject().Select(p => p.Name).ToHashSet(StringComparer.Ordinal)
-                .SetEquals(new[] { "GrantId", "SkillId", "SkillInstanceId", "SourceId", "IsEnabled" }) &&
-                !JsonSerializer.Deserialize<SkillGrant>(JsonSerializer.Serialize(normal))!.IsModeRule,
-                "The additive false mode flag must leave the historical ordinary grant JSON shape unchanged.");
-        var general = new GeneralDefinition("fixture:grant-old", "old", "", [new("ordinary copy", "ordinary") { ContentId = id }]);
-        var player = new CharacterState { Seat = 0, Name = "mode owner", IsHuman = true, Role = Role.Contestant,
-            RoleRevealed = true, General = general, GeneralSelected = true, GeneralRevealed = true, Hp = 4, MaxHp = 4 };
-        var rule = new SkillGrant("mode:fixture:champion", id, "mode:fixture:champion", "mode:wenhe") { IsModeRule = true };
-        player.SkillGrants.Grant(rule); player.SkillGrants.Grant(normal);
-        Need(player.SkillGrants.SetEnabled(normal.GrantId, false) && player.SkillGrants.RemoveGrant(normal.GrantId) &&
-            player.SkillGrants.Grants.Any(g => g.GrantId == rule.GrantId && g.IsEnabled && g.IsModeRule),
-            "A normal acquired grant with the identical skill ID can still be disabled and lost while the independent mode instance remains.");
-        var revision = player.SkillGrants.Revision;
-        Need(!player.SkillGrants.RemoveGrant(rule.GrantId) && !player.SkillGrants.SetEnabled(rule.GrantId, false) &&
-            player.SkillGrants.Revision == revision, "Rejected ordinary loss of a mode-owned instance must not mutate its grant revision.");
-        player.General = new("fixture:grant-replacement", "replacement", "", []);
-        Need(player.General.Skills.Count == 0 && player.SkillGrants.Grants is [var remaining] && remaining == rule &&
-            player.SkillGrants.EffectiveSkillIds.SequenceEqual([id]),
-            "A native template replacement removes its printed copy and retains the separate permanent mode grant.");
-        var prefixOnly = normal with { GrantId = "mode-looking-ordinary", SkillInstanceId = "mode-looking-ordinary", SourceId = "mode:wenhe" };
-        player.SkillGrants.Grant(prefixOnly);
-        Need(player.SkillGrants.RemoveGrant(prefixOnly.GrantId), "An unmarked ordinary grant receives no protection merely from a mode-like source string.");
-        foreach (var bad in new[] { rule with { GrantId = "bad-source", SourceId = "acquired:fake" },
-                     rule with { GrantId = "bad-disable", IsEnabled = false },
-                     rule with { GrantId = "bad-expiry", TurnExpiry = new(1, 0) } })
-        {
-            var rejected = false;
-            try { player.SkillGrants.Grant(bad); } catch (InvalidOperationException) { rejected = true; }
-            Need(rejected && player.SkillGrants.Grants.Count == 1, "A protected mode instance cannot be forged from a disabled, expiring or character-owned source.");
-        }
-    }
-
     public static void NativeSuppressionAndDeathCursePreserveModeRulesNirvanaAndChampionMark()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());

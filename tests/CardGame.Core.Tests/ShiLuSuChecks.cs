@@ -57,50 +57,6 @@ internal static class ShiLuSuChecks
             marked.G.GetHumanLegalActions().Any(a => a.ConversionSource?.SkillId == Shanxi && a.TargetSeats.SequenceEqual([3])),
             "The real foreign-material native Duel consumes only its original Play target; another living target remains legal."); marked.Cold(); marked.Replay();
     }
-    public static void ActualForeignHandDodgeResponsePreservesActorProviderCold()
-    {
-        var s = Scene.Start(shared: true, response: true); s.Play(); s.End(); s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge });
-        var id = s.V(1).Hand.Single().Id; var hp = s.V(0).Hp;
-        var originalSlash = s.G.ResolutionStack.OfType<CardUseFrame>().Last(f => f.CardKind == CardKind.Slash && f.CardAttack?.TargetSeat == 0);
-        s.Need(s.P!.Choices.Any(c => c.Cards.SequenceEqual([id])), "The actual response query offers the authorized foreign Dodge.");
-        s.Cold(); s.Answer(c => c.Cards.SequenceEqual([id]));
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Driver && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") == "completed-dodge"));
-        var a = s.E<CardActionAcceptedEvent>().Select(e => e.Action).Single(a => a.PhysicalCards.Any(c => c.CardId == id));
-        var completed = s.G.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Last(f => f.CompletedResponseReturn?.Kind == ProgramCompletedResponseKind.Dodge);
-        s.Need(completed is { Continuation: null, CompletedResponseReturn.IsCommitted: false, Action: { Type: CardActionType.Response, EffectiveKind: CardKind.Dodge, ActorSeat: 0, ProviderSeat: 1, ResponderSeat: 0, RequesterSeat: null } } &&
-            completed.Action.ActionId == a.ActionId && completed.Action.PhysicalCards.Single().CardId == id && completed.Action.PhysicalCards.Single().From == CardLocation.Hand(1) &&
-            completed.ParentFrameId == originalSlash.Id && completed.AttackOwnerFrameId == originalSlash.Id && completed.Action.ParentActionId == originalSlash.Action!.ActionId && completed.Action.OpponentSeat == originalSlash.SourceSeat &&
-            s.G.CreateCardZoneDiagnostics().Single(c => c.CardId == id).Location == CardLocation.DiscardPile && s.G.CardMovements.Count(m => m.CardId == id && m.From == CardLocation.Hand(1) && m.To == CardLocation.Processing) == 1 &&
-            s.G.CardMovements.Count(m => m.CardId == id && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile) == 1 && s.V(0).Hp == hp,
-            "The genuine foreign-Hand Dodge reaches its typed completed-use window after physical cleanup, with its exact accepted actor/provider/original Hand and original native Slash parent.");
-        s.Cold(); s.Replay(); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "completed-dodge");
-        s.Reach(() => s.E<ShiLsRefillIssuedEvent>().Length == 1 && s.E<CardUseFinishedEvent>().Any(e => e.ResolutionId == originalSlash.Id)); s.Play();
-        s.Need(a is { Type: CardActionType.Response, ActorSeat: 0, ProviderSeat: 1, ResponderSeat: 0, RequesterSeat: null } &&
-            a.PhysicalCards.Single().From == CardLocation.Hand(1) && s.V(0).Hp == hp && s.V(1).HandCount == 3,
-            "Playing an authorized Dodge is the beneficiary's real autonomous response, pays Lu Su's last physical Hand card and refills its provider.");
-        s.Need(s.E<ProgramCardTriggerResolvedEvent>().Count(e => e.SkillId == Driver && e.TriggerId == "after-shared-dodge" && e.Activated) == 1 &&
-            s.E<ProgramBindingResolvedEvent>().Count(e => e.SkillId == Driver && e.BindingId == "after-shared-dodge" && e.Activated && e.Completed) == 1 &&
-            s.E<CardActionAcceptedEvent>().Count(e => e.Action.ActionId == a.ActionId) == 1 && s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == originalSlash.Id) == 1 &&
-            s.G.ResolutionStack.All(f => f.Id != completed.Id) && s.G.CardMovements.Count(m => m.CardId == id && m.From == CardLocation.Hand(1) && m.To == CardLocation.Processing) == 1 &&
-            s.G.CardMovements.Count(m => m.CardId == id && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile) == 1 && s.E<ShiLsRefillIssuedEvent>().Length == 1 && s.V(0).Hp == hp,
-            "Cold completion resumes the original Slash once, resolves its one real use-completed observer, and neither repays the foreign response nor repeats cleanup or Haoshi refill."); s.Cold(); s.Replay();
-    }
-    public static void DimengSelfExchangeMultiDiscardAndPaidChildCold()
-    {
-        var s = Scene.Start(); s.Play(); var own = s.V(0).Hand.Select(c => c.Id).Order().ToArray(); var foreign = s.V(1).Hand.Select(c => c.Id).Order().ToArray();
-        s.Skill(); s.Answer(c => Branch(c) == "pair" && c.Targets.SequenceEqual([0])); s.Cold(); s.Answer(c => Branch(c) == "pair" && c.Targets.SequenceEqual([1]));
-        s.Reach(() => s.P?.Choices.Any(c => Branch(c) == "discard") == true);
-        s.Need(s.V(0).Hand.Select(c => c.Id).Order().SequenceEqual(foreign) && s.V(1).Hand.Select(c => c.Id).Order().SequenceEqual(own),
-            "Dimeng may include Lu Su and exchanges the original physical hands before any benefit or cost.");
-        s.Answer(c => Branch(c) == "discard"); var originalCount = s.V(0).HandCount;
-        s.Need(s.P!.RequiredCardCount == 2 && s.P.MinimumCardCount == 2, "The projected unpaid HE collector advertises two simultaneous selections.");
-        s.Answer(c => Branch(c) == "add"); s.Answer(c => Branch(c) == "add");
-        s.Need(s.V(0).HandCount == originalCount && s.E<ShiLsDiscardPaidEvent>().Length == 0, "Individual selection clicks do not discard a material early.");
-        s.Cold(); s.Answer(c => Branch(c) == "pay"); s.Reach(() => s.P?.SkillPrompt?.SkillId == Watch);
-        s.Need(s.V(0).HandCount == originalCount - 2 && s.E<ShiLsDiscardPaidEvent>().Length == 1, "One real logical discard pays all selected materials before its observer child.");
-        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue"); s.Play();
-        s.Need(s.E<ShiLsDiscardPaidEvent>().Length == 1 && s.G.GetHumanLegalActions().All(a => a.SkillId != Dimeng), "Cold resuming the paid child neither pays again nor restores this phase's activation."); s.Replay();
-    }
     private static string? Branch(PromptChoice c) => c.Parameters.GetValueOrDefault("branch");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {

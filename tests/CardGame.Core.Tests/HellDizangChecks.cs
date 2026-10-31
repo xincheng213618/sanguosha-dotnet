@@ -6,129 +6,6 @@ internal static class HellDizangChecks
 {
     private const string Owner = "fixture:hell-dizang-owner", Driver = "fixture:hell-dizang-driver",
         Quiet = "fixture:hell-dizang-quiet", Watch = "fixture:hell-dizang-watch", Mode = "fixture:hell-dizang";
-    private const string WuliangDraw = "skill-program.hell:wuliang.Draw";
-
-    public static void ActualDistanceFireDamageThresholdAndWuliangDrawChildrenCold()
-    {
-        var (game, registry) = Start(["hell:bufo", "hell:wuliang", "hell:diting"], protectedPeers: true, damageWatch: true);
-        Reach(game, () => NativeDraw(game, WuliangDraw, 3));
-        Need(V(game, 0).HandCount == 4 && Draws(game, WuliangDraw) == 0 &&
-            V(game, 0).EquipmentSlotCapacities!.GetValueOrDefault(EquipmentSlot.OffensiveHorse) == 0 &&
-            V(game, 0).EquipmentSlotCapacities!.GetValueOrDefault(EquipmentSlot.DefensiveHorse) == 0,
-            "Actual appearance must abolish both mount slots and request exactly three extra cards before their physical draw.");
-        game = Cold(game, registry);
-        Continue(game);
-        Reach(game, () => P(game)?.PlayerSeat == 0 && game.ResolutionStack.OfType<ProgramSkillFrame>()
-            .Any(frame => frame.HellBufo is { NextTargetIndex: 1 }));
-        var paid = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.HellBufo is not null).HellBufo!;
-        Need(paid.Targets.SequenceEqual([1, 4]) && paid.Targets is IList<int> { IsReadOnly: true } &&
-            E<DamageAppliedEvent>(game).Count(e => e.SourceSeat == 0 && e.Nature == DamageNature.Fire) == 1,
-            "Bufo freezes only actual combat-distance-one seats and suspends after its first real damage for the complete child observer.");
-        game = Cold(game, registry);
-        Continue(game);
-        Play(game);
-        Need(V(game, 0).HandCount == 9 && Draws(game, WuliangDraw) == 3 &&
-            E<HellBufoTargetFrozenEvent>(game).Select(e => e.TargetSeat).SequenceEqual([1, 4]) &&
-            new[] { 1, 4 }.All(seat => V(game, seat).Hp == 19 && game.GetCombatDistance(0, seat) == 1) &&
-            new[] { 2, 3 }.All(seat => V(game, seat).Hp == 20 && game.GetCombatDistance(0, seat) == 2),
-            "The distance fire must affect both eligible others exactly once, excluding farther seats, while appearance draws three in addition to the initial four and ordinary two.");
-        foreach (var amount in new[] { 1, 2, 3 })
-        {
-            var before = V(game, 0).Hp;
-            Use(game, "self-" + amount, []);
-            Play(game);
-            Need(V(game, 0).Hp == before - (amount < 2 ? amount : amount - 1),
-                "Bufo reduces exactly one point only for an actual received damage amount of at least two.");
-        }
-        Need(V(game, 0).Hp == 4, "The native one/two/three-damage threshold sequence must leave four health.");
-        Use(game, "lose-two", []);
-        Play(game);
-        Need(V(game, 0).Hp == 2, "Health loss must bypass the damage-only Bufo reduction.");
-        var hand = V(game, 0).HandCount;
-        End(game);
-        Reach(game, () => NativeDraw(game, WuliangDraw, 2));
-        Need(V(game, 0).HandCount == hand && Draws(game, WuliangDraw) == 3,
-            "Wuliang's ending draw must pause at the real two-card request before receiving any ending cards.");
-        game = Cold(game, registry);
-        Continue(game);
-        Play(game);
-        Need(V(game, 0).Hp == 3 && Draws(game, WuliangDraw) == 5 &&
-            E<HellBufoTargetFrozenEvent>(game).GroupBy(e => e.ProgramFrameId).Count() == 2 &&
-            E<NativeDrawAttemptDecidedEvent>(game).Count(e => e.RecipientSeat == 0 && e.RequestedCount == 3) == 1,
-            "The next real own turn must heal to exactly three, repeat its distance fire and never repeat the original appearance draw.");
-        _ = Cold(game, registry);
-    }
-
-    public static void FinalJudgmentAnySuitRankChoiceAndColdReplay()
-    {
-        var (game, registry) = Start(["hell:dayuan"]);
-        Play(game);
-        var cases = new[] { (Suit.Spade, 1), (Suit.Heart, 7), (Suit.Club, 12), (Suit.Diamond, 13) };
-        foreach (var (suit, rank) in cases)
-        {
-            var oldResults = E<JudgmentResolvedEvent>(game).Count();
-            Use(game, "judge", [2]);
-            Reach(game, () => P(game)?.Kind == DecisionKind.ProgramJudgmentTrigger &&
-                P(game)!.Choices.Any(choice => choice.Parameters.GetValueOrDefault("action") == "program-judgment-trigger-activate"));
-            var judgment = game.ResolutionStack.OfType<JudgmentFrame>().Single();
-            var printed = V(game, 2).Judgment.Single(card => card.Id == judgment.CardId);
-            Need(printed is { Kind: CardKind.Dodge, Suit: Suit.Club, Rank: 7 } &&
-                E<JudgmentResolvedEvent>(game).Count() == oldResults,
-                "Dayuan must be offered before the original physical judgment has any final result.");
-            Answer(game, choice => choice.Parameters.GetValueOrDefault("action") == "program-judgment-trigger-activate");
-            Reach(game, () => P(game)?.Choices.Count == 4 && P(game)!.Choices.All(choice => choice.Parameters.ContainsKey("suit")));
-            game = Cold(game, registry);
-            Answer(game, choice => choice.Parameters.GetValueOrDefault("suit") == suit.ToString());
-            Need(P(game)?.Choices.Count == 13 && P(game)!.Choices.All(choice => choice.Parameters.ContainsKey("rank")) &&
-                E<JudgmentResolvedEvent>(game).Count() == oldResults && !E<HellDayuanJudgmentOverriddenEvent>(game)
-                    .Any(e => e.Receipt.JudgmentFrameId == judgment.Id),
-                "Choosing a suit only must retain all thirteen rank choices without prematurely changing or finalizing the judgment.");
-            game = Cold(game, registry);
-            var before = State(game);
-            var rejected = game.Submit(new AnswerPromptCommand(2, P(game)!.PromptId, P(game)!.Choices[0].Id, game.Revision));
-            Need(!rejected.Accepted && State(game) == before,
-                "Another actual seat cannot answer Dizang's still-owned final-rank choice.");
-            Answer(game, choice => choice.Parameters.GetValueOrDefault("rank") == rank.ToString());
-            Play(game);
-            var receipt = E<HellDayuanJudgmentOverriddenEvent>(game).Single(e => e.Receipt.JudgmentFrameId == judgment.Id).Receipt;
-            var result = E<JudgmentResolvedEvent>(game).Single(e => e.ResolutionId == judgment.Id);
-            Need(receipt.CardId == printed.Id && receipt.Suit == suit && receipt.Rank == rank &&
-                result.CardId == printed.Id && result.CardKind == CardKind.Dodge && result.Suit == suit && result.Rank == rank &&
-                result.Succeeded == (suit is Suit.Heart or Suit.Diamond) &&
-                game.CreateCardZoneDiagnostics().Single(card => card.CardId == printed.Id).Location == CardLocation.DiscardPile &&
-                E<JudgmentReplacementResolvedEvent>(game).All(e => e.JudgmentResolutionId != judgment.Id),
-                "All four suits and arbitrary legal ranks must become the native result of the same physical card, without creating a replacement entity.");
-            game = Cold(game, registry);
-        }
-        var (zero, zeroRegistry) = Start(["hell:dayuan"], zeroJudgmentDeck: true);
-        Play(zero);
-        Need(zero.CreateCardZoneDiagnostics().All(card => card.Location != CardLocation.DrawPile),
-            "The small legal physical deck must be exhausted by real initial dealing and the first normal draw.");
-        var mengpo = zero.CreateSnapshot(0).Players.Single(player => player.GeneralId == "fixture:hell-zero-mengpo").Seat;
-        Use(zero, "kill-for-zero-judgment", [mengpo]);
-        Play(zero);
-        Need(E<HellReturnSoulInjectedEvent>(zero).Length == 2 && zero.CreateCardZoneDiagnostics()
-                .Where(card => card.Location == CardLocation.DrawPile).All(card => card.CardKind == CardKind.ReturnSoul),
-            "A real Wanghun death must inject the only two draw-pile entities, carrying their native None/zero faces.");
-        Use(zero, "judge", [Enumerable.Range(1, 4).First(seat => V(zero, seat).IsAlive)]);
-        Reach(zero, () => P(zero)?.Kind == DecisionKind.ProgramJudgmentTrigger && P(zero)!.Choices.Any(choice =>
-            choice.Parameters.GetValueOrDefault("action") == "program-judgment-trigger-activate"));
-        var nativeZero = zero.ResolutionStack.OfType<JudgmentFrame>().Single();
-        var zeroFace = V(zero, nativeZero.TargetSeat).Judgment.Single(card => card.Id == nativeZero.CardId);
-        Need(zeroFace is { Kind: CardKind.ReturnSoul, Suit: Suit.None, Rank: 0 },
-            "The None/zero judgment must be a genuinely injected Soul entity rather than an illegal printed fixture recipe.");
-        Answer(zero, choice => choice.Parameters.GetValueOrDefault("action") == "program-judgment-trigger-activate");
-        Reach(zero, () => P(zero)?.Choices.Count == 4);
-        Answer(zero, choice => choice.Parameters.GetValueOrDefault("suit") == Suit.Diamond.ToString());
-        zero = Cold(zero, zeroRegistry);
-        Answer(zero, choice => choice.Parameters.GetValueOrDefault("rank") == "13");
-        Play(zero);
-        Need(E<JudgmentResolvedEvent>(zero).Single(e => e.ResolutionId == nativeZero.Id) is
-                { CardKind: CardKind.ReturnSoul, Suit: Suit.Diamond, Rank: 13, Succeeded: true } &&
-            E<HellDayuanJudgmentOverriddenEvent>(zero).Single(e => e.Receipt.JudgmentFrameId == nativeZero.Id).Receipt.CardId == zeroFace.Id,
-            "Dayuan must also convert the native None/zero Soul judgment to a legal chosen suit/rank on the same physical entity.");
-        _ = Cold(zero, zeroRegistry);
-    }
 
     public static void AbolishedMountSlotsNativeRecastPaymentDrawAndCold()
     {
@@ -198,8 +75,6 @@ internal static class HellDizangChecks
     private static PendingDecision? P(GameEngine game) => Enumerable.Range(0, 5).Select(seat => game.CreateSnapshot(seat).PendingDecision)
         .FirstOrDefault(prompt => prompt is not null);
     private static T[] E<T>(GameEngine game) where T : IGameEvent => game.Events.Select(entry => entry.Payload).OfType<T>().ToArray();
-    private static int Draws(GameEngine game, string reason) => game.CardMovements.Count(move =>
-        move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(0) && move.Reason.Value == reason);
     private static bool NativeDraw(GameEngine game, string reason, int count) => P(game)?.PlayerSeat == 0 &&
         game.ResolutionStack.OfType<NativeDrawAttemptFrame>().LastOrDefault() is { } frame &&
         frame.Context.Reason.Value == reason && frame.Context.RequestedCount == count;

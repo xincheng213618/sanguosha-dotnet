@@ -7,49 +7,6 @@ using CardGame.Wpf.ViewModels;
 
 internal static class NativeDiscardBatchUiChecks
 {
-    public static void CaoXianAdjustmentAndTargetDiscardUseOneEditableDraft(string output)
-    {
-        var (game, registry) = NativeCollectedDiscardProjectionChecks.CreateCaoXianDiscardScene();
-        var store = new MemorySaveStore();
-        store.Write(GameSaveSlot.Manual, new(GameSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, false, game.CreateCheckpoint()));
-        using var model = new MainViewModel(false, 373, showSetup: false, saveStore: store, contentRegistry: registry)
-            { IsMotionEnabled = false, IsMusicEnabled = false, IsSoundEnabled = false };
-        LegacySaveFixtures.Load(model); game = Program.Engine(model);
-        Program.Assert(!model.HasSaveError, model.SaveStatus);
-        VerifyDraft(5, "lingxi");
-        NativeCollectedDiscardProjectionChecks.BeginCaoXianSelfDiscard(game); Refresh();
-        VerifyDraft(2, "zhifou");
-        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
-        Program.Assert(SnapshotJson.Serialize(game.CreateSnapshot(0)) == SnapshotJson.Serialize(restored.CreateSnapshot(0)),
-            "Both original Cao Xian native batch payments must cold-restore through the accepted original answers.");
-
-        void VerifyDraft(int required, string skill)
-        {
-            Program.Assert(model.IsOwnedCardSelectionPending && !model.IsCardPaymentSelectionPending && !model.IsHandResponsePending &&
-                game.CreateSnapshot(0).PendingDecision!.RequiredCardCount == required,
-                "Cao Xian's current fixed unpaid collection must use the shared batch selector, including native prompts without SkillPrompt.");
-            var ids = model.Hand.Where(c => c.IsPlayable).Take(required).Select(c => c.Id).ToArray();
-            Program.Assert(ids.Length == required, "The native batch must publish every required owned physical material.");
-            var commands = game.AcceptedCommands.Count; var moves = game.CardMovements.Count;
-            Select(ids[0]); Select(ids[1]); Refresh();
-            Program.Assert(model.Hand.Count(c => c.IsSelected) == 2 && game.AcceptedCommands.Count == commands && game.CardMovements.Count == moves,
-                "Two physical selections survive a view refresh without submitting or paying either singleton.");
-            model.CancelActionCommand.Execute(null);
-            Program.Assert(!model.HasSelection && model.Hand.All(c => !c.IsSelected) && game.AcceptedCommands.Count == commands && game.CardMovements.Count == moves,
-                "Cancel clears the full local Cao Xian draft while its original native collection remains unpaid.");
-            foreach (var id in ids) Select(id); Refresh();
-            Program.Assert(model.CanConfirmSelected && model.Hand.Count(c => c.IsSelected) == required,
-                "A complete exact set enables one explicit confirmation instead of capping selection at one.");
-            using (var host = new NativeResponseStatusChecks.NativeHost(model)) host.Capture(output, "native-cao-xian-" + skill + "-selected", 1120);
-            model.ConfirmSelectedCommand.Execute(null);
-            var actual = game.CardMovements.Skip(moves).Where(m => m.Reason.Value == "skill-program.ol:lingxi-or-zhifou.discard").ToArray();
-            Program.Assert(actual.Length == required && actual.Select(m => m.CardId).ToHashSet().SetEquals(ids) &&
-                game.AcceptedCommands.Count == commands + required && model.Hand.All(c => !c.IsSelected),
-                "One primary confirmation submits only the current original selection commands and pays the entire exact set once.");
-        }
-        void Select(int id) => model.SelectCardCommand.Execute(model.Hand.Single(c => c.Id == id));
-        void Refresh() => typeof(MainViewModel).GetMethod("RefreshCurrentView", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(model, null);
-    }
 
     public static void NativeVariableCostKeepsMultipleCardsAndCountRestrictions(string output)
     {

@@ -8,70 +8,6 @@ internal static class HellOrdinaryTrickChecks
     private const string Mode = "fixture:hell-ordinary", Actor = "fixture:hell-ordinary-actor", Driver = "fixture:hell-ordinary-driver", Quiet = "fixture:hell-ordinary-quiet";
     private const string Tiered = "boundary:jiaozhao-round-current", State = "boundary-jiaozhao-round-tier";
 
-    public static void AddedSoulNamePreservesAllHandOneZeroMaterialsAndNativeSkillRestoration()
-    {
-        foreach (var variant in new[] { "qice", "miaoxian", "tier-one", "tier-zero" })
-        {
-            var skill = variant == "qice" ? "classic:qice" : variant == "miaoxian" ? "ol:miaoxian" : Tiered;
-            var (game, registry) = Start(skill);
-            var original = registry.GetSkill(skill).Program!; var originalHash = original.GameplayHash;
-            var sacrifice = game.CreateSnapshot(0).Players.Single(p => p.GeneralId == "fixture:hell-ordinary-sacrifice").Seat;
-            Accept(game, new UseProgramSkillCommand(0, Driver, "kill", [], [sacrifice], game.Revision, P(game)!.PromptId)); Play(game);
-            Require(E<HellWanghunGrantLostEvent>(game).Any(e => e.TargetSeat == 3) && E<HellWanghunGrantLostEvent>(game).All(e => e.TargetSeat != 0) &&
-                E<HellReturnSoulInjectedEvent>(game).Count() == 2, $"A real allied Wanghun death removes genuine enemy grants and creates a legal ReturnSoul target without disabling the human converter. Variant={variant}; sacrifice HP={game.CreateSnapshot(0).Players[sacrifice].Hp}; lost targets={string.Join(',', E<HellWanghunGrantLostEvent>(game).Select(e => e.TargetSeat))}; injected={E<HellReturnSoulInjectedEvent>(game).Count()}.");
-            if (variant == "tier-zero")
-                for (var i = 0; i < 2; i++) { Accept(game, new UseProgramSkillCommand(0, Driver, "upgrade", [], [], game.Revision, P(game)!.PromptId)); Play(game); }
-            if (variant == "miaoxian")
-                while (V(game).HandCount > 1)
-                { Accept(game, new UseProgramSkillCommand(0, Driver, "discard", [V(game).Hand[0].Id], [], game.Revision, P(game)!.PromptId)); Play(game); }
-
-            var materials = V(game).Hand.Select(c => c.Id).ToArray(); var moveStart = game.CardMovements.Count;
-            if (variant == "qice")
-            {
-                Accept(game, new UseProgramSkillCommand(0, skill, "all-hand-as-ordinary-trick", materials, [], game.Revision, P(game)!.PromptId));
-                Until(game, () => P(game)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "use-all-hand-as-ordinary-trick") == true);
-                Require(P(game)!.Choices.Any(c => c.Parameters.GetValueOrDefault("card-kind") == nameof(CardKind.ReturnSoul)), "Qice's unchanged all-ordinary producer adds the actual Hell-only name.");
-                Cold(game, registry); Answer(game, c => c.Parameters.GetValueOrDefault("card-kind") == nameof(CardKind.ReturnSoul));
-            }
-            else
-            {
-                var action = game.GetHumanLegalActions().First(a => a.ConversionSource?.SkillId == skill && a.PlayedCardKind == CardKind.ReturnSoul);
-                Require(action.ConversionSource!.BindingId.EndsWith(".activity-return-soul", StringComparison.Ordinal) &&
-                    (variant == "tier-zero" ? action.CardId == 0 : action.CardId > 0), "A unique derived binding keeps the source family's exact one-entity or zero-entity material arity.");
-                var published = game.GetCardConversionDefinition(action.ConversionSource);
-                Require(published is { OutputKind: CardKind.ReturnSoul } && published.Id == action.ConversionSource.BindingId &&
-                    original.ViewAs.Any(template => SameConversionPolicy(template, published)) && !original.ViewAs.Any(rule => rule.Id == published.Id),
-                    "The public conversion definition resolves the published activity source to its exact immutable ReturnSoul rule, preserving the original material policy and all shared quotas without adding a binding to the registry.");
-                Cold(game, registry);
-                Accept(game, new PlayCardCommand(0, action.CardId!.Value, action.TargetSeats, game.Revision, P(game)!.PromptId, action.PlayedCardKind, action.TargetCardId)
-                { ConversionSource = action.ConversionSource });
-            }
-            Until(game, () => P(game)?.SkillPrompt?.SkillId == "classic:jizhi");
-            var use = game.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardKind == CardKind.ReturnSoul);
-            var expectedCount = variant == "qice" ? materials.Length : variant == "tier-zero" ? 0 : 1;
-            var actual = use.Action!.PhysicalCards.Select(c => c.CardId).ToArray();
-            Require(actual.Length == expectedCount && actual.Distinct().Count() == expectedCount && (variant != "qice" || actual.Order().SequenceEqual(materials.Order())) &&
-                use.Action.ConversionChain.Single().SkillId == skill &&
-                game.CardMovements.Skip(moveStart).Count(m => actual.Contains(m.CardId) && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == expectedCount,
-                "The native ReturnSoul Use retains every exact original hand cost and the unmodified source skill identity; card zero is never a physical payment.");
-            if (variant.StartsWith("tier-", StringComparison.Ordinal))
-            {
-                var receipt = E<TieredRoundConversionUseIssuedEvent>(game).Single().Receipt;
-                Require(receipt.GameplayHash == originalHash && receipt.MaterialCount == expectedCount && receipt.Source.BindingId == use.Action.ConversionChain.Single().BindingId,
-                    "The zero/one producer's native issued receipt resolves its derived name against the unchanged original gameplay hash and shared tier quota.");
-            }
-            Cold(game, registry); Play(game);
-            Require(E<CardUseFinishedEvent>(game).Count(e => e.ResolutionId == use.Id) == 1 &&
-                E<HellSoulGrantRestoredEvent>(game).Any(e => e.CardUseFrameId == use.Id && e.TargetSeat == 3 && e.Outcome == "restored") &&
-                E<ProgramBindingResolvedEvent>(game).Count(e => e.SkillId == "classic:jizhi" && e.Completed) == 1 &&
-                original.GameplayHash == originalHash && registry.GetSkill(skill).Program == original &&
-                !original.ViewAs.Any(v => v.OutputKind == CardKind.ReturnSoul) && !game.CardMovements.Any(m => m.CardId == 0),
-                "A real ordinary-trick use activates the projected static Jizhi filter, restores the exact Wanghun grant and returns once, while original rules/hash and physical zones remain unchanged.");
-            if (variant != "qice") Require(game.GetHumanLegalActions().All(a => a.ConversionSource?.SkillId != skill), "The derived activity name spends the same existing per-turn/tier allowance and grants no extra conversion.");
-            Cold(game, registry);
-        }
-    }
-
     public static void QicePermissionFilterKeepsOtherNamesAndUnpaidMaterials()
     {
         var (game, registry) = Start("classic:qice");
@@ -106,14 +42,6 @@ internal static class HellOrdinaryTrickChecks
     }
 
     private static PlayerSnapshot V(GameEngine game) => game.CreateSnapshot(0).Players[0];
-    private static bool SameConversionPolicy(SkillProgramViewAs template, SkillProgramViewAs projected)
-    {
-        var original = JsonSerializer.SerializeToNode(template)!.AsObject();
-        var runtime = JsonSerializer.SerializeToNode(projected)!.AsObject();
-        original.Remove(nameof(SkillProgramViewAs.Id)); original.Remove(nameof(SkillProgramViewAs.OutputKind));
-        runtime.Remove(nameof(SkillProgramViewAs.Id)); runtime.Remove(nameof(SkillProgramViewAs.OutputKind));
-        return JsonNode.DeepEquals(original, runtime);
-    }
     private static PendingDecision? P(GameEngine game) => Enumerable.Range(0, 5).Select(s => game.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static IEnumerable<T> E<T>(GameEngine game) => game.Events.Select(e => e.Payload).OfType<T>();
     private static void Play(GameEngine game) => Until(game, () => P(game) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });

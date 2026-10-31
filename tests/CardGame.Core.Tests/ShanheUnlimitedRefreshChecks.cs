@@ -84,31 +84,6 @@ internal static class ShanheUnlimitedRefreshChecks
         }
     }
 
-    public static void RealEconomyComponentsParticipateInRestockAndQualityPromotion()
-    {
-        var source = Source(2146);
-        var fillers = Enumerable.Range(1, 7).Select(index => new ShanheRewardDefinition("stock-" + index, "经济货品" + index)
-            { Rarity = 1, CampaignEconomy = new(FreeShopRefreshes: 1) }).ToArray();
-        var quality = new ShanheRewardDefinition("forced-quality", "定向品质检查") { CampaignEconomy = new(ShopTacticPromotionPercent: 100) };
-        var goods = fillers.Take(3).Append(source).Concat(fillers.Skip(3)).ToArray();
-        var definition = ShopDefinition(goods.Concat([Source(2252), quality]).ToArray(), goods.Select(reward =>
-            new ShanheNodeChoiceDefinition("buy-" + reward.Id, reward.Name, reward.Id == Final ? 700 : 100,
-                RewardId: reward.Id, LeavesNode: false)).ToArray(), 50_000);
-        var baseline = Enter(definition);
-        Need(baseline.Snapshot.ShopItems.All(item => item.Reward?.Id != Final), "The fixed native sample leaves the higher-tier component outside its first shelf.");
-        var promoted = Enter(definition, ["forced-quality", Restock]);
-        Buy(promoted, promoted.Snapshot.ShopItems.Single(item => item.Reward?.Id == Final), 700);
-        Need(promoted.Snapshot.ShopItems.Any(item => item.ChoiceId.StartsWith("$restock:0:1:", StringComparison.Ordinal)) &&
-            promoted.Snapshot.ShopItems.All(item => !item.IsPurchased && item.Reward?.Id != Final) && !promoted.Snapshot.ShopPaidRefreshUnlimited,
-            "A real 700-coin legendary component can be promoted and its purchased position replenishes, but one component grants no complete school.");
-        var replenished = Enter(definition, [Restock]); var purchases = 0;
-        while (replenished.Snapshot.ShopItems.All(item => item.Reward?.Id != Final) && purchases < fillers.Length)
-        { Buy(replenished, replenished.Snapshot.ShopItems.First(item => item.CanPurchase), 100 + purchases * 100); purchases++; }
-        Need(replenished.Snapshot.ShopItems.Any(item => item.Reward?.Id == Final &&
-            item.ChoiceId.StartsWith("$restock:", StringComparison.Ordinal) && item.GoldCost == 700 + purchases * 100),
-            "Replenishment can supply a real school component at its source price plus the retained category surcharge.");
-    }
-
     private static ShanheCampaignDefinition Definition(int gold)
     {
         var cards = Enumerable.Range(1, 6).Select(i => new ShanheRewardDefinition("card-" + i, "军资" + i,

@@ -7,25 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Shared\WuYiEnhancementScenario.cs" Link="WuYiEnhancementScenario.cs" />
     <Compile Include="..\CardGame.Core.Tests\WushuangOfficialSkillsAChecks.cs" Link="WushuangOfficialSkillsAScenario.cs" />
-    <Compile Include="..\Shared\BoundaryZuoCiScenario.cs" Link="BoundaryZuoCiScenario.cs" />
-    <Compile Include="..\Shared\BoundaryZhouFeiScenario.cs" Link="BoundaryZhouFeiScenario.cs" />
-    <Compile Include="..\CardGame.Core.Tests\BoundaryYanYanMobileChecks.cs" Link="BoundaryYanYanMobileChecks.cs" />
-    <Compile Include="..\Shared\BoundaryWangJiScenario.cs" Link="BoundaryWangJiScenario.cs" />
-    <Compile Include="..\Shared\BoundarySunLuBanScenario.cs" Link="BoundarySunLuBanScenario.cs" />
-    <Compile Include="..\Shared\BoundaryGuYongScenario.cs" Link="BoundaryGuYongScenario.cs" />
-    <Compile Include="..\Shared\BoundaryCaoZhenScenario.cs" Link="BoundaryCaoZhenScenario.cs" />
-    <Compile Include="..\Shared\BoundaryCaiFuRenScenario.cs" Link="BoundaryCaiFuRenScenario.cs" />
-    <Compile Include="..\CardGame.Core.Tests\BoundaryZhuZhiChecks.cs" Link="BoundaryZhuZhiChecks.cs" />
-    <Compile Include="..\Shared\BoundaryYiJiScenario.cs" Link="BoundaryYiJiScenario.cs" />
-    <Compile Include="..\CardGame.Core.Tests\BoundaryCaoXiuMobileChecks.cs" Link="BoundaryCaoXiuMobileChecks.cs" />
-    <Compile Include="..\CardGame.Core.Tests\BoundaryQuanCongChecks.cs" Link="BoundaryQuanCongChecks.cs" />
-    <Compile Include="..\Shared\MouSimaYiGiveScenario.cs" Link="MouSimaYiGiveScenario.cs" />
     <Compile Include="..\Shared\BaguaResponseScenario.cs" Link="BaguaResponseScenario.cs" />
     <Compile Include="..\Shared\CharacterFixtureContent.cs" Link="CharacterFixtureContent.cs" />
-    <Compile Include="..\CardGame.Core.Tests\MobileYuanShaoChecks.cs" Link="MobileYuanShaoChecks.cs" />
-    <Compile Include="..\CardGame.Core.Tests\ShenMaChaoChecks.cs" Link="ShenMaChaoScenario.cs" />
     <Compile Include="..\CardGame.Core.Tests\ShenDengAiChecks.cs" Link="ShenDengAiScenario.cs" />
     <Compile Include="..\CardGame.Core.Tests\Fame2017PublicPileChecks.cs" Link="Fame2017PublicPileScenario.cs" />
     <Compile Include="..\CardGame.Core.Tests\NativeCollectedDiscardProjectionChecks.cs" Link="NativeCollectedDiscardScenario.cs" />

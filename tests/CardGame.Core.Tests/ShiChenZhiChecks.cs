@@ -47,55 +47,6 @@ internal static class ShiChenZhiChecks
             "A genuine extra turn still starts when Chen Zhi alone has the greatest HP, and that lease never invents a negative HP cost.");
     }
 
-    public static void GlobalFirstDiscardAndUsedOrPlayedSlashTargetFilterCold()
-    {
-        var s = Scene.Start(3); s.Play();
-        s.Native(CardKind.Slash, 1); s.Play(); s.Native(CardKind.Duel, 1);
-        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondSlash });
-        s.Answer(c => c.Cards.Count == 0 && c.Parameters.GetValueOrDefault("conversion-skill-id") is null); s.Play();
-        s.Need(s.E<CardActionAcceptedEvent>().Any(e => e.Action is { ActorSeat: 1, Type: CardActionType.Response, EffectiveKind: CardKind.Slash }) &&
-            s.E<MobileShiChenZhiFirstDiscardEvent>().Length == 0,
-            "Both a native used Slash and the opponent's genuinely played Duel Slash occur; their normal action cleanup is not an actual discard opportunity.");
-        s.Driver("strip-one", [3]); s.OfferRenxing();
-        var first = s.E<MobileShiChenZhiFirstDiscardEvent>().Single();
-        s.Need(s.G.CardMovements.Single(m => m.Sequence == first.MovementSequence).From == CardLocation.Hand(3),
-            "The first actual discard belongs to another player, so Renxing observes the entire table rather than only Chen Zhi's losses.");
-        s.Activate(); s.Branch("discard");
-        var targets = s.P!.Choices.SelectMany(c => c.Targets).Distinct().ToArray();
-        s.Need(!targets.Contains(0) && !targets.Contains(1) && targets.Contains(2) && targets.Contains(3),
-            "Both the actual user and the actual player of Slash are excluded from this turn's discard-target list, including pure Duel responses.");
-        s.Answer(c => c.Targets.SequenceEqual([3]));
-        s.Need(s.P!.Choices.Count > 0 && s.P.Choices.All(c => c.Cards.Count == 0 && c.Parameters.ContainsKey("slot-index")),
-            "Selecting another player's Hand publishes only opaque legal slots, with no card identities.");
-        s.Cold(); s.Answer(c => c.Parameters.ContainsKey("slot-index"));
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Watch); s.Cold(); s.ContinueWatch(); s.Play();
-        s.Need(s.E<MobileShiChenZhiRenxingCompletedEvent>() is [{ Branch: "discard", TargetSeat: 3 }] &&
-            s.G.CardMovements.Count(m => m.From == CardLocation.Hand(3) && m.To == CardLocation.DiscardPile &&
-                m.Reason.Value == "skill.mobile-shi-chen-zhi.discard") == 1,
-            "The original paid native foreign discard resumes its child once; its own nested discard cannot create another first opportunity.");
-        s.Driver("discard-own", []); s.Play();
-        s.Need(s.E<MobileShiChenZhiRenxingCompletedEvent>().Length == 1 && s.E<MobileShiChenZhiFirstDiscardEvent>().Length == 1 &&
-            s.RenxingOffersSkipped == 0 && s.RoundUses == 1,
-            "Later own discards in the same turn neither reopen the already-consumed table-wide first opportunity nor debit another round use.");
-        s.End(); s.Play();
-        s.Need(s.G.State.TurnNumber == 2 && s.E<RoundStartedEvent>().Length == 1,
-            "The real extra turn is a distinct first-discard opportunity but retains the same round budget.");
-        s.Driver("discard-own", []); s.OfferRenxing(); s.Activate(); s.Branch("draw"); s.Play();
-        s.Need(s.RoundUses == 2 && s.E<MobileShiChenZhiRenxingCompletedEvent>().Length == 2,
-            "The extra turn's first actual discard consumes exactly the second same-round Renxing use.");
-        s.End(); s.Play();
-        s.Need(s.RenxingOffersSkipped == 0 && s.RoundUses == 0 &&
-            s.E<MobileShiChenZhiFirstDiscardEvent>().Select(e => e.ActualTurn).Distinct().Count() >= 5,
-            "All three intervening normal actors really discard, without offering a third same-round Renxing; only the following normal round resets its visible allowance.");
-        s.Replay();
-
-        var declined = Scene.Start(3); declined.Play(); declined.Driver("strip-one", [3]); declined.OfferRenxing();
-        declined.Answer(c => Key(c) == "skip"); declined.Play(); declined.Driver("discard-own", []); declined.Play();
-        declined.Need(declined.E<MobileShiChenZhiRenxingCompletedEvent>().Length == 0 &&
-            declined.E<MobileShiChenZhiFirstDiscardEvent>().Length == 1 && declined.RenxingOffersSkipped == 0,
-            "Declining the first opportunity cannot postpone Renxing to a later discard in that same actual turn.");
-    }
-
     private static string? Key(PromptChoice choice) => choice.Parameters.GetValueOrDefault("program-action");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {

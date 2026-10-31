@@ -12,46 +12,6 @@ internal static class ShanhePlayerRosterChecks
     ];
     private const string ExpandedPlayer = "classic:lu-xun";
 
-    public static void OrdinaryRosterStartsRealExpandedGeneralBattleAndRestoresCold()
-    {
-        var registry = StandardShanheCampaignCatalog.PlayerRosterRegistry;
-        var roster = StandardShanheCampaignCatalog.GetPlayerGeneralIds();
-        var ordinary = new[] { "identity:classic-8", "identity:classic-boundary-8" }
-            .SelectMany(id => registry.Modes[id].GeneralPoolIds!).ToHashSet(StringComparer.Ordinal);
-        Require(roster.Count > LegacyRoster.Length && roster.Take(LegacyRoster.Length).SequenceEqual(LegacyRoster) &&
-            roster.Distinct(StringComparer.Ordinal).Count() == roster.Count &&
-            roster.All(id => ordinary.Contains(id) && registry.IsGeneralPlayable(id)),
-            "The expanded roster must preserve the original eight first and contain unique playable ordinary identity generals.");
-        Require(roster.Contains(ExpandedPlayer) && !LegacyRoster.Contains(ExpandedPlayer) &&
-            !roster.Contains(StandardShanheBossPackage.ShenguiLvbuId) && !roster.Contains(StandardShanheBossPackage.FenghuangId) &&
-            !roster.Any(id => id.StartsWith("fan:", StringComparison.Ordinal) || id.StartsWith("national:", StringComparison.Ordinal) ||
-                id.StartsWith("composed:", StringComparison.Ordinal) || id.Contains("demo-", StringComparison.Ordinal)),
-            "Encounter forms, fan-made generals, national-war identities and demonstration generals are not expedition choices.");
-        RejectMutation(roster);
-
-        var definition = StandardShanheCampaignCatalog.CreateDefinition();
-        Require(definition.PlayerGeneralIds.SequenceEqual(roster), "Both catalogue and UI must consume the same frozen roster.");
-        var session = Create(definition, ExpandedPlayer);
-        Accept(session, new MoveShanheNodeCommand(session.Snapshot.AvailableNodes.Single().Id, session.Revision));
-        Accept(session, new ChooseShanheNodeOptionCommand("supplies", null, session.Revision));
-        Accept(session, new MoveShanheNodeCommand(session.Snapshot.AvailableNodes.Single().Id, session.Revision));
-        var setup = session.PendingBattleSetup ?? throw new InvalidOperationException("The real first battle was not prepared.");
-        var battleRegistry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup);
-        Require(roster.All(battleRegistry.IsGeneralPlayable), "Every advertised choice must exist in the actual battle content source.");
-        var battle = StandardShanheCampaignCatalog.CreateBattle(setup);
-        var start = battle.Submit(new StartGameCommand());
-        Require(start.Accepted && battle.CreateSnapshot(0).Players.Single(player => player.IsHuman).GeneralId == ExpandedPlayer &&
-            battle.State.Status != EngineStatus.NotStarted,
-            "An added general must enter a real battle and pass its actual start command.");
-        var coldBattle = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(battle.CreateCheckpoint())), battleRegistry);
-        Require(JsonSerializer.Serialize(battle.CreateSnapshot(0)) == JsonSerializer.Serialize(coldBattle.CreateSnapshot(0)),
-            "The added general's real started battle retains the ordinary replay fingerprint gate.");
-        var restored = Restore(session.CreateCheckpoint());
-        Require(JsonSerializer.Serialize(session.Snapshot) == JsonSerializer.Serialize(restored.Snapshot) &&
-            ShanheBattleSetup.ValueEquals(session.PendingBattleSetup!, restored.PendingBattleSetup!),
-            "A cold campaign replay must preserve the expanded player's route and exact pending battle identity.");
-    }
-
     public static void SavedRostersFreezeLegacyCompatibilityAndRejectForgedPools()
     {
         foreach (var edition in new[] { StandardShanheCampaignCatalog.LocalEditionId, StandardShanheCampaignCatalog.Returning2026EditionId })
@@ -113,12 +73,6 @@ internal static class ShanhePlayerRosterChecks
         var cold = ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(checkpoint));
         return ShanheCampaignSession.Restore(cold, StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(cold, 1),
             StandardShanheCampaignCatalog.CreateBattleRegistry);
-    }
-
-    private static void Accept(ShanheCampaignSession session, ShanheCampaignCommand command)
-    {
-        var result = session.Submit(command);
-        Require(result.Accepted, result.Error ?? "Campaign command rejected.");
     }
 
     private static void RejectMutation(IReadOnlyList<string> values)

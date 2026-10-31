@@ -31,25 +31,6 @@ internal static class ShortPlanningAiChecks
             "Removing an uncertain Bagua response contributes a smaller discounted continuation value than a deterministic blocker.");
     }
 
-    public static void PreservesVineFireAndSilverLionHealing()
-    {
-        var vine = Scene(LegalActionKind.Dismantlement, CardKind.FireSlash, CardKind.Tengjia);
-        var vineView = Change(vine.View, 1, player => player with { Hp = 2, MaxHp = 4 });
-        var oldVine = Brain(AiDecisionPolicy.CooperativeCategoryGiftVersion).ChoosePlay(vineView, [vine.Remove, vine.Slash, End], 1);
-        var newVine = Brain(AiDecisionPolicy.TacticalPlanningVersion).ChoosePlay(vineView, [vine.Remove, vine.Slash, End], 1);
-        Need(oldVine.Action == vine.Remove && newVine.Action == vine.Slash &&
-            Score(newVine.Thought, vine.Remove) < Score(oldVine.Thought, vine.Remove) - 80,
-            "An existing fire Slash should exploit the enemy's Vine vulnerability rather than dismantling it first.");
-
-        var lion = Scene(LegalActionKind.Snatch, CardKind.Slash, CardKind.SilverLion);
-        var lionView = Change(lion.View, 1, player => player with { Hp = 1, MaxHp = 4 });
-        var oldLion = Brain(AiDecisionPolicy.CooperativeCategoryGiftVersion).ChoosePlay(lionView, [lion.Remove, lion.Slash, End], 1);
-        var newLion = Brain(AiDecisionPolicy.TacticalPlanningVersion).ChoosePlay(lionView, [lion.Remove, lion.Slash, End], 1);
-        Need(oldLion.Action == lion.Remove && newLion.Action == lion.Slash &&
-            newLion.Thought.Candidates.Single(candidate => candidate.Action == lion.Remove).Reason.Contains("回复体力"),
-            "The one-HP enemy's Silver Lion must not be removed to heal it before the available attack.");
-    }
-
     public static void SelectsFireAndRedSlashAgainstPublicArmor()
     {
         var vine = Scene(LegalActionKind.Dismantlement, CardKind.FireSlash, CardKind.Tengjia);

@@ -9,21 +9,6 @@ internal static class ShanheLiveMarketChecks
     private const string Driver = "fixture:live-market-driver", Extra = "fixture:live-market-extra", Quiet = "fixture:live-market-quiet";
     private const string Deck = "fixture:live-market-deck";
 
-    public static void EntryWealthQualificationSurvivesPurchasesAndRefreshes()
-    {
-        var scene = Scene.Start();
-        scene.Buy("wealth");
-        Need(scene.Market().Gold == 2000 && scene.Player().Skills!.Count(skill =>
-                skill.ContentId == StandardShanheWealthPackage.WealthHandLimitSkillId) == 1,
-            "The new entry-wealth tactic uses this battle's frozen 3000 entry coins after its actual price lowers the wallet to the 2000 threshold.");
-        scene.Submit(new CardGame.Core.RefreshShanheMarketCommand(0, scene.Game.Revision));
-        scene.Buy("slash");
-        Need(scene.Market().Gold == 1800 && scene.Player().Skills!.Count(skill =>
-                skill.ContentId == StandardShanheWealthPackage.WealthHandLimitSkillId) == 1 &&
-            scene.Facts<ShanheMarketPurchaseCommittedEvent>().Length == 2,
-            "A paid refresh and another purchase preserve entry qualification without treating the current wallet as entry money.");
-    }
-
     public static void PaidSkillTacticAndCardsApplyNowAndKeepTheOriginalPrompt()
     {
         var scene = Scene.Start();

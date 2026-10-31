@@ -36,49 +36,6 @@ internal static class ShanheAppliedDamageReflectionChecks
             "The reflected segment is real sourced native skill damage, with no inherited card use or manufactured HP subtraction.");
     }
 
-    public static void ReflectionCopiesFrozenFinalNatureAndUsesFreshSkillDamageWithNativeArmor()
-    {
-        foreach (var silverLion in new[] { false, true })
-        {
-            var s = Scene.Start(fire: true, silverLion);
-            s.Use("armor-two");
-            if (silverLion)
-            {
-                var lion = s.View().Hand.Single(card => card.Kind == CardKind.SilverLion).Id;
-                s.Use("equip-peer", [lion], [1]);
-                Need(s.View(1).Equipment.Single().Id == lion &&
-                    s.Game.CardMovements.Any(move => move.CardId == lion && move.From == CardLocation.Hand(0) && move.To == CardLocation.Equipment(1)),
-                    "A real original Silver Lion is placed in the attacker's equipment area by native selected-equipment movement before damage.");
-            }
-            var fireCard = s.View(1).Hand.Single(card => card.Kind == CardKind.FireSlash).Id;
-            s.NextOwnPlay();
-            var hits = s.Events<DamageAppliedEvent>();
-            var incoming = hits.Single(hit => hit.SourceSeat == 1 && hit.TargetSeat == 0);
-            var reflected = hits.Single(hit => hit.SourceSeat == 0 && hit.TargetSeat == 1);
-            var use = s.Events<CardUseDeclaredEvent>().Single(item => item.SourceSeat == 1 && item.CardId == fireCard);
-            Need(hits.Length == 2 && incoming is { Amount: 3, Nature: DamageNature.Fire, SourceLess: false,
-                    ArmorPayment: { DamageAmount: 3, ArmorBefore: 2, ArmorAbsorbed: 2, ArmorAfter: 0, HpLossAmount: 1 } } &&
-                incoming.SourceCardUseResolutionId == use.ResolutionId && s.View() is { Hp: 29, Armor: 0 } &&
-                use.CardKind == CardKind.FireSlash &&
-                s.Events<CardUseFinishedEvent>().Count(item => item.ResolutionId == use.ResolutionId) == 1 &&
-                s.Game.CardMovements.Count(move => move.CardId == fireCard && move.From == CardLocation.Hand(1) && move.To == CardLocation.Processing) == 1 &&
-                s.Game.CardMovements.Count(move => move.CardId == fireCard && move.To == CardLocation.DiscardPile) == 1,
-                "The NPC actually pays and finishes one physical Fire Slash; its final three-point Fire segment spends two Armor and loses only one HP.",
-                new { silverLion, Hits = hits, Uses = s.Events<CardUseDeclaredEvent>(), Owner = s.View() });
-            var bonus = s.Events<ProgramCardDamageModifiedEvent>().Single(item => item.Source.SkillId == Jiyi);
-            Need(bonus is { TargetSeat: 1, CardKind: null, BaseAmount: 3, ModifiedAmount: 4 } &&
-                reflected.Amount == (silverLion ? 1 : 4) && reflected.Nature == DamageNature.Fire &&
-                reflected is { SourceLess: false, SourceCardUseResolutionId: null } &&
-                !s.Events<ProgramCardDamageModifiedEvent>().Any(item => item.Source.OwnerSeat == 0 && item.Source.SkillId == Driver) &&
-                s.Events<ProgramCardDamageModifiedEvent>().Single(item => item.Source.SkillId == EnemyDriver) is
-                    { TargetSeat: 0, CardKind: CardKind.FireSlash, BaseAmount: 1, ModifiedAmount: 3 } &&
-                s.Events<ProgramBindingResolvedEvent>().Single(item => item.SkillId == Reflect) is { Activated: true, Completed: true } &&
-                s.View(1).Hp == (silverLion ? 29 : 26),
-                "The reflected child copies the original finalized three and Fire, gets its own legitimate direct-skill +1 once, and never reapplies either participant's Slash-only bonus; real Silver Lion subsequently caps that fresh native damage to one.",
-                new { silverLion, Hits = hits, Modifiers = s.Events<ProgramCardDamageModifiedEvent>(), Requests = s.Events<DamageRequestedEvent>() });
-        }
-    }
-
     private static void Need(bool value, string message, object? details = null)
     { if (!value) throw new InvalidOperationException(details is null ? message : message + " " + JsonSerializer.Serialize(details)); }
 

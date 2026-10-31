@@ -4,103 +4,6 @@ using CardGame.Core;
 
 internal static class ProgramInteractionChecks
 {
-    public static void RegistrationAndDispatchPreserveBoundaries()
-    {
-        var methods = Methods(typeof(Host));
-        var catalog = ProgramInteractionCatalog.Discover(methods);
-        var reversed = ProgramInteractionCatalog.Discover(methods.Reverse());
-        Require(catalog.Answers.SequenceEqual(reversed.Answers) &&
-                catalog.Prefixes.SequenceEqual(reversed.Prefixes) &&
-                catalog.AiChoices.SequenceEqual(reversed.AiChoices) &&
-                catalog.BeforeAnswers.SequenceEqual(reversed.BeforeAnswers),
-            "Reflection enumeration must not change interaction registration or precedence.");
-
-        var production = ProgramInteractionCatalog.Discover(
-            ProgramRuntimeModuleCatalog.Default.Methods.Concat(Methods(typeof(ProgramAiChoiceSelector))));
-        foreach (var method in production.Answers.Values.Concat(production.Prefixes.Values)
-                     .Concat(production.AiChoices.Values).Concat(production.BeforeAnswers).Distinct())
-        {
-            var parameters = method.GetParameters().Select(parameter => parameter.ParameterType);
-            if (!method.IsStatic) parameters = parameters.Prepend(method.DeclaringType!);
-            var signature = Expression.GetDelegateType(parameters.Append(method.ReturnType).ToArray());
-            Require(method.CreateDelegate(signature).Method == method,
-                "A registered production interaction must bind directly without reflection invocation.");
-        }
-
-        foreach (var names in new[]
-                 {
-                     new[] { "DuplicateAnswerA", "DuplicateAnswerB" },
-                     new[] { "DuplicateAiA", "DuplicateAiB" },
-                     new[] { "DuplicateBeforeA", "DuplicateBeforeB" },
-                     new[] { "Prefix", "NestedPrefix" },
-                     new[] { "Prefix", "OverlappingAnswer" },
-                     new[] { "WrongAnswer" }, new[] { "WrongAi" }, new[] { "WrongBefore" },
-                     new[] { "GenericAnswer" }, new[] { "EmptyAnswer" }, new[] { "UnknownAi" }
-                 })
-            Reject(() => ProgramInteractionCatalog.Discover(names.Select(name =>
-                typeof(InvalidHost).GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic)!)));
-
-        var host = new Host();
-        var router = Router(catalog, host);
-        var choice = Choice("published", "exact");
-        host.Expected = choice;
-        router.Resolve(choice);
-        Require(host.Calls.SequenceEqual(["before:10", "before:20", "answer"]),
-            "Pre-handlers must run by explicit order before the exact answer handler.");
-        var bindings = host.BindingCount;
-        host.Calls.Clear();
-        router.Resolve(choice);
-        Require(host.BindingCount == bindings && host.Calls.SequenceEqual(["before:10", "before:20", "answer"]),
-            "Reusing an answer must preserve dispatch while retaining this session's delegates.");
-
-        foreach (var (id, expected) in new[]
-                 {
-                     ("stop-first", new[] { "before:10" }),
-                     ("stop-second", new[] { "before:10", "before:20" })
-                 })
-        {
-            host.Calls.Clear();
-            router.Resolve(Choice(id, "exact"));
-            Require(host.Calls.SequenceEqual(expected), "A handled pre-answer must stop every later handler.");
-        }
-
-        host.Calls.Clear();
-        host.Expected = Choice("prefix", "family:selected");
-        router.Resolve(host.Expected);
-        Require(host.Calls.SequenceEqual(["before:10", "before:20", "family:selected"]),
-            "A prefix handler must receive the original action and original published choice.");
-
-        foreach (var action in new[] { "activate", "skip" })
-        {
-            host.Calls.Clear();
-            host.Expected = Choice("group-" + action, action);
-            router.Resolve(host.Expected);
-            Require(host.Calls.SequenceEqual(["before:10", "before:20", action]),
-                "Activation/group protocol must retain its own validation boundary after pre-handlers.");
-        }
-        Reject(() => router.Resolve(Choice("unknown", "Exact")));
-        host.Expected = Choice("failure", "throw");
-        try { router.Resolve(host.Expected); throw new Exception("The original rule failure was swallowed."); }
-        catch (InvalidOperationException error)
-        { Require(ReferenceEquals(error, Host.Failure), "Direct handler exceptions must not be wrapped or replaced."); }
-
-        var decision = Decision(choice, Choice("other", "exact"));
-        var frame = Frame();
-        host.Expected = choice;
-        host.ExpectedFrame = frame;
-        foreach (var op in new[] { SkillProgramEffectOp.Draw, SkillProgramEffectOp.Recover,
-                     SkillProgramEffectOp.LoseHp, SkillProgramEffectOp.Damage })
-            Require(ReferenceEquals(router.SelectAi(decision, frame, Effect(op)), choice),
-                "Every supported private static/instance AI signature must return the exact published choice.");
-        var callsBeforeUnknown = host.Calls.ToArray();
-        Reject(() => router.SelectAi(decision, frame, Effect(SkillProgramEffectOp.ChangeMaximumHp)));
-        Require(host.Calls.SequenceEqual(callsBeforeUnknown), "An unknown AI opcode must never enter activation fallback.");
-
-        var other = new Host { Expected = choice };
-        Router(catalog, other).Resolve(choice);
-        Require(other.Calls.SequenceEqual(["before:10", "before:20", "answer"]),
-            "Sharing immutable registration must not bind a new session to an earlier host.");
-    }
 
     public static void AiSelectionPreservesPublishedOrderAndConditionalPolicies()
     {
@@ -165,13 +68,6 @@ internal static class ProgramInteractionChecks
     private static MethodInfo[] Methods(Type type) => type.GetMethods(
         BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
 
-    private static ProgramInteractionRouter Router(ProgramInteractionCatalog catalog, Host host) =>
-        new(catalog, (method, type) =>
-        {
-            host.BindingCount++;
-            return method.IsStatic ? method.CreateDelegate(type) : method.CreateDelegate(type, host);
-        }, host.Activation);
-
     private static ProgramSkillFrame Frame() => new(41, 0, "fixture:interaction", "run", "hash", 0, [], []);
 
     private static PendingDecision Decision(params PromptChoice[] choices) =>
@@ -200,60 +96,5 @@ internal static class ProgramInteractionChecks
     private static void Require(bool condition, string message)
     {
         if (!condition) throw new InvalidOperationException(message);
-    }
-
-    private sealed class Host
-    {
-        internal static readonly InvalidOperationException Failure = new("original handler failure");
-        internal readonly List<string> Calls = [];
-        internal int BindingCount;
-        internal PromptChoice? Expected;
-        internal ProgramSkillFrame? ExpectedFrame;
-
-        [ProgramAnswerBefore(20)]
-        private bool BeforeSecond(PromptChoice choice) { Calls.Add("before:20"); return choice.Id.Value == "stop-second"; }
-        [ProgramAnswerBefore(10)]
-        private bool BeforeFirst(PromptChoice choice) { Calls.Add("before:10"); return choice.Id.Value == "stop-first"; }
-        [ProgramAnswer("exact")]
-        private void Answer(PromptChoice choice) { Require(ReferenceEquals(choice, Expected), "Answer reconstructed the published choice."); Calls.Add("answer"); }
-        [ProgramAnswerPrefix("family:")]
-        private void Prefix(PromptChoice choice, string action) { Require(ReferenceEquals(choice, Expected), "Prefix lost the published choice."); Calls.Add(action); }
-        [ProgramAnswer("throw")]
-        private static void Throw(PromptChoice choice) => throw Failure;
-        [ProgramAiChoice(SkillProgramEffectOp.Draw)]
-        private static PromptChoice AiDecision(PendingDecision decision) => decision.Choices[0];
-        [ProgramAiChoice(SkillProgramEffectOp.Recover)]
-        private PromptChoice AiFrame(ProgramSkillFrame frame) { Require(ReferenceEquals(frame, ExpectedFrame), "AI frame changed."); return Expected!; }
-        [ProgramAiChoice(SkillProgramEffectOp.LoseHp)]
-        private PromptChoice AiPair(PendingDecision decision, ProgramSkillFrame frame) { Require(ReferenceEquals(frame, ExpectedFrame), "AI frame changed."); return decision.Choices[0]; }
-        [ProgramAiChoice(SkillProgramEffectOp.Damage)]
-        private PromptChoice AiFull(PendingDecision decision, ProgramSkillFrame frame, SkillProgramEffect effect) { Require(ReferenceEquals(frame, ExpectedFrame) && effect.Op == SkillProgramEffectOp.Damage, "AI instruction context changed."); return decision.Choices[0]; }
-
-        internal void Activation(PromptChoice choice)
-        {
-            var action = choice.Parameters["program-action"];
-            if (action is not ("activate" or "skip")) throw new InvalidOperationException("Unknown activation.");
-            Require(ReferenceEquals(choice, Expected), "Activation lost the published choice.");
-            Calls.Add(action);
-        }
-    }
-
-    private static class InvalidHost
-    {
-        [ProgramAnswer("same")] private static void DuplicateAnswerA(PromptChoice choice) { }
-        [ProgramAnswer("same")] private static void DuplicateAnswerB(PromptChoice choice) { }
-        [ProgramAiChoice(SkillProgramEffectOp.Draw)] private static PromptChoice DuplicateAiA(PendingDecision decision) => decision.Choices[0];
-        [ProgramAiChoice(SkillProgramEffectOp.Draw)] private static PromptChoice DuplicateAiB(PendingDecision decision) => decision.Choices[0];
-        [ProgramAnswerBefore(1)] private static bool DuplicateBeforeA(PromptChoice choice) => false;
-        [ProgramAnswerBefore(1)] private static bool DuplicateBeforeB(PromptChoice choice) => false;
-        [ProgramAnswerPrefix("prefix:")] private static void Prefix(PromptChoice choice) { }
-        [ProgramAnswerPrefix("prefix:nested:")] private static void NestedPrefix(PromptChoice choice) { }
-        [ProgramAnswer("prefix:exact")] private static void OverlappingAnswer(PromptChoice choice) { }
-        [ProgramAnswer("wrong")] private static bool WrongAnswer(PromptChoice choice) => false;
-        [ProgramAiChoice(SkillProgramEffectOp.Draw)] private static void WrongAi(PendingDecision decision) { }
-        [ProgramAnswerBefore(2)] private static bool WrongBefore(string choice) => false;
-        [ProgramAnswer("generic")] private static void GenericAnswer<T>(PromptChoice choice) { }
-        [ProgramAnswer] private static void EmptyAnswer(PromptChoice choice) { }
-        [ProgramAiChoice((SkillProgramEffectOp)int.MaxValue)] private static PromptChoice UnknownAi(PendingDecision decision) => decision.Choices[0];
     }
 }

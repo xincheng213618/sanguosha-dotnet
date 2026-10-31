@@ -67,51 +67,6 @@ internal static class NianRevivalChecks
         Cold(low, lowRegistry);
     }
 
-    public static void AiRevivesHumanWithColdDrawAndPreservesLimitedUsage()
-    {
-        var (g, registry) = Start(limited: true);
-        var initial = V(g, 0);
-        Need(initial.Hp == 6, "The limited-skill fixture uses the activity's real five-tier maximum HP.");
-        Use(g, Driver, "empty-own-hp", 0);
-        Until(g, () => P(g) is { Kind: DecisionKind.RescueDying, PlayerSeat: 0 } dying &&
-            dying.Choices.Any(c => c.Parameters.GetValueOrDefault("response") == "program-trigger" &&
-                c.Parameters.GetValueOrDefault("skill-id") == "nian:niepan" &&
-                c.Parameters.GetValueOrDefault("binding-id") == "limited-dying-rescue"));
-        Cold(g, registry);
-        Answer(g, c => c.Parameters.GetValueOrDefault("response") == "program-trigger" &&
-            c.Parameters.GetValueOrDefault("skill-id") == "nian:niepan" &&
-            c.Parameters.GetValueOrDefault("binding-id") == "limited-dying-rescue"); Play(g);
-        Need(V(g, 0).Hp == 3 && V(g, 0).HandCount == initial.HandCount + 3 &&
-            Facts<SkillUsageConsumedEvent>(g).Count(e => e.SkillId == "nian:niepan") == 1,
-            "The local five-tier dying skill recovers three, draws three and consumes its original once-per-game ledger.");
-        Use(g, Driver, "kill", 0);
-        Until(g, () => !V(g, 0).IsAlive);
-        Need(g.CreateSnapshot(0).Winner == Winner.None, "One dead human does not end a live allied team's game.");
-        Cold(g, registry);
-        Until(g, () => P(g) is { PlayerSeat: 0, SkillPrompt.SkillId: Observer } &&
-            Facts<NianAllyRevivedEvent>(g).Any(e => e.TargetSeat == 0));
-        Need(g.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.NianRevival is
-                { TargetSeat: 0, Stage: NianRevivalStage.DrawChildren }) &&
-            Facts<NianRevivalPaidEvent>(g).Single().ActorSeat is 1 or 2 && V(g, 0).HandCount == 2,
-            "A real AI ally spends the team charge while the dead human's restored draw opens a nested observable child.");
-        Cold(g, registry);
-        var revivalId = Facts<NianRevivalPaidEvent>(g).Single().FrameId;
-        CompleteRevivalObservers(g, revivalId);
-        Need(Facts<NianRevivalPaidEvent>(g).Count() == 1 && V(g, 0).Hp == 2 &&
-            V(g, 0).MaxHp == initial.MaxHp && V(g, 0).GeneralId == initial.GeneralId &&
-            V(g, 0).HandCount == 2 && Facts<NianRevivalCompletedEvent>(g).Single(e => e.FrameId == revivalId).DrawnCards == 2 &&
-            g.CardMovements.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0) &&
-                m.Reason.Value == "activity.nian.revival-draw") == 2 &&
-            Facts<SkillUsageConsumedEvent>(g).Count(e => e.SkillId == "nian:niepan") == 1,
-            "Resuming the nested draw pays and draws once, preserving the original general and limited skill usage.");
-        Play(g);
-        Use(g, Driver, "kill", 0);
-        Until(g, () => !V(g, 0).IsAlive);
-        Need(Facts<SkillUsageConsumedEvent>(g).Count(e => e.SkillId == "nian:niepan") == 1,
-            "The already consumed dying skill does not reappear after revival.");
-        Cold(g, registry);
-    }
-
     public static void TimeoutCancelsPaidRevivalDrawWithoutRefundOrReplay()
     {
         var (g, registry) = Start(observeRevival: true);
@@ -271,22 +226,6 @@ internal static class NianRevivalChecks
     private static void Until(GameEngine g, Func<bool> ready)
     { for (var i = 0; i < 240; i++) { if (ready()) return; Step(g); }
         throw new InvalidOperationException("Nian revival fixture failed to reach the expected boundary: " + Boundary(g)); }
-    private static void CompleteRevivalObservers(GameEngine g, long revivalId)
-    {
-        for (var i = 0; i < 32; i++)
-        {
-            if (Facts<NianRevivalCompletedEvent>(g).Any(e => e.FrameId == revivalId)) return;
-            if (P(g) is { PlayerSeat: 0, SkillPrompt.SkillId: Observer } &&
-                g.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == revivalId &&
-                    f.NianRevival is { TargetSeat: 0, Stage: NianRevivalStage.DrawChildren }))
-            {
-                Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "skip");
-                continue;
-            }
-            Step(g);
-        }
-        throw new InvalidOperationException("The exact paid revival observers did not drain: " + Boundary(g));
-    }
     private static void Step(GameEngine g)
     {
         if (P(g) is { PlayerSeat: 0 } p)

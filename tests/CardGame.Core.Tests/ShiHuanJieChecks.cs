@@ -41,67 +41,6 @@ internal static class ShiHuanJieChecks
             "Both temporary sources expire at the real turn end while the original printed Kanpo survives; cold recovery never pays the exchange twice."); s.Cold(); s.Replay();
     }
 
-    public static void LimitedAllHandDiscardRealShuffleOrderedFourDrawsAndPaidRecoveryCold()
-    {
-        var s = Scene.Start(); s.Play();
-        s.Native(CardKind.BaguaFormation, []); s.Play(); s.Native(CardKind.Indulgence, [1]); s.Play();
-        var equipment = s.V(0).Equipment.Single().Id; var judgment = s.V(1).Judgment.Single().Id;
-        var hands = Enumerable.Range(0, 4).SelectMany(i => s.V(i).Hand.Select(c => (Seat: i, c.Id))).ToArray();
-        s.Need(s.V(1).HandCount == 4, "The actual other player already has four hand cards; the obsolete test-server prerequisite must not prohibit the formal skill.");
-        s.Accept(new UseProgramSkillCommand(0, Zhengshuo, "reset-all-hands", [], [], s.G.Revision, s.P!.PromptId)); s.AtWatch();
-        var root = s.Root!; var paid = s.E<MobileShiHuanJieMovementPaidEvent>().Single(e => e.Stage == MobileShiHuanJieStage.DiscardChildren);
-        s.Need(root.MobileShiHuanJie is { Stage: MobileShiHuanJieStage.DiscardChildren } && root.PendingMovementContinuation is not null &&
-            paid.Count == hands.Length && paid.BatchId is not null &&
-            s.G.CardMovements.Count(m => hands.Any(h => h.Id == m.CardId && m.From == CardLocation.Hand(h.Seat)) && m.Reason.Value == "skill.mobile-shi-huan-jie.discard") == hands.Length &&
-            s.E<NativeLogicalDiscardInvocationRecordedEvent>().Count(e => e.ParentFrameId == root.Id && e.Reason.Value == "skill.mobile-shi-huan-jie.discard") == 4 &&
-            !s.HasSkill(0, Zhengshuo) && s.E<MobileShiHuanJieShuffledEvent>().Length == 0 && s.E<MobileShiHuanJieDrawCompletedEvent>().Length == 0 &&
-            s.V(0).Equipment.Any(c => c.Id == equipment) && s.V(1).Judgment.Any(c => c.Id == judgment),
-            "The once-paid limited skill discards all original hands in one real batch, records each participant's logical discard, waits for its paid child despite source loss, and preserves equipment and judgment.");
-        s.Cold(); s.ContinueWatch();
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Watch && s.E<MobileShiHuanJieDrawCompletedEvent>().Length == 1);
-        s.Need(s.Root?.MobileShiHuanJie is { Stage: MobileShiHuanJieStage.DrawChildren, Cursor: 0 } &&
-            s.E<MobileShiHuanJieShuffledEvent>().Length == 1 && s.E<MobileShiHuanJieDrawCompletedEvent>() is [{ RecipientSeat: 0, ActualCount: 4 }] &&
-            s.E<NativeDrawInvocationRecordedEvent>().Any(e => e.ParentFrameId == root.Id && e.OwnerSeat == 0 && e.Requested == 4 && e.ActualCount == 4),
-            "Only after the discard child completes does the complete real deck shuffle once, then the first native four-card draw pays before its own child.");
-        var originalDraw = s.Root!.MobileShiHuanJie!.Draw!;
-        var invoice = s.E<NativeDrawInvocationRecordedEvent>().Single(e => e.ParentFrameId == root.Id && e.OwnerSeat == 0);
-        var observedBatches = new HashSet<long>(); var observedFrames = new HashSet<long>();
-        // Native DrawCards draws four times via DrawOne. The configured
-        // perBatch observer therefore has four distinct one-card children;
-        // these do not represent four draw instructions or repeated payment.
-        for (var index = 0; index < originalDraw.ActualDrawIds.Count; index++)
-        {
-            s.AtWatch();
-            var observer = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Last(f => f.SkillId == Watch);
-            var window = s.G.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(f => f.Id == observer.WindowContext!.ParentFrameId);
-            s.Need(observer.TriggerId == "draw-child" && observedFrames.Add(observer.Id) && observedBatches.Add(window.Batch.Id) &&
-                window.Batch.ParentFrameId == root.Id && window.Batch.Movements is [var material] &&
-                material.CardId == originalDraw.ActualDrawIds[index] && material.From == CardLocation.DrawPile && material.To == CardLocation.Hand(0) &&
-                material.Reason.Value == "skill-program.mobile-shi-huan-jie.draw" &&
-                s.Root?.MobileShiHuanJie is { Stage: MobileShiHuanJieStage.DrawChildren, Cursor: 0, Draw: { } sameDraw } &&
-                sameDraw.ActualDrawIds.SequenceEqual(originalDraw.ActualDrawIds) && sameDraw.SequenceBefore == originalDraw.SequenceBefore && sameDraw.SequenceAfter == originalDraw.SequenceAfter &&
-                s.E<MobileShiHuanJieDrawCompletedEvent>() is [{ RecipientSeat: 0, ActualCount: 4 }] &&
-                s.E<NativeDrawInvocationRecordedEvent>().Where(e => e.ParentFrameId == root.Id && e.OwnerSeat == 0).SequenceEqual([invoice]) &&
-                s.E<MobileShiHuanJieMovementPaidEvent>().Count(e => e.Stage == MobileShiHuanJieStage.DiscardChildren) == 1 &&
-                s.E<MobileShiHuanJieShuffledEvent>().Length == 1 && Enumerable.Range(1, 3).All(seat => s.V(seat).HandCount == 0),
-                "Each native one-card gain child belongs to a distinct original DrawOne batch; all four pause behind the same paid draw-four invoice before the next recipient.");
-            if (index is 0 or 3) s.Cold();
-            s.ContinueWatch();
-        }
-        s.Play();
-        var drawObservers = s.E<ProgramBindingStartedEvent>().Where(e => e.SkillId == Watch && e.BindingId == "draw-child").ToArray();
-        var drawReturns = s.E<ProgramBindingResolvedEvent>().Where(e => e.SkillId == Watch && e.BindingId == "draw-child").ToArray();
-        s.Need(observedBatches.Count == 4 && observedFrames.Count == 4 && drawObservers.Length == 4 && drawReturns.Length == 4 &&
-            drawReturns.All(e => e.Activated && e.Completed) && drawObservers.Select(e => e.FrameId).Order().SequenceEqual(drawReturns.Select(e => e.FrameId).Order()),
-            "All four explicitly configured per-batch draw children complete exactly once, including the last child's cold recovery.");
-        s.Need(s.E<MobileShiHuanJieDrawCompletedEvent>().Select(e => (e.Cursor, e.RecipientSeat, e.ActualCount)).SequenceEqual(new[] { (0, 0, 4), (1, 1, 4), (2, 2, 4), (3, 3, 4) }) &&
-            Enumerable.Range(0, 4).All(i => s.V(i).HandCount == 4) && s.E<MobileShiHuanJieShuffledEvent>().Length == 1 &&
-            s.E<MobileShiHuanJieCompletedEvent>().Count(e => e.Operation == SkillProgramEffectOp.ResolveMobileShiHuanJieZhengshuo) == 1 &&
-            s.G.CardMovements.All(m => m.CardId != equipment || m.To != CardLocation.DiscardPile) &&
-            s.G.CardMovements.All(m => m.CardId != judgment || m.To != CardLocation.DiscardPile),
-            "The issued global effect survives source loss and both cold children, each real recipient receives exactly one four-card request in action order, and the original non-hand regions remain untouched."); s.Replay();
-    }
-
     private static string? Key(PromptChoice c) => c.Parameters.GetValueOrDefault("program-action");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {

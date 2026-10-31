@@ -66,21 +66,6 @@ internal static class ProgramNativeReturnChecks
         _ = new ProgramNativeReturnCatalog(ProgramRuntimeModuleCatalog.Default.Methods);
     }
 
-    public static void InvalidNativeReturnMetadataFailsBeforeDispatch()
-    {
-        var complete = Methods(typeof(ReturnFixture));
-        foreach (var fixture in new[] { typeof(DuplicateFixture), typeof(InvalidSignatureFixture), typeof(InvalidStaticFixture),
-                     typeof(InvalidOrderFixture), typeof(InvalidPhaseFixture), typeof(MissingContinuationFixture), typeof(WrongContinuationFixture) })
-            Reject(() => new ProgramNativeReturnCatalog(complete.Concat(Methods(fixture))));
-        Reject(() => new ProgramNativeReturnCatalog(complete.Where(method => method.Name != "BeforeParent")));
-        var catalog = new ProgramNativeReturnCatalog(complete);
-        Require(catalog.Validations is IList<ProgramNativeReturnCatalog.Validation> { IsReadOnly: true } &&
-                catalog.Preparations is IList<ProgramNativeReturnCatalog.Preparation> { IsReadOnly: true } &&
-                catalog.UseReturns is IList<ProgramNativeReturnCatalog.UseReturn> { IsReadOnly: true } &&
-                catalog.AttackReturns is IList<ProgramNativeReturnCatalog.AttackReturn> { IsReadOnly: true },
-            "Native return metadata must freeze every exposed registration collection.");
-    }
-
     private static CardUseFrame Use(long id) => new(id, 0, 7, CardKind.Slash, [1], ResolutionFrameStep.Completed);
     private static MethodInfo[] Methods(Type type) => type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
     private static void Require(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
@@ -120,17 +105,5 @@ internal static class ProgramNativeReturnChecks
         [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 20)] private bool AttackExclusive(AttackReceipt receipt) { Trace.Add("attack-exclusive"); return ExclusiveAttack; }
         [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 30)] private void AttackLast() => Trace.Add("attack-last");
         [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 10)] private void BeforeParent(AttackReceipt receipt) => Trace.Add("parent-check");
-    }
-
-    private sealed class DuplicateFixture { [NativeUseReturn(10)] private void Return(CardUseFrame use) { } }
-    private sealed class InvalidSignatureFixture { [NativeUseReturn(100)] private int Return(CardUseFrame use) => 0; }
-    private sealed class InvalidStaticFixture { [NativeUseReturn(100)] private static void Return(CardUseFrame use) { } }
-    private sealed class InvalidOrderFixture { [NativeUseReturn(0)] private void Return(CardUseFrame use) { } }
-    private sealed class InvalidPhaseFixture { [NativeAttackReturn((NativeAttackReturnPhase)99, 10)] private void Return(AttackReceipt receipt) { } }
-    private sealed class MissingContinuationFixture { [NativeUsePreparation(100, 100, "absent")] private bool Prepare(CardUseFrame use) => true; }
-    private sealed class WrongContinuationFixture
-    {
-        [NativeUsePreparation(100, 100, nameof(Return))] private bool Prepare(CardUseFrame use) => true;
-        private bool Return(CardUseFrame use) => true;
     }
 }

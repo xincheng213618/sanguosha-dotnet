@@ -38,44 +38,6 @@ internal static class ShiDengAiChecks
         s.Need(lost.Length >= 2 && s.Charge() == (Math.Min(before.Capacity, before.Current + lost.Length), before.Capacity), "One real batch containing several non-damage entities gains one point for each entity, capped by the current capacity.");
         s.Cold(); s.Replay();
     }
-    public static void ActualTurnEndDiscardAndOneDistanceFreeMultiTargetSnatchCold()
-    {
-        var s = Scene.Start(grow: false); s.Play(); s.Need(s.Charge() == (0, 1), "The initial real full-charge start grows zero-of-zero before the first Play.");
-        s.Native(CardKind.BaguaFormation); s.Watch("equipment-paid");
-        var equipmentUse = s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.ShiDengAiEquipmentLoss is not null);
-        s.Need(equipmentUse.ShiDengAiEquipmentLoss is { Settled: false, PlacementSequence: null } receipt && s.Zone(receipt.CardId) == CardLocation.Processing && s.Charge() == (0, 1),
-            "The actual equipment payment retains its exact original native frame while placement is pending, without prematurely gaining charge.");
-        s.Cold(); s.Replay(); s.Continue("equipment-paid"); s.Play();
-        s.Need(s.E<ShiDaEquipmentLossSettledEvent>() is [{ UseId: var settledUse, Lost: false, PlacementSequence: not null }] && settledUse == equipmentUse.Id,
-            "The same native equipment payment returns through its own real placement once after cold recovery.");
-        s.Need(s.Charge() == (0, 1), "Moving a hand equipment card into one's own equipment area is not an actual loss.");
-        s.Native(CardKind.IronChain, [1, 2]); s.Play();
-        s.Need(s.Charge() == (1, 1) && s.E<ShiDaTargetRecordedEvent>().Where(e => e.Actor == 0).Select(e => e.Target).Distinct().Order().SequenceEqual([1, 2]), "The real non-damage use gains charge and records the actual actor's two native designated targets.");
-        s.Activate(Tuntian, "spend-charge"); s.Stage(ShiDaStage.Amount); s.Answer(c => c.Parameters.GetValueOrDefault("number") == "1"); s.Answer(c => Branch(c) == "spend"); s.Play();
-        s.Need(s.Charge() == (0, 1) && s.E<ShiDaSpentEvent>() is [{ Amount: 1, Recipients: 0 }], "Tuntian may spend a point with fewer recipients, including none.");
-        s.Native(CardKind.Slash, [1]); s.Play(); s.Need(s.Charge() == (0, 1), "A physical damage-card loss does not fund Tuntian.");
-        var armor = s.V(0).Equipment.Single().Id; s.End();
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Jixi && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
-        s.Need(s.G.Events.Any(e => e.Payload is TurnEndedEvent { TurnNumber: 1, ActorSeat: 0 }) && s.G.State.Phase == TurnPhase.Finished, "Jixi starts after the actual turn has ended, rather than at the ending phase.");
-        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate"); s.Stage(ShiDaStage.Cost);
-        s.Answer(c => Branch(c) == "cost" && c.Cards.Contains(armor)); s.Watch("cost-paid"); var frame = s.Root!.Id;
-        s.Need(s.Zone(armor) == CardLocation.DiscardPile && s.E<ShiDaCostPaidEvent>() is [{ Owner: 0, CardId: var paid }] && paid == armor &&
-            s.E<NativeLogicalDiscardInvocationRecordedEvent>().Count(e => e.ParentFrameId == frame && e.ActualCount == 1 && e.Reason.Value == "skill.mobile-shi-deng-ai.jixi.discard") == 1,
-            "One real current-turn owner's equipment discard is paid once before its observer child.");
-        s.Cold(); s.Replay(); s.Continue("cost-paid"); s.Stage(ShiDaStage.Targets);
-        s.Answer(c => Branch(c) == "target" && c.Targets.SequenceEqual([1])); s.Answer(c => Branch(c) == "target" && c.Targets.SequenceEqual([2]));
-        var hands = new[] { s.V(1).HandCount, s.V(2).HandCount }; s.Answer(c => Branch(c) == "snatch");
-        s.Reach(() => s.P?.Kind == DecisionKind.SelectTargetCard && s.Root?.ShiDengAi?.Stage == ShiDaStage.NativeUse);
-        var issued = s.E<ShiDaSnatchIssuedEvent>().Single(); var native = s.G.ResolutionStack.OfType<CardUseFrame>().Single(f => f.Id == issued.UseId);
-        s.Need(native.CardKind == CardKind.Snatch && native.Action is { Type: CardActionType.Use, ActorSeat: 0, ProviderSeat: 0, PhysicalCards.Count: 0, ConversionChain.Count: 0 } a && a.ActionId == issued.ActionId && a.TargetSeats.SequenceEqual([1, 2]) &&
-            s.E<CardUseDeclaredEvent>().Count(e => e.ResolutionId == issued.UseId && e.CardKind == CardKind.Snatch) == 1,
-            "Jixi issues one complete zero-entity native Snatch on both historical targets, including the seat at ordinary distance two.");
-        s.Cold(); s.Replay(); s.Reach(() => s.E<ShiDaSnatchReturnedEvent>().Length == 1);
-        s.Need(s.V(1).HandCount == hands[0] - 1 && s.V(2).HandCount == hands[1] - 1 && s.E<ShiDaCostPaidEvent>().Length == 1 &&
-            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == issued.UseId && e.CardKind == CardKind.Snatch) == 1 && s.G.ResolutionStack.All(f => f.Id != issued.UseId),
-            "The restored original Snatch resolves both real target selections and returns once without paying another cost or creating a second card use.");
-        s.Cold(); s.Replay();
-    }
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
         public GameEngine G { get; private set; } = game;

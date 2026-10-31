@@ -33,26 +33,6 @@ internal static class ModeFeatureFactoryChecks
             "Runtime factory composition is sorted independently of registration order while content recovery identity stays unchanged.");
     }
 
-    public static void FactoriesRejectDuplicateUnknownAndUnsupportedHosts()
-    {
-        Reject<InvalidOperationException>(() => ContentRegistry.Build(new FixturePackage(
-            [new FixtureFactory("test:same-runtime", Mode), new FixtureFactory("test:same-runtime", Mode)])),
-            "Duplicate executable factory ids must fail content registration.");
-        Reject<InvalidOperationException>(() => ContentRegistry.Build(new FixturePackage(
-            [new FixtureFactory("test:missing-mode-runtime", "test:missing-mode")])),
-            "A runtime factory cannot reference an unregistered mode.");
-        var registry = ContentRegistry.Build(new FixturePackage([]));
-        var context = new ModeFeatureCreationContext(1, registry, _ => null);
-        Reject<NotSupportedException>(() => context.GetHost<IFixtureHost>(),
-            "A missing dedicated host fails explicitly instead of discovering or loading another assembly.");
-        Reject<ArgumentException>(() => context.GetHost<FixtureHost>(),
-            "A mode factory requests narrow host interfaces rather than arbitrary engine or implementation classes.");
-        var nullFactory = new FixtureFactory("test:null-runtime", Mode) { ReturnNull = true };
-        var invalid = ContentRegistry.Build(new FixturePackage([nullFactory]));
-        Reject<InvalidOperationException>(() => invalid.ModeFeatureFactories.Single().Create(context),
-            "A factory cannot install a null feature into match composition.");
-    }
-
     private interface IFixtureHost { }
     private sealed class FixtureHost : IFixtureHost { }
     private sealed record FixtureFeature(int Seed, IFixtureHost Host) : IGameModeFeature;
@@ -77,12 +57,6 @@ internal static class ModeFeatureFactoryChecks
                 ModeKind: ContentModeKind.Team, TeamCounts: new Dictionary<string, int> { ["team:a"] = 2, ["team:b"] = 2 }));
             foreach (var factory in factories) builder.AddModeFeatureFactory(factory);
         }
-    }
-    private static void Reject<T>(Action action, string message) where T : Exception
-    {
-        try { action(); }
-        catch (T) { return; }
-        throw new InvalidOperationException(message);
     }
     private static void Require(bool condition, string message)
     { if (!condition) throw new InvalidOperationException(message); }

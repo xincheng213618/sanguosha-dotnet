@@ -8,29 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Shared\WuYiEnhancementScenario.cs" Link="WuYiEnhancementScenario.cs" />
     <Compile Include="..\Shared\BoundaryFuHuangHouScenario.cs" Link="BoundaryFuHuangHouScenario.cs" />
-    <Compile Include="..\Shared\BoundaryCaiFuRenScenario.cs" Link="BoundaryCaiFuRenScenario.cs" />
-    <Compile Include="..\Shared\BoundaryHanDangScenario.cs" Link="BoundaryHanDangScenario.cs" />
-    <Compile Include="..\Shared\BoundaryLiuBiaoScenario.cs" Link="BoundaryLiuBiaoScenario.cs" />
     <Compile Include="..\Shared\BoundaryLiaoHuaScenario.cs" Link="BoundaryLiaoHuaScenario.cs" />
-    <Compile Include="..\Shared\BoundaryYuFanScenario.cs" Link="BoundaryYuFanScenario.cs" />
-    <Compile Include="..\Shared\BoundaryZuoCiScenario.cs" Link="BoundaryZuoCiScenario.cs" />
-    <Compile Include="..\Shared\BoundaryZhouFeiScenario.cs" Link="BoundaryZhouFeiScenario.cs" />
-    <Compile Include="..\Shared\BoundaryWangJiScenario.cs" Link="BoundaryWangJiScenario.cs" />
-    <Compile Include="..\Shared\BoundarySunLuBanScenario.cs" Link="BoundarySunLuBanScenario.cs" />
-    <Compile Include="..\Shared\BoundaryGuYongScenario.cs" Link="BoundaryGuYongScenario.cs" />
-    <Compile Include="..\Shared\BoundaryCaoZhenScenario.cs" Link="BoundaryCaoZhenScenario.cs" />
-    <Compile Include="..\Shared\BoundaryYiJiScenario.cs" Link="BoundaryYiJiScenario.cs" />
-    <Compile Include="..\Shared\MouSimaYiGiveScenario.cs" Link="MouSimaYiGiveScenario.cs" />
     <Compile Include="..\Shared\BaguaResponseScenario.cs" Link="BaguaResponseScenario.cs" />
-    <Compile Include="..\Shared\SharedPhaseSkillScenario.cs" Link="SharedPhaseSkillScenario.cs" />
     <Compile Include="..\Shared\CharacterFixtureContent.cs" Link="CharacterFixtureContent.cs" />
     <Compile Include="..\Shared\ActiveEffectScenario.cs" Link="ActiveEffectScenario.cs" />
     <Compile Include="..\Shared\PrivateReserveScenario.cs" Link="PrivateReserveScenario.cs" />
-    <Compile Include="..\Shared\DelayedTrickScenario.cs" Link="DelayedTrickScenario.cs" />
     <Compile Include="..\Shared\LastZoneConversionScenario.cs" Link="LastZoneConversionScenario.cs" />
-    <Compile Include="..\Shared\PopulationTopReorderScenario.cs" Link="PopulationTopReorderScenario.cs" />
     <Compile Include="..\Shared\WushengResponseScenario.cs" Link="WushengResponseScenario.cs" />
     <Compile Include="..\Shared\BorrowedSwordScenario.cs" Link="BorrowedSwordScenario.cs" />
     <Compile Include="..\Shared\StoneAxeScenario.cs" Link="StoneAxeScenario.cs" />

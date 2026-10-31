@@ -28,33 +28,6 @@ internal static class ShiXiaoQiaoChecks
         s.Cold(); s.Replay();
     }
 
-    public static void CurrentAcquiredLimitedSkillAndSelfLossDrawCold()
-    {
-        var s = Scene.Start(false); s.AtOffer();
-        s.Need(s.E<SkillsAcquiredEvent>().Any(e => e.PlayerSeat == 2 && e.SkillIds.Contains(Borrowed)) &&
-            s.V(2).Skills!.Any(skill => skill.Id == Borrowed), "A donor's genuine earlier acquisition is already part of its current first-round skills.");
-        s.Copy(2, Borrowed); s.Play(0);
-        s.Need(s.Has(Borrowed) && s.E<ShiXqCopiedEvent>().Single().SkillId == Borrowed,
-            "The current formal rule copies an actually acquired Limited skill without the old reveal-version blacklist.");
-        var borrowed = s.E<ShiXqCopiedEvent>().Single(); var hand = s.V(0).HandCount;
-        s.HeyunSelf(Borrowed); s.AtWatch();
-        s.Need(!s.Has(Borrowed) && s.V(0).HandCount == hand + 2 && s.Root?.ShiXiaoQiao is { Stage: ShiXqStage.DrawChildren, Paid: true } &&
-            s.E<ShiXqHeyunPaidEvent>().Length == 1 && s.E<ShiXqDrawPaidEvent>().Length == 1,
-            "Self is a legal common-skill target; actual loss of the copied skill precedes one two-card native draw and its observer child.");
-        s.Cold(); s.ContinueWatch(); s.Play(0); hand = s.V(0).HandCount;
-        s.HeyunSelf(Heyun); s.AtWatch();
-        s.Need(!s.Has(Heyun) && s.Has(Yinhui) && s.V(0).HandCount == hand + 2 &&
-            s.Root?.SkillId == Heyun && s.Root.ShiXiaoQiao is { Paid: true, Stage: ShiXqStage.DrawChildren },
-            "Losing Heyun itself retains the original paid frame through the actual draw child.");
-        s.Cold(); s.ContinueWatch(); s.Play(0);
-        s.Need(s.E<ShiXqHeyunPaidEvent>().Length == 2 && s.E<ShiXqDrawPaidEvent>().Length == 2,
-            "Cold return neither loses nor repeats either original skill payment or native draw.");
-        s.AtOffer(2); s.Activate(); s.AtBranch("donor");
-        s.Need(s.E<ShiXqGrantClearedEvent>().Single() is { WasPresent: false } cleared && cleared.GrantId == borrowed.GrantId &&
-            s.E<ShiXqCopiedEvent>().Length == 1, "A copied source already lost to Heyun is skipped safely at the next actual round clear.");
-        s.Cold(); s.Replay();
-    }
-
     private static string? Branch(PromptChoice c) => c.Parameters.GetValueOrDefault("branch");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {

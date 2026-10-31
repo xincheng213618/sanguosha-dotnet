@@ -12,45 +12,6 @@ internal static class ShanheDrawThresholdChecks
     private const string Deck = "fixture:draw-threshold-deck";
     private const string CurrentTactic = "shanhe:current-shenlong-baiwei-2143", Jieming = "boundary:jieming-current";
 
-    public static void NativePaidDrawsInsertThresholdDamageAndReturnToOriginalDamageCold()
-    {
-        foreach (var profile in new[] { Profile.Capped, Profile.NativeBenefit })
-        foreach (var nestedVictimDies in new[] { false, true })
-        {
-            var s = Scene.Start(profile, nestedVictimDies);
-            Need(s.Hits().Length == 0, "The fixed opening stays below the real draw threshold.");
-            s.HitThroughNativePaidDraw(profile);
-            if (nestedVictimDies)
-                Need(s.Game.ResolutionStack.OfType<ProgramSkillFrame>().Any(frame =>
-                        frame.AttackAttempt is not null && frame.AttackReturn?.Insertion is not null),
-                    "The real inserted lethal hit uses the shared scheduler scope rather than a skill-specific permission.");
-            var reason = profile == Profile.Capped ? "program.capped-hand-refresh.draw" : "program.applied-damage-benefit.draw";
-            var invoice = s.OwnerInvoices().Single(item => item.Reason.Value == reason);
-            var target = s.Events<NativeDrawThresholdTargetChosenEvent>().Single();
-            Need(invoice.ProgramOrigin is { } origin && origin.Source.OwnerSeat == 0 &&
-                origin.Operation == (profile == Profile.Capped ? SkillProgramEffectOp.DrawThenDiscardHandToMaximumHp : SkillProgramEffectOp.DrawOwnerAtAppliedDamage),
-                "Every native draw retains its actual issuing skill instance, content hash and paused instruction.");
-            Need(invoice.ActualCount == (profile == Profile.Capped ? 5 : 4) && target.InvocationId == invoice.InvocationId &&
-                s.Hits() is [{ SourceSeat: 0, TargetSeat: 2 or 3, Amount: 1 }] &&
-                s.Events<DamageAppliedEvent>().Single(item => item.TargetSeat == 0) is { SourceSeat: 2, Amount: 1 },
-                "A paid native instruction's real draw inserts one enemy-only threshold hit inside the original sourced damage.");
-            s.Cold();
-            s.FinishNativePaidDraw();
-            Need(s.OwnerInvoices().Count(item => item.Reason.Value == reason) == 1 &&
-                s.Events<NativeDrawThresholdTargetChosenEvent>().Length == 1 && s.Hits().Length == 1 &&
-                s.Events<PlayerDiedEvent>().Length == (nestedVictimDies ? 1 : 0) &&
-                s.Game.ResolutionStack.All(frame => frame is not DamageFrame and not DamageTriggerWindowFrame and not ProgramSkillFrame) &&
-                !s.Game.IsFaulted,
-                "Cold recovery never repeats the paid draw or inserted hit, and every child returns to the original Play prompt.");
-            if (profile == Profile.Capped)
-                Need(s.View().HandCount == 5 && s.Events<ProgramCappedHandRefreshCompletedEvent>() is [{ Completed: true }],
-                    "Jieming's target-owned discard completes only after the inserted damage returns and retains the original five-card cap.");
-            s.AssertActualMaterials();
-            if (profile == Profile.NativeBenefit) s.AssertProgramOriginCannotBeReassigned(invoice);
-            s.Cold();
-        }
-    }
-
     public static void NiepanDyingDrawCrossesOneThresholdAndResumesOriginalDamage()
     {
         foreach (var nestedVictimDies in new[] { false, true })

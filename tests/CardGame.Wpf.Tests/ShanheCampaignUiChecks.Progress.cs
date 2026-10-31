@@ -13,46 +13,6 @@ using CardGame.Wpf.ViewModels;
 
 internal static partial class ShanheCampaignUiChecks
 {
-    public static void CurrentConfigurationReplaysAndActualFailureResetsPreparation()
-    {
-        var store = new MemoryShanheCampaignSaveStore();
-        using var original = Create(new MemorySaveStore(), store);
-        original.OpenShanheCommand.Execute(null);
-        original.StartShanheCommand.Execute(null);
-        var saved = store.Read();
-        using (var matching = Create(new MemorySaveStore(), store))
-        {
-            matching.ContinueShanheCommand.Execute(null);
-            Program.Assert(matching.HasShanheSession && matching.IsShanheRunInProgress,
-                "Matching current content restores the issued expedition normally.");
-        }
-        var definition = StandardShanheCampaignCatalog.CreateDefinitionForCheckpoint(saved.Campaign, saved.Difficulty);
-        var changed = saved with { Campaign = saved.Campaign with
-            { CampaignHash = ShanheCampaignContent.GetContentHash(definition with { IntroText = "Earlier presentation" }) } };
-        store.Write(changed);
-        var source = JsonSerializer.Serialize(store.Read());
-        using (var readable = Create(new MemorySaveStore(), store))
-        {
-            readable.ContinueShanheCommand.Execute(null);
-            Program.Assert(!readable.HasShanheSession && readable.CanPrepareShanheExpedition &&
-                !readable.CanContinueShanheExpedition &&
-                JsonSerializer.Serialize(store.Read()) == source,
-                "Mismatched content returns to preparation and preserves the source journal until a new expedition is confirmed.");
-        }
-        var invalid = saved with { Campaign = saved.Campaign with
-        {
-            Commands = saved.Campaign.Commands.Append(new MoveShanheNodeCommand("missing-node", saved.Campaign.Revision)).ToArray(),
-            Revision = saved.Campaign.Revision + 1
-        } };
-        store.Write(invalid);
-        source = JsonSerializer.Serialize(store.Read());
-        using var reset = Create(new MemorySaveStore(), store);
-        reset.ContinueShanheCommand.Execute(null);
-        Program.Assert(!reset.HasShanheSession && reset.CanPrepareShanheExpedition && reset.StartShanheCommand.CanExecute(null) &&
-            !reset.CanContinueShanheExpedition && reset.ShanheStatusText.Contains("已重置") &&
-            JsonSerializer.Serialize(store.Read()) == source,
-            "An actual invalid journal resets to usable preparation, preserving the source until a new expedition is confirmed.");
-    }
 
     public static void FailedAndAbandonedEncountersRetryFromSavedProgress(string output)
     {

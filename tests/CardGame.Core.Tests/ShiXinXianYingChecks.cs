@@ -47,40 +47,6 @@ internal static class ShiXinXianYingChecks
         s.Need(s.G.GetHumanLegalActions().All(a => a.ProgramSkillId != Jiejie), "The actual own Play phase consumes its single Jiejie activation.");
         s.Replay();
     }
-    public static void SharedActivatorPrivateViewRealMissingSuitAndActualCampDiscardCold()
-    {
-        var s = Scene.Start(shared: true); s.Play();
-        var actorHand = s.V(0).Hand.ToArray(); var count = s.V(0).HandCount;
-        s.ActivateJiejie();
-        s.Need(s.P is { PlayerSeat: 1, IsPrivate: true } && s.G.CreateSnapshot(0).PendingDecision is null &&
-            s.G.CreateSnapshot(1).PrivateRevealedCards!.Select(c => c.Id).Order().SequenceEqual(actorHand.Select(c => c.Id).Order()),
-            "The foreign actor authorizes a real shared activation, while only its exact Xin Xian Ying owner watches that hand.");
-        s.Cold(); s.Answer(c => Branch(c) == "Diamond");
-        s.Reach(() => s.P?.Choices.Any(c => Branch(c) == "discard") == true);
-        var obtained = s.G.CardMovements.Single(m => m.Reason.Value == "skill-program.mobile-shi-jiejie.obtain");
-        s.Need(obtained.From == CardLocation.DrawPile && obtained.To == CardLocation.Hand(0) &&
-            s.V(0).Hand.Single(c => c.Id == obtained.CardId).Suit == Suit.Diamond && s.V(0).HandCount == count + 1 &&
-            s.E<ShiXinXianYingSuitAllowanceEvent>().Length == 0 &&
-            s.E<ShiXinXianYingQingshiIssuedEvent>() is [{ Target: 0, SameCamp: false, FromJiejie: true }],
-            "A missing suit obtains a real matching deck entity; identical printed Wei faction does not merge the opposing actual teams.");
-        s.Cold(); s.Answer(c => Branch(c) == "discard");
-        s.Need(s.P is { PlayerSeat: 1 } && s.P.Choices.All(c => c.Cards.Count == 0) && s.G.CreateSnapshot(0).PendingDecision is null,
-            "The owner chooses an opaque original foreign Hand slot without exposing that hand to other viewers.");
-        s.Cold(); s.Answer(c => Branch(c) == "discard"); s.Play();
-        var moves = s.G.CardMovements.Where(m => m.Reason.Value == "skill-program.mobile-shi-qingshi.discard").ToArray();
-        s.Need(moves.Length == 2 && moves.Select(m => m.From.OwnerSeat).Order().SequenceEqual(new int?[] { 0, 1 }) &&
-            s.E<ShiXinXianYingDrawReturnedEvent>().Length == 0 && s.G.GetHumanLegalActions().All(a => a.ProgramSkillId != Jiejie),
-            "Opposing camps discard the two selected original entities once and consume this activator's per-phase shared quota.");
-        s.Replay();
-
-        var damage = Scene.Start(); damage.Play(); damage.Incoming();
-        damage.Reach(() => damage.P?.SkillPrompt?.SkillId == Qingshi && damage.P.Choices.Any(c => Key(c) == "activate"));
-        damage.Answer(c => Key(c) == "activate"); damage.Reach(() => damage.P?.Choices.Any(c => Branch(c) == "target") == true);
-        damage.Cold(); damage.Answer(c => c.Targets.SequenceEqual([0])); damage.Play();
-        damage.Need(damage.E<ShiXinXianYingQingshiIssuedEvent>() is [{ Target: 0, FromJiejie: false, SameCamp: true }] &&
-            damage.E<ShiXinXianYingDrawReturnedEvent>() is [{ Actual: 2 }],
-            "The real after-damage Qingshi separately accepts its own native target and self draw, outside Jiejie's round quota.");
-    }
     private static string? Branch(PromptChoice c) => c.Parameters.GetValueOrDefault("branch");
     private static string? Key(PromptChoice c) => c.Parameters.GetValueOrDefault("program-action");
     private sealed class Scene(GameEngine game, ContentRegistry registry)

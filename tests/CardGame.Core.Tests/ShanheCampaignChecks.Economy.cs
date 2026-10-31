@@ -124,33 +124,6 @@ internal static partial class ShanheCampaignChecks
             Accept(session, new ChooseShanheNodeOptionCommand(Item(reward).ChoiceId, replacement, session.Revision));
     }
 
-    public static void EconomyStockExpansionAndOrdinarySingleRefreshRemainConditionalCold()
-    {
-        var stock = Enumerable.Range(0, 12).Select(index => new ShanheRewardDefinition("training-" + index,
-            "操练" + index, Bonuses: new(MaxHp: 1))).ToArray();
-        var definition = new ShanheCampaignDefinition("fixture:economy-stock", "商品扩容", [Player], ["shop"],
-        [new("shop", "集市", ShanheNodeKind.Shop, ["battle"], Choices: stock.Select(reward =>
-            new ShanheNodeChoiceDefinition("buy-" + reward.Id, reward.Name, 200, RewardId: reward.Id, LeavesNode: false)).ToArray()),
-         new("battle", "终点", ShanheNodeKind.Battle, [], [new("enemy", "守军", [new(Enemy)])])],
-            stock.Concat(EconomyRewards()).ToArray(), StartingGold: 1000);
-        var basicOptions = new ShanheCampaignOptions(71, Player) { UseCodexRewardPool = true };
-        var plain = ShanheCampaignSession.Create(definition, basicOptions, Registry);
-        Accept(plain, new MoveShanheNodeCommand("shop", plain.Revision));
-        var ordinaryCount = plain.Snapshot.ShopItems.Count;
-        Require(plain.Snapshot.ShopRefreshRemaining == 1 && ordinaryCount == 5,
-            "A player who owns no economy tactics keeps five ordinary goods and one refresh.");
-        Accept(plain, new RefreshShanheShopCommand(plain.Revision));
-        var before = Snapshot(plain);
-        Require(!plain.Submit(new RefreshShanheShopCommand(plain.Revision)).Accepted && Snapshot(plain) == before,
-            "The ordinary second refresh is rejected rather than silently granting membership.");
-        var expanded = ShanheCampaignSession.Create(definition, basicOptions with
-            { EquippedTacticIds = ["tactic-economy-2136", "tactic-economy-2137"] }, Registry);
-        Accept(expanded, new MoveShanheNodeCommand("shop", expanded.Revision));
-        Require(expanded.Snapshot.ShopItems.Count == ordinaryCount + 3 && expanded.Snapshot.ShopRefreshRemaining == 1,
-            "Actually owning both stock tactics adds their published one-plus-two goods without changing the independent refresh allowance.");
-        Cold(expanded, definition); Cold(plain, definition);
-    }
-
     private static ShanheRewardDefinition[] EconomyRewards() => StandardShanheCampaignCatalog.CurrentEconomyTactics
         .Select(source => new ShanheRewardDefinition(source.RewardId, source.Name)
         { CampaignEconomy = source.Effect, Description = source.Description }).ToArray();

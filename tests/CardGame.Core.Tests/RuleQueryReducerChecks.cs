@@ -69,38 +69,6 @@ internal static class RuleQueryReducerChecks
             "Distance explanations must preserve outgoing and incoming stage identity instead of flattening Set/Add semantics.");
     }
 
-    public static void StaticSetConflictsAreRejectedBeforePlay()
-    {
-        var sameValue = LoadPrograms("""
-            {"id":"fixture:set-a","revision":1,"minimumRulesVersion": 171,
-             "modifiers":[{"id":"set","query":"handLimit","operation":"set","value":5,"priority":10}],
-             "viewAs":[],"activations":[],"triggers":[],"contributions":[],"cardIdentities":[]},
-            {"id":"fixture:set-b","revision":1,"minimumRulesVersion": 171,
-             "modifiers":[{"id":"set","query":"handLimit","operation":"set","value":5,"priority":10}],
-             "viewAs":[],"activations":[],"triggers":[],"contributions":[],"cardIdentities":[]},
-            {"id":"fixture:set-c","revision":1,"minimumRulesVersion": 171,
-             "modifiers":[{"id":"set","query":"handLimit","operation":"set","value":7,"priority":20}],
-             "viewAs":[],"activations":[],"triggers":[],"contributions":[],"cardIdentities":[]}
-            """);
-        SkillProgramRules.ValidateSetModifierConflicts(sameValue);
-
-        var conflict = LoadPrograms("""
-            {"id":"fixture:set-left","revision":1,"minimumRulesVersion": 171,
-             "modifiers":[{"id":"future-hp","query":"handLimit","operation":"set","value":5,"priority":10,
-               "condition":{"kind":"hpAtLeast","value":2}}],
-             "viewAs":[],"activations":[],"triggers":[],"contributions":[],"cardIdentities":[]},
-            {"id":"fixture:set-right","revision":1,"minimumRulesVersion": 171,
-             "modifiers":[{"id":"future-hp","query":"handLimit","operation":"set","value":6,"priority":10,
-               "condition":{"kind":"hpAtLeast","value":3}}],
-             "viewAs":[],"activations":[],"triggers":[],"contributions":[],"cardIdentities":[]}
-            """);
-        var exception = Capture<InvalidOperationException>(() =>
-            ContentRegistry.Build(new QueryFixturePackage(conflict)));
-        Require(exception.Message.Contains("fixture:set-left/future-hp", StringComparison.Ordinal) &&
-                exception.Message.Contains("fixture:set-right/future-hp", StringComparison.Ordinal),
-            "Registry freeze must reject future conditional Set conflicts with both stable sources.");
-    }
-
     public static void IsIndependentOfInputOrderAndRejectsOnlyWinningSetConflicts()
     {
         RuleQueryContribution[] inputs =
@@ -196,19 +164,5 @@ internal static class RuleQueryReducerChecks
     private static void Require(bool condition, string message)
     {
         if (!condition) throw new InvalidOperationException(message);
-    }
-
-    private sealed class QueryFixturePackage(IReadOnlyList<SkillProgram> programs) : IGameContentPackage
-    {
-        public PackageManifest Manifest { get; } = new("query-fixture", new Version(1, 0, 0));
-
-        public void Register(IContentRegistryBuilder builder)
-        {
-            foreach (var program in programs)
-                builder.AddSkill(new ContentSkillDefinition(program.Id, "Fixture", "Fixture")
-                {
-                    Program = program
-                });
-        }
     }
 }

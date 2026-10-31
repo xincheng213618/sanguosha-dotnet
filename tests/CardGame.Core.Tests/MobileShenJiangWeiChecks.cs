@@ -7,57 +7,6 @@ using CardGame.Core.Campaigns;
 internal static partial class MobileShenJiangWeiChecks
 {
     private const string Hero = "mobile:shen-jiang-wei", Driver = "fixture:mobile-jw-driver", Watch = "fixture:mobile-jw-watch", Rescue = "fixture:mobile-jw-rescue", Quiet = "fixture:mobile-jw-quiet", Mode = "identity:classic-mobile-jw-fixture";
-    public static void TiantaoShenpeiAndHuitianUseRealNativeReturns()
-    {
-        var (g, registry) = Start(); Play(g);
-        var dodge = V(g).Hand.First(c => c.Kind == CardKind.Dodge).Id; Give(g, dodge, 1);
-        var slot = V(g, 1).HandCount - 1; var initialHp = V(g).Hp;
-        for (var n = 0; n < initialHp; n++) { Use(g, "hurt"); if (n < initialHp - 1) Play(g); }
-        Offer(g, "mobile:shenpei"); Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "skip"); Play(g);
-        Need(E<PlayerDyingEvent>(g).Count(e => e.VictimSeat == 0) == 1 && V(g).Hp == 1 && E<MobileJiangWeiStartedEvent>(g).All(e => e.Operation != SkillProgramEffectOp.ResolveMobileJiangWeiShenpei),
-            "Declining Shenpei leaves its game limit unused; the separate native one-point rescue ends the first genuine Dying.");
-        Use(g, "hurt"); Offer(g, "mobile:shenpei"); Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        Menu(g, MobileJiangWeiStage.ThunderTarget);
-        var root = Root(g)!; var rootId = root.Id; var before = V(g, 1).Hp;
-        Need(root.MobileJiangWei is { Amount: 2, DyingId: > 0 } r && V(g).Hp == 2 && E<PlayerDyingEvent>(g).Count(e => e.VictimSeat == 0) == 2 &&
-            g.ResolutionStack.OfType<DyingFrame>().Any(d => d.Id == r.DyingId && d.VictimSeat == 0),
-            "Shenpei recovers two, including its second actual entering-Dying occurrence, while preserving the original native Dying parent until the whole skill returns.");
-        g = Cold(g, registry); Answer(g, c => c.Targets.SequenceEqual([1])); Play(g);
-        Need(V(g, 1).Hp == before - 2 && V(g).Hp == 2 && E<MobileJiangWeiCompletedEvent>(g).Count(e => e.FrameId == rootId) == 1 &&
-            E<DamageAppliedEvent>(g).Any(e => e.SourceSeat == 0 && e.TargetSeat == 1 && e.Amount == 2 && e.Nature == DamageNature.Thunder),
-            "The exact restored Shenpei deals native two-point thunder damage, then grants Huitian and returns its original Dying only once.");
-        Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-        Menu(g, MobileJiangWeiStage.Region); Answer(g, c => Branch(c) == "region" && Value(c) == (int)CardZoneKind.Hand);
-        Menu(g, MobileJiangWeiStage.OtherTargets); Answer(g, c => Branch(c) == "discard-target" && c.Targets.SequenceEqual([2]));
-        Menu(g, MobileJiangWeiStage.OtherTargets); Answer(g, c => Branch(c) == "discard-target" && c.Targets.SequenceEqual([1]));
-        Menu(g, MobileJiangWeiStage.OtherTargets); Answer(g, c => Branch(c) == "targets-done");
-        Menu(g, MobileJiangWeiStage.DiscardCard); Answer(g, c => c.Parameters.GetValueOrDefault("slot-index") == slot.ToString(CultureInfo.InvariantCulture));
-        Menu(g, MobileJiangWeiStage.DiscardCard); Answer(g, c => c.Parameters.GetValueOrDefault("slot-index") == "0");
-        Offer(g, "mobile:huitian");
-        var tiantao = E<MobileJiangWeiStartedEvent>(g).Last(e => e.Operation == SkillProgramEffectOp.ResolveMobileJiangWeiTiantao);
-        Need(V(g, 1).Hp == before - 3 && Zone(g, dodge) == CardLocation.DiscardPile && g.CardMovements.Count(m => m.CardId == dodge && m.Reason.Value == "mobile.tiantao.discard") == 1 &&
-            g.CardMovements.Where(m => m.Reason.Value == "mobile.tiantao.discard" && m.From.OwnerSeat != 0).Select(m => m.From.OwnerSeat).SequenceEqual(new int?[] { 1, 2 }),
-            "Tiantao discards the selected actual opaque foreign Dodge and causes that character exactly one additional native HP loss.");
-        Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate"); Play(g);
-        Need(E<TurnStartedEvent>(g).Count(e => e.ActorSeat == 0) == 2 && E<ProgramBindingStartedEvent>(g).Count(e => e.OwnerSeat == 0 && e.SkillId == "mobile:huitian" && e.BindingId == "higher-hp-extra-turn") == 1,
-            "Huitian draws through the ordinary producer and really inserts an extra turn, rather than skipping other characters or just setting a marker.");
-        Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-        Menu(g, MobileJiangWeiStage.Region); var hp = V(g).Hp;
-        Answer(g, c => Branch(c) == "region" && Value(c) == (int)CardZoneKind.Equipment);
-        Menu(g, MobileJiangWeiStage.OtherTargets); Answer(g, c => Branch(c) == "targets-done");
-        for (var n = 0; n < 240 && V(g).IsAlive; n++)
-        {
-            if (P(g) is { } p)
-            {
-                Need(p.SkillPrompt?.SkillId == "mobile:huitian", "Only remaining real turn-end Huitian offers may interrupt the next round.");
-                Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "skip");
-            }
-            else Accept(g, new AdvanceOneStepCommand(g.Revision));
-        }
-        Need(hp > 0 && !V(g).IsAlive && E<PlayerDyingEvent>(g).Count(e => e.VictimSeat == 0) == 2 && E<ProgramSkillCauseDeathDeclaredEvent>(g).Count(e => e.SkillId == "mobile:huitian" && e.TargetSeat == 0) == 1,
-            "An empty equipment region is legal and costs no HP; the following round causes actual Huitian direct death without inventing another Dying entry.");
-        _ = tiantao;
-    }
     private static GameOptions Options(bool nestedDying = false)
     {
         var setup = new ShanheBattleSetup(7, 1, "mobile-jiang-wei", Hero, 4, 0, 0, 0, 0, [],

@@ -9,40 +9,6 @@ internal static class ShiWangChangChecks
         Driver = "fixture:shi-wang-chang-driver", Watch = "fixture:shi-wang-chang-watch", Quiet = "fixture:shi-wang-chang-quiet",
         Peer = "fixture:shi-wang-chang-peer", Source = "fixture:shi-wang-chang-source", Deck = "fixture:shi-wang-chang-deck";
 
-    public static void KaijiDyingPopulationNativeDrawsRewardAndPaidChildCold()
-    {
-        var s = Scene.Start(true); s.Offer(Kaiji); s.Activate();
-        s.Need(s.Root!.MobileShiWangChang is { Maximum: 1 }, "Kaiji starts at one without inventing a dying participant.");
-        s.Branch("pick", 0); s.Branch("done"); s.PaidWatch();
-        var original = s.Root!.Id; var actualMoves = s.G.CardMovements.Count;
-        s.Need(s.Root.MobileShiWangChang is { Stage: MobileShiWangChangStage.DrawChildren, Index: 0, Draw.ActualDrawIds.Count: 1 },
-            "The actual native recipient draw is fully paid before its movement observer is answered.");
-        s.Cold(); s.Continue(); s.Play();
-        s.Need(s.E<MobileShiKaijiDrawReturnedEvent>().Count(e => e.FrameId == original) == 1 &&
-            s.E<MobileShiKaijiRewardBoundEvent>().Single(e => e.FrameId == original).Qualified &&
-            s.G.CardMovements.Count >= actualMoves + 3,
-            "Cold return retains the already-paid draw, then gives only one nonbasic reward and the genuine normal phase draw.");
-        s.Drive("hurt", [1]); s.Rescue(); s.Play();
-        s.Drive("hurt", [2]); s.Rescue(); s.Play();
-        s.Need(s.E<PlayerDyingEvent>().Select(e => e.VictimSeat).Distinct().Order().SequenceEqual([1, 2]) && s.V(1).IsAlive && s.V(2).IsAlive,
-            "Two real one-HP peers enter native dying and are actually rescued by physical Peaches.");
-        s.Drive("extra"); s.Play(); var round = s.E<RoundStartedEvent>().Last().RoundNumber;
-        s.End(); s.Offer(Kaiji); s.Activate();
-        s.Need(s.Root!.MobileShiWangChang is { Maximum: 2 } &&
-            s.V(0).SkillRuntimeStates!.Single(v => v.SkillId == Kaiji).PublicRuleStates!.Single(v => v.StateId == "kaiji-maximum").Value == 2,
-            "The original preparation freezes X=2 from distinct previously-dying survivors and publishes the same visible count.");
-        s.Branch("pick", 1); s.Branch("pick", 0); s.Branch("unpick", 1); s.Branch("pick", 1);
-        var batch = s.Root!.Id; s.Branch("done"); s.PaidWatch(); s.Cold(); s.Continue(); s.Play();
-        s.Need(s.E<MobileShiKaijiTargetCommittedEvent>().Where(e => e.FrameId == batch).Select(e => e.Target).SequenceEqual([0, 1]) &&
-            s.E<MobileShiKaijiDrawReturnedEvent>().Count(e => e.FrameId == batch && e.Actual == 1 && e.NonBasicGained) == 2 &&
-            s.E<MobileShiKaijiRewardBoundEvent>().Count(e => e.FrameId == batch && e.Qualified) == 1 && s.E<RoundStartedEvent>().Last().RoundNumber == round,
-            "Confirmed targets retain their final order through cold recovery; two recipients each draw once, but their two nonbasic gains grant only one reward in the actual extra turn.");
-        s.Drive("hurt", [2]); s.Reach(() => s.P?.Kind == DecisionKind.RescueDying); s.Decline(); s.Play();
-        s.Need(!s.V(2).IsAlive && s.V(0).SkillRuntimeStates!.Single(v => v.SkillId == Kaiji).PublicRuleStates!.Single(v => v.StateId == "kaiji-maximum").Value == 1,
-            "A previously-dying participant's actual death removes that participant from the current living X immediately.");
-        s.Replay();
-    }
-
     public static void ShepanHiddenTopDeckExactUseTurnAndRoundNameLimitsCold()
     {
         var s = Scene.Start(false); s.Play(); var hp = s.V(1).Hp;

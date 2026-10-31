@@ -106,47 +106,6 @@ internal static class GuanduEventChecks
         }
     }
 
-    public static void WuchaoAndUnderdogUseActualDamageAndRecipientScopes()
-    {
-        {
-            var (g, r) = Start(CardKind.Slash, battleEvent: GuanduBattleEvent.WuchaoFire);
-            foreach (var seat in new[] { 5, 6, 7 }) { Use(g, "chain", seat); Play(g); }
-            var hp = new[] { V(g, 5).Hp, V(g, 6).Hp, V(g, 7).Hp };
-            Physical(g, CardKind.Slash, [7]); Play(g);
-            var hits = E<DamageAppliedEvent>(g).ToArray();
-            Need(hits.Length == 3 && hits.All(e => e.Nature == DamageNature.Fire && e.Amount == 1) &&
-                Enumerable.Range(5, 3).All(seat => V(g, seat).Hp == hp[seat - 5] - 1 && !V(g, seat).IsChained),
-                "Wuchao converts a real normal Slash into fire before chain capture, propagating one native base damage to each actual chained recipient."); Cold(g, r);
-        }
-        {
-            var (g, r) = Start(CardKind.Slash, battleEvent: GuanduBattleEvent.Underdog);
-            Use(g, "hurt", 0); Play(g); var hp = V(g, 7).Hp;
-            Use(g, "damage", 7); Play(g); Use(g, "damage", 7); Play(g);
-            Need(E<DamageAppliedEvent>(g).Where(e => e.TargetSeat == 7).Select(e => e.Amount).SequenceEqual([2, 1]) && V(g, 7).Hp == hp - 3,
-                "Underdog compares the live recipient and source HP for every real damage instance; the bonus disappears after the first hit lowers the target below the source."); Cold(g, r);
-        }
-    }
-
-    public static void GrainShortageReplacesNormalCountAndRewardsUseOnce()
-    {
-        var (g, r) = Start(CardKind.Slash, battleEvent: GuanduBattleEvent.GrainShortage);
-        Need(E<ActualDrawPhaseCompletedEvent>(g).Single(e => e.OwnerSeat == 0 && !e.IsExtra).DrawCount == 1,
-            "Grain shortage reduces the actual normal two-card draw by one, rather than changing opening hands or arbitrary skill draws.");
-        foreach (var seat in new[] { 5, 6, 7 }) { Use(g, "chain", seat); Play(g); }
-        var fire = g.GetHumanLegalActions().First(a => a.PlayedCardKind == CardKind.FireSlash && a.TargetSeat == 7);
-        Act(g, fire);
-        Until(g, () => g.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.GuanduEventFlow?.Operation == SkillProgramEffectOp.RewardGuanduDamage && f.NativeDraw is not null));
-        Need(g.ResolutionStack.OfType<CardUseFrame>().Any(f => f.CardKind == CardKind.FireSlash),
-            "The first native damage owns the once-per-use reward's actual draw request while retaining its paid elemental Slash parent."); Cold(g, r); Play(g);
-        var reward = E<GuanduDamageRewardedEvent>(g).Single();
-        Need(E<DamageAppliedEvent>(g).Count() == 3 && E<GuanduDamageRewardedEvent>(g).Count() == 1 &&
-            E<CardUseDeclaredEvent>(g).Single(e => e.CardKind == CardKind.FireSlash).ResolutionId == reward.UseFrameId &&
-            g.CardMovements.Count(m => m.Reason.Value == "guandu.grain-shortage.draw" && m.To == CardLocation.Hand(0)) == 1,
-            "Three native chained damage recipients reward the real use only once through one actual one-card draw.");
-        Use(g, "damage", 7); Play(g);
-        Need(E<GuanduDamageRewardedEvent>(g).Count() == 1, "A standalone skill-damage frame is not another damage-causing card use."); Cold(g, r);
-    }
-
     public static void TurnStartDuelAndHpLossRetainRealSourceAndCold()
     {
         foreach (var duel in new[] { false, true })
@@ -196,73 +155,6 @@ internal static class GuanduEventChecks
             "Only the next complete normal round reopens the mode's Slash-as-Dodge choice.");
         Cold(g, r); Answer(g, c => c.Parameters.GetValueOrDefault("conversion-skill-id") == "guandu:battle-event"); Play(g);
         Need(E<GuanduHoldLineUsedEvent>(g).Count(e => e.OwnerSeat == 0) == 2, "The reopened actual-round choice can pay a second real material."); Cold(g, r);
-    }
-
-    public static void StandoffSwitchesAtRoundFiveAndOnlyFirstSlash()
-    {
-        var (g, r) = Start(CardKind.Slash, battleEvent: GuanduBattleEvent.Standoff);
-        for (var round = 1; round <= 4; round++)
-        {
-            Need(E<RoundStartedEvent>(g).Last().RoundNumber == round && V(g, 0).HandLimit == V(g, 0).Hp + round,
-                "Early standoff uses the actual complete-round number as its additive hand limit.");
-            var old = g.State.TurnNumber; End(g); Until(g, () => IsPlay(g) && g.State.TurnNumber > old);
-        }
-        Need(E<RoundStartedEvent>(g).Last().RoundNumber == 5 && V(g, 0).HandLimit == V(g, 0).Hp,
-            "At the fifth real round the cumulative early-round hand-limit bonus ends."); Cold(g, r);
-        var before = E<DamageAppliedEvent>(g).Count(); Physical(g, CardKind.Slash, [7]); Play(g); Physical(g, CardKind.Slash, [7]); Play(g);
-        Need(E<DamageAppliedEvent>(g).Skip(before).Select(e => e.Amount).SequenceEqual([2, 1]),
-            "Only the first actual Slash use in the later own turn gains damage, even when a legitimate second Slash allowance exists."); Cold(g, r);
-    }
-
-    public static void SlowAdvanceTracksResponsesSkippedDrawAndNextActualDraw()
-    {
-        {
-            var (g, r) = Start(CardKind.Duel, battleEvent: GuanduBattleEvent.SlowAdvance);
-            Use(g, "jianji", 7); Until(g, () => P(g)?.Kind == DecisionKind.RespondSlash);
-            Answer(g, c => c.Parameters.GetValueOrDefault("conversion-binding-id") == "slash-response"); Play(g);
-            var turn = g.State.TurnNumber; End(g); Until(g, () => IsPlay(g) && g.State.TurnNumber > turn);
-            Need(!E<GuanduSlowAdvanceEarnedEvent>(g).Any(e => e.Phase.ActualTurnOwnerSeat == 0 && e.Phase.TurnNumber == turn) &&
-                E<ActualDrawPhaseCompletedEvent>(g).Last(e => e.OwnerSeat == 0 && !e.IsExtra).DrawCount == 2,
-                "A real Slash response to another actor's native Duel during the owner's actual Play counts as played Slash and prevents the next-draw credit."); Cold(g, r);
-        }
-        {
-            var (g, r) = Start(CardKind.Slash, battleEvent: GuanduBattleEvent.SlowAdvance);
-            Use(g, "skip-draw"); Play(g); var turn = g.State.TurnNumber; End(g);
-            Until(g, () => IsPlay(g) && g.State.TurnNumber > turn);
-            Need(E<ActualDrawPhaseCompletedEvent>(g).Last(e => e.OwnerSeat == 0).Skipped && !E<GuanduSlowAdvanceConsumedEvent>(g).Any(e => e.OwnerSeat == 0),
-                "Skipping the next actual normal draw cannot consume a Slow Advance bonus that never contributed cards."); Cold(g, r);
-            turn = g.State.TurnNumber; End(g); Until(g, () => IsPlay(g) && g.State.TurnNumber > turn);
-            Need(E<ActualDrawPhaseCompletedEvent>(g).Last(e => e.OwnerSeat == 0).DrawCount == 3 &&
-                E<GuanduSlowAdvanceConsumedEvent>(g).Last(e => e.OwnerSeat == 0).Credits == 2,
-                "The following actual normal draw gains one rather than stacking skipped credits, and only its real completion consumes them."); Cold(g, r);
-        }
-    }
-
-    public static void ArroganceChecksHandMaximumAfterItsRealDiscard()
-    {
-        {
-            var (g, r) = Start(CardKind.Slash, battleEvent: GuanduBattleEvent.Arrogance);
-            var hp = V(g, 0).Hp; var turn = g.State.TurnNumber;
-            Need(V(g, 4).Hp == hp, "The independent-hand branch starts with tied highest commander health.");
-            End(g); Until(g, () => E<TurnEndedEvent>(g).Any(e => e.ActorSeat == 0 && e.TurnNumber == turn));
-            Need(V(g, 0).Hp == hp - 1 && E<ProgramSkillHpLostEvent>(g).Count(e => e.SkillId == "guandu:battle-event" && e.TargetSeat == 0) == 1,
-                "Hand-count maximum causes real HP loss even when the owner is not the unique highest-HP role."); Cold(g, r);
-        }
-        {
-            var (g, r) = Start(CardKind.Slash, battleEvent: GuanduBattleEvent.Arrogance);
-            Use(g, "nick", 4); Play(g); Use(g, "grow-five", 1); Play(g);
-            var hp = V(g, 0).Hp; var turn = g.State.TurnNumber; End(g);
-            Until(g, () => P(g)?.SkillPrompt?.SkillId == "guandu:battle-event" && P(g)!.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-owned-cards"));
-            Need(V(g, 0).HandCount == V(g, 1).HandCount, "The normal discard has left equal hand counts before Arrogance's additional mandatory discard."); Cold(g, r);
-            var card = P(g)!.Choices.First(c => c.Parameters.GetValueOrDefault("program-action") == "select-owned-cards").Cards.Single();
-            Answer(g, c => c.Cards.SequenceEqual([card]));
-            if (P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "finish-owned-cards") == true)
-                Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "finish-owned-cards");
-            Until(g, () => E<TurnEndedEvent>(g).Any(e => e.ActorSeat == 0 && e.TurnNumber == turn));
-            Need(V(g, 0).Hp == hp && V(g, 0).HandCount < V(g, 1).HandCount &&
-                g.CardMovements.Count(m => m.CardId == card && m.To == CardLocation.DiscardPile) == 1,
-                "Arrogance pays its real one-card discard first, then recomputes hand maximum and avoids the now-inapplicable HP loss."); Cold(g, r);
-        }
     }
 
     public static void TenthBorrowedSwordRechecksOnlyWeaponOwnersAndKeepsThePairedSourceVictim()

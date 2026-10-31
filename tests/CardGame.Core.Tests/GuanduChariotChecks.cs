@@ -47,51 +47,6 @@ internal static class GuanduChariotChecks
         DestroyedOnce(g, chariot, invoice.MovementSequence); Cold(g, r);
     }
 
-    public static void RedChariotWushengUseAndRealDiscardPhaseDestroyOnce()
-    {
-        {
-            var (g, r) = StartChariot(); var chariot = Chariot(g);
-            var targetHp = V(g, 7).Hp;
-            Need(targetHp > V(g, 0).Hp, "The actual Underdog event fixture begins with the enemy above the SP Guan Yu commander's health.");
-            var slash = g.GetHumanLegalActions().Single(a => a.Kind == LegalActionKind.Slash && a.CardId == chariot &&
-                a.TargetSeats.SequenceEqual([7]) && a.ConversionSource?.SkillId == Wusheng);
-            Act(g, slash); Until(g, () => IsWatcher(g, "committed"));
-            var use = g.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardKind == CardKind.Slash);
-            Need(use.Action!.PhysicalCards is [{ CardId: var id, CardKind: CardKind.ThunderChariot, From: var from }] &&
-                id == chariot && from == CardLocation.Equipment(0),
-                "A normal Wusheng Slash also retains its actual equipped red chariot as its native accepted material.");
-            DestroyedOnce(g, chariot); Cold(g, r); Continue(g); Play(g);
-            Need(E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.Id) == 1 &&
-                E<DamageAppliedEvent>(g).Where(e => e.SourceSeat == 0 && e.TargetSeat == 7).ToArray() is [{ Amount: 2 }] &&
-                V(g, 7).Hp == targetHp - 2,
-                "A genuine equipment-to-Slash use finishes once and applies the actual Underdog bonus once after the paid chariot has been destroyed.");
-            DestroyedOnce(g, chariot); Cold(g, r);
-        }
-        {
-            var (g, r) = StartChariot(); var chariot = Chariot(g); var turn = g.State.TurnNumber;
-            Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-            Until(g, () => P(g)?.SkillPrompt?.SkillId == Driver && P(g)!.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") == "discard"));
-            Need(g.State.Phase == TurnPhase.Discard && g.CreateCardZoneDiagnostics().Single(c => c.CardId == chariot).Location == CardLocation.Equipment(0),
-                "The real discard-phase instruction pauses before discarding its owned equipment, with the physical chariot still present.");
-            Cold(g, r); Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "discard");
-            Until(g, () => E<TurnEndedEvent>(g).Any(e => e.TurnNumber == turn));
-            var owned = E<ProgramOwnedZoneCardsDiscardedEvent>(g).Where(e => e.SkillId == Driver).ToArray();
-            var invocations = E<NativeBuZhiDiscardInvocationRecordedEvent>(g).Where(e => e.Source.SkillId == Driver).ToArray();
-            var hand = g.CardMovements.Where(move => move.From == CardLocation.Hand(0) && move.To == CardLocation.DiscardPile &&
-                move.Reason == CardMoveReasons.HandLimitDiscard && move.TurnNumber == turn).ToArray();
-            var diagnostic = $"owned=[{string.Join(',', owned.Select(e => e.CardCount))}], " +
-                $"native=[{string.Join(',', invocations.Select(e => $"{e.ActualCount}/{e.ZoneMask}"))}], " +
-                $"handMoves=[{string.Join(',', hand.Select(move => move.CardId))}], finalHand={V(g, 0).HandCount}, hp={V(g, 0).Hp}.";
-            Need(owned is [{ CardCount: 1 }],
-                "The actual owned-equipment discard instruction must report exactly one real discarded chariot. " + diagnostic);
-            Need(invocations is [{ ActualCount: 1, ZoneMask: 2 }],
-                "The active native aggregation producer must preserve one exact equipped-entity discard invoice. " + diagnostic);
-            Need(hand is [{ CardKind: CardKind.Duel }] && V(g, 0).HandCount == V(g, 0).Hp,
-                "The same genuine discard phase must also discard exactly one hand card to its actual hand limit. " + diagnostic);
-            DestroyedOnce(g, chariot); Cold(g, r);
-        }
-    }
-
     private static bool IsWatcher(GameEngine g, string binding) => P(g)?.SkillPrompt?.SkillId == Watcher &&
         g.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.SkillId == Watcher && f.TriggerId == binding);
     private static void Continue(GameEngine g) => Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");

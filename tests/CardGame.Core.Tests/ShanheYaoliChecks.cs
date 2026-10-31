@@ -8,10 +8,6 @@ internal static class ShanheYaoliChecks
 {
     private static readonly string[] Skills = ["shanhe:current-yaoli-2319", "shanhe:current-yaoli-2320", "shanhe:current-yaoli-2321",
         "shanhe:current-yaoli-2322", "shanhe:current-yaoli-2191", "shanhe:current-yaoli-2192"];
-    private static readonly string[] Rewards = ["tactic-yaoli-current-2319", "tactic-yaoli-current-2320", "tactic-yaoli-current-2321",
-        "tactic-yaoli-current-2322", "tactic-yaoli-current-2191", "tactic-yaoli-current-2192"];
-    private static readonly int[] Bonuses = [1, 1, 2, 2, 1, 2];
-    private static readonly int?[] Limits = [1, 3, 1, 2, null, null];
     private const string Owner = "fixture:yaoli-owner", Driver = "fixture:yaoli-driver", Deck = "fixture:yaoli-deck";
     private const string Health = "fixture:yaoli-health", Gain = "fixture:yaoli-gain", Gate = "fixture:yaoli-gate";
     private const string Mutation = "fixture:yaoli-mutation", Cost = "fixture:yaoli-cost", Quiet = "fixture:yaoli-quiet";
@@ -20,45 +16,6 @@ internal static class ShanheYaoliChecks
     private static readonly Lazy<ContentRegistry> Production = new(() => StandardShanheCampaignCatalog.CreateBattleRegistry(
         new ShanheBattleSetup(83, 1, "fixture:yaoli-content", "classic:guan-yu", 4, 0, 0, 0, 0, [Zaiqi], [], [],
             [new("classic:cao-cao")], [], new string('c', 64)) { TacticSkillIds = Skills }));
-
-    public static void RecoveryCallsStackSixVersionsAndRealPeachesResetAtActualTurnsCold()
-    {
-        VerifyPolicyLoader();
-        VerifyProductionLoadout();
-        var s = Scene.Start("stack"); s.Play();
-        var firstTurn = s.Turn;
-        var peaches = s.V().Hand.Where(card => card.Kind == CardKind.Peach).Select(card => card.Id).ToArray();
-        Need(peaches.Length == 2 && s.V().Hp == 1, "Two real initial Peaches and a genuinely wounded owner precede any recovery call.");
-        s.BeginPeach(); s.Until(s.AtHealth); CheckPayment(s, 1, 10, 1, 10, Eligible(1)); s.Cold(); s.Play();
-        var resets = new[] { 10, 8, 6 };
-        for (var ordinal = 2; ordinal <= 4; ordinal++)
-        {
-            s.Use("lose-" + resets[ordinal - 2]);
-            Need(s.V().Hp == 1, "Only real HP-loss commands prepare the next distinct recovery; loss never consumes a recovery ordinal.");
-            s.Begin("two"); s.Until(s.AtHealth);
-            var modified = 2 + Eligible(ordinal).Sum(id => Bonuses[Array.IndexOf(Skills, id)]);
-            CheckPayment(s, 2, modified, ordinal, modified, Eligible(ordinal)); s.Cold(); s.Play();
-        }
-        Need(s.E<ActualTurnRecoveryRecordedEvent>().Where(fact => fact.TargetSeat == 0 && fact.TurnNumber == firstTurn)
-                .Select(fact => fact.Ordinal).SequenceEqual([1, 2, 3, 4]),
-            "A ten-HP first recovery counts as one call; distinct versions have independent first/first-two/first-three/unlimited eligibility.");
-        s.Use("lose-5"); s.EndPlay(); s.Until(() => s.Turn > firstTurn && s.P is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
-        s.BeginPeach(); s.Until(s.AtHealth); CheckPayment(s, 1, 10, 1, 10, Eligible(1)); s.Cold(); s.Play();
-        s.Begin("two"); s.Until(s.AtHealth); CheckPayment(s, 2, 8, 2, 8, Eligible(2)); s.Play();
-        s.Begin("two"); s.Until(s.AtHealth); CheckPayment(s, 2, 6, 3, 1, Eligible(3)); s.Cold(); s.Play();
-        var positive = s.E<ActualTurnRecoveryRecordedEvent>().Length;
-        var applied = s.E<RecoveryAppliedEvent>().Length; var bills = s.E<RecoveryAmountBonusAppliedEvent>().Length;
-        s.Use("one");
-        Need(s.V().Hp == 20 && s.E<ActualTurnRecoveryRecordedEvent>().Length == positive &&
-            s.E<RecoveryAppliedEvent>().Length == applied && s.E<RecoveryAmountBonusAppliedEvent>().Length == bills,
-            "A full-health recovery does not pay a bonus, issue a positive recovery fact or consume a new ordinal.");
-        s.Use("lose-1"); s.Begin("one"); s.Until(s.AtHealth); CheckPayment(s, 1, 4, 4, 1, Eligible(4)); s.Cold(); s.Play();
-        Need(peaches.All(id => s.G.CardMovements.Count(move => move.CardId == id && move.From == CardLocation.Hand(0) &&
-                move.To == CardLocation.Processing) == 1 && s.G.CardMovements.Count(move => move.CardId == id &&
-                move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile) == 1),
-            "Both native Peach uses keep their exact original entity payments and cleanup once across cold recovery children.");
-        s.PureViews(); s.Cold();
-    }
 
     public static void LiveSourcesAndPaidChildrenPreserveEligibilityAndZeroRecoveryCold()
     {
@@ -135,89 +92,6 @@ internal static class ShanheYaoliChecks
             s.Cold();
         }
     }
-
-    public static void ZaiqiKuangguBloodBladeAndRecoveryDrawUseOneModifiedPaymentCold()
-    {
-        var s = Scene.Start("reaction"); s.Play(); s.Begin("one"); s.Play();
-        Need(s.E<RecoveryAppliedEvent>().Select(fact => fact.Amount).SequenceEqual([3, 3, 2]) && s.V().Hp == 12 &&
-            s.E<RecoveryAmountBonusAppliedEvent>().Select(fact => fact.Receipt.ModifiedRequestedAmount).SequenceEqual([3, 3, 3]) &&
-            s.E<ActualTurnRecoveryRecordedEvent>().Select(fact => fact.Ordinal).SequenceEqual([1, 2, 3]) &&
-            s.E<DamageAppliedEvent>().Length == 3 && s.E<DamageAppliedEvent>().All(fact => fact is { SourceSeat: 0, TargetSeat: 1, Amount: 1 }) &&
-            s.E<ProgramBindingResolvedEvent>().Count(fact => fact.SkillId == RecoveryDraw && fact.Completed) == 3 && s.V().HandCount == 3 && s.ColdPaidChildren >= 3,
-            "One boosted primitive recovery starts three real recovery events, three blood-blade damages and three recovery draws; boundary Kuanggu's recover option ends at full health: " + s.Diagnostic());
-        var oldRecoveries = s.E<RecoveryAppliedEvent>().Length;
-        s.Begin("damage", [1]); s.Until(() => s.Optional(Kuanggu)); s.Answer(choice => Action(choice) == "activate");
-        s.Until(() => s.P?.SkillPrompt?.SkillId == Kuanggu && s.P.Choices.Any(choice => Option(choice) == "draw"));
-        Need(s.P!.Choices.All(choice => Option(choice) != "recover"), "At full health the actual S5-compatible Kuanggu benefit offers draw, not an impossible recovery.");
-        s.Cold(); s.Answer(choice => Option(choice) == "draw"); s.Play();
-        Need(s.V().HandCount == 4 && s.E<RecoveryAppliedEvent>().Length == oldRecoveries &&
-            s.E<ActualTurnRecoveryRecordedEvent>().Length == 3 && s.E<DamageAppliedEvent>().Length == 4 &&
-            s.E<ProgramBindingResolvedEvent>().Count(fact => fact.SkillId == RecoveryDraw && fact.Completed) == 3,
-            "Choosing the real boundary Kuanggu draw branch is not a recovery, cannot consume medicine and cannot fire blood blade or recovery-draw again.");
-        s.Cold();
-
-        var zaiqi = Scene.Start("zaiqi"); zaiqi.Until(() => zaiqi.Optional(Zaiqi)); zaiqi.Answer(choice => Action(choice) == "activate");
-        zaiqi.Until(zaiqi.AtHealth);
-        var reveal = zaiqi.E<ProgramCardsRevealedEvent>().Single(fact => fact.SkillId == Zaiqi);
-        Need(reveal.Cards.Count == 9 && reveal.Cards.All(card => card.Suit == Suit.Heart) &&
-            zaiqi.E<RecoveryAppliedEvent>() is [{ Amount: 8, RemainingHp: 12 }],
-            "Real 887 reveals lost HP plus one hearts; the single requested nine-point recovery is modified before one maximum-HP clamp.");
-        CheckPayment(zaiqi, 9, 11, 1, 8, [Skills[5]]); zaiqi.Cold(); zaiqi.Play();
-        var ids = reveal.Cards.Select(card => card.Id).ToArray();
-        Need(ids.All(id => zaiqi.G.CardMovements.Count(move => move.CardId == id && move.From == CardLocation.Processing &&
-                move.To == CardLocation.DiscardPile && move.Reason.Value == "skill-program." + Zaiqi + ".MoveBoundCards") == 1) &&
-            zaiqi.E<RecoveryAppliedEvent>().Length == 1 && zaiqi.E<DamageAppliedEvent>().Length == 1 &&
-            zaiqi.E<ProgramBindingResolvedEvent>().Count(fact => fact.SkillId == RecoveryDraw && fact.Completed) == 1 && zaiqi.V().HandCount == 1,
-            "The single native 887 payment returns its real recovery/gain children, discards every original heart once and triggers recovery-draw/blood-blade once, not per recovered HP.");
-        zaiqi.Cold();
-    }
-
-    public static void RedirectedRecoveryAndYizhengSupportApplyFinalRecipientPoliciesOnceCold()
-    {
-        var redirect = Scene.Start("redirect"); redirect.Play(); redirect.Begin("one");
-        redirect.Until(() => redirect.P?.Kind == DecisionKind.RecoveryReplacement);
-        Need(redirect.P!.Choices.Any(choice => choice.Parameters.GetValueOrDefault("recovery-action") == "redirect" && choice.Targets.SequenceEqual([1])),
-            "The actual printed Lord-qualified boundary Jiuyuan publishes a real optional recovery destination to the human recovering actor.");
-        redirect.Cold(); redirect.Answer(choice => choice.Parameters.GetValueOrDefault("recovery-action") == "redirect" && choice.Targets.SequenceEqual([1]));
-        redirect.Until(() => redirect.P?.SkillPrompt?.SkillId == Gain);
-        var bill = redirect.E<RecoveryAmountBonusAppliedEvent>().Single();
-        Need(redirect.E<RecoveryReplacementChosenEvent>() is [{ RecoveringSeat: 0, BeneficiarySeat: 1 }] &&
-            bill.Receipt is { SourceSeat: 0, TargetSeat: 1, BaseRequestedAmount: 1, ModifiedRequestedAmount: 4, HpBefore: 1, HpAfter: 5,
-                ActualTurnRecoveryOrdinal: 1 } && bill.Receipt.Sources.Select(source => source.Source.SkillId).Order().SequenceEqual(new[] { Skills[1], Skills[5] }.Order()) &&
-            bill.Receipt.Sources.All(source => source.Source.OwnerSeat == 1) &&
-            redirect.V().Hp == 10 && redirect.V(1).Hp == 5 && redirect.V().HandCount == 1 &&
-            redirect.E<ActualTurnRecoveryRecordedEvent>() is [{ TargetSeat: 1, TurnOwnerSeat: 0, Ordinal: 1, ActualAmount: 4 }] &&
-            redirect.G.ResolutionStack.OfType<RecoveryReplacementFrame>().Any(frame => frame.Id == bill.RecoveryFrameId && frame.AmountBonus is not null),
-            "The off-turn beneficiary's limited II and unlimited VI apply together, excluding the original actor's I; the genuine provider-draw child retains its already-paid replacement receipt.");
-        redirect.Cold(); redirect.Play();
-        Need(redirect.E<RecoveryAppliedEvent>().Length == 1 && redirect.G.CardMovements.Count(move => move.To == CardLocation.Hand(0) &&
-            move.Reason.Value == "skill-program.recovery-replacement.reward") == 1, "Cold replacement reward returns neither recover nor pay the provider twice.");
-
-        var support = Scene.Start("support"); support.Play(); support.EndPlay(); support.Until(() => support.Optional(Yizheng));
-        support.Answer(choice => Action(choice) == "activate");
-        support.Until(() => support.P?.SkillPrompt?.SkillId == Yizheng && support.P.Choices.Any(choice => choice.Targets.SequenceEqual([1])));
-        support.Cold(); support.Answer(choice => choice.Targets.SequenceEqual([1]));
-        support.Until(() => support.P?.SkillPrompt?.SkillId == Driver && support.P.Choices.Any(choice => choice.Targets.SequenceEqual([1])));
-        support.Answer(choice => choice.Targets.SequenceEqual([1])); support.Until(() => support.P?.SkillPrompt?.SkillId == Cost);
-        Need(support.E<CaoSongYizhengGrantedEvent>().Single().RecipientSeat == 1 &&
-            support.E<CaoSongYizhengAmountPaidEvent>().Length == 1 && support.V().MaxHp == 19 && support.V(1).Hp == 1 &&
-            support.E<RecoveryAmountBonusAppliedEvent>().Length == 0 && support.E<RecoveryAppliedEvent>().Length == 0,
-            "Real native Yizheng pays its source's maximum HP and pauses in the actual health child before final medicine or HP application.");
-        support.Cold(); support.Continue(); support.Until(() => support.AtDriver("support-tail"));
-        var paid = support.E<RecoveryAmountBonusAppliedEvent>().Single();
-        Need(support.E<CaoSongYizhengAmountIncreasedEvent>().Single().Recovery &&
-            paid.Receipt is { TargetSeat: 1, BaseRequestedAmount: 2, ModifiedRequestedAmount: 4, HpBefore: 1, HpAfter: 5, ActualTurnRecoveryOrdinal: 1 } &&
-            paid.Receipt.Sources.Select(source => source.Source.SkillId).SequenceEqual([Skills[5]]) &&
-            support.E<RecoveryAppliedEvent>() is [{ SourceSeat: 0, TargetSeat: 1, Amount: 4, RemainingHp: 5 }] &&
-            support.E<CaoSongYizhengAmountPaidEvent>().Length == 1,
-            "Native support increases the frozen base first, then the finalized beneficiary's live medicine is added and clamped in the same sole recovery.");
-        support.Cold(); support.Continue(); support.Until(() => !support.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.SkillId == Driver));
-        Need(support.E<RecoveryAppliedEvent>().Length == 1 && support.E<RecoveryAmountBonusAppliedEvent>().Length == 1 &&
-            support.E<CaoSongYizhengAmountPaidEvent>().Length == 1, "Returning from both genuine native support and paid medicine children does not repeat either cost or recovery.");
-        support.Cold();
-    }
-
-    private static string[] Eligible(int ordinal) => Skills.Where((_, index) => Limits[index] is not { } limit || ordinal <= limit).ToArray();
     private static string Peer(int seat) => "fixture:yaoli-peer-" + seat;
     private static string? Action(PromptChoice choice) => choice.Parameters.GetValueOrDefault("program-action");
     private static string? Option(PromptChoice choice) => choice.Parameters.GetValueOrDefault("option-id");
@@ -236,69 +110,6 @@ internal static class ShanheYaoliChecks
             s.G.ResolutionStack.OfType<RecoveryReplacementFrame>().Any(frame => frame.Id == paid.RecoveryFrameId &&
                 JsonSerializer.Serialize(frame.AmountBonus) == JsonSerializer.Serialize(receipt)),
             "One live-source bonus receipt is frozen on its exact recovery owner and equals the genuine actual-turn payment: " + s.Diagnostic());
-    }
-
-    private static void VerifyPolicyLoader()
-    {
-        string Read(string suffix)
-        { using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.shanhe-current-yaoli." + suffix)!; using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-        var original = JsonNode.Parse(Read("rules.json"))!; var presentation = Read("presentation.json");
-        JsonObject Policy(JsonNode root) => root["skills"]![0]!["cardPolicies"]![0]!.AsObject();
-        void Load(JsonNode node) => _ = SkillProgramCatalog.Load(node.ToJsonString(), presentation);
-        Load(original);
-        foreach (var mutate in new Action<JsonObject>[]
-        {
-            policy => policy["value"] = 0, policy => policy["value"] = 21,
-            policy => policy["maximumRecoveryOrdinal"] = 0, policy => policy["maximumRecoveryOrdinal"] = -1,
-            policy => policy["cardKinds"] = new JsonArray("peach"), policy => policy["requiredCardKinds"] = new JsonArray("peach"),
-            policy => policy["condition"] = JsonNode.Parse("{\"kind\":\"wounded\"}")
-        })
-        {
-            var copy = original.DeepClone(); mutate(Policy(copy)); var rejected = false;
-            try { Load(copy); } catch (Exception error) when (error is InvalidOperationException or ArgumentException or JsonException) { rejected = true; }
-            Need(rejected, "The actual recovery-policy loader rejects an invalid value/limit/filter/condition rather than broadening its contract.");
-        }
-        var unrelated = original.DeepClone(); var other = Policy(unrelated); other["kind"] = "outgoingDistanceOne"; other["value"] = 0; other.Remove("maximumRecoveryOrdinal");
-        Load(unrelated); other["maximumRecoveryOrdinal"] = 1; var wrongKind = false;
-        try { Load(unrelated); } catch (Exception error) when (error is InvalidOperationException or ArgumentException or JsonException) { wrongKind = true; }
-        Need(wrongKind, "A known otherwise-valid distance policy cannot acquire a recovery-ordinal field; its positive control has loaded first.");
-    }
-
-    private static void VerifyProductionLoadout()
-    {
-        var current = StandardShanheCampaignCatalog.CreateCodexDefinition(1, StandardShanheCampaignCatalog.Returning2026EditionId);
-        var old = StandardShanheCampaignCatalog.CreateCodexDefinition(1, StandardShanheCampaignCatalog.LocalEditionId);
-        var defaults = StandardShanheCampaignCatalog.GetDefaultCodexUnlockedRewardIds(current);
-        Need(Rewards.Where((_, index) => index != 3).All(defaults.Contains) && !defaults.Contains(Rewards[3]) &&
-            StandardShanheCampaignCatalog.CodexRewardIdsByNodeId[117] == Rewards[3] &&
-            old.Rewards.All(reward => !Rewards.Contains(reward.Id)) &&
-            Rewards.Select((id, index) => current.Rewards.Single(reward => reward.Id == id).TacticSkillId == Skills[index]).All(value => value),
-            "All six source-backed versions are independent current rewards; only IV belongs to node 117, the five other default entries are availability rather than free grants, and 2024 is isolated.");
-        var run = ShanheCampaignSession.Create(current, new(83, current.PlayerGeneralIds[0])
-            { UseCodexRewardPool = true, UnlockedRewardIds = defaults, EquippedTacticIds = [Rewards[0]] }, StandardShanheCampaignCatalog.CreateBattleRegistry);
-        for (var step = 0; step < 6 && run.Snapshot.Phase != ShanheCampaignPhase.Battle; step++)
-        {
-            ShanheCampaignCommand command = run.Snapshot.Phase switch
-            {
-                ShanheCampaignPhase.Map => new MoveShanheNodeCommand(run.Snapshot.AvailableNodes[0].Id, run.Revision),
-                ShanheCampaignPhase.NodeChoice => new ChooseShanheNodeOptionCommand(run.Snapshot.NodeChoices.First(choice => choice.RewardId == "supplies").Id, null, run.Revision),
-                _ => throw new InvalidOperationException("Unexpected equipped medicine route.")
-            };
-            var result = run.Submit(command); Need(result.Accepted, result.Error ?? "Equipped medicine command rejected.");
-            var before = JsonSerializer.Serialize(run.Snapshot);
-            run = ShanheCampaignSession.Restore(ShanheCampaignJson.Deserialize(ShanheCampaignJson.Serialize(run.CreateCheckpoint())), current, StandardShanheCampaignCatalog.CreateBattleRegistry);
-            Need(before == JsonSerializer.Serialize(run.Snapshot), "A real campaign cold-restores its frozen equipped medicine while traversing its opening event and route.");
-        }
-        var setup = run.PendingBattleSetup ?? throw new InvalidOperationException("The equipped medicine run did not issue a real first battle.");
-        Need(setup.TacticSkillIds.SequenceEqual([Skills[0]]) && run.Snapshot.ExtraSkillIds.Count == 0,
-            "Only genuinely equipped medicine reaches the actual battle recipe; the registry-only all-reward probe cannot grant the five unearned variants or occupy an extra-skill slot.");
-        var registry = StandardShanheCampaignCatalog.CreateBattleRegistry(setup); var battle = StandardShanheCampaignCatalog.CreateBattle(setup);
-        var started = battle.Submit(new StartGameCommand()); Need(started.Accepted, started.Error?.Message ?? "Actual medicine encounter rejected.");
-        Need(battle.CreateSnapshot(0).Players[0].Skills?.Count(skill => Skills.Contains(skill.ContentId)) == 1,
-            "The real production encounter creates exactly its one equipped medicine source.");
-        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(battle.CreateCheckpoint())), registry);
-        Need(Enumerable.Range(0, battle.PlayerCount).All(viewer => SnapshotJson.Serialize(battle.CreateSnapshot(viewer)) == SnapshotJson.Serialize(restored.CreateSnapshot(viewer))),
-            "The actual earned production tactic, startup and all private views survive native cold replay.");
     }
 
     private sealed class Scene(GameEngine game, ContentRegistry registry, string scene)

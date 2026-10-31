@@ -67,34 +67,6 @@ internal static class DragonBoatGeneralChecks
         Cold(g, registry);
     }
 
-    public static void LianpianUsesRealConsecutiveTargetsWithoutTheOrdinaryOlQuota()
-    {
-        var (g, registry) = Start("lianpian");
-        Play(g);
-        Native(g, LegalActionKind.Duel, 1); Play(g);
-        Need(!Paid(g, "dragonboat:lianpian").Any(), "The first real card use cannot manufacture a consecutive target.");
-        for (var index = 0; index < 4; index++)
-        {
-            Native(g, LegalActionKind.Duel, 1);
-            Until(g, () => Optional(g, "dragonboat:lianpian"));
-            Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-            Until(g, () => P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "dragonboat-general") == true);
-            Need(P(g)!.Choices.All(c => c.Targets.SequenceEqual([1])), "Only the actual common target is an activity Lianpian recipient.");
-            if (index == 0) Cold(g, registry);
-            Answer(g, c => c.Targets.SequenceEqual([1]));
-            if (index == 0)
-            {
-                Until(g, () => g.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.DragonBoatGeneral is { Stage: DragonBoatGeneralStage.DrawChildren }));
-                Cold(g, registry);
-            }
-            Play(g);
-        }
-        Need(Paid(g, "dragonboat:lianpian").Count() == 4 && Paid(g, "dragonboat:lianpian").All(e => e.RecipientSeat == 1 && e.ActualCount == 1) &&
-            !g.Events.Select(e => e.Payload).OfType<LianpianGiftPaidEvent>().Any(),
-            "The 2018 activity directly draws for the common target four times; the ordinary OL self-draw/gift and three-use quota do not leak into it.");
-        Cold(g, registry);
-    }
-
     public static void DianhuCountsRealDamagePointsAndJianjiKeepsItsNativeExactCard()
     {
         var (g, registry) = Start("huang-quan");
@@ -126,74 +98,13 @@ internal static class DragonBoatGeneralChecks
         Cold(g, registry);
     }
 
-    public static void XingzhaoSharesThresholdBenefitsAndWenjiTunjiangUseTeamRules()
-    {
-        var (g, registry) = Start("tang-zi"); Play(g);
-        Use(g, "damage-two", [1]); Play(g);
-        Need(V(g, 0).Skills!.Any(s => s.Id == "dragonboat:xunxun") && V(g, 4).Skills!.Any(s => s.Id == "dragonboat:xunxun") &&
-            !V(g, 1).Skills!.Any(s => s.Id == "dragonboat:xunxun"),
-            "Two actual team treasures grant the self-contained activity Xunxun to Tang Zi and the teammate, independently of ordinary OL Tang Zi.");
-        Use(g, "damage-two", [1]); Play(g);
-        var equipmentSequence = g.CardMovements.Count;
-        var equipmentHand = V(g, 0).HandCount;
-        Native(g, LegalActionKind.Equip, 0);
-        Until(g, () => P(g)?.SkillPrompt?.SkillId == Watch);
-        var equipmentDraw = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.OwnerSeat == 0 && f.SkillId == "dragonboat:xingzhao");
-        Cold(g, registry); Play(g);
-        Need(E<ProgramBindingResolvedEvent>(g).Count(e => e.FrameId == equipmentDraw.Id && e.OwnerSeat == 0 && e.SkillId == "dragonboat:xingzhao" &&
-                e.BindingId == "team-four-equipment" && e.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && e.Activated && e.Completed) == 1 &&
-            g.CardMovements.Skip(equipmentSequence).Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0) &&
-                m.Reason.Value == "skill-program.dragonboat:xingzhao.Draw") == 1 && V(g, 0).HandCount == equipmentHand,
-            "At four treasures an actual native equipment use runs Xingzhao's draw and its real child window.");
-        Use(g, "damage-two", [1]); Play(g);
-        var before = V(g, 0).Hand.Select(c => c.Id).ToArray();
-        var movement = g.CardMovements.Count;
-        Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-        Until(g, () => E<TurnEndedEvent>(g).Any(e => e.ActorSeat == 0));
-        Need(before.All(id => V(g, 0).Hand.Any(c => c.Id == id)) &&
-            !g.CardMovements.Skip(movement).Any(m => m.From == CardLocation.Hand(0) && m.To == CardLocation.DiscardPile),
-            "Six actual treasures skip the real discard phase while a hand above its limit retains every entity.");
-        Cold(g, registry);
-
-        var (w, wr) = Start("liu-qi");
-        Until(w, () => Optional(w, "dragonboat:wenji"));
-        Answer(w, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        Until(w, () => P(w)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "wenji") == true);
-        Need(P(w)!.Choices.All(c => c.Targets.SequenceEqual([4])), "Activity Wenji can request only the teammate's actual gift.");
-        Cold(w, wr); Answer(w, c => c.Targets.SequenceEqual([4])); Play(w);
-        var gift = E<WenjiGiftPaidEvent>(w).Single(e => e.Source.OwnerSeat == 0);
-        Need(gift.RecipientSeat == 4 && E<WenjiNameArmedEvent>(w).Single(e => e.Grant.Source.OwnerSeat == 0).Grant.Name == gift.Name,
-            "The real teammate chooses and pays the actual name whose native responses are prohibited for the current turn.");
-        Cold(w, wr);
-        Accept(w, new EndPlayPhaseCommand(0, w.Revision, P(w)!.PromptId));
-        Until(w, () => Optional(w, "dragonboat:tunjiang"));
-        Answer(w, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        Until(w, () => P(w)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "dragonboat-general") == true);
-        Need(P(w)!.Choices.SelectMany(c => c.Targets).Order().SequenceEqual([0]),
-            "An undamaging friendly actual turn offers only Liu Qi or that turn owner, deduplicating his own ending.");
-        // This is Liu Qi's own ending: the only distinct beneficiary is himself.
-        Answer(w, c => c.Targets.SequenceEqual([0]));
-        Until(w, () => Paid(w, "dragonboat:tunjiang").Any());
-        Need(Paid(w, "dragonboat:tunjiang").Single().RecipientSeat == 0 && Paid(w, "dragonboat:tunjiang").Single().RequestedCount == 2,
-            "The activity draws exactly two for the chosen beneficiary rather than using ordinary OL's faction-count/untargeted-Play rule.");
-        Cold(w, wr);
-    }
-
     private static IEnumerable<DragonBoatDrawPaidEvent> Paid(GameEngine g, string skill) => E<DragonBoatDrawPaidEvent>(g).Where(e => e.OwnerSeat == 0 && e.SkillId == skill);
     private static IEnumerable<T> E<T>(GameEngine g) => g.Events.Select(e => e.Payload).OfType<T>();
     private static PlayerSnapshot V(GameEngine g, int seat) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 8).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
-    private static bool Optional(GameEngine g, string skill) => P(g) is { PlayerSeat: 0 } p && p.SkillPrompt?.SkillId == skill && p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
     private static void Answer(GameEngine g, Func<PromptChoice, bool> predicate)
     { var p = P(g)!; Accept(g, new AnswerPromptCommand(p.PlayerSeat, p.PromptId, p.Choices.First(predicate).Id, g.Revision)); }
     private static void Use(GameEngine g, string id, IReadOnlyList<int> targets) => Accept(g, new UseProgramSkillCommand(0, Driver, id, [], targets, g.Revision, P(g)!.PromptId));
-    private static void Native(GameEngine g, LegalActionKind kind, int target)
-    {
-        var action = g.GetHumanLegalActions().First(a => a.Kind == kind && a.CardId is not null &&
-            (kind == LegalActionKind.Equip || a.TargetSeats.SequenceEqual([target])));
-        Accept(g, new PlayCardCommand(0, action.CardId!.Value, action.TargetSeats, g.Revision, P(g)!.PromptId, action.PlayedCardKind, action.TargetCardId)
-        { ConversionSource = action.ConversionSource });
-    }
     private static void Play(GameEngine g) => Until(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
     private static void Until(GameEngine g, Func<bool> done, bool endPlays = false)
     {

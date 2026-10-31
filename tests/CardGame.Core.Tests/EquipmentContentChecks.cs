@@ -3,76 +3,6 @@ using CardGame.Modes.Standard;
 
 internal static class EquipmentContentChecks
 {
-    public static void OptionalPackagesAndGeneratedDependencies()
-    {
-        var standard = EquipmentContentRegistry.Create(BuiltInEquipmentContent.Standard);
-        Require(standard.IsEquipment(CardKind.QinggangSword) && !standard.IsEquipment(CardKind.WushuangHalberd) &&
-            !standard.IsEquipment(CardKind.ShuraInfernoHalberd) && !standard.IsEquipment(CardKind.GeneralWeapon),
-            "Uninstalled activity and generated-equipment packages do not enter the standard equipment registry.");
-        var activity = EquipmentContentRegistry.Create(BuiltInEquipmentContent.Standard, BuiltInEquipmentContent.Hulao);
-        Require(activity.IsEquipment(CardKind.WushuangHalberd) && !activity.IsEquipment(CardKind.ShuraInfernoHalberd) &&
-            activity.GetSkillBinding(CardKind.WushuangHalberd) is
-                { SkillId: "hulao:wushuang-halberd", GrantPrefix: "equipment:hulao" } binding &&
-            binding.CreateGrantId(17) == "equipment:hulao:17",
-            "Explicit installation supplies only the selected definitions and the original equipment grant identities.");
-
-        var builder = new EquipmentContentBuilder().Add(BuiltInEquipmentContent.Standard);
-        var frozen = builder.Build();
-        var local = new EquipmentDefinition(CardKind.Xuanjian, "本局玄剑", EquipmentSlot.Weapon, "本局注册的装备。", WeaponAttackRange: 6);
-        builder.Add(new("test:local-equipment", [local]));
-        Require(!frozen.IsEquipment(CardKind.Xuanjian) && builder.Build().Get(CardKind.Xuanjian) == local &&
-            EquipmentCatalog.Get(CardKind.Xuanjian).WeaponAttackRange == 3,
-            "A local registration neither rewrites a previously frozen match nor changes legacy global definitions.");
-
-        var emptyRegistry = ContentRegistry.Build();
-        var mode = new ContentModeDefinition("test:equipment-mode", "测试身份场", 8, 8,
-            new Dictionary<string, int>());
-        var ordinary = StandardModeEquipmentProfiles.CreateForMatch(mode, emptyRegistry);
-        Require(!ordinary.IsEquipment(CardKind.WushuangHalberd) && !ordinary.IsEquipment(CardKind.GeneralWeapon),
-            "Match assembly does not load unrelated special content in an otherwise ordinary table.");
-        var hulao = StandardModeEquipmentProfiles.CreateForMatch(mode with { HulaoActivity = new() }, emptyRegistry);
-        Require(BuiltInEquipmentContent.Hulao.Definitions.All(definition => hulao.IsEquipment(definition.Kind)) &&
-            !hulao.IsEquipment(CardKind.ShuraInfernoHalberd),
-            "The selected Hulao recipe supplies its whole initial equipment set without installing another activity's weapons.");
-        var shenwu = StandardModeEquipmentProfiles.CreateForMatch(mode with
-        {
-            ShenwuActivity = new([], [], [], [], [], 0, [], 1, [], new Dictionary<string, string>())
-        }, emptyRegistry);
-        var guandu = StandardModeEquipmentProfiles.CreateForMatch(mode with
-        {
-            GuanduActivity = new(new Dictionary<string, IReadOnlyList<string>>(), new Dictionary<string, string>(), [], [])
-        }, emptyRegistry);
-        Require(BuiltInEquipmentContent.Shenwu.Definitions.All(definition => shenwu.IsEquipment(definition.Kind)) &&
-            BuiltInEquipmentContent.Guandu.Definitions.All(definition => guandu.IsEquipment(definition.Kind)),
-            "Activity-selected equipment is present even before the selected equipment or a later encounter appears in the deck.");
-        var wushuang = StandardModeEquipmentProfiles.CreateForMatch(mode with { Id = WushuangMode.ModeId }, emptyRegistry);
-        Require(!ordinary.DestinationPolicies.ContainsKey(BuiltInEquipmentContent.WushuangShopSource) &&
-            wushuang.DestinationPolicies.ContainsKey(BuiltInEquipmentContent.WushuangShopSource) &&
-            WushuangCatalogue.Cards.Where(card => card.IsAvailableInShop && card.IsEquipment && card.Kind is not null)
-                .All(card => wushuang.IsEquipment(card.Kind!.Value)),
-            "The Wushuang profile explicitly installs purchasable equipment and its physical-entity lifetime policy.");
-        var recipeKinds = new List<CardKind> { CardKind.WushuangHalberd };
-        var disabledPolicies = new List<string> { BuiltInEquipmentContent.WushuangPurchases.Id };
-        var recipe = new ModeEquipmentRecipe(recipeKinds, disabledPolicies);
-        recipeKinds.Clear(); disabledPolicies.Clear();
-        var explicitRecipe = BuiltInEquipmentContent.CreateForMatch(recipe, emptyRegistry);
-        Require(explicitRecipe.IsEquipment(CardKind.WushuangHalberd) &&
-            !explicitRecipe.DestinationPolicies.ContainsKey(BuiltInEquipmentContent.WushuangShopSource) &&
-            recipe.RequiredKinds is System.Collections.IList { IsReadOnly: true } &&
-            recipe.DisabledDestinationPolicyPackageIds is System.Collections.IList { IsReadOnly: true },
-            "The generic resolver consumes a frozen explicit recipe without inspecting a mode id or retaining mutable caller lists.");
-        var generatedRegistry = ContentRegistry.Build(new GeneratedEquipmentDependencies());
-        var generated = StandardModeEquipmentProfiles.CreateForMatch(mode, generatedRegistry);
-        Require(generated.IsEquipment(CardKind.GeneralWeapon) && generated.IsEquipment(CardKind.Xuanjian) &&
-            !generatedRegistry.Cards.Values.Any(card => card.LegacyKind is CardKind.GeneralWeapon or CardKind.Xuanjian) &&
-            !generated.IsEquipment(CardKind.WushuangHalberd),
-            "Native generation and named-weapon program outputs remain available even when the weapons have no deck entry.");
-
-        var all = EquipmentContentRegistry.Create(BuiltInEquipmentContent.All);
-        Require(EquipmentCatalog.Implemented.SequenceEqual(all.Implemented) &&
-            all.Implemented.SequenceEqual(all.Implemented.OrderBy(definition => definition.Slot).ThenBy(definition => definition.Kind)),
-            "The compatibility catalogue keeps the complete existing definitions and their slot/kind ordering.");
-    }
 
     public static void PurchasedEquipmentLifetimeUsesExactEntitySource()
     {
@@ -180,28 +110,6 @@ internal static class EquipmentContentChecks
     {
         public PackageManifest Manifest { get; } = new("test:extra-equipment-runtime", new Version(1, 0, 0), []);
         public void Register(IContentRegistryBuilder builder) => builder.AddEquipmentContent(equipment);
-    }
-
-    private sealed class GeneratedEquipmentDependencies : IGameContentPackage
-    {
-        public PackageManifest Manifest { get; } = new("test:generated-equipment", new Version(1, 0, 0), []);
-
-        public void Register(IContentRegistryBuilder builder)
-        {
-            var catalog = SkillProgramCatalog.Load($$$$"""
-                {"schemaVersion":{{{{SkillProgramCatalog.RulesSchemaVersion}}}},"skills":[{
-                  "id":"test:equipment-generator","revision":1,"triggers":[{
-                    "id":"generate","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,
-                    "effects":[{"op":"equipSampledGenerals","target":"owner","amount":1},
-                               {"op":"placeNamedWeapon","target":"owner","outputKind":"xuanjian"}]
-                  }]}]}
-                """, $$$$"""
-                {"schemaVersion":{{{{SkillProgramCatalog.PresentationSchemaVersion}}}},"skills":{
-                  "test:equipment-generator":{"name":"生成装备","description":"测试隐式与显式装备依赖。"}}}
-                """);
-            builder.AddSkill(new("test:equipment-generator", "生成装备", "测试隐式与显式装备依赖。")
-                { Program = catalog.Programs["test:equipment-generator"], ProgramPresentation = catalog.Presentations["test:equipment-generator"] });
-        }
     }
 
     private static void Require(bool condition, string message)

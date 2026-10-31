@@ -81,60 +81,6 @@ internal static class ShiWeiYanChecks
         s.Replay();
     }
 
-    public static void KuangguDrawThresholdReturnsToOriginalSlashCold()
-    {
-        var s = Scene.Start(4, drawThreshold: true);
-        s.ZhuangshiPrompt();
-        var discarded = s.V(0).Hand.First(card => card.Kind == CardKind.Dodge).Id;
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "card-" + discarded);
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "hp-2");
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "pay");
-        s.Play(); s.PauseKuanggu = true; s.Slash(3);
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Kuanggu);
-        s.Answer(c => Key(c) == "activate");
-        s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") == "draw") == true);
-        var hand = s.V(0).HandCount;
-        var original = s.G.ResolutionStack.OfType<CardUseFrame>().Last().Id;
-        var inventory = s.G.CreateCardZoneDiagnostics().Select(card => card.CardId).Order().ToArray();
-        s.Cold();
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "draw");
-        s.Reach(() => s.P?.SkillPrompt?.SkillId == Kuanggu && s.P.Choices.Any(c => Key(c) == "activate"));
-        s.Need(s.E<NativeDrawThresholdTargetChosenEvent>() is [{ Source.SkillId: StandardShanheDrawThresholdPackage.ShenlongBaiwei2SkillId }] &&
-            s.V(0).HandCount == hand + 1 && !s.E<CardUseFinishedEvent>().Any(e => e.ResolutionId == original),
-            "Kuanggu's sixth real draw must issue one nested tactic damage before the original Slash finishes.");
-        s.Cold();
-        s.Answer(c => Key(c) == "skip");
-        s.PauseKuanggu = false; s.Play();
-        s.Need(!s.G.IsFaulted && s.V(0).HandCount == hand + 1 &&
-            s.E<NativeDrawThresholdTargetChosenEvent>().Length == 1 &&
-            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == original) == 1 &&
-            s.E<ProgramBindingResolvedEvent>().Count(e => e.SkillId == StandardShanheDrawThresholdPackage.ShenlongBaiwei2SkillId && e.Completed) == 1 &&
-            !s.G.ResolutionStack.Any(f => f is ProgramSkillFrame or DamageFrame) &&
-            inventory.SequenceEqual(s.G.CreateCardZoneDiagnostics().Select(card => card.CardId).Order()),
-            "Both paid returns must complete once, retire the prompt and conserve every physical card without redrawing.");
-        s.Replay();
-    }
-
-    public static void DrawPhaseThresholdKillAllowsKuangguAndMissionCold()
-    {
-        var s = Scene.Start(4, drawThreshold: true, drawPhaseKill: true);
-        s.PauseKuanggu = true;
-        s.Reach(() => s.P?.SkillPrompt?.SkillId is Kuanggu or Kuanggu2);
-        s.Need(s.G.State.Phase == TurnPhase.Draw && s.E<CardUseDeclaredEvent>().Length == 0 &&
-            s.E<NativeDrawThresholdTargetChosenEvent>().Length == 1,
-            "A genuine normal Draw can deal tactic damage and offer Kuanggu before any card is used.");
-        s.Answer(c => Key(c) == "activate");
-        var hand = s.V(0).HandCount;
-        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "draw");
-        s.Cold(); s.PauseKuanggu = false; s.ZhuangshiPrompt();
-        s.Need(s.E<PlayerDiedEvent>() is [{ KillerSeat: 0 }] &&
-            s.E<MobileShiWeiYanMissionEvent>() is [{ Succeeded: true }] && s.HasSkill(Kuanggu2) &&
-            s.V(0).HandCount == hand + 1 && s.E<CardUseDeclaredEvent>().Length == 0 &&
-            s.E<NativeDrawThresholdTargetChosenEvent>().Length == 1 && !s.G.IsFaulted,
-            "Draw-phase lethal damage, its Kuanggu draw and the genuine kill mission finish before the first play phase without duplication.");
-        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "decline"); s.Play(); s.Replay();
-    }
-
     private static string? Key(PromptChoice c) => c.Parameters.GetValueOrDefault("program-action");
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {

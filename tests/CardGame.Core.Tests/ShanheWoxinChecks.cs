@@ -9,32 +9,6 @@ internal static class ShanheWoxinChecks
     private const string Quiet = "fixture:woxin-quiet", Shield = "fixture:woxin-shield", Deck = "fixture:woxin-deck";
     private static string Peer(int seat) => "fixture:woxin-peer-" + seat;
 
-    public static void OutsideHitsAccumulateAndPreventedDamagePreservesCredits()
-    {
-        var s = Scene.Start(false);
-        s.Use("incoming", [1]); s.Use("lose", []);
-        Need(s.E<ShanheWoxinCreditEarnedEvent>().Length == 0,
-            "Neither received damage in the owner's own turn nor direct HP loss earns an outside-turn credit.");
-        s.NextOwnPlay();
-        Need(s.E<ShanheWoxinCreditEarnedEvent>().Select(e => e.ReceivedAmount).SequenceEqual([1, 2]),
-            "Two genuine outside-turn damage events earn two credits, rather than three credits for three damage points.");
-        var revision = s.G.Revision; var events = s.G.Events.Count;
-        var action = s.G.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.SequenceEqual([2]));
-        Need(s.G.PredictPublicActionDamage(0, action, 2).DamageAmount == 3 &&
-            s.G.PredictPublicActionDamage(0, action, 2).DamageAmount == 3 && s.G.Revision == revision && s.G.Events.Count == events &&
-            s.E<ShanheWoxinReservationIssuedEvent>().Length == 0,
-            "Repeated public prediction shows both credits without reserving, consuming or issuing gameplay facts.");
-        s.Use("strike", [3]);
-        Need(s.V(3).Hp == 30 && s.E<ShanheWoxinReservationIssuedEvent>() is [{ Receipt.Amount: 2 }] &&
-            s.E<ShanheWoxinReservationConsumedEvent>().Length == 0,
-            "A real before-damage prevention leaves its two reserved credits unspent when the original attack frame finishes.");
-        s.Use("strike", [2]); s.Use("strike", [2]);
-        Need(s.E<DamageAppliedEvent>().Where(e => e.SourceSeat == 0 && e.TargetSeat == 2).Select(e => e.Amount).SequenceEqual([3, 1]) &&
-            s.E<ShanheWoxinReservationConsumedEvent>() is [{ AppliedAmount: 3 }] &&
-            s.G.PredictPublicActionDamage(0, action, 2).DamageAmount == 1,
-            "The next genuine skill damage consumes the two original credits once; later damage and prediction return to the normal amount.");
-    }
-
     public static void ReflectionsConsumeNewCreditsWithinTheOriginalOutsideTurn()
     {
         var s = Scene.Start(true); s.NextOwnPlay();

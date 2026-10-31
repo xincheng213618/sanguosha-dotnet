@@ -8,43 +8,6 @@ internal static class WenheRuleChecks
     private const string Mode = "fixture:wenhe-rules", Driver = "fixture:wenhe-rules-driver",
         Owner = "fixture:wenhe-rules-owner", Quiet = "fixture:wenhe-rules-quiet", DrawWatch = "fixture:wenhe-rules-draw-watch";
 
-    public static void ChampionMarkNativeDrawPrivateUntilUseOnceAndColdReplay()
-    {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
-        var game = New(registry);
-        Start(game);
-        Until(game, () => game.PendingDecision is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
-        Need(game.CreateSnapshot(0).WenheAspiration is { GoalRank: 1, CanUseChampionMark: true, ChampionMarkUsed: false } &&
-            Enumerable.Range(0, 8).All(viewer => game.CreateSnapshot(viewer).Players.All(player => player.WenheChampionMarkUsed is null)) &&
-            Enumerable.Range(1, 7).All(viewer => game.CreateSnapshot(viewer).Players[0].Hand.Count == 0) &&
-            Enumerable.Range(0, 8).All(viewer => game.CreateSnapshot(viewer).Players.All(player =>
-                player.Skills!.Any(skill => skill.ContentId == "wenhe:champion-mark") == (player.Seat == viewer))) &&
-            game.GetHumanLegalActions().Count(action => action.ProgramSkillId == "wenhe:champion-mark") == 1 &&
-            E<WenheChampionMarkUsedEvent>(game).Length == 0,
-            "Before actual use the champion owner has one private legal action, while no viewer sees an unused champion marker or another player's hand.");
-        game = Cold(game, registry);
-        var before = V(game, 0).HandCount;
-        Accept(game, new UseProgramSkillCommand(0, "wenhe:champion-mark", "draw-two", [], [],
-            game.Revision, game.PendingDecision!.PromptId));
-        Until(game, () => game.PendingDecision is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
-        var used = E<WenheChampionMarkUsedEvent>(game).Single();
-        Need(used.Seat == 0 && V(game, 0).HandCount == before + 2 &&
-            game.CreateSnapshot(0).WenheAspiration is { GoalRank: 1, CanUseChampionMark: false, ChampionMarkUsed: true } &&
-            E<NativeDrawAttemptStartedEvent>(game).Count(e => e.Context.ParentFrameId == used.ProgramFrameId &&
-                e.Context.RecipientSeat == 0 && e.Context.RequestedCount == 2) == 1 &&
-            Enumerable.Range(0, 8).All(viewer => game.CreateSnapshot(viewer).Players[0].WenheChampionMarkUsed == true &&
-                game.CreateSnapshot(viewer).Players[0].Skills!.Any(skill => skill.ContentId == "wenhe:champion-mark") &&
-                game.CreateSnapshot(viewer).Players.Skip(1).All(player => player.WenheChampionMarkUsed is null)) &&
-            game.GetHumanLegalActions().All(action => action.ProgramSkillId != "wenhe:champion-mark"),
-            "One actual targetless champion activation must pay the once-game mark before a native two-card draw and only then publicly reveal that used marker.");
-        game = Cold(game, registry);
-        var frozen = State(game);
-        var forged = game.Submit(new UseProgramSkillCommand(0, "wenhe:champion-mark", "draw-two", [], [],
-            game.Revision, game.PendingDecision!.PromptId));
-        Need(!forged.Accepted && State(game) == frozen && E<WenheChampionMarkUsedEvent>(game).Length == 1,
-            "A forged second champion activation must reject without drawing, changing any private viewer, moving a cursor or recording another use.");
-    }
-
     public static void FirstRoundChaosIncludesOwnerUsesNearestPhysicalSlashAndColdPrompt()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(slash: true));

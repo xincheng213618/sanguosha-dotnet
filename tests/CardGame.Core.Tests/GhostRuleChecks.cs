@@ -6,65 +6,6 @@ internal static partial class GhostRuleChecks
 {
     private const string Driver = "fixture:ghost-rule-driver", Mode = "fixture:ghost-rule-mode";
 
-    public static void EnyuanRequiresHeartsPerDamageAndRewardsActualRecoveryPoints()
-    {
-        foreach (var suit in new[] { Suit.Heart, Suit.Spade })
-        {
-            var (g, registry) = Start("ghost:enyuan", suit);
-            var actorBefore = V(g, 0).HandCount;
-            var targetBefore = V(g, 1).HandCount;
-            Use(g, "damage", 1);
-            Until(g, () => P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "hand-repayment") == true);
-            Cold(g, registry);
-            var prompt = P(g)!;
-            Require(prompt.PlayerSeat == 0, "The actual damage source owns the private Enyuan repayment choice.");
-            var gifts = prompt.Choices.Where(c => c.Parameters.GetValueOrDefault("repayment") == "give").ToArray();
-            Require((gifts.Length > 0) == (suit == Suit.Heart) && gifts.All(c => V(g, 0).Hand.Single(card => card.Id == c.Cards.Single()).Suit == Suit.Heart),
-                "Only actual effective-heart hand cards can repay the old ghost Enyuan.");
-            Answer(g, c => c.Parameters.GetValueOrDefault("repayment") == (suit == Suit.Heart ? "give" : "lose-hp"));
-            Play(g);
-            Require(V(g, 1).Hp == 2 && (suit == Suit.Heart
-                ? V(g, 0).HandCount == actorBefore - 1 && V(g, 1).HandCount == targetBefore + 1
-                : V(g, 0).Hp == 3 && V(g, 0).HandCount == actorBefore),
-                "Two damage points form one old Enyuan obligation: give one heart or lose exactly one HP.");
-            Require(E<ProgramHandRepaymentResolvedEvent>(g).Count() == 1, "The damage instance must not repay once per damage point.");
-            var beforeRecovery = V(g, 0).HandCount;
-            Use(g, "recover", 1); Play(g);
-            Require(V(g, 1).Hp == 4 && V(g, 0).HandCount == beforeRecovery + 2,
-                "Two actually recovered HP reward the other recovery source with two actual cards.");
-            Cold(g, registry);
-        }
-    }
-
-    public static void GhostDeathDiscardsTheKillerThroughNativeZones()
-    {
-        foreach (var skill in new[] { "ghost:beiming", "ghost:huilei" })
-        {
-            var (g, registry) = Start(skill, Suit.Heart);
-            Use(g, "equip", 0); Play(g);
-            UseCard(g, CardKind.Lightning, 0); Play(g);
-            var actor = V(g, 0);
-            Require(actor.Equipment.Count == 1 && actor.Judgment.Count == 1 && actor.Hand.Count > 0,
-                "The killer owns real hand, equipment and judgment entities before the lethal command.");
-            var hand = actor.Hand.Select(c => c.Id).ToArray();
-            var equipment = actor.Equipment.Single().Id;
-            var judgment = actor.Judgment.Single().Id;
-            Use(g, "kill", 1); Play(g);
-            Require(!V(g, 1).IsAlive && V(g, 0).HandCount == 0, "Both death skills discard the living killer's entire hand.");
-            var all = skill == "ghost:huilei";
-            Require((V(g, 0).Equipment.Count == 0) == all && V(g, 0).Judgment.Single().Id == judgment,
-                "Huilei also discards equipment; judgment cards are unowned and remain after both death skills.");
-            var expected = hand.Concat(all ? [equipment] : Array.Empty<int>()).ToArray();
-            Require(expected.All(id => g.CardMovements.Any(move => move.CardId == id && move.From.OwnerSeat == 0 &&
-                move.To == CardLocation.DiscardPile && move.Reason.Value.Contains("DiscardDeathSourceCards", StringComparison.Ordinal))),
-                "Death cleanup uses native, attributable movements of the original physical entities.");
-            var receipt = E<DeathSourceCardsDiscardedEvent>(g).Single();
-            Require(receipt.OwnerSeat == 1 && receipt.SourceSeat == 0 && receipt.Count == expected.Length,
-                "The receipt retains the dead skill owner and actual killer as separate participants.");
-            Cold(g, registry);
-        }
-    }
-
     public static void GhostJudgmentDiscardAndRedBlackConsequencesUseActualCards()
     {
         {

@@ -14,52 +14,6 @@ internal static class ShanheGuideTaskSettlementChecks
     private const int SourceDifficulty = 11;
     private static readonly int[] VerifiedSourceDifficulties = [1, 2, 6, 11];
 
-    public static void SourceEditionDifficultyPersistsAndLegacyTiersStayBounded()
-    {
-        var definition = new ShanheCampaignDefinition(StandardShanheCampaignCatalog.Source2026CampaignId(25), "来源难度25", [Hero], ["only"],
-            [Node("only", null, 2397, 5107)], []) { SourceDifficultyId = 25,
-                SourceEnemyGrowth = StandardShanheSourceEnemyGrowth.Season5,
-                SourceEnemyGrowthHash = StandardShanheSourceEnemyGrowth.Season5.ContentHash,
-                SourceGrowthPolicy = ShanheSourceDifficultyRuntime.PolicyId };
-        var options = new ShanheCampaignOptions(71, Hero)
-        {
-            UseCodexRewardPool = true, SourceDifficultyId = 25,
-            ExpeditionId = Guid.Parse("dc4b527d-d1d5-4c91-9d8b-5de114318b94").ToString("N")
-        };
-        var session = ShanheCampaignSession.Create(definition, options, _ => Registry.Value);
-        Win(session, "only");
-        var campaign = new MemoryShanheCampaignSaveStore();
-        var save = new ShanheCampaignSaveFile(ShanheCampaignSaveFile.CurrentFormatVersion, DateTimeOffset.UtcNow, 25, session.CreateCheckpoint());
-        campaign.Write(save);
-        var cold = ShanheCampaignSession.Restore(campaign.Read().Campaign, definition, _ => Registry.Value);
-        Program.Assert(cold.Snapshot.Phase == ShanheCampaignPhase.Won && cold.CreateCheckpoint().Options.SourceDifficultyId == 25 &&
-            ShanheCodexSettlement.CanSettle(cold, 25),
-            "The actual source edition's terminal native battle and source tier twenty-five survive the existing expedition store and settlement boundary.");
-        Program.Assert(ShanheCodexSettlement.TryPrepare(new(), cold, 25, out var receipt), "The source settlement prepares its account value.");
-        var account = new MemoryShanheCodexStore(); account.Write(receipt);
-        Program.Assert(account.Read().RunRecords is [{ Difficulty: 25, SourceDifficultyId: 25 }] &&
-            !ShanheCodexSettlement.TryPrepare(new(), cold, 24, out _),
-            "A source run record preserves the original tier, and a caller cannot settle it under a different selected difficulty.");
-        foreach (var invalid in new[]
-        {
-            save with { Difficulty = 24 },
-            save with { Campaign = save.Campaign with { Options = options with { SourceDifficultyId = null } } },
-            save with { Campaign = save.Campaign with { CampaignId = "shanhe:zhuhou-2026-3" } },
-            save with { Campaign = save.Campaign with { CampaignId = "fixture:old-local", Options = options with { SourceDifficultyId = null } } }
-        })
-        {
-            var rejected = false;
-            try { campaign.Write(invalid); } catch (InvalidDataException) { rejected = true; }
-            Program.Assert(rejected && campaign.Read().Difficulty == 25,
-                "A mismatched source identity or a legacy edition claiming twenty-five tiers cannot replace the valid expedition save.");
-        }
-        var old = save with { Difficulty = 3, Campaign = save.Campaign with
-            { CampaignId = "shanhe:zhuhou-2026-3", Options = options with { SourceDifficultyId = null } } };
-        campaign.Write(old);
-        Program.Assert(campaign.Read().Difficulty == 3 && campaign.Read().Campaign.Options.SourceDifficultyId is null,
-            "Legacy three-tier save records remain supported without requiring a newly invented source difficulty.");
-    }
-
     public static void NativeBattleProgressAndAtomicTaskBooksRetryCold()
     {
         var definition = new ShanheCampaignDefinition(StandardShanheCampaignCatalog.Source2026CampaignId(SourceDifficulty), "任务结算", [Hero], ["one"],

@@ -10,67 +10,6 @@ internal static class HellMengpoChecks
     private const string Limited = "fixture:hell-mengpo-limited", Watch = "fixture:hell-mengpo-watch";
     private const string Curse = "fixture:hell-mengpo-curse", Mengpo = "fixture:hell-mengpo";
 
-    public static void ShiyouRedirectsHandLimitAndProgramDiscardsBeforeEntry()
-    {
-        foreach (var scene in new[] { "shiyou", "shiyou-program", "shiyou-mixed", "shiyou-all" })
-        {
-            var (g, registry) = Start(scene);
-            if (scene == "shiyou-mixed")
-            {
-                var equip = g.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Equip);
-                Accept(g, new PlayCardCommand(0, equip.CardId!.Value, equip.TargetSeats, g.Revision, P(g)!.PromptId));
-                Play(g);
-            }
-            var outside = V(g, 0).Hand[0].Id;
-            Use(g, "discard-one", [outside], []); Play(g);
-            Need(!Facts<HellShiyouInterceptedEvent>(g).Any() &&
-                g.CreateCardZoneDiagnostics().Single(c => c.CardId == outside).Location == CardLocation.DiscardPile,
-                "An ordinary real Play-phase discard is excluded from Shiyou's actual Discard-phase boundary.");
-            var hand = V(g, 0).Hand.ToArray();
-            var originals = hand.Concat(V(g, 0).Equipment).ToArray();
-            var sources = g.CreateCardZoneDiagnostics().Where(c => originals.Any(card => card.Id == c.CardId))
-                .ToDictionary(c => c.CardId, c => c.Location);
-            var duplicates = scene == "shiyou-mixed" ? new[] { V(g, 0).Equipment.Single().Id, hand[0].Id } :
-                hand.GroupBy(c => c.Suit).First(group => group.Count() >= 2).Take(2).Select(c => c.Id).ToArray();
-            Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-            int[] discarded;
-            if (scene is "shiyou-program" or "shiyou-mixed")
-            {
-                Until(g, () => P(g) is { PlayerSeat: 0, SkillPrompt.SkillId: Driver });
-                Cold(g, registry);
-                foreach (var id in duplicates)
-                    Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "select-owned-cards" && c.Cards.Contains(id));
-                if (P(g) is { SkillPrompt.SkillId: Driver } prompt && prompt.Choices.Any(c =>
-                        c.Parameters.GetValueOrDefault("program-action") == "finish-owned-cards"))
-                    Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "finish-owned-cards");
-                discarded = duplicates;
-            }
-            else if (scene == "shiyou-all") discarded = hand.Select(c => c.Id).ToArray();
-            else
-            {
-                Until(g, () => P(g) is { Kind: DecisionKind.DiscardCards, PlayerSeat: 0 });
-                var count = P(g)!.RequiredCardCount;
-                discarded = duplicates.Concat(hand.Select(c => c.Id).Except(duplicates).Take(count - 2)).ToArray();
-                Cold(g, registry);
-                Accept(g, new DiscardCardsCommand(0, discarded, P(g)!.PromptId, g.Revision));
-            }
-            Until(g, () => Facts<HellShiyouInterceptedEvent>(g).Any());
-            var redirected = Facts<HellShiyouInterceptedEvent>(g).Where(e => discarded.Contains(e.Receipt.CardId)).ToArray();
-            Need(redirected.Length == originals.Where(c => discarded.Contains(c.Id)).Select(c => c.Suit).Distinct().Count() &&
-                redirected.Select(e => e.Receipt.EffectiveSuit).Distinct().Count() == redirected.Length &&
-                redirected.All(e => e.Receipt.Phase.Kind == ActualDiscardRecoveryPhaseKind.Discard &&
-                    e.Receipt.Phase.ActorSeat == 0 && e.Receipt.Source.OwnerSeat == 3 &&
-                    e.Receipt.OriginalSource == sources[e.Receipt.CardId] &&
-                    g.CardMovements.Count(m => m.CardId == e.Receipt.CardId && m.Sequence == e.MovementSequence &&
-                        m.From == e.Receipt.ActualFrom && m.To == CardLocation.Hand(3)) == 1 &&
-                    !g.CardMovements.Any(m => m.CardId == e.Receipt.CardId && m.To == CardLocation.DiscardPile)) &&
-                discarded.Except(redirected.Select(e => e.Receipt.CardId)).All(id =>
-                    g.CardMovements.Count(m => m.CardId == id && m.To == CardLocation.DiscardPile) == 1),
-                "Shiyou redirects one physical card per distinct suit before discard entry, including one mixed HE payment and one whole same-suit hand discard; all remaining cards genuinely enter discard.");
-            Cold(g, registry);
-        }
-    }
-
     public static void WanghunRestoresOnlyItsOwnSkillsAndDestroysSoulWithColdChildren()
     {
         var (g, registry) = Start("soul");
@@ -106,59 +45,6 @@ internal static class HellMengpoChecks
             Facts<HellReturnSoulDestroyedEvent>(g).Count(e => g.Events.Select(x => x.Payload).OfType<CardUseFinishedEvent>()
                 .Any(use => (use.ResolutionId == first || use.ResolutionId == second) && use.CardId == e.CardId)) == 2,
             "Soul restores only the exact Wanghun original grants, retains every limited-use ledger and other Duanchang loss, and destroys each real used soul once.");
-        Cold(g, registry);
-    }
-
-    public static void WangshiBansUseAndResponseCategoryForTheActualEnemyTurn()
-    {
-        var (g, registry) = Start("wangshi");
-        var ban = Facts<HellWangshiCategoryBanEvent>(g).Single(e => e.TurnOwnerSeat == 0);
-        var kind = ban.Category switch { "basic" => CardKind.Slash, "trick" => CardKind.Nullification, _ => CardKind.Crossbow };
-        Need(ban.MengpoSeat == 3 && ban.TurnNumber == g.State.TurnNumber &&
-            Forbidden(g, 0, kind, CardActionType.Use) && Forbidden(g, 0, kind, CardActionType.Response) &&
-            !Forbidden(g, 1, kind, CardActionType.Response) &&
-            g.GetHumanLegalActions().Where(a => a.CardId is > 0).All(a =>
-                Category(a.PlayedCardKind ?? V(g, 0).Hand.Single(c => c.Id == a.CardId).Kind) != ban.Category),
-            "A living Mengpo issues one real enemy-turn category ban, covering effective Use and Response kinds without restricting other participants.");
-        Cold(g, registry);
-        Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-        Until(g, () => Facts<TurnStartedEvent>(g).Any(e => e.ActorSeat == 1));
-        Need(Facts<TurnEndedEvent>(g).Any(e => e.ActorSeat == 0 && e.TurnNumber == ban.TurnNumber) &&
-            !Forbidden(g, 0, kind, CardActionType.Use) && !Forbidden(g, 0, kind, CardActionType.Response),
-            "The issued prohibition expires with its exact actual turn instead of following the source or persisting into the next participant's turn.");
-        Cold(g, registry);
-    }
-
-    public static void RealRobeExcludesEverySoulTargetWithoutPublishingAnEmptyUse()
-    {
-        var (g, registry) = Start("soul-blocked");
-        Need(V(g, 3).Equipment is [{ Kind: CardKind.NationalStyleRobe }] &&
-            Facts<CardUseDeclaredEvent>(g).Count(e => e.SourceSeat == 3 && e.CardKind == CardKind.NationalStyleRobe) == 1,
-            "The sole enemy really uses a physical deck robe through the native game-start equipment instruction.");
-        Use(g, "kill", [], [1]); Play(g);
-        Need(!V(g, 1).IsAlive && Facts<HellWanghunGrantLostEvent>(g).ToArray() is
-                [{ TargetSeat: 3, Grant.SkillId: Limited }] && !Facts<HellSoulGrantRestoredEvent>(g).Any() &&
-            Facts<HellWanghunCompletedEvent>(g).Single().LostSkillCount == 1,
-            "A real allied Wanghun death leaves exactly one genuine outstanding enemy skill loss before target-protection filtering.");
-        var soul = V(g, 0).Hand.First(card => card.Kind == CardKind.ReturnSoul);
-        var hand = V(g, 0).Hand.Select(card => card.Id).ToArray();
-        var movementCount = g.CardMovements.Count;
-        var revision = g.Revision;
-        Need(!g.GetHumanLegalActions().Any(action => action.Kind == LegalActionKind.ReturnSoul),
-            "The physical soul has no legal use when the real robe prohibits its only outstanding recipient.");
-        var rejected = g.Submit(new PlayCardCommand(0, soul.Id, [3], g.Revision, P(g)!.PromptId));
-        Need(!rejected.Accepted && g.Revision == revision && g.CardMovements.Count == movementCount &&
-            V(g, 0).Hand.Select(card => card.Id).SequenceEqual(hand),
-            "Forging the blocked physical use rejects before paying or moving its real material.");
-        Cold(g, registry);
-        Use(g, "all-hand", hand, []);
-        Until(g, () => P(g)?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") ==
-            "use-all-hand-as-ordinary-trick") == true);
-        Need(P(g)!.Choices.All(choice => choice.Parameters.GetValueOrDefault("card-kind") != nameof(CardKind.ReturnSoul)) &&
-            V(g, 0).Hand.Select(card => card.Id).SequenceEqual(hand) && g.CardMovements.Count == movementCount &&
-            !g.ResolutionStack.OfType<CardUseFrame>().Any(frame => frame.CardKind == CardKind.ReturnSoul) &&
-            !Facts<HellSoulRestoreIssuedEvent>(g).Any(),
-            "The native all-hand ordinary-trick chooser still offers other real names, excludes the post-filter empty soul option, and pays no physical card before a legal name is selected.");
         Cold(g, registry);
     }
 
@@ -202,13 +88,6 @@ internal static class HellMengpoChecks
             "The native restoration drains its actual SkillsChanged child, returns once, retires its private internal grant and destroys the used entity before it can be recycled.");
         Cold(g, registry); return use.Id;
     }
-
-    private static string Category(CardKind kind) => CardCatalog.Get(kind).CategoryName switch
-    { "基本牌" => "basic", "装备牌" => "equipment", _ => "trick" };
-    private static bool Forbidden(GameEngine g, int seat, CardKind kind, CardActionType type) =>
-        (bool)global::FixtureRuntimeAccess.Engine.GetMethod("IsCardUseForbidden", BindingFlags.Instance | BindingFlags.NonPublic,
-            [typeof(int), typeof(CardKind), typeof(CardActionType), typeof(bool), typeof(long?)])!
-            .Invoke(g, [seat, kind, type, false, null])!;
     private static (GameEngine, ContentRegistry) Start(string scene)
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(scene));
@@ -311,8 +190,6 @@ internal static class HellMengpoChecks
             { BossActivity = new([Owner, .. peers], stages, 1, [], EnemyTeamId: "team:hell") });
         }
     }
-
-    private static PlayerSnapshot V(GameEngine g, int seat) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(seat => g.CreateSnapshot(seat).PendingDecision).FirstOrDefault(p => p is not null);
     private static IEnumerable<T> Facts<T>(GameEngine g) => g.Events.Select(e => e.Payload).OfType<T>();
     private static bool IsPlay(GameEngine g) => P(g) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard };

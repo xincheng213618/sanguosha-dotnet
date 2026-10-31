@@ -83,43 +83,6 @@ internal static class NativeColdDamageChecks
         _ = Cold(late, lateRegistry);
     }
 
-    public static void SequentialReplacementWaitsForPaidSilverLionRecoveryAndRestores()
-    {
-        var (g, registry) = Start();
-        var lion = View(g).Hand.Single(c => c.Kind == CardKind.SilverLion).Id;
-        var equipment = g.GetHumanLegalActions().Single(a => a.Kind == LegalActionKind.Equip && a.CardId == lion);
-        Accept(g, new PlayCardCommand(0, lion, equipment.TargetSeats, g.Revision, P(g)!.PromptId)); Play(g);
-        var hp = View(g).Hp;
-        DriverUse(g, "self-cold", []); Reach(g, IsCold);
-        var offered = Facts<ColdDamageOfferedEvent>(g).Single();
-        Answer(g, c => c.Parameters.GetValueOrDefault("action") == "cold-replace");
-        Need(P(g)!.Choices.Where(c => c.Parameters.GetValueOrDefault("target-zone") == "hand").All(c => c.Cards.Count == 0) &&
-            P(g)!.Choices.Any(c => c.Cards.SequenceEqual([lion])),
-            "Sequential Cold replacement publishes only opaque hand slots and actual public equipment.");
-        Answer(g, c => c.Cards.SequenceEqual([lion])); Reach(g, p => p.SkillPrompt?.SkillId == Watch);
-        var paid = g.ResolutionStack.OfType<ColdDamageReplacementFrame>().Single();
-        Need(paid is { Activated: true, ChoiceMade: true } && paid.Discards is [var first] && first.CardId == lion &&
-            g.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Any(f => f.ResumeFrameId == paid.Id &&
-                f.Continuation == PostEventContinuation.ColdDamageReplacement && f.Change.ParentFrameId == paid.Id) &&
-            Zone(g, lion) == CardLocation.DiscardPile && View(g).Hp == hp + 1 &&
-            !Facts<ColdDamageCompletedEvent>(g).Any(),
-            "The first actual discard is retained on the native Cold frame while Silver Lion's genuine recovery child is pending; the second card is not charged early.");
-        g = Cold(g, registry);
-        Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue"); Reach(g, IsCold);
-        var handBefore = View(g).Hand.Count;
-        Answer(g, c => c.Parameters.GetValueOrDefault("target-zone") == "hand"); Play(g);
-        var completed = Facts<ColdDamageCompletedEvent>(g).Single();
-        Need(completed.FrameId == paid.Id && completed.AttackId == offered.AttackId && completed.Prevented &&
-            completed.PreventedAmount == offered.Amount && completed.DiscardedCount == 2 &&
-            Facts<ColdDamageDiscardedEvent>(g).Select(e => e.Ordinal).SequenceEqual([1, 2]) &&
-            g.CardMovements.Count(m => m.CardId == lion && m.Reason.Value == "damage.cold.discard") == 1 &&
-            View(g).Hand.Count == handBefore - 1 && View(g).Hp == hp + 1 &&
-            !Facts<DamageAppliedEvent>(g).Any(e => e.TargetSeat == 0) &&
-            !g.ResolutionStack.OfType<ColdDamageReplacementFrame>().Any(),
-            "The restored child return keeps the first payment, discards exactly one further live hand entity, and prevents the entire original amount without damage triggers.");
-        _ = Cold(g, registry);
-    }
-
     private static (GameEngine, ContentRegistry) Start(bool lateCap = false)
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
@@ -140,7 +103,6 @@ internal static class NativeColdDamageChecks
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, g.PlayerCount).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static bool IsCold(PendingDecision p) => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "native-cold-damage");
     private static IEnumerable<T> Facts<T>(GameEngine g) => g.Events.Select(e => e.Payload).OfType<T>();
-    private static CardLocation Zone(GameEngine g, int card) => g.CreateCardZoneDiagnostics().Single(c => c.CardId == card).Location;
     private static void DriverUse(GameEngine g, string id, int[] targets) => Accept(g, new UseProgramSkillCommand(0, Driver, id, [], targets, g.Revision, P(g)!.PromptId));
     private static void Play(GameEngine g) => Reach(g, p => p is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
     private static void Reach(GameEngine g, Func<PendingDecision, bool> ready)

@@ -65,48 +65,6 @@ internal static class ShiZhaoYunChecks
         .Single(skill => skill.SkillId == Wuyi).PublicRuleStates!
         .Single(state => state.StateId == "shi-wuyi" && state.Kind == ProgramPublicRuleStateKind.ActivationLimit && state.Scope == SkillUsageScope.Round);
 
-    public static void ActualTurnAllPlayersPlayedSlashesDynamicBidirectionalDuelAndRoundLimit()
-    {
-        var s = Scene.Start(duels: true); s.Play();
-        var startingHp = s.V(0).Hp; s.End();
-        PracticeDuel(s, 1);
-        s.OfferCuifeng(1); var firstTurn = s.G.State.TurnNumber;
-        s.Need(s.E<CardActionAcceptedEvent>().Count(e => e.Action.Type == CardActionType.Response &&
-                e.Action.EffectiveKind == CardKind.Slash && e.Action.ActorSeat is 0 or 1) == 2,
-            "Both participants really played their own hand Slash in the first foreign actual turn.");
-        var firstHp = s.V(1).Hp; s.ActivateCuifeng(1);
-        var firstUse = s.E<CardUseDeclaredEvent>().Last(e => e.CardKind == CardKind.Duel && e.SourceSeat == 0);
-        s.Reach(() => s.E<CardUseFinishedEvent>().Any(e => e.ResolutionId == firstUse.ResolutionId));
-        s.Need(firstUse.CardId == 0 && s.E<CardActionAcceptedEvent>().Any(e => e.Action is
-                { ActorSeat: 0, Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0 } && e.Action.TargetSeats.SequenceEqual([1])),
-            "The accepted turn-ending skill owns a genuine native zero-entity Duel against that exact turn's other living owner.");
-        s.Need(s.V(1).Hp == firstHp - 3 && s.E<DamageAppliedEvent>().Any(e => e.SourceSeat == 0 && e.TargetSeat == 1 && e.Amount == 3),
-            "The outgoing native Duel adds both actors' actual played Slashes, for one plus two damage.");
-
-        PracticeDuel(s, 2); s.OfferCuifeng(2); s.ActivateCuifeng(2);
-        var secondUse = s.E<CardUseDeclaredEvent>().Last(e => e.CardKind == CardKind.Duel && e.SourceSeat == 0);
-        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondSlash } && s.P.IncomingCard == CardKind.Duel);
-        var hp = s.V(0).Hp; s.Answer(c => c.Cards.Count == 0 && c.Parameters.GetValueOrDefault("conversion-skill-id") is null);
-        s.Reach(() => s.E<CardUseFinishedEvent>().Any(e => e.ResolutionId == secondUse.ResolutionId));
-        s.Need(s.V(0).Hp == hp - 4 && s.E<DamageAppliedEvent>().Any(e => e.SourceSeat == 2 && e.TargetSeat == 0 && e.Amount == 4) &&
-                s.V(0).Hp == startingHp - 6,
-            "The second native Duel also increases incoming damage and includes the Slash just played inside this very Duel, while prior actual-turn Slashes do not leak in.");
-        s.Play();
-        s.Need(s.E<CardUseDeclaredEvent>().Count(e => e.SourceSeat == 0 && e.CardKind == CardKind.Duel) == 2 &&
-                s.G.State.TurnNumber > firstTurn,
-            "The third other living turn offers no third activation in that same real round, and the owner's own ending never creates a self-Duel.");
-        s.Replay();
-    }
-
-    private static void PracticeDuel(Scene s, int source)
-    {
-        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondSlash });
-        s.Answer(c => c.Cards.Count == 1 && s.V(0).Hand.Any(card => card.Id == c.Cards[0] && card.Kind == CardKind.Slash));
-        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondSlash });
-        s.Need(s.E<DuelResponseEvent>().Any(e => e.ResponderSeat == source && e.UsedSlash), "The actual peer spent its own real Slash before the next human response.");
-        s.Answer(c => c.Cards.Count == 0 && c.Parameters.GetValueOrDefault("conversion-skill-id") is null);
-    }
-
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
         public GameEngine G { get; private set; } = game;

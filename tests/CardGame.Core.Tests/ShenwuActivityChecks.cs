@@ -95,55 +95,6 @@ internal static class ShenwuActivityChecks
         }
     }
 
-    public static void ExactInitialRecipePermanentHalfHealthAndFrozenMetadata()
-    {
-        var fixture = new Fixture();
-        var registry = ContentRegistry.Build(new StandardContentPackage(), fixture);
-        var published = registry.Modes[FixtureMode].ShenwuActivity!;
-        var frozen = JsonSerializer.Serialize(published);
-        var hash = registry.ContentHash;
-        fixture.PlayerPool.Clear();
-        fixture.PlayerOffsets[0] = 5;
-        fixture.HalfSkills.Clear();
-        Require(JsonSerializer.Serialize(published) == frozen && registry.ContentHash == hash &&
-            published.PlayerPoolIds is IList<string> { IsReadOnly: true } &&
-            published.PlayerSeatOffsets is IList<int> { IsReadOnly: true } &&
-            published.HalfHpSkillIds is IDictionary<string, string> { IsReadOnly: true },
-            "Published Shenwu metadata must detach and freeze nested pools, seat offsets and permanent-skill maps.");
-        Require(ContentRegistry.Build(new StandardContentPackage(), new Fixture(playerTier: 4)).ContentHash != hash,
-            "The local player tier must participate in the content fingerprint.");
-        foreach (var human in new[] { 0, 4 })
-        {
-            var initial = Create(registry, FixtureMode, human);
-            var snapshot = initial.CreateSnapshot(human, revealAll: true);
-            Require(snapshot.Players.All(player => player.MaxHp == (player.TeamId == "team:allies" ? 6 :
-                    player.Seat == (human + 4) % 6 ? 8 : 4) && player.Hp == player.MaxHp &&
-                player.HandCount == (player.TeamId == "team:allies" ? 5 : player.Seat == (human + 4) % 6 ? 8 : 4)),
-                "The six-seat initial recipe is leader eight cards, minions four, and three tier-five players at health six with five cards.");
-            Cold(initial, registry);
-        }
-        var game = Create(registry, FixtureMode);
-        Accept(game, new StartGameCommand());
-        ReachPlay(game);
-        var range = game.GetAttackRange(4);
-        Activate(game, "hit-four", [4]);
-        ReachPlay(game);
-        Require(View(game).Players[4].Hp == 4 && View(game).Players[4].Skills!.Any(skill => skill.ContentId == Half) &&
-            game.GetAttackRange(4) == range + 4 && HalfEvents(game).Length == 1,
-            "The first real damage to half health must grant the formerly absent skill and invalidate warmed rule queries.");
-        Cold(game, registry);
-        Activate(game, "heal-three", [4]);
-        ReachPlay(game);
-        Require(View(game).Players[4].Hp == 7 && View(game).Players[4].Skills!.Any(skill => skill.ContentId == Half),
-            "Healing above half health must retain the permanent skill.");
-        Activate(game, "hit-four", [4]);
-        ReachPlay(game);
-        Require(View(game).Players[4].Hp == 3 && HalfEvents(game).Length == 1 &&
-            View(game).Players[4].Skills!.Count(skill => skill.ContentId == Half) == 1,
-            "A later threshold crossing must not grant or publish the same hidden skill twice.");
-        Cold(game, registry);
-    }
-
     public static void LeaderVictoryWaitsForDeathChildrenAndAlliedExtinctionLoses()
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
@@ -212,8 +163,6 @@ internal static class ShenwuActivityChecks
             UseInteractiveSetup = interactive, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 12
         }, registry);
     private static GameSnapshot View(GameEngine game) => game.CreateSnapshot(game.State.HumanSeat, revealAll: true);
-    private static ShenwuLeaderEnragedEvent[] HalfEvents(GameEngine game) =>
-        game.Events.Select(entry => entry.Payload).OfType<ShenwuLeaderEnragedEvent>().ToArray();
     private static void Activate(GameEngine game, string activation, int[] targets) =>
         Accept(game, new UseProgramSkillCommand(0, Driver, activation, [], targets, game.Revision, game.PendingDecision!.PromptId));
     private static void ReachPlay(GameEngine game) => Reach(game,

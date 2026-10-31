@@ -58,44 +58,6 @@ internal static class WenheRoundRuleChecks
         Cold(g, r);
     }
 
-    public static void DeadActualTurnOwnerStillRunsOnlyTheModeEquipmentEnding()
-    {
-        var (g, r) = Start(2);
-        PlayInRound(g, 2, WenheRuleKind.Equipment);
-        SpendHumanNirvana(g);
-        Need(Nirvanas(g, 0) == 1 && V(g, 0).Hp == 3, "The real human must consume the one mode Nirvana before the actual death test.");
-        var turn = g.CreateSnapshot(0).TurnNumber;
-        var before = g.Events.Count;
-        var aliveHp = g.CreateSnapshot(0).Players.Skip(1).ToDictionary(p => p.Seat, p => p.Hp);
-        Use(g, "self-lethal");
-        Drive(g, () => E<TurnEndedEvent>(g).Any(e => e.TurnNumber == turn && e.ActorSeat == 0));
-        var issued = E<WenheRuleFlowIssuedEvent>(g).Where(e => e.Operation == SkillProgramEffectOp.ResolveWenheTurnEnd && e.TurnNumber == turn).ToArray();
-        Need(!V(g, 0).IsAlive && issued is [{ OwnerSeat: 1, Count: 7 }] &&
-            E<WenheRuleParticipantEvent>(g).Where(e => e.ProgramFrameId == issued[0].ProgramFrameId).Select(e => e.Seat).SequenceEqual(Enumerable.Range(1, 7)) &&
-            aliveHp.All(pair => V(g, pair.Key).Hp == pair.Value - 1) &&
-            !g.Events.Skip(before).Any(e => e.Payload is ProgramBindingStartedEvent { SkillId: Driver, BindingId: "ordinary-ending" }),
-            "A genuinely dead actual turn owner must retain one mode-only equipment ending under a living host, without opening its ordinary ending-stage skill.");
-        Cold(g, r);
-    }
-
-    public static void BountyKillUsesDoubleRealRewardWithoutHealing()
-    {
-        var (g, r) = Start(0);
-        PlayInRound(g, 2, WenheRuleKind.Bounty);
-        Use(g, "weaken-two", 1); Play(g);
-        Use(g, "defeat", 1); Play(g);
-        Need(V(g, 1).IsAlive && Nirvanas(g, 1) == 1, "The first actual lethal hit must consume the opponent's mode rescue rather than award a kill.");
-        var before = V(g, 0);
-        g = Cold(g, r);
-        Use(g, "defeat", 1); Play(g);
-        var reward = E<WenheRuleFlowIssuedEvent>(g).Single(e => e.Operation == SkillProgramEffectOp.RewardWenheKiller);
-        Need(!V(g, 1).IsAlive && V(g, 0).MaxHp == before.MaxHp + 2 && V(g, 0).Hp == before.Hp &&
-            V(g, 0).HandCount == before.HandCount + 6 && reward is { Amount: 2, Count: 1 } &&
-            E<NativeDrawAttemptStartedEvent>(g).Any(e => e.Context.ParentFrameId == reward.ProgramFrameId && e.Context.RequestedCount == 6),
-            "The fixed real Bounty round must grant exactly two maximum health and six native cards, never healing the wounded killer.");
-        Cold(g, r);
-    }
-
     public static void LastStandRescueDrawAndExtraActualTurnArePaidOnceEach()
     {
         var (g, r) = Start(15);

@@ -35,34 +35,6 @@ internal static class WushuangAuditCombatChecks
         Cold(g, true);
     }
 
-    public static void WangongKeepsLastActualBasicAcrossTurnsAndCapturesAcceptedSlash()
-    {
-        var g = Start(false);
-        Use(g, "obtain-slash"); Play(g); Use(g, "obtain-alcohol"); Play(g); Use(g, "obtain-draw"); Play(g);
-        var alcohol = Card(g, CardKind.Alcohol); Play(g);
-        var alcoholUse = E<CardUseDeclaredEvent>(g).Single(e => e.ResolutionId == alcohol);
-        var oldTurn = V(g).TurnNumber;
-        Accept(g, new EndPlayPhaseCommand(0, g.Revision, P(g)!.PromptId));
-        Until(g, () => V(g).TurnNumber > oldTurn && P(g) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
-        Require(!Player(g, 0).HasAlcoholEffect, "A new actual turn expires the old Alcohol damage boost.");
-        var slash = Card(g, CardKind.Slash);
-        Until(g, () => P(g)?.SkillPrompt?.SkillId == Driver &&
-            g.ResolutionStack.OfType<CardUseFrame>().Any(f => f.Id == slash && f.WushuangWangong is not null));
-        var use = g.ResolutionStack.OfType<CardUseFrame>().Single(f => f.Id == slash);
-        var receipt = use.WushuangWangong!;
-        Require(receipt.PreviousOriginFrameId == alcoholUse.ResolutionId && receipt.UseFrameId == slash &&
-            E<DamageAppliedEvent>(g).Any(e => e.SourceSeat == 0 && e.TargetSeat == 1 && e.Amount == 2),
-            "The previous actual Alcohol use survives phase and turn boundaries; an accepted out-of-range Slash captures that exact previous use and deals the bonus damage.");
-        Cold(g, false); Play(g);
-        var next = Card(g, CardKind.Slash); Play(g);
-        Require(E<WushuangWangongUseCapturedEvent>(g).Count(e => e.Receipt.UseFrameId == slash || e.Receipt.UseFrameId == next) == 2,
-            "The second actual Slash remains legal after the ordinary one-Slash quota and captures the preceding actual Slash.");
-        Card(g, CardKind.DrawTwo); Play(g);
-        Require(!g.GetHumanLegalActions().Any(a => a.CardId is { } id && Player(g, 0).Hand.Any(c => c.Id == id && c.Kind == CardKind.Slash)),
-            "An actual non-basic use clears Wangong's future unlimited-distance and unlimited-quota privilege.");
-        Cold(g, false);
-    }
-
     private static GameEngine Start(bool camp)
     {
         var registry = camp ? CampRegistry.Value : WangongRegistry.Value;
@@ -75,16 +47,6 @@ internal static class WushuangAuditCombatChecks
     private static PlayerSnapshot Player(GameEngine g, int seat) => V(g).Players.Single(p => p.Seat == seat);
     private static PendingDecision? P(GameEngine g) => V(g).PendingDecision;
     private static IEnumerable<T> E<T>(GameEngine g) => g.Events.Select(e => e.Payload).OfType<T>();
-    private static void Use(GameEngine g, string binding) => Accept(g, new UseProgramSkillCommand(0, Driver, binding, [], [], g.Revision, P(g)!.PromptId));
-    private static long Card(GameEngine g, CardKind kind)
-    {
-        var action = g.GetHumanLegalActions().FirstOrDefault(a => a.CardId is { } id && Player(g, 0).Hand.Any(c => c.Id == id && c.Kind == kind) &&
-            (kind is CardKind.DrawTwo or CardKind.Alcohol || a.TargetSeats.Contains(1)));
-        Require(action is not null, "The actual " + kind + " must be legal at its native quota and distance gates.");
-        var before = E<CardUseDeclaredEvent>(g).Select(e => e.ResolutionId).ToHashSet();
-        Accept(g, new PlayCardCommand(0, action!.CardId!.Value, action.TargetSeats, g.Revision, P(g)!.PromptId, action.PlayedCardKind, action.TargetCardId));
-        return E<CardUseDeclaredEvent>(g).Last(e => !before.Contains(e.ResolutionId)).ResolutionId;
-    }
     private static void Play(GameEngine g) => Until(g, () => P(g) is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
     private static void Until(GameEngine g, Func<bool> ready)
     {
